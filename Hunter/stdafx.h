@@ -10,21 +10,30 @@
 #include <strsafe.h>
 
 #include <iostream>
+#include <vector>
 
 #include <d3d9.h>
 #include <d3dx9.h>
 
 #include <algorithm>
 
-#include "Typedefs.h"
+#include <assert.h>
 
+#include "Typedefs.h"
 
 #define WINSIZEX (1600)
 #define WINSIZEY (900)
 
+#define MAX_PATH (256)
+
 #include "CommonUtils.h"
+
+#include "Reflection.h"
+
 #include "Engine.h"
+#include "D3DCommon.h"
 
 extern Engine *gEngine;
+extern IDirect3DDevice9 *gpDevice;
 
 #endif

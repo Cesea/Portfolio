@@ -37,7 +37,8 @@ void Engine::Run()
 	{
 		if (!ProcessWindowMessage())
 		{
-			_pVideo->Update(_applicationTimer.GetDeltaMS());
+			_pScene->Update(_applicationTimer.GetDeltaTime())
+			_pVideo->Update(_applicationTimer.GetDeltaTime());
 
 			_applicationTimer.Tick();
 
@@ -85,57 +86,6 @@ LRESULT Engine::EngineWindowCallback(HWND windowHandle, UINT msg, WPARAM wParam,
 		_running = false;
 		_valid = false;
 	}break;
-	//case WM_INPUT :
-	//{
-	//	char buffer[256] = { 0, };
-	//	UINT dwSize;
-	//	GetRawInputData((HRAWINPUT)lParam, RID_INPUT, nullptr, &dwSize, sizeof(RAWINPUTHEADER));
-	//	BYTE *pByte = new BYTE[dwSize];
-
-	//	if (pByte == nullptr)
-	//	{
-	//		return 0;
-	//	}
-	//	if (GetRawInputData((HRAWINPUT)lParam, RID_INPUT, pByte, &dwSize, sizeof(RAWINPUTHEADER)) != dwSize)
-	//	{
-	//		Console::Log("GetRawInputBuffer does not return correct size!\n");
-	//	}
-	//	RAWINPUT *raw = (RAWINPUT *)pByte;
-	//	if (raw->header.dwType == RIM_TYPEKEYBOARD)
-	//	{
-	//		StringCchPrintf(buffer, STRSAFE_MAX_CCH, TEXT(" Kbd: make=%04x Flags:%04x Reserved:%04x ExtraInformation:%08x, msg=%04x VK=%04x \n"),
-	//			raw->data.keyboard.MakeCode,
-	//			raw->data.keyboard.Flags,
-	//			raw->data.keyboard.Reserved,
-	//			raw->data.keyboard.ExtraInformation,
-	//			raw->data.keyboard.Message,
-	//			raw->data.keyboard.VKey);
-	//		//if (FAILED(hResult))
-	//		//{
-	//		//	// TODO: write error handler
-	//		//}
-	//		OutputDebugString(buffer);
-	//	}
-	//	else if(raw->header.dwType == RIM_TYPEMOUSE)
-	//	{
-	//		StringCchPrintf(buffer, STRSAFE_MAX_CCH, TEXT("Mouse: usFlags=%04x ulButtons=%04x usButtonFlags=%04x usButtonData=%04x ulRawButtons=%04x lLastX=%04x lLastY=%04x ulExtraInformation=%04x\r\n"),
-	//			raw->data.mouse.usFlags,
-	//			raw->data.mouse.ulButtons,
-	//			raw->data.mouse.usButtonFlags,
-	//			raw->data.mouse.usButtonData,
-	//			raw->data.mouse.ulRawButtons,
-	//			raw->data.mouse.lLastX,
-	//			raw->data.mouse.lLastY,
-	//			raw->data.mouse.ulExtraInformation);
-	//		//if (FAILED(hResult))
-	//		//{
-	//		//	// TODO: write error handler
-	//		//}
-	//		OutputDebugString(buffer);
-	//	}
-	//	delete[] pByte;
-	//	return DefWindowProc(windowHandle, msg, wParam, lParam);
-	//}
 	default :
 	{
 		return DefWindowProc(windowHandle, msg, wParam, lParam);
@@ -245,6 +195,13 @@ bool Engine::InitializeSystems()
 	_pInput->GetChannel().Add<InputSystem::MousePressedEvent, InputHandler>(handler);
 	_pInput->GetChannel().Add<InputSystem::MouseReleasedEvent, InputHandler>(handler);
 	_pInput->GetChannel().Add<InputSystem::MouseDownEvent, InputHandler>(handler);
+
+	_pScene = std::make_shared<SceneSystem>(SceneSystem());
+	if (!_pScene->Init("SceneSystem", SystemSetting()))
+	{
+		return false;
+	}
+
 	return true;
 }
 

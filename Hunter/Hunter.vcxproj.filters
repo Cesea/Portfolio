@@ -5,13 +5,7 @@
     <ClCompile Include="Engine.cpp">
       <Filter>Core</Filter>
     </ClCompile>
-    <ClCompile Include="System.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
     <ClCompile Include="stdafx.cpp" />
-    <ClCompile Include="VideoSystem.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
     <ClCompile Include="DataPackage.cpp">
       <Filter>Sub</Filter>
     </ClCompile>
@@ -21,11 +15,74 @@
     <ClCompile Include="Console.cpp">
       <Filter>Core</Filter>
     </ClCompile>
-    <ClCompile Include="InputSystem.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
     <ClCompile Include="CommonUtils.cpp">
       <Filter>Sub</Filter>
+    </ClCompile>
+    <ClCompile Include="Effect.cpp">
+      <Filter>D3D</Filter>
+    </ClCompile>
+    <ClCompile Include="InputSystem.cpp">
+      <Filter>Core\System</Filter>
+    </ClCompile>
+    <ClCompile Include="System.cpp">
+      <Filter>Core\System</Filter>
+    </ClCompile>
+    <ClCompile Include="VideoSystem.cpp">
+      <Filter>Core\System</Filter>
+    </ClCompile>
+    <ClCompile Include="Gui.cpp">
+      <Filter>GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="GuiResource.cpp">
+      <Filter>GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="Control.cpp">
+      <Filter>GUI\Controls</Filter>
+    </ClCompile>
+    <ClCompile Include="Dialog.cpp">
+      <Filter>GUI\Controls</Filter>
+    </ClCompile>
+    <ClCompile Include="StaticControl.cpp">
+      <Filter>GUI\Controls</Filter>
+    </ClCompile>
+    <ClCompile Include="TextureManager.cpp">
+      <Filter>Managers</Filter>
+    </ClCompile>
+    <ClCompile Include="EffectManager.cpp">
+      <Filter>Managers</Filter>
+    </ClCompile>
+    <ClCompile Include="IMesh.cpp">
+      <Filter>D3D</Filter>
+    </ClCompile>
+    <ClCompile Include="SceneSystem.cpp">
+      <Filter>Core\System</Filter>
+    </ClCompile>
+    <ClCompile Include="Meta.cpp">
+      <Filter>Sub\Reflection</Filter>
+    </ClCompile>
+    <ClCompile Include="Variant.cpp">
+      <Filter>Sub\Reflection\Variant</Filter>
+    </ClCompile>
+    <ClCompile Include="VariantBase.cpp">
+      <Filter>Sub\Reflection\Variant</Filter>
+    </ClCompile>
+    <ClCompile Include="RefVariant.cpp">
+      <Filter>Sub\Reflection\Variant</Filter>
+    </ClCompile>
+    <ClCompile Include="Transform.cpp">
+      <Filter>Sub</Filter>
+    </ClCompile>
+    <ClCompile Include="BaseScene.cpp">
+      <Filter>Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="Component.cpp">
+      <Filter>Core\ECS</Filter>
+    </ClCompile>
+    <ClCompile Include="PhysicsSystem.cpp">
+      <Filter>Core\System</Filter>
+    </ClCompile>
+    <ClCompile Include="TextSerializer.cpp">
+      <Filter>Sub\Reflection</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -45,12 +102,6 @@
     <ClInclude Include="Engine.h">
       <Filter>Core</Filter>
     </ClInclude>
-    <ClInclude Include="System.h">
-      <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="VideoSystem.h">
-      <Filter>Core</Filter>
-    </ClInclude>
     <ClInclude Include="EventQueue.h">
       <Filter>Event</Filter>
     </ClInclude>
@@ -66,14 +117,108 @@
     <ClInclude Include="Console.h">
       <Filter>Core</Filter>
     </ClInclude>
-    <ClInclude Include="SceneSystem.h">
-      <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="InputSystem.h">
-      <Filter>Core</Filter>
-    </ClInclude>
     <ClInclude Include="CommonUtils.h">
       <Filter>Sub</Filter>
+    </ClInclude>
+    <ClInclude Include="Gui.h">
+      <Filter>GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="TextureManager.h">
+      <Filter>Managers</Filter>
+    </ClInclude>
+    <ClInclude Include="FontManager.h">
+      <Filter>Managers</Filter>
+    </ClInclude>
+    <ClInclude Include="EffectManager.h">
+      <Filter>Managers</Filter>
+    </ClInclude>
+    <ClInclude Include="Effect.h">
+      <Filter>D3D</Filter>
+    </ClInclude>
+    <ClInclude Include="D3DCommon.h">
+      <Filter>D3D</Filter>
+    </ClInclude>
+    <ClInclude Include="InputSystem.h">
+      <Filter>Core\System</Filter>
+    </ClInclude>
+    <ClInclude Include="SceneSystem.h">
+      <Filter>Core\System</Filter>
+    </ClInclude>
+    <ClInclude Include="System.h">
+      <Filter>Core\System</Filter>
+    </ClInclude>
+    <ClInclude Include="VideoSystem.h">
+      <Filter>Core\System</Filter>
+    </ClInclude>
+    <ClInclude Include="IScene.h">
+      <Filter>Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="XMLManager.h">
+      <Filter>Managers</Filter>
+    </ClInclude>
+    <ClInclude Include="GuiResource.h">
+      <Filter>GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="Control.h">
+      <Filter>GUI\Controls</Filter>
+    </ClInclude>
+    <ClInclude Include="StaticControl.h">
+      <Filter>GUI\Controls</Filter>
+    </ClInclude>
+    <ClInclude Include="ButtonControl.h">
+      <Filter>GUI\Controls</Filter>
+    </ClInclude>
+    <ClInclude Include="Dialog.h">
+      <Filter>GUI\Controls</Filter>
+    </ClInclude>
+    <ClInclude Include="SingletonBase.h">
+      <Filter>Managers</Filter>
+    </ClInclude>
+    <ClInclude Include="ResourceManager.h">
+      <Filter>Managers</Filter>
+    </ClInclude>
+    <ClInclude Include="Texture.h">
+      <Filter>D3D</Filter>
+    </ClInclude>
+    <ClInclude Include="IMesh.h">
+      <Filter>D3D</Filter>
+    </ClInclude>
+    <ClInclude Include="StaticMeshManager.h">
+      <Filter>Managers</Filter>
+    </ClInclude>
+    <ClInclude Include="Meta.h">
+      <Filter>Sub\Reflection</Filter>
+    </ClInclude>
+    <ClInclude Include="Reflection.h">
+      <Filter>Sub\Reflection</Filter>
+    </ClInclude>
+    <ClInclude Include="RemQual.h">
+      <Filter>Sub\Reflection</Filter>
+    </ClInclude>
+    <ClInclude Include="Variant.h">
+      <Filter>Sub\Reflection\Variant</Filter>
+    </ClInclude>
+    <ClInclude Include="VariantBase.h">
+      <Filter>Sub\Reflection\Variant</Filter>
+    </ClInclude>
+    <ClInclude Include="RefVariant.h">
+      <Filter>Sub\Reflection\Variant</Filter>
+    </ClInclude>
+    <ClInclude Include="StaticMesh.h" />
+    <ClInclude Include="Transform.h">
+      <Filter>Sub</Filter>
+    </ClInclude>
+    <ClInclude Include="BaseScene.h">
+      <Filter>Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Entity.h">
+      <Filter>Core\ECS</Filter>
+    </ClInclude>
+    <ClInclude Include="PhysicsSystem.h">
+      <Filter>Core\System</Filter>
+    </ClInclude>
+    <ClInclude Include="TextSerializer.h">
+      <Filter>Sub\Reflection</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -85,6 +230,33 @@
     </Filter>
     <Filter Include="Sub">
       <UniqueIdentifier>{f0b23895-3d21-4c5e-b58d-d8cf44373094}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GUI">
+      <UniqueIdentifier>{bcfbf6b7-ef54-46c1-aa3f-e16c655fd70b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Managers">
+      <UniqueIdentifier>{dd9be55d-6b15-4a92-868d-f0f884e2091e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sub\Reflection">
+      <UniqueIdentifier>{6bbf2e31-ddbb-464f-bfbd-9c2453eb1087}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="D3D">
+      <UniqueIdentifier>{90a21fa1-7f39-4247-9c5c-7baab7f73e24}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Scene">
+      <UniqueIdentifier>{8c9cd546-7171-45e7-b49f-873d7745382f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\System">
+      <UniqueIdentifier>{e5f48745-5d7e-4565-bd8e-8884a513ad53}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GUI\Controls">
+      <UniqueIdentifier>{57d48df4-4e4b-40f8-9c08-49981fe29a16}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sub\Reflection\Variant">
+      <UniqueIdentifier>{3af32ef6-17c4-400d-8ff3-d80d939f2a13}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\ECS">
+      <UniqueIdentifier>{b95cc362-b92e-4594-9f7e-f616decbab66}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

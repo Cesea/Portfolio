@@ -8,8 +8,14 @@
 
 #include "InputSystem.h"
 #include "VideoSystem.h"
+#include "SceneSystem.h"
 
 #include <memory>
+
+#include "TextureManager.h"
+#include "EffectManager.h"
+//#include "FontManager.h"
+//#include "MeshManager.h"
 
 typedef std::shared_ptr<System> SystemPtr;
 
@@ -73,6 +79,7 @@ public :
 
 	VideoSystem *GetVideo() { return _pVideo.get(); }
 	InputSystem *GetInput() { return _pInput.get(); }
+	SceneSystem *GetScene() { return _pScene.get(); }
 
 private :
 	bool InitializeSystems();
@@ -91,6 +98,7 @@ private :
 
 	std::shared_ptr<VideoSystem> _pVideo;
 	std::shared_ptr<InputSystem> _pInput;
+	std::shared_ptr<SceneSystem> _pScene;
 
 	InputHandler handler;
 };

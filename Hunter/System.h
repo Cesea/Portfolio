@@ -24,7 +24,7 @@ public :
 	virtual bool Init(const std::string &name, SystemSetting &setting);
 	virtual void ShutDown();
 
-	virtual void Update(uint32 deltaMS);
+	virtual void Update(float deltaTime);
 
 	const std::string GetName() { return _name; }
 

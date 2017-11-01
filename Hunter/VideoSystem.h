@@ -1,8 +1,9 @@
 #ifndef VIDEO_SYSTEM_H
 #define VIDEO_SYSTEM_H
 
-
 #include "System.h"
+
+//#include "RenderComponent.h"
 
 struct RenderWindow
 {
@@ -22,7 +23,7 @@ public :
 	virtual bool Init(const std::string &name, const SystemSetting &setting);
 	virtual void ShutDown();
 
-	virtual void Update(uint32 deltaMS);
+	virtual void Update(float deltaTime);
 
 	LPDIRECT3DDEVICE9 GetDevice()
 	{

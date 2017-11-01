@@ -11,7 +11,8 @@ public :
 
 	void Tick();
 
-	uint32 GetDeltaMS();
+	float GetDeltaTime();
+
 
 private :
 	LARGE_INTEGER _prevCounter;;

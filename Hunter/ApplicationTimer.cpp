@@ -33,7 +33,7 @@ void ApplicationTimer::Tick()
 	_prevCounter = _currentCounter;
 }
 
-uint32 ApplicationTimer::GetDeltaMS()
+float ApplicationTimer::GetDeltaTime()
 {
-	return _currentDeltaMS;
+	return (float)_currentDeltaMS / 1000.0f;
 }

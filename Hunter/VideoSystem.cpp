@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "VideoSystem.h"
 
+IDirect3DDevice9 *gpDevice;
+
 VideoSystem::VideoSystem()
 {
 }
@@ -26,7 +28,7 @@ void VideoSystem::ShutDown()
 {
 }
 
-void VideoSystem::Update(uint32 deltaMS)
+void VideoSystem::Update(float deltaTime)
 {
 	_pDevice->BeginScene();
 	_pDevice->Clear(0, nullptr, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER | D3DCLEAR_STENCIL, 0xff101010, 1.0f, 0);
@@ -92,9 +94,7 @@ bool VideoSystem::InitD3D(HWND windowHandle)
 		return false;
 	}
 
-	//_pBatch = new SpriteBatch;
-	//_pBatch->Init(_pDevice);
-	//DirectX Init End /////////////////////////////////
+	gpDevice = _pDevice;
 
 	return result;
 }

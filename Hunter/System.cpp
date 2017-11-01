@@ -27,7 +27,7 @@ void System::ShutDown()
 	_channel.Broadcast<System::SystemShutDown>(SystemShutDown(this));
 }
 
-void System::Update(uint32 deltaMS)
+void System::Update(float deltaTime)
 {
 }
 

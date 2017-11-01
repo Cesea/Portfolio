@@ -3,6 +3,8 @@
 
 #include "System.h"
 
+//#include "InputComponent.h"
+
 constexpr int32 MOUSE_BUTTON_LEFT = 0;
 constexpr int32 MOUSE_BUTTON_MIDDLE = 1;
 constexpr int32 MOUSE_BUTTON_RIGHT = 2;
@@ -24,9 +26,9 @@ public :
 	inline bool32 IsPressed(int32 keyCode) const { return (_currentState[keyCode] && !_oldState[keyCode]); }
 
 
-	inline inline bool32 IsShiftDown() { return _shiftDown; }
-	inline inline bool32 IsAltDown() { return _altDown; }
-	inline inline bool32 IsControlDown() { return _ctrlDown; }
+	inline bool32 IsShiftDown() { return _shiftDown; }
+	inline bool32 IsAltDown() { return _altDown; }
+	inline bool32 IsControlDown() { return _ctrlDown; }
 
 private :
 
