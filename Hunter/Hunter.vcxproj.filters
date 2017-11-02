@@ -30,20 +30,14 @@
     <ClCompile Include="VideoSystem.cpp">
       <Filter>Core\System</Filter>
     </ClCompile>
-    <ClCompile Include="Gui.cpp">
-      <Filter>GUI</Filter>
-    </ClCompile>
-    <ClCompile Include="GuiResource.cpp">
-      <Filter>GUI</Filter>
-    </ClCompile>
     <ClCompile Include="Control.cpp">
-      <Filter>GUI\Controls</Filter>
+      <Filter>GUI\Retained\Controls</Filter>
     </ClCompile>
     <ClCompile Include="Dialog.cpp">
-      <Filter>GUI\Controls</Filter>
+      <Filter>GUI\Retained\Controls</Filter>
     </ClCompile>
     <ClCompile Include="StaticControl.cpp">
-      <Filter>GUI\Controls</Filter>
+      <Filter>GUI\Retained\Controls</Filter>
     </ClCompile>
     <ClCompile Include="TextureManager.cpp">
       <Filter>Managers</Filter>
@@ -75,14 +69,20 @@
     <ClCompile Include="BaseScene.cpp">
       <Filter>Scene</Filter>
     </ClCompile>
-    <ClCompile Include="Component.cpp">
-      <Filter>Core\ECS</Filter>
-    </ClCompile>
     <ClCompile Include="PhysicsSystem.cpp">
       <Filter>Core\System</Filter>
     </ClCompile>
     <ClCompile Include="TextSerializer.cpp">
       <Filter>Sub\Reflection</Filter>
+    </ClCompile>
+    <ClCompile Include="Gui.cpp">
+      <Filter>GUI\Retained</Filter>
+    </ClCompile>
+    <ClCompile Include="GuiResource.cpp">
+      <Filter>GUI\Retained</Filter>
+    </ClCompile>
+    <ClCompile Include="imguiRenderer.cpp">
+      <Filter>GUI</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -120,9 +120,6 @@
     <ClInclude Include="CommonUtils.h">
       <Filter>Sub</Filter>
     </ClInclude>
-    <ClInclude Include="Gui.h">
-      <Filter>GUI</Filter>
-    </ClInclude>
     <ClInclude Include="TextureManager.h">
       <Filter>Managers</Filter>
     </ClInclude>
@@ -156,20 +153,17 @@
     <ClInclude Include="XMLManager.h">
       <Filter>Managers</Filter>
     </ClInclude>
-    <ClInclude Include="GuiResource.h">
-      <Filter>GUI</Filter>
-    </ClInclude>
     <ClInclude Include="Control.h">
-      <Filter>GUI\Controls</Filter>
+      <Filter>GUI\Retained\Controls</Filter>
     </ClInclude>
     <ClInclude Include="StaticControl.h">
-      <Filter>GUI\Controls</Filter>
+      <Filter>GUI\Retained\Controls</Filter>
     </ClInclude>
     <ClInclude Include="ButtonControl.h">
-      <Filter>GUI\Controls</Filter>
+      <Filter>GUI\Retained\Controls</Filter>
     </ClInclude>
     <ClInclude Include="Dialog.h">
-      <Filter>GUI\Controls</Filter>
+      <Filter>GUI\Retained\Controls</Filter>
     </ClInclude>
     <ClInclude Include="SingletonBase.h">
       <Filter>Managers</Filter>
@@ -220,6 +214,15 @@
     <ClInclude Include="TextSerializer.h">
       <Filter>Sub\Reflection</Filter>
     </ClInclude>
+    <ClInclude Include="Gui.h">
+      <Filter>GUI\Retained</Filter>
+    </ClInclude>
+    <ClInclude Include="GuiResource.h">
+      <Filter>GUI\Retained</Filter>
+    </ClInclude>
+    <ClInclude Include="imguiRenderer.h">
+      <Filter>GUI</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Event">
@@ -249,14 +252,17 @@
     <Filter Include="Core\System">
       <UniqueIdentifier>{e5f48745-5d7e-4565-bd8e-8884a513ad53}</UniqueIdentifier>
     </Filter>
-    <Filter Include="GUI\Controls">
-      <UniqueIdentifier>{57d48df4-4e4b-40f8-9c08-49981fe29a16}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Sub\Reflection\Variant">
       <UniqueIdentifier>{3af32ef6-17c4-400d-8ff3-d80d939f2a13}</UniqueIdentifier>
     </Filter>
     <Filter Include="Core\ECS">
       <UniqueIdentifier>{b95cc362-b92e-4594-9f7e-f616decbab66}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GUI\Retained">
+      <UniqueIdentifier>{2a13886c-38b1-4b75-8384-e30c2d02c998}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GUI\Retained\Controls">
+      <UniqueIdentifier>{57d48df4-4e4b-40f8-9c08-49981fe29a16}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

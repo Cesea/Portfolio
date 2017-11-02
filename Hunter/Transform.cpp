@@ -871,7 +871,7 @@ void Transform::RotateSlerp(const Transform& from, const Transform& to, float t)
 	}
 
 	//t 가 1 과 같다면...
-	else if (FLOATEQUAL(t, 1.0f))
+	else if (FloatEqual(t, 1.0f))
 	{
 		this->SetRotateWorld(toQuat);
 	}

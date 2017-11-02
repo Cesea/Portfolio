@@ -37,7 +37,7 @@ void Engine::Run()
 	{
 		if (!ProcessWindowMessage())
 		{
-			_pScene->Update(_applicationTimer.GetDeltaTime())
+			_pScene->Update(_applicationTimer.GetDeltaTime());
 			_pVideo->Update(_applicationTimer.GetDeltaTime());
 
 			_applicationTimer.Tick();
@@ -46,7 +46,7 @@ void Engine::Run()
 			static uint64 counter = 0;
 			if ((counter % 20) == 0)
 			{
-				Console::Log("DeltaMS : %d\n", _applicationTimer.GetDeltaMS());
+				Console::Log("DeltaMS : %d\n", _applicationTimer.GetDeltaTime());
 			}
 			counter++;
 			#endif

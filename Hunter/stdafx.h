@@ -15,6 +15,8 @@
 #include <d3d9.h>
 #include <d3dx9.h>
 
+#include <math.h>
+
 #include <algorithm>
 
 #include <assert.h>

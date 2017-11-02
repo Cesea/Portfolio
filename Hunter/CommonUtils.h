@@ -68,6 +68,21 @@ inline float Clamp01(float value)
 	{
 		result = 1.0f;
 	}
+	return result;
+}
+
+inline float ClampMinusOnePlusOne(float value)
+{
+	float result = value;
+	if (result < -1.0f)
+	{
+		result = -1.0f;
+	}
+	else if (result > 1.0f)
+	{
+		result = 1.0f;
+	}
+	return result;
 }
 
 POINT PointMake(int x, int y);

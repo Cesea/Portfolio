@@ -35,13 +35,14 @@ void SceneSystem::Update(float deltaTime)
 
 bool SceneSystem::ChangeScene(const std::string &key)
 {
-
-	if (!pSceneToChange)
+	auto find = _scenes.find(key);
+	if (find == _scenes.end())
 	{
+		Console::Log("There is no such scene %s\n", key);
 		return false;
 	}
 
-	bool initResult = pSceneToChange->Init();
+	bool initResult = find->second->Init();
 	if (!initResult)
 	{
 		Console::Log("Scene initialization failed.");
@@ -53,7 +54,7 @@ bool SceneSystem::ChangeScene(const std::string &key)
 		_pCurrentScene->Release();
 	}
 
-	_pCurrentScene = pSceneToChange;
+	_pCurrentScene = find->second;
 	return true;
 }
 
@@ -61,7 +62,7 @@ void SceneSystem::AddScene(const std::string &sceneName, IScene *pScene)
 {
 	if (pScene = nullptr)
 	{
-		return
+		return;
 	}
 	auto find = _scenes.find(sceneName);
 	//¾ø´Ù¸é
