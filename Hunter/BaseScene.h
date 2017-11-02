@@ -23,6 +23,14 @@ public :
 
 protected :
 	bool _active;
+
+	bool _itemCheck{ false };
+	bool _collapse{ false };
+
+	float _sliderValue{ 0 };
+
+	int32 _scroll{ 0 };
+
 };
 
 

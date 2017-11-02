@@ -23,6 +23,8 @@ void InputSystem::ShutDown()
 
 void InputSystem::Update(float deltaTime)
 {
+	keyboard.Update();
+	mouse.Update();
 }
 
 Keyboard::Keyboard(InputSystem *parent)

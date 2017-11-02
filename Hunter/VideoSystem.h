@@ -5,6 +5,8 @@
 
 //#include "RenderComponent.h"
 
+#include "imguiRenderer.h"
+
 struct RenderWindow
 {
 	int32 width;
@@ -42,6 +44,8 @@ private :
 	D3DPRESENT_PARAMETERS _presentParams;
 
 	RenderWindow _renderWindow;
+
+	im::GuiRenderer *_pimguiRenderer;
 };
 
 #endif

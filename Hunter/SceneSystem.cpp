@@ -31,6 +31,7 @@ void SceneSystem::ShutDown()
 void SceneSystem::Update(float deltaTime)
 {
 	_pCurrentScene->Update(deltaTime);
+	_pCurrentScene->Render();
 }
 
 bool SceneSystem::ChangeScene(const std::string &key)
@@ -60,7 +61,7 @@ bool SceneSystem::ChangeScene(const std::string &key)
 
 void SceneSystem::AddScene(const std::string &sceneName, IScene *pScene)
 {
-	if (pScene = nullptr)
+	if (pScene == nullptr)
 	{
 		return;
 	}

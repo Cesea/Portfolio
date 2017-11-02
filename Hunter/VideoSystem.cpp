@@ -3,6 +3,8 @@
 
 IDirect3DDevice9 *gpDevice;
 
+using namespace im;
+
 VideoSystem::VideoSystem()
 {
 }
@@ -20,6 +22,9 @@ bool VideoSystem::Init(const std::string & name, const SystemSetting & setting)
 		return false;
 	}
 
+	_pimguiRenderer = new im::GuiRenderer();
+	_pimguiRenderer->Init(gpDevice, "consolas", WINSIZEX, WINSIZEY);
+
 
 	return true;
 }
@@ -31,10 +36,11 @@ void VideoSystem::ShutDown()
 void VideoSystem::Update(float deltaTime)
 {
 	_pDevice->BeginScene();
-	_pDevice->Clear(0, nullptr, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER | D3DCLEAR_STENCIL, 0xff101010, 1.0f, 0);
+	_pDevice->Clear(0, nullptr, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER | D3DCLEAR_STENCIL, 0xff404040, 1.0f, 0);
 
 	//PerformRender();
 
+	_pimguiRenderer->Draw();
 	_pDevice->EndScene();
 
 	_pDevice->Present(nullptr, nullptr, NULL, nullptr);
@@ -49,7 +55,7 @@ bool VideoSystem::InitD3D(HWND windowHandle)
 	GetClientRect(windowHandle, &windowRect);
 	_renderWindow.width = windowRect.right - windowRect.left;
 	_renderWindow.height = windowRect.bottom - windowRect.top;
-	_renderWindow.backBufferFormat = D3DFMT_X8R8G8B8;
+	_renderWindow.backBufferFormat = D3DFMT_A8R8G8B8;
 	_renderWindow.depthStencilFormat = D3DFMT_D24S8;
 
 	//DirectX Init Start

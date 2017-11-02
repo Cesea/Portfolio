@@ -99,8 +99,7 @@ bool32 Engine::ProcessWindowMessage()
 	bool32 result = false;
 
 	MSG msg;
-	_pInput->keyboard.Update();
-	_pInput->mouse.Update();
+	_pInput->Update(0.0f);
 	while (PeekMessage(&msg, _windowHandle, 0, 0, PM_REMOVE))
 	{
 		switch (msg.message)
