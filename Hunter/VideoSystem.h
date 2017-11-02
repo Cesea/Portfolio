@@ -35,6 +35,8 @@ public :
 
 private :
 	bool InitD3D(HWND windowHandle);
+	
+	bool InitDefaultRenderState();
 
 	bool PerformRender();
 

@@ -5,6 +5,28 @@
 
 constexpr float EPSILON = 0.001f;
 
+inline bool IsCharacter(WPARAM wParam)
+{
+	bool result = false;
+	if (wParam >= 32 && wParam <= 127 ||
+		wParam == 8)
+	{
+		result = true;
+	}
+	return result;
+}
+
+inline bool IsLetter(WPARAM wParam)
+{
+	bool result = false;
+	if (wParam >= 65 && wParam <= 90 ||
+		wParam >= 97 && wParam <= 122)
+	{
+		result = true;
+	}
+	return result;
+}
+
 
 inline float Uint32ToFloat(uint32 ms)
 {

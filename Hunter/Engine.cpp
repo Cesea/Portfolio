@@ -114,8 +114,13 @@ bool32 Engine::ProcessWindowMessage()
 		case WM_SYSKEYDOWN :
 		case WM_SYSKEYUP :
 		{
-			_pInput->keyboard.UpdateWithMessage(msg.wParam, msg.lParam);
+			_pInput->keyboard.UpdateWithMessage(msg.message, msg.wParam, msg.lParam);
 		}break;
+
+		//case WM_CHAR :
+		//{
+		//	_pInput->keyboard.SetCharInput((uint8)msg.wParam);
+		//}break;
 
 		case WM_LBUTTONDOWN :
 		case WM_LBUTTONUP :

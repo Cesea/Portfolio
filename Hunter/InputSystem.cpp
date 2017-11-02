@@ -36,7 +36,7 @@ Keyboard::~Keyboard()
 {
 }
 
-void Keyboard::UpdateWithMessage(WPARAM wParam, LPARAM lParam)
+void Keyboard::UpdateWithMessage(UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	bool32 wasDown = ((lParam & (1 << 30)) != 0);
 	bool32 isDown = ((lParam & (1 << 31)) == 0);
@@ -47,6 +47,9 @@ void Keyboard::UpdateWithMessage(WPARAM wParam, LPARAM lParam)
 	{
 		ProcessWindowMessage(&_currentState[wParam], isDown);
 	}
+
+	_shiftDown = IsDown(VK_SHIFT);
+
 	if (IsDown(wParam))
 	{
 		_pParent->_channel.Broadcast<InputSystem::KeyDownEvent>(InputSystem::KeyDownEvent(wParam));
@@ -57,13 +60,33 @@ void Keyboard::UpdateWithMessage(WPARAM wParam, LPARAM lParam)
 	}
 	if (IsPressed(wParam))
 	{
+		std::cout << wParam << std::endl;
 		_pParent->_channel.Broadcast<InputSystem::KeyPressedEvent>(InputSystem::KeyPressedEvent(wParam));
+		if (IsCharacter(wParam))
+		{
+			if (_shiftDown)
+			{
+				SetCharInput(wParam);
+			}
+			else
+			{
+				if (wParam == 8)
+				{
+					SetCharInput(wParam);
+				}
+				else
+				{
+					SetCharInput(wParam + 32);
+				}
+			}
+		}
 	}
 }
 
 void Keyboard::Update()
 {
 	memcpy(_oldState, _currentState, sizeof(bool32) * 256);
+	_charInput = 0;
 }
 
 void Keyboard::ProcessWindowMessage(bool32 * button, bool32 isDown)

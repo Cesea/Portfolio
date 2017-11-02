@@ -17,7 +17,7 @@ public :
 	Keyboard(InputSystem *pParent);
 	~Keyboard();
 
-	void UpdateWithMessage(WPARAM wParam, LPARAM lParam);
+	void UpdateWithMessage(UINT msg, WPARAM wParam, LPARAM lParam);
 
 	void Update();
 
@@ -29,6 +29,9 @@ public :
 	inline bool32 IsShiftDown() { return _shiftDown; }
 	inline bool32 IsAltDown() { return _altDown; }
 	inline bool32 IsControlDown() { return _ctrlDown; }
+
+	inline uint8 GetCharInput() const { return _charInput; }
+	inline void SetCharInput(uint8 ch) { _charInput = ch; }
 
 private :
 
@@ -72,6 +75,8 @@ public:
 		result.y = _currentPoint.y - _oldPoint.y;
 		return result;
 	}
+
+	inline const int32 GetWheelDelta() const { return _wheelDelta; }
 
 private:
 	bool32 _currentState[3] = { 0, };

@@ -84,6 +84,9 @@
     <ClCompile Include="imguiRenderer.cpp">
       <Filter>GUI</Filter>
     </ClCompile>
+    <ClCompile Include="tinyxml2.cpp">
+      <Filter>Sub\xml</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -198,7 +201,6 @@
     <ClInclude Include="RefVariant.h">
       <Filter>Sub\Reflection\Variant</Filter>
     </ClInclude>
-    <ClInclude Include="StaticMesh.h" />
     <ClInclude Include="Transform.h">
       <Filter>Sub</Filter>
     </ClInclude>
@@ -222,6 +224,12 @@
     </ClInclude>
     <ClInclude Include="imguiRenderer.h">
       <Filter>GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="tinyxml2.h">
+      <Filter>Sub\xml</Filter>
+    </ClInclude>
+    <ClInclude Include="StaticMesh.h">
+      <Filter>D3D</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -263,6 +271,9 @@
     </Filter>
     <Filter Include="GUI\Retained\Controls">
       <UniqueIdentifier>{57d48df4-4e4b-40f8-9c08-49981fe29a16}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sub\xml">
+      <UniqueIdentifier>{291f8bb9-9ec3-41d4-a4a9-846cb98317e4}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

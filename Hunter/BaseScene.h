@@ -29,6 +29,9 @@ protected :
 
 	float _sliderValue{ 0 };
 
+	char _strings1[MAX_PATH] = {0, };
+	char _strings2[MAX_PATH] = {0, };
+
 	int32 _scroll{ 0 };
 
 };

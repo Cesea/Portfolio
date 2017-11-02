@@ -2,6 +2,8 @@
 #define IM_GUI_RENDERER_H
 
 
+#include "InputSystem.h"
+
 namespace im
 {
 	enum TextAlign
@@ -64,12 +66,14 @@ namespace im
 				mx(-1), my(-1), scroll(0),
 				active(0), hot(0), hotToBe(0), isHot(false), isActive(false), wentActive(false),
 				dragX(0), dragY(0), dragOrig(0), widgetX(0), widgetY(0), widgetW(100),
-				insideCurrentScroll(false), areaId(0), widgetId(0)
+				insideCurrentScroll(false), areaId(0), widgetId(0), charInput(0), keyboardFocusID(0)
 			{
 			}
 
-			bool left;
+			bool left, right, middle;
 			bool leftPressed, leftReleased;
+			bool rightPressed, rightReleased;
+			bool middlePressed, middleReleased;
 			int32 mx, my;
 			int32 scroll;
 			uint32 active;
@@ -86,7 +90,9 @@ namespace im
 			uint32 areaId;
 			uint32 widgetId;
 
-			uint32 inputChar;
+			uint32 keyboardFocusID;
+
+			uint8 charInput;
 		};
 	public:
 		GuiRenderer();
@@ -101,6 +107,9 @@ namespace im
 
 		static GfxCommand gfxCommandQueue[GFXCOMMAND_QUEUE_SIZE];
 		static unsigned gfxCommandQueueSize;
+
+		ID3DXFont *GetFont() { return _fonts[0]; }
+
 
 	private :
 		void DrawRect(int32 x0, int32 y0, int32 x1, int32 y1, D3DCOLOR color);
@@ -117,7 +126,6 @@ namespace im
 		D3DXMATRIXA16 _projection;
 		D3DXMATRIXA16 _view;
 		LPD3DXFONT _fonts[3];
-
 	};
 
 	struct UIVertex
@@ -171,7 +179,15 @@ namespace im
 	{
 		GuiRenderer::gState.leftPressed = false;
 		GuiRenderer::gState.leftReleased = false;
+		GuiRenderer::gState.leftPressed = false;
+		GuiRenderer::gState.leftReleased = false;
+		GuiRenderer::gState.rightPressed = false;
+		GuiRenderer::gState.rightReleased = false;
+		GuiRenderer::gState.middlePressed = false;
+		GuiRenderer::gState.middleReleased = false;
+
 		GuiRenderer::gState.scroll = 0;
+		GuiRenderer::gState.charInput = 0;
 	}
 
 	inline void ClearActive()
@@ -194,10 +210,11 @@ namespace im
 
 
 	static bool ButtonLogic(uint32 id, bool over);
+	static bool KeyLogic(uint32 id);
 
-	static void UpdateInput(int32 mx, int32 my, uint8 mouseButton, int32 scroll);
+	static void UpdateInput(Mouse &refMouse, uint8 inputChar);
 
-	void BeginFrame(int32 mx, int32 my, uint8 mbut, int32 scroll);
+	void BeginFrame(Mouse &refMouse, uint8 inputChar);
 	void EndFrame();
 
 	bool BeginScrollArea(const char* name, int32 x, int32 y, int32 w, int32 h, int32* scroll);
@@ -214,8 +231,10 @@ namespace im
 	bool Collapse(const char* text, const char* subtext, bool checked, int32 width = 0, bool enabled = true);
 	void Label(const char* text);
 	void Value(const char* text);
-	bool Slider(const char* text, float* val, float vmin, float vmax, float vinc, 
+	bool Slider(const char* text, float* val, float vMin, float vMax, float vInc, 
 		int32 width = 0, bool enabled = true);
+	bool Edit(char *text, int32 width = 0, bool enabled = true);
+
 
 	void DrawFont(int32 x, int32 y, int32 align, const char* text, D3DCOLOR color);
 	void DrawLine(float x0, float y0, float x1, float y1, float r, D3DCOLOR color);

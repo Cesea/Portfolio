@@ -100,7 +100,18 @@ bool VideoSystem::InitD3D(HWND windowHandle)
 		return false;
 	}
 
+	InitDefaultRenderState();
+
 	gpDevice = _pDevice;
+
+	return result;
+}
+
+bool VideoSystem::InitDefaultRenderState()
+{
+	bool result = true;
+
+	_pDevice->SetRenderState(D3DRS_LIGHTING, false);
 
 	return result;
 }

@@ -126,6 +126,7 @@
     <ClCompile Include="imguiRenderer.cpp" />
     <ClCompile Include="PhysicsSystem.cpp" />
     <ClCompile Include="TextSerializer.cpp" />
+    <ClCompile Include="tinyxml2.cpp" />
     <ClCompile Include="Transform.cpp" />
     <ClCompile Include="DataPackage.cpp" />
     <ClCompile Include="Dialog.cpp" />
@@ -161,6 +162,7 @@
     <ClInclude Include="imguiRenderer.h" />
     <ClInclude Include="PhysicsSystem.h" />
     <ClInclude Include="TextSerializer.h" />
+    <ClInclude Include="tinyxml2.h" />
     <ClInclude Include="Transform.h" />
     <ClInclude Include="D3DCommon.h" />
     <ClInclude Include="DataPackage.h" />
