@@ -19,8 +19,8 @@ inline bool IsCharacter(WPARAM wParam)
 inline bool IsLetter(WPARAM wParam)
 {
 	bool result = false;
-	if (wParam >= 65 && wParam <= 90 ||
-		wParam >= 97 && wParam <= 122)
+	if (wParam >= 65 && wParam <= 94 ||
+		wParam >= 97 && wParam <= 126)
 	{
 		result = true;
 	}
@@ -128,8 +128,11 @@ inline D3DXVECTOR3 InterpolateVector3(const D3DXVECTOR3 &start, const D3DXVECTOR
 		InterpolateFloat(start.y, end.y, t),
 		InterpolateFloat(start.z, end.z, t));
 }
+struct Ray {
+	D3DXVECTOR3 origin;		//직선의 시작위치
+	D3DXVECTOR3 direction;  //직선의 방향(정규화 되어있어야 함);
 
-
+};
 
 
 

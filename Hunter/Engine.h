@@ -19,45 +19,43 @@
 
 typedef std::shared_ptr<System> SystemPtr;
 
-class InputHandler
-{
-public :
-
-		//gEngine->GetInput()->GetChannel().Add<InputSystemm::KeyDownEvent, InputHandler>
-
-	void Handle(const InputSystem::KeyDownEvent &event)
-	{
-		std::cout << event.code << " down" << std::endl;
-	}
-	void Handle(const InputSystem::KeyPressedEvent &event)
-	{
-		std::cout << event.code << " pressed" << std::endl;
-	}
-	void Handle(const InputSystem::KeyReleasedEvent &event)
-	{
-		std::cout << event.code << " released" << std::endl;
-	}
-	void Handle(const InputSystem::MouseMoveEvent &event)
-	{
-		std::cout << event.coord.x << ", " << event.coord.y << " move" << std::endl;
-	}
-	void Handle(const InputSystem::MouseDownEvent &event)
-	{
-		std::cout << event.coord.x << ", " << event.coord.y << " move, " << event.code << " down" << std::endl;
-	}
-	void Handle(const InputSystem::MousePressedEvent &event)
-	{
-		std::cout << event.coord.x << ", " << event.coord.y << " move, " << event.code << " pressed" << std::endl;
-	}
-	void Handle(const InputSystem::MouseReleasedEvent &event)
-	{
-		std::cout << event.coord.x << ", " << event.coord.y << " move, " << event.code << " released" << std::endl;
-	}
-	void Handle(const InputSystem::MouseWheelEvent &event)
-	{
-		std::cout << event.code << " down" << std::endl;
-	}
-};
+//class InputHandler
+//{
+//public :
+//
+//	void Handle(const InputSystem::KeyDownEvent &event)
+//	{
+//		std::cout << event.code << " down" << std::endl;
+//	}
+//	void Handle(const InputSystem::KeyPressedEvent &event)
+//	{
+//		std::cout << event.code << " pressed" << std::endl;
+//	}
+//	void Handle(const InputSystem::KeyReleasedEvent &event)
+//	{
+//		std::cout << event.code << " released" << std::endl;
+//	}
+//	void Handle(const InputSystem::MouseMoveEvent &event)
+//	{
+//		std::cout << event.coord.x << ", " << event.coord.y << " move" << std::endl;
+//	}
+//	void Handle(const InputSystem::MouseDownEvent &event)
+//	{
+//		std::cout << event.coord.x << ", " << event.coord.y << " move, " << event.code << " down" << std::endl;
+//	}
+//	void Handle(const InputSystem::MousePressedEvent &event)
+//	{
+//		std::cout << event.coord.x << ", " << event.coord.y << " move, " << event.code << " pressed" << std::endl;
+//	}
+//	void Handle(const InputSystem::MouseReleasedEvent &event)
+//	{
+//		std::cout << event.coord.x << ", " << event.coord.y << " move, " << event.code << " released" << std::endl;
+//	}
+//	void Handle(const InputSystem::MouseWheelEvent &event)
+//	{
+//		std::cout << event.code << " down" << std::endl;
+//	}
+//};
 
 class Engine
 {
@@ -100,7 +98,6 @@ private :
 	std::shared_ptr<InputSystem> _pInput;
 	std::shared_ptr<SceneSystem> _pScene;
 
-	InputHandler handler;
 };
 
 #endif

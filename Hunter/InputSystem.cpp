@@ -36,57 +36,55 @@ Keyboard::~Keyboard()
 {
 }
 
-void Keyboard::UpdateWithMessage(UINT msg, WPARAM wParam, LPARAM lParam)
+void Keyboard::UpdateOnKeyUp(WPARAM wParam, LPARAM lParam)
 {
-	bool32 wasDown = ((lParam & (1 << 30)) != 0);
-	bool32 isDown = ((lParam & (1 << 31)) == 0);
-
-	_altDown = ((lParam & (1 << 29)));
-
-	if (isDown != wasDown)
-	{
-		ProcessWindowMessage(&_currentState[wParam], isDown);
-	}
-
-	_shiftDown = IsDown(VK_SHIFT);
-
-	if (IsDown(wParam))
-	{
-		_pParent->_channel.Broadcast<InputSystem::KeyDownEvent>(InputSystem::KeyDownEvent(wParam));
-	}
-	if (IsReleased(wParam))
-	{
-		_pParent->_channel.Broadcast<InputSystem::KeyReleasedEvent>(InputSystem::KeyReleasedEvent(wParam));
-	}
-	if (IsPressed(wParam))
-	{
-		std::cout << wParam << std::endl;
-		_pParent->_channel.Broadcast<InputSystem::KeyPressedEvent>(InputSystem::KeyPressedEvent(wParam));
-		if (IsCharacter(wParam))
-		{
-			if (_shiftDown)
-			{
-				SetCharInput(wParam);
-			}
-			else
-			{
-				if (wParam == 8)
-				{
-					SetCharInput(wParam);
-				}
-				else
-				{
-					SetCharInput(wParam + 32);
-				}
-			}
-		}
-	}
+	_currentState[wParam] = true;
 }
+
+void Keyboard::UpdateOnKeyDown(WPARAM wParam, LPARAM lParam)
+{
+	_currentState[wParam] = false;
+}
+
+void Keyboard::UpdateOnChar(WPARAM wParam, LPARAM lParam)
+{
+	_charInput;
+}
+
+//void Keyboard::UpdateWithMessage(UINT msg, WPARAM wParam, LPARAM lParam)
+//{
+//	_wParam = wParam;
+//	bool32 wasDown = ((lParam & (1 << 30)) != 0);
+//	bool32 isDown = ((lParam & (1 << 31)) == 0);
+//
+//	_altDown = ((lParam & (1 << 29)));
+//
+//	if (isDown != wasDown)
+//	{
+//		ProcessWindowMessage(&_currentState[wParam], isDown);
+//	}
+//
+//	_shiftDown = IsDown(VK_SHIFT);
+//
+//	if (IsDown(wParam))
+//	{
+//		_pParent->_channel.Broadcast<InputSystem::KeyDownEvent>(InputSystem::KeyDownEvent(wParam));
+//	}
+//	if (IsReleased(wParam))
+//	{
+//		_pParent->_channel.Broadcast<InputSystem::KeyReleasedEvent>(InputSystem::KeyReleasedEvent(wParam));
+//	}
+//	if (IsPressed(wParam))
+//	{
+//		std::cout << wParam << std::endl;
+//		_pParent->_channel.Broadcast<InputSystem::KeyPressedEvent>(InputSystem::KeyPressedEvent(wParam));
+//	}
+//}
 
 void Keyboard::Update()
 {
-	memcpy(_oldState, _currentState, sizeof(bool32) * 256);
 	_charInput = 0;
+	memcpy(_oldState, _currentState, sizeof(bool32) * 256);
 }
 
 void Keyboard::ProcessWindowMessage(bool32 * button, bool32 isDown)

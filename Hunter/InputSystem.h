@@ -17,8 +17,11 @@ public :
 	Keyboard(InputSystem *pParent);
 	~Keyboard();
 
-	void UpdateWithMessage(UINT msg, WPARAM wParam, LPARAM lParam);
+	void UpdateOnKeyUp(WPARAM wParam, LPARAM lParam);
+	void UpdateOnKeyDown(WPARAM wParam, LPARAM lParam);
+	void UpdateOnChar(WPARAM wParam, LPARAM lParam);
 
+	void UpdateWithMessage(UINT msg, WPARAM wParam, LPARAM lParam);
 	void Update();
 
 	inline bool32 IsDown(int32 keyCode) const { return _currentState[keyCode]; }
@@ -45,6 +48,7 @@ private :
 	bool32 _altDown{};
 	bool32 _ctrlDown{};
 
+	WPARAM _wParam{};
 	uint8 _charInput{};
 
 	InputSystem *_pParent;

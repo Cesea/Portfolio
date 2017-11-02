@@ -44,7 +44,7 @@ bool BaseScene::Render()
 	{
 		_collapse = !_collapse;
 	}
-	im::Slider("slider", &_sliderValue, -20, 20, 1, 200);
+	im::Slider("slider", &_sliderValue, -20, 20, 0.1, 200);
 
 	im::EndScrollArea();
 

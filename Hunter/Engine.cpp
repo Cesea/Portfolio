@@ -35,22 +35,25 @@ void Engine::Run()
 
 	while (_valid && _running)
 	{
-		if (!ProcessWindowMessage())
+		MSG msg{};
+		while (PeekMessage(&msg, 0, 0, 0, PM_REMOVE))
 		{
-			_pScene->Update(_applicationTimer.GetDeltaTime());
-			_pVideo->Update(_applicationTimer.GetDeltaTime());
-
-			_applicationTimer.Tick();
-
-			#if defined HUNTER_DEBUG
-			static uint64 counter = 0;
-			if ((counter % 20) == 0)
-			{
-				Console::Log("DeltaMS : %d\n", _applicationTimer.GetDeltaTime());
-			}
-			counter++;
-			#endif
+			TranslateMessage(&msg);
+			DispatchMessage(&msg);
 		}
+		_pScene->Update(_applicationTimer.GetDeltaTime());
+		_pVideo->Update(_applicationTimer.GetDeltaTime());
+
+		_applicationTimer.Tick();
+
+		#if defined HUNTER_DEBUG
+		static uint64 counter = 0;
+		if ((counter % 20) == 0)
+		{
+			Console::Log("DeltaMS : %d\n", _applicationTimer.GetDeltaTime());
+		}
+		counter++;
+		#endif
 	}
 	ShutDownSystems();
 }
@@ -86,6 +89,35 @@ LRESULT Engine::EngineWindowCallback(HWND windowHandle, UINT msg, WPARAM wParam,
 		_running = false;
 		_valid = false;
 	}break;
+
+	case WM_SYSKEYDOWN:
+	case WM_KEYDOWN :
+	{
+		_pInput->keyboard.UpdateOnKeyDown(msg.wParam, msg.lParam);
+	}break;
+
+	case WM_SYSKEYUP :
+	case WM_KEYUP :
+	{
+		_pInput->keyboard.UpdateOnKeyUP(msg.wParam, msg.lParam);
+	}break;
+
+	case WM_CHAR :
+	{
+		_pInput->keyboard.UpdateOnChar(wParam, lParam);
+	}break;
+
+	case WM_LBUTTONDOWN:
+	case WM_LBUTTONUP:
+	case WM_MBUTTONUP:
+	case WM_MBUTTONDOWN:
+	case WM_RBUTTONDOWN:
+	case WM_RBUTTONUP:
+	case WM_MOUSEMOVE:
+	{
+		_pInput->mouse.UpdateWithMessage(msg.wParam, msg.lParam);
+	}break;
+
 	default :
 	{
 		return DefWindowProc(windowHandle, msg, wParam, lParam);
@@ -192,13 +224,13 @@ bool Engine::InitializeSystems()
 		return false;
 	}
 
-	_pInput->GetChannel().Add<InputSystem::KeyDownEvent, InputHandler>(handler);
-	_pInput->GetChannel().Add<InputSystem::KeyPressedEvent, InputHandler>(handler);
-	_pInput->GetChannel().Add<InputSystem::KeyReleasedEvent, InputHandler>(handler);
-	_pInput->GetChannel().Add<InputSystem::MouseMoveEvent, InputHandler>(handler);
-	_pInput->GetChannel().Add<InputSystem::MousePressedEvent, InputHandler>(handler);
-	_pInput->GetChannel().Add<InputSystem::MouseReleasedEvent, InputHandler>(handler);
-	_pInput->GetChannel().Add<InputSystem::MouseDownEvent, InputHandler>(handler);
+	//_pInput->GetChannel().Add<InputSystem::KeyDownEvent, InputHandler>(handler);
+	//_pInput->GetChannel().Add<InputSystem::KeyPressedEvent, InputHandler>(handler);
+	//_pInput->GetChannel().Add<InputSystem::KeyReleasedEvent, InputHandler>(handler);
+	//_pInput->GetChannel().Add<InputSystem::MouseMoveEvent, InputHandler>(handler);
+	//_pInput->GetChannel().Add<InputSystem::MousePressedEvent, InputHandler>(handler);
+	//_pInput->GetChannel().Add<InputSystem::MouseReleasedEvent, InputHandler>(handler);
+	//_pInput->GetChannel().Add<InputSystem::MouseDownEvent, InputHandler>(handler);
 
 	_pScene = std::make_shared<SceneSystem>(SceneSystem());
 	if (!_pScene->Init("SceneSystem", SystemSetting()))

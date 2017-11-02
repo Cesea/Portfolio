@@ -9,7 +9,7 @@ public:
 
 	virtual HRESULT Init(const std::string &filePath, const D3DXMATRIXA16* matCorrection = NULL) = 0;
 	virtual void Release() = 0;
-	//virtual void Render(const cTransform& Trans) = 0;
+	//virtual void Render(const Transform& Trans) = 0;
 };
 
 #endif
