@@ -77,7 +77,7 @@ float Matrix::operator()(uint32 row, uint32 col) const
 
 Matrix & Matrix::operator*=(const Matrix & other)
 {
-	Matrix result = *this;
+	Matrix thisCopy = *this;
 
 	for ( int32 i = 0; i < 4; ++i )
 	{
@@ -86,7 +86,7 @@ Matrix & Matrix::operator*=(const Matrix & other)
 			*this[i][j] = 0.0f;
 			for ( int32 k = 0; k < 4; ++k )
 			{
-				*this[i][j] += ( result )[i][k] * result[k][j];
+				*this[i][j] += ( thisCopy )[i][k] * other[k][j];
 			}
 		}
 	}
