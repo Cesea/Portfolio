@@ -21,7 +21,7 @@ namespace im
 		GFXCOMMAND_TRIANGLE,
 		GFXCOMMAND_LINE,
 		GFXCOMMAND_TEXT,
-		GFXCOMMAND_STENCIL,
+		GFXCOMMAND_SCISSOR,
 	};
 
 	struct GfxRect
@@ -238,10 +238,9 @@ namespace im
 	bool Edit(char *text, int32 width = 0, bool enabled = true);
 
 
-	void DrawFont(int32 x, int32 y, int32 align, const char* text, D3DCOLOR color);
-	void DrawLine(float x0, float y0, float x1, float y1, float r, D3DCOLOR color);
-	void DrawRoundedRect(float x, float y, float w, float h, float r, D3DCOLOR color);
-	void DrawRect(float x, float y, float w, float h, D3DCOLOR color);
+	//void DrawFontCommand(int32 x, int32 y, int32 align, const char* text, D3DCOLOR color);
+	//void DrawLineCommand(float x0, float y0, float x1, float y1, float r, D3DCOLOR color);
+	//void DrawRectCommand(float x, float y, float w, float h, D3DCOLOR color);
 
 	class EditorWindow
 	{

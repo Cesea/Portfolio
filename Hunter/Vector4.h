@@ -39,19 +39,14 @@ public :
 
 Vector4 operator * (float f, const Vector4& other);
 
-float D3DXVec4Length
-    ( const D3DXVECTOR4 *pV );
+inline float Vec4Length ( const Vector4 *pV );
 
-float D3DXVec4LengthSq
-    ( const D3DXVECTOR4 *pV );
+inline float Vec4LengthSq ( const Vector4 *pV );
 
-float D3DXVec4Dot
-    ( const D3DXVECTOR4 *pV1, const D3DXVECTOR4 *pV2 );
+inline float Vec4Dot ( const Vector4 *pV1, const Vector4 *pV2 );
 
-D3DXVECTOR4* D3DXVec4Add
-    ( D3DXVECTOR4 *pOut, const D3DXVECTOR4 *pV1, const D3DXVECTOR4 *pV2);
+inline Vector4* Vec4Add ( Vector4 *pOut, const Vector4 *pV1, const Vector4 *pV2);
 
-D3DXVECTOR4* D3DXVec4Subtract
-    ( D3DXVECTOR4 *pOut, const D3DXVECTOR4 *pV1, const D3DXVECTOR4 *pV2);
+inline Vector4* Vec4Subtract ( Vector4 *pOut, const Vector4 *pV1, const Vector4 *pV2);
 
 #endif

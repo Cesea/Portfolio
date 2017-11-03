@@ -23,6 +23,7 @@ typedef uint32 EffectID;
 typedef uint32 FontID;
 
 typedef uint32 ComponentID;
+typedef uint32 ComponentFamilyID;
 typedef uint32 EntityID;
 typedef uint32 SurfaceID;
 

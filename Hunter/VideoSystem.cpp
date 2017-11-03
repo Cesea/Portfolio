@@ -35,6 +35,12 @@ void VideoSystem::ShutDown()
 
 void VideoSystem::Update(float deltaTime)
 {
+
+
+}
+
+void VideoSystem::Render()
+{
 	_pDevice->BeginScene();
 	_pDevice->Clear(0, nullptr, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER | D3DCLEAR_STENCIL, 0xff404040, 1.0f, 0);
 
@@ -44,7 +50,6 @@ void VideoSystem::Update(float deltaTime)
 	_pDevice->EndScene();
 
 	_pDevice->Present(nullptr, nullptr, NULL, nullptr);
-
 }
 
 bool VideoSystem::InitD3D(HWND windowHandle)

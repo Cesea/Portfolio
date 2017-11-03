@@ -4,7 +4,7 @@
 #include "CommandComponent.h"
 #include "HealthComponent.h"
 #include "PhysicsComponent.h"
-#include "RenderComponent.h"
+#include "VisualComponent.h"
 
 ComponentFactory::ComponentFactory()
 {

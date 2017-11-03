@@ -5,12 +5,14 @@
 
 #include "Component.h"
 
+#include "Transform.h"
+
 constexpr EntityID INVALID_ENTITY = 0;
 
 class Entity
 {
-	typedef std::map<ComponentID, Component *> ComponentMap;
-	typedef std::map<ComponentID, Component *>::iterator ComponentMapIter;
+	typedef std::map<ComponentFamilyID, Component *> ComponentTable;
+	typedef std::map<ComponentFamilyID, Component *>::iterator ComponentTableIter;
 
 public:
 	explicit Entity(EntityID id);
@@ -28,11 +30,11 @@ public:
 	bool HasComponent(ComponentID id);
 
 	template<typename T>
-	T *GetComponent(ComponentID id)
+	T *GetComponent(ComponentFamilyID id)
 	{
 		T *result = nullptr;
 
-		ComponentMapIter& iter = _components.find(T::ID);
+		ComponentTableIter& iter = _components.find(T::ID);
 		if (iter != _components.end())
 		{
 			result = static_cast<T *>(iter->second);
@@ -42,6 +44,6 @@ public:
 	}
 private:
 	EntityID _id;
-	ComponentMap _components;
+	ComponentTable _components;
 };
 #endif

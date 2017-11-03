@@ -2,6 +2,7 @@
 #define MATRIX_H
 
 class Vector3;
+class Plane;
 
 class Matrix : public D3DXMATRIXA16
 {
@@ -50,13 +51,9 @@ Matrix operator * (float f, const Matrix& other);
 
 Matrix* MatrixIdentity ( Matrix *pOut );
 
-BOOL MatrixIsIdentity ( const Matrix *pM );
+bool MatrixIsIdentity ( const Matrix *pM );
 
-
-FLOAT MatrixDeterminant ( const Matrix *pM );
-
-HRESULT MatrixDecompose ( Vector3 *pOutScale, D3DXQUATERNION *pOutRotation, 
-	  Vector3 *pOutTranslation, const Matrix *pM );
+float MatrixDeterminant ( const Matrix *pM );
 
 Matrix* MatrixTranspose ( Matrix *pOut, const Matrix *pM );
 
@@ -71,60 +68,60 @@ Matrix* MatrixMultiplyTranspose ( Matrix *pOut, const Matrix *pM1, const Matrix 
 // be returned.  The determinant of pM is also returned it pfDeterminant
 // is non-NULL.
 Matrix* MatrixInverse
-    ( Matrix *pOut, FLOAT *pDeterminant, const Matrix *pM );
+    ( Matrix *pOut, float *pDeterminant, const Matrix *pM );
 
 // Build a matrix which scales by (sx, sy, sz)
-Matrix* MatrixScaling ( Matrix *pOut, FLOAT sx, FLOAT sy, FLOAT sz );
+Matrix* MatrixScaling ( Matrix *pOut, float sx, float sy, float sz );
 
 // Build a matrix which translates by (x, y, z)
-Matrix* MatrixTranslation ( Matrix *pOut, FLOAT x, FLOAT y, FLOAT z );
+Matrix* MatrixTranslation ( Matrix *pOut, float x, float y, float z );
 
 // Build a matrix which rotates around the X axis
-Matrix* MatrixRotationX ( Matrix *pOut, FLOAT Angle );
+Matrix* MatrixRotationX ( Matrix *pOut, float angle );
 
 // Build a matrix which rotates around the Y axis
-Matrix* MatrixRotationY ( Matrix *pOut, FLOAT Angle );
+Matrix* MatrixRotationY ( Matrix *pOut, float angle );
 
 // Build a matrix which rotates around the Z axis
-Matrix* MatrixRotationZ ( Matrix *pOut, FLOAT Angle );
+Matrix* MatrixRotationZ ( Matrix *pOut, float angle );
 
 // Build a matrix which rotates around an arbitrary axis
-Matrix* MatrixRotationAxis ( Matrix *pOut, const Vector3 *pV, FLOAT Angle );
+Matrix* MatrixRotationAxis ( Matrix *pOut, const Vector3 *pV, float angle );
 
 // Build a matrix from a quaternion
-Matrix* MatrixRotationQuaternion ( Matrix *pOut, const D3DXQUATERNION *pQ);
+Matrix* MatrixRotationQuaternion ( Matrix *pOut, const Quaternion *pQ);
 
 // Yaw around the Y axis, a pitch around the X axis,
 // and a roll around the Z axis.
-Matrix* MatrixRotationYawPitchRoll ( Matrix *pOut, FLOAT Yaw, FLOAT Pitch, FLOAT Roll );
+Matrix* MatrixRotationYawPitchRoll ( Matrix *pOut, float yaw, float pitch, float roll );
 
 // Build transformation matrix.  NULL arguments are treated as identity.
 // Mout = Msc-1 * Msr-1 * Ms * Msr * Msc * Mrc-1 * Mr * Mrc * Mt
 Matrix* MatrixTransformation
     ( Matrix *pOut, const Vector3 *pScalingCenter,
-      const D3DXQUATERNION *pScalingRotation, const Vector3 *pScaling,
-      const Vector3 *pRotationCenter, const D3DXQUATERNION *pRotation,
+      const Quaternion *pScalingRotation, const Vector3 *pScaling,
+      const Vector3 *pRotationCenter, const Quaternion *pRotation,
       const Vector3 *pTranslation);
 
 // Build 2D transformation matrix in XY plane.  NULL arguments are treated as identity.
 // Mout = Msc-1 * Msr-1 * Ms * Msr * Msc * Mrc-1 * Mr * Mrc * Mt
 Matrix* MatrixTransformation2D
-    ( Matrix *pOut, const D3DXVECTOR2* pScalingCenter, 
-      FLOAT ScalingRotation, const D3DXVECTOR2* pScaling, 
-      const D3DXVECTOR2* pRotationCenter, FLOAT Rotation, 
-      const D3DXVECTOR2* pTranslation);
+    ( Matrix *pOut, const Vector2* pScalingCenter, 
+      float ScalingRotation, const Vector2* pScaling, 
+      const Vector2* pRotationCenter, float rotation, 
+      const Vector2* pTranslation);
 
 // Build affine transformation matrix.  NULL arguments are treated as identity.
 // Mout = Ms * Mrc-1 * Mr * Mrc * Mt
 Matrix* MatrixAffineTransformation
-    ( Matrix *pOut, FLOAT Scaling, const Vector3 *pRotationCenter,
-      const D3DXQUATERNION *pRotation, const Vector3 *pTranslation);
+    ( Matrix *pOut, float Scaling, const Vector3 *pRotationCenter,
+      const Quaternion *pRotation, const Vector3 *pTranslation);
 
 // Build 2D affine transformation matrix in XY plane.  NULL arguments are treated as identity.
 // Mout = Ms * Mrc-1 * Mr * Mrc * Mt
 Matrix* MatrixAffineTransformation2D
-    ( Matrix *pOut, FLOAT Scaling, const D3DXVECTOR2* pRotationCenter, 
-      FLOAT Rotation, const D3DXVECTOR2* pTranslation);
+    ( Matrix *pOut, float scaling, const Vector2* pRotationCenter, 
+      float rotation, const Vector2* pTranslation);
 
 // Build a lookat matrix. (right-handed)
 Matrix* MatrixLookAtRH
@@ -138,63 +135,48 @@ Matrix* MatrixLookAtLH
 
 // Build a perspective projection matrix. (right-handed)
 Matrix* MatrixPerspectiveRH
-    ( Matrix *pOut, FLOAT w, FLOAT h, FLOAT zn, FLOAT zf );
+    ( Matrix *pOut, float w, float h, float zn, float zf );
 
 // Build a perspective projection matrix. (left-handed)
 Matrix* MatrixPerspectiveLH
-    ( Matrix *pOut, FLOAT w, FLOAT h, FLOAT zn, FLOAT zf );
+    ( Matrix *pOut, float w, float h, float zn, float zf );
 
 // Build a perspective projection matrix. (right-handed)
 Matrix* MatrixPerspectiveFovRH
-    ( Matrix *pOut, FLOAT fovy, FLOAT Aspect, FLOAT zn, FLOAT zf );
+    ( Matrix *pOut, float fovy, float aspect, float zn, float zf );
 
 // Build a perspective projection matrix. (left-handed)
 Matrix* MatrixPerspectiveFovLH
-    ( Matrix *pOut, FLOAT fovy, FLOAT Aspect, FLOAT zn, FLOAT zf );
+    ( Matrix *pOut, float fovy, float aspect, float zn, float zf );
 
 // Build a perspective projection matrix. (right-handed)
 Matrix* MatrixPerspectiveOffCenterRH
-    ( Matrix *pOut, FLOAT l, FLOAT r, FLOAT b, FLOAT t, FLOAT zn,
-      FLOAT zf );
+    ( Matrix *pOut, float l, float r, float b, float t, float zn,
+      float zf );
 
 // Build a perspective projection matrix. (left-handed)
 Matrix* MatrixPerspectiveOffCenterLH
-    ( Matrix *pOut, FLOAT l, FLOAT r, FLOAT b, FLOAT t, FLOAT zn,
-      FLOAT zf );
+    ( Matrix *pOut, float l, float r, float b, float t, float zn,
+      float zf );
 
 // Build an ortho projection matrix. (right-handed)
-Matrix* MatrixOrthoRH
-    ( Matrix *pOut, FLOAT w, FLOAT h, FLOAT zn, FLOAT zf );
+Matrix* MatrixOrthoRH ( Matrix *pOut, float w, float h, float zn, float zf );
 
 // Build an ortho projection matrix. (left-handed)
-Matrix* MatrixOrthoLH
-    ( Matrix *pOut, FLOAT w, FLOAT h, FLOAT zn, FLOAT zf );
+Matrix* MatrixOrthoLH ( Matrix *pOut, float w, float h, float zn, float zf );
 
 // Build an ortho projection matrix. (right-handed)
-Matrix* MatrixOrthoOffCenterRH
-    ( Matrix *pOut, FLOAT l, FLOAT r, FLOAT b, FLOAT t, FLOAT zn,
-      FLOAT zf );
+Matrix* MatrixOrthoOffCenterRH ( Matrix *pOut, float l, float r, float b, float t, float zn,
+      float zf );
 
 // Build an ortho projection matrix. (left-handed)
-Matrix* MatrixOrthoOffCenterLH
-    ( Matrix *pOut, FLOAT l, FLOAT r, FLOAT b, FLOAT t, FLOAT zn,
-      FLOAT zf );
+Matrix* MatrixOrthoOffCenterLH ( Matrix *pOut, float l, float r, float b, float t, float zn, float zf );
 
 // Build a matrix which flattens geometry into a plane, as if casting
 // a shadow from a light.
-Matrix* MatrixShadow
-    ( Matrix *pOut, const D3DXVECTOR4 *pLight,
-      const D3DXPLANE *pPlane );
+Matrix* MatrixShadow ( Matrix *pOut, const Vector4 *pLight, const Plane *pPlane );
 
 // Build a matrix which reflects the coordinate system about a plane
-Matrix* MatrixReflect
-    ( Matrix *pOut, const D3DXPLANE *pPlane );
-
-#ifdef __cplusplus
-}
-#endif
-
-
-
+Matrix* MatrixReflect ( Matrix *pOut, const Plane *pPlane );
 
 #endif

@@ -44,6 +44,8 @@ void Engine::Run()
 		_pScene->Update(_applicationTimer.GetDeltaTime());
 		_pVideo->Update(_applicationTimer.GetDeltaTime());
 
+		_pVideo->Render();
+
 		_applicationTimer.Tick();
 
 		#if defined HUNTER_DEBUG

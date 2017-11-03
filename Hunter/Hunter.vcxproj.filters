@@ -72,9 +72,6 @@
     <ClCompile Include="PhysicsSystem.cpp">
       <Filter>Core\System\PhysicsSystem</Filter>
     </ClCompile>
-    <ClCompile Include="RenderComponent.cpp">
-      <Filter>Core\ECS\Component\RenderComponent</Filter>
-    </ClCompile>
     <ClCompile Include="CommandComponent.cpp">
       <Filter>Core\ECS\Component\CommandComponent</Filter>
     </ClCompile>
@@ -105,9 +102,6 @@
     <ClCompile Include="PhysicsComponent.cpp">
       <Filter>Core\ECS\Component\PhysicsComponent</Filter>
     </ClCompile>
-    <ClCompile Include="Entity.cpp">
-      <Filter>Core\ECS</Filter>
-    </ClCompile>
     <ClCompile Include="XMLManager.cpp">
       <Filter>Managers</Filter>
     </ClCompile>
@@ -125,6 +119,24 @@
     </ClCompile>
     <ClCompile Include="Vector4.cpp">
       <Filter>Math</Filter>
+    </ClCompile>
+    <ClCompile Include="Quaternion.cpp">
+      <Filter>Math</Filter>
+    </ClCompile>
+    <ClCompile Include="Plane.cpp">
+      <Filter>Math</Filter>
+    </ClCompile>
+    <ClCompile Include="Entity.cpp">
+      <Filter>Core\ECS\Entity</Filter>
+    </ClCompile>
+    <ClCompile Include="VisualComponent.cpp">
+      <Filter>Core\ECS\Component\VisualComponent</Filter>
+    </ClCompile>
+    <ClCompile Include="Component.cpp">
+      <Filter>Core\ECS\Component</Filter>
+    </ClCompile>
+    <ClCompile Include="EntityTemplate.cpp">
+      <Filter>Core\ECS\Entity</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -234,9 +246,6 @@
     <ClInclude Include="BaseScene.h">
       <Filter>Scene</Filter>
     </ClInclude>
-    <ClInclude Include="Entity.h">
-      <Filter>Core\ECS</Filter>
-    </ClInclude>
     <ClInclude Include="Gui.h">
       <Filter>GUI\Retained</Filter>
     </ClInclude>
@@ -272,9 +281,6 @@
     </ClInclude>
     <ClInclude Include="PhysicsComponent.h">
       <Filter>Core\ECS\Component\PhysicsComponent</Filter>
-    </ClInclude>
-    <ClInclude Include="RenderComponent.h">
-      <Filter>Core\ECS\Component\RenderComponent</Filter>
     </ClInclude>
     <ClInclude Include="CommandComponent.h">
       <Filter>Core\ECS\Component\CommandComponent</Filter>
@@ -318,6 +324,27 @@
     <ClInclude Include="Matrix.h">
       <Filter>Math</Filter>
     </ClInclude>
+    <ClInclude Include="Quaternion.h">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Plane.h">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Entity.h">
+      <Filter>Core\ECS\Entity</Filter>
+    </ClInclude>
+    <ClInclude Include="EntityFactory.h">
+      <Filter>Core\ECS\Entity</Filter>
+    </ClInclude>
+    <ClInclude Include="VisualComponent.h">
+      <Filter>Core\ECS\Component\VisualComponent</Filter>
+    </ClInclude>
+    <ClInclude Include="ComponentTemplate.h">
+      <Filter>Core\ECS\Component</Filter>
+    </ClInclude>
+    <ClInclude Include="EntityTemplate.h">
+      <Filter>Core\ECS\Entity</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Event">
@@ -359,9 +386,6 @@
     <Filter Include="Core\ECS\Component\PhysicsComponent">
       <UniqueIdentifier>{7c1ff5ea-9487-49ce-907c-90425871b7ef}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Core\ECS\Component\RenderComponent">
-      <UniqueIdentifier>{10c5e796-980a-4add-8b92-55f72e5224a5}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Sub">
       <UniqueIdentifier>{f0b23895-3d21-4c5e-b58d-d8cf44373094}</UniqueIdentifier>
     </Filter>
@@ -397,6 +421,12 @@
     </Filter>
     <Filter Include="Math">
       <UniqueIdentifier>{a3fc95b4-5fb1-4f8f-8f65-d94a2c21622d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\ECS\Entity">
+      <UniqueIdentifier>{a7343b1c-dd07-47ed-95e0-d2c5a6a63021}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\ECS\Component\VisualComponent">
+      <UniqueIdentifier>{10c5e796-980a-4add-8b92-55f72e5224a5}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

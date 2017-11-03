@@ -37,17 +37,17 @@ public :
     bool operator != ( const Vector2& other) const;
 };
 
-float Vec2Length ( const Vector2 *pV );
+inline float Vec2Length ( const Vector2 *pV );
 
-float Vec2LengthSq ( const Vector2 *pV );
+inline float Vec2LengthSq ( const Vector2 *pV );
 
-float Vec2Dot ( const Vector2 *pV1, const Vector2 *pV2 );
+inline float Vec2Dot ( const Vector2 *pV1, const Vector2 *pV2 );
 
-Vector2* Vec2Add ( Vector2 *pOut, const Vector2 *pV1, const Vector2 *pV2 );
+inline Vector2* Vec2Add ( Vector2 *pOut, const Vector2 *pV1, const Vector2 *pV2 );
 
-Vector2* Vec2Subtract ( Vector2 *pOut, const Vector2 *pV1, const Vector2 *pV2 );
+inline Vector2* Vec2Subtract ( Vector2 *pOut, const Vector2 *pV1, const Vector2 *pV2 );
 
-Vector2*  Vec2Normalize ( Vector2 *pOut, const Vector2 *pV );
+inline Vector2*  Vec2Normalize ( Vector2 *pOut, const Vector2 *pV );
 
 
 #endif

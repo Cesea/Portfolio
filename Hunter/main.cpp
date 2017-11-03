@@ -22,10 +22,10 @@ DEFINE_META_POD(uint32);
 int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE phInstance, LPSTR cmdLine, int cmdShow)
 {
 
-	D3DXMATRIX test(1.0f, 0.0f, 0.0f, 0.0f,
+	Matrix test(1.0f, 0.0f, 0.0f, 0.0f,
 					0.0f, 1.0f, 0.0f, 0.0f,
 					0.0f, 0.0f, 1.0f, 0.0f,
-					0.0f, 0.0f, 0.0f, 1.0f);
+					4.0f, 3.0f, 2.0f, 1.0f);
 
 	gEngine = new Engine;
 	if (!gEngine->InitializePlatform(hInstance))

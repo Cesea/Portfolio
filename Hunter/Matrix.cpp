@@ -1,6 +1,9 @@
 #include "stdafx.h"
 #include "Matrix.h"
 
+#include "Vector3.h"
+#include "Plane.h"
+
 DEFINE_META(Matrix)
 {
 	ADD_MEMBER(_11);
@@ -83,10 +86,10 @@ Matrix & Matrix::operator*=(const Matrix & other)
 	{
 		for ( int32 j = 0; j < 4; ++j )
 		{
-			*this[i][j] = 0.0f;
+			(*this).m[i][j] = 0.0f;
 			for ( int32 k = 0; k < 4; ++k )
 			{
-				*this[i][j] += ( thisCopy )[i][k] * other[k][j];
+				(*this).m[i][j] += (thisCopy).m[i][k] * other.m[k][j];
 			}
 		}
 	}
@@ -157,15 +160,14 @@ Matrix Matrix::operator*(const Matrix & other) const
 	{
 		for ( int32 j = 0; j < 4; ++j )
 		{
-			ret[i][j] = 00.f;
+			result.m[i][j] = 00.f;
 			for ( int k = 0; k < 4; ++k )
 			{
-				ret[i][j] += ( *this )[i][k] * result[k][j];
+				result.m[i][j] += ( *this ).m[i][k] * result.m[k][j];
 			}
 		}
 	}
-
-	return ret;
+	return result;
 }
 
 Matrix Matrix::operator+(const Matrix & other) const
@@ -226,4 +228,169 @@ Matrix operator*(float f, const Matrix & other)
 		other._21 * f, other._22 * f, other._23 * f, other._24 * f,
 		other._31 * f, other._32 * f, other._33 * f, other._34 * f,
 		other._41 * f, other._42 * f, other._43 * f, other._44 * f);
+}
+
+Matrix * MatrixIdentity(Matrix * pOut)
+{
+	return (Matrix *)D3DXMatrixIdentity(pOut);
+}
+
+bool MatrixIsIdentity(const Matrix * pM)
+{
+	return D3DXMatrixIsIdentity(pM);
+}
+
+float MatrixDeterminant(const Matrix * pM)
+{
+	return D3DXMatrixDeterminant(pM);
+}
+
+Matrix * MatrixTranspose(Matrix * pOut, const Matrix * pM)
+{
+	return (Matrix *)D3DXMatrixTranspose(pOut, pM);
+}
+
+Matrix * MatrixMultiply(Matrix * pOut, const Matrix * pM1, const Matrix * pM2)
+{
+	return (Matrix *)D3DXMatrixMultiply(pOut, pM1, pM2);
+}
+
+Matrix * MatrixMultiplyTranspose(Matrix * pOut, const Matrix * pM1, const Matrix * pM2)
+{
+	return (Matrix *)D3DXMatrixMultiplyTranspose(pOut, pM1, pM2);
+}
+
+Matrix * MatrixInverse(Matrix * pOut, float * pDeterminant, const Matrix * pM)
+{
+	return (Matrix *)D3DXMatrixInverse(pOut, pDeterminant, pM);
+}
+
+Matrix * MatrixScaling(Matrix * pOut, float sx, float sy, float sz)
+{
+	return (Matrix *)D3DXMatrixScaling(pOut, sx, sy, sz);
+}
+
+Matrix * MatrixTranslation(Matrix * pOut, float x, float y, float z)
+{
+	return (Matrix *)D3DXMatrixTranslation(pOut, x, y, z);
+}
+
+Matrix * MatrixRotationX(Matrix * pOut, float angle)
+{
+	return (Matrix *)D3DXMatrixRotationX(pOut, angle);
+}
+
+Matrix * MatrixRotationY(Matrix * pOut, float angle)
+{
+	return (Matrix *)D3DXMatrixRotationY(pOut, angle);
+}
+
+Matrix * MatrixRotationZ(Matrix * pOut, float angle)
+{
+	return (Matrix *)D3DXMatrixRotationZ(pOut, angle);
+}
+
+Matrix * MatrixRotationAxis(Matrix * pOut, const Vector3 * pV, float angle)
+{
+	return (Matrix *)D3DXMatrixRotationAxis(pOut, pV, angle);
+}
+
+Matrix * MatrixRotationQuaternion(Matrix * pOut, const Quaternion * pQ)
+{
+	return (Matrix *)D3DXMatrixRotationQuaternion(pOut, pQ);
+}
+
+Matrix * MatrixRotationYawPitchRoll(Matrix * pOut, float yaw, float pitch, float roll)
+{
+	return (Matrix *)D3DXMatrixRotationYawPitchRoll(pOut, yaw, pitch, roll);
+}
+
+Matrix * MatrixTransformation(Matrix * pOut, const Vector3 * pScalingCenter, const Quaternion * pScalingRotation, const Vector3 * pScaling, const Vector3 * pRotationCenter, const Quaternion * pRotation, const Vector3 * pTranslation)
+{
+	return (Matrix *)D3DXMatrixTransformation(pOut, pScalingCenter, pScalingRotation, pScaling, pRotationCenter, pRotation, pTranslation);
+}
+
+Matrix * MatrixTransformation2D(Matrix * pOut, const Vector2 * pScalingCenter, float scalingRotation, const Vector2 * pScaling, const Vector2 * pRotationCenter, float rotation, const Vector2 * pTranslation)
+{
+	return (Matrix *)D3DXMatrixTransformation2D(pOut, pScalingCenter, scalingRotation, pScaling, pRotationCenter, rotation, pTranslation);
+}
+
+Matrix * MatrixAffineTransformation(Matrix * pOut, float scaling, const Vector3 * pRotationCenter, const Quaternion * pRotation, const Vector3 * pTranslation)
+{
+	return (Matrix *)D3DXMatrixAffineTransformation(pOut, scaling, pRotationCenter, pRotation, pTranslation);
+}
+
+Matrix * MatrixAffineTransformation2D(Matrix * pOut, float scaling, const Vector2 * pRotationCenter, float rotation, const Vector2 * pTranslation)
+{
+	return (Matrix *)D3DXMatrixAffineTransformation2D(pOut, scaling, pRotationCenter, rotation, pTranslation);
+}
+
+Matrix * MatrixLookAtRH(Matrix * pOut, const Vector3 * pEye, const Vector3 * pAt, const Vector3 * pUp)
+{
+	return (Matrix *)D3DXMatrixLookAtRH(pOut, pEye, pAt, pUp);
+}
+
+Matrix * MatrixLookAtLH(Matrix * pOut, const Vector3 * pEye, const Vector3 * pAt, const Vector3 * pUp)
+{
+	return (Matrix *)D3DXMatrixLookAtLH(pOut, pEye, pAt, pUp);
+}
+
+Matrix * MatrixPerspectiveRH(Matrix * pOut, float w, float h, float zn, float zf)
+{
+	return (Matrix *)D3DXMatrixPerspectiveRH(pOut, w, h, zn, zf);
+}
+
+Matrix * MatrixPerspectiveLH(Matrix * pOut, float w, float h, float zn, float zf)
+{
+	return (Matrix *)D3DXMatrixPerspectiveLH(pOut, w, h, zn, zf);
+}
+
+Matrix * MatrixPerspectiveFovRH(Matrix * pOut, float fovy, float aspect, float zn, float zf)
+{
+	return (Matrix *)D3DXMatrixPerspectiveFovRH(pOut, fovy, aspect, zn, zf);
+}
+
+Matrix * MatrixPerspectiveFovLH(Matrix * pOut, float fovy, float aspect, float zn, float zf)
+{
+	return (Matrix *)D3DXMatrixPerspectiveFovLH(pOut, fovy, aspect, zn, zf);
+}
+
+Matrix * MatrixPerspectiveOffCenterRH(Matrix * pOut, float l, float r, float b, float t, float zn, float zf)
+{
+	return (Matrix *)D3DXMatrixPerspectiveOffCenterRH(pOut, l, r, b, t, zn, zf);
+}
+
+Matrix * MatrixPerspectiveOffCenterLH(Matrix * pOut, float l, float r, float b, float t, float zn, float zf)
+{
+	return (Matrix *)D3DXMatrixPerspectiveOffCenterLH(pOut, l, r, b, t, zn, zf);
+}
+
+Matrix * MatrixOrthoRH(Matrix * pOut, float w, float h, float zn, float zf)
+{
+	return (Matrix *)D3DXMatrixOrthoRH(pOut, w, h, zn, zf);
+}
+
+Matrix * MatrixOrthoLH(Matrix * pOut, float w, float h, float zn, float zf)
+{
+	return (Matrix *)D3DXMatrixOrthoLH(pOut, w, h, zn, zf);
+}
+
+Matrix * MatrixOrthoOffCenterRH(Matrix * pOut, float l, float r, float b, float t, float zn, float zf)
+{
+	return (Matrix *)D3DXMatrixOrthoOffCenterRH(pOut, l, r, b, t, zn, zf);
+}
+
+Matrix * MatrixOrthoOffCenterLH(Matrix * pOut, float l, float r, float b, float t, float zn, float zf)
+{
+	return (Matrix *)D3DXMatrixOrthoOffCenterLH(pOut, l, r, b, t, zn, zf);
+}
+
+Matrix * MatrixShadow(Matrix * pOut, const Vector4 * pLight, const Plane * pPlane)
+{
+	return (Matrix *)D3DXMatrixShadow(pOut, pLight, pPlane);
+}
+
+Matrix * MatrixReflect(Matrix * pOut, const Plane * pPlane)
+{
+	return (Matrix *)D3DXMatrixReflect(pOut, pPlane);
 }

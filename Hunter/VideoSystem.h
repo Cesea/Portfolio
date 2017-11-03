@@ -3,7 +3,7 @@
 
 #include "System.h"
 
-//#include "RenderComponent.h"
+//#include "VisualComponent.h"
 
 #include "imguiRenderer.h"
 
@@ -26,6 +26,7 @@ public :
 	virtual void ShutDown();
 
 	virtual void Update(float deltaTime);
+	void Render();
 
 	LPDIRECT3DDEVICE9 GetDevice()
 	{

@@ -21,14 +21,16 @@
 
 #include <assert.h>
 
-#include "Typedefs.h"
-#include "Reflection.h"
 
 #define WINSIZEX (1600)
 #define WINSIZEY (900)
 
 #define MAX_PATH (256)
 
+#include "Typedefs.h"
+#include "Reflection.h"
+
+#include "Math.h"
 #include "CommonUtils.h"
 
 

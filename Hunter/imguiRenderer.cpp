@@ -113,11 +113,11 @@ void im::GuiRenderer::Draw()
 	_pDevice->SetRenderState(D3DRS_LASTPIXEL, FALSE);
 	_pDevice->SetRenderState(D3DRS_FOGENABLE, FALSE);
 	_pDevice->SetRenderState(D3DRS_STENCILENABLE, FALSE);
-	//_pDevice->SetRenderState(D3DRS_COLORWRITEENABLE, 0x0000000F);
+	_pDevice->SetRenderState(D3DRS_COLORWRITEENABLE, 0x0000000F);
 	_pDevice->SetRenderState(D3DRS_SCISSORTESTENABLE, FALSE);
-	//_pDevice->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_ADD);
-	//_pDevice->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
-	//_pDevice->SetTextureStageState(0, D3DTSS_COLORARG2, D3DTA_DIFFUSE);
+	_pDevice->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_ADD);
+	_pDevice->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
+	_pDevice->SetTextureStageState(0, D3DTSS_COLORARG2, D3DTA_DIFFUSE);
 	_pDevice->SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_SELECTARG1);
 	_pDevice->SetTextureStageState(0, D3DTSS_ALPHAARG1, D3DTA_TEXTURE);
 	_pDevice->SetTextureStageState(0, D3DTSS_TEXCOORDINDEX, D3DTSS_TCI_PASSTHRU);
@@ -138,7 +138,6 @@ void im::GuiRenderer::Draw()
 	const GfxCommand* queue = gfxCommandQueue;
 	int numQueue = gfxCommandQueueSize;
 
-	//glDisable(GL_SCISSOR_TEST);
 	for (int i = 0; i < numQueue; ++i)
 	{
 		const GfxCommand& cmd = queue[i];
@@ -172,21 +171,19 @@ void im::GuiRenderer::Draw()
 		{
 			this->DrawFont(0, cmd.text.x, cmd.text.y, cmd.color, cmd.text.text, cmd.text.align);
 		}
-		//else if (cmd.type == GFXCMD_STENCIL)
-		//{
-		//	if (cmd.flags)
-		//	{
-		//		glEnable(GL_SCISSOR_TEST);
-		//		glScissor(cmd.rect.x, cmd.rect.y, cmd.rect.w, cmd.rect.h);
-		//	}
-		//	else
-		//	{
-		//		glDisable(GL_SCISSOR_TEST);
-		//	}
-		//}
+		else if (cmd.type == GFXCOMMAND_SCISSOR)
+		{
+			if (cmd.flags)
+			{
+				_pDevice->SetRenderState(D3DRS_SCISSORTESTENABLE, true);
+				_pDevice->SetScissorRect(&RECTMake(cmd.rect.x, cmd.rect.y, cmd.rect.x + cmd.rect.w, cmd.rect.y + cmd.rect.h));
+			}
+			else
+			{
+				_pDevice->SetRenderState(D3DRS_SCISSORTESTENABLE, true);
+			}
+		}
 	}
-	//glDisable(GL_SCISSOR_TEST);
-
 	_pStateBlock->Apply();
 }
 
@@ -286,13 +283,13 @@ static void ResetGfxCmdQueue()
 	GuiRenderer::gfxCommandQueueSize = 0;
 }
 
-static void AddGfxCmdStencil(int32 x, int32 y, int32 w, int32 h)
+static void AddGfxCmdStencil(int32 x, int32 y, int32 w, int32 h, bool flag)
 {
 	if (GuiRenderer::gfxCommandQueueSize >= GFXCOMMAND_QUEUE_SIZE)
 		return;
 	GfxCommand& cmd = GuiRenderer::gfxCommandQueue[GuiRenderer::gfxCommandQueueSize++];
-	cmd.type = GFXCOMMAND_STENCIL;
-	cmd.flags = x < 0 ? 0 : 1;      // on/off flag.
+	cmd.type = GFXCOMMAND_SCISSOR;
+	cmd.flags = flag;
 	cmd.color = 0;
 	cmd.rect.x = (int16)x;
 	cmd.rect.y = (int16)y;
@@ -328,20 +325,6 @@ static void AddGfxCmdLine(float x0, float y0, float x1, float y1, float r, D3DCO
 	cmd.line.y1 = (int16)(y1);
 }
 
-
-static void AddGfxCmdRoundedRect(float x, float y, float w, float h, float r, D3DCOLOR color)
-{
-	if (GuiRenderer::gfxCommandQueueSize >= GFXCOMMAND_QUEUE_SIZE)
-		return;
-	GfxCommand& cmd = GuiRenderer::gfxCommandQueue[GuiRenderer::gfxCommandQueueSize++];
-	cmd.type = GFXCOMMAND_RECT;
-	cmd.flags = 0;
-	cmd.color = color;
-	cmd.rect.x = (int16)(x);
-	cmd.rect.y = (int16)(y);
-	cmd.rect.w = (int16)(w);
-	cmd.rect.h = (int16)(h);
-}
 
 static void AddGfxCommandTriangle(int32 x, int32 y, int32 w, int32 h, int32 flags, D3DCOLOR color)
 {
@@ -977,22 +960,17 @@ bool im::Edit(char * text, int32 width, bool enabled)
 	return keyResult;
 }
 
-void im::DrawFont(int32 x, int32 y, int32 align, const char * text, D3DCOLOR color)
-{
-	AddGfxCommandText(x, y, align, text, color);
-}
-
-void im::DrawLine(float x0, float y0, float x1, float y1, float r, D3DCOLOR color)
-{
-	AddGfxCmdLine(x0, y0, x1, y1, r, color);
-}
-
-void im::DrawRoundedRect(float x, float y, float w, float h, float r, D3DCOLOR color)
-{
-	AddGfxCmdRoundedRect(x, y, w, h, r, color);
-}
-
-void im::DrawRect(float x, float y, float w, float h, D3DCOLOR color)
-{
-	AddGfxCommandRect(x, y, w, h, color);
-}
+//void im::DrawFontCommand(int32 x, int32 y, int32 align, const char * text, D3DCOLOR color)
+//{
+//	AddGfxCommandText(x, y, align, text, color);
+//}
+//
+//void im::DrawLineCommand(float x0, float y0, float x1, float y1, float r, D3DCOLOR color)
+//{
+//	AddGfxCmdLine(x0, y0, x1, y1, r, color);
+//}
+//
+//void im::DrawRectCommand(float x, float y, float w, float h, D3DCOLOR color)
+//{
+//	AddGfxCommandRect(x, y, w, h, color);
+//}
