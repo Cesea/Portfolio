@@ -9,6 +9,8 @@
 #include "InputSystem.h"
 #include "VideoSystem.h"
 #include "SceneSystem.h"
+#include "PhysicsSystem.h"
+#include "CommandSystem.h"
 
 #include <memory>
 
@@ -16,6 +18,15 @@
 #include "EffectManager.h"
 //#include "FontManager.h"
 //#include "MeshManager.h"
+
+//struct ServiceProvider
+//{
+//	InputSystem *pInput{};
+//	VideoSystem *pVideo{};
+//	SceneSystem *pScene{};
+//	PhysicsSystem *pPhysics{};
+//	CommandSystem *pCommand{};
+//};
 
 typedef std::shared_ptr<System> SystemPtr;
 
@@ -73,7 +84,6 @@ public :
 	HINSTANCE GetInstanceHandle();
 
 	LRESULT CALLBACK EngineWindowCallback(HWND windowHandle, UINT msg, WPARAM wParam, LPARAM lParam);
-	bool32 ProcessWindowMessage();
 
 	VideoSystem *GetVideo() { return _pVideo.get(); }
 	InputSystem *GetInput() { return _pInput.get(); }

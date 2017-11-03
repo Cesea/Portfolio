@@ -21,6 +21,14 @@ protected :
 class PlayerCommandComponent : public CommandComponent
 {
 public :
+	PlayerCommandComponent() {}
+	virtual ~PlayerCommandComponent() {}
+
+	virtual bool PreInit(Entity *pOwner);
+	virtual bool Init();
+	virtual bool Release();
+
+	virtual void Update(float deltaTime);
 
 private :
 
@@ -29,6 +37,14 @@ private :
 class AICommandComponent : public CommandComponent
 {
 public :
+	AICommandComponent();
+	virtual ~AICommandComponent();
+
+	virtual bool PreInit(Entity *pOwner);
+	virtual bool Init();
+	virtual bool Release();
+
+	virtual void Update(float deltaTime);
 
 private :
 };

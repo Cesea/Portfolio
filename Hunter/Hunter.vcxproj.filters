@@ -21,15 +21,6 @@
     <ClCompile Include="Effect.cpp">
       <Filter>D3D</Filter>
     </ClCompile>
-    <ClCompile Include="InputSystem.cpp">
-      <Filter>Core\System</Filter>
-    </ClCompile>
-    <ClCompile Include="System.cpp">
-      <Filter>Core\System</Filter>
-    </ClCompile>
-    <ClCompile Include="VideoSystem.cpp">
-      <Filter>Core\System</Filter>
-    </ClCompile>
     <ClCompile Include="Control.cpp">
       <Filter>GUI\Retained\Controls</Filter>
     </ClCompile>
@@ -47,9 +38,6 @@
     </ClCompile>
     <ClCompile Include="IMesh.cpp">
       <Filter>D3D</Filter>
-    </ClCompile>
-    <ClCompile Include="SceneSystem.cpp">
-      <Filter>Core\System</Filter>
     </ClCompile>
     <ClCompile Include="Meta.cpp">
       <Filter>Sub\Reflection</Filter>
@@ -75,9 +63,6 @@
     <ClCompile Include="GuiResource.cpp">
       <Filter>GUI\Retained</Filter>
     </ClCompile>
-    <ClCompile Include="imguiRenderer.cpp">
-      <Filter>GUI</Filter>
-    </ClCompile>
     <ClCompile Include="tinyxml2.cpp">
       <Filter>Sub\tinyxml</Filter>
     </ClCompile>
@@ -92,6 +77,45 @@
     </ClCompile>
     <ClCompile Include="CommandComponent.cpp">
       <Filter>Core\ECS\Component\CommandComponent</Filter>
+    </ClCompile>
+    <ClCompile Include="imguiRenderer.cpp">
+      <Filter>GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="CommandSystem.cpp">
+      <Filter>Core\System\CommandSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="System.cpp">
+      <Filter>Core\System</Filter>
+    </ClCompile>
+    <ClCompile Include="SceneSystem.cpp">
+      <Filter>Core\System\SceneeSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="InputSystem.cpp">
+      <Filter>Core\System\InputSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="VideoSystem.cpp">
+      <Filter>Core\System\VideoSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="ComponentFactory.cpp">
+      <Filter>Core\ECS\Component</Filter>
+    </ClCompile>
+    <ClCompile Include="HealthComponent.cpp">
+      <Filter>Core\ECS\Component\Health</Filter>
+    </ClCompile>
+    <ClCompile Include="PhysicsComponent.cpp">
+      <Filter>Core\ECS\Component\PhysicsComponent</Filter>
+    </ClCompile>
+    <ClCompile Include="Entity.cpp">
+      <Filter>Core\ECS</Filter>
+    </ClCompile>
+    <ClCompile Include="XMLManager.cpp">
+      <Filter>Managers</Filter>
+    </ClCompile>
+    <ClCompile Include="XmlSerializer.cpp">
+      <Filter>Sub\Reflection\Serializer</Filter>
+    </ClCompile>
+    <ClCompile Include="Vector3.cpp">
+      <Filter>Math</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -143,18 +167,6 @@
     </ClInclude>
     <ClInclude Include="D3DCommon.h">
       <Filter>D3D</Filter>
-    </ClInclude>
-    <ClInclude Include="InputSystem.h">
-      <Filter>Core\System</Filter>
-    </ClInclude>
-    <ClInclude Include="SceneSystem.h">
-      <Filter>Core\System</Filter>
-    </ClInclude>
-    <ClInclude Include="System.h">
-      <Filter>Core\System</Filter>
-    </ClInclude>
-    <ClInclude Include="VideoSystem.h">
-      <Filter>Core\System</Filter>
     </ClInclude>
     <ClInclude Include="IScene.h">
       <Filter>Scene</Filter>
@@ -261,6 +273,27 @@
     <ClInclude Include="HealthComponent.h">
       <Filter>Core\ECS\Component\Health</Filter>
     </ClInclude>
+    <ClInclude Include="CommandSystem.h">
+      <Filter>Core\System\CommandSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="System.h">
+      <Filter>Core\System</Filter>
+    </ClInclude>
+    <ClInclude Include="SceneSystem.h">
+      <Filter>Core\System\SceneeSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="InputSystem.h">
+      <Filter>Core\System\InputSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="VideoSystem.h">
+      <Filter>Core\System\VideoSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="ComponentFactory.h">
+      <Filter>Core\ECS\Component</Filter>
+    </ClInclude>
+    <ClInclude Include="Vector3.h">
+      <Filter>Math</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Event">
@@ -325,6 +358,21 @@
     </Filter>
     <Filter Include="Core\ECS\Component\Health">
       <UniqueIdentifier>{12a9b84b-d7f5-4bfe-a865-130516f0dda3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\System\CommandSystem">
+      <UniqueIdentifier>{46f0bc65-5f06-44dd-a5c1-6fe23fdb4469}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\System\SceneeSystem">
+      <UniqueIdentifier>{7f27f576-2e1f-4782-9b40-a2e0bbfeb180}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\System\InputSystem">
+      <UniqueIdentifier>{f1cfac8a-df1c-4e77-a1c0-7b9851f84811}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\System\VideoSystem">
+      <UniqueIdentifier>{05262f6f-8893-4a0a-b28e-843ce048c3cb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Math">
+      <UniqueIdentifier>{a3fc95b4-5fb1-4f8f-8f65-d94a2c21622d}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

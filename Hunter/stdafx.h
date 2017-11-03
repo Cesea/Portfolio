@@ -22,6 +22,7 @@
 #include <assert.h>
 
 #include "Typedefs.h"
+#include "Reflection.h"
 
 #define WINSIZEX (1600)
 #define WINSIZEY (900)
@@ -30,7 +31,6 @@
 
 #include "CommonUtils.h"
 
-#include "Reflection.h"
 
 #include "Engine.h"
 #include "D3DCommon.h"

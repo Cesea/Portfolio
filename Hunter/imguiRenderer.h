@@ -1,11 +1,11 @@
 #ifndef IM_GUI_RENDERER_H
 #define IM_GUI_RENDERER_H
 
-
 #include "InputSystem.h"
 
 namespace im
 {
+
 	enum TextAlign
 	{
 		ALIGN_LEFT = 0x00000000,
@@ -241,9 +241,14 @@ namespace im
 	void DrawRoundedRect(float x, float y, float w, float h, float r, D3DCOLOR color);
 	void DrawRect(float x, float y, float w, float h, D3DCOLOR color);
 
-	//bool GuiInit(const char* fontpath);
-	//void GuiDestroy();
-	//void GuiDraw(int32 width, int32 height);
+	class EditorWindow
+	{
+	public :
+
+	private :
+
+	};
+
 }
 
 #endif

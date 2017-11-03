@@ -48,7 +48,7 @@ void Keyboard::UpdateOnKeyDown(WPARAM wParam, LPARAM lParam)
 
 void Keyboard::UpdateOnChar(WPARAM wParam, LPARAM lParam)
 {
-	_charInput;
+	_charInput = wParam;
 }
 
 //void Keyboard::UpdateWithMessage(UINT msg, WPARAM wParam, LPARAM lParam)

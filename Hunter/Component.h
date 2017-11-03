@@ -1,7 +1,13 @@
 #ifndef COMPONENT_H
 #define COMPONENT_H
 
+constexpr ComponentID INVALID_COMPONENT = 0;
+
 class Entity;
+
+//enum ComponentType
+//{
+//};
 
 class Component
 {
@@ -17,7 +23,6 @@ public:
 
 protected :
 	Entity *_pOwner{};
-
 };
 
 #endif

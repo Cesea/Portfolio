@@ -131,8 +131,15 @@ inline D3DXVECTOR3 InterpolateVector3(const D3DXVECTOR3 &start, const D3DXVECTOR
 struct Ray {
 	D3DXVECTOR3 origin;		//직선의 시작위치
 	D3DXVECTOR3 direction;  //직선의 방향(정규화 되어있어야 함);
-
 };
+
+float RandFloat();
+float RandFloat(float max);
+float RandFloat(float min, float max);
+
+int32 RandInt();
+int32 RandInt(int32 max);
+int32 RandInt(int32 min, int32 max);
 
 
 

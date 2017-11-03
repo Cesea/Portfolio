@@ -38,3 +38,33 @@ RECT RECTMake(int left, int top, int right, int bottom)
 	result.bottom = bottom;
 	return result;
 }
+
+float RandFloat()
+{
+	return (float)rand() / (float)RAND_MAX;
+}
+
+float RandFloat(float max)
+{
+	return ((float)rand() / (float)RAND_MAX) * max;
+}
+
+float RandFloat(float min, float max)
+{
+	return ((float)rand() / (float)RAND_MAX) * (max - min) + min;
+}
+
+int32 RandInt()
+{
+	return rand();
+}
+
+int32 RandInt(int32 max)
+{
+	return rand() % max;
+}
+
+int32 RandInt(int32 min, int32 max)
+{
+	return rand() % (max - min); +min;
+}

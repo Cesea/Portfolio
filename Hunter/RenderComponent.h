@@ -20,7 +20,14 @@ public :
 class BufferRenderComponent : public RenderComponent
 {
 public :
+	BufferRenderComponent() {}
+	virtual ~BufferRenderComponent() {}
 
+	virtual bool PreInit(Entity *pOwner);
+	virtual bool Init();
+	virtual bool Release();
+
+	virtual void Update(float deltaTime);
 private :
 
 };
@@ -28,7 +35,14 @@ private :
 class MeshRenderComponent : public RenderComponent
 {
 public :
+	MeshRenderComponent() {}
+	virtual ~MeshRenderComponent() {}
 
+	virtual bool PreInit(Entity *pOwner);
+	virtual bool Init();
+	virtual bool Release();
+
+	virtual void Update(float deltaTime);
 private :
 
 };

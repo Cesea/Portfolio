@@ -21,6 +21,7 @@ Engine::~Engine()
 
 void Engine::Run()
 {
+	_console.Init();
 	if (!InitializeSystems())
 	{
 		return;
@@ -29,13 +30,12 @@ void Engine::Run()
 	_running = true;
 	_valid = true;
 
-	_console.Init();
-
 	_applicationTimer.Initialize(16);
 
 	while (_valid && _running)
 	{
 		MSG msg{};
+		_pInput->Update(0.0f);
 		while (PeekMessage(&msg, 0, 0, 0, PM_REMOVE))
 		{
 			TranslateMessage(&msg);
@@ -93,13 +93,13 @@ LRESULT Engine::EngineWindowCallback(HWND windowHandle, UINT msg, WPARAM wParam,
 	case WM_SYSKEYDOWN:
 	case WM_KEYDOWN :
 	{
-		_pInput->keyboard.UpdateOnKeyDown(msg.wParam, msg.lParam);
+		_pInput->keyboard.UpdateOnKeyDown(wParam, lParam);
 	}break;
 
 	case WM_SYSKEYUP :
 	case WM_KEYUP :
 	{
-		_pInput->keyboard.UpdateOnKeyUP(msg.wParam, msg.lParam);
+		_pInput->keyboard.UpdateOnKeyUp(wParam, lParam);
 	}break;
 
 	case WM_CHAR :
@@ -115,7 +115,7 @@ LRESULT Engine::EngineWindowCallback(HWND windowHandle, UINT msg, WPARAM wParam,
 	case WM_RBUTTONUP:
 	case WM_MOUSEMOVE:
 	{
-		_pInput->mouse.UpdateWithMessage(msg.wParam, msg.lParam);
+		_pInput->mouse.UpdateWithMessage(wParam, lParam);
 	}break;
 
 	default :
@@ -125,56 +125,6 @@ LRESULT Engine::EngineWindowCallback(HWND windowHandle, UINT msg, WPARAM wParam,
 	}
 	return result;
 }
-
-bool32 Engine::ProcessWindowMessage()
-{
-	bool32 result = false;
-
-	MSG msg;
-	_pInput->Update(0.0f);
-	while (PeekMessage(&msg, _windowHandle, 0, 0, PM_REMOVE))
-	{
-		switch (msg.message)
-		{
-		case WM_DESTROY :
-		{
-			_running = false;
-			_valid = false;
-		}break;
-		case WM_KEYDOWN :
-		case WM_KEYUP :
-		case WM_SYSKEYDOWN :
-		case WM_SYSKEYUP :
-		{
-			_pInput->keyboard.UpdateWithMessage(msg.message, msg.wParam, msg.lParam);
-		}break;
-
-		//case WM_CHAR :
-		//{
-		//	_pInput->keyboard.SetCharInput((uint8)msg.wParam);
-		//}break;
-
-		case WM_LBUTTONDOWN :
-		case WM_LBUTTONUP :
-		case WM_MBUTTONUP :
-		case WM_MBUTTONDOWN :
-		case WM_RBUTTONDOWN :
-		case WM_RBUTTONUP :
-		case WM_MOUSEMOVE :
-		{
-			_pInput->mouse.UpdateWithMessage(msg.wParam, msg.lParam);
-		}break;
-		default :
-		{
-			TranslateMessage(&msg);
-			DispatchMessage(&msg);
-		}break;
-
-		}
-	}
-	return result;
-}
-
 
 bool Engine::InitializePlatform(HINSTANCE instanceHandle)
 {

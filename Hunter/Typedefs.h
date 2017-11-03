@@ -22,9 +22,9 @@ typedef uint32 TextureID;
 typedef uint32 EffectID;
 typedef uint32 FontID;
 
+typedef uint32 ComponentID;
+typedef uint32 EntityID;
 typedef uint32 SurfaceID;
-
-typedef uint32 VertexCacheID;
 
 typedef uint32 UIID;
 

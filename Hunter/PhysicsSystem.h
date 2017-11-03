@@ -1,4 +1,4 @@
-#ifndef PHYSCIS_SYSTEM_H
+#ifndef PHYSICS_SYSTEM_H
 #define PHYSICS_SYSTEM_H
 
 #include "System.h"
@@ -17,6 +17,8 @@ public:
 	virtual void Update(float deltaTime);
 
 	virtual EventChannel GetChannel() { return _channel; }
+
+private :
 
 };
 
