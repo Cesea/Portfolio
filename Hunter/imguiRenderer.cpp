@@ -371,6 +371,12 @@ static void AddGfxCommandText(int32 x, int32 y, int32 align, const char* text, D
 	cmd.text.text = text;
 }
 
+bool im::imMessageProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
+{
+	bool result = false;
+	return result;
+}
+
 bool im::ButtonLogic(uint32 id, bool over)
 {
 	bool res = false;

@@ -89,6 +89,9 @@ public :
 	void SetSerializer(SerializerFunction func = nullptr);
 	void Serialize(std::ostream &os, RefVariant ref) const;
 
+	//TODO : Implement this;
+	uint32 TotalNumElement() const;
+
 private :
 	std::string _name;
 	SerializerFunction _serializer;

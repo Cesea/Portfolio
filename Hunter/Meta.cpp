@@ -72,6 +72,11 @@ void MetaData::Serialize(std::ostream & os, RefVariant ref) const
 	}
 }
 
+uint32 MetaData::TotalNumElement() const
+{
+	return uint32();
+}
+
 Member *& Member::Next()
 {
 	return _next;

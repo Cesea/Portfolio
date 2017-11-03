@@ -3,12 +3,12 @@
 
 #include "tinyxml2.h"
 
-struct vec3
-{
-	float x;
-	float y;
-	float z;
-};
+//struct vec3
+//{
+//	float x;
+//	float y;
+//	float z;
+//};
 
 void DumpToStdOut(const tinyxml2::XMLAttribute *pAttribute, uint32 indent = 0)
 {
@@ -121,38 +121,38 @@ bool BaseScene::Init()
 
 	//document.SaveFile("res/data.xml");
 
-	tinyxml2::XMLDocument document;
-	tinyxml2::XMLError error =  document.LoadFile("res/data.xml");
-	if (error != tinyxml2::XML_SUCCESS)
-	{
-		return false;
-	}
+	//tinyxml2::XMLDocument document;
+	//tinyxml2::XMLError error =  document.LoadFile("res/data.xml");
+	//if (error != tinyxml2::XML_SUCCESS)
+	//{
+	//	return false;
+	//}
 
-	tinyxml2::XMLElement *pRootElement = document.RootElement();
+	//tinyxml2::XMLElement *pRootElement = document.RootElement();
 
-	tinyxml2::XMLElement *pPositionElement = pRootElement->NextSiblingElement("position");
+	//tinyxml2::XMLElement *pPositionElement = pRootElement->NextSiblingElement("position");
 
-	std::string str;
+	//std::string str;
 
 	//const tinyxml2::XMLElement *pChild = pPositionElement->;
-	while (pPositionElement)
-	{
-		str = pPositionElement->Name();
-		std::cout << str << std::endl;
+	//while (pPositionElement)
+	//{
+	//	str = pPositionElement->Name();
+	//	std::cout << str << std::endl;
 
-		const tinyxml2::XMLAttribute *pAttribute = pPositionElement->FirstAttribute();
-		while (pAttribute != nullptr)
-		{
-			str = pAttribute->Name();
-			std::cout << str << std::endl;
+	//	const tinyxml2::XMLAttribute *pAttribute = pPositionElement->FirstAttribute();
+	//	while (pAttribute != nullptr)
+	//	{
+	//		str = pAttribute->Name();
+	//		std::cout << str << std::endl;
 
-			str = pAttribute->Value();
-			std::cout << str << std::endl;
+	//		str = pAttribute->Value();
+	//		std::cout << str << std::endl;
 
-			pAttribute = pAttribute->Next();
-		}
-
-	}
+	//		pAttribute = pAttribute->Next();
+	//	}
+	//	pPositionElement = pPositionElement->NextSiblingElement();
+	//}
 
 	//const tinyxml2::XMLElement *pElement = pRootElement;
 	//for (; pElement != nullptr; pElement->NextSibling())

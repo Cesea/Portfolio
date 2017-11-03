@@ -54,6 +54,8 @@ namespace im
 		};
 	};
 
+	bool imMessageProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
+
 	constexpr uint32 GFXCOMMAND_QUEUE_SIZE = 5000;
 
 	class GuiRenderer
