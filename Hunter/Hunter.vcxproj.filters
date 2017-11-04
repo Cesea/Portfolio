@@ -9,6 +9,9 @@
     <ClCompile Include="DataPackage.cpp">
       <Filter>Sub</Filter>
     </ClCompile>
+    <ClCompile Include="ApplicationTimer.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
     <ClCompile Include="Console.cpp">
       <Filter>Core</Filter>
     </ClCompile>
@@ -135,6 +138,7 @@
     <ClCompile Include="EntityTemplate.cpp">
       <Filter>Core\ECS\Entity</Filter>
     </ClCompile>
+<<<<<<< HEAD
     <ClCompile Include="ApplicationTimer.cpp">
       <Filter>Core\Timers</Filter>
     </ClCompile>
@@ -150,6 +154,8 @@
     <ClCompile Include="VertexBuffer.cpp">
       <Filter>Core\Resources\VertexBuffer</Filter>
     </ClCompile>
+=======
+>>>>>>> parent of 0dc814c... 일단 데이터 풀은 멈춘다..
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -176,6 +182,9 @@
     </ClInclude>
     <ClInclude Include="Typedefs.h">
       <Filter>Sub</Filter>
+    </ClInclude>
+    <ClInclude Include="ApplicationTimer.h">
+      <Filter>Core</Filter>
     </ClInclude>
     <ClInclude Include="Console.h">
       <Filter>Core</Filter>
@@ -354,6 +363,7 @@
     <ClInclude Include="EntityTemplate.h">
       <Filter>Core\ECS\Entity</Filter>
     </ClInclude>
+<<<<<<< HEAD
     <ClInclude Include="ApplicationTimer.h">
       <Filter>Core\Timers</Filter>
     </ClInclude>
@@ -381,6 +391,8 @@
     <ClInclude Include="VertexBuffer.h">
       <Filter>Core\Resources\VertexBuffer</Filter>
     </ClInclude>
+=======
+>>>>>>> parent of 0dc814c... 일단 데이터 풀은 멈춘다..
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Event">
@@ -464,6 +476,7 @@
     <Filter Include="Core\ECS\Component\VisualComponent">
       <UniqueIdentifier>{10c5e796-980a-4add-8b92-55f72e5224a5}</UniqueIdentifier>
     </Filter>
+<<<<<<< HEAD
     <Filter Include="Core\Timers">
       <UniqueIdentifier>{1a498917-4bd0-45a4-8cdb-28af30c3deb7}</UniqueIdentifier>
     </Filter>
@@ -473,5 +486,7 @@
     <Filter Include="Core\Resources\VertexBuffer">
       <UniqueIdentifier>{9d3c54ad-e264-45bc-822f-ffd99ff7f4d5}</UniqueIdentifier>
     </Filter>
+=======
+>>>>>>> parent of 0dc814c... 일단 데이터 풀은 멈춘다..
   </ItemGroup>
 </Project>

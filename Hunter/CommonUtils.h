@@ -1,8 +1,6 @@
 #ifndef COMMON_UTILS_H
 #define COMMON_UTILS_H
 
-#include "BitFlags.h"
-#include "NumericTools.h"
 #include <cstdlib>
 
 constexpr float EPSILON = 0.001f;
@@ -131,20 +129,6 @@ inline float ClampMinusOnePlusOne(float value)
 	else if (result > 1.0f)
 	{
 		result = 1.0f;
-	}
-	return result;
-}
-
-inline int32 ClampInt(int32 value, int32 min, int32 max)
-{
-	int32  result = value;
-	if (result < min)
-	{
-		result = min;
-	}
-	if (result > max)
-	{
-		result = max;
 	}
 	return result;
 }
