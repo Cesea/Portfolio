@@ -22,6 +22,8 @@ typedef uint32 TextureID;
 typedef uint32 EffectID;
 typedef uint32 FontID;
 
+typedef uint16 PoolHandle;
+
 typedef uint32 ComponentID;
 typedef uint32 ComponentFamilyID;
 typedef uint32 EntityID;

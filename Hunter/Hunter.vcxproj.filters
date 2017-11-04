@@ -9,9 +9,6 @@
     <ClCompile Include="DataPackage.cpp">
       <Filter>Sub</Filter>
     </ClCompile>
-    <ClCompile Include="ApplicationTimer.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
     <ClCompile Include="Console.cpp">
       <Filter>Core</Filter>
     </ClCompile>
@@ -138,6 +135,12 @@
     <ClCompile Include="EntityTemplate.cpp">
       <Filter>Core\ECS\Entity</Filter>
     </ClCompile>
+    <ClCompile Include="ApplicationTimer.cpp">
+      <Filter>Core\Timers</Filter>
+    </ClCompile>
+    <ClCompile Include="ReferenceCounter.cpp">
+      <Filter>Core\Resources</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -164,9 +167,6 @@
     </ClInclude>
     <ClInclude Include="Typedefs.h">
       <Filter>Sub</Filter>
-    </ClInclude>
-    <ClInclude Include="ApplicationTimer.h">
-      <Filter>Core</Filter>
     </ClInclude>
     <ClInclude Include="Console.h">
       <Filter>Core</Filter>
@@ -345,6 +345,21 @@
     <ClInclude Include="EntityTemplate.h">
       <Filter>Core\ECS\Entity</Filter>
     </ClInclude>
+    <ClInclude Include="ApplicationTimer.h">
+      <Filter>Core\Timers</Filter>
+    </ClInclude>
+    <ClInclude Include="ReferenceCounter.h">
+      <Filter>Core\Resources</Filter>
+    </ClInclude>
+    <ClInclude Include="BitFlags.h">
+      <Filter>Sub</Filter>
+    </ClInclude>
+    <ClInclude Include="DataPool.h">
+      <Filter>Core\Resources</Filter>
+    </ClInclude>
+    <ClInclude Include="NumericTools.h">
+      <Filter>Sub</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Event">
@@ -427,6 +442,15 @@
     </Filter>
     <Filter Include="Core\ECS\Component\VisualComponent">
       <UniqueIdentifier>{10c5e796-980a-4add-8b92-55f72e5224a5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Timers">
+      <UniqueIdentifier>{1a498917-4bd0-45a4-8cdb-28af30c3deb7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Resources">
+      <UniqueIdentifier>{ca6f9eff-5239-4241-8601-a5e9f82a03c7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Memory">
+      <UniqueIdentifier>{27818145-7f84-4584-afad-028f53812b82}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

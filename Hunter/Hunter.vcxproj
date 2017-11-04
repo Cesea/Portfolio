@@ -136,6 +136,7 @@
     <ClCompile Include="PhysicsSystem.cpp" />
     <ClCompile Include="Plane.cpp" />
     <ClCompile Include="Quaternion.cpp" />
+    <ClCompile Include="ReferenceCounter.cpp" />
     <ClCompile Include="VisualComponent.cpp" />
     <ClCompile Include="TextSerializer.cpp" />
     <ClCompile Include="tinyxml2.cpp" />
@@ -172,6 +173,7 @@
     <ClInclude Include="AISystem.h" />
     <ClInclude Include="ApplicationTimer.h" />
     <ClInclude Include="BaseScene.h" />
+    <ClInclude Include="BitFlags.h" />
     <ClInclude Include="ButtonControl.h" />
     <ClInclude Include="Color4F.h" />
     <ClInclude Include="CommandComponent.h" />
@@ -182,6 +184,7 @@
     <ClInclude Include="ComponentTemplate.h" />
     <ClInclude Include="Console.h" />
     <ClInclude Include="Control.h" />
+    <ClInclude Include="DataPool.h" />
     <ClInclude Include="Entity.h" />
     <ClInclude Include="EntityFactory.h" />
     <ClInclude Include="EntityTemplate.h" />
@@ -189,11 +192,13 @@
     <ClInclude Include="imguiRenderer.h" />
     <ClInclude Include="Math.h" />
     <ClInclude Include="Matrix.h" />
+    <ClInclude Include="NumericTools.h" />
     <ClInclude Include="PhysicsComponent.h" />
     <ClInclude Include="PhysicsSystem.h" />
     <ClInclude Include="PhysicsUtils.h" />
     <ClInclude Include="Plane.h" />
     <ClInclude Include="Quaternion.h" />
+    <ClInclude Include="ReferenceCounter.h" />
     <ClInclude Include="VisualComponent.h" />
     <ClInclude Include="TextSerializer.h" />
     <ClInclude Include="tinyxml2.h" />
