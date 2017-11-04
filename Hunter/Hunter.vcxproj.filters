@@ -141,6 +141,15 @@
     <ClCompile Include="ReferenceCounter.cpp">
       <Filter>Core\Resources</Filter>
     </ClCompile>
+    <ClCompile Include="ResourcePoolManager.cpp">
+      <Filter>Core\Resources</Filter>
+    </ClCompile>
+    <ClCompile Include="ResourcePoolItem.cpp">
+      <Filter>Core\Resources</Filter>
+    </ClCompile>
+    <ClCompile Include="VertexBuffer.cpp">
+      <Filter>Core\Resources\VertexBuffer</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -360,6 +369,18 @@
     <ClInclude Include="NumericTools.h">
       <Filter>Sub</Filter>
     </ClInclude>
+    <ClInclude Include="ResourcePool.h">
+      <Filter>Core\Resources</Filter>
+    </ClInclude>
+    <ClInclude Include="ResourcePoolManager.h">
+      <Filter>Core\Resources</Filter>
+    </ClInclude>
+    <ClInclude Include="ResourcePoolItem.h">
+      <Filter>Core\Resources</Filter>
+    </ClInclude>
+    <ClInclude Include="VertexBuffer.h">
+      <Filter>Core\Resources\VertexBuffer</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Event">
@@ -449,8 +470,8 @@
     <Filter Include="Core\Resources">
       <UniqueIdentifier>{ca6f9eff-5239-4241-8601-a5e9f82a03c7}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Core\Memory">
-      <UniqueIdentifier>{27818145-7f84-4584-afad-028f53812b82}</UniqueIdentifier>
+    <Filter Include="Core\Resources\VertexBuffer">
+      <UniqueIdentifier>{9d3c54ad-e264-45bc-822f-ffd99ff7f4d5}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

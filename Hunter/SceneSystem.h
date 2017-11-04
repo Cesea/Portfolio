@@ -11,7 +11,15 @@ class SceneSystem : public System
 {
 	typedef std::map<std::string, IScene *> SceneMap;
 	typedef std::map<std::string, IScene *>::iterator SceneMapIter;
+
 public :
+	struct SceneChangeEvent
+	{
+		std::string newSceneName;
+	};
+
+public :
+
 	SceneSystem();
 	virtual ~SceneSystem();
 

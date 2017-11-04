@@ -3,6 +3,15 @@
 
 #include "Typedefs.h"
 
+#define FLAG(x) (1<<(x))
+#define TEST_BIT(flag, bit) (((flag.value) & FLAG((bit))) !=0)
+#define TEST_ALL(flag, set) (((flag.value) & (set)) == (set))
+#define TEST_ANY(flag, set) (((flag.value) & (set)) !=0)
+#define SET_BIT(flag, bit) ((flag.value) |= FLAG((bit)))
+#define CLEAR_BIT(flag, bit) ((flag.value) &= ~FLAG((bit)))
+#define SET_ALL(flag, set) ((flag.value) |= (set))
+#define CLEAR_ALL(flag, set) ((flag.value) &= ~(set))
+
 template <class T>
 class BitFlags
 {

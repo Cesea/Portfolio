@@ -137,6 +137,9 @@
     <ClCompile Include="Plane.cpp" />
     <ClCompile Include="Quaternion.cpp" />
     <ClCompile Include="ReferenceCounter.cpp" />
+    <ClCompile Include="ResourcePoolItem.cpp" />
+    <ClCompile Include="ResourcePoolManager.cpp" />
+    <ClCompile Include="VertexBuffer.cpp" />
     <ClCompile Include="VisualComponent.cpp" />
     <ClCompile Include="TextSerializer.cpp" />
     <ClCompile Include="tinyxml2.cpp" />
@@ -199,6 +202,10 @@
     <ClInclude Include="Plane.h" />
     <ClInclude Include="Quaternion.h" />
     <ClInclude Include="ReferenceCounter.h" />
+    <ClInclude Include="ResourcePool.h" />
+    <ClInclude Include="ResourcePoolItem.h" />
+    <ClInclude Include="ResourcePoolManager.h" />
+    <ClInclude Include="VertexBuffer.h" />
     <ClInclude Include="VisualComponent.h" />
     <ClInclude Include="TextSerializer.h" />
     <ClInclude Include="tinyxml2.h" />

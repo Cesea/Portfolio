@@ -33,6 +33,8 @@
 #include "Math.h"
 #include "CommonUtils.h"
 
+#include "ResourcePoolManager.h"
+
 
 #include "Engine.h"
 #include "D3DCommon.h"

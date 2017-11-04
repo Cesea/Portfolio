@@ -7,6 +7,32 @@
 
 constexpr float EPSILON = 0.001f;
 
+enum LockFlagBits
+{
+	LockReadBit = 0,	// lock data for reading
+	LockWriteBit,		// lock data for selective writing (not all data is changed)
+	LockReplaceBit,	// lock data to completely overwrite all data
+	LockExclusiveBit,		// allow no other locks while active
+	LockWaitBit,			// wait until data is available
+};
+
+enum LockFlags
+{
+	LockRead = FLAG(LockReadBit),
+	LockWriteFlag = FLAG(LockWriteBit),
+	LockReplaceFlag = FLAG(LockWriteBit),
+	LockExclusive = FLAG(LockExclusiveBit),
+	LockWait = FLAG(LockWaitBit),
+};
+
+enum LockType
+{
+	ReadLock = 0,
+	WriteLock,
+	ReadWriteLock,
+};
+
+
 inline bool IsCharacter(WPARAM wParam)
 {
 	bool result = false;

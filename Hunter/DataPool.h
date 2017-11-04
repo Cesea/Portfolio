@@ -6,11 +6,11 @@
 #include "Typedefs.h"
 #include "BitFlags.h"
 
+
 constexpr PoolHandle INVALID_POOL_HANDLE = 0xffff;
 
 inline void ClearHandle(PoolHandle handle) { handle = INVALID_POOL_HANDLE; }
 inline bool32 ValidHandle(PoolHandle handle) { return (handle != INVALID_POOL_HANDLE); }
-
 
 template <typename T>
 class PoolGroup
@@ -100,20 +100,12 @@ inline uint16 PoolGroup<T>::AddMember(const T & member)
 template<typename T>
 inline uint16 PoolGroup<T>::NextMember()
 {
-	//debug_assert(_memberList && _nextOpenList, "Group has not been created");
-	//debug_assert(_totalOpen, "no open slots");
-
 	// return the first member of our
 	// open list, and move our internal
 	// handle to the next member
 	uint16 slot = _firstOpen;
 	_firstOpen = _nextOpenList[slot];
 	--_totalOpen;
-
-	//debug_assert(_firstOpen != INVALID_INDEX,
-	//	"Invalid Open Index");
-
-	//debug_assert(IsOpen(slot), "invalid index");
 
 	// signal this member as being is use
 	_nextOpenList[slot] = INVALID_INDEX;
@@ -124,11 +116,6 @@ inline uint16 PoolGroup<T>::NextMember()
 template<typename T>
 inline void PoolGroup<T>::Release(uint16 index)
 {
-	//debug_assert(_memberList && _nextOpenList, "Group has not been created");
-	//debug_assert(index < _maxCount, "invalid index");
-
-	//debug_assert(!IsOpen(index), "invalid index to release");
-
 	_nextOpenList[index] = _totalOpen ? _firstOpen : index;
 	++_totalOpen;
 	_firstOpen = index;
@@ -155,36 +142,24 @@ inline uint16 PoolGroup<T>::FirstOpen() const
 template<typename T>
 inline bool PoolGroup<T>::IsOpen(uint16 index) const
 {
-	debug_assert(_memberList && _nextOpenList, "Group has not been created");
-	debug_assert(index < _maxCount, "invalid index");
-
 	return _nextOpenList[index] != INVALID_POOL_HANDLE;
 }
 
 template<typename T>
 inline T & PoolGroup<T>::Member(uint16 index)
 {
-	debug_assert(_memberList && _nextOpenList, "Group has not been created");
-	debug_assert(index < _maxCount, "invalid index");
-
 	return _memberList[index];
 }
 
 template<typename T>
 inline const T & PoolGroup<T>::Member(uint16 index) const
 {
-	debug_assert(_memberList && _nextOpenList, "Group has not been created");
-	debug_assert(index < _maxCount, "invalid index");
-
 	return _memberList[index];
 }
 
 template<typename T>
 inline T * PoolGroup<T>::MemberPtr(uint16 index)
 {
-	debug_assert(_memberList && _nextOpenList, "Group has not been created");
-	debug_assert(index < _maxCount, "invalid index");
-
 	return &_memberList[index];
 }
 
@@ -192,10 +167,11 @@ template<typename T>
 inline const T * PoolGroup<T>::MemberPtr(uint16 index) const
 {
 	debug_assert(_memberList && _nextOpenList, "Group has not been created");
-	debug_assert(index < _maxCount, "invalid index");
-
 	return &_memberList[index];
 }
+
+
+
 
 class DataPoolInterface
 {
@@ -219,6 +195,11 @@ public :
 protected:
 	bool _initialized;
 };
+
+
+constexpr uint32 INDEX_MASK = 0xff;
+constexpr uint32 GROUP_INDEX_SHIFT = 8;
+constexpr uint16 GROUP_COUNT = 128;
 
 template <typename T>
 class DataPool : public DataPoolInterface
@@ -264,8 +245,8 @@ private:
 	uint16 _totalMembers;
 	uint16 _totalOpen;
 	uint16 _groupCount;
-	uint32 _indexMask;
-	int32 _indexShift;
+	uint16 _indexMask;
+	uint16 _groupIndexShift;
 
 	// Private Functions...
 	explicit DataPool(const DataPool& Src);
@@ -299,11 +280,9 @@ template<typename T>
 inline void DataPool<T>::Initialize(uint16 growSize)
 {
 	_initialized = true;
-	_groupCount = NearestPowerOfTwo(growSize);
-	_indexShift = LowestBitSet(_groupCount);
-	_indexShift = ClampInt(_indexShift, -1, 15);
-	_groupCount = 1 << _indexShift;
-	_indexMask = _groupCount - 1;
+	_groupCount = GROUP_COUNT;
+	_groupIndexShift = GROUP_INDEX_SHIFT;
+	_indexMask = INDEX_MASK;
 }
 
 template<typename T>
@@ -443,7 +422,7 @@ inline DataPool<T>::DataPool(const DataPool & Src)
 }
 
 template<typename T>
-inline DataPool & DataPool<T>::operator=(const DataPool & Src)
+inline DataPool<T> & DataPool<T>::operator=(const DataPool & Src)
 {
 	// TODO: insert return statement here
 }
@@ -514,7 +493,7 @@ inline const PoolGroup<T>* DataPool<T>::GetGroup(uint32 index) const
 template<typename T>
 inline int32 DataPool<T>::GetGroupNumber(PoolHandle handle) const
 {
-	return handle >> _indexShift;
+	return handle >> _groupIndexShift;
 }
 
 template<typename T>
@@ -526,7 +505,7 @@ inline int32 DataPool<T>::GetItemIndex(PoolHandle handle) const
 template<typename T>
 inline PoolHandle DataPool<T>::BuildHandle(int32 group, int32 index) const
 {
-	return (group << _indexShift) * index;
+	return (group << _groupIndexShift) * index;
 }
 
 #endif
