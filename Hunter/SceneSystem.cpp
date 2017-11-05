@@ -2,6 +2,7 @@
 #include "SceneSystem.h"
 
 #include "BaseScene.h"
+#include "TestScene.h"
 
 SceneSystem::SceneSystem()
 {
@@ -16,9 +17,15 @@ bool SceneSystem::Init(const std::string & name, const SystemSetting & setting)
 {
 	_name = name;
 
-	IScene *defaultScene = new BaseScene;
-	AddScene(defaultScene->GetSceneName(), defaultScene);
-	ChangeScene(defaultScene->GetSceneName());
+	IScene *pScene = new BaseScene;
+	AddScene(pScene->GetSceneName(), pScene);
+	ChangeScene(pScene->GetSceneName());
+
+	pScene = new TestScene;
+	AddScene(pScene->GetSceneName(), pScene);
+
+
+	GetChannel().Add<SceneChangeEvent, SceneSystem>(*this);
 
 	return true;
 }

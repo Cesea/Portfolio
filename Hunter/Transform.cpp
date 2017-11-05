@@ -13,6 +13,8 @@ Transform::Transform()
 	//정보 리셋
 	this->Reset();
 
+	MatrixIdentity(&_matFinal);
+	MatrixIdentity(&_matLocal);
 	if (this->_bAutoUpdate)
 		this->UpdateTransform();
 }
@@ -36,19 +38,19 @@ void Transform::Reset(int resetFlag /*= -1*/)
 	if (resetFlag & RESET_ROTATION)
 	{
 		//회전방향은 
-		//this->axis[0] = D3DXVECTOR3( 1, 0, 0 );
-		//this->axis[1] = D3DXVECTOR3( 0, 1, 0 );
-		//this->axis[2] = D3DXVECTOR3( 0, 0, 1 );
+		//this->axis[0] = Vector3( 1, 0, 0 );
+		//this->axis[1] = Vector3( 0, 1, 0 );
+		//this->axis[2] = Vector3( 0, 0, 1 );
 
-		this->right = D3DXVECTOR3(1, 0, 0);
-		this->up = D3DXVECTOR3(0, 1, 0);
-		this->forward = D3DXVECTOR3(0, 0, 1);
+		this->right = Vector3(1, 0, 0);
+		this->up = Vector3(0, 1, 0);
+		this->forward = Vector3(0, 0, 1);
 	}
 
 	if (resetFlag & RESET_SCALE)
 	{
 		//스케일의 초기화 값
-		this->_scale = D3DXVECTOR3(1, 1, 1);
+		this->_scale = Vector3(1, 1, 1);
 	}
 
 	this->UpdateTransform();
@@ -66,26 +68,26 @@ void Transform::AddChild(Transform* pNewChild)
 
 	//부모의 상대적인 좌표값으로 갱신하기위해 
 	//부모의 final 역행렬을 구한다.
-	D3DXMATRIXA16 matInvFinal;
-	D3DXMatrixInverse(&matInvFinal, NULL, &this->_matFinal);
+	Matrix matInvFinal;
+	MatrixInverse(&matInvFinal, NULL, &this->_matFinal);
 
 	//자식의 Position 과 Axis 및 Scale 갱신
-	D3DXVec3TransformCoord(&pNewChild->_position, &pNewChild->_position, &matInvFinal);
+	Vec3TransformCoord(&pNewChild->_position, &pNewChild->_position, &matInvFinal);
 
 	//축3개 변환하고 
 	for (int i = 0; i < 3; i++) {
-		D3DXVec3TransformNormal(pNewChild->axis + i, pNewChild->axis + i, &matInvFinal);
+		Vec3TransformNormal(pNewChild->axis + i, pNewChild->axis + i, &matInvFinal);
 	}
 
 	//3축에 대한 길이값을 얻는다.
-	pNewChild->_scale.x = D3DXVec3Length(&pNewChild->right);
-	pNewChild->_scale.y = D3DXVec3Length(&pNewChild->up);
-	pNewChild->_scale.z = D3DXVec3Length(&pNewChild->forward);
+	pNewChild->_scale.x = Vec3Length(&pNewChild->right);
+	pNewChild->_scale.y = Vec3Length(&pNewChild->up);
+	pNewChild->_scale.z = Vec3Length(&pNewChild->forward);
 
 	//정규화
-	D3DXVec3Normalize(&pNewChild->right, &pNewChild->right);
-	D3DXVec3Normalize(&pNewChild->up, &pNewChild->up);
-	D3DXVec3Normalize(&pNewChild->forward, &pNewChild->forward);
+	Vec3Normalize(&pNewChild->right, &pNewChild->right);
+	Vec3Normalize(&pNewChild->up, &pNewChild->up);
+	Vec3Normalize(&pNewChild->forward, &pNewChild->forward);
 
 	//새로운 놈의 부모는 내가 된다.
 	pNewChild->pParent = this;
@@ -180,22 +182,22 @@ void Transform::ReleaseParent()
 	this->_position.z = this->_matFinal._43;
 
 	//3축 얻어온다.
-	D3DXVECTOR3 forwardScaled(this->_matFinal._31, this->_matFinal._32, this->_matFinal._33);
-	D3DXVECTOR3 upScaled(this->_matFinal._21, this->_matFinal._22, this->_matFinal._23);
-	D3DXVECTOR3 rightScaled(this->_matFinal._11, this->_matFinal._12, this->_matFinal._13);
+	Vector3 forwardScaled(this->_matFinal._31, this->_matFinal._32, this->_matFinal._33);
+	Vector3 upScaled(this->_matFinal._21, this->_matFinal._22, this->_matFinal._23);
+	Vector3 rightScaled(this->_matFinal._11, this->_matFinal._12, this->_matFinal._13);
 
 	//3축에서 스케일 뺀다
-	float scaleX = D3DXVec3Length(&rightScaled);
-	float scaleY = D3DXVec3Length(&upScaled);
-	float scaleZ = D3DXVec3Length(&forwardScaled);
+	float scaleX = Vec3Length(&rightScaled);
+	float scaleY = Vec3Length(&upScaled);
+	float scaleZ = Vec3Length(&forwardScaled);
 
 	//정규화
-	D3DXVECTOR3 forwardUnit;
-	D3DXVECTOR3 upUnit;
-	D3DXVECTOR3 rightUnit;
-	D3DXVec3Normalize(&rightUnit, &rightScaled);
-	D3DXVec3Normalize(&upUnit, &upScaled);
-	D3DXVec3Normalize(&forwardUnit, &forwardScaled);
+	Vector3 forwardUnit;
+	Vector3 upUnit;
+	Vector3 rightUnit;
+	Vec3Normalize(&rightUnit, &rightScaled);
+	Vec3Normalize(&upUnit, &upScaled);
+	Vec3Normalize(&forwardUnit, &forwardScaled);
 
 	//정규화된 3축 대입
 	this->forward = forwardUnit;
@@ -218,17 +220,17 @@ void Transform::ReleaseParent()
 //위치를 월드 좌표계로 셋팅한다. 
 void Transform::SetWorldPosition(float x, float y, float z)
 {
-	D3DXVECTOR3 pos(x, y, z);
+	Vector3 pos(x, y, z);
 
 	//부모가 있다면 부모의 상태적인 위치로 바꿔라...
 	if (this->pParent != NULL)
 	{
 		//부모의 최종 행렬의 역행렬
-		D3DXMATRIXA16 matInvParentFinal;
-		D3DXMatrixInverse(&matInvParentFinal, NULL, &this->pParent->_matFinal);
+		Matrix matInvParentFinal;
+		MatrixInverse(&matInvParentFinal, NULL, &this->pParent->_matFinal);
 
 		//그 역행에 Pos 적용
-		D3DXVec3TransformCoord(&pos, &pos, &matInvParentFinal);
+		Vec3TransformCoord(&pos, &pos, &matInvParentFinal);
 	}
 
 	this->_position.x = pos.x;
@@ -239,17 +241,17 @@ void Transform::SetWorldPosition(float x, float y, float z)
 		this->UpdateTransform();
 }
 
-void Transform::SetWorldPosition(D3DXVECTOR3 pos)
+void Transform::SetWorldPosition(Vector3 pos)
 {
 	//부모가 있다면 부모의 상태적인 위치로 바꿔라...
 	if (this->pParent != NULL)
 	{
 		//부모의 최종 행렬의 역행렬
-		D3DXMATRIXA16 matInvParentFinal;
-		D3DXMatrixInverse(&matInvParentFinal, NULL, &this->pParent->_matFinal);
+		Matrix matInvParentFinal;
+		MatrixInverse(&matInvParentFinal, NULL, &this->pParent->_matFinal);
 
 		//그 역행에 Pos 적용
-		D3DXVec3TransformCoord(&pos, &pos, &matInvParentFinal);
+		Vec3TransformCoord(&pos, &pos, &matInvParentFinal);
 	}
 
 	this->_position.x = pos.x;
@@ -271,7 +273,7 @@ void Transform::SetLocalPosition(float x, float y, float z)
 		this->UpdateTransform();
 }
 
-void Transform::SetLocalPosition(D3DXVECTOR3 pos)
+void Transform::SetLocalPosition(Vector3 pos)
 {
 	this->_position.x = pos.x;
 	this->_position.y = pos.y;
@@ -285,36 +287,36 @@ void Transform::SetLocalPosition(D3DXVECTOR3 pos)
 void Transform::MovePositionSelf(float dx, float dy, float dz)
 {
 	//이동 벡터
-	D3DXVECTOR3 move(0, 0, 0);
+	Vector3 move(0, 0, 0);
 
 	//자신의 이동 축 얻는다.
-	D3DXVECTOR3 moveAxis[3];
+	Vector3 moveAxis[3];
 	this->GetUnitAxies(moveAxis);
 	move += moveAxis[0] * dx;
 	move += moveAxis[1] * dy;
 	move += moveAxis[2] * dz;
 
 	//월드 이동
-	D3DXVECTOR3 nowWorldPos = this->GetWorldPosition();
+	Vector3 nowWorldPos = this->GetWorldPosition();
 
 	//아래의 함수에서 TransformUpdate 가 일어남
 	this->SetWorldPosition(nowWorldPos + move);
 }
 
-void Transform::MovePositionSelf(D3DXVECTOR3 delta)
+void Transform::MovePositionSelf(Vector3 delta)
 {
 	//이동 벡터
-	D3DXVECTOR3 move(0, 0, 0);
+	Vector3 move(0, 0, 0);
 
 	//자신의 이동 축 얻는다.
-	D3DXVECTOR3 moveAxis[3];
+	Vector3 moveAxis[3];
 	this->GetUnitAxies(moveAxis);
 	move += moveAxis[0] * delta.x;
 	move += moveAxis[1] * delta.y;
 	move += moveAxis[2] * delta.z;
 
 	//월드 이동
-	D3DXVECTOR3 nowWorldPos = this->GetWorldPosition();
+	Vector3 nowWorldPos = this->GetWorldPosition();
 
 	//아래의 함수에서 TransformUpdate 가 일어남
 	this->SetWorldPosition(nowWorldPos + move);
@@ -324,19 +326,19 @@ void Transform::MovePositionSelf(D3DXVECTOR3 delta)
 void Transform::MovePositionWorld(float dx, float dy, float dz)
 {
 	//이동 벡터
-	D3DXVECTOR3 move(dx, dy, dz);
+	Vector3 move(dx, dy, dz);
 
 	//월드 이동
-	D3DXVECTOR3 nowWorldPos = this->GetWorldPosition();
+	Vector3 nowWorldPos = this->GetWorldPosition();
 
 	//아래의 함수에서 TransformUpdate 가 일어남
 	this->SetWorldPosition(nowWorldPos + move);
 }
 
-void Transform::MovePositionWorld(D3DXVECTOR3 delta)
+void Transform::MovePositionWorld(Vector3 delta)
 {
 	//월드 이동
-	D3DXVECTOR3 nowWorldPos = this->GetWorldPosition();
+	Vector3 nowWorldPos = this->GetWorldPosition();
 
 	//아래의 함수에서 TransformUpdate 가 일어남
 	this->SetWorldPosition(nowWorldPos + delta);
@@ -354,7 +356,7 @@ void Transform::MovePositionLocal(float dx, float dy, float dz)
 		this->UpdateTransform();
 }
 
-void Transform::MovePositionLocal(D3DXVECTOR3 delta)
+void Transform::MovePositionLocal(Vector3 delta)
 {
 	this->_position += delta;
 
@@ -374,7 +376,7 @@ void Transform::SetScale(float x, float y, float z)
 		this->UpdateTransform();
 }
 
-void Transform::SetScale(D3DXVECTOR3 scale)
+void Transform::SetScale(Vector3 scale)
 {
 	this->_scale = scale;
 
@@ -393,7 +395,7 @@ void Transform::Scaling(float dx, float dy, float dz)
 		this->UpdateTransform();
 }
 
-void Transform::Scaling(D3DXVECTOR3 deltaScale)
+void Transform::Scaling(Vector3 deltaScale)
 {
 	this->_scale += deltaScale;
 
@@ -408,31 +410,31 @@ void Transform::RotateWorld(float angleX, float angleY, float angleZ)
 	if (this->pParent)
 	{
 		//진짜로월드 축
-		D3DXVECTOR3 worldAxis[3];
+		Vector3 worldAxis[3];
 		this->GetUnitAxies(worldAxis);
 
 		//각 축에 대한 회전 행렬
-		D3DXMATRIXA16 matRotateX;
-		D3DXMatrixRotationX(&matRotateX, angleX);
+		Matrix matRotateX;
+		MatrixRotationX(&matRotateX, angleX);
 
-		D3DXMATRIXA16 matRotateY;
-		D3DXMatrixRotationY(&matRotateY, angleY);
+		Matrix matRotateY;
+		MatrixRotationY(&matRotateY, angleY);
 
-		D3DXMATRIXA16 matRotateZ;
-		D3DXMatrixRotationZ(&matRotateZ, angleZ);
+		Matrix matRotateZ;
+		MatrixRotationZ(&matRotateZ, angleZ);
 
 		//최종 회전 행렬
-		D3DXMATRIXA16 matRotate = matRotateY * matRotateX * matRotateZ;
+		Matrix matRotate = matRotateY * matRotateX * matRotateZ;
 
 		//부모의 역행렬로 다시 회전
-		D3DXMATRIXA16 matInvParentFinal;
-		D3DXMatrixInverse(&matInvParentFinal, NULL, &this->pParent->_matFinal);
+		Matrix matInvParentFinal;
+		MatrixInverse(&matInvParentFinal, NULL, &this->pParent->_matFinal);
 
 		matRotate = matRotate * matInvParentFinal;
 
 		//최종 회전 행렬 대로 회전 시킨다.
 		for (int i = 0; i < 3; i++)
-			D3DXVec3TransformNormal(this->axis + i, worldAxis + i, &matRotate);
+			Vec3TransformNormal(this->axis + i, worldAxis + i, &matRotate);
 
 
 		if (this->_bAutoUpdate)
@@ -449,40 +451,40 @@ void Transform::RotateWorld(float angleX, float angleY, float angleZ)
 
 }
 
-void Transform::RotateWorld(D3DXVECTOR3 angle)
+void Transform::RotateWorld(Vector3 angle)
 {
 	//부모가 있는 경우
 	if (this->pParent)
 	{
 		//진짜로월드 축
-		D3DXVECTOR3 worldAxis[3];
+		Vector3 worldAxis[3];
 		this->GetUnitAxies(worldAxis);
 
 		//각 축에 대한 회전 행렬
-		D3DXMATRIXA16 matRotateX;
-		D3DXMatrixRotationX(&matRotateX, angle.x);
+		Matrix matRotateX;
+		MatrixRotationX(&matRotateX, angle.x);
 
-		D3DXMATRIXA16 matRotateY;
-		D3DXMatrixRotationY(&matRotateY, angle.y);
+		Matrix matRotateY;
+		MatrixRotationY(&matRotateY, angle.y);
 
-		D3DXMATRIXA16 matRotateZ;
-		D3DXMatrixRotationZ(&matRotateZ, angle.z);
+		Matrix matRotateZ;
+		MatrixRotationZ(&matRotateZ, angle.z);
 
 
 		//최종 회전 행렬만들때 미리 역행렬성분을 곱해놓으면 1 번만 회전시키면 된다.
 
 		//최종 회전 행렬
-		D3DXMATRIXA16 matRotate = matRotateY * matRotateX * matRotateZ;
+		Matrix matRotate = matRotateY * matRotateX * matRotateZ;
 
 		//부모의 역행렬로 다시 회전
-		D3DXMATRIXA16 matInvParentFinal;
-		D3DXMatrixInverse(&matInvParentFinal, NULL, &this->pParent->_matFinal);
+		Matrix matInvParentFinal;
+		MatrixInverse(&matInvParentFinal, NULL, &this->pParent->_matFinal);
 
 		matRotate = matRotate * matInvParentFinal;
 
 		//최종 회전 행렬 대로 회전 시킨다.
 		for (int i = 0; i < 3; i++)
-			D3DXVec3TransformNormal(this->axis + i, worldAxis + i, &matRotate);
+			Vec3TransformNormal(this->axis + i, worldAxis + i, &matRotate);
 
 
 		if (this->_bAutoUpdate)
@@ -500,49 +502,49 @@ void Transform::RotateWorld(D3DXVECTOR3 angle)
 void Transform::RotateSelf(float angleX, float angleY, float angleZ)
 {
 	//각 축에 대한 회전 행렬
-	D3DXMATRIXA16 matRotateX;
-	D3DXMatrixRotationAxis(&matRotateX, &this->GetRight(), angleX);
+	Matrix matRotateX;
+	MatrixRotationAxis(&matRotateX, &this->GetRight(), angleX);
 
-	D3DXMATRIXA16 matRotateY;
-	D3DXMatrixRotationAxis(&matRotateY, &this->GetUp(), angleY);
+	Matrix matRotateY;
+	MatrixRotationAxis(&matRotateY, &this->GetUp(), angleY);
 
-	D3DXMATRIXA16 matRotateZ;
-	D3DXMatrixRotationAxis(&matRotateZ, &this->GetForward(), angleZ);
+	Matrix matRotateZ;
+	MatrixRotationAxis(&matRotateZ, &this->GetForward(), angleZ);
 
 
 	//최종 회전 행렬
-	D3DXMATRIXA16 matRotate = matRotateY * matRotateX * matRotateZ;
+	Matrix matRotate = matRotateY * matRotateX * matRotateZ;
 
 
 	//최종 회전 행렬 대로 회전 시킨다.
 	for (int i = 0; i < 3; i++)
-		D3DXVec3TransformNormal(&this->axis[i], &this->axis[i], &matRotate);
+		Vec3TransformNormal(&this->axis[i], &this->axis[i], &matRotate);
 
 
 	if (this->_bAutoUpdate)
 		this->UpdateTransform();
 }
 
-void Transform::RotateSelf(D3DXVECTOR3 angle)
+void Transform::RotateSelf(Vector3 angle)
 {
 	//각 축에 대한 회전 행렬
-	D3DXMATRIXA16 matRotateX;
-	D3DXMatrixRotationAxis(&matRotateX, &this->GetRight(), angle.x);
+	Matrix matRotateX;
+	MatrixRotationAxis(&matRotateX, &this->GetRight(), angle.x);
 
-	D3DXMATRIXA16 matRotateY;
-	D3DXMatrixRotationAxis(&matRotateY, &this->GetUp(), angle.y);
+	Matrix matRotateY;
+	MatrixRotationAxis(&matRotateY, &this->GetUp(), angle.y);
 
-	D3DXMATRIXA16 matRotateZ;
-	D3DXMatrixRotationAxis(&matRotateZ, &this->GetForward(), angle.z);
+	Matrix matRotateZ;
+	MatrixRotationAxis(&matRotateZ, &this->GetForward(), angle.z);
 
 
 	//최종 회전 행렬
-	D3DXMATRIXA16 matRotate = matRotateY * matRotateX * matRotateZ;
+	Matrix matRotate = matRotateY * matRotateX * matRotateZ;
 
 
 	//최종 회전 행렬 대로 회전 시킨다.
 	for (int i = 0; i < 3; i++)
-		D3DXVec3TransformNormal(&this->axis[i], &this->axis[i], &matRotate);
+		Vec3TransformNormal(&this->axis[i], &this->axis[i], &matRotate);
 
 
 	if (this->_bAutoUpdate)
@@ -553,46 +555,46 @@ void Transform::RotateSelf(D3DXVECTOR3 angle)
 void Transform::RotateLocal(float angleX, float angleY, float angleZ)
 {
 	//각 축에 대한 회전 행렬
-	D3DXMATRIXA16 matRotateX;
-	D3DXMatrixRotationX(&matRotateX, angleX);
+	Matrix matRotateX;
+	MatrixRotationX(&matRotateX, angleX);
 
-	D3DXMATRIXA16 matRotateY;
-	D3DXMatrixRotationY(&matRotateY, angleY);
+	Matrix matRotateY;
+	MatrixRotationY(&matRotateY, angleY);
 
-	D3DXMATRIXA16 matRotateZ;
-	D3DXMatrixRotationZ(&matRotateZ, angleZ);
+	Matrix matRotateZ;
+	MatrixRotationZ(&matRotateZ, angleZ);
 
 	//최종 회전 행렬
-	D3DXMATRIXA16 matRotate = matRotateY * matRotateX * matRotateZ;
+	Matrix matRotate = matRotateY * matRotateX * matRotateZ;
 
 
 	//최종 회전 행렬 대로 회전 시킨다.
 	for (int i = 0; i < 3; i++)
-		D3DXVec3TransformNormal(&this->axis[i], &this->axis[i], &matRotate);
+		Vec3TransformNormal(&this->axis[i], &this->axis[i], &matRotate);
 
 
 	if (this->_bAutoUpdate)
 		this->UpdateTransform();
 }
 
-void Transform::RotateLocal(D3DXVECTOR3 angle)
+void Transform::RotateLocal(Vector3 angle)
 {
 	//각 축에 대한 회전 행렬
-	D3DXMATRIXA16 matRotateX;
-	D3DXMatrixRotationX(&matRotateX, angle.x);
+	Matrix matRotateX;
+	MatrixRotationX(&matRotateX, angle.x);
 
-	D3DXMATRIXA16 matRotateY;
-	D3DXMatrixRotationY(&matRotateY, angle.y);
+	Matrix matRotateY;
+	MatrixRotationY(&matRotateY, angle.y);
 
-	D3DXMATRIXA16 matRotateZ;
-	D3DXMatrixRotationZ(&matRotateZ, angle.z);
+	Matrix matRotateZ;
+	MatrixRotationZ(&matRotateZ, angle.z);
 
 	//최종 회전 행렬
-	D3DXMATRIXA16 matRotate = matRotateY * matRotateX * matRotateZ;
+	Matrix matRotate = matRotateY * matRotateX * matRotateZ;
 
 	//최종 회전 행렬 대로 회전 시킨다.
 	for (int i = 0; i < 3; i++)
-		D3DXVec3TransformNormal(&this->axis[i], &this->axis[i], &matRotate);
+		Vec3TransformNormal(&this->axis[i], &this->axis[i], &matRotate);
 
 	if (this->_bAutoUpdate)
 		this->UpdateTransform();
@@ -600,31 +602,31 @@ void Transform::RotateLocal(D3DXVECTOR3 angle)
 
 
 //특정 방향을 바라보게 회전해라.
-void Transform::LookDirection(D3DXVECTOR3 dir, D3DXVECTOR3 up /*= D3DXVECTOR3(0, 1, 0)*/)
+void Transform::LookDirection(Vector3 dir, Vector3 up /*= Vector3(0, 1, 0)*/)
 {
 	//정면 벡터
-	D3DXVECTOR3 newForward = dir;
+	Vector3 newForward = dir;
 
 	//오른쪽벡터 ( 매개변수로 들어온 Up 을 가지고 외적 )
-	D3DXVECTOR3 newRight;
-	D3DXVec3Cross(&newRight, &up, &newForward);
-	D3DXVec3Normalize(&newRight, &newRight);
+	Vector3 newRight;
+	Vec3Cross(&newRight, &up, &newForward);
+	Vec3Normalize(&newRight, &newRight);
 
 	//업 
-	D3DXVECTOR3 newUp;
-	D3DXVec3Cross(&newUp, &newForward, &newRight);
-	D3DXVec3Normalize(&newUp, &newUp);
+	Vector3 newUp;
+	Vec3Cross(&newUp, &newForward, &newRight);
+	Vec3Normalize(&newUp, &newUp);
 
 	//만약 부모가 있다면...
 	if (this->pParent)
 	{
 		//새로운 축 성분에 부모 역행렬 곱해....
-		D3DXMATRIXA16 matInvParentFinal;
-		D3DXMatrixInverse(&matInvParentFinal, NULL, &this->pParent->_matFinal);
+		Matrix matInvParentFinal;
+		MatrixInverse(&matInvParentFinal, NULL, &this->pParent->_matFinal);
 
-		D3DXVec3TransformNormal(&this->forward, &newForward, &matInvParentFinal);
-		D3DXVec3TransformNormal(&this->right, &newRight, &matInvParentFinal);
-		D3DXVec3TransformNormal(&this->up, &newUp, &matInvParentFinal);
+		Vec3TransformNormal(&this->forward, &newForward, &matInvParentFinal);
+		Vec3TransformNormal(&this->right, &newRight, &matInvParentFinal);
+		Vec3TransformNormal(&this->up, &newUp, &matInvParentFinal);
 	}
 
 	else
@@ -639,64 +641,64 @@ void Transform::LookDirection(D3DXVECTOR3 dir, D3DXVECTOR3 up /*= D3DXVECTOR3(0,
 }
 
 //특정 방향을 바라보는데 angle 각만큼만 회전 해라
-void Transform::LookDirection(D3DXVECTOR3 dir, float angle)
+void Transform::LookDirection(Vector3 dir, float angle)
 {
 	//진짜로월드 축
-	D3DXVECTOR3 worldAxis[3];
+	Vector3 worldAxis[3];
 	this->GetUnitAxies(worldAxis);
 
 	//정면 벡터와 바라볼 방향의 각도차를 얻자...
 	float distRadian = acos(
-		ClampMinusOnePlusOne(D3DXVec3Dot(worldAxis + AXIS_Z, &dir)));
+		ClampMinusOnePlusOne(Vec3Dot(worldAxis + AXIS_Z, &dir)));
 
 	//각도차가 거의 없다면 하지마...
 	if (FloatZero(distRadian)) return;
 
 	//외적 ( 내정면과 타겟까지의 방향을 외적 )
-	D3DXVECTOR3 cross;
-	D3DXVec3Cross(&cross, worldAxis + AXIS_Z, &dir);
-	D3DXVec3Normalize(&cross, &cross);
+	Vector3 cross;
+	Vec3Cross(&cross, worldAxis + AXIS_Z, &dir);
+	Vec3Normalize(&cross, &cross);
 
 	//외적축으로 각차만큼 회전 시키는 행렬
-	D3DXMATRIXA16 matRotate;
-	D3DXMatrixRotationAxis(&matRotate, &cross, min(angle, distRadian));
+	Matrix matRotate;
+	MatrixRotationAxis(&matRotate, &cross, min(angle, distRadian));
 
 	//만약 부모가 있다면...
 	if (this->pParent)
 	{
 		//회전 성분에 부모 역행렬 곱해....
-		D3DXMATRIXA16 matInvParentFinal;
-		D3DXMatrixInverse(&matInvParentFinal, NULL, &this->pParent->_matFinal);
+		Matrix matInvParentFinal;
+		MatrixInverse(&matInvParentFinal, NULL, &this->pParent->_matFinal);
 		matRotate = matRotate * matInvParentFinal;
 	}
 
 	//적용
 	for (int i = 0; i < 3; i++)
-		D3DXVec3TransformNormal(this->axis + i, worldAxis + i, &matRotate);
+		Vec3TransformNormal(this->axis + i, worldAxis + i, &matRotate);
 
 	if (this->_bAutoUpdate)
 		this->UpdateTransform();
 }
 
 //특정위치를 바라보게 회전해라.
-void Transform::LookPosition(D3DXVECTOR3 pos, D3DXVECTOR3 up /*= D3DXVECTOR3(0, 1, 0)*/)
+void Transform::LookPosition(Vector3 pos, Vector3 up /*= Vector3(0, 1, 0)*/)
 {
 	//위치에 대한 방향벡터를 얻는다.
-	D3DXVECTOR3 worldPos = this->GetWorldPosition();
-	D3DXVECTOR3 dir = pos - worldPos;
+	Vector3 worldPos = this->GetWorldPosition();
+	Vector3 dir = pos - worldPos;
 
-	D3DXVec3Normalize(&dir, &dir);
+	Vec3Normalize(&dir, &dir);
 	this->LookDirection(dir, up);
 }
 
 //특정위치를  바라보는데 angle 각만큼만 회전 해라
-void Transform::LookPosition(D3DXVECTOR3 pos, float angle)
+void Transform::LookPosition(Vector3 pos, float angle)
 {
 	//위치에 대한 방향벡터를 얻는다.
-	D3DXVECTOR3 worldPos = this->GetWorldPosition();
-	D3DXVECTOR3 dir = pos - worldPos;
+	Vector3 worldPos = this->GetWorldPosition();
+	Vector3 dir = pos - worldPos;
 
-	D3DXVec3Normalize(&dir, &dir);
+	Vec3Normalize(&dir, &dir);
 	this->LookDirection(dir, angle);
 }
 
@@ -704,30 +706,30 @@ void Transform::LookPosition(D3DXVECTOR3 pos, float angle)
 void Transform::SetRotateWorld(float eAngleX, float eAngleY, float aAngleZ)
 {
 	//사원수 준비
-	D3DXQUATERNION quatRot;
-	D3DXQuaternionRotationYawPitchRoll(&quatRot, eAngleY, eAngleX, aAngleZ);
+	Quaternion quatRot;
+	QuaternionRotationYawPitchRoll(&quatRot, eAngleY, eAngleX, aAngleZ);
 
 	//사원수에 의한 행렬준비
-	D3DXMATRIXA16 matRotate;
-	D3DXMatrixRotationQuaternion(&matRotate, &quatRot);		//사원수에 의한 회전값으로 회전행렬이 만들어진다.
+	Matrix matRotate;
+	MatrixRotationQuaternion(&matRotate, &quatRot);		//사원수에 의한 회전값으로 회전행렬이 만들어진다.
 
 															//만약 부모가 있다면...
 	if (this->pParent)
 	{
 		//회전 성분에 부모 역행렬 곱해....
-		D3DXMATRIXA16 matInvParentFinal;
-		D3DXMatrixInverse(&matInvParentFinal, NULL, &this->pParent->_matFinal);
+		Matrix matInvParentFinal;
+		MatrixInverse(&matInvParentFinal, NULL, &this->pParent->_matFinal);
 		matRotate = matRotate * matInvParentFinal;
 	}
 
 	//축리셋
-	this->right = D3DXVECTOR3(1, 0, 0);
-	this->up = D3DXVECTOR3(0, 1, 0);
-	this->forward = D3DXVECTOR3(0, 0, 1);
+	this->right = Vector3(1, 0, 0);
+	this->up = Vector3(0, 1, 0);
+	this->forward = Vector3(0, 0, 1);
 
 	//최종 회전 행렬 대로 회전 시킨다.
 	for (int i = 0; i < 3; i++)
-		D3DXVec3TransformNormal(&this->axis[i], &this->axis[i], &matRotate);
+		Vec3TransformNormal(&this->axis[i], &this->axis[i], &matRotate);
 
 	if (this->_bAutoUpdate)
 		this->UpdateTransform();
@@ -736,119 +738,119 @@ void Transform::SetRotateWorld(float eAngleX, float eAngleY, float aAngleZ)
 void Transform::SetRotateLocal(float eAngleX, float eAngleY, float aAngleZ)
 {
 	//사원수 준비
-	D3DXQUATERNION quatRot;
-	D3DXQuaternionRotationYawPitchRoll(&quatRot, eAngleY, eAngleX, aAngleZ);
+	Quaternion quatRot;
+	QuaternionRotationYawPitchRoll(&quatRot, eAngleY, eAngleX, aAngleZ);
 
 	//사원수에 의한 행렬준비
-	D3DXMATRIXA16 matRotate;
-	D3DXMatrixRotationQuaternion(&matRotate, &quatRot);		//사원수에 의한 회전값으로 회전행렬이 만들어진다.
+	Matrix matRotate;
+	MatrixRotationQuaternion(&matRotate, &quatRot);		//사원수에 의한 회전값으로 회전행렬이 만들어진다.
 
 															//축리셋
-	this->right = D3DXVECTOR3(1, 0, 0);
-	this->up = D3DXVECTOR3(0, 1, 0);
-	this->forward = D3DXVECTOR3(0, 0, 1);
+	this->right = Vector3(1, 0, 0);
+	this->up = Vector3(0, 1, 0);
+	this->forward = Vector3(0, 0, 1);
 
 	//최종 회전 행렬 대로 회전 시킨다.
 	for (int i = 0; i < 3; i++)
-		D3DXVec3TransformNormal(&this->axis[i], &this->axis[i], &matRotate);
+		Vec3TransformNormal(&this->axis[i], &this->axis[i], &matRotate);
 
 	if (this->_bAutoUpdate)
 		this->UpdateTransform();
 }
 
 // 회전 행렬을 넣어주면 그 회전 행렬대로 회전한다.
-void Transform::SetRotateWorld(const D3DXMATRIXA16& matWorldRotate)
+void Transform::SetRotateWorld(const Matrix& matWorldRotate)
 {
-	D3DXMATRIXA16 matRotate = matWorldRotate;
+	Matrix matRotate = matWorldRotate;
 
 	//만약 부모가 있다면...
 	if (this->pParent)
 	{
 		//회전 성분에 부모 역행렬 곱해....
-		D3DXMATRIXA16 matInvParentFinal;
-		D3DXMatrixInverse(&matInvParentFinal, NULL, &this->pParent->_matFinal);
+		Matrix matInvParentFinal;
+		MatrixInverse(&matInvParentFinal, NULL, &this->pParent->_matFinal);
 		matRotate = matRotate * matInvParentFinal;
 	}
 
 	//축리셋
-	this->right = D3DXVECTOR3(1, 0, 0);
-	this->up = D3DXVECTOR3(0, 1, 0);
-	this->forward = D3DXVECTOR3(0, 0, 1);
+	this->right = Vector3(1, 0, 0);
+	this->up = Vector3(0, 1, 0);
+	this->forward = Vector3(0, 0, 1);
 
 	//최종 회전 행렬 대로 회전 시킨다.
 	for (int i = 0; i < 3; i++)
-		D3DXVec3TransformNormal(&this->axis[i], &this->axis[i], &matRotate);
+		Vec3TransformNormal(&this->axis[i], &this->axis[i], &matRotate);
 
 	if (this->_bAutoUpdate)
 		this->UpdateTransform();
 }
 
-void Transform::SetRotateLocal(const D3DXMATRIXA16& matWorldRotate)
+void Transform::SetRotateLocal(const Matrix& matWorldRotate)
 {
-	D3DXMATRIXA16 matRotate = matWorldRotate;
+	Matrix matRotate = matWorldRotate;
 
 	//축리셋
-	this->right = D3DXVECTOR3(1, 0, 0);
-	this->up = D3DXVECTOR3(0, 1, 0);
-	this->forward = D3DXVECTOR3(0, 0, 1);
+	this->right = Vector3(1, 0, 0);
+	this->up = Vector3(0, 1, 0);
+	this->forward = Vector3(0, 0, 1);
 
 	//최종 회전 행렬 대로 회전 시킨다.
 	for (int i = 0; i < 3; i++)
-		D3DXVec3TransformNormal(&this->axis[i], &this->axis[i], &matRotate);
+		Vec3TransformNormal(&this->axis[i], &this->axis[i], &matRotate);
 
 	if (this->_bAutoUpdate)
 		this->UpdateTransform();
 }
 
 // 회전 사원수를 넣어주면 그 회전값 대로 회전한다.
-void Transform::SetRotateWorld(const D3DXQUATERNION& matWorldRotate)
+void Transform::SetRotateWorld(const Quaternion& matWorldRotate)
 {
 	//사원수 준비
-	D3DXQUATERNION quatRot = matWorldRotate;
+	Quaternion quatRot = matWorldRotate;
 
 	//사원수에 의한 행렬준비
-	D3DXMATRIXA16 matRotate;
-	D3DXMatrixRotationQuaternion(&matRotate, &quatRot);		//사원수에 의한 회전값으로 회전행렬이 만들어진다.
+	Matrix matRotate;
+	MatrixRotationQuaternion(&matRotate, &quatRot);		//사원수에 의한 회전값으로 회전행렬이 만들어진다.
 
 															//만약 부모가 있다면...
 	if (this->pParent)
 	{
 		//회전 성분에 부모 역행렬 곱해....
-		D3DXMATRIXA16 matInvParentFinal;
-		D3DXMatrixInverse(&matInvParentFinal, NULL, &this->pParent->_matFinal);
+		Matrix matInvParentFinal;
+		MatrixInverse(&matInvParentFinal, NULL, &this->pParent->_matFinal);
 		matRotate = matRotate * matInvParentFinal;
 	}
 
 	//축리셋
-	this->right = D3DXVECTOR3(1, 0, 0);
-	this->up = D3DXVECTOR3(0, 1, 0);
-	this->forward = D3DXVECTOR3(0, 0, 1);
+	this->right = Vector3(1, 0, 0);
+	this->up = Vector3(0, 1, 0);
+	this->forward = Vector3(0, 0, 1);
 
 	//최종 회전 행렬 대로 회전 시킨다.
 	for (int i = 0; i < 3; i++)
-		D3DXVec3TransformNormal(&this->axis[i], &this->axis[i], &matRotate);
+		Vec3TransformNormal(&this->axis[i], &this->axis[i], &matRotate);
 
 	if (this->_bAutoUpdate)
 		this->UpdateTransform();
 }
 
-void Transform::SetRotateLocal(const D3DXQUATERNION& matWorldRotate)
+void Transform::SetRotateLocal(const Quaternion& matWorldRotate)
 {
 	//사원수 준비
-	D3DXQUATERNION quatRot = matWorldRotate;
+	Quaternion quatRot = matWorldRotate;
 
 	//사원수에 의한 행렬준비
-	D3DXMATRIXA16 matRotate;
-	D3DXMatrixRotationQuaternion(&matRotate, &quatRot);		//사원수에 의한 회전값으로 회전행렬이 만들어진다.
+	Matrix matRotate;
+	MatrixRotationQuaternion(&matRotate, &quatRot);		//사원수에 의한 회전값으로 회전행렬이 만들어진다.
 
 															//축리셋
-	this->right = D3DXVECTOR3(1, 0, 0);
-	this->up = D3DXVECTOR3(0, 1, 0);
-	this->forward = D3DXVECTOR3(0, 0, 1);
+	this->right = Vector3(1, 0, 0);
+	this->up = Vector3(0, 1, 0);
+	this->forward = Vector3(0, 0, 1);
 
 	//최종 회전 행렬 대로 회전 시킨다.
 	for (int i = 0; i < 3; i++)
-		D3DXVec3TransformNormal(&this->axis[i], &this->axis[i], &matRotate);
+		Vec3TransformNormal(&this->axis[i], &this->axis[i], &matRotate);
 
 	if (this->_bAutoUpdate)
 		this->UpdateTransform();
@@ -860,9 +862,8 @@ void Transform::RotateSlerp(const Transform& from, const Transform& to, float t)
 {
 	t = Clamp01(t);
 
-
-	D3DXQUATERNION fromQuat = from.GetWorldRotateQuaternion();
-	D3DXQUATERNION toQuat = to.GetWorldRotateQuaternion();
+	Quaternion fromQuat = from.GetWorldRotateQuaternion();
+	Quaternion toQuat = to.GetWorldRotateQuaternion();
 
 	//t 가 0 과 같다면...
 	if (FloatZero(t))
@@ -880,11 +881,11 @@ void Transform::RotateSlerp(const Transform& from, const Transform& to, float t)
 	//0 과 1 사이의 값일때만 보간
 	else
 	{
-		D3DXQUATERNION result;
+		Quaternion result;
 
 		//from 과 to 사원수간의 t 만큼의 회전보간을 하여
 		//result 사원수에 대입
-		D3DXQuaternionSlerp(&result, &fromQuat, &toQuat, t);
+		QuaternionSlerp(&result, &fromQuat, &toQuat, t);
 
 		//보간된 사원수 정보로 회전 셋팅
 		this->SetRotateWorld(result);
@@ -896,8 +897,8 @@ void Transform::PositionLerp(const Transform& from, const Transform& to, float t
 {
 	t = Clamp01(t);
 
-	D3DXVECTOR3 fromWorldPos = from.GetWorldPosition();
-	D3DXVECTOR3 toWorldPos = to.GetWorldPosition();
+	Vector3 fromWorldPos = from.GetWorldPosition();
+	Vector3 toWorldPos = to.GetWorldPosition();
 
 	//t 가 0 과 같다면...
 	if (FloatZero(t))
@@ -915,8 +916,8 @@ void Transform::PositionLerp(const Transform& from, const Transform& to, float t
 	//0 과 1 사이의 값일때만 보간
 	else
 	{
-		D3DXVECTOR3 result;
-		D3DXVec3Lerp(&result, &fromWorldPos, &toWorldPos, t);
+		Vector3 result;
+		Vec3Lerp(&result, &fromWorldPos, &toWorldPos, t);
 		this->SetWorldPosition(result);
 	}
 }
@@ -926,9 +927,9 @@ void Transform::Interpolate(const Transform& from, const Transform& to, float t)
 {
 	t = Clamp01(t);
 
-	D3DXVECTOR3 resultScale;
-	D3DXVECTOR3 resultPosition;
-	D3DXQUATERNION resultRotate;
+	Vector3 resultScale;
+	Vector3 resultPosition;
+	Quaternion resultRotate;
 
 	//t 가 0 과 같다면...
 	if (FloatZero(t))
@@ -950,24 +951,24 @@ void Transform::Interpolate(const Transform& from, const Transform& to, float t)
 	//0 과 1 사이의 값일때만 보간
 	else
 	{
-		D3DXVECTOR3 fromScale = from._scale;
-		D3DXVECTOR3 toScale = to._scale;
+		Vector3 fromScale = from._scale;
+		Vector3 toScale = to._scale;
 
-		D3DXVECTOR3 fromPosition = from.GetWorldPosition();
-		D3DXVECTOR3 toPosition = to.GetWorldPosition();
+		Vector3 fromPosition = from.GetWorldPosition();
+		Vector3 toPosition = to.GetWorldPosition();
 
-		D3DXQUATERNION fromQuat = from.GetWorldRotateQuaternion();
-		D3DXQUATERNION toQuat = to.GetWorldRotateQuaternion();
+		Quaternion fromQuat = from.GetWorldRotateQuaternion();
+		Quaternion toQuat = to.GetWorldRotateQuaternion();
 
 
 		//스케일 보간
-		D3DXVec3Lerp(&resultScale, &fromScale, &toScale, t);
+		Vec3Lerp(&resultScale, &fromScale, &toScale, t);
 
 		//위치 보간
-		D3DXVec3Lerp(&resultPosition, &fromPosition, &toPosition, t);
+		Vec3Lerp(&resultPosition, &fromPosition, &toPosition, t);
 
 		//회전 보간
-		D3DXQuaternionSlerp(&resultRotate, &fromQuat, &toQuat, t);
+		QuaternionSlerp(&resultRotate, &fromQuat, &toQuat, t);
 
 
 	}
@@ -994,17 +995,17 @@ void Transform::Interpolate(const Transform& from, const Transform& to, float t)
 void Transform::UpdateTransform()
 {
 	//자신의 정보로 matLocal 행렬을 갱신한다.
-	D3DXMatrixIdentity(&this->_matLocal);
+	MatrixIdentity(&this->_matLocal);
 
 	//스케일 먹은 축정보
-	D3DXVECTOR3 scaledRight = this->right * this->_scale.x;
-	D3DXVECTOR3 scaledUp = this->up * this->_scale.y;
-	D3DXVECTOR3 scaledForward = this->forward * this->_scale.z;
+	Vector3 scaledRight = this->right * this->_scale.x;
+	Vector3 scaledUp = this->up * this->_scale.y;
+	Vector3 scaledForward = this->forward * this->_scale.z;
 
-	memcpy(&this->_matLocal._11, &scaledRight, sizeof(D3DXVECTOR3));
-	memcpy(&this->_matLocal._21, &scaledUp, sizeof(D3DXVECTOR3));
-	memcpy(&this->_matLocal._31, &scaledForward, sizeof(D3DXVECTOR3));
-	memcpy(&this->_matLocal._41, &this->_position, sizeof(D3DXVECTOR3));
+	memcpy(&this->_matLocal._11, &scaledRight, sizeof(Vector3));
+	memcpy(&this->_matLocal._21, &scaledUp, sizeof(Vector3));
+	memcpy(&this->_matLocal._31, &scaledForward, sizeof(Vector3));
+	memcpy(&this->_matLocal._41, &this->_position, sizeof(Vector3));
 
 	//나의 최종 행렬
 	if (this->pParent == NULL)
@@ -1013,7 +1014,8 @@ void Transform::UpdateTransform()
 	}
 
 	//내가 부모가 있다면...
-	else {
+	else 
+	{
 		this->_matFinal = _matLocal * this->pParent->_matFinal;
 	}
 
@@ -1038,8 +1040,8 @@ void Transform::SetDeviceWorld(LPDIRECT3DDEVICE9 pDevice)
 //Device 에 자신의 Tansform 을 뷰로 셋팅
 void Transform::SetDeviceView(LPDIRECT3DDEVICE9 pDevice)
 {
-	D3DXMATRIXA16 matView;
-	D3DXMatrixInverse(&matView, NULL, &_matFinal);
+	Matrix matView;
+	MatrixInverse(&matView, NULL, &_matFinal);
 
 	pDevice->SetTransform(D3DTS_VIEW, &matView);
 }
@@ -1049,60 +1051,60 @@ void Transform::SetDeviceView(LPDIRECT3DDEVICE9 pDevice)
 // Get 들..................
 //
 //최종 행렬을 얻는다.
-D3DXMATRIXA16 Transform::GetFinalMatrix() const
+Matrix Transform::GetFinalMatrix() const
 {
 	return this->_matFinal;
 }
 
-D3DXMATRIXA16 Transform::GetWorldRotateMatrix() const
+Matrix Transform::GetWorldRotateMatrix() const
 {
 	//자신의 축으로 회전 행렬을 만들어 재낀다
-	D3DXMATRIXA16 matRotate;
-	D3DXMatrixIdentity(&matRotate);
+	Matrix matRotate;
+	MatrixIdentity(&matRotate);
 
 	//3축을 얻는다.
-	D3DXVECTOR3 axis[3];
+	Vector3 axis[3];
 	this->GetUnitAxies(axis);
 
 	//행렬에 적용
-	memcpy(&matRotate._11, axis + 0, sizeof(D3DXVECTOR3));
-	memcpy(&matRotate._21, axis + 1, sizeof(D3DXVECTOR3));
-	memcpy(&matRotate._31, axis + 2, sizeof(D3DXVECTOR3));
+	memcpy(&matRotate._11, axis + 0, sizeof(Vector3));
+	memcpy(&matRotate._21, axis + 1, sizeof(Vector3));
+	memcpy(&matRotate._31, axis + 2, sizeof(Vector3));
 
 	return matRotate;
 }
 
-D3DXQUATERNION Transform::GetWorldRotateQuaternion() const
+Quaternion Transform::GetWorldRotateQuaternion() const
 {
-	D3DXQUATERNION quat;
+	Quaternion quat;
 
-	D3DXMATRIXA16 matRotate = this->GetWorldRotateMatrix();
+	Matrix matRotate = this->GetWorldRotateMatrix();
 
 	//회전 행렬로 사원수를 만든다.
-	D3DXQuaternionRotationMatrix(&quat, &matRotate);
+	QuaternionRotationMatrix(&quat, &matRotate);
 
 	return quat;
 }
 
 //위치 값을 얻는다.
-D3DXVECTOR3 Transform::GetWorldPosition() const
+Vector3 Transform::GetWorldPosition() const
 {
-	D3DXVECTOR3 pos = this->_position;
+	Vector3 pos = this->_position;
 
 	if (this->pParent) {
-		D3DXVec3TransformCoord(&pos, &pos, &this->pParent->_matFinal);
+		Vec3TransformCoord(&pos, &pos, &this->pParent->_matFinal);
 	}
 
 	return pos;
 }
 
-D3DXVECTOR3 Transform::GetLocalPosition() const
+Vector3 Transform::GetLocalPosition() const
 {
 	return this->_position;
 }
 
 //축을 얻는다. ( 월드 기준 )
-void Transform::GetScaledAxies(D3DXVECTOR3* pVecArr) const
+void Transform::GetScaledAxies(Vector3* pVecArr) const
 {
 	for (int i = 0; i < 3; i++) {
 		pVecArr[i] = this->axis[i];
@@ -1110,56 +1112,56 @@ void Transform::GetScaledAxies(D3DXVECTOR3* pVecArr) const
 
 	//부모가 있다면..
 	if (this->pParent) {
-		D3DXMATRIXA16 matParentFinal = this->pParent->_matFinal;
+		Matrix matParentFinal = this->pParent->_matFinal;
 		for (int i = 0; i < 3; i++) {
-			D3DXVec3TransformNormal(&pVecArr[i], &pVecArr[i], &matParentFinal);
+			Vec3TransformNormal(&pVecArr[i], &pVecArr[i], &matParentFinal);
 		}
 	}
 }
 
-void Transform::GetUnitAxies(D3DXVECTOR3* pVecArr) const
+void Transform::GetUnitAxies(Vector3* pVecArr) const
 {
 	for (int i = 0; i < 3; i++) {
-		D3DXVec3Normalize(pVecArr + i, this->axis + i);
+		Vec3Normalize(pVecArr + i, this->axis + i);
 	}
 
 	//부모가 있다면..
 	if (this->pParent) {
-		D3DXMATRIXA16 matParentFinal = this->pParent->_matFinal;
+		Matrix matParentFinal = this->pParent->_matFinal;
 		for (int i = 0; i < 3; i++) {
-			D3DXVec3TransformNormal(&pVecArr[i], &pVecArr[i], &matParentFinal);
+			Vec3TransformNormal(&pVecArr[i], &pVecArr[i], &matParentFinal);
 		}
 	}
 }
 
-D3DXVECTOR3 Transform::GetScaledAxis(int axisNum) const
+Vector3 Transform::GetScaledAxis(int axisNum) const
 {
-	D3DXVECTOR3 result = this->axis[axisNum];
+	Vector3 result = this->axis[axisNum];
 
 	//부모가 있다면..
 	if (this->pParent) {
-		D3DXMATRIXA16 matParentFinal = this->pParent->_matFinal;
-		D3DXVec3TransformNormal(&result, &result, &matParentFinal);
+		Matrix matParentFinal = this->pParent->_matFinal;
+		Vec3TransformNormal(&result, &result, &matParentFinal);
 	}
 
 	return result;
 }
 
-D3DXVECTOR3 Transform::GetUnitAxis(int axisNum) const
+Vector3 Transform::GetUnitAxis(int axisNum) const
 {
-	D3DXVECTOR3 result;
-	D3DXVec3Normalize(&result, this->axis + axisNum);
+	Vector3 result;
+	Vec3Normalize(&result, this->axis + axisNum);
 
 	//부모가 있다면..
 	if (this->pParent) {
-		D3DXMATRIXA16 matParentFinal = this->pParent->_matFinal;
-		D3DXVec3TransformNormal(&result, &result, &matParentFinal);
+		Matrix matParentFinal = this->pParent->_matFinal;
+		Vec3TransformNormal(&result, &result, &matParentFinal);
 	}
 
 	return result;
 }
 
-D3DXVECTOR3 Transform::GetForward(bool bNormalize /*= true*/) const
+Vector3 Transform::GetForward(bool bNormalize /*= true*/) const
 {
 	if (bNormalize)
 		return this->GetUnitAxis(AXIS_Z);
@@ -1167,7 +1169,7 @@ D3DXVECTOR3 Transform::GetForward(bool bNormalize /*= true*/) const
 	return this->GetScaledAxis(AXIS_Z);
 }
 
-D3DXVECTOR3 Transform::GetUp(bool bNormalize /*= true*/) const
+Vector3 Transform::GetUp(bool bNormalize /*= true*/) const
 {
 	if (bNormalize)
 		return this->GetUnitAxis(AXIS_Y);
@@ -1175,7 +1177,7 @@ D3DXVECTOR3 Transform::GetUp(bool bNormalize /*= true*/) const
 	return this->GetScaledAxis(AXIS_Y);
 }
 
-D3DXVECTOR3 Transform::GetRight(bool bNormalize /*= true*/) const
+Vector3 Transform::GetRight(bool bNormalize /*= true*/) const
 {
 	if (bNormalize)
 		return this->GetUnitAxis(AXIS_X);
@@ -1193,7 +1195,7 @@ D3DXVECTOR3 Transform::GetRight(bool bNormalize /*= true*/) const
 //	static float minAngleV = -85.0f;			//수직 최저 앵글
 //	static float sensitivityH = 1.0f;					//가로 민감도
 //	static float sensitivityV = 1.0f;					//세로 민감도 ( 이값이 음수면 Invert Mouse )
-//	static D3DXVECTOR3 nowVelocity(0, 0, 0);			//현제 방향과 속도를 가진 벡터
+//	static Vector3 nowVelocity(0, 0, 0);			//현제 방향과 속도를 가진 벡터
 //
 //	static float accelate = 30.0f;						//초당 이동 증가값
 //	static float nowSpeed = 3.0f;						//현재 속도
@@ -1219,7 +1221,7 @@ D3DXVECTOR3 Transform::GetRight(bool bNormalize /*= true*/) const
 //		//
 //
 //		//입력 방향벡터
-//		D3DXVECTOR3 inputVector(0, 0, 0);
+//		Vector3 inputVector(0, 0, 0);
 //
 //		if (KEY_MGR->IsStayDown('W')) {
 //			inputVector.z = 1.0f;
@@ -1249,12 +1251,12 @@ D3DXVECTOR3 Transform::GetRight(bool bNormalize /*= true*/) const
 //		if (VECTORZERO(inputVector) == false)
 //		{
 //			//정규화
-//			D3DXVec3Normalize(&inputVector, &inputVector);
+//			Vec3Normalize(&inputVector, &inputVector);
 //		}
 //
 //		//이동 해라
 //		//타겟벡터 
-//		D3DXVECTOR3 target = inputVector * maxSpeed;
+//		Vector3 target = inputVector * maxSpeed;
 //		this->MovePositionSelf(target * timeDelta);
 //
 //		//
@@ -1320,8 +1322,8 @@ D3DXVECTOR3 Transform::GetRight(bool bNormalize /*= true*/) const
 //Transform 에 대한 기즈모를 그린다.
 void Transform::RenderGizmo(bool applyScale /*= false*/)
 {
-	D3DXVECTOR3 worldPos = this->GetWorldPosition();
-	D3DXVECTOR3 axis[3];
+	Vector3 worldPos = this->GetWorldPosition();
+	Vector3 axis[3];
 
 	if (applyScale)
 		this->GetScaledAxies(axis);

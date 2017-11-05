@@ -15,6 +15,9 @@ public:
 
 	virtual void ReleaseResource(Effect *pData);
 	virtual void ReleaseResource(const std::string &key);
+	virtual bool32 ChangeCurrentResource(Effect *pData);
+
+private :
 
 };
 

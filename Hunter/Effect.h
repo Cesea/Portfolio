@@ -1,13 +1,15 @@
 #ifndef EFFECT_H
 #define EFFECT_H
 
-class Effect
+class Effect : public Resource
 {
-public:
+	friend class EffectManager;
+private :
 	Effect();
 	~Effect();
 	Effect(const Effect &other);
 	Effect &operator= (const Effect &other);
+public:
 
 	bool Load(const std::string &fileName, DWORD shaderFlag = 0);
 
@@ -40,6 +42,8 @@ public:
 	{
 		_effect->CommitChanges();
 	}
+
+	EffectID GetID() { return _id; }
 private:
 	ID3DXEffect *_effect{};
 };

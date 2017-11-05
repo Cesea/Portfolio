@@ -59,21 +59,24 @@ void DumpToStdOut(const tinyxml2::XMLNode *pParent, uint32 indent = 0)
 	}
 }
 
-bool BaseScene::Load()
+bool32 BaseScene::Load()
 {
-	bool result = true;
+	bool32 result = true;
 	return result;
 }
 
-bool BaseScene::Unload()
+bool32 BaseScene::Unload()
 {
-	bool result = true;
+	bool32 result = true;
 	return result;
 }
 
-bool BaseScene::Init()
+bool32 BaseScene::Init()
 {
-	bool result = true;
+	bool32 result = true;
+
+	_camera.SetWorldPosition(0.0f, 2.0f, -3.0f);
+
 	//std::vector<int> arrays;
 	//for (int i = 0; i < 10; ++i)
 	//{
@@ -171,25 +174,33 @@ bool BaseScene::Init()
 	//		std::cout << str << std::endl;
 	//	}
 	//}
+	_active = true;
+	return result;
+}
+
+bool32 BaseScene::Update(float deltaTime)
+{
+	bool32 result = true;
+
+	_camera.UpdateMatrix();
+	_camera.UpdateCamToDevice(gpDevice);
 
 	return result;
 }
 
-bool BaseScene::Update(float deltaTime)
+bool32 BaseScene::Render()
 {
-	bool result = true;
-	return result;
-}
-
-bool BaseScene::Render()
-{
-	bool result = true;
+	bool32 result = true;
 
 	im::BeginFrame(gEngine->GetInput()->mouse, gEngine->GetInput()->keyboard.GetCharInput());
 
 	im::BeginScrollArea("Editor", 100, 100, 400, 600, &_scroll);
 
-	im::Button("Hi", 100, true);
+	if (im::Button("Hi", 100, true))
+	{
+		EventChannel channel;
+		channel.Broadcast(SceneSystem::SceneChangeEvent("TestScene"));
+	}
 	im::Item("HIIII", 100, true);
 	if (im::Check("TODO", _itemCheck))
 	{
@@ -211,6 +222,15 @@ bool BaseScene::Render()
 
 	im::EndFrame();
 
+	gpDevice->Clear(0, nullptr, D3DCLEAR_ZBUFFER | D3DCLEAR_STENCIL | D3DCLEAR_TARGET, 0xff000000, 1.0f, 0.0f);
+	gpDevice->BeginScene();
+
+	debugdraw::WorldGrid(0.4, 10);
+
+	gpDevice->EndScene();
+	gpDevice->Present(nullptr, nullptr, nullptr, nullptr);
+
+
 	return result;
 }
 
@@ -223,7 +243,7 @@ const char * BaseScene::GetSceneName()
 	return "BaseScene";
 }
 
-bool BaseScene::IsActive()
+bool32 BaseScene::IsActive()
 {
 	return _active;
 }

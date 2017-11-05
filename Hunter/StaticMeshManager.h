@@ -5,13 +5,13 @@
 
 #include "StaticMesh.h"
 
-class StaticMeshManager : public ResourceManager<Effect, StaticMesh>
+class StaticMeshManager : public ResourceManager<StaticMesh, StaticMeshManager>
 {
 public:
 	StaticMeshManager(void);
 	~StaticMeshManager(void);
 
-	virtual Effect *LoadResource(const std::string &filePath, void* pParam = NULL);
+	virtual StaticMesh *LoadResource(const std::string &filePath, void* pParam = NULL);
 
 	virtual void ReleaseResource(StaticMesh *pData);
 	virtual void ReleaseResource(const std::string &key);

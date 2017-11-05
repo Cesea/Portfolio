@@ -6,6 +6,7 @@
 //#include "VisualComponent.h"
 
 #include "imguiRenderer.h"
+#include "DebugDraw.h"
 
 struct RenderWindow
 {

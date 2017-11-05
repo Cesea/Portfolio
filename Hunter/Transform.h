@@ -15,24 +15,24 @@ protected:
 	union
 	{
 		struct{
-			D3DXVECTOR3	axis[3];
+			Vector3	axis[3];
 		};
 		struct
 		{
-			D3DXVECTOR3 right;
-			D3DXVECTOR3 up	;
-			D3DXVECTOR3 forward;
+			Vector3 right;
+			Vector3 up	;
+			Vector3 forward;
 
 		};
 	};
 
 	//위치
-	D3DXVECTOR3 _position;
+	Vector3 _position;
 
 	//스케일
-	D3DXVECTOR3 _scale;
+	Vector3 _scale;
 
-	D3DXMATRIXA16 _matFinal;
+	Matrix _matFinal;
 
 	bool _bAutoUpdate;
 
@@ -42,7 +42,7 @@ protected:
 
 	Transform* _pNextSibling;
 
-	D3DXMATRIXA16 _matLocal;
+	Matrix _matLocal;
 
 public:
 	Transform();
@@ -63,48 +63,48 @@ public:
 
 	//위치를 월드 좌표계로 셋팅한다. 
 	void SetWorldPosition(float x, float y, float z);
-	void SetWorldPosition(D3DXVECTOR3 pos);
+	void SetWorldPosition(Vector3 pos);
 
 
 	//위치를 로컬 좌표계로 셋팅한다.  ( 부모가 있는 경우 무모의 상태적인 위치 )
 	void SetLocalPosition(float x, float y, float z);
-	void SetLocalPosition(D3DXVECTOR3 pos);
+	void SetLocalPosition(Vector3 pos);
 
 
 	//자신의 축기준으로 이동 시킨다.
 	void MovePositionSelf(float dx, float dy, float dz);
-	void MovePositionSelf(D3DXVECTOR3 delta);
+	void MovePositionSelf(Vector3 delta);
 
 	//월드 기준으로 이동 시킨다.
 	void MovePositionWorld(float dx, float dy, float dz);
-	void MovePositionWorld(D3DXVECTOR3 delta);
+	void MovePositionWorld(Vector3 delta);
 
 	//부모가 있는 경우 로컬 기준으로 이동 시킨다.
 	void MovePositionLocal(float dx, float dy, float dz);
-	void MovePositionLocal(D3DXVECTOR3 delta);
+	void MovePositionLocal(Vector3 delta);
 
 
 
 	//스케일 셋팅 
 	void SetScale(float x, float y, float z);
-	void SetScale(D3DXVECTOR3 scale);
+	void SetScale(Vector3 scale);
 
 	//스케일링
 	void Scaling(float dx, float dy, float dz);
-	void Scaling(D3DXVECTOR3 deltaScale);
+	void Scaling(Vector3 deltaScale);
 
 	//월드 기준으로 회전 
 	void RotateWorld(float angleX, float angleY, float angleZ);
-	void RotateWorld(D3DXVECTOR3 angle);
+	void RotateWorld(Vector3 angle);
 
 	//자신의 축기준으로 회전
 	void RotateSelf(float angleX, float angleY, float angleZ);
-	void RotateSelf(D3DXVECTOR3 angle);
+	void RotateSelf(Vector3 angle);
 
 
 	//부모가 있는 경우 부모 로컬의 축기준으로 회전
 	void RotateLocal(float angleX, float angleY, float angleZ);
-	void RotateLocal(D3DXVECTOR3 angle);
+	void RotateLocal(Vector3 angle);
 
 
 	//사원수를 이용한 특정 회전값으로 회전량을 가져라....
@@ -112,24 +112,24 @@ public:
 	void SetRotateLocal(float eAngleX, float eAngleY, float aAngleZ);
 
 	// 회전 행렬을 넣어주면 그 회전 행렬대로 회전한다.
-	void SetRotateWorld(const D3DXMATRIXA16& matWorldRotate);
-	void SetRotateLocal(const D3DXMATRIXA16& matWorldRotate);
+	void SetRotateWorld(const Matrix& matWorldRotate);
+	void SetRotateLocal(const Matrix& matWorldRotate);
 
 	// 회전 사원수를 넣어주면 그 회전값 대로 회전한다.
-	void SetRotateWorld(const D3DXQUATERNION& matWorldRotate);
-	void SetRotateLocal(const D3DXQUATERNION& matWorldRotate);
+	void SetRotateWorld(const Quaternion& matWorldRotate);
+	void SetRotateLocal(const Quaternion& matWorldRotate);
 
 	//특정 방향을 바라보게 회전해라.
-	void LookDirection(D3DXVECTOR3 dir, D3DXVECTOR3 up = D3DXVECTOR3(0, 1, 0));
+	void LookDirection(Vector3 dir, Vector3 up = Vector3(0, 1, 0));
 
 	//특정 방향을 바라보는데 angle 각만큼만 회전 해라
-	void LookDirection(D3DXVECTOR3 dir, float angle);
+	void LookDirection(Vector3 dir, float angle);
 
 	//특정위치를 바라보게 회전해라.
-	void LookPosition(D3DXVECTOR3 pos, D3DXVECTOR3 up = D3DXVECTOR3(0, 1, 0));
+	void LookPosition(Vector3 pos, Vector3 up = Vector3(0, 1, 0));
 
 	//특정위치를  바라보는데 angle 각만큼만 회전 해라
-	void LookPosition(D3DXVECTOR3 pos, float angle);
+	void LookPosition(Vector3 pos, float angle);
 
 	// 자신의 회전 값을 from 과 to 사이의 회전량만큼 회전보간(구면보간) 하여 적용
 	void RotateSlerp(const Transform& from, const Transform& to, float t);
@@ -150,31 +150,27 @@ public:
 
 	void RenderGizmo(bool applyScale = false);
 
-	//void DefaultControl(float timeDelta);
-	//void DefaultControl2(float timeDelta);
-
-
 	///// Get  //////
 
 	//최종 행렬을 얻는다.
-	D3DXMATRIXA16 GetFinalMatrix() const;
-	D3DXMATRIXA16 GetWorldRotateMatrix() const;
-	D3DXQUATERNION GetWorldRotateQuaternion() const;
+	Matrix GetFinalMatrix() const;
+	Matrix GetWorldRotateMatrix() const;
+	Quaternion GetWorldRotateQuaternion() const;
 
 	//위치 값을 얻는다.
-	D3DXVECTOR3 GetWorldPosition() const;
-	D3DXVECTOR3 GetLocalPosition() const;
+	Vector3 GetWorldPosition() const;
+	Vector3 GetLocalPosition() const;
 
 	//축을 얻는다. ( 월드 기준 )
-	void GetScaledAxies(D3DXVECTOR3* pVecArr) const;
-	void GetUnitAxies(D3DXVECTOR3* pVecArr) const;
-	D3DXVECTOR3 GetScaledAxis(int axisNum) const;
-	D3DXVECTOR3 GetUnitAxis(int axisNum) const;
-	D3DXVECTOR3 GetForward(bool bNormalize = true) const;
-	D3DXVECTOR3 GetUp(bool bNormalize = true) const;
-	D3DXVECTOR3 GetRight(bool bNormalize = true) const;
+	void GetScaledAxies(Vector3* pVecArr) const;
+	void GetUnitAxies(Vector3* pVecArr) const;
+	Vector3 GetScaledAxis(int axisNum) const;
+	Vector3 GetUnitAxis(int axisNum) const;
+	Vector3 GetForward(bool bNormalize = true) const;
+	Vector3 GetUp(bool bNormalize = true) const;
+	Vector3 GetRight(bool bNormalize = true) const;
 
-	D3DXVECTOR3 GetScale() const {
+	Vector3 GetScale() const {
 		return this->_scale;
 	}
 };

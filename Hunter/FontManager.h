@@ -9,7 +9,7 @@ public:
 	FontManager(void);
 	~FontManager(void);
 
-	virtual Effect *LoadResource(const std::string &filePath, void* pParam = NULL);
+	virtual ID3DXFont *LoadResource(const std::string &filePath, void* pParam = NULL);
 
 	virtual void ReleaseResource(ID3DXFont *pData);
 	virtual void ReleaseResource(const std::string &key);

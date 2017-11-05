@@ -15,6 +15,7 @@ class SceneSystem : public System
 public :
 	struct SceneChangeEvent
 	{
+		SceneChangeEvent(const std::string &name) : newSceneName(name) {}
 		std::string newSceneName;
 	};
 
@@ -40,6 +41,16 @@ private :
 
 	SceneMap _scenes;
 	IScene *_pCurrentScene;
+
+	//Event handle
+public :
+
+	void Handle(const SceneChangeEvent &event)
+	{
+		Console::Log("Scene Changed %s\n", event.newSceneName);
+		ChangeScene(event.newSceneName);
+	}
+
 
 };
 

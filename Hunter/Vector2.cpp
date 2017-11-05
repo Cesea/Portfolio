@@ -93,39 +93,3 @@ Vector2 operator*(float f, const Vector2 & other)
 {
 	return Vector2(other.x * f, other.y * f);
 }
-
-float Vec2Length(const Vector2 * pV)
-{
-	return sqrtf((pV->x * pV->x) + (pV->y * pV->y));
-}
-
-float Vec2LengthSq(const Vector2 * pV)
-{
-	return ((pV->x * pV->x) + (pV->y * pV->y));
-}
-
-float Vec2Dot(const Vector2 * pV1, const Vector2 * pV2)
-{
-	return (pV1->x * pV2->x) + (pV1->y * pV2->y);
-}
-
-Vector2 * Vec2Add(Vector2 * pOut, const Vector2 * pV1, const Vector2 * pV2)
-{
-	pOut->x = pV1->x + pV2->x;
-	pOut->y = pV1->y + pV2->y;
-	return  pOut;
-}
-
-Vector2 * Vec2Subtract(Vector2 * pOut, const Vector2 * pV1, const Vector2 * pV2)
-{
-	pOut->x = pV1->x - pV2->x;
-	pOut->y = pV1->y - pV2->y;
-	return  pOut;
-}
-
-Vector2 * Vec2Normalize(Vector2 * pOut, const Vector2 * pV)
-{
-	float lengthInv = 1.0f / Vec2Length(pV);
-	*pOut = (*pV) * lengthInv;
-	return pOut;
-}

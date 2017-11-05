@@ -27,9 +27,6 @@
     <ClCompile Include="StaticControl.cpp">
       <Filter>GUI\Retained\Controls</Filter>
     </ClCompile>
-    <ClCompile Include="TextureManager.cpp">
-      <Filter>Managers</Filter>
-    </ClCompile>
     <ClCompile Include="EffectManager.cpp">
       <Filter>Managers</Filter>
     </ClCompile>
@@ -47,9 +44,6 @@
     </ClCompile>
     <ClCompile Include="RefVariant.cpp">
       <Filter>Sub\Reflection\Variant</Filter>
-    </ClCompile>
-    <ClCompile Include="Transform.cpp">
-      <Filter>Sub</Filter>
     </ClCompile>
     <ClCompile Include="BaseScene.cpp">
       <Filter>Scene</Filter>
@@ -138,17 +132,23 @@
     <ClCompile Include="ApplicationTimer.cpp">
       <Filter>Core\Timers</Filter>
     </ClCompile>
-    <ClCompile Include="ReferenceCounter.cpp">
-      <Filter>Core\Resources</Filter>
+    <ClCompile Include="SurfaceMaterial.cpp">
+      <Filter>D3D</Filter>
     </ClCompile>
-    <ClCompile Include="ResourcePoolManager.cpp">
-      <Filter>Core\Resources</Filter>
+    <ClCompile Include="SurfaceMaterialManager.cpp">
+      <Filter>Managers</Filter>
     </ClCompile>
-    <ClCompile Include="ResourcePoolItem.cpp">
-      <Filter>Core\Resources</Filter>
+    <ClCompile Include="TestScene.cpp">
+      <Filter>Scene\TestScene</Filter>
     </ClCompile>
-    <ClCompile Include="VertexBuffer.cpp">
-      <Filter>Core\Resources\VertexBuffer</Filter>
+    <ClCompile Include="DebugDraw.cpp">
+      <Filter>Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="Transform.cpp">
+      <Filter>Sub\Commons</Filter>
+    </ClCompile>
+    <ClCompile Include="Camera.cpp">
+      <Filter>Sub\Commons</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -182,9 +182,6 @@
     </ClInclude>
     <ClInclude Include="CommonUtils.h">
       <Filter>Sub</Filter>
-    </ClInclude>
-    <ClInclude Include="TextureManager.h">
-      <Filter>Managers</Filter>
     </ClInclude>
     <ClInclude Include="FontManager.h">
       <Filter>Managers</Filter>
@@ -222,9 +219,6 @@
     <ClInclude Include="ResourceManager.h">
       <Filter>Managers</Filter>
     </ClInclude>
-    <ClInclude Include="Texture.h">
-      <Filter>D3D</Filter>
-    </ClInclude>
     <ClInclude Include="IMesh.h">
       <Filter>D3D</Filter>
     </ClInclude>
@@ -249,9 +243,6 @@
     <ClInclude Include="RefVariant.h">
       <Filter>Sub\Reflection\Variant</Filter>
     </ClInclude>
-    <ClInclude Include="Transform.h">
-      <Filter>Sub</Filter>
-    </ClInclude>
     <ClInclude Include="BaseScene.h">
       <Filter>Scene</Filter>
     </ClInclude>
@@ -269,9 +260,6 @@
     </ClInclude>
     <ClInclude Include="StaticMesh.h">
       <Filter>D3D</Filter>
-    </ClInclude>
-    <ClInclude Include="AISystem.h">
-      <Filter>Core\System</Filter>
     </ClInclude>
     <ClInclude Include="Component.h">
       <Filter>Core\ECS\Component</Filter>
@@ -357,29 +345,41 @@
     <ClInclude Include="ApplicationTimer.h">
       <Filter>Core\Timers</Filter>
     </ClInclude>
-    <ClInclude Include="ReferenceCounter.h">
-      <Filter>Core\Resources</Filter>
-    </ClInclude>
     <ClInclude Include="BitFlags.h">
       <Filter>Sub</Filter>
     </ClInclude>
-    <ClInclude Include="DataPool.h">
-      <Filter>Core\Resources</Filter>
+    <ClInclude Include="SurfaceMaterial.h">
+      <Filter>D3D</Filter>
     </ClInclude>
-    <ClInclude Include="NumericTools.h">
-      <Filter>Sub</Filter>
+    <ClInclude Include="Resource.h">
+      <Filter>D3D</Filter>
     </ClInclude>
-    <ClInclude Include="ResourcePool.h">
-      <Filter>Core\Resources</Filter>
+    <ClInclude Include="SurfaceMaterialManager.h">
+      <Filter>Managers</Filter>
     </ClInclude>
-    <ClInclude Include="ResourcePoolManager.h">
-      <Filter>Core\Resources</Filter>
+    <ClInclude Include="AISystem.h">
+      <Filter>Core\System\AI</Filter>
     </ClInclude>
-    <ClInclude Include="ResourcePoolItem.h">
-      <Filter>Core\Resources</Filter>
+    <ClInclude Include="TestScene.h">
+      <Filter>Scene\TestScene</Filter>
     </ClInclude>
-    <ClInclude Include="VertexBuffer.h">
-      <Filter>Core\Resources\VertexBuffer</Filter>
+    <ClInclude Include="DebugDraw.h">
+      <Filter>Debug</Filter>
+    </ClInclude>
+    <ClInclude Include="Transform.h">
+      <Filter>Sub\Commons</Filter>
+    </ClInclude>
+    <ClInclude Include="Camera.h">
+      <Filter>Sub\Commons</Filter>
+    </ClInclude>
+    <ClInclude Include="Ray.h">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderQueue.h">
+      <Filter>Core\System\VideoSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="DrawCommands.h">
+      <Filter>Core\System\VideoSystem</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -467,11 +467,17 @@
     <Filter Include="Core\Timers">
       <UniqueIdentifier>{1a498917-4bd0-45a4-8cdb-28af30c3deb7}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Core\Resources">
-      <UniqueIdentifier>{ca6f9eff-5239-4241-8601-a5e9f82a03c7}</UniqueIdentifier>
+    <Filter Include="Core\System\AI">
+      <UniqueIdentifier>{6c4296ed-e03d-4d77-9b2b-7f9bdb5082d3}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Core\Resources\VertexBuffer">
-      <UniqueIdentifier>{9d3c54ad-e264-45bc-822f-ffd99ff7f4d5}</UniqueIdentifier>
+    <Filter Include="Scene\TestScene">
+      <UniqueIdentifier>{5a71353e-00bc-4729-92c9-598c2955957d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Debug">
+      <UniqueIdentifier>{76a6963c-195a-47f4-bb35-80dc0a39ec35}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sub\Commons">
+      <UniqueIdentifier>{db2f3cb1-6abc-4de3-9ac7-2b30c4b52e3e}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

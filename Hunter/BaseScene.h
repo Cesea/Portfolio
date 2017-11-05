@@ -3,7 +3,7 @@
 
 #include "IScene.h"
 
-
+#include "Camera.h"
 
 class BaseScene : public IScene
 {
@@ -11,23 +11,23 @@ public :
 	BaseScene() {};
 	virtual ~BaseScene() {}
 
-	virtual bool Load();
-	virtual bool Unload();
+	virtual bool32 Load();
+	virtual bool32 Unload();
 
-	virtual bool Init();
-	virtual bool Update(float deltaTime);
-	virtual bool Render();
+	virtual bool32 Init();
+	virtual bool32 Update(float deltaTime);
+	virtual bool32 Render();
 
 	virtual void Release();
 
 	virtual const char *GetSceneName();
-	virtual bool IsActive();
+	virtual bool32 IsActive();
 
 protected :
-	bool _active;
+	bool32 _active;
 
-	bool _itemCheck{ false };
-	bool _collapse{ false };
+	bool32 _itemCheck{ false };
+	bool32 _collapse{ false };
 
 	float _sliderValue{ 0 };
 
@@ -35,6 +35,8 @@ protected :
 	char _strings2[MAX_PATH] = {0, };
 
 	int32 _scroll{ 0 };
+
+	Camera _camera;
 
 };
 

@@ -1,36 +1,10 @@
 #ifndef COMMON_UTILS_H
 #define COMMON_UTILS_H
 
-#include "BitFlags.h"
-#include "NumericTools.h"
 #include <cstdlib>
 
 constexpr float EPSILON = 0.001f;
-
-enum LockFlagBits
-{
-	LockReadBit = 0,	// lock data for reading
-	LockWriteBit,		// lock data for selective writing (not all data is changed)
-	LockReplaceBit,	// lock data to completely overwrite all data
-	LockExclusiveBit,		// allow no other locks while active
-	LockWaitBit,			// wait until data is available
-};
-
-enum LockFlags
-{
-	LockRead = FLAG(LockReadBit),
-	LockWriteFlag = FLAG(LockWriteBit),
-	LockReplaceFlag = FLAG(LockWriteBit),
-	LockExclusive = FLAG(LockExclusiveBit),
-	LockWait = FLAG(LockWaitBit),
-};
-
-enum LockType
-{
-	ReadLock = 0,
-	WriteLock,
-	ReadWriteLock,
-};
+constexpr float ONE_RAD = 0.017453f;
 
 
 inline bool IsCharacter(WPARAM wParam)
@@ -164,16 +138,12 @@ inline float InterpolateFloat(float start, float end, float t)
 	return start + ((end - start) * t);
 }
 
-inline D3DXVECTOR3 InterpolateVector3(const D3DXVECTOR3 &start, const D3DXVECTOR3 &end, float t)
-{
-	return D3DXVECTOR3(InterpolateFloat(start.x, end.x, t),
-		InterpolateFloat(start.y, end.y, t),
-		InterpolateFloat(start.z, end.z, t));
-}
-struct Ray {
-	D3DXVECTOR3 origin;		//직선의 시작위치
-	D3DXVECTOR3 direction;  //직선의 방향(정규화 되어있어야 함);
-};
+//inline Vector InterpolateVector3(const D3DXVECTOR3 &start, const D3DXVECTOR3 &end, float t)
+//{
+//	return D3DXVECTOR3(InterpolateFloat(start.x, end.x, t),
+//		InterpolateFloat(start.y, end.y, t),
+//		InterpolateFloat(start.z, end.z, t));
+//}
 
 float RandFloat();
 float RandFloat(float max);

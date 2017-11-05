@@ -14,7 +14,7 @@
 
 #include <memory>
 
-#include "TextureManager.h"
+#include "SurfaceMaterialManager.h"
 #include "EffectManager.h"
 //#include "FontManager.h"
 //#include "MeshManager.h"

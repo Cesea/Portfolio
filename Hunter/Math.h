@@ -5,6 +5,11 @@
 #include "Vector3.h"
 #include "Vector4.h"
 
+#include "Plane.h"
+#include "Color4F.h"
+
+#include "Ray.h"
+
 #include "Quaternion.h"
 #include "Matrix.h"
 

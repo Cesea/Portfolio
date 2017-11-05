@@ -121,28 +121,3 @@ Vector4 operator*(float f, const Vector4 & other)
 {
 	return Vector4(f * other.x, f * other.y, f * other.z, f * other.w);
 }
-
-float Vec4Length(const Vector4 * pV)
-{
-	return D3DXVec4Length(pV);
-}
-
-float Vec4LengthSq(const Vector4 * pV)
-{
-	return D3DXVec4LengthSq(pV);
-}
-
-float Vec4Dot(const Vector4 * pV1, const Vector4 * pV2)
-{
-	return D3DXVec4Dot(pV1, pV2);
-}
-
-Vector4 * Vec4Add(Vector4 * pOut, const Vector4 * pV1, const Vector4 * pV2)
-{
-	return (Vector4 *)D3DXVec4Add(pOut, pV1, pV2);
-}
-
-Vector4 * Vec4Subtract(Vector4 * pOut, const Vector4 * pV1, const Vector4 * pV2)
-{
-	return (Vector4 *)D3DXVec4Subtract(pOut, pV1, pV2);
-}

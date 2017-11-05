@@ -14,15 +14,11 @@ typedef int64_t int64;
 
 typedef int32 bool32;
 
-typedef uint32 SkinID;
-typedef uint32 MaterialID;
+typedef uint32 SurfaceID;
 typedef uint32 TextureID;
-//typedef uint32 VShaderID;
-//typedef uint32 PShaderID;
 typedef uint32 EffectID;
 typedef uint32 FontID;
 
-typedef uint16 PoolHandle;
 
 typedef uint32 ComponentID;
 typedef uint32 ComponentFamilyID;

@@ -18,7 +18,7 @@ Effect::Effect(const Effect & other)
 
 Effect & Effect::operator=(const Effect & other)
 {
-	_effect = other._effect;
+	//_effect = other._effect;
 	return *this;
 }
 

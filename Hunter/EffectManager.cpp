@@ -45,3 +45,16 @@ void EffectManager::ReleaseResource(const std::string & key)
 		_resources.erase(find);
 	}
 }
+
+bool32 EffectManager::ChangeCurrentResource(Effect * pData)
+{
+	if (_pCurrentResource == pData)
+	{
+		return false;
+	}
+	else
+	{
+		_pCurrentResource = pData;
+		return true;
+	}
+}

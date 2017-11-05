@@ -1,6 +1,9 @@
 #ifndef RESOURCE_MANAGER_H
 #define RESOURCE_MANAGER_H
 
+#if defined FindResource
+# undef FindResource
+#endif
 
 #include "SingletonBase.h"
 
@@ -23,7 +26,8 @@ public:
 	~ResourceManager(void);
 
 	//파일 경로로 리소스를 불러온다.
-	T *GetResource(const std::string &filePath, void* pParam = NULL);
+	T *CreateResource(const std::string &filePath, void* pParam = NULL);
+	T *FindResource(const std::string &key);
 
 	//특정 리소스 해제
 	void RemoveResource(const std::string &filePath);
@@ -31,6 +35,9 @@ public:
 	//모든 리소스 해제
 	void ClearResource();
 
+
+	uint32 GetCurrentResourceID() { return _pCurrentResource->GetID(); }
+	const T *GetCurrentResource() { return _pCurrentResource; }
 protected:
 
 	//로드 방식만 재정의 
@@ -39,6 +46,9 @@ protected:
 	//해재 방식만 재정의
 	virtual void ReleaseResource(T *data) = 0;
 	virtual void ReleaseResource(const std::string &key) = 0;
+	virtual bool32 ChangeCurrentResource(T *pResource) = 0;
+
+	T *_pCurrentResource{};
 };
 
 template< typename T, typename A >
@@ -55,7 +65,7 @@ ResourceManager<T, A>::~ResourceManager(void)
 
 
 template<typename T, typename A>
-T *ResourceManager<T, A>::GetResource(const std::string &filePath, void* pParam)
+T *ResourceManager<T, A>::CreateResource(const std::string &filePath, void* pParam)
 {
 	std::unordered_map<std::string, T *>::iterator pIter;
 
@@ -80,6 +90,25 @@ T *ResourceManager<T, A>::GetResource(const std::string &filePath, void* pParam)
 
 	//여기까지왔다면 이미 있다는거
 	return pIter->second;
+}
+
+template<typename T, typename A>
+inline T * ResourceManager<T, A>::FindResource(const std::string & key)
+{
+	std::unordered_map<std::string, T *>::iterator pIter;
+
+	//이미 로딩되었는지 확인
+	pIter = _resources.find(filePath);
+
+	//해당 filePath 가 맵에 추가 되어있지 않다면...
+	if (pIter == _resources.end())
+	{
+		return nullptr;
+	}
+	else
+	{
+		return pIter->second;
+	}
 }
 
 

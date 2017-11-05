@@ -42,7 +42,6 @@ void VideoSystem::Update(float deltaTime)
 void VideoSystem::Render()
 {
 	_pDevice->BeginScene();
-	_pDevice->Clear(0, nullptr, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER | D3DCLEAR_STENCIL, 0xff404040, 1.0f, 0);
 
 	//PerformRender();
 
@@ -117,6 +116,7 @@ bool VideoSystem::InitDefaultRenderState()
 	bool result = true;
 
 	_pDevice->SetRenderState(D3DRS_LIGHTING, false);
+	//_pDevice->SetRenderState(D3DRS_SHADEMODE, D3DSHADE_GOURAUD);
 
 	return result;
 }
