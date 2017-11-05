@@ -13,14 +13,12 @@ public :
 	int32 Remove(int32 index);
 	T *GetAt(int32 index);
 
-	T *operator[] (int32 index);
-
 	int32 Size() { return _end; }
 
 	void Clear();
 
 private :
-	T *_pDatas;
+	T *_dataArrays;
 	int32 _end{ 0 };
 	uint32 _size;
 };
@@ -30,7 +28,7 @@ template<typename T>
 inline PackedArray<T>::PackedArray(uint32 size)
 	:_size(size)
 {
-	_pDatas = new T[size];
+	_dataArrays = new T[size];
 }
 
 template<typename T>
@@ -41,18 +39,20 @@ inline int32 PackedArray<T>::Allocate()
 	{
 		return -1;
 	}
-	T *pData = new (&_pDatas[end]) T;
+	T *pData = new (&_dataArrays[_end]) T;
 	return _end++;
 }
 
 template<typename T>
 inline int32 PackedArray<T>::Remove(int32 index)
 {
+	_end--;
 	if (index != _end)
 	{
-		_pDatas[index] = _pDatas[_end];
+		_dataArrays[index] = _dataArrays[_end];
+		return _end;
 	}
-	return _end--;
+	return -1;
 }
 
 template<typename T>
@@ -62,17 +62,7 @@ inline T * PackedArray<T>::GetAt(int32 index)
 	{
 		return nullptr;
 	}
-	return &_pDatas[index];
-}
-
-template<typename T>
-inline T * PackedArray<T>::operator[](int32 index)
-{
-	if (index > _size)
-	{
-		return nullptr;
-	}
-	return &_pDatas[index];
+	return &_dataArrays[index];
 }
 
 template<typename T>

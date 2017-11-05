@@ -15,7 +15,7 @@ LinearAllocator::~LinearAllocator()
 
 void * LinearAllocator::Allocate(uint32 size)
 {
-	if (_pCurrent + size > _pEnd)
+	if (size == 0 || _pCurrent + size > _pEnd)
 	{
 		return nullptr;
 	}
@@ -23,6 +23,16 @@ void * LinearAllocator::Allocate(uint32 size)
 	void *pBlock = _pCurrent;
 	_pCurrent += size;
 	return pBlock;
+}
+
+uint32 LinearAllocator::MaxSize()
+{
+	return _pEnd - _pStart;
+}
+
+uint32 LinearAllocator::CurrentSize()
+{
+	return _pCurrent - _pStart;
 }
 
 void LinearAllocator::Clear()

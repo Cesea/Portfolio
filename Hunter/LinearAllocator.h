@@ -10,6 +10,8 @@ public :
 	~LinearAllocator();
 
 	void *Allocate(uint32 size);
+	uint32 MaxSize();
+	uint32 CurrentSize();
 	void Clear();
 
 private :

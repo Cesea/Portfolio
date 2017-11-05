@@ -10,8 +10,8 @@ struct DrawCommand
 	typedef void(*DispatchCommand)(const void *pData, const DrawDispatcher &dispatcher);
 	DispatchCommand dispatch{ nullptr };
 
-	DrawCommand *pNext;
-	char *extraCommandData;
+	DrawCommand *pNext{nullptr};
+	char *extraCommandData{nullptr};
 };
 
 template <class Derived>

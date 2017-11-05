@@ -14,7 +14,6 @@ void DispatchDrawIndexPrimitive(const void * pData, const DrawDispatcher & dispa
 	//dispatcher.DrawIndexPrimitive(pConverted);
 }
 
-
 void DispatchSetEffect(const void * pData, const DrawDispatcher & dispatcher)
 {
 	const SetEffectCommand *pConverted = static_cast<const SetEffectCommand *>(pData);

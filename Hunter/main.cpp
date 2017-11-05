@@ -1,15 +1,7 @@
 #include "stdafx.h"
 #include <iostream>
 
-
-//DECLARE_META(D3DXVECTOR3);
-//
-//DEFINE_META(D3DXVECTOR3)
-//{
-//	ADD_MEMBER(x);
-//	ADD_MEMBER(y);
-//	ADD_MEMBER(z);
-//}
+#include "PackedArary.h"
 
 DEFINE_META_POD(int8);
 DEFINE_META_POD(int16);
@@ -22,10 +14,6 @@ DEFINE_META_POD(uint32);
 int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE phInstance, LPSTR cmdLine, int cmdShow)
 {
 
-	Matrix test(1.0f, 0.0f, 0.0f, 0.0f,
-					0.0f, 1.0f, 0.0f, 0.0f,
-					0.0f, 0.0f, 1.0f, 0.0f,
-					4.0f, 3.0f, 2.0f, 1.0f);
 
 	gEngine = new Engine;
 	if (!gEngine->InitializePlatform(hInstance))

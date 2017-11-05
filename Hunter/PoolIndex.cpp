@@ -33,7 +33,7 @@ bool PoolIndex::IsValid(Handle handle)
 	return false;
 }
 
-void PoolIndex::SetInnerIndexValue(Handle handle void *pData)
+void PoolIndex::SetInnerIndexValue(Handle handle, void *pData)
 {
 	if (IsValid(handle))
 	{
@@ -43,5 +43,5 @@ void PoolIndex::SetInnerIndexValue(Handle handle void *pData)
 
 void * PoolIndex::Get(Handle handle)
 {
-	return IsValid(handle) ? _indices.Get(handle.index) : nullptr;
+	return IsValid(handle) ? _indices.GetAt(handle.index)->pData : nullptr;
 }

@@ -6,10 +6,10 @@
 #include "Handle.h"
 
 template <typename Data>
-class IndexPool
+class IndexedPool
 {
 public : 
-	IndexedPool(size_t size) : indices(size), dataPool(size) {}
+	IndexedPool(uint32 size) : _maxSize(size), indices(size), dataPool(size) {}
 	Handle CreateObject();
 	void DeleteObject(Handle handle);
 	Data * Get(Handle handle);
@@ -18,12 +18,15 @@ public :
 private:
 	SparseArray<Handle> _indices;
 	PackedArray<Data> _dataPool;
+
+	uint32 _baseVersion{ 0 };
+	uint32 _maxSize;
 };
 
 #endif
 
 template<typename Data>
-inline Handle IndexPool<Data>::CreateObject()
+inline Handle IndexedPool<Data>::CreateObject()
 {
 	Handle handle;
 	handle.index = _indices.Allocate();
@@ -37,7 +40,7 @@ inline Handle IndexPool<Data>::CreateObject()
 }
 
 template<typename Data>
-inline void IndexPool<Data>::DeleteObject(Handle handle)
+inline void IndexedPool<Data>::DeleteObject(Handle handle)
 {
 	Handle *index = _indices.GetAt(handle.index);
 	if (index == nullptr)
@@ -59,7 +62,7 @@ inline void IndexPool<Data>::DeleteObject(Handle handle)
 }
 
 template<typename Data>
-inline Data * IndexPool<Data>::Get(Handle handle)
+inline Data * IndexedPool<Data>::Get(Handle handle)
 {
 	Handle *index = _indices.GetAt(handle.index);
 	if (index == nullptr)

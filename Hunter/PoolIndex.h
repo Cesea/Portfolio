@@ -12,15 +12,16 @@ public :
 	Handle CreateHandle(void *pData);
 	bool IsValid(Handle handle);
 
-	void SetInnerIndexValue(Handle handle void *pData);
+	void SetInnerIndexValue(Handle handle, void *pData);
 	void *Get(Handle handle);
 
-private :
 	struct InnerHandle
 	{
 		uint32 group;
 		void *pData;
 	};
+
+private :
 
 	SparseArray<InnerHandle> _indices;
 };
