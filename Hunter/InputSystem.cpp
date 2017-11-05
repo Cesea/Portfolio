@@ -2,7 +2,6 @@
 #include "InputSystem.h"
 
 InputSystem::InputSystem()
-	:keyboard(this), mouse(this)
 {
 	
 }
@@ -14,6 +13,8 @@ InputSystem::~InputSystem()
 bool InputSystem::Init(const std::string & name, const SystemSetting & setting)
 {
 	_name = name;
+	mouse.Init(this);
+	keyboard.Init(this);
 	return true;
 }
 
@@ -27,23 +28,28 @@ void InputSystem::Update(float deltaTime)
 	mouse.Update();
 }
 
-Keyboard::Keyboard(InputSystem *parent)
+Keyboard::Keyboard()
 {
-	_pParent = parent;
 }
 
 Keyboard::~Keyboard()
 {
 }
 
+bool Keyboard::Init(InputSystem * pParent)
+{
+	_pParent = pParent;
+	return true;
+}
+
 void Keyboard::UpdateOnKeyUp(WPARAM wParam, LPARAM lParam)
 {
-	_currentState[wParam] = true;
+	_currentState[wParam] = false;
 }
 
 void Keyboard::UpdateOnKeyDown(WPARAM wParam, LPARAM lParam)
 {
-	_currentState[wParam] = false;
+	_currentState[wParam] = true;
 }
 
 void Keyboard::UpdateOnChar(WPARAM wParam, LPARAM lParam)
@@ -51,57 +57,68 @@ void Keyboard::UpdateOnChar(WPARAM wParam, LPARAM lParam)
 	_charInput = wParam;
 }
 
-//void Keyboard::UpdateWithMessage(UINT msg, WPARAM wParam, LPARAM lParam)
-//{
-//	_wParam = wParam;
-//	bool32 wasDown = ((lParam & (1 << 30)) != 0);
-//	bool32 isDown = ((lParam & (1 << 31)) == 0);
-//
-//	_altDown = ((lParam & (1 << 29)));
-//
-//	if (isDown != wasDown)
-//	{
-//		ProcessWindowMessage(&_currentState[wParam], isDown);
-//	}
-//
-//	_shiftDown = IsDown(VK_SHIFT);
-//
-//	if (IsDown(wParam))
-//	{
-//		_pParent->_channel.Broadcast<InputSystem::KeyDownEvent>(InputSystem::KeyDownEvent(wParam));
-//	}
-//	if (IsReleased(wParam))
-//	{
-//		_pParent->_channel.Broadcast<InputSystem::KeyReleasedEvent>(InputSystem::KeyReleasedEvent(wParam));
-//	}
-//	if (IsPressed(wParam))
-//	{
-//		std::cout << wParam << std::endl;
-//		_pParent->_channel.Broadcast<InputSystem::KeyPressedEvent>(InputSystem::KeyPressedEvent(wParam));
-//	}
-//}
+void Keyboard::UpdateWithMessage(UINT msg, WPARAM wParam, LPARAM lParam)
+{
+	switch (msg)
+	{
+	case WM_SYSKEYDOWN :
+	case WM_KEYDOWN :
+	{
+		this->UpdateOnKeyDown(wParam, lParam);
+	}break;
+	case WM_SYSKEYUP:
+	case WM_KEYUP :
+	{
+		this->UpdateOnKeyUp(wParam, lParam);
+	}break;
+	case WM_CHAR :
+	{
+		this->UpdateOnChar(wParam, lParam);
+	}break;
+	}
+}
 
 void Keyboard::Update()
 {
 	_charInput = 0;
-	memcpy(_oldState, _currentState, sizeof(bool32) * 256);
-}
-
-void Keyboard::ProcessWindowMessage(bool32 * button, bool32 isDown)
-{
-	if (*button != isDown)
+	for (int32 i = 0; i < 256; ++i)
 	{
-		*button = isDown;
+		if (IsDown(i))
+		{
+			_pParent->GetChannel().Broadcast<InputSystem::KeyDownEvent>(InputSystem::KeyDownEvent(i));
+		}
+		if (IsReleased(i))
+		{
+			_pParent->GetChannel().Broadcast<InputSystem::KeyReleasedEvent>(InputSystem::KeyReleasedEvent(i));
+		}
+		if (IsPressed(i))
+		{
+			_pParent->GetChannel().Broadcast<InputSystem::KeyPressedEvent>(InputSystem::KeyPressedEvent(i));
+		}
 	}
+	memcpy(_oldState, _currentState, sizeof(bool) * 256);
 }
 
-Mouse::Mouse(InputSystem *parent)
+//void Keyboard::ProcessWindowMessage(bool32 * button, bool32 isDown)
+//{
+//	if (*button != isDown)
+//	{
+//		*button = isDown;
+//	}
+//}
+
+Mouse::Mouse()
 {
-	_pParent = parent;
 }
 
 Mouse::~Mouse()
 {
+}
+
+bool Mouse::Init(InputSystem * pParent)
+{
+	_pParent = pParent;
+	return true;
 }
 
 void Mouse::UpdateWithMessage(WPARAM wParam, LPARAM lParam)

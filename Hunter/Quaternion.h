@@ -6,6 +6,8 @@ class Matrix;
 class Quaternion : public D3DXQUATERNION
 {
 public :
+	DECLARE_META(Quaternion);
+
 	Quaternion();
 	Quaternion(float x, float y, float z, float w);
 	Quaternion(const Quaternion &other);

@@ -38,6 +38,9 @@ protected :
 
 	Camera _camera;
 
+	IDirect3DVertexBuffer9 *_pBuffer;
+	IDirect3DVertexDeclaration9 *_pDecl;
+
 };
 
 

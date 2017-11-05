@@ -19,12 +19,18 @@ public:
 private :
 };
 
-class SurfaceMaterial : public Resource
+class SurfaceMaterial 
 {
 	friend class SurfaceMaterialManager;
 public:
 	D3DMATERIAL9 material;
 	Texture *textures[MAX_NUM_TEXTURE] = {nullptr, };
+
+	Handle effectHandle;
+
+	Handle diffuseTextureHandle;
+	Handle specularTextureHandle;
+	Handle normalTextureHandle;
 private :
 
 

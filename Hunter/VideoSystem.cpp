@@ -45,11 +45,43 @@ void VideoSystem::Render()
 
 	//PerformRender();
 
-	_pimguiRenderer->Draw();
+	//_pimguiRenderer->Draw();
 	_pDevice->EndScene();
 
 	_pDevice->Present(nullptr, nullptr, NULL, nullptr);
 }
+
+bool32 VideoSystem::Draw(IDirect3DVertexBuffer9 *pVertexBuffer, 
+	IDirect3DVertexDeclaration9 *pVertexDecl,
+	uint32 startVertex, uint32 vertexCount, uint32 stride)
+{
+	_pDevice->SetVertexDeclaration(pVertexDecl);
+	_pDevice->SetStreamSource(0, pVertexBuffer, 0, stride);
+	_pDevice->SetIndices(nullptr);
+	if (FAILED(_pDevice->DrawPrimitive(D3DPT_TRIANGLELIST, startVertex, vertexCount / 3)))
+	{
+		return false;
+	}
+	return true;
+}
+
+bool32 VideoSystem::DrawIndexed(IDirect3DVertexBuffer9 * pVertexBuffer, 
+	IDirect3DIndexBuffer9 * pIndexBuffer,
+	IDirect3DVertexDeclaration9 * pVertexDecl, 
+	uint32 indexCount, uint32 vertexCount, uint32 startIndex, uint32 baseVertex, uint32 stride)
+{
+	_pDevice->SetVertexDeclaration(pVertexDecl);
+	_pDevice->SetStreamSource(0, pVertexBuffer, 0, stride);
+	_pDevice->SetIndices(pIndexBuffer);
+	if (FAILED(_pDevice->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, baseVertex, 0, 
+		vertexCount, startIndex, indexCount / 3)))
+	{
+		return false;
+	}
+	return true;
+}
+
+
 
 bool VideoSystem::InitD3D(HWND windowHandle)
 {

@@ -1,6 +1,14 @@
 #include "stdafx.h"
 #include "Quaternion.h"
 
+DEFINE_META(Quaternion)
+{
+	ADD_MEMBER(x);
+	ADD_MEMBER(y);
+	ADD_MEMBER(z);
+	ADD_MEMBER(w);
+}
+
 Quaternion::Quaternion()
 {
 }

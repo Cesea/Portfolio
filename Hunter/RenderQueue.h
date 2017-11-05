@@ -1,35 +1,25 @@
 #ifndef RENDER_QUEUE_H
 #define RENDER_QUEUE_H
 
-template <typename T>
-class CommandBucket
+#include "DrawCommands.h"
+
+class RenderQueue
 {
-	typedef T Key;
 public :
-	CommandBucket(uint32 numCommand, const Matrix &viewMatrix, const Matrix &projectionMatrix);
+	static const uint32 queueSize = 1024;
 
-	template <typename C>
-	C *AddCommand(Key key);
-
-	template <typename C>
-	C *AllocateCommand();
-
-	void Sort();
-
-	void Submit();
+	bool32 Submit(DrawCommand *pCommand);
+	DrawCommand *Pop();
+	bool32 IsEmpty();
 
 private :
-	Key *_keys;
-	void **_ppDatas;
 
-	Matrix _viewMatrix;
-	Matrix _projectionMatrix;
+	DrawCommand *_queue[queueSize];
+
+	int32 _head{};
+	uint32 _tail{ 0 };
+	bool32 _empty{ false };
+
 };
-
-
-template<typename T>
-inline CommandBucket<T>::CommandBucket(uint32 numCommand, const Matrix & viewMatrix, const Matrix & projectionMatrix)
-{
-}
 
 #endif

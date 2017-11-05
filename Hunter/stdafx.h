@@ -30,7 +30,9 @@
 #include "Typedefs.h"
 #include "Reflection.h"
 
+
 #include "Resource.h"
+#include "Handle.h"
 
 #include "Math.h"
 #include "CommonUtils.h"

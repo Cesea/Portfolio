@@ -14,12 +14,11 @@ class InputSystem;
 class Keyboard
 {
 public :
-	Keyboard(InputSystem *pParent);
+	Keyboard();
 	~Keyboard();
 
-	void UpdateOnKeyUp(WPARAM wParam, LPARAM lParam);
-	void UpdateOnKeyDown(WPARAM wParam, LPARAM lParam);
-	void UpdateOnChar(WPARAM wParam, LPARAM lParam);
+	bool Init(InputSystem *pParent);
+
 
 	void UpdateWithMessage(UINT msg, WPARAM wParam, LPARAM lParam);
 	void Update();
@@ -38,11 +37,15 @@ public :
 
 private :
 
-	void ProcessWindowMessage(bool32 *button, bool32 isDown);
+	void UpdateOnKeyUp(WPARAM wParam, LPARAM lParam);
+	void UpdateOnKeyDown(WPARAM wParam, LPARAM lParam);
+	void UpdateOnChar(WPARAM wParam, LPARAM lParam);
+
+	//void ProcessWindowMessage(bool32 *button, bool32 isDown);
 
 private :
-	bool32 _currentState[256] = {0, };
-	bool32 _oldState[256] = {0, };
+	bool _currentState[256] = {0, };
+	bool _oldState[256] = {0, };
 
 	bool32 _shiftDown{};
 	bool32 _altDown{};
@@ -58,8 +61,10 @@ private :
 class Mouse
 {
 public:
-	Mouse(InputSystem *pParent);
+	Mouse();
 	~Mouse();
+
+	bool Init(InputSystem *pParent);
 
 	void UpdateWithMessage(WPARAM wParam, LPARAM lParam);
 	void UpdateWheelWithMessage(WPARAM wParam, LPARAM lParam);

@@ -35,6 +35,14 @@ public :
 	}
 	virtual EventChannel GetChannel() { return _channel; }
 
+	bool32 Draw(IDirect3DVertexBuffer9 *pVertexBuffer, 
+		IDirect3DVertexDeclaration9 *pVertexDecl,
+		uint32 startVertex, uint32 vertexCount, uint32 stride);
+	bool32 DrawIndexed(IDirect3DVertexBuffer9 * pVertexBuffer, 
+		IDirect3DIndexBuffer9 * pIndexBuffer, 
+		IDirect3DVertexDeclaration9 * pVertexDecl, 
+		uint32 indexCount, uint32 vertexCount, uint32 startIndex, uint32 baseVerteex, uint32 stride);
+
 private :
 	bool InitD3D(HWND windowHandle);
 	

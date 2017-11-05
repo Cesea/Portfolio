@@ -119,6 +119,11 @@ bool Vector3::operator!=(const Vector3 & other) const
 	return !(*this == other);
 }
 
+bool Vector3::IsZero() const
+{
+	return FloatZero(x) && FloatZero(y) && FloatZero(z);
+}
+
 Vector3 operator*(float f, const Vector3 & other)
 {
 	return Vector3(other.x * f, other.y * f, other.z * f);

@@ -17,6 +17,7 @@ void ApplicationTimer::Initialize(int32 targetMS)
 	_prevCounter = _startCounter;
 
 	_targetFramePerMS = targetMS;
+	_timeScale = 1.0f / (float)_frequency.QuadPart;
 
 	QueryPerformanceCounter(&_currentCounter);
 }
@@ -25,15 +26,15 @@ void ApplicationTimer::Tick()
 {
 	QueryPerformanceCounter(&_currentCounter);
 
-	int64 deltaMS = (int64)((_currentCounter.QuadPart - _prevCounter.QuadPart) / _frequency.QuadPart);
+	_currentDeltaSecond = (_currentCounter.QuadPart - _prevCounter.QuadPart) * _timeScale;
+	_currentDeltaMS = (int32)(_currentDeltaSecond * 1000);
 
-	int64 timeToSleep = _targetFramePerMS - deltaMS;
+	int64 timeToSleep = _targetFramePerMS - _currentDeltaMS;
+	if (timeToSleep > 0)
+	{
+		Sleep(timeToSleep);
+	}
 
-	Sleep(timeToSleep);
 	_prevCounter = _currentCounter;
 }
 
-float ApplicationTimer::GetDeltaTime()
-{
-	return (float)_currentDeltaMS / 1000.0f;
-}

@@ -3,6 +3,7 @@
 
 #include "Transform.h"
 
+
 class Camera : public Transform
 {
 protected:
@@ -16,10 +17,16 @@ protected:
 
 	bool _bOrtho;		//직교니?
 
+	float _moveSpeed;
+	float _rotationSpeed;
+
+	Vector3 _toMove;
+	//float _friction;
+	//float _aceel;
+
 public:
 	Camera();
 	~Camera();
-
 
 	//투영행렬과 View 행렬을 업데이트
 	void UpdateMatrix();
@@ -28,42 +35,26 @@ public:
 	void UpdateCamToDevice(LPDIRECT3DDEVICE9 pDevice);
 
 	//카메라 관련 행렬을 얻는다.
-	const Matrix &GetViewMatrix() const 
-	{
-		return _matView;
-	}
+	const Matrix &GetViewMatrix() const { return _matView; }
 
-	const Matrix &GetProjectionMatrix() const 
-	{
-		return _matProjection;
-	}
+	const Matrix &GetProjectionMatrix() const { return _matProjection; }
 
-	const Matrix &GetViewProjectionMatrix() const 
-	{
-		return _matViewProjection;
-	}
+	const Matrix &GetViewProjectionMatrix() const { return _matViewProjection; }
 
 	//화각 셋팅
-	void SetFov(float fov) 
-	{
-		_fov = fov;
-	}
+	void SetFov(float fov) { _fov = fov; }
 
-	float GetFov() 
-	{
-		return _fov;
-	}
+	float GetFov() { return _fov; }
 
-	void OrthoToggle() 
-	{
-		_bOrtho = !_bOrtho;
-	}
+	void OrthoToggle() { _bOrtho = !_bOrtho; }
 
 	//화면의 위치를 가지고 카메라의 투영 레이를 얻는다
 	void ComputeRay(Ray *pOutRay, const Vector2* screenPos);
 
 	//월드 위치로  화면의 위치를 얻는다.
 	bool GetWorldPosToScreenPos(Vector2* pScreenPos, const Vector3* pWorldPos);
+
+	void Handle(const InputSystem::KeyDownEvent &event);
 };
 
 

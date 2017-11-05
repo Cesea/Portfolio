@@ -11,6 +11,12 @@ Camera::Camera()
 
 	//기본 Far
 	_camFar = 1000.f;
+
+	_moveSpeed = 1.0f;
+	_rotationSpeed = 1.0f;
+
+	EventChannel channel;
+	channel.Add<InputSystem::KeyDownEvent, Camera>(*this) ;
 }
 
 Camera::~Camera()
@@ -19,6 +25,13 @@ Camera::~Camera()
 
 void Camera::UpdateMatrix()
 {
+	//이동값이 남아있다면 움직여라
+	if (!_toMove.IsZero())
+	{
+		Vec3Normalize(&_toMove, &_toMove);
+		this->MovePositionSelf(_toMove);
+		_toMove = Vector3(0.0f, 0.0f, 0.0f);
+	}
 	//화각에 의한 Projection 행렬 업데이트
 	MatrixPerspectiveFovLH(
 		&_matProjection,
@@ -36,7 +49,6 @@ void Camera::UpdateMatrix()
 void Camera::UpdateCamToDevice(LPDIRECT3DDEVICE9 pDevice)
 {	//행렬 업데이트 해주고 
 	this->UpdateMatrix();
-
 	//셋팅
 	pDevice->SetTransform(D3DTS_VIEW, &_matView);
 	pDevice->SetTransform(D3DTS_PROJECTION, &_matProjection);
@@ -119,4 +131,35 @@ bool Camera::GetWorldPosToScreenPos(Vector2 * pScreenPos, const Vector3 * pWorld
 	pScreenPos->y = halfScreenH - (halfScreenH * pos.y);	//Y 값은 반전
 
 	return true;
+}
+
+void Camera::Handle(const InputSystem::KeyDownEvent & event)
+{
+	Vector3 diff = Vector3(0.0f, 0.0f, 0.0f);
+	float deltaTime = APPTIMER->GetTargetTime();
+	//move forward
+	if (event.code == 'W')
+	{
+		_toMove.z += _moveSpeed * deltaTime;
+	}
+	else if (event.code == 'S')
+	{
+		_toMove.z -= _moveSpeed * deltaTime;
+	}
+	else if (event.code == 'A')
+	{
+		_toMove.x -= _moveSpeed * deltaTime;
+	}
+	else if (event.code == 'D')
+	{
+		_toMove.x += _moveSpeed * deltaTime;
+	}
+	else if (event.code == 'Q')
+	{
+		_toMove.y += _moveSpeed * deltaTime;
+	}
+	else if (event.code == 'E')
+	{
+		_toMove.y -= _moveSpeed * deltaTime;
+	}
 }

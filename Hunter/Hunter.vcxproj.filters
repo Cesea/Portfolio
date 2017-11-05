@@ -150,6 +150,27 @@
     <ClCompile Include="Camera.cpp">
       <Filter>Sub\Commons</Filter>
     </ClCompile>
+    <ClCompile Include="Ray.cpp">
+      <Filter>Math</Filter>
+    </ClCompile>
+    <ClCompile Include="DrawCommands.cpp">
+      <Filter>Core\System\VideoSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="DrawDispatcher.cpp">
+      <Filter>Core\System\VideoSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderQueue.cpp">
+      <Filter>Core\System\VideoSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="LinearAllocator.cpp">
+      <Filter>Core\Containers</Filter>
+    </ClCompile>
+    <ClCompile Include="CommandBucket.cpp">
+      <Filter>Core\System\VideoSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="PoolIndex.cpp">
+      <Filter>Core\Containers</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -164,9 +185,6 @@
     </ClInclude>
     <ClInclude Include="EventHandlerQueue.h">
       <Filter>Event</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine.h">
-      <Filter>Core</Filter>
     </ClInclude>
     <ClInclude Include="EventQueue.h">
       <Filter>Event</Filter>
@@ -375,11 +393,38 @@
     <ClInclude Include="Ray.h">
       <Filter>Math</Filter>
     </ClInclude>
+    <ClInclude Include="DrawCommands.h">
+      <Filter>Core\System\VideoSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="DrawDispatcher.h">
+      <Filter>Core\System\VideoSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="CommandBucket.h">
+      <Filter>Core\System\VideoSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="Handle.h">
+      <Filter>Core\Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="PackedArary.h">
+      <Filter>Core\Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="SparseArray.h">
+      <Filter>Core\Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="IndexPool.h">
+      <Filter>Core\Containers</Filter>
+    </ClInclude>
     <ClInclude Include="RenderQueue.h">
       <Filter>Core\System\VideoSystem</Filter>
     </ClInclude>
-    <ClInclude Include="DrawCommands.h">
-      <Filter>Core\System\VideoSystem</Filter>
+    <ClInclude Include="LinearAllocator.h">
+      <Filter>Core\Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="PoolIndex.h">
+      <Filter>Core\Containers</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -478,6 +523,9 @@
     </Filter>
     <Filter Include="Sub\Commons">
       <UniqueIdentifier>{db2f3cb1-6abc-4de3-9ac7-2b30c4b52e3e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Containers">
+      <UniqueIdentifier>{16b070f5-134d-4a8f-81b9-ba7c063cf1f0}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

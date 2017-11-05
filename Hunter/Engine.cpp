@@ -30,7 +30,7 @@ void Engine::Run()
 	_running = true;
 	_valid = true;
 
-	_applicationTimer.Initialize(16);
+	APPTIMER->Initialize(16);
 
 	while (_valid && _running)
 	{
@@ -38,21 +38,38 @@ void Engine::Run()
 		_pInput->Update(0.0f);
 		while (PeekMessage(&msg, 0, 0, 0, PM_REMOVE))
 		{
-			TranslateMessage(&msg);
-			DispatchMessage(&msg);
+			switch (msg.message)
+			{
+				case WM_SYSKEYDOWN:
+				case WM_KEYDOWN :
+				case WM_SYSKEYUP :
+				case WM_KEYUP :
+				case WM_CHAR :
+				{
+					_pInput->keyboard.UpdateWithMessage(msg.message, msg.wParam, msg.lParam);
+				}break;
+
+				default :
+				{
+					TranslateMessage(&msg);
+					DispatchMessage(&msg);
+				}break;
+			}
 		}
-		_pScene->Update(_applicationTimer.GetDeltaTime());
-		_pVideo->Update(_applicationTimer.GetDeltaTime());
+		float deltaTime = APPTIMER->GetTargetTime();
+
+		_pScene->Update(deltaTime);
+		_pVideo->Update(deltaTime);
 
 		_pVideo->Render();
 
-		_applicationTimer.Tick();
+		APPTIMER->Tick();
 
 		#if defined HUNTER_DEBUG
 		static uint64 counter = 0;
 		if ((counter % 20) == 0)
 		{
-			Console::Log("DeltaMS : %d\n", _applicationTimer.GetDeltaTime());
+			Console::Log("DeltaMS : %d\n", APPTIMER->GetDeltaMS());
 		}
 		counter++;
 		#endif
@@ -92,22 +109,14 @@ LRESULT Engine::EngineWindowCallback(HWND windowHandle, UINT msg, WPARAM wParam,
 		_valid = false;
 	}break;
 
-	case WM_SYSKEYDOWN:
-	case WM_KEYDOWN :
-	{
-		_pInput->keyboard.UpdateOnKeyDown(wParam, lParam);
-	}break;
-
-	case WM_SYSKEYUP :
-	case WM_KEYUP :
-	{
-		_pInput->keyboard.UpdateOnKeyUp(wParam, lParam);
-	}break;
-
-	case WM_CHAR :
-	{
-		_pInput->keyboard.UpdateOnChar(wParam, lParam);
-	}break;
+	//case WM_SYSKEYDOWN:
+	//case WM_KEYDOWN :
+	//case WM_SYSKEYUP :
+	//case WM_KEYUP :
+	//case WM_CHAR :
+	//{
+	//	_pInput->keyboard.UpdateWithMessage(msg, wParam, lParam);
+	//}break;
 
 	case WM_LBUTTONDOWN:
 	case WM_LBUTTONUP:

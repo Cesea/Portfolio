@@ -101,7 +101,6 @@ private :
 	HWND _windowHandle;
 	HINSTANCE _instanceHandle;
 
-	ApplicationTimer _applicationTimer;
 	Console _console;
 
 	std::shared_ptr<VideoSystem> _pVideo;
