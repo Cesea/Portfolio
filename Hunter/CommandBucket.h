@@ -1,68 +1,141 @@
 #ifndef COMMAND_BUCKET_H
 #define COMMAND_BUCKET_H
 
-#include "PoolIndex.h"
-#include "LinearAllocator.h"
-#include "PackedArary.h"
+#include "CommandPacket.h"
 
-#include "DrawCommands.h"
+#include "RenderContext.h"
 
-struct CommandKey
-{
-	int32 key;
-};
-
+template <typename Key>
 class CommandBucket
 {
 public :
-	CommandBucket(LinearAllocator *commandPool, uint32 maxCommand);
-	~CommandBucket();
+	CommandBucket();
 
-	template <typename CommandDataType>
-	Handle CreateCommand(CommandKey key);
+	bool32 Init(uint32 maxSize, const Matrix &view, const Matrix &projection);
 
-	template <typename CommandDataType>
-	CommandDataType *GetCommandData(Handle handle);
+	template <typename U>
+	U *AddCommand(Key key, size_t auxMemorySize);
 
-	DrawCommand *GetCommand(Handle handle);
+	template <typename U, typename V>
+	U *AppendCommand(V *command, size_t auxMemorySize);
+
+	void Sort();
+	void Submit();
 
 	void Clear();
 
-	void Submit();
+private :
+	void SubmitPacket(const CommandPacket packet);
+
+	void DecodeKey(Key key);
 
 private :
-	int32 _count{0};
-	uint32 _maxCommand;
-	CommandKey *_keys;
-	Handle *_commandHandles;
+	uint32 _maxSize;
+	uint32 _currentSize;
+	Key *_keys;
+	CommandPacket *_packets;
 
-	PoolIndex *_pCommandIndex;
-	LinearAllocator *_pCommandPool;
+	Matrix _viewMatrix;
+	Matrix _projectionMatrix;
 
+	RenderContext _context;
 };
 
 
-template<typename CommandDataType>
-inline Handle CommandBucket::CreateCommand(CommandKey key)
+template<typename Key>
+inline CommandBucket<Key>::CommandBucket()
 {
-	DrawCommand *pCommand = new (_pCommandPool) DrawCommand;
-
-	CommandDataType *dataType = new (_pCommandPool) CommandDataType;
-
-	pCommand->dispatch = CommandData<CommandDataType>::Dispatchfunction;
-	Handle commandHandle = _pCommandIndex->CreateHandle((void *)pCommand);
-
-	_keys[_count] = key;
-	_commandHandles[_count] = commandHandle;
-	_count++;
-
-	return commandHandle;
+	
 }
 
-template<typename CommandDataType>
-inline CommandDataType * CommandBucket::GetCommandData(Handle handle)
+template<typename Key>
+inline bool32 CommandBucket<Key>::Init(uint32 maxSize, const Matrix & view, const Matrix & projection)
 {
-	return NULL;
+	_currentSize = 0;
+	_maxSize = maxSize;
+	_viewMatrix = view;
+	_projectionMatrix = projection;
+	_keys = new Key[_maxSize];
+	_packets = new void *[_maxSize];
+	return true;
 }
+
+template<typename Key>
+inline void CommandBucket<Key>::Sort()
+{
+}
+
+template<typename Key>
+inline void CommandBucket<Key>::Submit()
+{
+	gpDevice->SetTransform(D3DTS_VIEW, &_viewMatrix);
+	gpDevice->SetTransform(D3DTS_PROJECTION, &_projectionMatrix);
+
+	for (uint32 i = 0; i < _currentSize; ++i)
+	{
+		CommandPacket packet = _packets[i];
+		do
+		{
+			SubmitPacket(packet);
+			packet = commandpacket::LoadNextCommandPacket(packet);
+		} while (packet != nullptr);
+	}
+}
+
+template<typename Key>
+inline void CommandBucket<Key>::Clear()
+{
+	for (int i = 0; i < _currentSize; ++i)
+	{
+		SAFE_DELETE(_packets[i]);
+	}
+	_currentSize = 0;
+}
+
+template<typename Key>
+inline void CommandBucket<Key>::SubmitPacket(const CommandPacket packet)
+{
+	const BackendDispatchFunction function = commandpacket::LoadBackendDispatchFunction(packet);
+	const void *command = commandpacket::LoadCommand(packet);
+	function(command);
+}
+
+template<typename Key>
+inline void CommandBucket<Key>::DecodeKey(Key key)
+{
+}
+
+template<typename Key>
+template<typename U>
+inline U * CommandBucket<Key>::AddCommand(Key key, size_t auxMemorySize)
+{
+	CommandPacket packet = commandpacket::Create<U>(auxMemorySize);
+	//store key and pointer to the data
+	{
+		const uint32 current = _currentSize++;
+		_keys[current] = key;
+		_packets[current] = packet;
+	}
+
+	commandpacket::StoreNextCommandPacket(packet, nullptr);
+	commandpacket::StoreBackendDispatchFunction(packet, U::DISPATCH_FUNCTION);
+
+	return commandpacket::GetCommand<U>(packet);
+}
+
+template<typename Key>
+template<typename U, typename V>
+inline U * CommandBucket<Key>::AppendCommand(V * command, size_t auxMemorySize)
+{
+	CommandPacket packet = commandpacket::Create<U>(auxMemorySize);
+
+	commandpacket::StoreNextCommandPacket<V>(command, packet);
+
+	commandpacket::StoreNextCommandPacket(packet, nullptr);
+	commandpacket::StoreBackendDispatchFunction(packet, U::DISPATCH_FUNCTION);
+
+	return commandpacket::GetCommand<U>(packet);
+}
+
 
 #endif

@@ -26,6 +26,16 @@ bool VideoSystem::Init(const std::string & name, const SystemSetting & setting)
 	_pimguiRenderer->Init(gpDevice, "consolas", WINSIZEX, WINSIZEY);
 
 
+	Matrix view;
+	Matrix projection;
+
+
+	MatrixLookAtLH(&view, &Vector3(0.0f, 0.0f, -2.0f), &Vector3(0.0f, 0.0f, 0.0f), &Vector3(0.0f, 1.0f, 0.0f));
+	MatrixPerspectiveFovLH(&projection, D3DX_PI * 0.5f, (float)WINSIZEX / (float)WINSIZEY, 0.1f, 1000.0f);
+
+	_commandBucket.Init(1000, view, projection);
+
+
 	return true;
 }
 
@@ -41,24 +51,26 @@ void VideoSystem::Update(float deltaTime)
 
 void VideoSystem::Render()
 {
+	_commandBucket.Sort();
+
+	_pDevice->Clear(0, nullptr, D3DCLEAR_TARGET | D3DCLEAR_STENCIL | D3DCLEAR_ZBUFFER, 0xff303030, 1.0f, 0);
 	_pDevice->BeginScene();
 
-	//PerformRender();
+	_commandBucket.Submit();
 
-	//_pimguiRenderer->Draw();
 	_pDevice->EndScene();
-
 	_pDevice->Present(nullptr, nullptr, NULL, nullptr);
+
+	_commandBucket.Clear();
 }
 
 bool32 VideoSystem::Draw(IDirect3DVertexBuffer9 *pVertexBuffer, 
-	IDirect3DVertexDeclaration9 *pVertexDecl,
-	uint32 startVertex, uint32 vertexCount, uint32 stride)
+	uint32 startVertex, uint32 primitiveCount, uint32 stride)
 {
-	_pDevice->SetVertexDeclaration(pVertexDecl);
+	_pDevice->SetFVF(D3DFVF_XYZ | D3DFVF_DIFFUSE);
 	_pDevice->SetStreamSource(0, pVertexBuffer, 0, stride);
 	_pDevice->SetIndices(nullptr);
-	if (FAILED(_pDevice->DrawPrimitive(D3DPT_TRIANGLELIST, startVertex, vertexCount / 3)))
+	if (FAILED(_pDevice->DrawPrimitive(D3DPT_TRIANGLELIST, startVertex, primitiveCount)))
 	{
 		return false;
 	}

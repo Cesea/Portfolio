@@ -18,6 +18,7 @@
 #include <math.h>
 
 #include <algorithm>
+#include <type_traits>
 
 #include <assert.h>
 
@@ -32,7 +33,6 @@
 
 
 #include "Resource.h"
-#include "Handle.h"
 
 #include "Math.h"
 #include "CommonUtils.h"

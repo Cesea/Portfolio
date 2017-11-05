@@ -28,7 +28,6 @@ void Camera::UpdateMatrix()
 	//이동값이 남아있다면 움직여라
 	if (!_toMove.IsZero())
 	{
-		Vec3Normalize(&_toMove, &_toMove);
 		this->MovePositionSelf(_toMove);
 		_toMove = Vector3(0.0f, 0.0f, 0.0f);
 	}

@@ -8,6 +8,12 @@
 #include "imguiRenderer.h"
 #include "DebugDraw.h"
 
+#include "Command.h"
+#include "CommandBucket.h"
+
+//defines 
+#define VIDEO (gEngine->GetVideo())
+
 struct RenderWindow
 {
 	int32 width;
@@ -36,12 +42,13 @@ public :
 	virtual EventChannel GetChannel() { return _channel; }
 
 	bool32 Draw(IDirect3DVertexBuffer9 *pVertexBuffer, 
-		IDirect3DVertexDeclaration9 *pVertexDecl,
-		uint32 startVertex, uint32 vertexCount, uint32 stride);
+		uint32 startVertex, uint32 primitiveCount, uint32 stride);
 	bool32 DrawIndexed(IDirect3DVertexBuffer9 * pVertexBuffer, 
 		IDirect3DIndexBuffer9 * pIndexBuffer, 
 		IDirect3DVertexDeclaration9 * pVertexDecl, 
 		uint32 indexCount, uint32 vertexCount, uint32 startIndex, uint32 baseVerteex, uint32 stride);
+
+	CommandBucket<uint32> &GetCommandBucket() { return _commandBucket; }
 
 private :
 	bool InitD3D(HWND windowHandle);
@@ -58,6 +65,8 @@ private :
 	RenderWindow _renderWindow;
 
 	im::GuiRenderer *_pimguiRenderer;
+
+	CommandBucket<uint32> _commandBucket;
 };
 
 #endif

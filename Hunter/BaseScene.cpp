@@ -178,16 +178,18 @@ bool32 BaseScene::Init()
 
 	gpDevice->CreateVertexDeclaration(elements, &_pDecl);
 
+	//gpDevice->SetVertexDeclaration(_pDecl);
+
 	gpDevice->CreateVertexBuffer(sizeof(Vertex) * 3, D3DUSAGE_WRITEONLY, 
 		Vertex::FVF, D3DPOOL_MANAGED, &_pBuffer, nullptr);
 
 	Vertex *pData = nullptr;
 	_pBuffer->Lock(0, 0, (void **)&pData, 0);
-	pData[0].position = Vector3(0.0f, 0.5f, 0.0f);
+	pData[0].position = Vector3(0.0f, 0.5f, 0.5f);
 	pData[0].color = 0xffff0000;
-	pData[1].position = Vector3(0.5f, -0.5f, 0.0f);
+	pData[1].position = Vector3(0.5f, -0.5f, 0.5f);
 	pData[1].color = 0xff00ff00;
-	pData[2].position = Vector3(-0.5f, -0.5f, 0.0f);
+	pData[2].position = Vector3(-0.5f, -0.5f, 0.5f);
 	pData[2].color = 0xff0000ff;
 	_pBuffer->Unlock();
 
@@ -239,16 +241,10 @@ bool32 BaseScene::Render()
 
 	//im::EndFrame();
 
-	gpDevice->Clear(0, nullptr, D3DCLEAR_ZBUFFER | D3DCLEAR_STENCIL | D3DCLEAR_TARGET, 0xff000000, 1.0f, 0.0f);
-	gpDevice->BeginScene();
-
-	debugdraw::WorldGrid(0.4, 10);
-
-	gEngine->GetVideo()->Draw(_pBuffer, _pDecl, 0, 3, sizeof(Vertex));
-
-	gpDevice->EndScene();
-	gpDevice->Present(nullptr, nullptr, nullptr, nullptr);
-
+	commands::Draw *dc =  VIDEO->GetCommandBucket().AddCommand<commands::Draw>(10, 0);
+	dc->primitiveCount = 1;
+	dc->startVertex = 0;
+	dc->vertexBuffer = _pBuffer;
 
 	return result;
 }
