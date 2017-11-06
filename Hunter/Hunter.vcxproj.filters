@@ -157,6 +157,12 @@
       <Filter>Core\System\VideoSystem</Filter>
     </ClCompile>
     <ClCompile Include="Command.cpp" />
+    <ClCompile Include="CodeTimer.cpp">
+      <Filter>Core\Timers</Filter>
+    </ClCompile>
+    <ClCompile Include="Debug.cpp">
+      <Filter>Debug</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -396,6 +402,12 @@
     </ClInclude>
     <ClInclude Include="RenderContext.h">
       <Filter>Core\System\VideoSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="CodeTimer.h">
+      <Filter>Core\Timers</Filter>
+    </ClInclude>
+    <ClInclude Include="Debug.h">
+      <Filter>Debug</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

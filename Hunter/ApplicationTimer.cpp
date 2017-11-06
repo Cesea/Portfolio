@@ -35,6 +35,7 @@ void ApplicationTimer::Tick()
 		Sleep(timeToSleep);
 	}
 
+	QueryPerformanceCounter(&_currentCounter);
 	_prevCounter = _currentCounter;
 }
 

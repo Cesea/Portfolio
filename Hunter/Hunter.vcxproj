@@ -122,6 +122,7 @@
     <ClCompile Include="BackendDispatch.cpp" />
     <ClCompile Include="BaseScene.cpp" />
     <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="CodeTimer.cpp" />
     <ClCompile Include="Command.cpp" />
     <ClCompile Include="CommandComponent.cpp" />
     <ClCompile Include="CommandSystem.cpp" />
@@ -130,6 +131,7 @@
     <ClCompile Include="ComponentFactory.cpp" />
     <ClCompile Include="Console.cpp" />
     <ClCompile Include="Control.cpp" />
+    <ClCompile Include="Debug.cpp" />
     <ClCompile Include="DebugDraw.cpp" />
     <ClCompile Include="Entity.cpp" />
     <ClCompile Include="EntityTemplate.cpp" />
@@ -183,6 +185,7 @@
     <ClInclude Include="BitFlags.h" />
     <ClInclude Include="ButtonControl.h" />
     <ClInclude Include="Camera.h" />
+    <ClInclude Include="CodeTimer.h" />
     <ClInclude Include="Color4F.h" />
     <ClInclude Include="Command.h" />
     <ClInclude Include="CommandBucket.h" />
@@ -195,6 +198,7 @@
     <ClInclude Include="ComponentTemplate.h" />
     <ClInclude Include="Console.h" />
     <ClInclude Include="Control.h" />
+    <ClInclude Include="Debug.h" />
     <ClInclude Include="DebugDraw.h" />
     <ClInclude Include="Entity.h" />
     <ClInclude Include="EntityFactory.h" />
