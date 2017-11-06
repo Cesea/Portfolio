@@ -15,9 +15,6 @@
     <ClCompile Include="CommonUtils.cpp">
       <Filter>Sub</Filter>
     </ClCompile>
-    <ClCompile Include="Effect.cpp">
-      <Filter>D3D</Filter>
-    </ClCompile>
     <ClCompile Include="Control.cpp">
       <Filter>GUI\Retained\Controls</Filter>
     </ClCompile>
@@ -26,12 +23,6 @@
     </ClCompile>
     <ClCompile Include="StaticControl.cpp">
       <Filter>GUI\Retained\Controls</Filter>
-    </ClCompile>
-    <ClCompile Include="EffectManager.cpp">
-      <Filter>Managers</Filter>
-    </ClCompile>
-    <ClCompile Include="IMesh.cpp">
-      <Filter>D3D</Filter>
     </ClCompile>
     <ClCompile Include="Meta.cpp">
       <Filter>Sub\Reflection</Filter>
@@ -132,23 +123,11 @@
     <ClCompile Include="ApplicationTimer.cpp">
       <Filter>Core\Timers</Filter>
     </ClCompile>
-    <ClCompile Include="SurfaceMaterial.cpp">
-      <Filter>D3D</Filter>
-    </ClCompile>
-    <ClCompile Include="SurfaceMaterialManager.cpp">
-      <Filter>Managers</Filter>
-    </ClCompile>
     <ClCompile Include="TestScene.cpp">
       <Filter>Scene\TestScene</Filter>
     </ClCompile>
     <ClCompile Include="DebugDraw.cpp">
       <Filter>Debug</Filter>
-    </ClCompile>
-    <ClCompile Include="Transform.cpp">
-      <Filter>Sub\Commons</Filter>
-    </ClCompile>
-    <ClCompile Include="Camera.cpp">
-      <Filter>Sub\Commons</Filter>
     </ClCompile>
     <ClCompile Include="Ray.cpp">
       <Filter>Math</Filter>
@@ -156,12 +135,32 @@
     <ClCompile Include="BackendDispatch.cpp">
       <Filter>Core\System\VideoSystem</Filter>
     </ClCompile>
-    <ClCompile Include="Command.cpp" />
-    <ClCompile Include="CodeTimer.cpp">
-      <Filter>Core\Timers</Filter>
+    <ClCompile Include="Mesh.cpp">
+      <Filter>Resource</Filter>
     </ClCompile>
-    <ClCompile Include="Debug.cpp">
-      <Filter>Debug</Filter>
+    <ClCompile Include="Camera.cpp">
+      <Filter>Sub\GameUtils</Filter>
+    </ClCompile>
+    <ClCompile Include="Transform.cpp">
+      <Filter>Sub\GameUtils</Filter>
+    </ClCompile>
+    <ClCompile Include="MatrixCache.cpp">
+      <Filter>Sub</Filter>
+    </ClCompile>
+    <ClCompile Include="ReferenceCounter.cpp">
+      <Filter>Resource\Pools</Filter>
+    </ClCompile>
+    <ClCompile Include="ResourcePoolItem.cpp">
+      <Filter>Resource\Pools</Filter>
+    </ClCompile>
+    <ClCompile Include="ResourcePoolManager.cpp">
+      <Filter>Resource\Pools</Filter>
+    </ClCompile>
+    <ClCompile Include="Command.cpp">
+      <Filter>Core\System\VideoSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="ResourcePool.cpp">
+      <Filter>Resource\Pools</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -193,15 +192,6 @@
     <ClInclude Include="CommonUtils.h">
       <Filter>Sub</Filter>
     </ClInclude>
-    <ClInclude Include="FontManager.h">
-      <Filter>Managers</Filter>
-    </ClInclude>
-    <ClInclude Include="EffectManager.h">
-      <Filter>Managers</Filter>
-    </ClInclude>
-    <ClInclude Include="Effect.h">
-      <Filter>D3D</Filter>
-    </ClInclude>
     <ClInclude Include="D3DCommon.h">
       <Filter>D3D</Filter>
     </ClInclude>
@@ -224,15 +214,6 @@
       <Filter>GUI\Retained\Controls</Filter>
     </ClInclude>
     <ClInclude Include="SingletonBase.h">
-      <Filter>Managers</Filter>
-    </ClInclude>
-    <ClInclude Include="ResourceManager.h">
-      <Filter>Managers</Filter>
-    </ClInclude>
-    <ClInclude Include="IMesh.h">
-      <Filter>D3D</Filter>
-    </ClInclude>
-    <ClInclude Include="StaticMeshManager.h">
       <Filter>Managers</Filter>
     </ClInclude>
     <ClInclude Include="Meta.h">
@@ -267,9 +248,6 @@
     </ClInclude>
     <ClInclude Include="tinyxml2.h">
       <Filter>Sub\tinyxml</Filter>
-    </ClInclude>
-    <ClInclude Include="StaticMesh.h">
-      <Filter>D3D</Filter>
     </ClInclude>
     <ClInclude Include="Component.h">
       <Filter>Core\ECS\Component</Filter>
@@ -358,15 +336,6 @@
     <ClInclude Include="BitFlags.h">
       <Filter>Sub</Filter>
     </ClInclude>
-    <ClInclude Include="SurfaceMaterial.h">
-      <Filter>D3D</Filter>
-    </ClInclude>
-    <ClInclude Include="Resource.h">
-      <Filter>D3D</Filter>
-    </ClInclude>
-    <ClInclude Include="SurfaceMaterialManager.h">
-      <Filter>Managers</Filter>
-    </ClInclude>
     <ClInclude Include="AISystem.h">
       <Filter>Core\System\AI</Filter>
     </ClInclude>
@@ -375,12 +344,6 @@
     </ClInclude>
     <ClInclude Include="DebugDraw.h">
       <Filter>Debug</Filter>
-    </ClInclude>
-    <ClInclude Include="Transform.h">
-      <Filter>Sub\Commons</Filter>
-    </ClInclude>
-    <ClInclude Include="Camera.h">
-      <Filter>Sub\Commons</Filter>
     </ClInclude>
     <ClInclude Include="Ray.h">
       <Filter>Math</Filter>
@@ -403,11 +366,47 @@
     <ClInclude Include="RenderContext.h">
       <Filter>Core\System\VideoSystem</Filter>
     </ClInclude>
-    <ClInclude Include="CodeTimer.h">
-      <Filter>Core\Timers</Filter>
+    <ClInclude Include="VertexBuffer.h">
+      <Filter>Resource</Filter>
     </ClInclude>
-    <ClInclude Include="Debug.h">
-      <Filter>Debug</Filter>
+    <ClInclude Include="IndexBuffer.h">
+      <Filter>Resource</Filter>
+    </ClInclude>
+    <ClInclude Include="Mesh.h">
+      <Filter>Resource</Filter>
+    </ClInclude>
+    <ClInclude Include="AABB.h">
+      <Filter>Sub\Geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="Material.h">
+      <Filter>Resource</Filter>
+    </ClInclude>
+    <ClInclude Include="GameUtils.h">
+      <Filter>Sub\GameUtils</Filter>
+    </ClInclude>
+    <ClInclude Include="Camera.h">
+      <Filter>Sub\GameUtils</Filter>
+    </ClInclude>
+    <ClInclude Include="Transform.h">
+      <Filter>Sub\GameUtils</Filter>
+    </ClInclude>
+    <ClInclude Include="MatrixCache.h">
+      <Filter>Sub</Filter>
+    </ClInclude>
+    <ClInclude Include="DataPool.h">
+      <Filter>Resource\Pools</Filter>
+    </ClInclude>
+    <ClInclude Include="ReferenceCounter.h">
+      <Filter>Resource\Pools</Filter>
+    </ClInclude>
+    <ClInclude Include="ResourcePoolItem.h">
+      <Filter>Resource\Pools</Filter>
+    </ClInclude>
+    <ClInclude Include="ResourcePoolManager.h">
+      <Filter>Resource\Pools</Filter>
+    </ClInclude>
+    <ClInclude Include="ResourcePool.h">
+      <Filter>Resource\Pools</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -504,8 +503,17 @@
     <Filter Include="Debug">
       <UniqueIdentifier>{76a6963c-195a-47f4-bb35-80dc0a39ec35}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Sub\Commons">
-      <UniqueIdentifier>{db2f3cb1-6abc-4de3-9ac7-2b30c4b52e3e}</UniqueIdentifier>
+    <Filter Include="Resource">
+      <UniqueIdentifier>{3d70d5cf-6765-4215-babf-900522c0b8ba}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sub\Geometry">
+      <UniqueIdentifier>{af510b90-b9d7-4a38-a5b2-3d59f833cb99}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sub\GameUtils">
+      <UniqueIdentifier>{563f8004-6a59-40ad-a91c-8b90fd7fda6e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource\Pools">
+      <UniqueIdentifier>{f5efead7-82ca-4cb0-95f0-06029a060f33}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

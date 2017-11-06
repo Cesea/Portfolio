@@ -50,6 +50,12 @@ void Keyboard::UpdateOnKeyUp(WPARAM wParam, LPARAM lParam)
 void Keyboard::UpdateOnKeyDown(WPARAM wParam, LPARAM lParam)
 {
 	_currentState[wParam] = true;
+
+	UINT tempChar = MapVirtualKey(wParam, MAPVK_VK_TO_CHAR);
+	//if (IsLetter(tempChar))
+	//{
+	//	_charInput = (_shiftDown) ? tempChar : tempChar + 32;
+	//}
 }
 
 void Keyboard::UpdateOnChar(WPARAM wParam, LPARAM lParam)

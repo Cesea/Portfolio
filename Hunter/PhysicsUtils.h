@@ -1,7 +1,7 @@
 #ifndef PHYSICS_UTILS_H
 #define PHYSICS_UTILS_H
 
-
+#include "Transform.h"
 #include "PhysicsComponent.h"
 
 //레이 바운드에 충돌했는지 확인
@@ -9,8 +9,8 @@ bool IsRayHitBound(
 	Ray *pRay,
 	PhysicsComponent *pComponent,
 	Transform* pBoundTrans,	//바운드의 트랜스
-	D3DXVECTOR3* pHitPos, //hit 위치 (NULL)
-	D3DXVECTOR3* pHitNormal);
+	Vector3* pHitPos, //hit 위치 (NULL)
+	Vector3* pHitNormal);
 
 
 //레이 바운드에 충돌했는지 확인
@@ -18,23 +18,23 @@ bool IsRayHitBound(
 	Ray *pRay,
 	PhysicsComponent *pBound,
 	Transform* pBoundTrans,	//바운드의 트랜스
-	D3DXVECTOR3* pHitPos, //hit 위치 (NULL)
-	D3DXVECTOR3* pHitNormal);
+	Vector3* pHitPos, //hit 위치 (NULL)
+	Vector3* pHitNormal);
 
 //레이가 오브젝트와 충돌
 bool IsRayHitStaticMeshObject(
 	Ray *pRay,
 	PhysicsComponent *pComponent,
-	D3DXVECTOR3* pHitPos,
-	D3DXVECTOR3* pHitNormal
+	Vector3* pHitPos,
+	Vector3* pHitNormal
 );
 
 bool IsRayHitSphere(
 	Ray *pRay,
-	const D3DXVECTOR3* pCenter,
+	const Vector3* pCenter,
 	float radius,
-	D3DXVECTOR3* pHitPos,
-	D3DXVECTOR3* pHitNormal);
+	Vector3* pHitPos,
+	Vector3* pHitNormal);
 
 //2개의 바운드에 대한 충돌
 bool IsOverlap(cBaseObject* pObjA, cBaseObject* pObjB);
@@ -42,14 +42,14 @@ bool IsOverlap(cBaseObject* pObjA, cBaseObject* pObjB);
 bool IsOverlap(Transform* pTransA, PhysicsComponent* pBoundA,
 	Transform* pTransB, cBound_Sphere* pBoundB);
 
-bool IsOverlap(Transform* pTransA, cBound_Box* pBoundA,
-	Transform* pTransB, cBound_Box* pBoundB);
+bool IsOverlap(Transform* pTransA, BoundingBoxPhysicsComponent* pBoundA,
+	Transform* pTransB, BoundingBoxPhysicsComponent* pBoundB);
 
-bool IsOverlap(Transform* pTransA, cBound_Sphere* pBoundA,
-	Transform* pTransB, cBound_Box* pBoundB);
+bool IsOverlap(Transform* pTransA, SpherePhysicsComponent* pBoundA,
+	Transform* pTransB, BoundingBoxPhysicsComponent* pBoundB);
 
-bool IsOverlap(Transform* pTransA, cBound_Box* pBoundA,
-	Transform* pTransB, cBound_Sphere* pBoundB);
+bool IsOverlap(Transform* pTransA, BoundingBoxPhysicsComponent* pBoundA,
+	Transform* pTransB, SpherePhysicsComponent* pBoundB);
 
 bool IsBlocking(cBaseObject* pObjA, cBaseObject* pObjB, float moveFactor = 0.0f);
 
@@ -58,12 +58,11 @@ bool IsBlocking(cBaseObject* pObjA, cBaseObject* pObjB, float moveFactor = 0.0f)
 //moveFactor가 0.5이면 겹칩에 대해 A 와 b가 같이량으로 움직인다.
 //moveFactor가 1일수록 겹칩에 대해 A가 움직인다.
 
+bool IsBlocking(Transform* pTransA, SpherePhysicsComponent* pBoundA,
+	Transform* pTransB, SpherePhysicsComponent* pBoundB, float moveFactor = 0.0f);
 
-bool IsBlocking(Transform* pTransA, cBound_Sphere* pBoundA,
-	Transform* pTransB, cBound_Sphere* pBoundB, float moveFactor = 0.0f);
-
-bool IsBlocking(Transform* pTransA, cBound_Box* pBoundA,
-	Transform* pTransB, cBound_Box* pBoundB, float moveFactor = 0.0f);
+bool IsBlocking(Transform* pTransA, BoundingBoxPhysicsComponent* pBoundA,
+	Transform* pTransB, BoundingBoxPhysicsComponent* pBoundB, float moveFactor = 0.0f);
 
 //점 3개로 무한 평면을 만든다
 void CteatePlane(LPD3DXPLANE pOutPlane, const D3DXVECTOR3* p0,

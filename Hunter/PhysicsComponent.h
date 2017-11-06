@@ -17,11 +17,11 @@ public :
 protected :
 };
 
-class SpherePhysicsComponent : public PhysicsComponent
+class RigidPhysicsComponent : public PhysicsComponent
 {
 public  :
-	SpherePhysicsComponent() {}
-	virtual ~SpherePhysicsComponent() {}
+	RigidPhysicsComponent() {}
+	virtual ~RigidPhysicsComponent() {}
 
 	virtual bool PreInit(Entity *pOwner);
 	virtual bool Init();
@@ -29,20 +29,11 @@ public  :
 
 	virtual void Update(float deltaTime);
 private :
+	Vector3 _accel;
+	Vector3 _velocity;;
+	Vector3 _friction;
+
 };
 
-class BoundingBoxPhysicsComponent : public PhysicsComponent
-{
-public :
-	BoundingBoxPhysicsComponent() {}
-	virtual ~BoundingBoxPhysicsComponent() {}
-
-	virtual bool PreInit(Entity *pOwner);
-	virtual bool Init();
-	virtual bool Release();
-
-	virtual void Update(float deltaTime);
-private :
-} ;
 
 #endif

@@ -10,7 +10,6 @@ public :
 
 	Plane operator= (const Plane &other);
 
-
 	// assignment operators
 	Plane& operator *= (float f);
 	Plane& operator /= (float f);

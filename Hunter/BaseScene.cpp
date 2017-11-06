@@ -3,6 +3,8 @@
 
 #include "tinyxml2.h"
 
+#include "DataPool.h"
+
 //struct vec3
 //{
 //	float x;
@@ -19,9 +21,6 @@ struct Vertex
 	{
 		FVF = D3DFVF_XYZ | D3DFVF_DIFFUSE
 	};
-
-
-	
 };
 
 void DumpToStdOut(const tinyxml2::XMLAttribute *pAttribute, uint32 indent = 0)
@@ -211,35 +210,35 @@ bool32 BaseScene::Render()
 {
 	bool32 result = true;
 
-	//im::BeginFrame(gEngine->GetInput()->mouse, gEngine->GetInput()->keyboard.GetCharInput());
+	im::BeginFrame(gEngine->GetInput()->mouse, gEngine->GetInput()->keyboard.GetCharInput());
 
-	//im::BeginScrollArea("Editor", 100, 100, 400, 600, &_scroll);
+	im::BeginScrollArea("Editor", 100, 100, 400, 600, &_scroll);
 
-	//if (im::Button("Hi", 100, true))
-	//{
-	//	EventChannel channel;
-	//	channel.Broadcast(SceneSystem::SceneChangeEvent("TestScene"));
-	//}
-	//im::Item("HIIII", 100, true);
-	//if (im::Check("TODO", _itemCheck))
-	//{
-	//	_itemCheck = !_itemCheck;
-	//}
-	//im::Value("holo");
-	//if (im::Collapse("TODO", "meto", _collapse))
-	//{
-	//	_collapse = !_collapse;
-	//}
-	//im::Slider("slider", &_sliderValue, -20, 20, 0.1, 200);
+	if (im::Button("Hi", 100, true))
+	{
+		EventChannel channel;
+		channel.Broadcast(SceneSystem::SceneChangeEvent("TestScene"));
+	}
+	im::Item("HIIII", 100, true);
+	if (im::Check("TODO", _itemCheck))
+	{
+		_itemCheck = !_itemCheck;
+	}
+	im::Value("holo");
+	if (im::Collapse("TODO", "meto", _collapse))
+	{
+		_collapse = !_collapse;
+	}
+	im::Slider("slider", &_sliderValue, -20, 20, 0.1, 200);
 
-	//im::EndScrollArea();
+	im::EndScrollArea();
 
-	//im::Edit(_strings1, 100);
-	//im::Edit(_strings2, 100);
+	im::Edit(_strings1, 100);
+	im::Edit(_strings2, 100);
 
-	//im::Button("After", 100);
+	im::Button("After", 100);
 
-	//im::EndFrame();
+	im::EndFrame();
 
 	commands::Draw *dc =  VIDEO->GetCommandBucket().AddCommand<commands::Draw>(10, 0);
 	dc->primitiveCount = 1;

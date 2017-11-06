@@ -3,6 +3,9 @@
 
 #include <cstdlib>
 
+#include "BitFlags.h"	
+
+
 constexpr float EPSILON = 0.001f;
 constexpr float ONE_RAD = 0.017453f;
 

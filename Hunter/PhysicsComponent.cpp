@@ -20,40 +20,21 @@ void PhysicsComponent::Update(float deltaTime)
 {
 }
 
-bool SpherePhysicsComponent::PreInit(Entity * pOwner)
+bool RigidPhysicsComponent::PreInit(Entity * pOwner)
 {
 	return false;
 }
 
-bool SpherePhysicsComponent::Init()
+bool RigidPhysicsComponent::Init()
 {
 	return false;
 }
 
-bool SpherePhysicsComponent::Release()
+bool RigidPhysicsComponent::Release()
 {
 	return false;
 }
 
-void SpherePhysicsComponent::Update(float deltaTime)
-{
-}
-
-bool BoundingBoxPhysicsComponent::PreInit(Entity * pOwner)
-{
-	return false;
-}
-
-bool BoundingBoxPhysicsComponent::Init()
-{
-	return false;
-}
-
-bool BoundingBoxPhysicsComponent::Release()
-{
-	return false;
-}
-
-void BoundingBoxPhysicsComponent::Update(float deltaTime)
+void RigidPhysicsComponent::Update(float deltaTime)
 {
 }

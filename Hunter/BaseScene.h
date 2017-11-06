@@ -3,7 +3,7 @@
 
 #include "IScene.h"
 
-#include "Camera.h"
+#include "DataPool.h"
 
 class BaseScene : public IScene
 {

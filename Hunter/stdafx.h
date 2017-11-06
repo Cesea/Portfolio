@@ -5,6 +5,12 @@
 #define SAFE_DELETE_ARRAY(p) if(p) {delete [] p; p = nullptr;}
 #define COM_RELEASE(p) if(p) {p->Release(); p = nullptr;}
 
+#if defined (DEBUG) || defined (_DEBUG)
+	#define Assert(expression)  if(!(expression)) { *(int *)0 = 0;}
+#else
+	#define Assert(expression) 
+#endif
+
 #define DEFINE_WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #include <strsafe.h>
@@ -22,7 +28,6 @@
 
 #include <assert.h>
 
-
 #define WINSIZEX (1600)
 #define WINSIZEY (900)
 
@@ -31,14 +36,13 @@
 #include "Typedefs.h"
 #include "Reflection.h"
 
-
-#include "Resource.h"
+//#include "Resource.h"
 
 #include "Math.h"
 #include "CommonUtils.h"
 
-
 #include "Engine.h"
+#include "GameUtils.h"
 #include "D3DCommon.h"
 
 extern Engine *gEngine;

@@ -1,6 +1,10 @@
 #include "stdafx.h"
 #include "Camera.h"
 
+void Camera::UpdateFrustum()
+{
+}
+
 Camera::Camera()
 {
 	//기본 화각 설정
@@ -161,4 +165,8 @@ void Camera::Handle(const InputSystem::KeyDownEvent & event)
 	{
 		_toMove.y -= _moveSpeed * deltaTime;
 	}
+}
+
+void Frustum::Cull(const AABB * aabbs, bool32 * pOutVisible, int32 numAABB)
+{
 }

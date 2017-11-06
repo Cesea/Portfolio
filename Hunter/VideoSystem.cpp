@@ -58,6 +58,8 @@ void VideoSystem::Render()
 
 	_commandBucket.Submit();
 
+	_pimguiRenderer->Draw();
+
 	_pDevice->EndScene();
 	_pDevice->Present(nullptr, nullptr, NULL, nullptr);
 

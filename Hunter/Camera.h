@@ -3,6 +3,19 @@
 
 #include "Transform.h"
 
+struct AABB
+{
+	Vector3 min;
+	Vector3 max;
+};
+
+struct Frustum
+{
+	void Cull(const AABB *aabbs, bool32 *pOutVisible, int32 numAABB);
+
+	Plane planes[6];
+};
+
 
 class Camera : public Transform
 {
@@ -23,6 +36,10 @@ protected:
 	Vector3 _toMove;
 	//float _friction;
 	//float _aceel;
+
+	Frustum _frustum;
+
+	void UpdateFrustum();
 
 public:
 	Camera();
@@ -53,6 +70,8 @@ public:
 
 	//월드 위치로  화면의 위치를 얻는다.
 	bool GetWorldPosToScreenPos(Vector2* pScreenPos, const Vector3* pWorldPos);
+
+	const Frustum &GetFrustum() { return _frustum; }
 
 	void Handle(const InputSystem::KeyDownEvent &event);
 };
