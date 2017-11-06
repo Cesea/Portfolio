@@ -18,7 +18,7 @@ void ResourcePoolManager::RegisterResourcePool(ResourceCode code, ResourcePoolIn
 	//¾øÀ¸¸é
 	if (find == _resourceTypeMap.end())
 	{
-		_resourceTypeMap.insert(code, pInterface);
+		_resourceTypeMap.insert(std::make_pair(code, pInterface));
 		_resourceFamilyList[code.family].push_back(pInterface);
 	}
 }
@@ -126,7 +126,7 @@ void ResourcePoolManager::DestroyResourceType(ResourceCode code)
 	auto find = _resourceTypeMap.find(code);
 	if (find != _resourceTypeMap.end())
 	{
-		(*iter).second->DestroyAll();
+		(*find).second->DestroyAll();
 	}
 }
 
@@ -135,7 +135,7 @@ void ResourcePoolManager::DisableResourceType(ResourceCode code)
 	auto find = _resourceTypeMap.find(code);
 	if (find != _resourceTypeMap.end())
 	{
-		(*iter).second->DisableAll();
+		(*find).second->DisableAll();
 	}
 }
 
@@ -144,7 +144,7 @@ void ResourcePoolManager::RestoreResourceType(ResourceCode code)
 	auto find = _resourceTypeMap.find(code);
 	if (find != _resourceTypeMap.end())
 	{
-		(*iter).second->RestoreAll();
+		(*find).second->RestoreAll();
 	}
 }
 
@@ -153,11 +153,11 @@ void ResourcePoolManager::CleanResourceType(ResourceCode code)
 	auto find = _resourceTypeMap.find(code);
 	if (find != _resourceTypeMap.end())
 	{
-		(*iter).second->Clean();
+		(*find).second->Clean();
 	}
 }
 
-ResourcePoolInterface * ResourcePoolManager::FindResourcePool(cResourceCode code) const
+ResourcePoolInterface * ResourcePoolManager::FindResourcePool(ResourceCode code) const
 {
 	ResourcePoolInterface *result = nullptr;
 	auto find = _resourceTypeMap.find(code);
@@ -168,21 +168,17 @@ ResourcePoolInterface * ResourcePoolManager::FindResourcePool(cResourceCode code
 	return result;
 }
 
-ResourcePoolInterface * ResourcePoolManager::FindResourcePool(ResourceCode code) const
-{
-	return nullptr;
-}
 
 PoolHandle ResourcePoolManager::FindResourceHandle(ResourceCode code, const std::string & name) const
 {
 	ResourcePoolInterface* pool = FindResourcePool(code);
-	PoolHandle handle;
+	PoolHandle handle = 0;
 
 	ClearHandle(handle);
 
 	if (pool)
 	{
-		handle = pool->FindResourceHandle(Name);
+		handle = pool->FindResourceHandle(name);
 	}
 
 	return handle;

@@ -46,7 +46,7 @@ ResourcePoolItem * ResourcePoolInterface::CreateResource(const std::string & res
 
 		pResource->SetResourcePool(this);
 		pResource->SetResourceHandle(handle);
-		pResource->SetResourceCode(m_registrationCode);
+		pResource->SetResourceCode(_registrationCode);
 		return pResource;
 	}
 
@@ -79,13 +79,13 @@ bool ResourcePoolInterface::SaveResource(ResourcePoolItem * pResource)
 
 PoolHandle ResourcePoolInterface::FindResourceHandle(const std::string & name)
 {
-	cPoolHandle newHandle(0);
+	PoolHandle newHandle(0);
 
 	ClearHandle(newHandle);
 
 	// look up the name in our map
-	NameTable::const_iterator iter = _nameMap.find(name);
-	if (iter != m_nameMap.end())
+	NameTable::const_iterator iter = _nameTable.find(name);
+	if (iter != _nameTable.end())
 	{
 		newHandle = iter->second;
 	}
@@ -95,8 +95,8 @@ PoolHandle ResourcePoolInterface::FindResourceHandle(const std::string & name)
 
 const std::string * ResourcePoolInterface::FindResourceName(PoolHandle handle) const
 {
-	NameTable::const_iterator iter = _nameMap.begin();
-	for (; iter != _nameMap.end(); ++iter)
+	NameTable::const_iterator iter = _nameTable.begin();
+	for (; iter != _nameTable.end(); ++iter)
 	{
 		if (handle == iter->second)
 		{
@@ -106,19 +106,19 @@ const std::string * ResourcePoolInterface::FindResourceName(PoolHandle handle) c
 	return nullptr;
 }
 
-void ResourcePoolInterface::SetResourceName(PoolHandle handle, const char * name)
+void ResourcePoolInterface::SetResourceName(PoolHandle handle, const std::string &name)
 {
-	NameTalbe::iterator iter = _nameMap.begin();
-	for (; iter != _nameMap.end(); ++iter)
+	NameTable::iterator iter = _nameTable.begin();
+	for (; iter != _nameTable.end(); ++iter)
 	{
 		if (handle == iter->second)
 		{
-			iter = _nameMap.erase(iter);
+			iter = _nameTable.erase(iter);
 			break;
 		}
 	}
 
-	_nameMap[std::string(name)] = handle;
+	_nameTable[name] = handle;
 }
 
 void ResourcePoolInterface::RegisterResourcePool(ResourceCode code)

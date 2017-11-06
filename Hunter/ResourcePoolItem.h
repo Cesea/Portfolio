@@ -29,10 +29,18 @@ public :
 	ResourceCode(uint16 family, uint16 type);
 	~ResourceCode();
 
-	bool operator< (const ResourceCode &other);
+	bool operator<(const ResourceCode &other)
+	{
+		return (this->value) < other.value;
+	}
 
 	void SetInvalid() { value = INVALID_CODE; }
 };
+
+inline bool	operator< (const ResourceCode &r1, const ResourceCode &r2)
+{
+	return r1.value < r2.value;
+}
 
 class ResourcePoolItem : public ReferenceCounter
 {
@@ -57,14 +65,14 @@ public :
 	virtual bool32 SaveResource(const std::string &fileName) = 0;
 
 	ResourceCode GetResourceCode() const;
-	ResourcePoolInterface *GetResourcePool() const;
-	PoolHandle GetHandle() const;
-	Uint32Flags GetFlags() const;
+	const ResourcePoolInterface *GetResourcePool() const;
+	PoolHandle GetResourceHandle() const;
+	Uint32Flags GetResourceFlags() const;
 
 	bool32 IsResourceCreated() const;
 	bool32 IsResourceDisabled() const;
 	bool32 IsResourceLoaded() const;
-	const std::string FindResourceName() const;
+	const std::string &FindResourceName() const;
 
 	void SetResourceName(const std::string &name);
 	void SetAlteredFlag(bool b);
@@ -74,9 +82,9 @@ public :
 
 protected :
 	void SetResourceCode(const ResourceCode code);
-	void SetResourcePool(const ResourcePoolInterface *pPool);
-	void SetHandle(PoolHandle handle);
-	void SetFlags(int flagbit, bool setting);
+	void SetResourcePool(ResourcePoolInterface *pPool);
+	void SetResourceHandle(PoolHandle handle);
+	void SetResourceFlags(int32 flagbit, bool setting);
 
 	void NotifyCreated();
 	void NotifyDisabled();
@@ -88,9 +96,9 @@ protected :
 
 private :
 	ResourceCode _resourceCode;
-	ResourcePoolInterface *_pPool;
-	PoolHandle _handle;
-	Uint32Flags _flags;
+	ResourcePoolInterface *_pResourcePool;
+	PoolHandle _resourceHandle;
+	Uint32Flags _resourceFlags;
 
 	ResourcePoolItem(const ResourcePoolItem &other);
 	ResourcePoolItem &operator= (const ResourcePoolItem &other);

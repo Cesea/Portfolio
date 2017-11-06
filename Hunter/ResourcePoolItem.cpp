@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "ResourcePoolItem.h"
+#include "ResourcePool.h"
 
 
 // ResourceCode ///////////////////////////////////////////////////
@@ -29,15 +30,14 @@ ResourceCode::~ResourceCode()
 {
 }
 
-bool ResourceCode::operator< (const ResourceCode &other)
-{
-	return value < other.value;
-}
+//bool ResourceCode::operator< (const ResourceCode &other)
+//{
+//	return value < other.value;
+//}
 
 //Resource Pool Item //////////////////////////////////////////////////
-
-
 ResourcePoolItem::ResourcePoolItem()
+	:_resourceCode(0), _resourceHandle(0), _resourceFlags(0), _pResourcePool(nullptr)
 {
 }
 
@@ -47,55 +47,64 @@ ResourcePoolItem::~ResourcePoolItem()
 
 ResourceCode ResourcePoolItem::GetResourceCode() const
 {
-	return ResourceCode();
+	return _resourceCode;
 }
 
-ResourcePoolInterface *ResourcePoolItem::GetResourcePool() const
+const ResourcePoolInterface *ResourcePoolItem::GetResourcePool() const
 {
-	return false;
+	return _pResourcePool;
 }
 
-PoolHandle ResourcePoolItem::GetHandle() const
+PoolHandle ResourcePoolItem::GetResourceHandle() const
 {
-	return false;
+	return _resourceHandle;
 }
 
-Uint32Flags ResourcePoolItem::GetFlags() const
+Uint32Flags ResourcePoolItem::GetResourceFlags() const
 {
-	return Uint32Flags();
+	return _resourceFlags;
 }
 
 bool32 ResourcePoolItem::IsResourceCreated() const
 {
-	return false;
+	return TEST_BIT(_resourceFlags, ResourceState::Created);
 }
 
 bool32 ResourcePoolItem::IsResourceDisabled() const
 {
-	return false;
+	return TEST_BIT(_resourceFlags, ResourceState::Disabled);
 }
 
 bool32 ResourcePoolItem::IsResourceLoaded() const
 {
-	return false;
+	return TEST_BIT(_resourceFlags, ResourceState::Loaded);
 }
 
-const std::string ResourcePoolItem::FindResourceName() const
+const std::string &ResourcePoolItem::FindResourceName() const
 {
+	if (_pResourcePool)
+	{
+		return *_pResourcePool->FindResourceName(_resourceHandle);
+	}
 	return std::string();
 }
 
 void ResourcePoolItem::SetResourceName(const std::string &name)
 {
+	if (_pResourcePool)
+	{
+		_pResourcePool->SetResourceName(_resourceHandle, name);
+	}
 }
 
 void ResourcePoolItem::SetAlteredFlag(bool b)
 {
+	_resourceFlags.SetBit(ResourceState::Altered, b);
 }
 
 bool32 ResourcePoolItem::IsAlteredFlag() const
 {
-	return false;
+	return TEST_BIT(_resourceFlags, ResourceState::Altered);
 }
 
 int32 ResourcePoolItem::Release()
@@ -105,45 +114,60 @@ int32 ResourcePoolItem::Release()
 
 void ResourcePoolItem::SetResourceCode(const ResourceCode code)
 {
+	_resourceCode = code;
 }
-void ResourcePoolItem::SetResourcePool(const ResourcePoolInterface *pPool)
+
+void ResourcePoolItem::SetResourcePool(ResourcePoolInterface *pPool)
 {
+	_pResourcePool = pPool;
 }
-void ResourcePoolItem::SetHandle(PoolHandle handle)
+
+void ResourcePoolItem::SetResourceHandle(PoolHandle handle)
 {
+	_resourceHandle = handle;
 }
-void ResourcePoolItem::SetFlags(int flagbit, bool setting)
+
+void ResourcePoolItem::SetResourceFlags(int32 flagbit, bool setting)
 {
+	_resourceFlags.SetBit(flagbit, setting);
 }
 
 void ResourcePoolItem::NotifyCreated()
 {
-}
-
-void ResourcePoolItem::NotifyDisabled()
-{
-}
-
-void ResourcePoolItem::NotifyLoaded()
-{
-}
-
-void ResourcePoolItem::NotifyUnloaded()
-{
-}
-
-void ResourcePoolItem::NotifyRestore()
-{
+	SetResourceFlags(ResourceState::Created, true);
 }
 
 void ResourcePoolItem::NotifyDestroyed()
 {
+	SetResourceFlags(ResourceState::Created, false);
+}
+
+void ResourcePoolItem::NotifyDisabled()
+{
+	SetResourceFlags(ResourceState::Disabled, true);
+}
+
+void ResourcePoolItem::NotifyLoaded()
+{
+	SetResourceFlags(ResourceState::Loaded, true);
+}
+
+void ResourcePoolItem::NotifyUnloaded()
+{
+	SetResourceFlags(ResourceState::Loaded, false);
+}
+
+void ResourcePoolItem::NotifyRestore()
+{
+	SetResourceFlags(ResourceState::Disabled, false);
 }
 
 void ResourcePoolItem::NotifySaved()
 {
+	SetAlteredFlag(false);
 }
 
+//not used
 ResourcePoolItem::ResourcePoolItem(const ResourcePoolItem &other)
 {
 

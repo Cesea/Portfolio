@@ -38,7 +38,7 @@ public:
 
 	PoolHandle FindResourceHandle(const std::string& name);
 	const std::string* FindResourceName(PoolHandle handle) const;
-	void SetResourceName(PoolHandle handle, const char* name);
+	void SetResourceName(PoolHandle handle, const std::string &name);
 
 	void RegisterResourcePool(ResourceCode code);
 	void UnregisterResourcePool();
