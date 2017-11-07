@@ -141,26 +141,32 @@
     <ClCompile Include="Camera.cpp">
       <Filter>Sub\GameUtils</Filter>
     </ClCompile>
-    <ClCompile Include="Transform.cpp">
-      <Filter>Sub\GameUtils</Filter>
-    </ClCompile>
     <ClCompile Include="MatrixCache.cpp">
       <Filter>Sub</Filter>
-    </ClCompile>
-    <ClCompile Include="ReferenceCounter.cpp">
-      <Filter>Resource\Pools</Filter>
-    </ClCompile>
-    <ClCompile Include="ResourcePoolItem.cpp">
-      <Filter>Resource\Pools</Filter>
-    </ClCompile>
-    <ClCompile Include="ResourcePoolManager.cpp">
-      <Filter>Resource\Pools</Filter>
     </ClCompile>
     <ClCompile Include="Command.cpp">
       <Filter>Core\System\VideoSystem</Filter>
     </ClCompile>
-    <ClCompile Include="ResourcePool.cpp">
-      <Filter>Resource\Pools</Filter>
+    <ClCompile Include="oldTransform.cpp">
+      <Filter>Sub\GameUtils</Filter>
+    </ClCompile>
+    <ClCompile Include="Transform.cpp">
+      <Filter>Math</Filter>
+    </ClCompile>
+    <ClCompile Include="Node.cpp">
+      <Filter>Sub\GameUtils</Filter>
+    </ClCompile>
+    <ClCompile Include="VertexBuffer.cpp">
+      <Filter>Resource</Filter>
+    </ClCompile>
+    <ClCompile Include="TerrainConfig.cpp">
+      <Filter>Sub\GameUtils\Terrain</Filter>
+    </ClCompile>
+    <ClCompile Include="Backend.cpp">
+      <Filter>Core\System\VideoSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="VertexBufferManager.cpp">
+      <Filter>Resource</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -387,26 +393,41 @@
     <ClInclude Include="Camera.h">
       <Filter>Sub\GameUtils</Filter>
     </ClInclude>
-    <ClInclude Include="Transform.h">
-      <Filter>Sub\GameUtils</Filter>
-    </ClInclude>
     <ClInclude Include="MatrixCache.h">
       <Filter>Sub</Filter>
     </ClInclude>
-    <ClInclude Include="DataPool.h">
-      <Filter>Resource\Pools</Filter>
+    <ClInclude Include="oldTransform.h">
+      <Filter>Sub\GameUtils</Filter>
     </ClInclude>
-    <ClInclude Include="ReferenceCounter.h">
-      <Filter>Resource\Pools</Filter>
+    <ClInclude Include="Transform.h">
+      <Filter>Math</Filter>
     </ClInclude>
-    <ClInclude Include="ResourcePoolItem.h">
-      <Filter>Resource\Pools</Filter>
+    <ClInclude Include="Node.h">
+      <Filter>Sub\GameUtils</Filter>
     </ClInclude>
-    <ClInclude Include="ResourcePoolManager.h">
-      <Filter>Resource\Pools</Filter>
+    <ClInclude Include="Terrain.h">
+      <Filter>Sub\GameUtils\Terrain</Filter>
     </ClInclude>
-    <ClInclude Include="ResourcePool.h">
-      <Filter>Resource\Pools</Filter>
+    <ClInclude Include="TerrainConfig.h">
+      <Filter>Sub\GameUtils\Terrain</Filter>
+    </ClInclude>
+    <ClInclude Include="TerrainNode.h">
+      <Filter>Sub\GameUtils\Terrain</Filter>
+    </ClInclude>
+    <ClInclude Include="TerrainQuadTree.h">
+      <Filter>Sub\GameUtils\Terrain</Filter>
+    </ClInclude>
+    <ClInclude Include="Backend.h">
+      <Filter>Core\System\VideoSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="Resource.h">
+      <Filter>Resource</Filter>
+    </ClInclude>
+    <ClInclude Include="VertexBufferManager.h">
+      <Filter>Resource</Filter>
+    </ClInclude>
+    <ClInclude Include="ResourceManager.h">
+      <Filter>Resource</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -512,8 +533,8 @@
     <Filter Include="Sub\GameUtils">
       <UniqueIdentifier>{563f8004-6a59-40ad-a91c-8b90fd7fda6e}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Resource\Pools">
-      <UniqueIdentifier>{f5efead7-82ca-4cb0-95f0-06029a060f33}</UniqueIdentifier>
+    <Filter Include="Sub\GameUtils\Terrain">
+      <UniqueIdentifier>{753fe9ca-8a91-47dd-af3d-e4e9932dbc8b}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

@@ -6,7 +6,7 @@
 class Ray
 {
 public :
-	//DECALRE_META(Ray);
+	DECLARE_META(Ray);
 
 	Ray();
 	Ray(const Vector3 &origin, const Vector3 &direction);

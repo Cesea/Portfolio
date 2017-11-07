@@ -22,6 +22,8 @@ bool VideoSystem::Init(const std::string & name, const SystemSetting & setting)
 		return false;
 	}
 
+	_vertexBufferManager.Init(256);
+
 	_pimguiRenderer = new im::GuiRenderer();
 	_pimguiRenderer->Init(gpDevice, "consolas", WINSIZEX, WINSIZEY);
 
@@ -66,11 +68,12 @@ void VideoSystem::Render()
 	_commandBucket.Clear();
 }
 
-bool32 VideoSystem::Draw(IDirect3DVertexBuffer9 *pVertexBuffer, 
-	uint32 startVertex, uint32 primitiveCount, uint32 stride)
+bool32 VideoSystem::Draw(VertexBufferHandle vertexHandle, 
+	uint32 startVertex, uint32 primitiveCount)
 {
 	_pDevice->SetFVF(D3DFVF_XYZ | D3DFVF_DIFFUSE);
-	_pDevice->SetStreamSource(0, pVertexBuffer, 0, stride);
+	const VertexBuffer &refVertexBuffer = _vertexBufferManager.GetMember(vertexHandle);
+	_pDevice->SetStreamSource(0, refVertexBuffer.Buffer(), 0, refVertexBuffer.Stride());
 	_pDevice->SetIndices(nullptr);
 	if (FAILED(_pDevice->DrawPrimitive(D3DPT_TRIANGLELIST, startVertex, primitiveCount)))
 	{

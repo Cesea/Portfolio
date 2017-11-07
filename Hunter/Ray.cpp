@@ -1,10 +1,10 @@
 #include "stdafx.h"
 
-//DEFINE_META(Ray)
-//{
-//	ADD_MEMBER(origin);
-//	ADD_MEMBER(direction);
-//}
+DEFINE_META(Ray)
+{
+	ADD_MEMBER(origin);
+	ADD_MEMBER(direction);
+}
 
 Ray::Ray()
 	:origin(), direction()

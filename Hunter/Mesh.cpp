@@ -6,13 +6,13 @@ Mesh::Mesh()
 }
 
 
-void Mesh::Cull(const Frustum &frustum)
-{
-	//frustum.Cull(&_boundingBoxes[0], &_visibility[0], _boundingBoxes.size());
-}
+//void Mesh::Cull(const Frustum &frustum)
+//{
+//	//frustum.Cull(&_boundingBoxes[0], &_visibility[0], _boundingBoxes.size());
+//}
 
-void Mesh::Render()
-{
+//void Mesh::Render()
+//{
 	//context->BindVertexBuffer();
 	//context->BindIndexBuffer();
 	//make Draw calls
@@ -21,4 +21,4 @@ void Mesh::Render()
 		//const SubMesh &subMesh = _subMeshes[i];
 		//subMesh->Draw
 	//}
-}
+//}

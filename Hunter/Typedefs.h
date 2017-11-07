@@ -27,4 +27,10 @@ typedef uint32 SurfaceID;
 
 typedef uint32 UIID;
 
+typedef uint16 ResourceHandle;
+typedef ResourceHandle VertexBufferHandle;
+typedef ResourceHandle IndexBufferHandle;
+typedef ResourceHandle EffectHandle;
+typedef ResourceHandle TextureHandle;
+
 #endif

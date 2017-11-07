@@ -5,11 +5,14 @@
 
 //#include "VisualComponent.h"
 
+
 #include "imguiRenderer.h"
 #include "DebugDraw.h"
 
 #include "Command.h"
 #include "CommandBucket.h"
+
+#include "VertexBufferManager.h"
 
 //defines 
 #define VIDEO (gEngine->GetVideo())
@@ -41,14 +44,16 @@ public :
 	}
 	virtual EventChannel GetChannel() { return _channel; }
 
-	bool32 Draw(IDirect3DVertexBuffer9 *pVertexBuffer, 
-		uint32 startVertex, uint32 primitiveCount, uint32 stride);
+	bool32 Draw(VertexBufferHandle vertexHandle,
+		uint32 startVertex, uint32 primitiveCount);
 	bool32 DrawIndexed(IDirect3DVertexBuffer9 * pVertexBuffer, 
 		IDirect3DIndexBuffer9 * pIndexBuffer, 
 		IDirect3DVertexDeclaration9 * pVertexDecl, 
 		uint32 indexCount, uint32 vertexCount, uint32 startIndex, uint32 baseVerteex, uint32 stride);
 
 	CommandBucket<uint32> &GetCommandBucket() { return _commandBucket; }
+
+	VertexBufferManager *GetVertexBufferManager() { return &_vertexBufferManager; }
 
 private :
 	bool InitD3D(HWND windowHandle);
@@ -67,6 +72,12 @@ private :
 	im::GuiRenderer *_pimguiRenderer;
 
 	CommandBucket<uint32> _commandBucket;
+
+	VertexBufferManager _vertexBufferManager;
+	//ResourceManager<IndexBuffer> _indexBufferManager;
+	//ResourceManager<Texture> _textureManager;
+	//ResourceManager<Effect> _effectManager;
+	//ResourceManager<RenderTarget> _renderTargetManager;
 };
 
 #endif

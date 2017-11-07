@@ -1,7 +1,7 @@
 #ifndef MATRIX_CACHE_H
 #define MATRIX_CACHE_H
 
-constexpr uint32 MAX_MATRIX_CACHE = 1000;
+constexpr uint32 MAX_MATRIX_CACHE = 256;
 
 class MatrixCache
 {

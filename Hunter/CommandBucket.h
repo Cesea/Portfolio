@@ -3,6 +3,7 @@
 
 #include "CommandPacket.h"
 
+#include "MatrixCache.h"
 #include "RenderContext.h"
 
 template <typename Key>
@@ -38,6 +39,7 @@ private :
 	Matrix _viewMatrix;
 	Matrix _projectionMatrix;
 
+	MatrixCache _matrices;
 	RenderContext _context;
 };
 

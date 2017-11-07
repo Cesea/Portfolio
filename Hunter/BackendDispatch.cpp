@@ -6,7 +6,7 @@
 void backenddispatch::Draw(const void * pData)
 {
 	const commands::Draw *pConverted = static_cast<const commands::Draw *>(pData);
-	VIDEO->Draw(pConverted->vertexBuffer, pConverted->startVertex, pConverted->primitiveCount, 16);
+	VIDEO->Draw(pConverted->vertexBufferHandle, pConverted->startVertex, pConverted->primitiveCount);
 	//backend::Draw(pConverted->primitiveCount, );
 }
 

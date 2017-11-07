@@ -29,6 +29,8 @@ public:
 
 	bool HasComponent(ComponentID id);
 
+	const Transform &GetTransform() { return _transform; }
+
 	template<typename T>
 	T *GetComponent(ComponentFamilyID id)
 	{
@@ -45,5 +47,6 @@ public:
 private:
 	EntityID _id;
 	ComponentTable _components;
+	Transform _transform;
 };
 #endif

@@ -3,8 +3,6 @@
 
 #include "IScene.h"
 
-#include "DataPool.h"
-
 class BaseScene : public IScene
 {
 public :
@@ -36,10 +34,9 @@ protected :
 
 	int32 _scroll{ 0 };
 
-	Camera _camera;
-
-	IDirect3DVertexBuffer9 *_pBuffer;
 	IDirect3DVertexDeclaration9 *_pDecl;
+
+	VertexBufferHandle _vertexHandle;
 
 };
 

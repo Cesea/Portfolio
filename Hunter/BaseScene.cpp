@@ -3,8 +3,6 @@
 
 #include "tinyxml2.h"
 
-#include "DataPool.h"
-
 //struct vec3
 //{
 //	float x;
@@ -88,7 +86,7 @@ bool32 BaseScene::Init()
 {
 	bool32 result = true;
 
-	_camera.SetWorldPosition(0.0f, 2.0f, -3.0f);
+	//_camera.SetWorldPosition(0.0f, 2.0f, -3.0f);
 
 	//std::vector<int> arrays;
 	//for (int i = 0; i < 10; ++i)
@@ -167,6 +165,19 @@ bool32 BaseScene::Init()
 	//	}
 	//}
 
+	Transform transform;
+	transform.SetTranslation(1.0f, 2.0f, 3.0f);
+	transform.SetScaling(1.0f, 2.0f, 1.0f);
+	Matrix matrix = transform.GetWorldMatrix();
+
+	Vertex vertices[3];
+	vertices[0].position = Vector3(0.0f, 0.5f, 0.5f);
+	vertices[0].color = 0xffff0000;
+	vertices[1].position = Vector3(0.5f, -0.5f, 0.5f);
+	vertices[1].color = 0xff00ff00;
+	vertices[2].position = Vector3(-0.5f, -0.5f, 0.5f);
+	vertices[2].color = 0xff0000ff;
+	_vertexHandle =  VIDEO->GetVertexBufferManager()->CreateStatic(3, sizeof(Vertex), vertices);
 
 	D3DVERTEXELEMENT9 elements[3] =
 	{
@@ -177,21 +188,6 @@ bool32 BaseScene::Init()
 
 	gpDevice->CreateVertexDeclaration(elements, &_pDecl);
 
-	//gpDevice->SetVertexDeclaration(_pDecl);
-
-	gpDevice->CreateVertexBuffer(sizeof(Vertex) * 3, D3DUSAGE_WRITEONLY, 
-		Vertex::FVF, D3DPOOL_MANAGED, &_pBuffer, nullptr);
-
-	Vertex *pData = nullptr;
-	_pBuffer->Lock(0, 0, (void **)&pData, 0);
-	pData[0].position = Vector3(0.0f, 0.5f, 0.5f);
-	pData[0].color = 0xffff0000;
-	pData[1].position = Vector3(0.5f, -0.5f, 0.5f);
-	pData[1].color = 0xff00ff00;
-	pData[2].position = Vector3(-0.5f, -0.5f, 0.5f);
-	pData[2].color = 0xff0000ff;
-	_pBuffer->Unlock();
-
 	_active = true;
 	return result;
 }
@@ -200,8 +196,8 @@ bool32 BaseScene::Update(float deltaTime)
 {
 	bool32 result = true;
 
-	_camera.UpdateMatrix();
-	_camera.UpdateCamToDevice(gpDevice);
+	//_camera.UpdateMatrix();
+	//_camera.UpdateCamToDevice(gpDevice);
 
 	return result;
 }
@@ -243,7 +239,7 @@ bool32 BaseScene::Render()
 	commands::Draw *dc =  VIDEO->GetCommandBucket().AddCommand<commands::Draw>(10, 0);
 	dc->primitiveCount = 1;
 	dc->startVertex = 0;
-	dc->vertexBuffer = _pBuffer;
+	dc->vertexBufferHandle = _vertexHandle;
 
 	return result;
 }

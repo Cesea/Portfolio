@@ -13,9 +13,8 @@ namespace commands
 		uint32 primitiveCount;
 		uint32 startVertex;
 
-		IDirect3DVertexBuffer9 *vertexBuffer;
 		//VertexDeclHandle vertexDecl;
-		//VertexBufferHandle vertexBuffer;
+		VertexBufferHandle vertexBufferHandle;
 		//IndexBufferHandle indexBuffer;
 	};	
 

@@ -4,43 +4,7 @@
 #include "ReferenceCounter.h"
 #include "DataPool.h"
 
-class ResourcePoolInterface;
-
-class ResourceCode
-{
-public :
-	enum
-	{
-		INVALID_CODE = 0xffffffff
-	};
-	union 
-	{
-		uint32 value;
-		struct
-		{
-			uint16 family;
-			uint16 type;
-		};
-	};
-
-	ResourceCode();
-	ResourceCode(const ResourceCode &other);
-	ResourceCode(uint32 source);
-	ResourceCode(uint16 family, uint16 type);
-	~ResourceCode();
-
-	bool operator<(const ResourceCode &other)
-	{
-		return (this->value) < other.value;
-	}
-
-	void SetInvalid() { value = INVALID_CODE; }
-};
-
-inline bool	operator< (const ResourceCode &r1, const ResourceCode &r2)
-{
-	return r1.value < r2.value;
-}
+class Reso
 
 class ResourcePoolItem : public ReferenceCounter
 {
@@ -53,7 +17,6 @@ public :
 		Altered,
 		NumStateFlags
 	};
-
 	ResourcePoolItem();
 	virtual ~ResourcePoolItem();
 
