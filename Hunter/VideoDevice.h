@@ -25,13 +25,14 @@ struct RenderWindow
 
 	D3DFORMAT backBufferFormat;
 	D3DFORMAT depthStencilFormat;
+	HWND windowHandle;
 };
 
-class VideoSystem : public System
+class VideoDevice : public System
 {
 public :
-	VideoSystem();
-	virtual ~VideoSystem();
+	VideoDevice();
+	virtual ~VideoDevice();
 
 	virtual bool Init(const std::string &name, const SystemSetting &setting);
 	virtual void ShutDown();
@@ -71,7 +72,7 @@ private :
 
 	RenderWindow _renderWindow;
 
-	im::GuiRenderer *_pimguiRenderer;
+	//im::GuiRenderer *_pimguiRenderer;
 
 	CommandBucket<uint32> _commandBucket;
 
@@ -83,5 +84,10 @@ private :
 	//ResourceManager<Effect> _effectManager;
 	//ResourceManager<RenderTarget> _renderTargetManager;
 };
+
+namespace backend
+{
+	
+}
 
 #endif

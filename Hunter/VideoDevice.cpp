@@ -1,19 +1,19 @@
 #include "stdafx.h"
-#include "VideoSystem.h"
+#include "VideoDevice.h"
 
 IDirect3DDevice9 *gpDevice;
 
 using namespace im;
 
-VideoSystem::VideoSystem()
+VideoDevice::VideoDevice()
 {
 }
 
-VideoSystem::~VideoSystem()
+VideoDevice::~VideoDevice()
 {
 }
 
-bool VideoSystem::Init(const std::string & name, const SystemSetting & setting)
+bool VideoDevice::Init(const std::string & name, const SystemSetting & setting)
 {
 	_name = name;
 
@@ -25,8 +25,7 @@ bool VideoSystem::Init(const std::string & name, const SystemSetting & setting)
 	_vertexBufferManager.Init(256);
 	_indexBufferManager.Init(256);
 
-	_pimguiRenderer = new im::GuiRenderer();
-	_pimguiRenderer->Init(gpDevice, "consolas", WINSIZEX, WINSIZEY);
+	im::GuiRenderer::GetInstance()->Init(gpDevice, "consolas", WINSIZEX, WINSIZEY);
 
 
 	Matrix view;
@@ -42,17 +41,17 @@ bool VideoSystem::Init(const std::string & name, const SystemSetting & setting)
 	return true;
 }
 
-void VideoSystem::ShutDown()
+void VideoDevice::ShutDown()
 {
 }
 
-void VideoSystem::Update(float deltaTime)
+void VideoDevice::Update(float deltaTime)
 {
 
 
 }
 
-void VideoSystem::Render()
+void VideoDevice::Render()
 {
 	_commandBucket.Sort();
 
@@ -61,7 +60,7 @@ void VideoSystem::Render()
 
 	_commandBucket.Submit();
 
-	_pimguiRenderer->Draw();
+	im::GuiRenderer::GetInstance()->Draw();
 
 	_pDevice->EndScene();
 	_pDevice->Present(nullptr, nullptr, NULL, nullptr);
@@ -70,7 +69,7 @@ void VideoSystem::Render()
 	_matrixCache.Clear();
 }
 
-bool32 VideoSystem::Draw(VertexBufferHandle vertexHandle,
+bool32 VideoDevice::Draw(VertexBufferHandle vertexHandle,
 		uint32 startVertex, uint32 primitiveCount, uint32 matrixIndex)
 {
 	_pDevice->SetTransform(D3DTS_WORLD, &_matrixCache.GetAt(matrixIndex));
@@ -86,7 +85,7 @@ bool32 VideoSystem::Draw(VertexBufferHandle vertexHandle,
 	return true;
 }
 
-bool32 VideoSystem::DrawIndexed(VertexBufferHandle vertexHandle, IndexBufferHandle indexHandle, 
+bool32 VideoDevice::DrawIndexed(VertexBufferHandle vertexHandle, IndexBufferHandle indexHandle, 
 	uint32 numVertex, uint32 startIndex, uint32 primitiveCount, uint32 matrixIndex)
 {
 	_pDevice->SetTransform(D3DTS_WORLD, &_matrixCache.GetAt(matrixIndex));
@@ -119,7 +118,7 @@ bool32 VideoSystem::DrawIndexed(VertexBufferHandle vertexHandle, IndexBufferHand
 //	return true;
 //}
 
-bool VideoSystem::InitD3D(HWND windowHandle)
+bool VideoDevice::InitD3D(HWND windowHandle)
 {
 	bool result = true;
 
@@ -179,7 +178,7 @@ bool VideoSystem::InitD3D(HWND windowHandle)
 	return result;
 }
 
-bool VideoSystem::InitDefaultRenderState()
+bool VideoDevice::InitDefaultRenderState()
 {
 	bool result = true;
 
@@ -189,7 +188,7 @@ bool VideoSystem::InitDefaultRenderState()
 	return result;
 }
 
-bool VideoSystem::PerformRender()
+bool VideoDevice::PerformRender()
 {
 	return false;
 }

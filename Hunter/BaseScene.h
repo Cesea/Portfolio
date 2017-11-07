@@ -25,12 +25,15 @@ protected :
 	bool32 _active;
 
 	bool32 _itemCheck{ false };
-	bool32 _collapse{ false };
+	bool _collapse{ false };
 
 	float _sliderValue{ 0 };
 
 	char _strings1[MAX_PATH] = {0, };
 	char _strings2[MAX_PATH] = {0, };
+
+	im::WindowPos _firstWindowPos;
+	im::WindowPos _secondWindowPos;
 
 	int32 _scroll{ 0 };
 
@@ -38,6 +41,8 @@ protected :
 
 	VertexBufferHandle _vertexHandle;
 	IndexBufferHandle _indexHandle;
+
+	bool _checked{ false };
 
 };
 

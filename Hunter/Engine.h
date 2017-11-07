@@ -7,7 +7,7 @@
 #include "Console.h"
 
 #include "InputSystem.h"
-#include "VideoSystem.h"
+#include "VideoDevice.h"
 #include "SceneSystem.h"
 #include "PhysicsSystem.h"
 #include "CommandSystem.h"
@@ -85,7 +85,7 @@ public :
 
 	LRESULT CALLBACK EngineWindowCallback(HWND windowHandle, UINT msg, WPARAM wParam, LPARAM lParam);
 
-	VideoSystem *GetVideo() { return _pVideo.get(); }
+	VideoDevice *GetVideo() { return _pVideo.get(); }
 	InputSystem *GetInput() { return _pInput.get(); }
 	SceneSystem *GetScene() { return _pScene.get(); }
 
@@ -103,7 +103,7 @@ private :
 
 	Console _console;
 
-	std::shared_ptr<VideoSystem> _pVideo;
+	std::shared_ptr<VideoDevice> _pVideo;
 	std::shared_ptr<InputSystem> _pInput;
 	std::shared_ptr<SceneSystem> _pScene;
 

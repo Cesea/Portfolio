@@ -2,6 +2,7 @@
 #define IM_GUI_RENDERER_H
 
 #include "InputSystem.h"
+#include "SingletonBase.h"
 
 namespace im
 {
@@ -11,6 +12,12 @@ namespace im
 		ALIGN_CENTER = 0x00000001,
 		ALIGN_RIGHT = 0x00000002,
 		ALIGN_VCENTER = 0x00000004,
+	};
+
+	struct WindowPos
+	{
+		int32 x;
+		int32 y;
 	};
 
 
@@ -43,7 +50,7 @@ namespace im
 	{
 		char type;
 		char flags;
-		char pad[2];
+		uint16 z;
 		D3DCOLOR color;
 		union
 		{
@@ -55,20 +62,76 @@ namespace im
 
 	struct Window
 	{
+		static int32 CAPTION_HEIGHT;
+		static int32 CAPTION_TEXT_OFFSET;
+		static int32 BUTTON_GAP;
+		static int32 BUTTON_SIZE;
+		static int32 MINIMIZE_BUTTON_RIGHT_OFFSET;
+		static int32 CLOSE_BUTTON_RIGHT_OFFSET;
+		static int32 WIDGET_YOFFSET_VALUE;
+		static int32 WIDGET_XOFFSET_VALUE;
+		static int32 WIDGET_INDENT_VALUE;
+		static int32 SPACING_VALUE;
+
+		static int32 AREA_HEADER;
+
+		static const D3DCOLOR DEFAULT_COLOR[4];
+
 		int32 x;
 		int32 y;
 		int32 width;
 		int32 height;
 
-		int32 scroll;
-		int32 top;
-		bool32 opened;
+		int32 z{0};
 
-		int32 widgetX;
-		int32 widgetY;
+		int32 scroll{0};
+		int32 top;
+		bool32 opened{true};
+		bool32 mouseInside{ false };
+
+		bool32 wentDrag{ false };
+		bool32 canDrag{false};
+
+		int32 prevDragX{-1};
+		int32 prevDragY{-1};
+
+		int32 widgetX{0};
+		int32 widgetY{0};
 
 		int32 internalWidgetID;
 	};
+
+	struct Button
+	{
+		static int32 BUTTON_WIDTH;
+		static int32 BUTTON_HEIGHT;
+	};
+
+	struct Font
+	{
+		static int32 FONT_HEIGHT;
+		static const D3DCOLOR DEFAULT_FONT_COLOR[4];
+	};
+
+	struct Slider
+	{
+		static int32 SLIDER_WIDTH;
+		static int32 SLIDER_HEIGHT;
+		static int32 MARKER_WIDTH;
+	};
+
+	struct Edit
+	{
+		static int32 EDIT_WIDTH;
+		static int32 EDIT_MAX_CHAR;
+		static int32 MARKET_WIDTH;
+	};
+
+	struct Check
+	{
+		static int32 CHECK_SIZE;
+	};
+
 	constexpr uint32 MAX_NUM_WINDOW = 10;
 
 	struct State
@@ -77,8 +140,9 @@ namespace im
 			left(false), leftPressed(false), leftReleased(false),
 			mx(-1), my(-1), scroll(0),
 			active(0), hot(0), hotToBe(0), isHot(false), isActive(false), wentActive(false),
-			dragX(0), dragY(0), dragOrig(0), widgetX(0), widgetY(0), widgetW(100),
-			insideCurrentScroll(false), areaId(0), widgetId(0), charInput(0), keyboardFocusID(0)
+			dragX(0), dragY(0), dragOrig(0), 
+			insideCurrentScroll(false), vkCode(0), keyboardFocusID(0),
+			globalWidgetID(0), currentWindowID(0)
 		{
 		}
 
@@ -105,14 +169,15 @@ namespace im
 
 		uint32 keyboardFocusID;
 
-		uint8 charInput;
+		uint8 vkCode;
+		bool32 shiftDown;
 	};
 
 	bool imMessageProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 	constexpr uint32 GFXCOMMAND_QUEUE_SIZE = 5000;
 
-	class GuiRenderer
+	class GuiRenderer : public SingletonBase<GuiRenderer>
 	{
 	public :
 	
@@ -132,7 +197,6 @@ namespace im
 
 		ID3DXFont *GetFont() { return _fonts[0]; }
 
-
 	private :
 		void DrawRect(int32 x0, int32 y0, int32 x1, int32 y1, D3DCOLOR color);
 		void DrawLine(int32 x0, int32 y0, int32 x1, int32 y1, D3DCOLOR color);
@@ -149,6 +213,7 @@ namespace im
 		D3DXMATRIXA16 _view;
 		LPD3DXFONT _fonts[3];
 	};
+
 
 	struct UIVertex
 	{
@@ -206,7 +271,7 @@ namespace im
 		GuiRenderer::gState.middleReleased = false;
 
 		GuiRenderer::gState.scroll = 0;
-		GuiRenderer::gState.charInput = 0;
+		GuiRenderer::gState.vkCode = 0;
 	}
 
 	inline void ClearActive()
@@ -229,18 +294,16 @@ namespace im
 
 
 	static bool ButtonLogic(uint32 id, bool over);
+	static bool FrameLogic(uint32 windowID, bool over);
 	static bool KeyLogic(uint32 id);
 
-	static void UpdateInput(Mouse &refMouse, uint8 inputChar);
+	static void UpdateInput(Mouse &refMouse, uint8 vkCode, bool32 shiftDown);
 
-	void BeginFrame(Mouse &refMouse, uint8 inputChar);
+	void BeginFrame(Mouse &refMouse, uint8 inputChar, bool32 shiftDown);
 	void EndFrame();
 
 
-	bool BeginWindow(const char* name, int32 x, int32 y, int32 w, int32 h, int32* scroll);
-	void EndWindow();
-	
-	bool BeginScrollArea(const char* name, int32 x, int32 y, int32 w, int32 h, int32* scroll);
+	bool BeginScrollArea(const char* name, WindowPos &pos, int32 w, int32 h, int32* scroll);
 	void EndScrollArea();
 
 	void Indent();
@@ -250,12 +313,11 @@ namespace im
 
 	bool Scissor(int32 x, int32 y, int32 width, int32 height, bool flag);
 
-	bool Button(const char* text, int32 width = 0, bool enabled = true);
-	bool Item(const char* text, int32 width = 0, bool enabled = true);
-	bool Check(const char* text, bool checked, int32 width = 0, bool enabled = true);
-	bool Collapse(const char* text, const char* subtext, bool checked, int32 width = 0, bool enabled = true);
+	bool Button(const char* text, int32 width = 0, int32 xPos = 0, bool enabled = true);
+	//bool Item(const char* text, int32 width = 0, bool enabled = true);
+	bool Check(const char* text, bool checked, int32 width = 0, int32 xPos = 0, bool enabled = true);
+	bool Collapse(const char* text, bool checked, int32 width = 0, int32 xPos = 0, bool enabled = true);
 	void Label(const char* text);
-	void Value(const char* text);
 	bool Slider(const char* text, float* val, float vMin, float vMax, float vInc, 
 		int32 width = 0, bool enabled = true);
 	bool Edit(char *text, int32 width = 0, bool enabled = true);

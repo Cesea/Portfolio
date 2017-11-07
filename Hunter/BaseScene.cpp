@@ -194,6 +194,12 @@ bool32 BaseScene::Init()
 
 	gpDevice->CreateVertexDeclaration(elements, &_pDecl);
 
+	_firstWindowPos.x = 100;
+	_firstWindowPos.y = 100;
+
+	_secondWindowPos.x = 200;
+	_secondWindowPos.y = 200;
+
 	_active = true;
 	return result;
 }
@@ -208,40 +214,92 @@ bool32 BaseScene::Update(float deltaTime)
 	return result;
 }
 
+
 bool32 BaseScene::Render()
 {
 	bool32 result = true;
 
+	im::BeginFrame(gEngine->GetInput()->mouse, 
+		gEngine->GetInput()->keyboard.GetCharInput(), 
+		gEngine->GetInput()->keyboard.GetShiftDown());
 
-	im::BeginFrame(gEngine->GetInput()->mouse, gEngine->GetInput()->keyboard.GetCharInput());
+	//im::Scissor(0, 0,300, 300, true);
 
-	im::Scissor(0, 0,300, 300, true);
+	im::BeginScrollArea("Editor", _firstWindowPos, 400, 600, &_scroll);
 
-	im::BeginScrollArea("Editor", 100, 100, 400, 600, &_scroll);
+	im::Button("X");
+	im::Button("Y");
+	im::Button("Z");
 
-	if (im::Button("Hi", 100, true))
-	{
-		EventChannel channel;
-		channel.Broadcast(SceneSystem::SceneChangeEvent("TestScene"));
-	}
-	im::Item("HIIII", 100, true);
-	if (im::Check("TODO", _itemCheck))
-	{
-		_itemCheck = !_itemCheck;
-	}
-	im::Value("holo");
-	if (im::Collapse("TODO", "meto", _collapse))
+	if (im::Collapse("col", _collapse))
 	{
 		_collapse = !_collapse;
 	}
-	im::Slider("slider", &_sliderValue, -20, 20, 0.1, 200);
+	if (!_collapse)
+	{
+		im::Indent();
+
+		im::Button("yaya");
+		im::Button("tototo");
+
+		im::Unindent();
+	}
+	
+	im::Slider("Slider", &_sliderValue, -10, 10, 0.1);
+
+	static int test = 0;
+	if (test % 20 == 0)
+	{
+		std::cout << _sliderValue << std::endl;
+	}
+	test++;
+
+	if (im::Check("toto", _checked))
+	{
+		_checked = !_checked;
+	}
 
 	im::EndScrollArea();
 
-	im::Edit(_strings1, 100);
-	im::Edit(_strings2, 100);
 
-	im::Button("After", 100);
+	im::BeginScrollArea("Editor", _secondWindowPos, 400, 600, &_scroll);
+
+	im::Button("X");
+	im::Button("Y");
+	im::Button("Z");
+
+	if (im::Collapse("col", _collapse))
+	{
+		_collapse = !_collapse;
+	}
+	if (!_collapse)
+	{
+		im::Indent();
+
+		im::Button("yaya");
+		im::Button("tototo");
+
+		im::Unindent();
+	}
+
+	im::Slider("Slider", &_sliderValue, -10, 10, 0.1);
+
+
+	if (im::Check("toto", _checked))
+	{
+		_checked = !_checked;
+	}
+
+	if (im::Edit(_strings1))
+	{
+		std::cout << _strings1 << std::endl;
+	}
+	if (im::Edit(_strings2))
+	{
+		std::cout << _strings2 << std::endl;
+	}
+
+	im::EndScrollArea();
 
 	im::EndFrame();
 

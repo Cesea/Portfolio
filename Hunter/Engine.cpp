@@ -172,7 +172,7 @@ bool Engine::InitializePlatform(HINSTANCE instanceHandle)
 
 bool Engine::InitializeSystems()
 {
-	_pVideo = std::make_shared<VideoSystem>(VideoSystem());
+	_pVideo = std::make_shared<VideoDevice>(VideoDevice());
 
 	if (!_pVideo->Init("VideoSystem", SystemSetting()))
 	{

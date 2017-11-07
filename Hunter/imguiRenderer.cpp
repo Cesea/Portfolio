@@ -3,9 +3,53 @@
 
 using namespace im;
 
+
 GfxCommand GuiRenderer::gfxCommandQueue[GFXCOMMAND_QUEUE_SIZE];
 unsigned GuiRenderer::gfxCommandQueueSize;
 State GuiRenderer::gState;
+
+int32 Window::CAPTION_HEIGHT = 28;
+int32 Window::CAPTION_TEXT_OFFSET = 4;
+int32 Window::BUTTON_GAP = 4;
+int32 Window::BUTTON_SIZE = Window::CAPTION_HEIGHT - 2 * Window::BUTTON_GAP;
+int32 Window::MINIMIZE_BUTTON_RIGHT_OFFSET = (Window::BUTTON_GAP + Window::BUTTON_SIZE) * 2;
+int32 Window::CLOSE_BUTTON_RIGHT_OFFSET = Window::BUTTON_GAP + Window::BUTTON_SIZE;
+int32 Window::WIDGET_YOFFSET_VALUE = 4;
+int32 Window::WIDGET_XOFFSET_VALUE = 8;
+int32 Window::WIDGET_INDENT_VALUE = 36;
+int32 Window::SPACING_VALUE = 6;
+int32 Window::AREA_HEADER = 24;
+
+int32 Button::BUTTON_WIDTH = 60;
+int32 Button::BUTTON_HEIGHT = 20;
+
+int32 Font::FONT_HEIGHT = 10;
+
+int32 Check::CHECK_SIZE = 8;
+
+int32 Slider::SLIDER_WIDTH = 100;
+int32 Slider::SLIDER_HEIGHT = 20;
+int32 Slider::MARKER_WIDTH = 10;
+
+int32 Edit::EDIT_WIDTH = 200;
+int32 Edit::EDIT_MAX_CHAR = 64;
+int32 Edit::MARKET_WIDTH = 5;
+
+const D3DCOLOR Window::DEFAULT_COLOR[4] =
+{
+	D3DCOLOR_ARGB(180, 120, 120, 120),
+	D3DCOLOR_ARGB(200, 150, 150, 150),
+	D3DCOLOR_ARGB(230, 180, 180, 180),
+	D3DCOLOR_ARGB(100, 100, 100, 100),
+};
+
+const D3DCOLOR Font::DEFAULT_FONT_COLOR[4] =
+{
+	D3DCOLOR_ARGB(230, 170, 170, 170),
+	D3DCOLOR_ARGB(230, 210, 210, 210),
+	D3DCOLOR_ARGB(230, 255, 255, 255),
+	D3DCOLOR_ARGB(140, 100, 100, 100),
+};
 
 im::GuiRenderer::GuiRenderer()
 {
@@ -101,7 +145,7 @@ void im::GuiRenderer::Draw()
 		_pStateBlock->Capture();
 	}
 
-	_pDevice->SetRenderState(D3DRS_ZENABLE, D3DZB_FALSE);
+	//_pDevice->SetRenderState(D3DRS_ZENABLE, D3DZB_FALSE);
 	_pDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
 	_pDevice->SetRenderState(D3DRS_ALPHATESTENABLE, FALSE);
 	_pDevice->SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE);
@@ -382,19 +426,30 @@ bool im::ButtonLogic(uint32 id, bool over)
 	{
 		GuiRenderer::gState.isActive = true;
 		if (over)
+		{
 			SetHot(id);
+		}
 		if (GuiRenderer::gState.leftReleased)
 		{
 			if (IsHot(id))
+			{
 				res = true;
+			}
 			ClearActive();
 		}
 	}
 
 	if (IsHot(id))
+	{
 		GuiRenderer::gState.isHot = true;
+	}
 
 	return res;
+}
+
+bool im::FrameLogic(uint32 windowID, bool over)
+{
+	return false;
 }
 
 bool im::KeyLogic(uint32 id)
@@ -404,7 +459,7 @@ bool im::KeyLogic(uint32 id)
 	return result;
 }
 
-void im::UpdateInput(Mouse &refMouse, uint8 inputChar)
+void im::UpdateInput(Mouse &refMouse, uint8 vkCode, bool32 shiftDown)
 {
 	//TODO : DEBUG
 
@@ -426,13 +481,13 @@ void im::UpdateInput(Mouse &refMouse, uint8 inputChar)
 
 	GuiRenderer::gState.scroll = refMouse.GetWheelDelta();
 
-	GuiRenderer::gState.charInput = inputChar;
-
+	GuiRenderer::gState.vkCode = vkCode;
+	GuiRenderer::gState.shiftDown = shiftDown;
 }
 
-void im::BeginFrame(Mouse &refMouse, uint8 inputChar)
+void im::BeginFrame(Mouse &refMouse, uint8 inputChar, bool32 shiftDown)
 {
-	UpdateInput(refMouse, inputChar);
+	UpdateInput(refMouse, inputChar, shiftDown);
 
 	GuiRenderer::gState.hot = GuiRenderer::gState.hotToBe;
 	GuiRenderer::gState.hotToBe = 0;
@@ -447,6 +502,7 @@ void im::BeginFrame(Mouse &refMouse, uint8 inputChar)
 		GuiRenderer::gState.windows[i].widgetX = 0;
 		GuiRenderer::gState.windows[i].widgetY = 0;
 		GuiRenderer::gState.windows[i].internalWidgetID = 0;
+		GuiRenderer::gState.windows[i].wentDrag = false;
 	}
 
 	GuiRenderer::gState.globalWidgetID = 0;
@@ -459,20 +515,6 @@ void im::EndFrame()
 	ClearInput();
 }
 
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-static const int32 BUTTON_HEIGHT = 20;
-static const int32 SLIDER_HEIGHT = 20;
-static const int32 SLIDER_MARKER_WIDTH = 10;
-static const int32 CHECK_SIZE = 8;
-static const int32 DEFAULT_SPACING = 4;
-static const int32 TEXT_HEIGHT = 8;
-static const int32 SCROLL_AREA_PADDING = 6;
-static const int32 INDENT_SIZE = 16;
-static const int32 AREA_HEADER = 28;
-
-static const int32 DEFAULT_BUTTON_WIDTH = 60;
-static const int32 DEFAULT_SLIDER_WIDTH = 120;
 
 constexpr int32 NORMAL_COLOR = 0;
 constexpr int32 HOVER_COLOR = 1;
@@ -495,89 +537,32 @@ static const D3DCOLOR DEFAULT_BUTTON_COLOR[4] =
 	D3DCOLOR_ARGB(100, 100, 100, 100),
 };
 
-static const D3DCOLOR DEFAULT_FONT_COLOR[4] = 
+
+
+//static int32 gScrollTop = 0;
+//static int32 gScrollBottom = 0;
+//static int32 gScrollRight = 0;
+//static int32 gScrollAreaTop = 0;
+//static int32* gScrollVal = 0;
+//static int32 gFocusTop = 0;
+//static int32 gFocusBottom = 0;
+//static uint32 gScrollId = 0;
+//static bool gInsideScrollArea = false;
+
+static Window &GetCurrentWindowRef()
 {
-	D3DCOLOR_ARGB(230, 170, 170, 170),
-	D3DCOLOR_ARGB(230, 210, 210, 210),
-	D3DCOLOR_ARGB(230, 255, 255, 255),
-	D3DCOLOR_ARGB(140, 100, 100, 100),
-};
+	Window &result = GuiRenderer::gState.windows[GuiRenderer::gState.currentWindowID];
+	return result;
+}
 
-static int32 gScrollTop = 0;
-static int32 gScrollBottom = 0;
-static int32 gScrollRight = 0;
-static int32 gScrollAreaTop = 0;
-static int32* gScrollVal = 0;
-static int32 gFocusTop = 0;
-static int32 gFocusBottom = 0;
-static uint32 gScrollId = 0;
-static bool gInsideScrollArea = false;
-
-
-//bool im::BeginWindow(const char * name, int32 x, int32 y, int32 w, int32 h, int32 * scroll)
-//{
-//	GuiRenderer::gState.areaId++;
-//	GuiRenderer::gState.widgetId = 0;
-//	gScrollId = (GuiRenderer::gState.areaId << 16) | GuiRenderer::gState.widgetId;
-//
-//	GuiRenderer::gState.widgetX = x + SCROLL_AREA_PADDING;
-//	//GuiRenderer::gState.widgetY = y + h + (*scroll) + DEFAULT_SPACING;
-//	GuiRenderer::gState.widgetY = y + BUTTON_HEIGHT + DEFAULT_SPACING;
-//	GuiRenderer::gState.widgetW = w - SCROLL_AREA_PADDING * 4;
-//	gScrollTop = y + BUTTON_HEIGHT + DEFAULT_SPACING;
-//	gScrollBottom = gScrollTop + h - BUTTON_HEIGHT - DEFAULT_SPACING;
-//	gScrollRight = x + w - SCROLL_AREA_PADDING * 3;
-//	gScrollVal = scroll;
-//
-//	gScrollAreaTop = GuiRenderer::gState.widgetY;
-//
-//	gFocusTop = y - AREA_HEADER;
-//	gFocusBottom = y - AREA_HEADER + h;
-//
-//	gInsideScrollArea = InRect(x, y, w, h, false);
-//	GuiRenderer::gState.insideCurrentScroll = gInsideScrollArea;
-//
-//	AddGfxCommandRect((float)x, (float)y, (float)w, (float)h, DEFAULT_SCROLL_COLOR[NORMAL_COLOR]);
-//
-//	AddGfxCommandRect((float)x, (float)y, (float)w, (float)BUTTON_HEIGHT, DEFAULT_SCROLL_COLOR[HOVER_COLOR]);
-//
-//	AddGfxCommandText(x + AREA_HEADER / 2, y + TEXT_HEIGHT / 2, ALIGN_LEFT, 
-//		name, DEFAULT_FONT_COLOR[HOT_COLOR]);
-//
-//	//AddGfxCmdStencil(x + SCROLL_AREA_PADDING, y + SCROLL_AREA_PADDING, w - SCROLL_AREA_PADDING * 4, h - AREA_HEADER - SCROLL_AREA_PADDING);
-//
-//	return gInsideScrollArea;
-//}
-//
-//void im::EndWindow()
-//{
-//	int x = gScrollRight + SCROLL_AREA_PADDING / 2;
-//	int y = gScrollTop;
-//	int w = SCROLL_AREA_PADDING * 2;
-//	int h = gScrollBottom - gScrollTop;
-//
-//	int sTop = gScrollAreaTop;
-//	GuiRenderer::gState.widgetY = gScrollBottom + DEFAULT_SPACING * 2;
-//	int sBottom = GuiRenderer::gState.widgetY;
-//	int sh = sTop - sBottom; // The scrollable area height.
-//}
-
-bool im::BeginScrollArea(const char * name, int32 x, int32 y, int32 w, int32 h, int32 * scroll)
+bool im::BeginScrollArea(const char * name, WindowPos &pos,  int32 w, int32 h, int32 * scroll)
 {
-	//GuiRenderer::gState.widgetId = 0;
-	//gScrollId = (GuiRenderer::gState.areaId << 16) | GuiRenderer::gState.widgetId;
+	Window &refWindow = GetCurrentWindowRef();
 
-	Window &refWindow = GuiRenderer::gState.windows[GuiRenderer::gState.currentWindowID++];
-
-	refWindow.x = x;
-	refWindow.y = y;
+	refWindow.x = pos.x;
+	refWindow.y = pos.y;
 	refWindow.width = w;
 	refWindow.height = h;
-
-	//GuiRenderer::gState.widgetX = x + SCROLL_AREA_PADDING;
-	////GuiRenderer::gState.widgetY = y + h + (*scroll) + DEFAULT_SPACING;
-	//GuiRenderer::gState.widgetY = y + BUTTON_HEIGHT + DEFAULT_SPACING;
-	//GuiRenderer::gState.widgetW = w - SCROLL_AREA_PADDING * 4;
 
 	//gScrollTop = y + BUTTON_HEIGHT + DEFAULT_SPACING;
 	//gScrollBottom = gScrollTop + h - BUTTON_HEIGHT - DEFAULT_SPACING;
@@ -589,19 +574,80 @@ bool im::BeginScrollArea(const char * name, int32 x, int32 y, int32 w, int32 h, 
 	//gFocusTop = y - AREA_HEADER;
 	//gFocusBottom = y - AREA_HEADER + h;
 
-	gInsideScrollArea = InRect(x, y, w, h, false);
-	GuiRenderer::gState.insideCurrentScroll = gInsideScrollArea;
+	//gInsideScrollArea = InRect(x, y, w, h, false);
+	//GuiRenderer::gState.insideCurrentScroll = gInsideScrollArea;
+	refWindow.mouseInside = InRect(refWindow.x, refWindow.y, refWindow.width, refWindow.height, false);
 
-	AddGfxCommandRect((float)x, (float)y, (float)w, (float)h, DEFAULT_SCROLL_COLOR[NORMAL_COLOR]);
+	//배경 그리기
+	AddGfxCommandRect((float)refWindow.x, (float)refWindow.y, (float)w, (float)h, 
+		DEFAULT_SCROLL_COLOR[NORMAL_COLOR]);
 
-	AddGfxCommandRect((float)x, (float)y, (float)w, (float)BUTTON_HEIGHT, DEFAULT_SCROLL_COLOR[HOVER_COLOR]);
+	//캡션 그리기
+	AddGfxCommandRect((float)refWindow.x, (float)refWindow.y, (float)w, (float)Window::CAPTION_HEIGHT,
+		DEFAULT_SCROLL_COLOR[HOVER_COLOR]);
 
-	AddGfxCommandText(x + AREA_HEADER / 2, y + TEXT_HEIGHT / 2, ALIGN_LEFT, 
-		name, DEFAULT_FONT_COLOR[HOT_COLOR]);
+	refWindow.canDrag = InRect(refWindow.x, refWindow.y, w, Window::CAPTION_HEIGHT, false);
 
-	//AddGfxCmdStencil(x + SCROLL_AREA_PADDING, y + SCROLL_AREA_PADDING, w - SCROLL_AREA_PADDING * 4, h - AREA_HEADER - SCROLL_AREA_PADDING);
+	AddGfxCommandText(refWindow.x + (Window::AREA_HEADER / 2), refWindow.y + (Font::FONT_HEIGHT), ALIGN_LEFT, 
+		name, Font::DEFAULT_FONT_COLOR[HOT_COLOR]);
 
-	return gInsideScrollArea;
+	AddGfxCommandScissor(refWindow.x, refWindow.y + Window::CAPTION_HEIGHT, w, h - Window::CAPTION_HEIGHT, true);
+
+	refWindow.widgetX += Window::SPACING_VALUE * 2;
+	refWindow.widgetY += Window::CAPTION_HEIGHT + Window::SPACING_VALUE;
+
+	//if (GuiRenderer::gState.wentActive)
+	//{
+	//	GuiRenderer::gState.dragX = GuiRenderer::gState.mx;
+	//	GuiRenderer::gState.dragOrig = normalizedValue;
+	//}
+	//if (GuiRenderer::gState.dragX != GuiRenderer::gState.mx)
+	//{
+	//	normalizedValue = GuiRenderer::gState.dragOrig +
+	//		(float)(GuiRenderer::gState.mx - GuiRenderer::gState.dragX) / (float)range;
+	//	if (normalizedValue < 0) normalizedValue = 0;
+	//	if (normalizedValue > 1) normalizedValue = 1;
+	//	*val = vmin + normalizedValue * (vmax - vmin);
+	//	*val = floorf(*val / vinc + 0.5f) * vinc; // Snap to vinc
+	//	m = (int32)(normalizedValue * range);
+	//	valChanged = true;
+	//}
+	if(refWindow.canDrag && GuiRenderer::gState.leftPressed)
+	{
+		refWindow.wentDrag = true;
+	}
+
+	if (refWindow.wentDrag)
+	{
+		refWindow.prevDragX = GuiRenderer::gState.mx;
+		refWindow.prevDragY = GuiRenderer::gState.my;
+	}
+
+	if (refWindow.prevDragX != -1 || refWindow.prevDragY != -1)
+	{
+		int32 xDiff = refWindow.prevDragX - GuiRenderer::gState.mx;
+		int32 yDiff = refWindow.prevDragY - GuiRenderer::gState.my;
+		refWindow.x -= xDiff;
+		refWindow.y -= yDiff;
+
+		//refWindow.x -= refWindow.x - GuiRenderer::gState.mx;
+		//refWindow.y -= refWindow.y - GuiRenderer::gState.my;
+
+		refWindow.prevDragX = GuiRenderer::gState.mx;
+		refWindow.prevDragY = GuiRenderer::gState.my;
+
+		if (GuiRenderer::gState.leftReleased)
+		{
+			refWindow.prevDragX = -1;
+			refWindow.prevDragY = -1;
+		}
+
+		pos.x = refWindow.x;
+		pos.y = refWindow.y;
+	}
+
+
+	return refWindow.mouseInside;
 }
 
 void im::EndScrollArea()
@@ -610,15 +656,15 @@ void im::EndScrollArea()
 	//AddGfxCmdStencil(-1, -1, -1, -1);
 
 	// Draw scroll bar
-	int x = gScrollRight + SCROLL_AREA_PADDING / 2;
-	int y = gScrollTop;
-	int w = SCROLL_AREA_PADDING * 2;
-	int h = gScrollBottom - gScrollTop;
+	//int x = gScrollRight + SCROLL_AREA_PADDING / 2;
+	//int y = gScrollTop;
+	//int w = SCROLL_AREA_PADDING * 2;
+	//int h = gScrollBottom - gScrollTop;
 
-	int sTop = gScrollAreaTop;
-	GuiRenderer::gState.widgetY = gScrollBottom + DEFAULT_SPACING * 2;
-	int sBottom = GuiRenderer::gState.widgetY;
-	int sh = sTop - sBottom; // The scrollable area height.
+	//int sTop = gScrollAreaTop;
+	//GuiRenderer::gState.widgetY = gScrollBottom + DEFAULT_SPACING * 2;
+	//int sBottom = GuiRenderer::gState.widgetY;
+	//int sh = sTop - sBottom; // The scrollable area height.
 
 
 	//float barHeight = (float)h / (float)sh;
@@ -680,34 +726,42 @@ void im::EndScrollArea()
 	//	}
 	//}
 	GuiRenderer::gState.insideCurrentScroll = false;
+
+	AddGfxCommandScissor(0, 0, 0, 0, false);
+	GuiRenderer::gState.currentWindowID++;
 }
 
 void im::Indent()
 {
-	GuiRenderer::gState.widgetX += INDENT_SIZE;
-	GuiRenderer::gState.widgetW -= INDENT_SIZE;
+	Window &refWindow = GetCurrentWindowRef();
+	refWindow.widgetX += Window::WIDGET_INDENT_VALUE;
 }
 
 void im::Unindent()
 {
-	GuiRenderer::gState.widgetX -= INDENT_SIZE;
-	GuiRenderer::gState.widgetW += INDENT_SIZE;
+	Window &refWindow = GetCurrentWindowRef();
+	refWindow.widgetX -= Window::WIDGET_INDENT_VALUE;
 }
 
 void im::imguiSeparator()
 {
-	GuiRenderer::gState.widgetY -= DEFAULT_SPACING * 3;
+	Window &refWindow = GetCurrentWindowRef();
+	refWindow.widgetY += Window::SPACING_VALUE * 3;
 }
 
 void im::SeparatorLine()
 {
-	int x = GuiRenderer::gState.widgetX;
-	int y = GuiRenderer::gState.widgetY - DEFAULT_SPACING * 2;
-	int w = GuiRenderer::gState.widgetW;
-	int h = 1;
-	GuiRenderer::gState.widgetY -= DEFAULT_SPACING * 4;
+	Window &refWindow = GetCurrentWindowRef();
+	refWindow.widgetY += Window::SPACING_VALUE * 3;
 
-	AddGfxCommandRect((float)x, (float)y, (float)w, (float)h, D3DCOLOR_ARGB(255, 255, 255, 32));
+	int x = refWindow.widgetX;
+	int y = refWindow.widgetY + Window::SPACING_VALUE * 2;
+	int w = refWindow.width;
+	int h = Window::SPACING_VALUE;
+
+	refWindow.widgetY += Window::SPACING_VALUE * 4;
+
+	AddGfxCommandRect((float)x, (float)y, (float)w, (float)h, D3DCOLOR_ARGB(180, 255, 255, 255));
 }
 
 bool im::Scissor(int32 x, int32 y, int32 width, int32 height, bool flag)
@@ -716,16 +770,17 @@ bool im::Scissor(int32 x, int32 y, int32 width, int32 height, bool flag)
 	return true;
 }
 
-bool im::Button(const char * text, int32 width, bool enabled)
+bool im::Button(const char * text, int32 width, int32 xPos, bool enabled)
 {
-	GuiRenderer::gState.widgetId++;
-	uint32 id = (GuiRenderer::gState.areaId << 16) | GuiRenderer::gState.widgetId;
+	Window &refWindow = GetCurrentWindowRef();
+	refWindow.internalWidgetID++;
+	uint32 id = ++GuiRenderer::gState.globalWidgetID;
 
-	int32 x = GuiRenderer::gState.widgetX;
-	int32 y = GuiRenderer::gState.widgetY/* - BUTTON_HEIGHT*/;
-	int32 w = (width == 0) ? DEFAULT_BUTTON_WIDTH : width;
-	int32 h = BUTTON_HEIGHT;
-	GuiRenderer::gState.widgetY += BUTTON_HEIGHT + DEFAULT_SPACING;
+	int32 x = (xPos) ? (xPos) : (refWindow.widgetX + refWindow.x);
+	int32 y = refWindow.widgetY + refWindow.y;
+	int32 w = (width == 0) ? Button::BUTTON_WIDTH : width;
+	int32 h = Button::BUTTON_HEIGHT;
+	refWindow.widgetY += Button::BUTTON_HEIGHT + Window::SPACING_VALUE;
 
 	bool over = enabled && InRect(x, y, w, h);
 
@@ -736,69 +791,37 @@ bool im::Button(const char * text, int32 width, bool enabled)
 
 	if (enabled)
 	{
-		AddGfxCommandText(x + BUTTON_HEIGHT / 2, y + BUTTON_HEIGHT / 2 - TEXT_HEIGHT / 2,
-			ALIGN_LEFT, text, IsHot(id) ? DEFAULT_FONT_COLOR[HOT_COLOR] : DEFAULT_FONT_COLOR[NORMAL_COLOR]);
+		AddGfxCommandText(x + Button::BUTTON_HEIGHT / 2, y + Button::BUTTON_HEIGHT / 2 - Font::FONT_HEIGHT / 2,
+			ALIGN_LEFT, text, 
+			IsHot(id) ? Font::DEFAULT_FONT_COLOR[HOT_COLOR] : Font::DEFAULT_FONT_COLOR[NORMAL_COLOR]);
 	}
 	else
 	{
-		AddGfxCommandText(x + BUTTON_HEIGHT / 2, y + BUTTON_HEIGHT / 2 - TEXT_HEIGHT / 2,
-			ALIGN_LEFT, text, DEFAULT_FONT_COLOR[DISABLE_COLOR]);
+		AddGfxCommandText(x + Button::BUTTON_HEIGHT / 2, y + Button::BUTTON_HEIGHT / 2 - Font::FONT_HEIGHT / 2,
+			ALIGN_LEFT, text, Font::DEFAULT_FONT_COLOR[DISABLE_COLOR]);
 	}
 
 	return res;
 }
 
-bool im::Item(const char * text, int32 width, bool enabled)
+bool im::Check(const char * text, bool checked, int32 width, int32 xPos,  bool enabled)
 {
-	GuiRenderer::gState.widgetId++;
-	unsigned int id = (GuiRenderer::gState.areaId << 16) | GuiRenderer::gState.widgetId;
+	Window &refWindow = GetCurrentWindowRef();
+	refWindow.internalWidgetID++;
+	uint32 id = ++GuiRenderer::gState.globalWidgetID;
 
-	int32 x = GuiRenderer::gState.widgetX;
-	int32 y = GuiRenderer::gState.widgetY;
-	int32 w = (width == 0) ? DEFAULT_BUTTON_WIDTH : width;
-	int32 h = BUTTON_HEIGHT;
-	GuiRenderer::gState.widgetY += BUTTON_HEIGHT + DEFAULT_SPACING;
+	int32 x = (xPos) ? (xPos) : (refWindow.widgetX + refWindow.x);
+	int32 y = refWindow.widgetY + refWindow.y;
+	int32 w = (width == 0) ? Button::BUTTON_WIDTH : width;
+	int32 h = Button::BUTTON_HEIGHT;
+	refWindow.widgetY += Button::BUTTON_HEIGHT + Window::SPACING_VALUE;
 
 	bool over = enabled && InRect(x, y, w, h);
 	bool res = ButtonLogic(id, over);
 
-	if (IsHot(id))
-	{
-		AddGfxCommandRect((float)x, (float)y, (float)w, (float)h,
-			IsActive(id) ? DEFAULT_BUTTON_COLOR[HOT_COLOR] : DEFAULT_BUTTON_COLOR[NORMAL_COLOR]);
-	}
-
-	if (enabled)
-	{
-		AddGfxCommandText(x + BUTTON_HEIGHT / 2, y + BUTTON_HEIGHT / 2 - TEXT_HEIGHT / 2,
-			ALIGN_LEFT, text, IsHot(id) ? DEFAULT_FONT_COLOR[HOT_COLOR] : DEFAULT_FONT_COLOR[NORMAL_COLOR]);
-	}
-	else
-	{
-		AddGfxCommandText(x + BUTTON_HEIGHT / 2, y + BUTTON_HEIGHT / 2 - TEXT_HEIGHT / 2,
-			ALIGN_LEFT, text, DEFAULT_FONT_COLOR[DISABLE_COLOR]);
-	}
-	
-	return res;
-}
-
-bool im::Check(const char * text, bool checked, int32 width, bool enabled)
-{
-	GuiRenderer::gState.widgetId++;
-	unsigned int id = (GuiRenderer::gState.areaId << 16) | GuiRenderer::gState.widgetId;
-
-	int x = GuiRenderer::gState.widgetX;
-	int y = GuiRenderer::gState.widgetY;
-	int w = (width == 0) ? DEFAULT_BUTTON_WIDTH : width;
-	int h = BUTTON_HEIGHT;
-	GuiRenderer::gState.widgetY += BUTTON_HEIGHT + DEFAULT_SPACING;
-
-	bool over = enabled && InRect(x, y, w, h);
-	bool res = ButtonLogic(id, over);
-
-	const int cx = x + BUTTON_HEIGHT / 2 - CHECK_SIZE / 2;
-	const int cy = y + BUTTON_HEIGHT / 2 - CHECK_SIZE / 2;
-	AddGfxCommandRect((float)cx - 3, (float)cy - 3, (float)CHECK_SIZE + 6, (float)CHECK_SIZE + 6,
+	const int cx = x + (Button::BUTTON_HEIGHT / 2) - (Check::CHECK_SIZE / 2);
+	const int cy = y + (Button::BUTTON_HEIGHT / 2) - (Check::CHECK_SIZE / 2);
+	AddGfxCommandRect((float)cx - 2, (float)cy - 2, (float)Check::CHECK_SIZE + 4, (float)Check::CHECK_SIZE + 4,
 		IsActive(id) ? DEFAULT_BUTTON_COLOR[HOT_COLOR] : DEFAULT_BUTTON_COLOR[NORMAL_COLOR]);
 
 	//checkbox color
@@ -806,119 +829,123 @@ bool im::Check(const char * text, bool checked, int32 width, bool enabled)
 	{
 		if (enabled)
 		{
-			AddGfxCommandRect((float)cx, (float)cy, (float)CHECK_SIZE, (float)CHECK_SIZE,
+			AddGfxCommandRect((float)cx, (float)cy, (float)Check::CHECK_SIZE, (float)Check::CHECK_SIZE,
 				D3DCOLOR_ARGB(255, 255, 255, IsActive(id) ? 255 : 200));
 		}
 		else
 		{
-			AddGfxCommandRect((float)cx, (float)cy, (float)CHECK_SIZE, (float)CHECK_SIZE,
+			AddGfxCommandRect((float)cx, (float)cy, (float)Check::CHECK_SIZE, (float)Check::CHECK_SIZE,
 				D3DCOLOR_ARGB(128, 128, 128, 200));
 		}
 	}
 
 	if (enabled)
 	{
-		AddGfxCommandText(x + BUTTON_HEIGHT, y + BUTTON_HEIGHT / 2 - TEXT_HEIGHT / 2,
-			ALIGN_LEFT, text, IsHot(id) ? DEFAULT_FONT_COLOR[HOT_COLOR] : DEFAULT_FONT_COLOR[NORMAL_COLOR]);
+		AddGfxCommandText(x + Button::BUTTON_HEIGHT, y + (Button::BUTTON_HEIGHT / 2) - (Font::FONT_HEIGHT / 2),
+			ALIGN_LEFT, text, 
+			IsHot(id) ? Font::DEFAULT_FONT_COLOR[HOT_COLOR] : Font::DEFAULT_FONT_COLOR[NORMAL_COLOR]);
 	}
 	else
 	{
-		AddGfxCommandText(x + BUTTON_HEIGHT, y + BUTTON_HEIGHT / 2 - TEXT_HEIGHT / 2,
-			ALIGN_LEFT, text, DEFAULT_FONT_COLOR[DISABLE_COLOR]);
+		AddGfxCommandText(x + Button::BUTTON_HEIGHT, y + (Button::BUTTON_HEIGHT / 2) - (Font::FONT_HEIGHT / 2),
+			ALIGN_LEFT, text, 
+			Font::DEFAULT_FONT_COLOR[DISABLE_COLOR]);
 	}
-
 	return res;
 }
 
-bool im::Collapse(const char * text, const char * subtext, bool checked, int32 width, bool enabled)
+bool im::Collapse(const char * text, bool checked, int32 width, int32 xPos, bool enabled)
 {
-	GuiRenderer::gState.widgetId++;
-	unsigned int id = (GuiRenderer::gState.areaId << 16) | GuiRenderer::gState.widgetId;
+	Window &refWindow = GetCurrentWindowRef();
+	refWindow.internalWidgetID++;
+	uint32 id = ++GuiRenderer::gState.globalWidgetID;
 
-	int x = GuiRenderer::gState.widgetX;
-	int y = GuiRenderer::gState.widgetY;
-	int w = (width == 0) ? DEFAULT_BUTTON_WIDTH : width;
-	int h = BUTTON_HEIGHT;
-	GuiRenderer::gState.widgetY += BUTTON_HEIGHT + DEFAULT_SPACING;
-
-	const int cx = x + BUTTON_HEIGHT / 2 - CHECK_SIZE / 2;
-	const int cy = y + BUTTON_HEIGHT / 2 - CHECK_SIZE / 2;
+	int32 x = (xPos) ? (xPos) : (refWindow.widgetX + refWindow.x);
+	int32 y = refWindow.widgetY + refWindow.y;
+	int32 w = (width == 0) ? Button::BUTTON_WIDTH : width;
+	int32 h = Button::BUTTON_HEIGHT;
+	refWindow.widgetY += Button::BUTTON_HEIGHT + Window::SPACING_VALUE;
 
 	bool over = enabled && InRect(x, y, w, h);
 	bool res = ButtonLogic(id, over);
 
-	//color for checkbox
+	const int cx = x + (Button::BUTTON_HEIGHT / 2) - (Check::CHECK_SIZE / 2);
+	const int cy = y + (Button::BUTTON_HEIGHT / 2) - (Check::CHECK_SIZE / 2);
+
+	////color for checkbox
 	if (checked)
 	{
-		AddGfxCommandTriangle(cx, cy, CHECK_SIZE, CHECK_SIZE, 2, 
+		AddGfxCommandTriangle(cx, cy, Check::CHECK_SIZE, Check::CHECK_SIZE, 2, 
 			D3DCOLOR_ARGB(255, 255, 255, IsActive(id) ? 255 : 200));
 	}
 	else
 	{
-		AddGfxCommandTriangle(cx, cy, CHECK_SIZE, CHECK_SIZE, 1, 
+		AddGfxCommandTriangle(cx, cy, Check::CHECK_SIZE, Check::CHECK_SIZE, 1, 
 			D3DCOLOR_ARGB(255, 255, 255, IsActive(id) ? 255 : 200));
 	}
 
 	if (enabled)
 	{
-		AddGfxCommandText(x + BUTTON_HEIGHT, y + BUTTON_HEIGHT / 2 - TEXT_HEIGHT / 2, ALIGN_LEFT,
-			text, IsHot(id) ? DEFAULT_FONT_COLOR[HOT_COLOR] : DEFAULT_FONT_COLOR[NORMAL_COLOR]);
+		AddGfxCommandText(x + Button::BUTTON_HEIGHT, y + (Button::BUTTON_HEIGHT / 2) - (Font::FONT_HEIGHT / 2),
+			ALIGN_LEFT, text,
+			IsHot(id) ? Font::DEFAULT_FONT_COLOR[HOT_COLOR] : Font::DEFAULT_FONT_COLOR[NORMAL_COLOR]);
 	}
 	else
 	{
-		AddGfxCommandText(x + BUTTON_HEIGHT, y + BUTTON_HEIGHT / 2 - TEXT_HEIGHT / 2, ALIGN_LEFT, 
-			text, DEFAULT_FONT_COLOR[DISABLE_COLOR]);
+		AddGfxCommandText(x + Button::BUTTON_HEIGHT, y + (Button::BUTTON_HEIGHT / 2) - (Font::FONT_HEIGHT / 2),
+			ALIGN_LEFT, text,
+			Font::DEFAULT_FONT_COLOR[DISABLE_COLOR]);
 	}
 
-	if (subtext)
-	{
-		AddGfxCommandText(x + w - BUTTON_HEIGHT / 2, y + BUTTON_HEIGHT / 2 - TEXT_HEIGHT / 2, ALIGN_RIGHT, 
-			subtext, DEFAULT_FONT_COLOR[NORMAL_COLOR]);
-	}
 	return res;
 }
 
 void im::Label(const char * text)
 {
-	int x = GuiRenderer::gState.widgetX;
-	int y = GuiRenderer::gState.widgetY;
-	GuiRenderer::gState.widgetY += BUTTON_HEIGHT;
-	AddGfxCommandText(x + DEFAULT_SPACING, y + BUTTON_HEIGHT / 2 - TEXT_HEIGHT / 2, ALIGN_LEFT, text, 
-		DEFAULT_FONT_COLOR[NORMAL_COLOR]);
-}
+	Window &refWindow = GetCurrentWindowRef();
+	refWindow.internalWidgetID++;
+	uint32 id = ++GuiRenderer::gState.globalWidgetID;
 
-void im::Value(const char * text)
-{
-	const int x = GuiRenderer::gState.widgetX;
-	const int y = GuiRenderer::gState.widgetY;
-	const int w = DEFAULT_BUTTON_WIDTH;
-	GuiRenderer::gState.widgetY += BUTTON_HEIGHT;
+	int32 x = refWindow.widgetX + refWindow.x;
+	int32 y = refWindow.widgetY + refWindow.y;
+	refWindow.widgetY += Button::BUTTON_HEIGHT + Window::SPACING_VALUE;
 
-	AddGfxCommandText(x + w - BUTTON_HEIGHT / 2, y + BUTTON_HEIGHT / 2 - TEXT_HEIGHT / 2,
-		ALIGN_LEFT, text, DEFAULT_FONT_COLOR[NORMAL_COLOR]);
+	AddGfxCommandText(x + Window::SPACING_VALUE, y + Button::BUTTON_HEIGHT / 2 - Font::FONT_HEIGHT / 2, 
+		ALIGN_LEFT, text, 
+		Font::DEFAULT_FONT_COLOR[NORMAL_COLOR]);
 }
 
 bool im::Slider(const char * text, float * val, float vmin, float vmax, float vinc, int32 width, bool enabled)
 {
-	GuiRenderer::gState.widgetId++;
-	unsigned int id = (GuiRenderer::gState.areaId << 16) | GuiRenderer::gState.widgetId;
+	Window &refWindow = GetCurrentWindowRef();
+	refWindow.internalWidgetID++;
+	uint32 id = ++GuiRenderer::gState.globalWidgetID;
 
-	int x = GuiRenderer::gState.widgetX;
-	int y = GuiRenderer::gState.widgetY;
-	int w = (width == 0) ? DEFAULT_SLIDER_WIDTH : width;
-	int h = SLIDER_HEIGHT;
-	GuiRenderer::gState.widgetY += SLIDER_HEIGHT + DEFAULT_SPACING;
+	int32 x = refWindow.widgetX + refWindow.x;
+	int32 y = refWindow.widgetY + refWindow.y;
+	int32 w = (width == 0) ? Slider::SLIDER_WIDTH : width;
+	int32 h = Slider::SLIDER_HEIGHT;
+	refWindow.widgetY += Slider::SLIDER_HEIGHT + Window::SPACING_VALUE;
+
+	//bool over = enabled && InRect(x, y, w, h);
+	//bool res = ButtonLogic(id, over);
 
 	AddGfxCommandRect((float)x, (float)y, (float)w, (float)h, DEFAULT_BUTTON_COLOR[NORMAL_COLOR]);
 
-	const int range = w - SLIDER_MARKER_WIDTH;
+	const int range = w - Slider::MARKER_WIDTH;
 
-	float u = (*val - vmin) / (vmax - vmin);
-	if (u < 0) u = 0;
-	if (u > 1) u = 1;
-	int m = (int)(u * range);
+	float normalizedValue = (*val - vmin) / (vmax - vmin);
+	if (normalizedValue < 0.0f)
+	{
+		normalizedValue = 0.0f;
+	}
+	if (normalizedValue > 1.0f)
+	{
+		normalizedValue = 1.0f;
+	}
+	int m = (int)(normalizedValue * range);
 
-	bool over = enabled && InRect(x + m, y, SLIDER_MARKER_WIDTH, SLIDER_HEIGHT);
+	bool over = enabled && InRect(x + m, y, Slider::MARKER_WIDTH, Slider::SLIDER_HEIGHT);
 	bool res = ButtonLogic(id, over);
 	bool valChanged = false;
 
@@ -927,51 +954,43 @@ bool im::Slider(const char * text, float * val, float vmin, float vmax, float vi
 		if (GuiRenderer::gState.wentActive)
 		{
 			GuiRenderer::gState.dragX = GuiRenderer::gState.mx;
-			GuiRenderer::gState.dragOrig = u;
+			GuiRenderer::gState.dragOrig = normalizedValue;
 		}
 		if (GuiRenderer::gState.dragX != GuiRenderer::gState.mx)
 		{
-			u = GuiRenderer::gState.dragOrig + (float)(GuiRenderer::gState.mx - GuiRenderer::gState.dragX) / (float)range;
-			if (u < 0) u = 0;
-			if (u > 1) u = 1;
-			*val = vmin + u*(vmax - vmin);
-			*val = floorf(*val / vinc + 0.5f)*vinc; // Snap to vinc
-			m = (int)(u * range);
+			normalizedValue = GuiRenderer::gState.dragOrig + 
+				(float)(GuiRenderer::gState.mx - GuiRenderer::gState.dragX) / (float)range;
+			if (normalizedValue < 0) normalizedValue = 0;
+			if (normalizedValue > 1) normalizedValue = 1;
+			*val = vmin + normalizedValue * (vmax - vmin);
+			*val = floorf(*val / vinc + 0.5f) * vinc; // Snap to vinc
+			m = (int32)(normalizedValue * range);
 			valChanged = true;
 		}
 	}
 
 	if (IsActive(id))
 	{
-		AddGfxCommandRect((float)(x + m), (float)y, (float)SLIDER_MARKER_WIDTH, (float)SLIDER_HEIGHT, 
+		AddGfxCommandRect((float)(x + m), (float)y, (float)Slider::MARKER_WIDTH, (float)Slider::SLIDER_HEIGHT, 
 			D3DCOLOR_ARGB(255, 255, 255, 255));
 	}
 	else
 	{
-		AddGfxCommandRect((float)(x + m), (float)y, (float)SLIDER_MARKER_WIDTH, (float)SLIDER_HEIGHT, 
+		AddGfxCommandRect((float)(x + m), (float)y, (float)Slider::MARKER_WIDTH, (float)Slider::SLIDER_HEIGHT, 
 			IsHot(id) ? D3DCOLOR_ARGB(210, 180, 180, 180) : D3DCOLOR_ARGB(180, 150, 150, 150));
 	}
 
-	// TODO: fix this, take a look at 'nicenum'.
-	//int digits = (int)(ceilf(log10f(vinc)));
-	//char fmt[16];
-	//snprintf(fmt, 16, "%%.%df", digits >= 0 ? 0 : -digits);
-	//char msg[128];
-	//snprintf(msg, 128, fmt, *val);
-
 	if (enabled)
 	{
-		AddGfxCommandText(x + SLIDER_HEIGHT / 2, y + SLIDER_HEIGHT / 2 - TEXT_HEIGHT / 2, ALIGN_LEFT, text, 
-			IsHot(id) ? DEFAULT_FONT_COLOR[HOT_COLOR] : DEFAULT_FONT_COLOR[NORMAL_COLOR]);
-		//AddGfxCommandText(x + SLIDER_HEIGHT / 2, y + SLIDER_HEIGHT / 2 - TEXT_HEIGHT / 2, ALIGN_LEFT, msg, 
-		//	IsHot(id) ? DEFAULT_FONT_COLOR[HOT_COLOR] : DEFAULT_FONT_COLOR[NORMAL_COLOR]);
+		AddGfxCommandText(x + (Slider::SLIDER_WIDTH / 2),
+			y + Slider::SLIDER_HEIGHT / 2 - Font::FONT_HEIGHT / 2, ALIGN_LEFT, text, 
+			IsHot(id) ? Font::DEFAULT_FONT_COLOR[HOT_COLOR] : Font::DEFAULT_FONT_COLOR[NORMAL_COLOR]);
 	}
 	else
 	{
-		AddGfxCommandText(x + SLIDER_HEIGHT / 2, y + SLIDER_HEIGHT / 2 - TEXT_HEIGHT / 2, ALIGN_LEFT, 
-			text, DEFAULT_FONT_COLOR[DISABLE_COLOR]);
-		//AddGfxCommandText(x + w - SLIDER_HEIGHT / 2, y + SLIDER_HEIGHT / 2 - TEXT_HEIGHT / 2, ALIGN_LEFT, 
-		//	msg, DEFAULT_FONT_COLOR[DISABLE_COLOR]);
+		AddGfxCommandText(x + Slider::SLIDER_HEIGHT / 2, 
+			y + Slider::SLIDER_HEIGHT / 2 - Font::FONT_HEIGHT / 2, ALIGN_LEFT, 
+			text, Font::DEFAULT_FONT_COLOR[DISABLE_COLOR]);
 	}
 
 	return res || valChanged;
@@ -979,18 +998,24 @@ bool im::Slider(const char * text, float * val, float vmin, float vmax, float vi
 
 bool im::Edit(char * text, int32 width, bool enabled)
 {
-	GuiRenderer::gState.widgetId++;
-	uint32 id = (GuiRenderer::gState.areaId << 16) | GuiRenderer::gState.widgetId;
+	Window &refWindow = GetCurrentWindowRef();
+	refWindow.internalWidgetID++;
+	uint32 id = ++GuiRenderer::gState.globalWidgetID;
 
-	int32 x = GuiRenderer::gState.widgetX;
-	int32 y = GuiRenderer::gState.widgetY/* - BUTTON_HEIGHT*/;
-	int32 w = (width == 0) ? DEFAULT_BUTTON_WIDTH : width;
-	int32 h = BUTTON_HEIGHT;
-	GuiRenderer::gState.widgetY += BUTTON_HEIGHT + DEFAULT_SPACING;
+	int32 x = refWindow.widgetX + refWindow.x;
+	int32 y = refWindow.widgetY + refWindow.y;
+	int32 w = (width == 0) ? Edit::EDIT_WIDTH : width;
+	int32 h = Button::BUTTON_HEIGHT;
+	refWindow.widgetY += Button::BUTTON_HEIGHT + Window::SPACING_VALUE;
+
+	RECT textRect = { 0, 0, 0, 0 };
+	GuiRenderer::GetInstance()->GetFont()->
+		DrawTextA(nullptr, text, -1, &textRect, ALIGN_LEFT | DT_CALCRECT, 0xffffffff);
+	int32 textWidth = textRect.right - textRect.left;
 
 	bool over = enabled && InRect(x, y, w, h);
-
 	bool mouseResult = ButtonLogic(id, over);
+
 	if (mouseResult)
 	{
 		GuiRenderer::gState.keyboardFocusID = id;
@@ -998,10 +1023,10 @@ bool im::Edit(char * text, int32 width, bool enabled)
 
 	bool keyResult = KeyLogic(id);
 
-	if (GuiRenderer::gState.charInput && keyResult)
+	if (GuiRenderer::gState.vkCode && keyResult)
 	{
 		int32 index = strlen(text);
-		if (GuiRenderer::gState.charInput == VK_BACK)
+		if (GuiRenderer::gState.vkCode == VK_BACK)
 		{
 			if (index > 0)
 			{
@@ -1010,7 +1035,15 @@ bool im::Edit(char * text, int32 width, bool enabled)
 		}
 		else
 		{
-			text[index] = GuiRenderer::gState.charInput;
+			char mappedChar = MapVirtualKey(GuiRenderer::gState.vkCode, MAPVK_VK_TO_CHAR);
+			if (IsLetter(mappedChar))
+			{
+				if (!GuiRenderer::gState.shiftDown)
+				{
+					mappedChar += 32;
+				}
+			}
+			text[index] = mappedChar;
 		}
 	}
 
@@ -1019,29 +1052,38 @@ bool im::Edit(char * text, int32 width, bool enabled)
 
 	if (enabled)
 	{
-		AddGfxCommandText(x + BUTTON_HEIGHT / 2, y + BUTTON_HEIGHT / 2 - TEXT_HEIGHT / 2,
-			ALIGN_LEFT, text, IsHot(id) ? DEFAULT_FONT_COLOR[HOT_COLOR] : DEFAULT_FONT_COLOR[NORMAL_COLOR]);
+		AddGfxCommandText(x + Button::BUTTON_HEIGHT / 2, y + Button::BUTTON_HEIGHT / 2 - Font::FONT_HEIGHT / 2,
+			ALIGN_LEFT, text, 
+			IsHot(id) ? Font::DEFAULT_FONT_COLOR[HOT_COLOR] : Font::DEFAULT_FONT_COLOR[NORMAL_COLOR]);
 	}
 	else
 	{
-		AddGfxCommandText(x + BUTTON_HEIGHT / 2, y + BUTTON_HEIGHT / 2 - TEXT_HEIGHT / 2,
-			ALIGN_LEFT, text, DEFAULT_FONT_COLOR[DISABLE_COLOR]);
+		AddGfxCommandText(x + Button::BUTTON_HEIGHT / 2, y + Button::BUTTON_HEIGHT / 2 - Font::FONT_HEIGHT / 2,
+			ALIGN_LEFT, text, Font::DEFAULT_FONT_COLOR[DISABLE_COLOR]);
 	}
 
-	return keyResult;
+	static uint32 tick = 0;
+	static bool on = false;
+
+	if (tick % 60 == 0)
+	{
+		on = !on;
+	}
+
+	if (keyResult && on)
+	{
+		AddGfxCommandRect((float)x + textWidth + Button::BUTTON_HEIGHT / 2, (float)y, (float)4, (float)h, DEFAULT_BUTTON_COLOR[HOT_COLOR]);
+	}
+
+	tick++;
+
+	bool entered = false;
+	if (id == GuiRenderer::gState.keyboardFocusID &&
+		(GuiRenderer::gState.vkCode == VK_RETURN))
+	{
+		entered = true;
+	}
+
+	return entered;
 }
 
-//void im::DrawFontCommand(int32 x, int32 y, int32 align, const char * text, D3DCOLOR color)
-//{
-//	AddGfxCommandText(x, y, align, text, color);
-//}
-//
-//void im::DrawLineCommand(float x0, float y0, float x1, float y1, float r, D3DCOLOR color)
-//{
-//	AddGfxCmdLine(x0, y0, x1, y1, r, color);
-//}
-//
-//void im::DrawRectCommand(float x, float y, float w, float h, D3DCOLOR color)
-//{
-//	AddGfxCommandRect(x, y, w, h, color);
-//}

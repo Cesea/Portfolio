@@ -1,8 +1,6 @@
 #include "stdafx.h"
 #include "Component.h"
 
-bool Component::Init(Entity * pOwner)
-{
-	this->_pOwner = pOwner;
-	return true;
-}
+
+ComponentID Component::componentID = INVALID_FAMILY_ID;
+ComponentFamilyID Component::componentFamilyID = INVALID_COMPONENT_ID;

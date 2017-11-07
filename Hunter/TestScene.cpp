@@ -29,7 +29,9 @@ bool32 TestScene::Render()
 {
 	bool32 result = true;
 
-	im::BeginFrame(gEngine->GetInput()->mouse, gEngine->GetInput()->keyboard.GetCharInput());
+	im::BeginFrame(gEngine->GetInput()->mouse, 
+		gEngine->GetInput()->keyboard.GetCharInput(), 
+		gEngine->GetInput()->keyboard.GetShiftDown() );
 
 	if (im::Button("toto"))
 	{

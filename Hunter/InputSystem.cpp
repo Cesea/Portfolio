@@ -50,17 +50,13 @@ void Keyboard::UpdateOnKeyUp(WPARAM wParam, LPARAM lParam)
 void Keyboard::UpdateOnKeyDown(WPARAM wParam, LPARAM lParam)
 {
 	_currentState[wParam] = true;
+	_vkCode = wParam;
 
-	UINT tempChar = MapVirtualKey(wParam, MAPVK_VK_TO_CHAR);
-	//if (IsLetter(tempChar))
-	//{
-	//	_charInput = (_shiftDown) ? tempChar : tempChar + 32;
-	//}
 }
 
 void Keyboard::UpdateOnChar(WPARAM wParam, LPARAM lParam)
 {
-	_charInput = wParam;
+	_vkCode = wParam;
 }
 
 void Keyboard::UpdateWithMessage(UINT msg, WPARAM wParam, LPARAM lParam)
@@ -86,7 +82,8 @@ void Keyboard::UpdateWithMessage(UINT msg, WPARAM wParam, LPARAM lParam)
 
 void Keyboard::Update()
 {
-	_charInput = 0;
+	_vkCode = 0;
+	_shiftDown = _currentState[VK_SHIFT] ? true : false;
 	for (int32 i = 0; i < 256; ++i)
 	{
 		if (IsDown(i))
