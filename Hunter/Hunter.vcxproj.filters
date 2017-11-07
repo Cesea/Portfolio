@@ -168,6 +168,12 @@
     <ClCompile Include="VertexBufferManager.cpp">
       <Filter>Resource</Filter>
     </ClCompile>
+    <ClCompile Include="IndexBuffer.cpp">
+      <Filter>Resource</Filter>
+    </ClCompile>
+    <ClCompile Include="IndexBufferManager.cpp">
+      <Filter>Resource</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -427,6 +433,9 @@
       <Filter>Resource</Filter>
     </ClInclude>
     <ClInclude Include="ResourceManager.h">
+      <Filter>Resource</Filter>
+    </ClInclude>
+    <ClInclude Include="IndexBufferManager.h">
       <Filter>Resource</Filter>
     </ClInclude>
   </ItemGroup>

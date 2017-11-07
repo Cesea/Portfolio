@@ -13,6 +13,7 @@
 #include "CommandBucket.h"
 
 #include "VertexBufferManager.h"
+#include "IndexBufferManager.h"
 
 //defines 
 #define VIDEO (gEngine->GetVideo())
@@ -45,15 +46,16 @@ public :
 	virtual EventChannel GetChannel() { return _channel; }
 
 	bool32 Draw(VertexBufferHandle vertexHandle,
-		uint32 startVertex, uint32 primitiveCount);
-	bool32 DrawIndexed(IDirect3DVertexBuffer9 * pVertexBuffer, 
-		IDirect3DIndexBuffer9 * pIndexBuffer, 
-		IDirect3DVertexDeclaration9 * pVertexDecl, 
-		uint32 indexCount, uint32 vertexCount, uint32 startIndex, uint32 baseVerteex, uint32 stride);
+		uint32 startVertex, uint32 primitiveCount, uint32 matrixIndex);
+	bool32 DrawIndexed(VertexBufferHandle vertexHandle, IndexBufferHandle indexHandle, 
+		uint32 numVertex, uint32 startIndex, uint32 primitiveCount, uint32 matrixIndex);
 
 	CommandBucket<uint32> &GetCommandBucket() { return _commandBucket; }
 
 	VertexBufferManager *GetVertexBufferManager() { return &_vertexBufferManager; }
+	IndexBufferManager *GetIndexBufferManager() { return &_indexBufferManager; }
+
+	MatrixCache &GetMatrixCache() { return _matrixCache; }
 
 private :
 	bool InitD3D(HWND windowHandle);
@@ -74,6 +76,8 @@ private :
 	CommandBucket<uint32> _commandBucket;
 
 	VertexBufferManager _vertexBufferManager;
+	IndexBufferManager _indexBufferManager;
+	MatrixCache _matrixCache;
 	//ResourceManager<IndexBuffer> _indexBufferManager;
 	//ResourceManager<Texture> _textureManager;
 	//ResourceManager<Effect> _effectManager;

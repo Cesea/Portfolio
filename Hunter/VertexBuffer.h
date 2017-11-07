@@ -11,9 +11,9 @@ public :
 	virtual ~VertexBuffer();
 
 	LPDIRECT3DVERTEXBUFFER9 Buffer() const;
-	uint32		Stride() const;
-	uint16		Count() const;
-	uint32		ByteSize() const;
+	uint32		GetStride() const;
+	uint16		GetCount() const;
+	uint32		GetByteSize() const;
 
 	virtual bool32 Create(uint32 maxCount, uint32 stride, bool32 dynamic = false, const void *pData = nullptr);
 	virtual bool32 Destroy();

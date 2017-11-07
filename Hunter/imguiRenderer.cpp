@@ -5,7 +5,7 @@ using namespace im;
 
 GfxCommand GuiRenderer::gfxCommandQueue[GFXCOMMAND_QUEUE_SIZE];
 unsigned GuiRenderer::gfxCommandQueueSize;
-GuiRenderer::State GuiRenderer::gState;
+State GuiRenderer::gState;
 
 im::GuiRenderer::GuiRenderer()
 {
@@ -180,10 +180,11 @@ void im::GuiRenderer::Draw()
 			}
 			else
 			{
-				_pDevice->SetRenderState(D3DRS_SCISSORTESTENABLE, true);
+				_pDevice->SetRenderState(D3DRS_SCISSORTESTENABLE, false);
 			}
 		}
 	}
+	_pDevice->SetRenderState(D3DRS_SCISSORTESTENABLE, false);
 	_pStateBlock->Apply();
 }
 
@@ -283,10 +284,12 @@ static void ResetGfxCmdQueue()
 	GuiRenderer::gfxCommandQueueSize = 0;
 }
 
-static void AddGfxCmdStencil(int32 x, int32 y, int32 w, int32 h, bool flag)
+static void AddGfxCommandScissor(int32 x, int32 y, int32 w, int32 h, bool flag)
 {
 	if (GuiRenderer::gfxCommandQueueSize >= GFXCOMMAND_QUEUE_SIZE)
+	{
 		return;
+	}
 	GfxCommand& cmd = GuiRenderer::gfxCommandQueue[GuiRenderer::gfxCommandQueueSize++];
 	cmd.type = GFXCOMMAND_SCISSOR;
 	cmd.flags = flag;
@@ -300,7 +303,9 @@ static void AddGfxCmdStencil(int32 x, int32 y, int32 w, int32 h, bool flag)
 static void AddGfxCommandRect(float x, float y, float w, float h, D3DCOLOR color)
 {
 	if (GuiRenderer::gfxCommandQueueSize >= GFXCOMMAND_QUEUE_SIZE)
+	{
 		return;
+	}
 	GfxCommand& cmd = GuiRenderer::gfxCommandQueue[GuiRenderer::gfxCommandQueueSize++];
 	cmd.type = GFXCOMMAND_RECT;
 	cmd.flags = 0;
@@ -436,12 +441,15 @@ void im::BeginFrame(Mouse &refMouse, uint8 inputChar)
 	GuiRenderer::gState.isActive = false;
 	GuiRenderer::gState.isHot = false;
 
-	GuiRenderer::gState.widgetX = 0;
-	GuiRenderer::gState.widgetY = 0;
-	GuiRenderer::gState.widgetW = 60;
+	GuiRenderer::gState.currentWindowID = 0;
+	for (int32 i = 0; i < MAX_NUM_WINDOW; ++i)
+	{
+		GuiRenderer::gState.windows[i].widgetX = 0;
+		GuiRenderer::gState.windows[i].widgetY = 0;
+		GuiRenderer::gState.windows[i].internalWidgetID = 0;
+	}
 
-	GuiRenderer::gState.areaId = 1;
-	GuiRenderer::gState.widgetId = 1;
+	GuiRenderer::gState.globalWidgetID = 0;
 
 	ResetGfxCmdQueue();
 }
@@ -450,6 +458,7 @@ void im::EndFrame()
 {
 	ClearInput();
 }
+
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 static const int32 BUTTON_HEIGHT = 20;
@@ -504,25 +513,81 @@ static int32 gFocusBottom = 0;
 static uint32 gScrollId = 0;
 static bool gInsideScrollArea = false;
 
+
+//bool im::BeginWindow(const char * name, int32 x, int32 y, int32 w, int32 h, int32 * scroll)
+//{
+//	GuiRenderer::gState.areaId++;
+//	GuiRenderer::gState.widgetId = 0;
+//	gScrollId = (GuiRenderer::gState.areaId << 16) | GuiRenderer::gState.widgetId;
+//
+//	GuiRenderer::gState.widgetX = x + SCROLL_AREA_PADDING;
+//	//GuiRenderer::gState.widgetY = y + h + (*scroll) + DEFAULT_SPACING;
+//	GuiRenderer::gState.widgetY = y + BUTTON_HEIGHT + DEFAULT_SPACING;
+//	GuiRenderer::gState.widgetW = w - SCROLL_AREA_PADDING * 4;
+//	gScrollTop = y + BUTTON_HEIGHT + DEFAULT_SPACING;
+//	gScrollBottom = gScrollTop + h - BUTTON_HEIGHT - DEFAULT_SPACING;
+//	gScrollRight = x + w - SCROLL_AREA_PADDING * 3;
+//	gScrollVal = scroll;
+//
+//	gScrollAreaTop = GuiRenderer::gState.widgetY;
+//
+//	gFocusTop = y - AREA_HEADER;
+//	gFocusBottom = y - AREA_HEADER + h;
+//
+//	gInsideScrollArea = InRect(x, y, w, h, false);
+//	GuiRenderer::gState.insideCurrentScroll = gInsideScrollArea;
+//
+//	AddGfxCommandRect((float)x, (float)y, (float)w, (float)h, DEFAULT_SCROLL_COLOR[NORMAL_COLOR]);
+//
+//	AddGfxCommandRect((float)x, (float)y, (float)w, (float)BUTTON_HEIGHT, DEFAULT_SCROLL_COLOR[HOVER_COLOR]);
+//
+//	AddGfxCommandText(x + AREA_HEADER / 2, y + TEXT_HEIGHT / 2, ALIGN_LEFT, 
+//		name, DEFAULT_FONT_COLOR[HOT_COLOR]);
+//
+//	//AddGfxCmdStencil(x + SCROLL_AREA_PADDING, y + SCROLL_AREA_PADDING, w - SCROLL_AREA_PADDING * 4, h - AREA_HEADER - SCROLL_AREA_PADDING);
+//
+//	return gInsideScrollArea;
+//}
+//
+//void im::EndWindow()
+//{
+//	int x = gScrollRight + SCROLL_AREA_PADDING / 2;
+//	int y = gScrollTop;
+//	int w = SCROLL_AREA_PADDING * 2;
+//	int h = gScrollBottom - gScrollTop;
+//
+//	int sTop = gScrollAreaTop;
+//	GuiRenderer::gState.widgetY = gScrollBottom + DEFAULT_SPACING * 2;
+//	int sBottom = GuiRenderer::gState.widgetY;
+//	int sh = sTop - sBottom; // The scrollable area height.
+//}
+
 bool im::BeginScrollArea(const char * name, int32 x, int32 y, int32 w, int32 h, int32 * scroll)
 {
-	GuiRenderer::gState.areaId++;
-	GuiRenderer::gState.widgetId = 0;
-	gScrollId = (GuiRenderer::gState.areaId << 16) | GuiRenderer::gState.widgetId;
+	//GuiRenderer::gState.widgetId = 0;
+	//gScrollId = (GuiRenderer::gState.areaId << 16) | GuiRenderer::gState.widgetId;
 
-	GuiRenderer::gState.widgetX = x + SCROLL_AREA_PADDING;
-	//GuiRenderer::gState.widgetY = y + h + (*scroll) + DEFAULT_SPACING;
-	GuiRenderer::gState.widgetY = y + BUTTON_HEIGHT + DEFAULT_SPACING;
-	GuiRenderer::gState.widgetW = w - SCROLL_AREA_PADDING * 4;
-	gScrollTop = y + BUTTON_HEIGHT + DEFAULT_SPACING;
-	gScrollBottom = gScrollTop + h - BUTTON_HEIGHT - DEFAULT_SPACING;
-	gScrollRight = x + w - SCROLL_AREA_PADDING * 3;
-	gScrollVal = scroll;
+	Window &refWindow = GuiRenderer::gState.windows[GuiRenderer::gState.currentWindowID++];
 
-	gScrollAreaTop = GuiRenderer::gState.widgetY;
+	refWindow.x = x;
+	refWindow.y = y;
+	refWindow.width = w;
+	refWindow.height = h;
 
-	gFocusTop = y - AREA_HEADER;
-	gFocusBottom = y - AREA_HEADER + h;
+	//GuiRenderer::gState.widgetX = x + SCROLL_AREA_PADDING;
+	////GuiRenderer::gState.widgetY = y + h + (*scroll) + DEFAULT_SPACING;
+	//GuiRenderer::gState.widgetY = y + BUTTON_HEIGHT + DEFAULT_SPACING;
+	//GuiRenderer::gState.widgetW = w - SCROLL_AREA_PADDING * 4;
+
+	//gScrollTop = y + BUTTON_HEIGHT + DEFAULT_SPACING;
+	//gScrollBottom = gScrollTop + h - BUTTON_HEIGHT - DEFAULT_SPACING;
+	//gScrollRight = x + w - SCROLL_AREA_PADDING * 3;
+	//gScrollVal = scroll;
+
+	//gScrollAreaTop = GuiRenderer::gState.widgetY;
+
+	//gFocusTop = y - AREA_HEADER;
+	//gFocusBottom = y - AREA_HEADER + h;
 
 	gInsideScrollArea = InRect(x, y, w, h, false);
 	GuiRenderer::gState.insideCurrentScroll = gInsideScrollArea;
@@ -643,6 +708,12 @@ void im::SeparatorLine()
 	GuiRenderer::gState.widgetY -= DEFAULT_SPACING * 4;
 
 	AddGfxCommandRect((float)x, (float)y, (float)w, (float)h, D3DCOLOR_ARGB(255, 255, 255, 32));
+}
+
+bool im::Scissor(int32 x, int32 y, int32 width, int32 height, bool flag)
+{
+	AddGfxCommandScissor(x, y, width, height, flag);
+	return true;
 }
 
 bool im::Button(const char * text, int32 width, bool enabled)

@@ -136,6 +136,8 @@
     <ClCompile Include="EntityTemplate.cpp" />
     <ClCompile Include="HealthComponent.cpp" />
     <ClCompile Include="imguiRenderer.cpp" />
+    <ClCompile Include="IndexBuffer.cpp" />
+    <ClCompile Include="IndexBufferManager.cpp" />
     <ClCompile Include="Matrix.cpp" />
     <ClCompile Include="MatrixCache.cpp" />
     <ClCompile Include="Mesh.cpp" />
@@ -208,6 +210,7 @@
     <ClInclude Include="HealthComponent.h" />
     <ClInclude Include="imguiRenderer.h" />
     <ClInclude Include="IndexBuffer.h" />
+    <ClInclude Include="IndexBufferManager.h" />
     <ClInclude Include="Material.h" />
     <ClInclude Include="Math.h" />
     <ClInclude Include="Matrix.h" />

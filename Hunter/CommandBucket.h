@@ -39,7 +39,6 @@ private :
 	Matrix _viewMatrix;
 	Matrix _projectionMatrix;
 
-	MatrixCache _matrices;
 	RenderContext _context;
 };
 

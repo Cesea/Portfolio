@@ -7,14 +7,14 @@ class MatrixCache
 {
 public :
 	MatrixCache();
-	void AddMatrix(const Matrix &matrix);
+	uint32 AddMatrix(const Matrix &matrix);
 
-	const Matrix &GetAt(uint32 i);
+	const Matrix &GetAt(uint32 i) const;
 	void Clear();
 
 private :
 	uint32 _currentCount;
-	Matrix _matrices[MAX_MATRIX_CACHE];
+	Matrix *_matrices;
 
 };
 

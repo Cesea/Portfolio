@@ -179,6 +179,12 @@ bool32 BaseScene::Init()
 	vertices[2].color = 0xff0000ff;
 	_vertexHandle =  VIDEO->GetVertexBufferManager()->CreateStatic(3, sizeof(Vertex), vertices);
 
+	uint16 indices[3];
+	indices[0] = 0;
+	indices[1] = 1;
+	indices[2] = 2;
+	_indexHandle = VIDEO->GetIndexBufferManager()->CreateStatic(3, IndexBuffer::IndexFormat::Uint16, indices);
+
 	D3DVERTEXELEMENT9 elements[3] =
 	{
 		{0, 0, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0},
@@ -206,7 +212,10 @@ bool32 BaseScene::Render()
 {
 	bool32 result = true;
 
+
 	im::BeginFrame(gEngine->GetInput()->mouse, gEngine->GetInput()->keyboard.GetCharInput());
+
+	im::Scissor(0, 0,300, 300, true);
 
 	im::BeginScrollArea("Editor", 100, 100, 400, 600, &_scroll);
 
@@ -236,10 +245,25 @@ bool32 BaseScene::Render()
 
 	im::EndFrame();
 
-	commands::Draw *dc =  VIDEO->GetCommandBucket().AddCommand<commands::Draw>(10, 0);
+	Matrix world;
+	MatrixTranslation(&world, 0.0f, 0.0f, 0.0f);
+
+	//GenerateKey();
+
+	commands::DrawIndexed *dc =  VIDEO->GetCommandBucket().AddCommand<commands::DrawIndexed>(10, 0);
 	dc->primitiveCount = 1;
-	dc->startVertex = 0;
+	dc->numVertex = 3;
+	dc->startIndex = 0;
 	dc->vertexBufferHandle = _vertexHandle;
+	dc->worldMatrix = VIDEO->GetMatrixCache().AddMatrix(world);
+
+	MatrixTranslation(&world, 0.5f, 0.0f, 0.0f);
+	commands::DrawIndexed *dc2 =  VIDEO->GetCommandBucket().AddCommand<commands::DrawIndexed>(10, 0);
+	dc2->primitiveCount = 1;
+	dc2->numVertex = 3;
+	dc2->startIndex = 0;
+	dc2->vertexBufferHandle = _vertexHandle;
+	dc2->worldMatrix = VIDEO->GetMatrixCache().AddMatrix(world);
 
 	return result;
 }

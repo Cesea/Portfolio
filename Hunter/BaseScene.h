@@ -37,6 +37,7 @@ protected :
 	IDirect3DVertexDeclaration9 *_pDecl;
 
 	VertexBufferHandle _vertexHandle;
+	IndexBufferHandle _indexHandle;
 
 };
 

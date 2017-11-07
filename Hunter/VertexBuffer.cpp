@@ -20,17 +20,17 @@ LPDIRECT3DVERTEXBUFFER9 VertexBuffer::Buffer() const
 	return _pBuffer;
 }
 
-uint32 VertexBuffer::Stride() const
+uint32 VertexBuffer::GetStride() const
 {
 	return _stride;
 }
 
-uint16 VertexBuffer::Count() const
+uint16 VertexBuffer::GetCount() const
 {
 	return _maxCount;
 }
 
-uint32 VertexBuffer::ByteSize() const
+uint32 VertexBuffer::GetByteSize() const
 {
 	return _maxCount * _stride;
 }
@@ -45,7 +45,7 @@ bool32 VertexBuffer::Create(uint32 maxCount, uint32 stride, bool32 dynamic , con
 	usage |= (dynamic) ? (D3DUSAGE_DYNAMIC) : (D3DUSAGE_WRITEONLY);
 	pool = (dynamic) ? (D3DPOOL_MANAGED) : (D3DPOOL_DEFAULT);
 
-	if (FAILED(gpDevice->CreateVertexBuffer(ByteSize(), usage, 0, pool, &_pBuffer, nullptr)))
+	if (FAILED(gpDevice->CreateVertexBuffer(GetByteSize(), usage, 0, pool, &_pBuffer, nullptr)))
 	{
 		return false;
 	}
@@ -55,7 +55,7 @@ bool32 VertexBuffer::Create(uint32 maxCount, uint32 stride, bool32 dynamic , con
 		void *datas = Lock(0, 0, 0);
 		if (datas != nullptr)
 		{
-			memcpy(datas, pData, ByteSize());
+			memcpy(datas, pData, GetByteSize());
 			Unlock();
 			return true;
 		}

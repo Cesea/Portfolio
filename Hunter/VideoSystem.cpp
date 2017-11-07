@@ -23,6 +23,7 @@ bool VideoSystem::Init(const std::string & name, const SystemSetting & setting)
 	}
 
 	_vertexBufferManager.Init(256);
+	_indexBufferManager.Init(256);
 
 	_pimguiRenderer = new im::GuiRenderer();
 	_pimguiRenderer->Init(gpDevice, "consolas", WINSIZEX, WINSIZEY);
@@ -66,14 +67,17 @@ void VideoSystem::Render()
 	_pDevice->Present(nullptr, nullptr, NULL, nullptr);
 
 	_commandBucket.Clear();
+	_matrixCache.Clear();
 }
 
-bool32 VideoSystem::Draw(VertexBufferHandle vertexHandle, 
-	uint32 startVertex, uint32 primitiveCount)
+bool32 VideoSystem::Draw(VertexBufferHandle vertexHandle,
+		uint32 startVertex, uint32 primitiveCount, uint32 matrixIndex)
 {
+	_pDevice->SetTransform(D3DTS_WORLD, &_matrixCache.GetAt(matrixIndex));
+
 	_pDevice->SetFVF(D3DFVF_XYZ | D3DFVF_DIFFUSE);
 	const VertexBuffer &refVertexBuffer = _vertexBufferManager.GetMember(vertexHandle);
-	_pDevice->SetStreamSource(0, refVertexBuffer.Buffer(), 0, refVertexBuffer.Stride());
+	_pDevice->SetStreamSource(0, refVertexBuffer.Buffer(), 0, refVertexBuffer.GetStride());
 	_pDevice->SetIndices(nullptr);
 	if (FAILED(_pDevice->DrawPrimitive(D3DPT_TRIANGLELIST, startVertex, primitiveCount)))
 	{
@@ -82,23 +86,38 @@ bool32 VideoSystem::Draw(VertexBufferHandle vertexHandle,
 	return true;
 }
 
-bool32 VideoSystem::DrawIndexed(IDirect3DVertexBuffer9 * pVertexBuffer, 
-	IDirect3DIndexBuffer9 * pIndexBuffer,
-	IDirect3DVertexDeclaration9 * pVertexDecl, 
-	uint32 indexCount, uint32 vertexCount, uint32 startIndex, uint32 baseVertex, uint32 stride)
+bool32 VideoSystem::DrawIndexed(VertexBufferHandle vertexHandle, IndexBufferHandle indexHandle, 
+	uint32 numVertex, uint32 startIndex, uint32 primitiveCount, uint32 matrixIndex)
 {
-	_pDevice->SetVertexDeclaration(pVertexDecl);
-	_pDevice->SetStreamSource(0, pVertexBuffer, 0, stride);
-	_pDevice->SetIndices(pIndexBuffer);
-	if (FAILED(_pDevice->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, baseVertex, 0, 
-		vertexCount, startIndex, indexCount / 3)))
+	_pDevice->SetTransform(D3DTS_WORLD, &_matrixCache.GetAt(matrixIndex));
+
+	_pDevice->SetFVF(D3DFVF_XYZ | D3DFVF_DIFFUSE);
+	const VertexBuffer &refVertexBuffer = _vertexBufferManager.GetMember(vertexHandle);
+	const IndexBuffer &refIndexBuffer = _indexBufferManager.GetMember(vertexHandle);
+	_pDevice->SetStreamSource(0, refVertexBuffer.Buffer(), 0, refVertexBuffer.GetStride());
+	_pDevice->SetIndices(refIndexBuffer.Buffer());
+	if (FAILED(_pDevice->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, 0, numVertex, startIndex, primitiveCount)))
 	{
 		return false;
 	}
 	return true;
 }
 
-
+//bool32 VideoSystem::DrawIndexed(IDirect3DVertexBuffer9 * pVertexBuffer, 
+//	IDirect3DIndexBuffer9 * pIndexBuffer,
+//	IDirect3DVertexDeclaration9 * pVertexDecl, 
+//	uint32 indexCount, uint32 vertexCount, uint32 startIndex, uint32 baseVertex, uint32 stride)
+//{
+//	_pDevice->SetVertexDeclaration(pVertexDecl);
+//	_pDevice->SetStreamSource(0, pVertexBuffer, 0, stride);
+//	_pDevice->SetIndices(pIndexBuffer);
+//	if (FAILED(_pDevice->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, baseVertex, 0, 
+//		vertexCount, startIndex, indexCount / 3)))
+//	{
+//		return false;
+//	}
+//	return true;
+//}
 
 bool VideoSystem::InitD3D(HWND windowHandle)
 {

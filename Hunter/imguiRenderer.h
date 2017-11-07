@@ -5,7 +5,6 @@
 
 namespace im
 {
-
 	enum TextAlign
 	{
 		ALIGN_LEFT = 0x00000000,
@@ -54,6 +53,61 @@ namespace im
 		};
 	};
 
+	struct Window
+	{
+		int32 x;
+		int32 y;
+		int32 width;
+		int32 height;
+
+		int32 scroll;
+		int32 top;
+		bool32 opened;
+
+		int32 widgetX;
+		int32 widgetY;
+
+		int32 internalWidgetID;
+	};
+	constexpr uint32 MAX_NUM_WINDOW = 10;
+
+	struct State
+	{
+		State() :
+			left(false), leftPressed(false), leftReleased(false),
+			mx(-1), my(-1), scroll(0),
+			active(0), hot(0), hotToBe(0), isHot(false), isActive(false), wentActive(false),
+			dragX(0), dragY(0), dragOrig(0), widgetX(0), widgetY(0), widgetW(100),
+			insideCurrentScroll(false), areaId(0), widgetId(0), charInput(0), keyboardFocusID(0)
+		{
+		}
+
+		bool left, right, middle;
+		bool leftPressed, leftReleased;
+		bool rightPressed, rightReleased;
+		bool middlePressed, middleReleased;
+		int32 mx, my;
+		int32 scroll;
+		uint32 active;
+		uint32 hot;
+		uint32 hotToBe;
+		bool isHot;
+		bool isActive;
+		bool wentActive;
+		int32 dragX, dragY;
+		float dragOrig;
+		bool insideCurrentScroll;
+
+		Window windows[im::MAX_NUM_WINDOW];
+		uint32 currentWindowID;
+
+		uint32 globalWidgetID;
+
+		uint32 keyboardFocusID;
+
+		uint8 charInput;
+	};
+
 	bool imMessageProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 	constexpr uint32 GFXCOMMAND_QUEUE_SIZE = 5000;
@@ -61,41 +115,7 @@ namespace im
 	class GuiRenderer
 	{
 	public :
-		struct State
-		{
-			State() :
-				left(false), leftPressed(false), leftReleased(false),
-				mx(-1), my(-1), scroll(0),
-				active(0), hot(0), hotToBe(0), isHot(false), isActive(false), wentActive(false),
-				dragX(0), dragY(0), dragOrig(0), widgetX(0), widgetY(0), widgetW(100),
-				insideCurrentScroll(false), areaId(0), widgetId(0), charInput(0), keyboardFocusID(0)
-			{
-			}
-
-			bool left, right, middle;
-			bool leftPressed, leftReleased;
-			bool rightPressed, rightReleased;
-			bool middlePressed, middleReleased;
-			int32 mx, my;
-			int32 scroll;
-			uint32 active;
-			uint32 hot;
-			uint32 hotToBe;
-			bool isHot;
-			bool isActive;
-			bool wentActive;
-			int32 dragX, dragY;
-			float dragOrig;
-			int32 widgetX, widgetY, widgetW;
-			bool insideCurrentScroll;
-
-			uint32 areaId;
-			uint32 widgetId;
-
-			uint32 keyboardFocusID;
-
-			uint8 charInput;
-		};
+	
 	public:
 		GuiRenderer();
 		~GuiRenderer();
@@ -172,9 +192,6 @@ namespace im
 		bool result = false;
 		result = (GuiRenderer::gState.mx >= x) && (GuiRenderer::gState.mx <= x + w) && (GuiRenderer::gState.my >= y) && (GuiRenderer::gState.my <= y + h);
 		return result;
-		//return /*(!checkScroll || GuiRenderer::gState.insideCurrentScroll) && */
-		//	GuiRenderer::gState.mx >= x && GuiRenderer::gState.mx <= x + w && 
-		//	GuiRenderer::gState.my >= y && GuiRenderer::gState.my <= y + h;
 	}
 
 	inline void ClearInput()
@@ -219,6 +236,10 @@ namespace im
 	void BeginFrame(Mouse &refMouse, uint8 inputChar);
 	void EndFrame();
 
+
+	bool BeginWindow(const char* name, int32 x, int32 y, int32 w, int32 h, int32* scroll);
+	void EndWindow();
+	
 	bool BeginScrollArea(const char* name, int32 x, int32 y, int32 w, int32 h, int32* scroll);
 	void EndScrollArea();
 
@@ -226,6 +247,8 @@ namespace im
 	void Unindent();
 	void imguiSeparator();
 	void SeparatorLine();
+
+	bool Scissor(int32 x, int32 y, int32 width, int32 height, bool flag);
 
 	bool Button(const char* text, int32 width = 0, bool enabled = true);
 	bool Item(const char* text, int32 width = 0, bool enabled = true);
