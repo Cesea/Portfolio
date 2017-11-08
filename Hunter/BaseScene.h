@@ -3,6 +3,9 @@
 
 #include "IScene.h"
 
+#include "World.h"
+#include "MoveSystem.h"
+
 class BaseScene : public IScene
 {
 public :
@@ -43,6 +46,10 @@ protected :
 	IndexBufferHandle _indexHandle;
 
 	bool _checked{ false };
+
+	World _world;
+
+	MoveSystem _moveSystem;
 
 };
 

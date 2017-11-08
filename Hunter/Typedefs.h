@@ -17,13 +17,5 @@ typedef int32 bool32;
 
 typedef uint32 FontID;
 
-typedef uint32 ComponentID;
-typedef uint32 ComponentFamilyID;
-typedef uint32 EntityID;
-
-typedef uint32 ComponentHandle;
-
-typedef uint32 UIID;
-
 
 #endif

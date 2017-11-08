@@ -3,7 +3,7 @@
 
 namespace commands 
 {
-	const BackendDispatchFunction Draw::DISPATCH_FUNCTION = backenddispatch::Draw;
+	//const BackendDispatchFunction Draw::DISPATCH_FUNCTION = backenddispatch::Draw;
 
-	const BackendDispatchFunction DrawIndexed::DISPATCH_FUNCTION = backenddispatch::DrawIndexed;
+	//const BackendDispatchFunction DrawIndexed::DISPATCH_FUNCTION = backenddispatch::DrawIndexed;
 }

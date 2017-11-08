@@ -83,7 +83,7 @@ public :
 
 	LRESULT CALLBACK EngineWindowCallback(HWND windowHandle, UINT msg, WPARAM wParam, LPARAM lParam);
 
-	VideoDevice *GetVideo() { return _pVideo.get(); }
+	video::VideoDevice *GetVideo() { return _pVideo.get(); }
 	InputManager *GetInput() { return _pInput.get(); }
 	SceneManager *GetScene() { return _pScene.get(); }
 
@@ -101,7 +101,7 @@ private :
 
 	Console _console;
 
-	std::shared_ptr<VideoDevice> _pVideo;
+	std::shared_ptr<video::VideoDevice> _pVideo;
 	std::shared_ptr<InputManager> _pInput;
 	std::shared_ptr<SceneManager> _pScene;
 

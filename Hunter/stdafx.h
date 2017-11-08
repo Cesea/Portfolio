@@ -33,6 +33,8 @@
 
 #include <math.h>
 
+#include <memory>
+#include <array>
 #include <algorithm>
 #include <type_traits>
 
@@ -47,6 +49,8 @@
 #include "Reflection.h"
 
 #include "EventChannel.h"
+
+#include "EntityComponentSystem.h"
 
 //#include "Resource.h"
 

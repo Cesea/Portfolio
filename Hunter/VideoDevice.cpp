@@ -5,6 +5,8 @@ IDirect3DDevice9 *gpDevice;
 
 using namespace im;
 
+using namespace video;
+
 VideoDevice::VideoDevice()
 {
 }
@@ -19,9 +21,6 @@ bool VideoDevice::Init()
 	{
 		return false;
 	}
-
-	_vertexBufferManager.Init(256);
-	_indexBufferManager.Init(256);
 
 	im::GuiRenderer::GetInstance()->Init(gpDevice, "consolas", WINSIZEX, WINSIZEY);
 
@@ -39,30 +38,9 @@ bool VideoDevice::Init()
 
 void VideoDevice::ShutDown()
 {
-	for (uint32 i = 0; i < ARRAY_COUNT(_indexBuffers); ++i)
-	{
-		_indexBuffers[i].destroy();
-	}
-
-	for (uint32 i = 0; i < ARRAY_COUNT(_vertexBuffers); ++i)
-	{
-		m_vertexBuffers[i].destroy();
-	}
-
-	for (uint32 i = 0; i < ARRAY_COUNT(_effects); ++i)
-	{
-		m_shaders[i].destroy();
-	}
-
-	for (uint32 i = 0; i < ARRAY_COUNT(_textures); ++i)
-	{
-		m_textures[i].destroy();
-	}
-
 	COM_RELEASE(_pDevice, 0);
 	COM_RELEASE(_pD3D, 0);
 
-	_initialized = false;
 }
 
 void VideoDevice::Update(float deltaTime)
@@ -86,40 +64,6 @@ void VideoDevice::Render()
 	_pDevice->Present(nullptr, nullptr, NULL, nullptr);
 
 	_commandBucket.Clear();
-	_matrixCache.Clear();
-}
-
-bool32 VideoDevice::Draw(VertexBufferHandle vertexHandle,
-		uint32 startVertex, uint32 primitiveCount, uint32 matrixIndex)
-{
-	_pDevice->SetTransform(D3DTS_WORLD, &_matrixCache.GetAt(matrixIndex));
-
-	_pDevice->SetFVF(D3DFVF_XYZ | D3DFVF_DIFFUSE);
-	const VertexBuffer &refVertexBuffer = _vertexBufferManager.GetMember(vertexHandle);
-	_pDevice->SetStreamSource(0, refVertexBuffer.Buffer(), 0, refVertexBuffer.GetStride());
-	_pDevice->SetIndices(nullptr);
-	if (FAILED(_pDevice->DrawPrimitive(D3DPT_TRIANGLELIST, startVertex, primitiveCount)))
-	{
-		return false;
-	}
-	return true;
-}
-
-bool32 VideoDevice::DrawIndexed(VertexBufferHandle vertexHandle, IndexBufferHandle indexHandle, 
-	uint32 numVertex, uint32 startIndex, uint32 primitiveCount, uint32 matrixIndex)
-{
-	_pDevice->SetTransform(D3DTS_WORLD, &_matrixCache.GetAt(matrixIndex));
-
-	_pDevice->SetFVF(D3DFVF_XYZ | D3DFVF_DIFFUSE);
-	const VertexBuffer &refVertexBuffer = _vertexBufferManager.GetMember(vertexHandle);
-	const IndexBuffer &refIndexBuffer = _indexBufferManager.GetMember(vertexHandle);
-	_pDevice->SetStreamSource(0, refVertexBuffer.Buffer(), 0, refVertexBuffer.GetStride());
-	_pDevice->SetIndices(refIndexBuffer.Buffer());
-	if (FAILED(_pDevice->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, 0, numVertex, startIndex, primitiveCount)))
-	{
-		return false;
-	}
-	return true;
 }
 
 bool VideoDevice::InitD3D(HWND windowHandle)

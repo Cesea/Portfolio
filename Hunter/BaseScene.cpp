@@ -3,13 +3,6 @@
 
 #include "tinyxml2.h"
 
-//struct vec3
-//{
-//	float x;
-//	float y;
-//	float z;
-//};
-
 struct Vertex
 {
 	Vector3 position;
@@ -165,6 +158,20 @@ bool32 BaseScene::Init()
 	//	}
 	//}
 
+	_world.AddSystem(_moveSystem);
+
+	//for (int32 i = 0; i < 600; ++i)
+	//{
+	//	Entity entity = _world.CreateEntity();
+	//	entity.AddComponent<PositionComponent>(Vector3(RandFloat(), RandFloat(), RandFloat()));
+	//	entity.AddComponent<MoveComponent>();
+
+	//	entity.Activate();
+	//}
+
+
+
+
 	Transform transform;
 	transform.SetTranslation(1.0f, 2.0f, 3.0f);
 	transform.SetScaling(1.0f, 2.0f, 1.0f);
@@ -177,13 +184,13 @@ bool32 BaseScene::Init()
 	vertices[1].color = 0xff00ff00;
 	vertices[2].position = Vector3(-0.5f, -0.5f, 0.5f);
 	vertices[2].color = 0xff0000ff;
-	_vertexHandle =  VIDEO->GetVertexBufferManager()->CreateStatic(3, sizeof(Vertex), vertices);
+	//_vertexHandle =  VIDEO->GetVertexBufferManager()->CreateStatic(3, sizeof(Vertex), vertices);
 
 	uint16 indices[3];
 	indices[0] = 0;
 	indices[1] = 1;
 	indices[2] = 2;
-	_indexHandle = VIDEO->GetIndexBufferManager()->CreateStatic(3, IndexBuffer::IndexFormat::Uint16, indices);
+	//_indexHandle = VIDEO->GetIndexBufferManager()->CreateStatic(3, IndexBuffer::IndexFormat::Uint16, indices);
 
 	D3DVERTEXELEMENT9 elements[3] =
 	{
@@ -208,6 +215,10 @@ bool32 BaseScene::Update(float deltaTime)
 {
 	bool32 result = true;
 
+	_world.Refresh();
+
+	_moveSystem.Update(deltaTime);
+
 	//_camera.UpdateMatrix();
 	//_camera.UpdateCamToDevice(gpDevice);
 
@@ -222,8 +233,6 @@ bool32 BaseScene::Render()
 	im::BeginFrame(gEngine->GetInput()->mouse, 
 		gEngine->GetInput()->keyboard.GetCharInput(), 
 		gEngine->GetInput()->keyboard.GetShiftDown());
-
-	//im::Scissor(0, 0,300, 300, true);
 
 	im::BeginScrollArea("Editor", _firstWindowPos, 400, 600, &_scroll);
 
@@ -308,20 +317,20 @@ bool32 BaseScene::Render()
 
 	//GenerateKey();
 
-	commands::DrawIndexed *dc =  VIDEO->GetCommandBucket().AddCommand<commands::DrawIndexed>(10, 0);
-	dc->primitiveCount = 1;
-	dc->numVertex = 3;
-	dc->startIndex = 0;
-	dc->vertexBufferHandle = _vertexHandle;
-	dc->worldMatrix = VIDEO->GetMatrixCache().AddMatrix(world);
+	//commands::DrawIndexed *dc =  VIDEO->GetCommandBucket().AddCommand<commands::DrawIndexed>(10, 0);
+	//dc->primitiveCount = 1;
+	//dc->numVertex = 3;
+	//dc->startIndex = 0;
+	//dc->vertexBufferHandle = _vertexHandle;
+	//dc->worldMatrix = VIDEO->GetMatrixCache().AddMatrix(world);
 
-	MatrixTranslation(&world, 0.5f, 0.0f, 0.0f);
-	commands::DrawIndexed *dc2 =  VIDEO->GetCommandBucket().AddCommand<commands::DrawIndexed>(10, 0);
-	dc2->primitiveCount = 1;
-	dc2->numVertex = 3;
-	dc2->startIndex = 0;
-	dc2->vertexBufferHandle = _vertexHandle;
-	dc2->worldMatrix = VIDEO->GetMatrixCache().AddMatrix(world);
+	//MatrixTranslation(&world, 0.5f, 0.0f, 0.0f);
+	//commands::DrawIndexed *dc2 =  VIDEO->GetCommandBucket().AddCommand<commands::DrawIndexed>(10, 0);
+	//dc2->primitiveCount = 1;
+	//dc2->numVertex = 3;
+	//dc2->startIndex = 0;
+	//dc2->vertexBufferHandle = _vertexHandle;
+	//dc2->worldMatrix = VIDEO->GetMatrixCache().AddMatrix(world);
 
 	return result;
 }

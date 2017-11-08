@@ -1,37 +1,96 @@
 #include "stdafx.h"
 #include "Entity.h"
 
-Entity::Entity(EntityID id)
+#include "World.h"
+
+Entity::Entity()
+	:_world(nullptr)
 {
 }
 
-Entity::~Entity()
+Entity::Entity(World & world, ID id)
+	:_world(&world), _id(id)
 {
 }
 
-HRESULT Entity::PrevInit()
+bool Entity::IsValid() const
 {
-	return E_NOTIMPL;
+	if (_world == nullptr)
+	{
+		return false;
+	}
+
+	return _world->IsValid(*this);
 }
 
-HRESULT Entity::Init()
+const Entity::ID & Entity::GetID() const
 {
-	return E_NOTIMPL;
+	return _id;
 }
 
-void Entity::Destroy()
+World & Entity::GetWorld() const
 {
+	Assert(_world);
+
+	return *_world;
 }
 
-void Entity::AddComponent(Component * pComponent)
+bool32 Entity::IsActivated() const
 {
+	return _world->IsActivated(*this);
 }
 
-void Entity::RemoveComponent(Component * pComponent)
+void Entity::Activate()
 {
+	GetWorld().ActivateEntity(*this);
 }
 
-bool Entity::HasComponent(ComponentID id)
+void Entity::Deactivate()
 {
-	return false;
+	GetWorld().DeactivateEntity(*this);
+}
+
+void Entity::Kill()
+{
+	GetWorld().KillEntity(*this);
+}
+
+void Entity::RemoveAllComponents()
+{
+	GetWorld()._entityAttributes.componentStorage.RemoveAllComponents(*this);
+}
+
+ComponentArray Entity::GetComponents() const
+{
+	return GetWorld()._entityAttributes.componentStorage.GetComponents(*this);
+}
+
+ComponentTypeList Entity::GetComponentTypeList() const
+{
+	return GetWorld()._entityAttributes.componentStorage.GetComponentTypeList(*this);
+}
+
+bool32 Entity::operator==(const Entity & entity) const
+{
+	return (_id == entity._id) && (_world == entity._world);
+}
+
+void Entity::AddComponent(Component * component, TypeID componentTypeID)
+{
+	GetWorld()._entityAttributes.componentStorage.AddComponent(*this, component, componentTypeID);
+}
+
+void Entity::RemoveComponent(TypeID componentTypeID)
+{
+	GetWorld()._entityAttributes.componentStorage.RemoveComponent(*this, componentTypeID);
+}
+
+Component & Entity::GetComponent(TypeID componentTypeID) const
+{
+	return GetWorld()._entityAttributes.componentStorage.GetComponent(*this, componentTypeID);
+}
+
+bool32 Entity::HasComponent(TypeID componentTypeID) const
+{
+	return GetWorld()._entityAttributes.componentStorage.HasComponent(*this, componentTypeID);
 }

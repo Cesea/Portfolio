@@ -5,7 +5,6 @@
 
 constexpr uint16 INVALID_INDEX = 0xffff;
 
-
 struct Handle
 {
 	Handle()
@@ -27,12 +26,14 @@ struct Handle
 	{
 		index = INVALID_INDEX;
 	}
+	static Handle INVALID_HANDLE;
 };
 
-static Handle INVALID_HANDLE;
 
 typedef Handle VertexBufferHandle;
+typedef Handle DynamicVertexBufferHandle;
 typedef Handle IndexBufferHandle;
+typedef Handle DynamicIndexBufferHandle;
 typedef Handle EffectHandle;
 typedef Handle TextureHandle;
 typedef Handle SurfaceMaterialHandle;
