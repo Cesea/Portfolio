@@ -12,9 +12,10 @@ DataPackage::~DataPackage()
 	Free();
 }
 
-void * DataPackage::Create(unsigned int size)
+void * DataPackage::Create(uint32 size)
 {
 	_data = new char[size];
+	Assert(_data);
 	_size = size;
 	return _data;
 }
@@ -39,7 +40,7 @@ void DataPackage::Save(const char *fileName)
 	}
 }
 
-void *DataPackage::Read(const char *fileName, unsigned int * size)
+void *DataPackage::Read(const char *fileName, uint32 *pOutSize)
 {
 	Free();
 	FILE *pFile;
@@ -53,9 +54,9 @@ void *DataPackage::Read(const char *fileName, unsigned int * size)
 		_data = new char[fileSize];
 		_size = fileSize;
 
-		if (size != nullptr)
+		if (pOutSize != nullptr)
 		{
-			*size = _size;
+			*pOutSize = _size;
 		}
 
 		fread(_data, _size, 1, pFile);

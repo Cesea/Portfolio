@@ -39,6 +39,30 @@ bool VideoDevice::Init()
 
 void VideoDevice::ShutDown()
 {
+	for (uint32 i = 0; i < ARRAY_COUNT(_indexBuffers); ++i)
+	{
+		_indexBuffers[i].destroy();
+	}
+
+	for (uint32 i = 0; i < ARRAY_COUNT(_vertexBuffers); ++i)
+	{
+		m_vertexBuffers[i].destroy();
+	}
+
+	for (uint32 i = 0; i < ARRAY_COUNT(_effects); ++i)
+	{
+		m_shaders[i].destroy();
+	}
+
+	for (uint32 i = 0; i < ARRAY_COUNT(_textures); ++i)
+	{
+		m_textures[i].destroy();
+	}
+
+	COM_RELEASE(_pDevice, 0);
+	COM_RELEASE(_pD3D, 0);
+
+	_initialized = false;
 }
 
 void VideoDevice::Update(float deltaTime)

@@ -3,7 +3,9 @@
 
 #include <cstdlib>
 
+#include "DataPackage.h"
 #include "BitFlags.h"	
+#include "Handle.h"
 
 
 constexpr float EPSILON = 0.001f;

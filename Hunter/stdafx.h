@@ -5,6 +5,16 @@
 #define SAFE_DELETE_ARRAY(p) if(p) {delete [] p; p = nullptr;}
 #define COM_RELEASE(p) if(p) {p->Release(); p = nullptr;}
 
+#define HRESULT_CHECK(expression)  \
+{ \
+	if(FAILED(expression)) \
+	{ \
+	Assert(false); \
+	} \
+}
+
+#define ARRAY_COUNT(arr) (sizeof(arr) / sizeof(arr[0]))
+
 #if defined (DEBUG) || defined (_DEBUG)
 	#define Assert(expression)  if(!(expression)) { *(int *)0 = 0;}
 #else

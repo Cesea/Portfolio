@@ -159,6 +159,7 @@
     <ClCompile Include="VisualSystem.cpp">
       <Filter>Core\ECS\System\Visual</Filter>
     </ClCompile>
+    <ClCompile Include="Handle.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -401,6 +402,9 @@
     </ClInclude>
     <ClInclude Include="VisualSystem.h">
       <Filter>Core\ECS\System\Visual</Filter>
+    </ClInclude>
+    <ClInclude Include="Handle.h">
+      <Filter>Sub</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
