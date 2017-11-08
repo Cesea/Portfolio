@@ -4,10 +4,12 @@
 DEFINE_META_POD(int8);
 DEFINE_META_POD(int16);
 DEFINE_META_POD(int32);
+DEFINE_META_POD(int64);
 
 DEFINE_META_POD(uint8);
 DEFINE_META_POD(uint16);
 DEFINE_META_POD(uint32);
+DEFINE_META_POD(uint64);
 
 struct foo
 {
@@ -21,6 +23,18 @@ struct foo
 	float b;
 	float c;
 };
+
+//template <typename T, typename Arena>
+//void* NewArray(size_t N, Arena &arena, const char *file, int32 line)
+//{
+//	//For POD
+//}
+//
+//template <typename T, typename Arena>
+//void *NewArray(size_t N, Arena &arena, const char *file, int32 line)
+//{
+//	//For Non POD
+//}
 
 void *operator new(size_t bytes, const char *file, int32 line)
 {
@@ -40,6 +54,18 @@ struct TypeAndCount<T[N]>
 	typedef T Type;
 	static const size_t Count = N;
 };
+
+template <typename T, typename Arena>
+T *NewArrayPOD(size_t N, Arena &arena, const char *file, int32 line)
+{
+	return static_cast<T *>(arena.Allocate(sizeof(T) * N, file, line));k
+}
+
+template <typename T, typename Arena>
+void DeleteArrayPOD(T *ptr, Arena &arena)
+{
+	arena.Free(ptr);
+}
 
 //template <typename Allocator>
 //void *operator new(size_t bytes, Allocator &allocator, const char *file, int32 line)
@@ -62,7 +88,7 @@ void Delete(T *object, Arena &arena)
 }
 
 template <typename T, typename Arena>
-T *NewArray(Arena &arena, size_t n, const char *file, int32 line)
+T *NewArray(Arena &arena, size_t N, const char *file, int32 line)
 {
 	union
 	{
@@ -71,16 +97,17 @@ T *NewArray(Arena &arena, size_t n, const char *file, int32 line)
 		T *as_T;
 	};
 
-	as_void = arena.Allocate(sizeof(T) * n + sizeof(size_t), file, line);
-	*as_size_t++ = n;
+	as_void = arena.Allocate(sizeof(T) * N + sizeof(size_t), file, line);
+	*as_size_t++ = N;
 
-	const T *const onePastLast = as_T + n;
+	//여기에 N이 더해지는것이 맞는지 아닌지를 확인하자
+	const T *const onePastLast = as_T + N;
 	while (as_T < onePastLast)
 	{
 		new (as_T++) T;
 	}
 
-	return (as_t - n);
+	return (as_t - N);
 }
 
 template <typename T, typename Arena>

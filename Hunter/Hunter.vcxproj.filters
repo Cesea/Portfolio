@@ -123,9 +123,6 @@
     <ClCompile Include="BackendDispatch.cpp">
       <Filter>Core\SubSystem\VideoDevice</Filter>
     </ClCompile>
-    <ClCompile Include="Mesh.cpp">
-      <Filter>Resource</Filter>
-    </ClCompile>
     <ClCompile Include="Camera.cpp">
       <Filter>Sub\GameUtils</Filter>
     </ClCompile>
@@ -144,23 +141,11 @@
     <ClCompile Include="Node.cpp">
       <Filter>Sub\GameUtils</Filter>
     </ClCompile>
-    <ClCompile Include="VertexBuffer.cpp">
-      <Filter>Resource</Filter>
-    </ClCompile>
     <ClCompile Include="TerrainConfig.cpp">
       <Filter>Sub\GameUtils\Terrain</Filter>
     </ClCompile>
     <ClCompile Include="Backend.cpp">
       <Filter>Core\SubSystem\VideoDevice</Filter>
-    </ClCompile>
-    <ClCompile Include="VertexBufferManager.cpp">
-      <Filter>Resource</Filter>
-    </ClCompile>
-    <ClCompile Include="IndexBuffer.cpp">
-      <Filter>Resource</Filter>
-    </ClCompile>
-    <ClCompile Include="IndexBufferManager.cpp">
-      <Filter>Resource</Filter>
     </ClCompile>
     <ClCompile Include="VideoDevice.cpp">
       <Filter>Core\SubSystem\VideoDevice</Filter>
@@ -173,18 +158,6 @@
     </ClCompile>
     <ClCompile Include="VisualSystem.cpp">
       <Filter>Core\ECS\System\Visual</Filter>
-    </ClCompile>
-    <ClCompile Include="Effect.cpp">
-      <Filter>Resource</Filter>
-    </ClCompile>
-    <ClCompile Include="EffectManager.cpp">
-      <Filter>Resource</Filter>
-    </ClCompile>
-    <ClCompile Include="Texture.cpp">
-      <Filter>Resource</Filter>
-    </ClCompile>
-    <ClCompile Include="TextureManager.cpp">
-      <Filter>Resource</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -378,20 +351,8 @@
     <ClInclude Include="RenderContext.h">
       <Filter>Core\SubSystem\VideoDevice</Filter>
     </ClInclude>
-    <ClInclude Include="VertexBuffer.h">
-      <Filter>Resource</Filter>
-    </ClInclude>
-    <ClInclude Include="IndexBuffer.h">
-      <Filter>Resource</Filter>
-    </ClInclude>
-    <ClInclude Include="Mesh.h">
-      <Filter>Resource</Filter>
-    </ClInclude>
     <ClInclude Include="AABB.h">
       <Filter>Sub\Geometry</Filter>
-    </ClInclude>
-    <ClInclude Include="Material.h">
-      <Filter>Resource</Filter>
     </ClInclude>
     <ClInclude Include="GameUtils.h">
       <Filter>Sub\GameUtils</Filter>
@@ -426,18 +387,6 @@
     <ClInclude Include="Backend.h">
       <Filter>Core\SubSystem\VideoDevice</Filter>
     </ClInclude>
-    <ClInclude Include="Resource.h">
-      <Filter>Resource</Filter>
-    </ClInclude>
-    <ClInclude Include="VertexBufferManager.h">
-      <Filter>Resource</Filter>
-    </ClInclude>
-    <ClInclude Include="ResourceManager.h">
-      <Filter>Resource</Filter>
-    </ClInclude>
-    <ClInclude Include="IndexBufferManager.h">
-      <Filter>Resource</Filter>
-    </ClInclude>
     <ClInclude Include="VideoDevice.h">
       <Filter>Core\SubSystem\VideoDevice</Filter>
     </ClInclude>
@@ -452,21 +401,6 @@
     </ClInclude>
     <ClInclude Include="VisualSystem.h">
       <Filter>Core\ECS\System\Visual</Filter>
-    </ClInclude>
-    <ClInclude Include="Effect.h">
-      <Filter>Resource</Filter>
-    </ClInclude>
-    <ClInclude Include="EffectManager.h">
-      <Filter>Resource</Filter>
-    </ClInclude>
-    <ClInclude Include="Texture.h">
-      <Filter>Resource</Filter>
-    </ClInclude>
-    <ClInclude Include="TextureManager.h">
-      <Filter>Resource</Filter>
-    </ClInclude>
-    <ClInclude Include="DeviceResource.h">
-      <Filter>Resource</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

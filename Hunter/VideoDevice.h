@@ -7,11 +7,14 @@
 #include "Command.h"
 #include "CommandBucket.h"
 
-#include "VertexBufferManager.h"
-#include "IndexBufferManager.h"
-
 //defines 
 #define VIDEO (gEngine->GetVideo())
+
+constexpr uint32 VERTEXBUFFER_MAX_NUM = 1024;
+constexpr uint32 INDEXBUFFER_MAX_NUM = 1024;
+constexpr uint32 TEXTURE_MAX_NUM = 256;
+constexpr uint32 EFFECT_MAX_NUM = 64;
+
 
 struct RenderWindow
 {
@@ -22,6 +25,7 @@ struct RenderWindow
 	D3DFORMAT depthStencilFormat;
 	HWND windowHandle;
 };
+
 
 class VideoDevice 
 {
@@ -48,10 +52,9 @@ public :
 
 	CommandBucket<uint32> &GetCommandBucket() { return _commandBucket; }
 
-	VertexBufferManager *GetVertexBufferManager() { return &_vertexBufferManager; }
-	IndexBufferManager *GetIndexBufferManager() { return &_indexBufferManager; }
-
 	MatrixCache &GetMatrixCache() { return _matrixCache; }
+
+	CreatevertexBuffer();
 
 private :
 	bool InitD3D(HWND windowHandle);
@@ -65,15 +68,19 @@ private :
 
 	D3DPRESENT_PARAMETERS _presentParams;
 
-	RenderWindow _renderWindow;
+	IDirect3DSwapChain9 *_additionalSwapChain;
 
+	RenderWindow _renderWindow;
 
 	EventChannel _channel;
 
 	CommandBucket<uint32> _commandBucket;
 
-	VertexBufferManager _vertexBufferManager;
-	IndexBufferManager _indexBufferManager;
+	VertexBuffer _vertexBuffers[VERTEXBUFFER_MAX_NUM];
+	IndexBuffer _indexBuffers[INDEXBUFFER_MAX_NUM];
+	Texture _textures[TEXTURE_MAX_NUM];
+	Effect _effets[EFFECT_MAX_NUM];
+
 	MatrixCache _matrixCache;
 };
 
