@@ -3,10 +3,6 @@
 
 #include "Component.h"
 
-constexpr ComponentID BUFFER_VISUAL_COMPONENT_ID = 1;
-constexpr ComponentID MESH_VISUAL_COMPONENT_ID = 1;
-
-
 class VisualComponent : public Component
 {
 public :
@@ -16,22 +12,28 @@ public :
 	//virtual void Render() const = 0;
 };
 
-class BufferVisualComponent : public VisualComponent
+class BufferVisualComponent : public Component
 {
 public :
 	BufferVisualComponent() {}
-	virtual ~BufferVisualComponent() {}
+	~BufferVisualComponent() {}
 
+	VertexBufferHandle vertexHandle;
+	IndexBufferHandle indexHandle;
+
+	EffectHandle effectHandle;
+	//VertexDeclHandle declHandle;
+	//SurfaceMaterialHandle materialHandle;
 
 private :
 
 };
 
-class MeshVisualComponent : public VisualComponent
+class MeshVisualComponent : public Component
 {
 public :
 	MeshVisualComponent() {}
-	virtual ~MeshVisualComponent() {}
+	~MeshVisualComponent() {}
 
 private :
 

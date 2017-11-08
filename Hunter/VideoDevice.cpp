@@ -13,10 +13,8 @@ VideoDevice::~VideoDevice()
 {
 }
 
-bool VideoDevice::Init(const std::string & name, const SystemSetting & setting)
+bool VideoDevice::Init()
 {
-	_name = name;
-
 	if (!InitD3D(gEngine->GetWindowHandle()))
 	{
 		return false;
@@ -27,7 +25,6 @@ bool VideoDevice::Init(const std::string & name, const SystemSetting & setting)
 
 	im::GuiRenderer::GetInstance()->Init(gpDevice, "consolas", WINSIZEX, WINSIZEY);
 
-
 	Matrix view;
 	Matrix projection;
 
@@ -36,7 +33,6 @@ bool VideoDevice::Init(const std::string & name, const SystemSetting & setting)
 	MatrixPerspectiveFovLH(&projection, D3DX_PI * 0.5f, (float)WINSIZEX / (float)WINSIZEY, 0.1f, 1000.0f);
 
 	_commandBucket.Init(1000, view, projection);
-
 
 	return true;
 }
@@ -101,22 +97,6 @@ bool32 VideoDevice::DrawIndexed(VertexBufferHandle vertexHandle, IndexBufferHand
 	}
 	return true;
 }
-
-//bool32 VideoSystem::DrawIndexed(IDirect3DVertexBuffer9 * pVertexBuffer, 
-//	IDirect3DIndexBuffer9 * pIndexBuffer,
-//	IDirect3DVertexDeclaration9 * pVertexDecl, 
-//	uint32 indexCount, uint32 vertexCount, uint32 startIndex, uint32 baseVertex, uint32 stride)
-//{
-//	_pDevice->SetVertexDeclaration(pVertexDecl);
-//	_pDevice->SetStreamSource(0, pVertexBuffer, 0, stride);
-//	_pDevice->SetIndices(pIndexBuffer);
-//	if (FAILED(_pDevice->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, baseVertex, 0, 
-//		vertexCount, startIndex, indexCount / 3)))
-//	{
-//		return false;
-//	}
-//	return true;
-//}
 
 bool VideoDevice::InitD3D(HWND windowHandle)
 {

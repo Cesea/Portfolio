@@ -1,17 +1,16 @@
 #ifndef EFFECT_H
 #define EFFECT_H
 
+#include "Resource.h"
+
 class Effect : public Resource
 {
-	friend class EffectManager;
 private :
 	Effect();
 	~Effect();
-	Effect(const Effect &other);
-	Effect &operator= (const Effect &other);
 public:
-
-	bool Load(const std::string &fileName, DWORD shaderFlag = 0);
+	bool32 Create(const std::string &fileName, DWORD shaderFlag = 0);
+	bool32 Destroy();
 
 	D3DXHANDLE GetTechHandle(const char *name);
 	D3DXHANDLE GetHandle(const char *name, D3DXHANDLE parent = NULL);
@@ -43,9 +42,12 @@ public:
 		_effect->CommitChanges();
 	}
 
-	EffectID GetID() { return _id; }
+
 private:
 	ID3DXEffect *_effect{};
+
+	Effect(const Effect &other);
+	Effect &operator= (const Effect &other);
 };
 
 

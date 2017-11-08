@@ -14,7 +14,7 @@ public:
 	Resource() { _handle = INVALID_HANDLE; }
 	virtual ~Resource() {}
 
-	virtual ResourceHandle Create() { return INVALID_HANDLE; }
+	virtual bool32 Create() { return false; }
 	virtual bool32 Destroy() { return false; }
 
 	ResourceHandle GetHandle() { return _handle; }

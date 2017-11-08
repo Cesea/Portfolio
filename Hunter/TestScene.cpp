@@ -36,7 +36,7 @@ bool32 TestScene::Render()
 	if (im::Button("toto"))
 	{
 		EventChannel channel;
-		channel.Broadcast(SceneSystem::SceneChangeEvent("BaseScene"));
+		channel.Broadcast(SceneManager::SceneChangeEvent("BaseScene"));
 	}
 
 	im::EndFrame();

@@ -1,14 +1,13 @@
 #ifndef TEST_ENGINE_H
 #define TEST_ENGINE_H
 
-#include "System.h"
 #include "ApplicationTimer.h"
 
 #include "Console.h"
 
-#include "InputSystem.h"
+#include "InputManager.h"
 #include "VideoDevice.h"
-#include "SceneSystem.h"
+#include "SceneManager.h"
 #include "PhysicsSystem.h"
 #include "CommandSystem.h"
 
@@ -28,7 +27,6 @@
 //	CommandSystem *pCommand{};
 //};
 
-typedef std::shared_ptr<System> SystemPtr;
 
 //class InputHandler
 //{
@@ -86,8 +84,8 @@ public :
 	LRESULT CALLBACK EngineWindowCallback(HWND windowHandle, UINT msg, WPARAM wParam, LPARAM lParam);
 
 	VideoDevice *GetVideo() { return _pVideo.get(); }
-	InputSystem *GetInput() { return _pInput.get(); }
-	SceneSystem *GetScene() { return _pScene.get(); }
+	InputManager *GetInput() { return _pInput.get(); }
+	SceneManager *GetScene() { return _pScene.get(); }
 
 private :
 	bool InitializeSystems();
@@ -104,8 +102,8 @@ private :
 	Console _console;
 
 	std::shared_ptr<VideoDevice> _pVideo;
-	std::shared_ptr<InputSystem> _pInput;
-	std::shared_ptr<SceneSystem> _pScene;
+	std::shared_ptr<InputManager> _pInput;
+	std::shared_ptr<SceneManager> _pScene;
 
 };
 

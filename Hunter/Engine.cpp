@@ -174,13 +174,13 @@ bool Engine::InitializeSystems()
 {
 	_pVideo = std::make_shared<VideoDevice>(VideoDevice());
 
-	if (!_pVideo->Init("VideoSystem", SystemSetting()))
+	if (!_pVideo->Init())
 	{
 		return false;
 	}
 
-	_pInput= std::make_shared<InputSystem>(InputSystem());
-	if (!_pInput->Init("InputSystem", SystemSetting()))
+	_pInput= std::make_shared<InputManager>(InputManager());
+	if (!_pInput->Init())
 	{
 		return false;
 	}
@@ -193,8 +193,8 @@ bool Engine::InitializeSystems()
 	//_pInput->GetChannel().Add<InputSystem::MouseReleasedEvent, InputHandler>(handler);
 	//_pInput->GetChannel().Add<InputSystem::MouseDownEvent, InputHandler>(handler);
 
-	_pScene = std::make_shared<SceneSystem>(SceneSystem());
-	if (!_pScene->Init("SceneSystem", SystemSetting()))
+	_pScene = std::make_shared<SceneManager>(SceneManager());
+	if (!_pScene->Init())
 	{
 		return false;
 	}

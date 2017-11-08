@@ -52,7 +52,7 @@
       <Filter>Sub\Reflection\Serializer</Filter>
     </ClCompile>
     <ClCompile Include="PhysicsSystem.cpp">
-      <Filter>Core\SubSystem\PhysicsSystem</Filter>
+      <Filter>Core\ECS\System\Physics</Filter>
     </ClCompile>
     <ClCompile Include="CommandComponent.cpp">
       <Filter>Core\ECS\Component\CommandComponent</Filter>
@@ -62,15 +62,6 @@
     </ClCompile>
     <ClCompile Include="CommandSystem.cpp">
       <Filter>Core\SubSystem\CommandSystem</Filter>
-    </ClCompile>
-    <ClCompile Include="System.cpp">
-      <Filter>Core\SubSystem</Filter>
-    </ClCompile>
-    <ClCompile Include="SceneSystem.cpp">
-      <Filter>Core\SubSystem\SceneeSystem</Filter>
-    </ClCompile>
-    <ClCompile Include="InputSystem.cpp">
-      <Filter>Core\SubSystem\InputSystem</Filter>
     </ClCompile>
     <ClCompile Include="ComponentFactory.cpp">
       <Filter>Core\ECS\Component</Filter>
@@ -174,6 +165,27 @@
     <ClCompile Include="VideoDevice.cpp">
       <Filter>Core\SubSystem\VideoDevice</Filter>
     </ClCompile>
+    <ClCompile Include="SceneManager.cpp">
+      <Filter>Core\SubSystem\SceneeManager</Filter>
+    </ClCompile>
+    <ClCompile Include="InputManager.cpp">
+      <Filter>Core\SubSystem\InputManager</Filter>
+    </ClCompile>
+    <ClCompile Include="VisualSystem.cpp">
+      <Filter>Core\ECS\System\Visual</Filter>
+    </ClCompile>
+    <ClCompile Include="Effect.cpp">
+      <Filter>Resource</Filter>
+    </ClCompile>
+    <ClCompile Include="EffectManager.cpp">
+      <Filter>Resource</Filter>
+    </ClCompile>
+    <ClCompile Include="Texture.cpp">
+      <Filter>Resource</Filter>
+    </ClCompile>
+    <ClCompile Include="TextureManager.cpp">
+      <Filter>Resource</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -271,10 +283,10 @@
       <Filter>Sub\Reflection\Serializer</Filter>
     </ClInclude>
     <ClInclude Include="PhysicsSystem.h">
-      <Filter>Core\SubSystem\PhysicsSystem</Filter>
+      <Filter>Core\ECS\System\Physics</Filter>
     </ClInclude>
     <ClInclude Include="PhysicsUtils.h">
-      <Filter>Core\SubSystem\PhysicsSystem</Filter>
+      <Filter>Core\ECS\System\Physics</Filter>
     </ClInclude>
     <ClInclude Include="PhysicsComponent.h">
       <Filter>Core\ECS\Component\PhysicsComponent</Filter>
@@ -287,15 +299,6 @@
     </ClInclude>
     <ClInclude Include="CommandSystem.h">
       <Filter>Core\SubSystem\CommandSystem</Filter>
-    </ClInclude>
-    <ClInclude Include="System.h">
-      <Filter>Core\SubSystem</Filter>
-    </ClInclude>
-    <ClInclude Include="SceneSystem.h">
-      <Filter>Core\SubSystem\SceneeSystem</Filter>
-    </ClInclude>
-    <ClInclude Include="InputSystem.h">
-      <Filter>Core\SubSystem\InputSystem</Filter>
     </ClInclude>
     <ClInclude Include="ComponentFactory.h">
       <Filter>Core\ECS\Component</Filter>
@@ -438,11 +441,32 @@
     <ClInclude Include="VideoDevice.h">
       <Filter>Core\SubSystem\VideoDevice</Filter>
     </ClInclude>
-    <ClInclude Include="VisualSystem.h">
-      <Filter>Core\ECS\System</Filter>
-    </ClInclude>
     <ClInclude Include="WorldEditor.h">
       <Filter>Sub\WorldEditor</Filter>
+    </ClInclude>
+    <ClInclude Include="SceneManager.h">
+      <Filter>Core\SubSystem\SceneeManager</Filter>
+    </ClInclude>
+    <ClInclude Include="InputManager.h">
+      <Filter>Core\SubSystem\InputManager</Filter>
+    </ClInclude>
+    <ClInclude Include="VisualSystem.h">
+      <Filter>Core\ECS\System\Visual</Filter>
+    </ClInclude>
+    <ClInclude Include="Effect.h">
+      <Filter>Resource</Filter>
+    </ClInclude>
+    <ClInclude Include="EffectManager.h">
+      <Filter>Resource</Filter>
+    </ClInclude>
+    <ClInclude Include="Texture.h">
+      <Filter>Resource</Filter>
+    </ClInclude>
+    <ClInclude Include="TextureManager.h">
+      <Filter>Resource</Filter>
+    </ClInclude>
+    <ClInclude Include="DeviceResource.h">
+      <Filter>Resource</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -533,17 +557,8 @@
     <Filter Include="Core\SubSystem">
       <UniqueIdentifier>{e5f48745-5d7e-4565-bd8e-8884a513ad53}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Core\SubSystem\PhysicsSystem">
-      <UniqueIdentifier>{38f62041-b695-4667-a92d-c088d6a67977}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Core\SubSystem\CommandSystem">
       <UniqueIdentifier>{46f0bc65-5f06-44dd-a5c1-6fe23fdb4469}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Core\SubSystem\SceneeSystem">
-      <UniqueIdentifier>{7f27f576-2e1f-4782-9b40-a2e0bbfeb180}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Core\SubSystem\InputSystem">
-      <UniqueIdentifier>{f1cfac8a-df1c-4e77-a1c0-7b9851f84811}</UniqueIdentifier>
     </Filter>
     <Filter Include="Core\SubSystem\AI">
       <UniqueIdentifier>{6c4296ed-e03d-4d77-9b2b-7f9bdb5082d3}</UniqueIdentifier>
@@ -556,6 +571,21 @@
     </Filter>
     <Filter Include="Sub\WorldEditor">
       <UniqueIdentifier>{35c933a0-76c2-436d-aefd-0f91891567df}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Memory">
+      <UniqueIdentifier>{98c93bb1-bc13-429c-8171-1e95e47a1893}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\SubSystem\SceneeManager">
+      <UniqueIdentifier>{7f27f576-2e1f-4782-9b40-a2e0bbfeb180}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\SubSystem\InputManager">
+      <UniqueIdentifier>{f1cfac8a-df1c-4e77-a1c0-7b9851f84811}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\ECS\System\Visual">
+      <UniqueIdentifier>{40dd0679-6318-4511-8b6d-8a02408dcca1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\ECS\System\Physics">
+      <UniqueIdentifier>{38f62041-b695-4667-a92d-c088d6a67977}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

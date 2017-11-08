@@ -9,9 +9,8 @@ PhysicsSystem::~PhysicsSystem()
 {
 }
 
-bool PhysicsSystem::Init(const std::string & name, SystemSetting & setting)
+bool PhysicsSystem::Init()
 {
-	_name = name;
 	return true;
 }
 

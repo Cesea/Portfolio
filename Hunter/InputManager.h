@@ -1,7 +1,5 @@
-#ifndef INPUT_SYSTEM_H
-#define INPUT_SYSTEM_H
-
-#include "System.h"
+#ifndef INPUT_MANAGER_H
+#define INPUT_MANAGER_H
 
 //#include "InputComponent.h"
 
@@ -9,7 +7,7 @@ constexpr int32 MOUSE_BUTTON_LEFT = 0;
 constexpr int32 MOUSE_BUTTON_MIDDLE = 1;
 constexpr int32 MOUSE_BUTTON_RIGHT = 2;
 
-class InputSystem;
+class InputManager;
 
 class Keyboard
 {
@@ -17,7 +15,7 @@ public :
 	Keyboard();
 	~Keyboard();
 
-	bool Init(InputSystem *pParent);
+	bool Init(InputManager *pParent);
 
 
 	void UpdateWithMessage(UINT msg, WPARAM wParam, LPARAM lParam);
@@ -54,7 +52,7 @@ private :
 	WPARAM _wParam{};
 	uint8 _vkCode{};
 
-	InputSystem *_pParent;
+	InputManager *_pParent;
 };
 
 
@@ -64,7 +62,7 @@ public:
 	Mouse();
 	~Mouse();
 
-	bool Init(InputSystem *pParent);
+	bool Init(InputManager *pParent);
 
 	void UpdateWithMessage(WPARAM wParam, LPARAM lParam);
 	void UpdateWheelWithMessage(WPARAM wParam, LPARAM lParam);
@@ -96,11 +94,11 @@ private:
 
 	int32 _wheelDelta{};
 
-	InputSystem *_pParent;
+	InputManager *_pParent;
 };
 
 
-class InputSystem : public System
+class InputManager 
 {
 	friend class Keyboard;
 	friend class Mouse;
@@ -165,18 +163,20 @@ public :
 		POINT coord;
 	};
 
-	InputSystem();
-	virtual ~InputSystem();
+	InputManager();
+	virtual ~InputManager();
 
-	virtual bool Init(const std::string &name, const SystemSetting &setting);
-	virtual void ShutDown();
+	bool Init();
+	void ShutDown();
 
-	virtual void Update(float deltaTime);
-	virtual EventChannel GetChannel() { return _channel; }
+	void Update(float deltaTime);
+	EventChannel GetChannel() { return _channel; }
 
 	Keyboard keyboard;
 	Mouse mouse;
 private :
+
+	EventChannel _channel;
 
 
 };

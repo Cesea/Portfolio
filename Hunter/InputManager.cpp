@@ -1,28 +1,27 @@
 #include "stdafx.h"
-#include "InputSystem.h"
+#include "InputManager.h"
 
-InputSystem::InputSystem()
+InputManager::InputManager()
 {
 	
 }
 
-InputSystem::~InputSystem()
+InputManager::~InputManager()
 {
 }
 
-bool InputSystem::Init(const std::string & name, const SystemSetting & setting)
+bool InputManager::Init()
 {
-	_name = name;
 	mouse.Init(this);
 	keyboard.Init(this);
 	return true;
 }
 
-void InputSystem::ShutDown()
+void InputManager::ShutDown()
 {
 }
 
-void InputSystem::Update(float deltaTime)
+void InputManager::Update(float deltaTime)
 {
 	keyboard.Update();
 	mouse.Update();
@@ -36,7 +35,7 @@ Keyboard::~Keyboard()
 {
 }
 
-bool Keyboard::Init(InputSystem * pParent)
+bool Keyboard::Init(InputManager * pParent)
 {
 	_pParent = pParent;
 	return true;
@@ -88,27 +87,19 @@ void Keyboard::Update()
 	{
 		if (IsDown(i))
 		{
-			_pParent->GetChannel().Broadcast<InputSystem::KeyDownEvent>(InputSystem::KeyDownEvent(i));
+			_pParent->GetChannel().Broadcast<InputManager::KeyDownEvent>(InputManager::KeyDownEvent(i));
 		}
 		if (IsReleased(i))
 		{
-			_pParent->GetChannel().Broadcast<InputSystem::KeyReleasedEvent>(InputSystem::KeyReleasedEvent(i));
+			_pParent->GetChannel().Broadcast<InputManager::KeyReleasedEvent>(InputManager::KeyReleasedEvent(i));
 		}
 		if (IsPressed(i))
 		{
-			_pParent->GetChannel().Broadcast<InputSystem::KeyPressedEvent>(InputSystem::KeyPressedEvent(i));
+			_pParent->GetChannel().Broadcast<InputManager::KeyPressedEvent>(InputManager::KeyPressedEvent(i));
 		}
 	}
 	memcpy(_oldState, _currentState, sizeof(bool) * 256);
 }
-
-//void Keyboard::ProcessWindowMessage(bool32 * button, bool32 isDown)
-//{
-//	if (*button != isDown)
-//	{
-//		*button = isDown;
-//	}
-//}
 
 Mouse::Mouse()
 {
@@ -118,7 +109,7 @@ Mouse::~Mouse()
 {
 }
 
-bool Mouse::Init(InputSystem * pParent)
+bool Mouse::Init(InputManager * pParent)
 {
 	_pParent = pParent;
 	return true;
@@ -139,7 +130,7 @@ void Mouse::UpdateWithMessage(WPARAM wParam, LPARAM lParam)
 
 	if (_currentPoint.x != _oldPoint.x || _currentPoint.y != _oldPoint.y)
 	{
-		_pParent->_channel.Broadcast<InputSystem::MouseMoveEvent>(InputSystem::MouseMoveEvent(PointMake(_currentPoint.x, _currentPoint.y)));
+		_pParent->_channel.Broadcast<InputManager::MouseMoveEvent>(InputManager::MouseMoveEvent(PointMake(_currentPoint.x, _currentPoint.y)));
 	}
 
 	//constexpr로 버튼이 정의 되어있다
@@ -147,21 +138,20 @@ void Mouse::UpdateWithMessage(WPARAM wParam, LPARAM lParam)
 	{
 		if (IsDown(i))
 		{
-			_pParent->_channel.Broadcast<InputSystem::MouseDownEvent>(InputSystem::MouseDownEvent(i,
+			_pParent->_channel.Broadcast<InputManager::MouseDownEvent>(InputManager::MouseDownEvent(i,
 				PointMake(_currentPoint.x, _currentPoint.y)));
 		}
 		if (IsReleased(i))
 		{
-			_pParent->_channel.Broadcast<InputSystem::MouseReleasedEvent>(InputSystem::MouseReleasedEvent(i,
+			_pParent->_channel.Broadcast<InputManager::MouseReleasedEvent>(InputManager::MouseReleasedEvent(i,
 				PointMake(_currentPoint.x, _currentPoint.y)));
 		}
 		if (IsPressed(i))
 		{
-			_pParent->_channel.Broadcast<InputSystem::MousePressedEvent>(InputSystem::MousePressedEvent(i, 
+			_pParent->_channel.Broadcast<InputManager::MousePressedEvent>(InputManager::MousePressedEvent(i, 
 				PointMake(_currentPoint.x, _currentPoint.y)));
 		}
 	}
-
 }
 
 void Mouse::UpdateWheelWithMessage(WPARAM wParam, LPARAM lParam)

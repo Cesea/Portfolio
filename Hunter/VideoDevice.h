@@ -1,11 +1,6 @@
 #ifndef VIDEO_SYSTEM_H
 #define VIDEO_SYSTEM_H
 
-#include "System.h"
-
-//#include "VisualComponent.h"
-
-
 #include "imguiRenderer.h"
 #include "DebugDraw.h"
 
@@ -28,23 +23,23 @@ struct RenderWindow
 	HWND windowHandle;
 };
 
-class VideoDevice : public System
+class VideoDevice 
 {
 public :
 	VideoDevice();
 	virtual ~VideoDevice();
 
-	virtual bool Init(const std::string &name, const SystemSetting &setting);
-	virtual void ShutDown();
+	bool Init();
+	void ShutDown();
 
-	virtual void Update(float deltaTime);
+	void Update(float deltaTime);
 	void Render();
 
 	LPDIRECT3DDEVICE9 GetDevice()
 	{
 		return _pDevice;
 	}
-	virtual EventChannel GetChannel() { return _channel; }
+	EventChannel GetChannel() { return _channel; }
 
 	bool32 Draw(VertexBufferHandle vertexHandle,
 		uint32 startVertex, uint32 primitiveCount, uint32 matrixIndex);
@@ -72,17 +67,14 @@ private :
 
 	RenderWindow _renderWindow;
 
-	//im::GuiRenderer *_pimguiRenderer;
+
+	EventChannel _channel;
 
 	CommandBucket<uint32> _commandBucket;
 
 	VertexBufferManager _vertexBufferManager;
 	IndexBufferManager _indexBufferManager;
 	MatrixCache _matrixCache;
-	//ResourceManager<IndexBuffer> _indexBufferManager;
-	//ResourceManager<Texture> _textureManager;
-	//ResourceManager<Effect> _effectManager;
-	//ResourceManager<RenderTarget> _renderTargetManager;
 };
 
 namespace backend

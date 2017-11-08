@@ -1,13 +1,12 @@
-#ifndef SCENE_SYSTEM_H
-#define SCENE_SYSTEM_H
+#ifndef SCENE_MANAGER_H
+#define SCENE_MANAGER_H
 
-#include "System.h"
 
 #include "IScene.h"
 
 #include <map>
 
-class SceneSystem : public System
+class SceneManager
 {
 	typedef std::map<std::string, IScene *> SceneMap;
 	typedef std::map<std::string, IScene *>::iterator SceneMapIter;
@@ -21,14 +20,14 @@ public :
 
 public :
 
-	SceneSystem();
-	virtual ~SceneSystem();
+	SceneManager();
+	virtual ~SceneManager();
 
-	virtual bool Init(const std::string &name, const SystemSetting &setting);
-	virtual void ShutDown();
+	bool Init();
+	void ShutDown();
 
 	virtual void Update(float deltaTime);
-	virtual EventChannel GetChannel() { return _channel; }
+	EventChannel GetChannel() { return _channel; }
 private :
 	bool ChangeScene(const std::string &key);
 
@@ -38,9 +37,11 @@ private :
 	void RemoveAllScenes();
 
 private :
-
 	SceneMap _scenes;
+
 	IScene *_pCurrentScene;
+
+	EventChannel _channel;
 
 	//Event handle
 public :

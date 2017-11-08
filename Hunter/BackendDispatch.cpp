@@ -17,3 +17,11 @@ void backenddispatch::DrawIndexed(const void * pData)
 		pConverted->numVertex, pConverted->startIndex, pConverted->numVertex, pConverted->worldMatrix);
 	//backend::Draw(pConverted->primitiveCount, );
 }
+
+void backenddispatch::SetEffect(const void * pCommand)
+{
+}
+
+void backenddispatch::SetSurfaceMaterial(const void * pCommand)
+{
+}

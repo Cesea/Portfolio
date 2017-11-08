@@ -36,6 +36,8 @@
 #include "Typedefs.h"
 #include "Reflection.h"
 
+#include "EventChannel.h"
+
 //#include "Resource.h"
 
 #include "Math.h"

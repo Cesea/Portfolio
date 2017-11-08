@@ -22,9 +22,9 @@ Effect & Effect::operator=(const Effect & other)
 	return *this;
 }
 
-bool Effect::Load(const std::string &fileName, DWORD shaderFlag)
+bool32 Effect::Create(const std::string &fileName, DWORD shaderFlag)
 {
-	bool result = true;;
+	bool32 result = true;
 	ID3DXBuffer *errorBuffer{};
 	HRESULT hr = D3DXCreateEffectFromFile(gpDevice, fileName.c_str(), nullptr, NULL, shaderFlag, NULL, &_effect, &errorBuffer);
 	if (FAILED(hr))
@@ -34,6 +34,12 @@ bool Effect::Load(const std::string &fileName, DWORD shaderFlag)
 	}
 
 	return result;
+}
+
+bool32 Effect::Destroy()
+{
+	COM_RELEASE(_effect)
+	return true;
 }
 
 D3DXHANDLE Effect::GetTechHandle(const char *name)

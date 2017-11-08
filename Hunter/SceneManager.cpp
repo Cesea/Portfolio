@@ -1,22 +1,21 @@
 #include "stdafx.h"
-#include "SceneSystem.h"
+#include "SceneManager.h"
 
 #include "BaseScene.h"
 #include "TestScene.h"
 
-SceneSystem::SceneSystem()
+SceneManager::SceneManager()
 {
 	_pCurrentScene = nullptr;
 }
 
-SceneSystem::~SceneSystem()
+SceneManager::~SceneManager()
 {
 }
 
-bool SceneSystem::Init(const std::string & name, const SystemSetting & setting)
+bool SceneManager::Init()
 {
-	_name = name;
-
+	//기본 베이스 씬 세팅
 	IScene *pScene = new BaseScene;
 	AddScene(pScene->GetSceneName(), pScene);
 	ChangeScene(pScene->GetSceneName());
@@ -24,24 +23,23 @@ bool SceneSystem::Init(const std::string & name, const SystemSetting & setting)
 	pScene = new TestScene;
 	AddScene(pScene->GetSceneName(), pScene);
 
-
-	GetChannel().Add<SceneChangeEvent, SceneSystem>(*this);
+	GetChannel().Add<SceneChangeEvent, SceneManager>(*this);
 
 	return true;
 }
 
-void SceneSystem::ShutDown()
+void SceneManager::ShutDown()
 {
 	RemoveAllScenes();
 }
 
-void SceneSystem::Update(float deltaTime)
+void SceneManager::Update(float deltaTime)
 {
 	_pCurrentScene->Update(deltaTime);
 	_pCurrentScene->Render();
 }
 
-bool SceneSystem::ChangeScene(const std::string &key)
+bool SceneManager::ChangeScene(const std::string &key)
 {
 	auto find = _scenes.find(key);
 	if (find == _scenes.end())
@@ -66,7 +64,7 @@ bool SceneSystem::ChangeScene(const std::string &key)
 	return true;
 }
 
-void SceneSystem::AddScene(const std::string &sceneName, IScene *pScene)
+void SceneManager::AddScene(const std::string &sceneName, IScene *pScene)
 {
 	if (pScene == nullptr)
 	{
@@ -80,7 +78,7 @@ void SceneSystem::AddScene(const std::string &sceneName, IScene *pScene)
 	}
 }
 
-void SceneSystem::RemoveScene(const std::string & key)
+void SceneManager::RemoveScene(const std::string & key)
 {
 	auto find = _scenes.find(key);
 	if (find == _scenes.end())
@@ -91,7 +89,7 @@ void SceneSystem::RemoveScene(const std::string & key)
 	}
 }
 
-void SceneSystem::RemoveAllScenes()
+void SceneManager::RemoveAllScenes()
 {
 	for (auto scene : _scenes)
 	{

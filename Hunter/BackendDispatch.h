@@ -7,6 +7,9 @@ namespace backenddispatch
 {
 	void Draw(const void *pCommand);
 	void DrawIndexed(const void *pCommand);
+
+	void SetEffect(const void *pCommand);
+	void SetSurfaceMaterial(const void *pCommand);
 }
 
 #endif

@@ -1,24 +1,24 @@
 #ifndef PHYSICS_SYSTEM_H
 #define PHYSICS_SYSTEM_H
 
-#include "System.h"
 
 //#include "PhysicsComponent.h"
 
-class PhysicsSystem : public System
+class PhysicsSystem 
 {
 public:
 	PhysicsSystem();
 	virtual ~PhysicsSystem();
 
-	virtual bool Init(const std::string &name, SystemSetting &setting);
+	virtual bool Init();
 	virtual void ShutDown();
 
-	virtual void Update(float deltaTime);
+	void Update(float deltaTime);
 
-	virtual EventChannel GetChannel() { return _channel; }
+	EventChannel GetChannel() { return _channel; }
 
 private :
+	EventChannel _channel;
 
 };
 

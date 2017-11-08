@@ -1,7 +1,7 @@
 #ifndef IM_GUI_RENDERER_H
 #define IM_GUI_RENDERER_H
 
-#include "InputSystem.h"
+#include "InputManager.h"
 #include "SingletonBase.h"
 
 namespace im
@@ -50,7 +50,7 @@ namespace im
 	{
 		char type;
 		char flags;
-		uint16 z;
+		float z;
 		D3DCOLOR color;
 		union
 		{
@@ -82,9 +82,8 @@ namespace im
 		int32 width;
 		int32 height;
 
-		int32 z{0};
+		float z{0.0f};
 
-		int32 scroll{0};
 		int32 top;
 		bool32 opened{true};
 		bool32 mouseInside{ false };
@@ -175,7 +174,7 @@ namespace im
 
 	bool imMessageProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
-	constexpr uint32 GFXCOMMAND_QUEUE_SIZE = 5000;
+	constexpr uint32 GFXCOMMAND_QUEUE_SIZE = 1000;
 
 	class GuiRenderer : public SingletonBase<GuiRenderer>
 	{
