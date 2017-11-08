@@ -29,22 +29,89 @@ void *operator new(size_t bytes, const char *file, int32 line)
 	return result;
 }
 
-template <Allocator>
-void *operator new(size_t bytes, Allocator &allocator, const char *file, lin32 line)
+template <class T> 
+struct TypeAndCount
 {
-	void *result = nullptr;
-	return result;
+};
+
+template <class T, size_t N>
+struct TypeAndCount<T[N]>
+{
+	typedef T Type;
+	static const size_t Count = N;
+};
+
+//template <typename Allocator>
+//void *operator new(size_t bytes, Allocator &allocator, const char *file, int32 line)
+//{
+//	void *result = allocator.Allocate(bytes);
+//	return result;
+//}
+//
+//template <typename Allocator>
+//void operator delete(void *ptr, Allocator &allocator, const char *file, int32 line)
+//{
+//	allocator.Free(ptr);
+//}
+
+template <typename T, typename Arena>
+void Delete(T *object, Arena &arena)
+{
+	object->~T();
+	arena.Free(object);
 }
+
+template <typename T, typename Arena>
+T *NewArray(Arena &arena, size_t n, const char *file, int32 line)
+{
+	union
+	{
+		void *as_void;
+		size_t *as_size_t;
+		T *as_T;
+	};
+
+	as_void = arena.Allocate(sizeof(T) * n + sizeof(size_t), file, line);
+	*as_size_t++ = n;
+
+	const T *const onePastLast = as_T + n;
+	while (as_T < onePastLast)
+	{
+		new (as_T++) T;
+	}
+
+	return (as_t - n);
+}
+
+template <typename T, typename Arena>
+void DeleteArray(T *ptr, Arena &arena)
+{
+	union
+	{
+		size_t *as_size_t;
+		T *as_T;
+	};
+
+	as_T = ptr;
+	const size_t N = as_size_t[-1];
+
+	for (size_t i = N; i > 0; --i)
+	{
+		as_T[i - 1].~T();
+	}
+	arena.Free(as_size_t - 1);
+}
+
+#define HUNTER_NEW(type, arena) new (arena.Allocate(sizeof(type), __FILE__, __LINE__)) type
+#define HUNTER_DELETE(type, arena) Delete(type, arena)
+#define HUNTER_NEW_ARRAY(type, arena) NewArray<TypeAndCount<type>::Type>(arena, TypeAndCount<type>::Count, __FILE__, __LINE__)
+#define HUNTER_DELETE_ARRAY(type, arena) DeleteArray(type, arena);
 
 int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE phInstance, LPSTR cmdLine, int cmdShow)
 {
-	
-	foo *a = new(__FILE__, __LINE__) foo(12.0f, 4.0f, 5.0f);
 
-	void *pData = malloc(1000);
-
-	//foo *f = new (__FILE__, __LINE__) foo(1.0f, 2.0f, 3.0f);
-
+	/*Test *test = HUNTER_NEW(Test, arena)(0, 1, 2);
+	HUNTER_DELETE(test, arena);*/
 
 
 	gEngine = new Engine;
