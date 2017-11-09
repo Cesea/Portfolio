@@ -165,7 +165,6 @@ bool32 BaseScene::Init()
 	//	Entity entity = _world.CreateEntity();
 	//	entity.AddComponent<PositionComponent>(Vector3(RandFloat(), RandFloat(), RandFloat()));
 	//	entity.AddComponent<MoveComponent>();
-
 	//	entity.Activate();
 	//}
 

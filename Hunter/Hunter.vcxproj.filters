@@ -409,6 +409,9 @@
     <ClInclude Include="MoveSystem.h">
       <Filter>GameScene</Filter>
     </ClInclude>
+    <ClInclude Include="TypeTraits.h">
+      <Filter>Sub</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Event">

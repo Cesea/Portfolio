@@ -250,6 +250,7 @@
     <ClInclude Include="StaticControl.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="Typedefs.h" />
+    <ClInclude Include="TypeTraits.h" />
     <ClInclude Include="Variant.h" />
     <ClInclude Include="VariantBase.h" />
     <ClInclude Include="Vector2.h" />

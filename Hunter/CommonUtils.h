@@ -7,10 +7,10 @@
 #include "BitFlags.h"	
 #include "Handle.h"
 
+#include "TypeTraits.h"
 
 constexpr float EPSILON = 0.001f;
 constexpr float ONE_RAD = 0.017453f;
-
 
 inline bool IsCharacter(WPARAM wParam)
 {
@@ -84,6 +84,20 @@ inline int32 RectWidth(const RECT &rect)
 inline int32 RectHeight(const RECT &rect)
 {
 	return rect.bottom - rect.top;
+}
+
+inline float ClampFloat(float value, float min, float max)
+{
+	float result = value;
+	if (result < min)
+	{
+		result = min;
+	}
+	else if (result > max)
+	{
+		result = max;
+	}
+	return result;
 }
 
 inline float Clamp01(float value)
