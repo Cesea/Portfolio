@@ -54,9 +54,6 @@
     <ClCompile Include="imguiRenderer.cpp">
       <Filter>GUI</Filter>
     </ClCompile>
-    <ClCompile Include="CommandSystem.cpp">
-      <Filter>Core\SubSystem\CommandSystem</Filter>
-    </ClCompile>
     <ClCompile Include="XMLManager.cpp">
       <Filter>Managers</Filter>
     </ClCompile>
@@ -131,22 +128,22 @@
     </ClCompile>
     <ClCompile Include="Handle.cpp" />
     <ClCompile Include="Entity.cpp">
-      <Filter>Core\ECS\Entity</Filter>
+      <Filter>ECS\Entity</Filter>
     </ClCompile>
     <ClCompile Include="World.cpp">
-      <Filter>Core\ECS</Filter>
+      <Filter>ECS</Filter>
     </ClCompile>
     <ClCompile Include="EntityIDPool.cpp">
-      <Filter>Core\ECS\Entity</Filter>
+      <Filter>ECS\Entity</Filter>
     </ClCompile>
     <ClCompile Include="Filter.cpp">
-      <Filter>Core\ECS</Filter>
+      <Filter>ECS</Filter>
     </ClCompile>
     <ClCompile Include="EntityComponentStorage.cpp">
-      <Filter>Core\ECS\Entity</Filter>
+      <Filter>ECS\Entity</Filter>
     </ClCompile>
     <ClCompile Include="BaseSystem.cpp">
-      <Filter>Core\ECS\System</Filter>
+      <Filter>ECS\System</Filter>
     </ClCompile>
     <ClCompile Include="PositionComponent.cpp">
       <Filter>GameScene</Filter>
@@ -155,6 +152,15 @@
       <Filter>GameScene</Filter>
     </ClCompile>
     <ClCompile Include="MoveSystem.cpp">
+      <Filter>GameScene</Filter>
+    </ClCompile>
+    <ClCompile Include="Allocators.cpp">
+      <Filter>Core\Memory</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderComponent.cpp">
+      <Filter>GameScene</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderSystem.cpp">
       <Filter>GameScene</Filter>
     </ClCompile>
   </ItemGroup>
@@ -186,9 +192,6 @@
     </ClInclude>
     <ClInclude Include="CommonUtils.h">
       <Filter>Sub</Filter>
-    </ClInclude>
-    <ClInclude Include="D3DCommon.h">
-      <Filter>D3D</Filter>
     </ClInclude>
     <ClInclude Include="IScene.h">
       <Filter>GameScene</Filter>
@@ -250,9 +253,6 @@
     <ClInclude Include="XmlSerializer.h">
       <Filter>Sub\Reflection\Serializer</Filter>
     </ClInclude>
-    <ClInclude Include="CommandSystem.h">
-      <Filter>Core\SubSystem\CommandSystem</Filter>
-    </ClInclude>
     <ClInclude Include="Vector3.h">
       <Filter>Math</Filter>
     </ClInclude>
@@ -282,9 +282,6 @@
     </ClInclude>
     <ClInclude Include="BitFlags.h">
       <Filter>Sub</Filter>
-    </ClInclude>
-    <ClInclude Include="AISystem.h">
-      <Filter>Core\SubSystem\AI</Filter>
     </ClInclude>
     <ClInclude Include="TestScene.h">
       <Filter>GameScene\TestScene</Filter>
@@ -368,40 +365,40 @@
       <Filter>Core\SubSystem\VideoDevice</Filter>
     </ClInclude>
     <ClInclude Include="BaseSystem.h">
-      <Filter>Core\ECS\System</Filter>
+      <Filter>ECS\System</Filter>
     </ClInclude>
     <ClInclude Include="Entity.h">
-      <Filter>Core\ECS\Entity</Filter>
+      <Filter>ECS\Entity</Filter>
     </ClInclude>
     <ClInclude Include="Filter.h">
-      <Filter>Core\ECS</Filter>
+      <Filter>ECS</Filter>
     </ClInclude>
     <ClInclude Include="Component.h">
-      <Filter>Core\ECS\Component</Filter>
+      <Filter>ECS\Component</Filter>
     </ClInclude>
     <ClInclude Include="World.h">
-      <Filter>Core\ECS</Filter>
+      <Filter>ECS</Filter>
     </ClInclude>
     <ClInclude Include="System.h">
-      <Filter>Core\ECS\System</Filter>
+      <Filter>ECS\System</Filter>
     </ClInclude>
     <ClInclude Include="EntityIDPool.h">
-      <Filter>Core\ECS\Entity</Filter>
+      <Filter>ECS\Entity</Filter>
     </ClInclude>
     <ClInclude Include="EntityComponentStorage.h">
-      <Filter>Core\ECS\Entity</Filter>
+      <Filter>ECS\Entity</Filter>
     </ClInclude>
     <ClInclude Include="ContainerCheck.h">
-      <Filter>Core\ECS</Filter>
+      <Filter>ECS</Filter>
     </ClInclude>
     <ClInclude Include="PositionComponent.h">
       <Filter>GameScene</Filter>
     </ClInclude>
     <ClInclude Include="EntityComponentSystem.h">
-      <Filter>Core\ECS</Filter>
+      <Filter>ECS</Filter>
     </ClInclude>
     <ClInclude Include="ClassTypeID.h">
-      <Filter>Core\ECS\System</Filter>
+      <Filter>ECS\System</Filter>
     </ClInclude>
     <ClInclude Include="MoveComponent.h">
       <Filter>GameScene</Filter>
@@ -411,6 +408,21 @@
     </ClInclude>
     <ClInclude Include="TypeTraits.h">
       <Filter>Sub</Filter>
+    </ClInclude>
+    <ClInclude Include="Assert.h">
+      <Filter>Debug</Filter>
+    </ClInclude>
+    <ClInclude Include="Memory.h">
+      <Filter>Core\Memory</Filter>
+    </ClInclude>
+    <ClInclude Include="Allocators.h">
+      <Filter>Core\Memory</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderSystem.h">
+      <Filter>GameScene</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderComponent.h">
+      <Filter>GameScene</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -426,20 +438,11 @@
     <Filter Include="Managers">
       <UniqueIdentifier>{dd9be55d-6b15-4a92-868d-f0f884e2091e}</UniqueIdentifier>
     </Filter>
-    <Filter Include="D3D">
-      <UniqueIdentifier>{90a21fa1-7f39-4247-9c5c-7baab7f73e24}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Core\ECS">
-      <UniqueIdentifier>{b95cc362-b92e-4594-9f7e-f616decbab66}</UniqueIdentifier>
-    </Filter>
     <Filter Include="GUI\Retained">
       <UniqueIdentifier>{2a13886c-38b1-4b75-8384-e30c2d02c998}</UniqueIdentifier>
     </Filter>
     <Filter Include="GUI\Retained\Controls">
       <UniqueIdentifier>{57d48df4-4e4b-40f8-9c08-49981fe29a16}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Core\ECS\Component">
-      <UniqueIdentifier>{4612874c-6698-4368-8047-8d8ef737e672}</UniqueIdentifier>
     </Filter>
     <Filter Include="Sub">
       <UniqueIdentifier>{f0b23895-3d21-4c5e-b58d-d8cf44373094}</UniqueIdentifier>
@@ -459,17 +462,11 @@
     <Filter Include="Math">
       <UniqueIdentifier>{a3fc95b4-5fb1-4f8f-8f65-d94a2c21622d}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Core\ECS\Entity">
-      <UniqueIdentifier>{a7343b1c-dd07-47ed-95e0-d2c5a6a63021}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Core\Timers">
       <UniqueIdentifier>{1a498917-4bd0-45a4-8cdb-28af30c3deb7}</UniqueIdentifier>
     </Filter>
     <Filter Include="Debug">
       <UniqueIdentifier>{76a6963c-195a-47f4-bb35-80dc0a39ec35}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Resource">
-      <UniqueIdentifier>{3d70d5cf-6765-4215-babf-900522c0b8ba}</UniqueIdentifier>
     </Filter>
     <Filter Include="Sub\Geometry">
       <UniqueIdentifier>{af510b90-b9d7-4a38-a5b2-3d59f833cb99}</UniqueIdentifier>
@@ -483,17 +480,8 @@
     <Filter Include="Core\SubSystem">
       <UniqueIdentifier>{e5f48745-5d7e-4565-bd8e-8884a513ad53}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Core\SubSystem\CommandSystem">
-      <UniqueIdentifier>{46f0bc65-5f06-44dd-a5c1-6fe23fdb4469}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Core\SubSystem\AI">
-      <UniqueIdentifier>{6c4296ed-e03d-4d77-9b2b-7f9bdb5082d3}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Core\SubSystem\VideoDevice">
       <UniqueIdentifier>{05262f6f-8893-4a0a-b28e-843ce048c3cb}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Core\ECS\System">
-      <UniqueIdentifier>{73e7c0f0-6155-478f-bc21-3ff3236126e8}</UniqueIdentifier>
     </Filter>
     <Filter Include="Sub\WorldEditor">
       <UniqueIdentifier>{35c933a0-76c2-436d-aefd-0f91891567df}</UniqueIdentifier>
@@ -512,6 +500,18 @@
     </Filter>
     <Filter Include="GameScene\TestScene">
       <UniqueIdentifier>{5a71353e-00bc-4729-92c9-598c2955957d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ECS">
+      <UniqueIdentifier>{b95cc362-b92e-4594-9f7e-f616decbab66}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ECS\Component">
+      <UniqueIdentifier>{4612874c-6698-4368-8047-8d8ef737e672}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ECS\Entity">
+      <UniqueIdentifier>{a7343b1c-dd07-47ed-95e0-d2c5a6a63021}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ECS\System">
+      <UniqueIdentifier>{73e7c0f0-6155-478f-bc21-3ff3236126e8}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

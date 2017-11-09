@@ -5,6 +5,7 @@
 
 #include "World.h"
 #include "MoveSystem.h"
+#include "RenderSystem.h"
 
 class BaseScene : public IScene
 {
@@ -50,6 +51,7 @@ protected :
 	World _world;
 
 	MoveSystem _moveSystem;
+	RenderSystem _renderSystem;
 
 };
 

@@ -46,13 +46,10 @@
 #define MAX_PATH (256)
 
 #include "Typedefs.h"
+#include "Memory.h"
 #include "Reflection.h"
-
 #include "EventChannel.h"
-
 #include "EntityComponentSystem.h"
-
-//#include "Resource.h"
 
 #include "Math.h"
 #include "CommonUtils.h"

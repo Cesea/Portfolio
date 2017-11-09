@@ -118,6 +118,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Allocators.cpp" />
     <ClCompile Include="ApplicationTimer.cpp" />
     <ClCompile Include="Backend.cpp" />
     <ClCompile Include="BackendDispatch.cpp" />
@@ -125,7 +126,6 @@
     <ClCompile Include="BaseSystem.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="Command.cpp" />
-    <ClCompile Include="CommandSystem.cpp" />
     <ClCompile Include="CommonUtils.cpp" />
     <ClCompile Include="Console.cpp" />
     <ClCompile Include="Control.cpp" />
@@ -145,6 +145,8 @@
     <ClCompile Include="MoveSystem.cpp" />
     <ClCompile Include="Quaternion.cpp" />
     <ClCompile Include="Ray.cpp" />
+    <ClCompile Include="RenderComponent.cpp" />
+    <ClCompile Include="RenderSystem.cpp" />
     <ClCompile Include="TerrainConfig.cpp" />
     <ClCompile Include="TestScene.cpp" />
     <ClCompile Include="Transform.cpp" />
@@ -177,8 +179,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AABB.h" />
-    <ClInclude Include="AISystem.h" />
     <ClInclude Include="ApplicationTimer.h" />
+    <ClInclude Include="Assert.h" />
     <ClInclude Include="Backend.h" />
     <ClInclude Include="BackendDispatch.h" />
     <ClInclude Include="BaseScene.h" />
@@ -191,7 +193,6 @@
     <ClInclude Include="Command.h" />
     <ClInclude Include="CommandBucket.h" />
     <ClInclude Include="CommandPacket.h" />
-    <ClInclude Include="CommandSystem.h" />
     <ClInclude Include="CommonUtils.h" />
     <ClInclude Include="Component.h" />
     <ClInclude Include="Console.h" />
@@ -207,9 +208,11 @@
     <ClInclude Include="GameUtils.h" />
     <ClInclude Include="Handle.h" />
     <ClInclude Include="imguiRenderer.h" />
+    <ClInclude Include="Allocators.h" />
     <ClInclude Include="Math.h" />
     <ClInclude Include="Matrix.h" />
     <ClInclude Include="MatrixCache.h" />
+    <ClInclude Include="Memory.h" />
     <ClInclude Include="MoveComponent.h" />
     <ClInclude Include="Node.h" />
     <ClInclude Include="Plane.h" />
@@ -217,7 +220,9 @@
     <ClInclude Include="MoveSystem.h" />
     <ClInclude Include="Quaternion.h" />
     <ClInclude Include="Ray.h" />
+    <ClInclude Include="RenderComponent.h" />
     <ClInclude Include="RenderContext.h" />
+    <ClInclude Include="RenderSystem.h" />
     <ClInclude Include="System.h" />
     <ClInclude Include="Terrain.h" />
     <ClInclude Include="TerrainConfig.h" />
@@ -228,7 +233,6 @@
     <ClInclude Include="TextSerializer.h" />
     <ClInclude Include="tinyxml2.h" />
     <ClInclude Include="oldTransform.h" />
-    <ClInclude Include="D3DCommon.h" />
     <ClInclude Include="DataPackage.h" />
     <ClInclude Include="Dialog.h" />
     <ClInclude Include="Engine.h" />

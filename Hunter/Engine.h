@@ -8,8 +8,6 @@
 #include "InputManager.h"
 #include "VideoDevice.h"
 #include "SceneManager.h"
-#include "PhysicsSystem.h"
-#include "CommandSystem.h"
 
 #include <memory>
 

@@ -293,9 +293,12 @@ namespace video
 
 		CommandBucket<uint32> &GetCommandBucket() { return _commandBucket; }
 
-		//void CreateIndexBuffer(IndexBufferHandle handle, DataPackage* mem, uint16 flags)
+		//이 모양으로 가자....
+		//IndexBufferHandle CreateIndexBuffer(DataPackage* mem, uint16 flags)
 		//{
-		//	_indexBuffers[handle.index].Create(mem->Size(), mem->Data(), flags);
+		//	IndexBufferHandle result = _indexPool.GetNextFreeHandle();
+		//	_indexBuffers[result.index].Create(mem->Size(), mem->Data(), flags);
+		//	return result;
 		//}
 
 		//void DestroyIndexBuffer(IndexBufferHandle handle)
@@ -402,6 +405,14 @@ namespace video
 		//Texture _textures[TEXTURE_MAX_NUM];
 		//Effect _effects[EFFECT_MAX_NUM];
 		//VertexDecl _vertexDecls[DECL_MAX_NUM];
+		//Model _models[MODEL_MAX_NUM];
+
+		//HandlePool<VertexBufferHandle> _vertexBufferPool;
+		//HandlePool<IndexVufferHandle> _indexBufferPool;
+		//HandlePool<TextureHandle> _textureHandle;
+		//HandlePool<EffectHandle> _effectPool;
+		//HandlePool<VertexDeclHandle> _vertexDeclPool;
+		//HandlePool<ModelHandle> _modelHandle;
 	};
 }
 

@@ -24,62 +24,37 @@ struct foo
 	float c;
 };
 
-
-//template <typename T, typename Arena>
-//void Delete(T *object, Arena &arena)
-//{
-//	object->~T();
-//	arena.Free(object);
-//}
-//
-//template <typename T, typename Arena>
-//T *NewArray(Arena &arena, size_t N, const char *file, int32 line)
-//{
-//	union
-//	{
-//		void *as_void;
-//		size_t *as_size_t;
-//		T *as_T;
-//	};
-//
-//	as_void = arena.Allocate(sizeof(T) * N + sizeof(size_t), file, line);
-//	*as_size_t++ = N;
-//
-//	//여기에 N이 더해지는것이 맞는지 아닌지를 확인하자
-//	const T *const onePastLast = as_T + N;
-//	while (as_T < onePastLast)
-//	{
-//		new (as_T++) T;
-//	}
-//
-//	return (as_t - N);
-//}
-//
-//template <typename T, typename Arena>
-//void DeleteArray(T *ptr, Arena &arena)
-//{
-//	union
-//	{
-//		size_t *as_size_t;
-//		T *as_T;
-//	};
-//
-//	as_T = ptr;
-//	const size_t N = as_size_t[-1];
-//
-//	for (size_t i = N; i > 0; --i)
-//	{
-//		as_T[i - 1].~T();
-//	}
-//	arena.Free(as_size_t - 1);
-//}
-
-
 int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE phInstance, LPSTR cmdLine, int cmdShow)
 {
+	MemoryArena<LinearAllocator, SingleThreadPolicy> arena(1024 * 100);
 
-	/*Test *test = HUNTER_NEW(Test, arena)(0, 1, 2);
-	HUNTER_DELETE(test, arena);*/
+	//int32 *a = (int32 *)HUNTER_NEW(int32, arena);
+	//*a = 1;
+
+	//int32 *b = (int32 *)HUNTER_NEW(int32, arena);
+	//*b = 2;
+
+	//int32 *c = (int32 *)HUNTER_NEW(int32, arena);
+	//*c = 3;
+
+	//int32 *d = (int32 *)HUNTER_NEW(int32, arena);
+
+	//*d = *a * *c;
+
+	//for (int i = 0; i < 10000; ++i)
+	//{
+	//	int32 *d = (int32 *)HUNTER_NEW(int32, arena);
+	//	HUNTER_DELETE(d, arena);
+	//}
+
+	for (int i = 0; i < 20000; ++i)
+	{
+		int32 *d = new int32;
+		delete d;
+	}
+
+
+	arena.Reset();
 
 
 	gEngine = new Engine;

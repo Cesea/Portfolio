@@ -159,17 +159,16 @@ bool32 BaseScene::Init()
 	//}
 
 	_world.AddSystem(_moveSystem);
+	_world.AddSystem(_renderSystem);
 
-	//for (int32 i = 0; i < 600; ++i)
-	//{
-	//	Entity entity = _world.CreateEntity();
-	//	entity.AddComponent<PositionComponent>(Vector3(RandFloat(), RandFloat(), RandFloat()));
-	//	entity.AddComponent<MoveComponent>();
-	//	entity.Activate();
-	//}
-
-
-
+	for (int32 i = 0; i < 2; ++i)
+	{
+		Entity entity = _world.CreateEntity();
+		entity.AddComponent<PositionComponent>(Vector3(RandFloat(), RandFloat(), RandFloat()));
+		entity.AddComponent<MoveComponent>();
+		entity.AddComponent<RenderComponent>();
+		entity.Activate();
+	}
 
 	Transform transform;
 	transform.SetTranslation(1.0f, 2.0f, 3.0f);
@@ -311,8 +310,8 @@ bool32 BaseScene::Render()
 
 	im::EndFrame();
 
-	Matrix world;
-	MatrixTranslation(&world, 0.0f, 0.0f, 0.0f);
+
+	_renderSystem.Update(0.0f);
 
 	//GenerateKey();
 
