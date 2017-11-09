@@ -1,7 +1,7 @@
 #ifndef NODE_H
 #define NODE_H
 
-#include "Transform.h"
+#include "TransformComponent.h"
 #include <list>
 
 class Node
@@ -19,8 +19,8 @@ public :
 
 private :
 	Node *_pParent;
-	Transform worldTransform;
-	Transform localTransform;
+	TransformComponent worldTransform;
+	TransformComponent localTransform;
 	std::list<Node *> _childrens;
 };
 

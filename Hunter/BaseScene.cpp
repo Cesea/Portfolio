@@ -164,16 +164,11 @@ bool32 BaseScene::Init()
 	for (int32 i = 0; i < 2; ++i)
 	{
 		Entity entity = _world.CreateEntity();
-		entity.AddComponent<PositionComponent>(Vector3(RandFloat(), RandFloat(), RandFloat()));
+		entity.AddComponent<TransformComponent>(Vector3(RandFloat(), RandFloat(), RandFloat()));
 		entity.AddComponent<MoveComponent>();
 		entity.AddComponent<RenderComponent>();
 		entity.Activate();
 	}
-
-	Transform transform;
-	transform.SetTranslation(1.0f, 2.0f, 3.0f);
-	transform.SetScaling(1.0f, 2.0f, 1.0f);
-	Matrix matrix = transform.GetWorldMatrix();
 
 	Vertex vertices[3];
 	vertices[0].position = Vector3(0.0f, 0.5f, 0.5f);

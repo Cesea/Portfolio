@@ -1689,7 +1689,7 @@ struct Context
 		return m_encoder[0].setTransform(m_submit->m_frameCache, _mtx, _num);
 	}
 
-	BGFX_API_FUNC(uint32_t allocTransform(Transform* _transform, uint16_t _num))
+	BGFX_API_FUNC(uint32_t allocTransform(TransformComponent* _transform, uint16_t _num))
 	{
 		return m_encoder[0].allocTransform(m_submit->m_frameCache, _transform, _num);
 	}

@@ -1,10 +1,10 @@
-#ifndef POSITION_SYSTEM_H
-#define POSITION_SYSTEM_H
+#ifndef MOVE_SYSTEM_H
+#define MOVE_SYSTEM_H
 
-#include "PositionComponent.h"
+#include "TransformComponent.h"
 #include "MoveComponent.h"
 
-class MoveSystem : public System<Requires<PositionComponent, MoveComponent>>
+class MoveSystem : public System<Requires<TransformComponent, MoveComponent>>
 {
 public :
 	MoveSystem();

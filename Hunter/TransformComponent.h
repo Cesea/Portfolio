@@ -1,5 +1,5 @@
-#ifndef OLD_TRANSFORM_H
-#define OLD_TRANSFORM_H
+#ifndef TRANSFORM_COMPONENT_H
+#define TRANSFORM_COMPONENT_H
 
 #define RESET_POSITION 1
 #define RESET_ROTATION 2
@@ -9,55 +9,25 @@
 #define AXIS_Y 1
 #define AXIS_Z 2
 
-class oldTransform
+
+struct TransformComponent : public Component
 {
-protected:
-	union
-	{
-		struct{
-			Vector3	axis[3];
-		};
-		struct
-		{
-			Vector3 right;
-			Vector3 up	;
-			Vector3 forward;
 
-		};
-	};
+	DECLARE_META(TransformComponent);
 
-	//위치
-	Vector3 _position;
-
-	//스케일
-	Vector3 _scale;
-
-	Matrix _matFinal;
-
-	bool _bAutoUpdate;
-
-	oldTransform* pParent;
-
-	oldTransform* _pFirstChild;
-
-	oldTransform* _pNextSibling;
-
-	Matrix _matLocal;
-
-public:
-	oldTransform();
-	~oldTransform();
+	TransformComponent();
+	~TransformComponent();
 
 	void SetAutoUpdate(bool bauto)
 	{
-		this->_bAutoUpdate = bauto;
+		this->_autoUpdate = bauto;
 	}
 
 	void Reset(int resetFlag = -1);
 
-	void AddChild(oldTransform* pChild);
+	void AddChild(TransformComponent* pChild);
 
-	void AttachTo(oldTransform* pParent);
+	void AttachTo(TransformComponent* pParent);
 
 	void ReleaseParent();
 
@@ -82,8 +52,6 @@ public:
 	//부모가 있는 경우 로컬 기준으로 이동 시킨다.
 	void MovePositionLocal(float dx, float dy, float dz);
 	void MovePositionLocal(Vector3 delta);
-
-
 
 	//스케일 셋팅 
 	void SetScale(float x, float y, float z);
@@ -132,23 +100,19 @@ public:
 	void LookPosition(Vector3 pos, float angle);
 
 	// 자신의 회전 값을 from 과 to 사이의 회전량만큼 회전보간(구면보간) 하여 적용
-	void RotateSlerp(const oldTransform& from, const oldTransform& to, float t);
+	void RotateSlerp(const TransformComponent& from, const TransformComponent& to, float t);
 
 	// 자신의 위치 값을 from 과 to 사이의 위치만큼 선형보간 하여 적용
-	void PositionLerp(const oldTransform& from, const oldTransform& to, float t);
+	void PositionLerp(const TransformComponent& from, const TransformComponent& to, float t);
 
 	// 자신의 모든 정보를 from 과 to 사이의 정보만큼 보간 하여 적용
-	void Interpolate(const oldTransform& from, const oldTransform& to, float t);
+	void Interpolate(const TransformComponent& from, const TransformComponent& to, float t);
 
-	///// update/////
-
-	void UpdateTransform();
-
-	void SetDeviceWorld(LPDIRECT3DDEVICE9 pDevie);
-
-	void SetDeviceView(LPDIRECT3DDEVICE9 pDevice);
-
-	void RenderGizmo(bool applyScale = false);
+	/////// update/////
+	//void UpdateTransform();
+	//void SetDeviceWorld(LPDIRECT3DDEVICE9 pDevie);
+	//void SetDeviceView(LPDIRECT3DDEVICE9 pDevice);
+	//void RenderGizmo(bool applyScale = false);
 
 	///// Get  //////
 
@@ -170,9 +134,36 @@ public:
 	Vector3 GetUp(bool bNormalize = true) const;
 	Vector3 GetRight(bool bNormalize = true) const;
 
-	Vector3 GetScale() const {
-		return this->_scale;
-	}
+	Vector3 GetScale() const { return this->_scale; }
+
+	//맴버 변수들
+
+	union
+	{
+		struct{
+			Vector3	_axis[3];
+		};
+		struct
+		{
+			Vector3 _right;
+			Vector3 _up	;
+			Vector3 _forward;
+
+		};
+	};
+
+	Vector3 _position;
+	Vector3 _dummyPosition;
+	Vector3 _scale;
+
+	Matrix _matFinal;
+	Matrix _matLocal;
+
+	TransformComponent* _pParent;
+	TransformComponent* _pFirstChild;
+	TransformComponent* _pNextSibling;
+
+	bool32 _autoUpdate;
 };
 
 #endif

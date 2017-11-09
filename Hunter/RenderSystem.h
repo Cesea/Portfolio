@@ -1,10 +1,10 @@
 #ifndef RENDER_SYSTEM_H
 #define RENDER_SYSTEM_H
 
-#include "PositionComponent.h"
+#include "TransformComponent.h"
 #include "RenderComponent.h"
 
-class RenderSystem : public System<Requires<PositionComponent, RenderComponent>>
+class RenderSystem : public System<Requires<TransformComponent, RenderComponent>>
 {
 public:
 	RenderSystem();

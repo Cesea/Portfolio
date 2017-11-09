@@ -75,13 +75,13 @@ inline Vector3* Vec3Normalize (Vector3 *pOut, const Vector3 *pV)
 {
 	return (Vector3 *)D3DXVec3Normalize(pOut, pV);
 }
-// Transform (x, y, z, 1) by matrix.
+// TransformComponent (x, y, z, 1) by matrix.
 inline Vector4* Vec3Transform (Vector4 *pOut, const Vector3 *pV, const Matrix *pM)
 {
 	return (Vector4 *)D3DXVec3Transform((D3DXVECTOR4 *)pOut, pV, (D3DXMATRIXA16 *)pM);
 }
 
-// Transform (x, y, z, 1) by matrix, project result back into w=1.
+// TransformComponent (x, y, z, 1) by matrix, project result back into w=1.
 inline Vector3* Vec3TransformCoord(Vector3 *pOut, const Vector3 *pV, const Matrix *pM)
 {
 	return (Vector3 *)D3DXVec3TransformCoord(pOut, pV, (D3DXMATRIX *)pM);
@@ -92,7 +92,7 @@ inline Vector3 *Vec3Lerp(Vector3 *pOut, const Vector3 *pV1, const Vector3 *pV2, 
 	return (Vector3 *)D3DXVec3Lerp(pOut, pV1, pV2, s);
 }
 
-// Transform (x, y, z, 0) by matrix.  If you transforming a normal by a 
+// TransformComponent (x, y, z, 0) by matrix.  If you transforming a normal by a 
 // non-affine matrix, the matrix you pass to this function should be the 
 // transpose of the inverse of the matrix you would use to transform a coord.
 inline Vector3* Vec3TransformNormal (Vector3 *pOut, const Vector3 *pV, const Matrix *pM)

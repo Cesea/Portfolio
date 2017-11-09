@@ -102,12 +102,6 @@
     <ClCompile Include="Command.cpp">
       <Filter>Core\SubSystem\VideoDevice</Filter>
     </ClCompile>
-    <ClCompile Include="oldTransform.cpp">
-      <Filter>Sub\GameUtils</Filter>
-    </ClCompile>
-    <ClCompile Include="Transform.cpp">
-      <Filter>Math</Filter>
-    </ClCompile>
     <ClCompile Include="Node.cpp">
       <Filter>Sub\GameUtils</Filter>
     </ClCompile>
@@ -126,7 +120,6 @@
     <ClCompile Include="InputManager.cpp">
       <Filter>Core\SubSystem\InputManager</Filter>
     </ClCompile>
-    <ClCompile Include="Handle.cpp" />
     <ClCompile Include="Entity.cpp">
       <Filter>ECS\Entity</Filter>
     </ClCompile>
@@ -145,41 +138,51 @@
     <ClCompile Include="BaseSystem.cpp">
       <Filter>ECS\System</Filter>
     </ClCompile>
-    <ClCompile Include="PositionComponent.cpp">
-      <Filter>GameScene</Filter>
-    </ClCompile>
-    <ClCompile Include="MoveComponent.cpp">
-      <Filter>GameScene</Filter>
-    </ClCompile>
-    <ClCompile Include="MoveSystem.cpp">
-      <Filter>GameScene</Filter>
-    </ClCompile>
     <ClCompile Include="Allocators.cpp">
       <Filter>Core\Memory</Filter>
     </ClCompile>
-    <ClCompile Include="RenderComponent.cpp">
-      <Filter>GameScene</Filter>
-    </ClCompile>
     <ClCompile Include="RenderSystem.cpp">
-      <Filter>GameScene</Filter>
+      <Filter>GameSystem</Filter>
     </ClCompile>
+    <ClCompile Include="RenderComponent.cpp">
+      <Filter>GameComponent</Filter>
+    </ClCompile>
+    <ClCompile Include="MoveComponent.cpp">
+      <Filter>GameComponent</Filter>
+    </ClCompile>
+    <ClCompile Include="MoveSystem.cpp">
+      <Filter>GameSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="TransformComponent.cpp">
+      <Filter>GameComponent</Filter>
+    </ClCompile>
+    <ClCompile Include="PhysicsSystem.cpp">
+      <Filter>GameSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="CollisionComponent.cpp">
+      <Filter>GameComponent</Filter>
+    </ClCompile>
+    <ClCompile Include="AnimationComponent.cpp">
+      <Filter>GameComponent</Filter>
+    </ClCompile>
+    <ClCompile Include="AnimationSystem.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="EventBridge.h">
-      <Filter>Event</Filter>
+      <Filter>Sub\Event</Filter>
     </ClInclude>
     <ClInclude Include="EventChannel.h">
-      <Filter>Event</Filter>
+      <Filter>Sub\Event</Filter>
     </ClInclude>
     <ClInclude Include="EventHandler.h">
-      <Filter>Event</Filter>
+      <Filter>Sub\Event</Filter>
     </ClInclude>
     <ClInclude Include="EventHandlerQueue.h">
-      <Filter>Event</Filter>
+      <Filter>Sub\Event</Filter>
     </ClInclude>
     <ClInclude Include="EventQueue.h">
-      <Filter>Event</Filter>
+      <Filter>Sub\Event</Filter>
     </ClInclude>
     <ClInclude Include="DataPackage.h">
       <Filter>Sub</Filter>
@@ -310,9 +313,6 @@
     <ClInclude Include="RenderContext.h">
       <Filter>Core\SubSystem\VideoDevice</Filter>
     </ClInclude>
-    <ClInclude Include="AABB.h">
-      <Filter>Sub\Geometry</Filter>
-    </ClInclude>
     <ClInclude Include="GameUtils.h">
       <Filter>Sub\GameUtils</Filter>
     </ClInclude>
@@ -321,12 +321,6 @@
     </ClInclude>
     <ClInclude Include="MatrixCache.h">
       <Filter>Sub</Filter>
-    </ClInclude>
-    <ClInclude Include="oldTransform.h">
-      <Filter>Sub\GameUtils</Filter>
-    </ClInclude>
-    <ClInclude Include="Transform.h">
-      <Filter>Math</Filter>
     </ClInclude>
     <ClInclude Include="Node.h">
       <Filter>Sub\GameUtils</Filter>
@@ -391,20 +385,11 @@
     <ClInclude Include="ContainerCheck.h">
       <Filter>ECS</Filter>
     </ClInclude>
-    <ClInclude Include="PositionComponent.h">
-      <Filter>GameScene</Filter>
-    </ClInclude>
     <ClInclude Include="EntityComponentSystem.h">
       <Filter>ECS</Filter>
     </ClInclude>
     <ClInclude Include="ClassTypeID.h">
       <Filter>ECS\System</Filter>
-    </ClInclude>
-    <ClInclude Include="MoveComponent.h">
-      <Filter>GameScene</Filter>
-    </ClInclude>
-    <ClInclude Include="MoveSystem.h">
-      <Filter>GameScene</Filter>
     </ClInclude>
     <ClInclude Include="TypeTraits.h">
       <Filter>Sub</Filter>
@@ -419,16 +404,40 @@
       <Filter>Core\Memory</Filter>
     </ClInclude>
     <ClInclude Include="RenderSystem.h">
-      <Filter>GameScene</Filter>
+      <Filter>GameSystem</Filter>
     </ClInclude>
     <ClInclude Include="RenderComponent.h">
-      <Filter>GameScene</Filter>
+      <Filter>GameComponent</Filter>
+    </ClInclude>
+    <ClInclude Include="MoveComponent.h">
+      <Filter>GameComponent</Filter>
+    </ClInclude>
+    <ClInclude Include="MoveSystem.h">
+      <Filter>GameSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="TransformComponent.h">
+      <Filter>GameComponent</Filter>
+    </ClInclude>
+    <ClInclude Include="PhysicsSystem.h">
+      <Filter>GameSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="CollisionComponent.h">
+      <Filter>GameComponent</Filter>
+    </ClInclude>
+    <ClInclude Include="TransformSystem.h">
+      <Filter>GameSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="AnimationComponent.h">
+      <Filter>GameComponent</Filter>
+    </ClInclude>
+    <ClInclude Include="DataBase.h">
+      <Filter>Core\SubSystem\DataBase</Filter>
+    </ClInclude>
+    <ClInclude Include="AnimationSystem.h">
+      <Filter>GameSystem</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <Filter Include="Event">
-      <UniqueIdentifier>{bbbb774f-e8d3-496c-b00f-420486f5d176}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Core">
       <UniqueIdentifier>{8a4674c1-2988-40bc-b6cc-2b8ff5e7456c}</UniqueIdentifier>
     </Filter>
@@ -512,6 +521,18 @@
     </Filter>
     <Filter Include="ECS\System">
       <UniqueIdentifier>{73e7c0f0-6155-478f-bc21-3ff3236126e8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GameSystem">
+      <UniqueIdentifier>{d7142de2-c937-4586-a206-5c7d6e472e49}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sub\Event">
+      <UniqueIdentifier>{bbbb774f-e8d3-496c-b00f-420486f5d176}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GameComponent">
+      <UniqueIdentifier>{65ee613f-7f85-4217-9267-1fdc8aebf75e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\SubSystem\DataBase">
+      <UniqueIdentifier>{04c70aa2-d19a-4fe2-b716-14917758bb68}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

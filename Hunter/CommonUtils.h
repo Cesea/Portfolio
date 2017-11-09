@@ -5,7 +5,6 @@
 
 #include "DataPackage.h"
 #include "BitFlags.h"	
-#include "Handle.h"
 
 #include "TypeTraits.h"
 

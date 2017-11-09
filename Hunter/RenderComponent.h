@@ -9,6 +9,13 @@ public:
 	RenderComponent();
 	virtual ~RenderComponent() {}
 
+public :
+	VertexBufferHandle _vertexBufferHandle;
+	IndexBufferHandle _indexBufferHandle;
+
+	EffectHandle _effectHandle;
+	SurfaceMaterialHandle _materialHandle;
+
 };
 
 #endif

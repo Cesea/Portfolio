@@ -24,7 +24,6 @@ public:
 	const Entity::ID BuildHandle(uint32 index, uint32 count) const;
 
 private:
-
 	uint32 _defaultPoolSize;
 
 	uint32 _nextID;

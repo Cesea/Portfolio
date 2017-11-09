@@ -12,13 +12,15 @@
 
 struct RenderContext
 {
-	EffectHandle _effectHandle;
+	//EffectHandle _effectHandle;
 	//SurfaceMaterialHandle _surfaceMaterialHandle;
 	//VertexDeclHandle _vertexDeclHandle;
-	VertexBufferHandle _vertexBufferHandle;
-	IndexBufferHandle _indexBufferHandle;
+	//VertexBufferHandle _vertexBufferHandle;
+	//IndexBufferHandle _indexBufferHandle;
 
-	//ResourceManager *pResourceManager;
+	Matrix _viewMatrix;
+	Matrix _projectionMatrix;
+	//CommandBucket bucket;
 };
 
 #endif

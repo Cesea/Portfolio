@@ -54,11 +54,11 @@ Plane* PlaneFromPointNormal(Plane *pOut, const D3DXVECTOR3 *pPoint, const D3DXVE
 // Construct a plane from 3 points
 Plane* PlaneFromPoints(Plane *pOut, const D3DXVECTOR3 *pV1, const D3DXVECTOR3 *pV2, const D3DXVECTOR3 *pV3);
 
-// Transform a plane by a matrix.  The vector (a,b,c) must be normal.
+// TransformComponent a plane by a matrix.  The vector (a,b,c) must be normal.
 // M should be the inverse transpose of the transformation desired.
 Plane* PlaneTransform(Plane *pOut, const Plane *pP, const D3DXMATRIX *pM);
 
-// Transform an array of planes by a matrix.  The vectors (a,b,c) must be normal.
+// TransformComponent an array of planes by a matrix.  The vectors (a,b,c) must be normal.
 // M should be the inverse transpose of the transformation desired.
 Plane* PlaneTransformArray(Plane *pOut, UINT OutStride, const Plane *pP, UINT PStride, const D3DXMATRIX *pM, UINT n);
 

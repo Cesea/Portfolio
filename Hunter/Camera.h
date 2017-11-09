@@ -1,7 +1,7 @@
 #ifndef CAMERA_H
 #define CAMERA_H
 
-//#include "Transform.h"
+//#include "TransformComponent.h"
 //
 //struct AABB
 //{
@@ -17,7 +17,7 @@
 //};
 //
 //
-//class Camera : public Transform
+//class Camera : public TransformComponent
 //{
 //protected:
 //	float _fov;			//카메라 화각

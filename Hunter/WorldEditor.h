@@ -22,7 +22,7 @@ public :
 //	void ChangeRotation(std::vector<EntityHandle> entities);
 //	void ChangeScaling(std::vector<EntityHandle> entities);
 //
-//	Transform transform;
+//	TransformComponent transform;
 };
 
 class WorldEditor
