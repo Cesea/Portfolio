@@ -163,12 +163,13 @@ namespace video
 	};
 
 	struct VertexBufferHandle { uint16 index; };
-	struct IndexBufferHandle { uint16 index; };
-	struct UniformHandle { uint16 index; };
 	struct VertexDeclHandle { uint16 index; };
-	struct TextureHandle { uint16 index; };
-	struct EffectHandle { uint16 index; };
+	struct IndexBufferHandle { uint16 index; };
 	struct SurfaceMaterialHandle { uint16 index; };
+	struct UniformHandle { uint16 index; };
+	struct TextureHandle { uint16 index; };
+	struct VertexShaderHandle { uint16 index; };
+	struct FragmentShaderHandle { uint16 index; };
 	struct RenderTargetHandle { uint16 index; };
 
 	struct ConstantType
@@ -233,57 +234,77 @@ namespace video
 
 	void Init(bool _createRenderThread = true, ReallocFunction _realloc = nullptr, FreeFunction free = nullptr);
 	void Shutdown();
-		void Reset(uint32 width, uint32 height, uint32 flags = VIDEO_RESET_NONE);
-		void Frame();
-		const Memory* Alloc(uint32 size);
-		const Memory* MakeRef(void* data, uint32 size);
-		void SetDebug(uint32 debug);
-		void DEBUG_TextClear(uint8 attr = 0, bool size = false);
-		void DEBUG_TextPrintf(uint16 x, uint16 y, uint8 attribute, const char* format, ...);
-		IndexBufferHandle CreateIndexBuffer(const Memory* mem);
-		void DestroyIndexBuffer(IndexBufferHandle handle);
-		bool CheckAvailDynamicIndexBuffer(uint16 num);
-		const DynamicIndexBuffer* AllocDynamicIndexBuffer(uint16 num);
-		VertexBufferHandle CreateVertexBuffer(const Memory* mem, VertexDeclHandle handle);
-		void DestroyVertexBuffer(VertexBufferHandle handle);
-		bool CheckAvailDynamicVertexBuffer(uint16 num, const VertexDecl& decl);
-		const DynamicVertexBuffer* AllocDynamicVertexBuffer(uint16 num, const VertexDecl& decl);
-		EffectHandle CreateEffect(const Memory *mem);
-		SurfaceMaterialHandle CreateSurfaceMaterial(EffectHandle handle);
-		void DestroyMaterial(SurfaceMaterialHandle handle);
-		TextureHandle CreateTexture(const Memory* mem, uint32 flags = VIDEO_TEXTURE_NONE, 
-			uint16* width = nullptr, uint16* height = nullptr);
-		void DestroyTexture(TextureHandle handle);
-		RenderTargetHandle CreateRenderTarget(uint32 width, uint32 height, uint32 flags = VIDEO_RENDER_TARGET_COLOR_RGBA);
-		void DestroyRenderTarget(RenderTargetHandle handle);
-		void SetViewRect(uint8 id, uint32 x, uint32 y, uint32 width, uint32 height);
-		void SetViewRectMask(uint32 viewMask, uint32 x, uint32 y, uint32 width, uint32 height);
-		void SetViewClear(uint8 id, uint8 flags, uint32 rgba = 0x000000ff, float depth = 1.0f, uint8 stencil = 0);
-		void SetViewClearMask(uint32 viewMask, uint8 flags, uint32 rgba = 0x000000ff, 
-			float depth = 1.0f, uint8 stencil = 0);
-		void SetViewSeq(uint8 id, bool enabled);
-		void SetViewSeqMask(uint32 viewMask, bool enabled);
-		void SetViewRenderTarget(uint8 id, RenderTargetHandle handle);
-		void SetViewRenderTargetMask(uint32 viewMask, RenderTargetHandle handle);
-		void SetViewTransform(uint8 id, const Matrix *view, const Matrix *projection, uint8 other = 0xff);
-		void SetViewTransformMask(uint32 viewMask, const Matrix *view, const Matrix *projection, uint8 other = 0xff);
-		void SetState(uint64 state);
-		uint32 SetTransform(const void* matrix, uint16 num = 1);
-		void SetUniform(UniformHandle handle, const void *value, uint16 num);
-		void SetUniform(SurfaceMaterialHandle material, UniformHandle handle, const void *value);
-		void SetTransform(uint32 cache = 0, uint32 num = 1);
-		void SetIndexBuffer(IndexBufferHandle handle, uint32 firstIndex, uint32 numIndices);
-		void SetIndexBuffer(IndexBufferHandle handle);
-		void SetIndexBuffer(const DynamicIndexBuffer* ib, uint32 numIndices = 0xffffffff);
-		void SetVertexBuffer(VertexBufferHandle handle);
-		void SetVertexBuffer(const DynamicVertexBuffer* vb);
-		void SetMaterial(SurfaceMaterialHandle handle);
-		void SetTexture(uint8 stage, UniformHandle sampler, TextureHandle handle);
-		void SetTexture(uint8 stage, UniformHandle sampler, RenderTargetHandle handle, bool depth = false);
-		void Submit(uint8 id);
-		void SubmitMask(uint32 viewMask);
-		void SaveScreenShot(const char* filePath);
-		void RenderFrame();
+	void Reset(uint32 width, uint32 height, uint32 flags = VIDEO_RESET_NONE);
+	void Frame();
+	const Memory* Alloc(uint32 size);
+	const Memory* MakeRef(void* data, uint32 size);
+
+	void SetDebug(uint32 debug);
+	void DEBUG_TextClear(uint8 attr = 0, bool size = false);
+	void DEBUG_TextPrintf(uint16 x, uint16 y, uint8 attribute, const char* format, ...);
+
+	IndexBufferHandle CreateIndexBuffer(const Memory* mem);
+	void DestroyIndexBuffer(IndexBufferHandle handle);
+	bool CheckAvailDynamicIndexBuffer(uint16 num);
+	const DynamicIndexBuffer* AllocDynamicIndexBuffer(uint16 num);
+	VertexBufferHandle CreateVertexBuffer(const Memory* mem, VertexDeclHandle handle);
+	void DestroyVertexBuffer(VertexBufferHandle handle);
+	bool CheckAvailDynamicVertexBuffer(uint16 num, const VertexDecl& decl);
+	const DynamicVertexBuffer* AllocDynamicVertexBuffer(uint16 num, const VertexDecl& decl);
+
+
+	VertexShaderHandle CreateVertexShader(const Memory* mem);
+	void DestroyVertexShader(VertexShaderHandle handle);
+	FragmentShaderHandle CreateFragmentShader(const Memory* mem);
+	void DestroyFragmentShader(FragmentShaderHandle handle);
+
+	SurfaceMaterialHandle CreateSurfaceMaterial(VertexShaderHandle vsh, FragmentShaderHandle fsh);
+	void DestroyMaterial(SurfaceMaterialHandle handle);
+
+	TextureHandle CreateTexture(const Memory* mem, uint32 flags = VIDEO_TEXTURE_NONE,
+		uint16* width = nullptr, uint16* height = nullptr);
+	void DestroyTexture(TextureHandle handle);
+
+	RenderTargetHandle CreateRenderTarget(uint32 width, uint32 height, uint32 flags = VIDEO_RENDER_TARGET_COLOR_RGBA);
+	void DestroyRenderTarget(RenderTargetHandle handle);
+
+	UniformHandle CreateUniform(const char *name, ConstantType::Enum type, uint16 num = 1);
+	void DestroyUniform();
+
+	void SetViewRect(uint8 id, uint32 x, uint32 y, uint32 width, uint32 height);
+	void SetViewRectMask(uint32 viewMask, uint32 x, uint32 y, uint32 width, uint32 height);
+	void SetViewClear(uint8 id, uint8 flags, uint32 rgba = 0x000000ff, float depth = 1.0f, uint8 stencil = 0);
+	void SetViewClearMask(uint32 viewMask, uint8 flags, uint32 rgba = 0x000000ff,
+		float depth = 1.0f, uint8 stencil = 0);
+
+	void SetViewSeq(uint8 id, bool enabled);
+	void SetViewSeqMask(uint32 viewMask, bool enabled);
+
+	void SetViewRenderTarget(uint8 id, RenderTargetHandle handle);
+	void SetViewRenderTargetMask(uint32 viewMask, RenderTargetHandle handle);
+
+	void SetViewTransform(uint8 id, const Matrix *view, const Matrix *projection, uint8 other = 0xff);
+	void SetViewTransformMask(uint32 viewMask, const Matrix *view, const Matrix *projection, uint8 other = 0xff);
+
+	void SetState(uint64 state);
+
+	uint32 SetTransform(const Matrix* matrix, uint16 num = 1);
+	void SetTransform(uint32 cache = 0, uint32 num = 1);
+
+	void SetUniform(UniformHandle handle, const void *value, uint16 num);
+
+	void SetIndexBuffer(IndexBufferHandle handle, uint32 firstIndex, uint32 numIndices);
+	void SetIndexBuffer(IndexBufferHandle handle);
+	void SetIndexBuffer(const DynamicIndexBuffer* ib, uint32 numIndices = 0xffffffff);
+	void SetVertexBuffer(VertexBufferHandle handle);
+	void SetVertexBuffer(const DynamicVertexBuffer* vb);
+	void SetMaterial(SurfaceMaterialHandle handle);
+	void SetTexture(uint8 stage, UniformHandle sampler, TextureHandle handle);
+	void SetTexture(uint8 stage, UniformHandle sampler, RenderTargetHandle handle, bool depth = false);
+	void Submit(uint8 id);
+	void SubmitMask(uint32 viewMask);
+	void SaveScreenShot(const char* filePath);
+	void RenderFrame();
 }//video
 
 #endif

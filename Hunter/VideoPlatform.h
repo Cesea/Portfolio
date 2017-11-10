@@ -4,11 +4,12 @@
 #include "stdafx.h"
 
 #include "Video.h"
+#include <inttypes.h>
+#include <stdarg.h>
 
 #include <unordered_map>
 
-namespace video
-{
+
 	#define VIDEO_RENDERER_DIRECT3D (BX_PLATFORM_WINDOWS|BX_PLATFORM_XBOX360)
 	#define VIDEO_MULTITHREADED  \
 		( (BX_PLATFORM_WINDOWS|BX_PLATFORM_XBOX360|BX_PLATFORM_NACL|BX_PLATFORM_LINUX)&(!BGFX_CONFIG_RENDERER_NULL) )
@@ -47,6 +48,272 @@ namespace video
 	#define VIDEO_SAMPLER_RENDERTARGET_DEPTH UINT16_C(0x0002)
 	#define VIDEO_SAMPLER_TYPE_MASK          UINT16_C(0x0003)
 
+namespace video
+{
+
+	extern const uint32_t gConstantTypeSize[ConstantType::Count];
+	extern ReallocFunction gRealloc;
+	extern FreeFunction gFree;
+	extern void Free(Memory* _mem);
+	//extern void saveTga(const char* _filePath, uint32_t _width, uint32_t _height, uint32_t _pitch, const void* _data);
+	extern const char* GetAttribName(Attrib::Enum _attr);
+
+
+	inline uint32_t uint16_min(uint16_t _a, uint16_t _b)
+	{
+		return _a > _b ? _b : _a;
+	}
+
+	inline uint32_t hash(const void* _data, uint32_t _size)
+	{
+		HashMurmur2A murmur;
+		murmur.begin();
+		murmur.add(_data, (int)_size);
+		return murmur.end();
+	}
+
+	inline uint32_t gcd(uint32_t _a, uint32_t _b)
+	{
+		do
+		{
+			uint32_t tmp = _a % _b;
+			_a = _b;
+			_b = tmp;
+		} while (_b);
+
+		return _a;
+	}
+
+	inline uint32_t lcm(uint32_t _a, uint32_t _b)
+	{
+		return _a * (_b / gcd(_a, _b));
+	}
+
+	inline uint32_t strideAlign(uint32_t _offset, uint32_t _stride)
+	{
+		const uint32_t mod = uint32_mod(_offset, _stride);
+		const uint32_t add = uint32_sub(_stride, mod);
+		const uint32_t mask = uint32_cmpeq(mod, 0);
+		const uint32_t tmp = uint32_selb(mask, 0, add);
+		const uint32_t result = uint32_add(_offset, tmp);
+
+		return result;
+	}
+
+	inline uint32_t strideAlign16(uint32_t _offset, uint32_t _stride)
+	{
+		uint32_t align = lcm(16, _stride);
+		return _offset + align - (_offset%align);
+	}
+
+	inline uint32_t strideAlign256(uint32_t _offset, uint32_t _stride)
+	{
+		uint32_t align = lcm(256, _stride);
+		return _offset + align - (_offset%align);
+	}
+
+	void Dump(const VertexDecl &decl);
+
+	struct TextVideoMem
+	{
+		TextVideoMem()
+		{
+			Resize();
+		}
+
+		~TextVideoMem()
+		{
+			gFree(_mem);
+		}
+
+		void Resize(bool sm = false, uint16_t width = VIDEO_DEFAULT_WIDTH, uint16 _height = BGFX_DEFAULT_HEIGHT)
+		{
+			_small = sm;
+			_width = uint32_max(1, _width / 8);
+			_height = uint32_max(1, _height / (_small ? 8 : 16));
+			_size = _width * _height * 2;
+
+			_mem = (uint8_t*)g_realloc(_mem, _size);
+
+			Clear();
+		}
+
+		void Clear()
+		{
+			memset(_mem, 0, _size);
+		}
+
+		void PrintfVargs(uint16_t x, uint16_t y, uint8_t attr, const char* format, va_list argList)
+		{
+			if (x < _width && y < _height)
+			{
+				char* temp = (char*)alloca(_width);
+
+				uint32_t num = vsnprintf(temp, _width, format, argList);
+
+				uint8_t* mem = &_mem[(y * _width + x) * 2];
+				for (uint32_t i = 0, xx = x; i < num && xx < _width; ++i, ++xx)
+				{
+					mem[0] = temp[i];
+					mem[1] = attr;
+					mem += 2;
+				}
+			}
+		}
+
+		void Printf(uint16_t x, uint16_t y, uint8_t attr, const char* format, ...)
+		{
+			va_list argList;
+			va_start(argList, format);
+			PrintfVargs(x, y, attr, format, argList);
+			va_end(argList);
+		}
+
+		uint8_t* _mem;
+		uint32_t _size;
+		uint16_t _width;
+		uint16_t _height;
+		bool _small;
+	};
+
+	struct TextVideoMemBlitter
+	{
+		void Init();
+		void Blit(const TextVideoMem& _mem);
+		void Setup();
+		void Render(uint32_t _numIndices);
+
+		video::TextureHandle _texture;
+		DynamicVertexBuffer* _vb;
+		DynamicIndexBuffer* _ib;
+		video::VertexDecl _decl;
+		video::SurfaceMaterialHandle _material;
+	};
+
+	extern TextVideoMemBlitter gTextVideoMemBlitter;
+
+	struct PredefinedUniform
+	{
+		enum Enum
+		{
+			eViewRect,
+			eViewTexel,
+			eView,
+			eViewProj,
+			eViewProjX,
+			eModel,
+			eModelViewProj,
+			eModelViewProjX,
+			eAlphaRef,
+			eCount
+		};
+
+		uint8 _type;
+		uint16 _loc;
+	};
+	PredefinedUniform::Enum NameToPredefinedUniformEnum(const char* name);
+
+	class StreamRead
+	{
+	public:
+		StreamRead(const void* _data, uint32_t _size)
+			: m_data((uint8_t*)_data)
+			, m_size(_size)
+			, m_pos(0)
+		{
+		}
+
+		~StreamRead()
+		{
+		}
+
+		void skip(uint32_t _size)
+		{
+			BX_CHECK(m_size - m_pos >= _size, "Available %d, requested %d.", m_size - m_pos, _size);
+			m_pos += _size;
+		}
+
+		void read(void* _data, uint32_t _size)
+		{
+			BX_CHECK(m_size - m_pos >= _size, "Available %d, requested %d.", m_size - m_pos, _size);
+			memcpy(_data, &m_data[m_pos], _size);
+			m_pos += _size;
+		}
+
+		template<typename Ty>
+		void read(Ty& _value)
+		{
+			read(&_value, sizeof(Ty));
+		}
+
+		const uint8_t* getDataPtr() const
+		{
+			return &m_data[m_pos];
+		}
+
+		uint32_t getPos() const
+		{
+			return m_pos;
+		}
+
+		void align(uint16_t _align)
+		{
+			m_pos = strideAlign(m_pos, _align);
+		}
+
+	private:
+		const uint8_t* m_data;
+		uint32_t m_size;
+		uint32_t m_pos;
+	};
+
+	class StreamWrite
+	{
+	public:
+		StreamWrite(void* _data, uint32_t _size)
+			: m_data((uint8_t*)_data)
+			, m_size(_size)
+			, m_pos(0)
+		{
+		}
+
+		~StreamWrite()
+		{
+		}
+
+		void write(void* _data, uint32_t _size)
+		{
+			BX_CHECK(m_size - m_pos >= _size, "Write out of bounds. Available %d, requested %d.", m_size - m_pos, _size);
+			memcpy(&m_data[m_pos], _data, _size);
+			m_pos += _size;
+		}
+
+		template<typename Ty>
+		void write(Ty& _value)
+		{
+			write(&_value, sizeof(Ty));
+		}
+
+		uint8_t* getDataPtr() const
+		{
+			return &m_data[m_pos];
+		}
+
+		uint32_t getPos() const
+		{
+			return m_pos;
+		}
+
+		void align(uint16_t _align)
+		{
+			m_pos = strideAlign(m_pos, _align);
+		}
+
+	private:
+		uint8_t* m_data;
+		uint32_t m_size;
+		uint32_t m_pos;
+	};
 
 	struct CommandBuffer
 	{
@@ -387,7 +654,7 @@ namespace video
 	struct UniformInfo
 	{
 		const void *_data;
-		BGFX_UNIFORM_FUNCTIONBIT _function;
+		UniformFunction _function;
 	};
 
 	class UniformRegistry
@@ -419,7 +686,7 @@ namespace video
 			{
 				UniformInfo info;
 				info._data = data;
-				info._func = func;
+				info._function = func;
 
 				std::pair<UniformHashMap::iterator, bool> result = _uniforms.insert(UniformHashMap::value_type(_name, info) );
 				return result.first->second;	
@@ -569,7 +836,7 @@ namespace video
 
 		void SetViewTransformMask(uint32 viewMask, const Matrix* view, const Matrix* proj, uint8 other)
 		{
-			for (uint32 id = 0, viewMask = _viewMask, ntz = uint32_cnttz(_viewMask); 0 != viewMask; viewMask >>= 1, id += 1, ntz = uint32_cnttz(viewMask))
+			for (uint32 id = 0, viewMask = viewMask, ntz = uint32_cnttz(_viewMask); 0 != viewMask; viewMask >>= 1, id += 1, ntz = uint32_cnttz(viewMask))
 			{
 				viewMask >>= ntz;
 				id += ntz;
@@ -578,11 +845,11 @@ namespace video
 			}
 		}
 
-		void SetState(uint64 _state)
+		void SetState(uint64 state)
 		{
-			uint8 blend = ((_state & VIDEO_STATE_BLEND_MASK) >> VIDEO_STATE_BLEND_SHIFT) & 0xff;
+			uint8 blend = ((state & VIDEO_STATE_BLEND_MASK) >> VIDEO_STATE_BLEND_SHIFT) & 0xff;
 			_key._trans = "\x0\x1\x1\x2\x2\x1\x2\x1\x2\x1\x1\x1\x1\x1\x1\x1\x1"[((blend) & 0xf) + (!!blend)];
-			_state._flags = _state;
+			_state._flags = state;
 		}
 
 		uint32 SetTransform(Matrix *matrix, uint16 num)
@@ -595,7 +862,7 @@ namespace video
 
 		void SetTransform(uint32 cache, uint16 num)
 		{
-			_state._matrix = _cache;
+			_state._matrix = cache;
 			_state._num = _num;
 		}
 
@@ -612,7 +879,7 @@ namespace video
 			_state._startIndex = ib->_startIndex;
 			_state._numIndices = numIndices;
 			_discard = (0 == numIndices);
-			g_free(const_cast<DynamicIndexBuffer*>(ib));
+			gFree(const_cast<DynamicIndexBuffer*>(ib));
 		}
 
 		void SetVertexBuffer(VertexBufferHandle handle)
@@ -629,20 +896,20 @@ namespace video
 			_state._numVertices = vb->_size / vb->_stride;
 			_state._vertexBuffer = vb->_handle;
 			_state._vertexDecl = vb->_decl;
-			g_free(const_cast<DynamicVertexBuffer*>(vb));
+			gFree(const_cast<DynamicVertexBuffer*>(vb));
 		}
 
 		void SetMaterial(SurfaceMaterialHandle handle)
 		{
 			Assert(invalidHandle = handle.index);
-			_key._material = _handle.index;
+			_key._material = handle.index;
 		}
 
-		void SetTexture(uint8 stage, UniformHandle sampler, TextureHandle handle)
+		void SetTexture(uint8 stage, UniformHandle uniformSampler, TextureHandle textureHandle)
 		{
 			_flags |= VIDEO_STATE_TEX0 << _stage;
 			Sampler& sampler = _state._sampler[_stage];
-			sampler._idx = handle.index;
+			sampler.index = handle.index;
 			sampler._flags = VIDEO_SAMPLER_NONE;
 
 			if (video::invalidHandle != sampler.idx)
@@ -652,7 +919,7 @@ namespace video
 			}
 		}
 
-		void SetTexture(uint8 stage, UniformHandle sampler, RenderTargetHandle handle, bool depth)
+		void SetTexture(uint8 stage, UniformHandle uniformSampler, RenderTargetHandle handle, bool depth)
 		{
 			_flags |= VIDEO_STATE_TEX0 << stage;
 			Sampler& sampler = _state._sampler[_stage];
@@ -683,18 +950,18 @@ namespace video
 		{
 			uint32 offset = _iboffset;
 			_iboffset = offset + _num * sizeof(uint16);
-			_iboffset = uint32_min(m_iboffset, VIDEO_DYNAMIC_INDEX_BUFFER_SIZE);
+			_iboffset = uint32_min(_iboffset, VIDEO_DYNAMIC_INDEX_BUFFER_SIZE);
 			_num = uint16((_iboffset - offset) / sizeof(uint16));
 			return offset;
 		}
 
 		bool CheckAvailDynamicVertexBuffer(uint16 num, uint16 stride)
 		{
-			uint32 offset = strideAlign(_vboffset, _stride);
-			uint32 vboffset = offset + _num * _stride;
+			uint32 offset = strideAlign(_vboffset, stride);
+			uint32 vboffset = offset + num * stride;
 			vboffset = uint32_min(vboffset, VIDEO_DYNAMIC_VERTEX_BUFFER_SIZE);
-			uint32 num = (vboffset - offset) / _stride;
-			return num == _num;
+			uint32 num = (vboffset - offset) / stride;
+			return num == num;
 		}
 
 		uint32 AllocDynamicVertexBuffer(uint16& num, uint16 stride)
@@ -823,7 +1090,8 @@ namespace video
 		IndexBufferHandle _freeIndexBufferHandle[VIDEO_MAX_INDEX_BUFFERS];
 		VertexDeclHandle _freeVertexDeclHandle[VIDEO_MAX_VERTEX_DECLS];
 		VertexBufferHandle _freeVertexBufferHandle[VIDEO_MAX_VERTEX_BUFFERS];
-		EffectHandle _freeEffectHandle[VIDEO_MAX_VERTEX_BUFFERS];
+		VertexShaderHandle _freeVertexShaderHandle[VIDEO_MAX_VERTEXSHADERS]
+		FragmentShaderHandle _freeFragmentShaderHandle[VIDEO_MAX_FRAGMENTSHADERS]
 		SurfaceMaterialHandle _freeMaterialHandle[VIDEO_MAX_MATERIALS];
 		TextureHandle _freeTextureHandle[VIDEO_MAX_TEXTURES];
 		RenderTargetHandle _freeRenderTargetHandle[VIDEO_MAX_RENDER_TARGETS];
@@ -842,6 +1110,8 @@ namespace video
 			_submit(&_frame[1]),
 			_indexBufferHandle(VIDEO_MAX_INDEX_BUFFERS),
 			_vertexDeclHandle(VIDEO_MAX_VERTEX_DECLS),
+			_vertexShaderHandle(),
+			_fragmentShaderHandle,
 			_effectHandle(VIDEO_MAX_EFFECTS),
 			_materialHandle(VIDEO_MAX_MATERIALS),
 			_textureHandle(VIDEO_MAX_TEXTURES),
