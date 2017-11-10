@@ -122,13 +122,10 @@
     <ClCompile Include="AnimationComponent.cpp" />
     <ClCompile Include="AnimationSystem.cpp" />
     <ClCompile Include="ApplicationTimer.cpp" />
-    <ClCompile Include="Backend.cpp" />
-    <ClCompile Include="BackendDispatch.cpp" />
     <ClCompile Include="BaseScene.cpp" />
     <ClCompile Include="BaseSystem.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="CollisionComponent.cpp" />
-    <ClCompile Include="Command.cpp" />
     <ClCompile Include="CommonUtils.cpp" />
     <ClCompile Include="Console.cpp" />
     <ClCompile Include="Control.cpp" />
@@ -173,6 +170,7 @@
     <ClCompile Include="Vector2.cpp" />
     <ClCompile Include="Vector3.cpp" />
     <ClCompile Include="Vector4.cpp" />
+    <ClCompile Include="Video.cpp" />
     <ClCompile Include="VideoDevice.cpp" />
     <ClCompile Include="World.cpp" />
     <ClCompile Include="XMLManager.cpp" />
@@ -183,8 +181,6 @@
     <ClInclude Include="AnimationSystem.h" />
     <ClInclude Include="ApplicationTimer.h" />
     <ClInclude Include="Assert.h" />
-    <ClInclude Include="Backend.h" />
-    <ClInclude Include="BackendDispatch.h" />
     <ClInclude Include="BaseScene.h" />
     <ClInclude Include="BaseSystem.h" />
     <ClInclude Include="BitFlags.h" />
@@ -192,14 +188,10 @@
     <ClInclude Include="Camera.h" />
     <ClInclude Include="ClassTypeID.h" />
     <ClInclude Include="Color4F.h" />
-    <ClInclude Include="Command.h" />
-    <ClInclude Include="CommandBucket.h" />
-    <ClInclude Include="CommandPacket.h" />
     <ClInclude Include="CommonUtils.h" />
     <ClInclude Include="Component.h" />
     <ClInclude Include="Console.h" />
     <ClInclude Include="ContainerCheck.h" />
-    <ClInclude Include="Context.h" />
     <ClInclude Include="Control.h" />
     <ClInclude Include="DataBase.h" />
     <ClInclude Include="DebugDraw.h" />
@@ -225,7 +217,6 @@
     <ClInclude Include="Quaternion.h" />
     <ClInclude Include="Ray.h" />
     <ClInclude Include="RenderComponent.h" />
-    <ClInclude Include="RenderContext.h" />
     <ClInclude Include="RenderSystem.h" />
     <ClInclude Include="System.h" />
     <ClInclude Include="Terrain.h" />
@@ -264,6 +255,7 @@
     <ClInclude Include="Vector2.h" />
     <ClInclude Include="Vector3.h" />
     <ClInclude Include="Vector4.h" />
+    <ClInclude Include="Video.h" />
     <ClInclude Include="VideoDevice.h" />
     <ClInclude Include="World.h" />
     <ClInclude Include="WorldEditor.h" />

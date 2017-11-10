@@ -20,6 +20,7 @@ DEFINE_META(TransformComponent)
 
 TransformComponent::TransformComponent()
 {
+
 	this->_pParent = NULL;
 	this->_pFirstChild = NULL;
 	this->_pNextSibling = NULL;

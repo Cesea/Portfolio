@@ -10,7 +10,6 @@ class RefVariant;
 
 typedef void(*SerializerFunction)(std::ostream &, RefVariant);
 
-
 #define PASETE(_, __) _##__
 #define GENERATE_LINE( _ ) PASTE( GENERATED_TOKEN_, _)
 #define GENERATE_FILE( _ ) PASETE( __FILE__, _ )
@@ -18,13 +17,9 @@ typedef void(*SerializerFunction)(std::ostream &, RefVariant);
 
 #define PTR_ADD(PTR, OFFSET)   ((void *)(((char *)(PTR)) + (OFFSET))) 
 
-
 #define META_TYPE(TYPE) (MetaCreator<RemQual<TYPE>::type>::Get())
 
-
 #define META(OBJECT) (MetaCreator<RemQual<decltype(OBJECT)>::type>::Get())
-
-
 
 #define DEFINE_META(TYPE) \
 	MetaCreator<RemQual<TYPE>::type> NAME_GENERATOR( )( #TYPE, sizeof( TYPE ) ); \

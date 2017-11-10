@@ -156,12 +156,25 @@ inline float InterpolateFloat(float start, float end, float t)
 	return start + ((end - start) * t);
 }
 
-//inline Vector InterpolateVector3(const D3DXVECTOR3 &start, const D3DXVECTOR3 &end, float t)
-//{
-//	return D3DXVECTOR3(InterpolateFloat(start.x, end.x, t),
-//		InterpolateFloat(start.y, end.y, t),
-//		InterpolateFloat(start.z, end.z, t));
-//}
+inline uint32 uint32_min(uint32 a, uint32 b)
+{
+	return (a < b) ? a : b;
+}
+
+inline uint32 uint32_max(uint32 a, uint32 b)
+{
+	return (a > b) ? a : b;
+}
+
+inline int32 int32_min(int32 a, int32 b)
+{
+	return (a < b) ? a : b;
+}
+
+inline int32 int32_max(int32 a, int32 b)
+{
+	return (a > b) ? a : b;
+}
 
 float RandFloat();
 float RandFloat(float max);

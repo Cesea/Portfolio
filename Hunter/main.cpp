@@ -41,7 +41,7 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE phInstance, LPSTR cmdLine, i
 
 	//*d = *a * *c;
 
-	//for (int i = 0; i < 10000; ++i)
+	//for (int i = 0; i < 20000; ++i)
 	//{
 	//	int32 *d = (int32 *)HUNTER_NEW(int32, arena);
 	//	HUNTER_DELETE(d, arena);

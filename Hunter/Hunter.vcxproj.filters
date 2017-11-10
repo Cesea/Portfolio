@@ -90,26 +90,17 @@
     <ClCompile Include="Ray.cpp">
       <Filter>Math</Filter>
     </ClCompile>
-    <ClCompile Include="BackendDispatch.cpp">
-      <Filter>Core\SubSystem\VideoDevice</Filter>
-    </ClCompile>
     <ClCompile Include="Camera.cpp">
       <Filter>Sub\GameUtils</Filter>
     </ClCompile>
     <ClCompile Include="MatrixCache.cpp">
       <Filter>Sub</Filter>
     </ClCompile>
-    <ClCompile Include="Command.cpp">
-      <Filter>Core\SubSystem\VideoDevice</Filter>
-    </ClCompile>
     <ClCompile Include="Node.cpp">
       <Filter>Sub\GameUtils</Filter>
     </ClCompile>
     <ClCompile Include="TerrainConfig.cpp">
       <Filter>Sub\GameUtils\Terrain</Filter>
-    </ClCompile>
-    <ClCompile Include="Backend.cpp">
-      <Filter>Core\SubSystem\VideoDevice</Filter>
     </ClCompile>
     <ClCompile Include="VideoDevice.cpp">
       <Filter>Core\SubSystem\VideoDevice</Filter>
@@ -166,6 +157,7 @@
       <Filter>GameComponent</Filter>
     </ClCompile>
     <ClCompile Include="AnimationSystem.cpp" />
+    <ClCompile Include="Video.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -298,21 +290,6 @@
     <ClInclude Include="Engine.h">
       <Filter>Core</Filter>
     </ClInclude>
-    <ClInclude Include="CommandBucket.h">
-      <Filter>Core\SubSystem\VideoDevice</Filter>
-    </ClInclude>
-    <ClInclude Include="Command.h">
-      <Filter>Core\SubSystem\VideoDevice</Filter>
-    </ClInclude>
-    <ClInclude Include="BackendDispatch.h">
-      <Filter>Core\SubSystem\VideoDevice</Filter>
-    </ClInclude>
-    <ClInclude Include="CommandPacket.h">
-      <Filter>Core\SubSystem\VideoDevice</Filter>
-    </ClInclude>
-    <ClInclude Include="RenderContext.h">
-      <Filter>Core\SubSystem\VideoDevice</Filter>
-    </ClInclude>
     <ClInclude Include="GameUtils.h">
       <Filter>Sub\GameUtils</Filter>
     </ClInclude>
@@ -337,9 +314,6 @@
     <ClInclude Include="TerrainQuadTree.h">
       <Filter>Sub\GameUtils\Terrain</Filter>
     </ClInclude>
-    <ClInclude Include="Backend.h">
-      <Filter>Core\SubSystem\VideoDevice</Filter>
-    </ClInclude>
     <ClInclude Include="VideoDevice.h">
       <Filter>Core\SubSystem\VideoDevice</Filter>
     </ClInclude>
@@ -354,9 +328,6 @@
     </ClInclude>
     <ClInclude Include="Handle.h">
       <Filter>Sub</Filter>
-    </ClInclude>
-    <ClInclude Include="Context.h">
-      <Filter>Core\SubSystem\VideoDevice</Filter>
     </ClInclude>
     <ClInclude Include="BaseSystem.h">
       <Filter>ECS\System</Filter>
@@ -435,6 +406,9 @@
     </ClInclude>
     <ClInclude Include="AnimationSystem.h">
       <Filter>GameSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="Video.h">
+      <Filter>Core\SubSystem\VideoDevice</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
