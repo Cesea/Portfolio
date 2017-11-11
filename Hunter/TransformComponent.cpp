@@ -15,7 +15,7 @@ DEFINE_META(TransformComponent)
 	ADD_MEMBER(_pParent);
 	ADD_MEMBER(_pFirstChild);
 	ADD_MEMBER(_pNextSibling);
-	ADD_MEMBER(_autoUpdate);
+	ADD_MEMBER(_transformDirty);
 };
 
 TransformComponent::TransformComponent()
@@ -25,17 +25,13 @@ TransformComponent::TransformComponent()
 	this->_pFirstChild = NULL;
 	this->_pNextSibling = NULL;
 
-	this->_autoUpdate = true;
+	this->_transformDirty = false;
 
 	//정보 리셋
 	this->Reset();
 
 	MatrixIdentity(&_matFinal);
 	MatrixIdentity(&_matLocal);
-	if (this->_autoUpdate)
-	{
-		this->UpdateTransform();
-	}
 }
 
 
@@ -57,9 +53,9 @@ void TransformComponent::Reset(int resetFlag /*= -1*/)
 	if (resetFlag & RESET_ROTATION)
 	{
 		//회전방향은 
-		//this->axis[0] = Vector3( 1, 0, 0 );
-		//this->axis[1] = Vector3( 0, 1, 0 );
-		//this->axis[2] = Vector3( 0, 0, 1 );
+		//this->_axis[0] = Vector3( 1, 0, 0 );
+		//this->_axis[1] = Vector3( 0, 1, 0 );
+		//this->_axis[2] = Vector3( 0, 0, 1 );
 
 		this->_right = Vector3(1, 0, 0);
 		this->_up = Vector3(0, 1, 0);
@@ -72,7 +68,7 @@ void TransformComponent::Reset(int resetFlag /*= -1*/)
 		this->_scale = Vector3(1, 1, 1);
 	}
 
-	this->UpdateTransform();
+	_transformDirty = true;
 }
 
 //특정 Child 를 내자식으로 붙인다.
@@ -94,8 +90,9 @@ void TransformComponent::AddChild(TransformComponent* pNewChild)
 	Vec3TransformCoord(&pNewChild->_position, &pNewChild->_position, &matInvFinal);
 
 	//축3개 변환하고 
-	for (int i = 0; i < 3; i++) {
-		Vec3TransformNormal(pNewChild->axis + i, pNewChild->axis + i, &matInvFinal);
+	for (int32 i = 0; i < 3; i++) 
+	{
+		Vec3TransformNormal(pNewChild->_axis + i, pNewChild->_axis + i, &matInvFinal);
 	}
 
 	//3축에 대한 길이값을 얻는다.
@@ -115,19 +112,20 @@ void TransformComponent::AddChild(TransformComponent* pNewChild)
 	TransformComponent* pChild = this->_pFirstChild;
 
 	//자식이 없는 쓸쓸한 독거노인이라면...
-	if (pChild == NULL) {
+	if (nullptr == pChild ) 
+	{
 		//안심하고 추가
 		this->_pFirstChild = pNewChild;
 		pNewChild->_pParent = this;
 	}
 
 	//대가족에 들어간다.
-	else {
-
-		while (pChild != NULL) {
-
+	else 
+	{
+		while (nullptr != pChild) 
+		{
 			//내가 들어갈 자리를 찾았다면...
-			if (pChild->_pNextSibling == NULL)
+			if (nullptr == pChild->_pNextSibling)
 			{
 				pChild->_pNextSibling = pNewChild;
 				pNewChild->_pParent = this;
@@ -139,8 +137,7 @@ void TransformComponent::AddChild(TransformComponent* pNewChild)
 	}
 
 	//업데이트
-	this->UpdateTransform();
-
+	_transformDirty = true;
 }
 
 //특정 TransformComponent 에 붙는다.
@@ -153,15 +150,17 @@ void TransformComponent::AttachTo(TransformComponent* pNewParent)
 void TransformComponent::ReleaseParent()
 {
 	//부모가 없니?
-	if (this->_pParent == NULL)
+	if (nullptr == _pParent)
+	{
 		return;
+	}
 
 	//부모랑 연을 끊기 전에 부모부터 자식연을 끊어라...
-	TransformComponent* pChild = this->_pParent->_pFirstChild;
+	TransformComponent* pChild = _pParent->_pFirstChild;
 
 	//내가 부모의 첫째자식이니?
-	if (pChild == this) {
-
+	if (this == pChild ) 
+	{
 		//내다음 자식이 첫번째 자식이 된다.
 		this->_pParent->_pFirstChild = this->_pNextSibling;
 
@@ -171,11 +170,11 @@ void TransformComponent::ReleaseParent()
 
 	else
 	{
-		while (pChild != NULL) {
-
+		while (nullptr != pChild) 
+		{
 			//현재 자식의 다음이 나니?
-			if (pChild->_pNextSibling == this) {
-
+			if (this == pChild->_pNextSibling) 
+			{
 				pChild->_pNextSibling = this->_pNextSibling;
 
 				//형재들과의 연도 끊는다.
@@ -190,7 +189,7 @@ void TransformComponent::ReleaseParent()
 	}
 
 	//부모랑 연을 끊어라...
-	this->_pParent = NULL;
+	this->_pParent = nullptr;
 
 	//자신의 현재 월드 위치에 대한 갱신이 필요하다.
 	//진짜월드 위치는 matFinal 이 다 가지고 있다.
@@ -231,8 +230,7 @@ void TransformComponent::ReleaseParent()
 	//나만의 새상이 되었다...
 
 	//부모랑 사라진 기념으로 Update 한번 콜
-	this->UpdateTransform();
-
+	_transformDirty = true;
 }
 
 
@@ -242,7 +240,7 @@ void TransformComponent::SetWorldPosition(float x, float y, float z)
 	Vector3 pos(x, y, z);
 
 	//부모가 있다면 부모의 상태적인 위치로 바꿔라...
-	if (this->_pParent != NULL)
+	if (nullptr != this->_pParent )
 	{
 		//부모의 최종 행렬의 역행렬
 		Matrix matInvParentFinal;
@@ -256,8 +254,7 @@ void TransformComponent::SetWorldPosition(float x, float y, float z)
 	this->_position.y = pos.y;
 	this->_position.z = pos.z;
 
-	if (this->_autoUpdate)
-		this->UpdateTransform();
+	_transformDirty = true;
 }
 
 void TransformComponent::SetWorldPosition(Vector3 pos)
@@ -277,8 +274,7 @@ void TransformComponent::SetWorldPosition(Vector3 pos)
 	this->_position.y = pos.y;
 	this->_position.z = pos.z;
 
-	if (this->_autoUpdate)
-		this->UpdateTransform();
+	_transformDirty = true;
 }
 
 //위치를 로컬 좌표계로 셋팅한다.  ( 부모가 있는 경우 무모의 상태적인 위치 )
@@ -288,8 +284,7 @@ void TransformComponent::SetLocalPosition(float x, float y, float z)
 	this->_position.y = y;
 	this->_position.z = z;
 
-	if (this->_autoUpdate)
-		this->UpdateTransform();
+	_transformDirty = true;
 }
 
 void TransformComponent::SetLocalPosition(Vector3 pos)
@@ -298,8 +293,7 @@ void TransformComponent::SetLocalPosition(Vector3 pos)
 	this->_position.y = pos.y;
 	this->_position.z = pos.z;
 
-	if (this->_autoUpdate)
-		this->UpdateTransform();
+	_transformDirty = true;
 }
 
 //자신의 축기준으로 이동 시킨다.
@@ -371,16 +365,14 @@ void TransformComponent::MovePositionLocal(float dx, float dy, float dz)
 	this->_position.y += dy;
 	this->_position.z += dz;
 
-	if (this->_autoUpdate)
-		this->UpdateTransform();
+	_transformDirty = true;
 }
 
 void TransformComponent::MovePositionLocal(Vector3 delta)
 {
 	this->_position += delta;
 
-	if (this->_autoUpdate)
-		this->UpdateTransform();
+	_transformDirty = true;
 }
 
 
@@ -391,16 +383,14 @@ void TransformComponent::SetScale(float x, float y, float z)
 	this->_scale.y = y;
 	this->_scale.z = z;
 
-	if (this->_autoUpdate)
-		this->UpdateTransform();
+	_transformDirty = true;
 }
 
 void TransformComponent::SetScale(Vector3 scale)
 {
 	this->_scale = scale;
 
-	if (this->_autoUpdate)
-		this->UpdateTransform();
+	_transformDirty = true;
 }
 
 //스케일링
@@ -410,16 +400,15 @@ void TransformComponent::Scaling(float dx, float dy, float dz)
 	this->_scale.y += dy;
 	this->_scale.z += dz;
 
-	if (this->_autoUpdate)
-		this->UpdateTransform();
+	
+	_transformDirty = true;
 }
 
 void TransformComponent::Scaling(Vector3 deltaScale)
 {
 	this->_scale += deltaScale;
 
-	if (this->_autoUpdate)
-		this->UpdateTransform();
+	_transformDirty = true;
 }
 
 //월드 기준으로 회전 
@@ -453,11 +442,9 @@ void TransformComponent::RotateWorld(float angleX, float angleY, float angleZ)
 
 		//최종 회전 행렬 대로 회전 시킨다.
 		for (int i = 0; i < 3; i++)
-			Vec3TransformNormal(this->axis + i, worldAxis + i, &matRotate);
+			Vec3TransformNormal(this->_axis + i, worldAxis + i, &matRotate);
 
-
-		if (this->_autoUpdate)
-			this->UpdateTransform();
+	_transformDirty = true;
 	}
 
 
@@ -503,11 +490,11 @@ void TransformComponent::RotateWorld(Vector3 angle)
 
 		//최종 회전 행렬 대로 회전 시킨다.
 		for (int i = 0; i < 3; i++)
-			Vec3TransformNormal(this->axis + i, worldAxis + i, &matRotate);
+			Vec3TransformNormal(this->_axis + i, worldAxis + i, &matRotate);
 
 
-		if (this->_autoUpdate)
-			this->UpdateTransform();
+	
+	_transformDirty = true;
 	}
 
 	//부모가 없는 경우
@@ -537,11 +524,11 @@ void TransformComponent::RotateSelf(float angleX, float angleY, float angleZ)
 
 	//최종 회전 행렬 대로 회전 시킨다.
 	for (int i = 0; i < 3; i++)
-		Vec3TransformNormal(&this->axis[i], &this->axis[i], &matRotate);
+		Vec3TransformNormal(&this->_axis[i], &this->_axis[i], &matRotate);
 
 
-	if (this->_autoUpdate)
-		this->UpdateTransform();
+	
+	_transformDirty = true;
 }
 
 void TransformComponent::RotateSelf(Vector3 angle)
@@ -563,11 +550,11 @@ void TransformComponent::RotateSelf(Vector3 angle)
 
 	//최종 회전 행렬 대로 회전 시킨다.
 	for (int i = 0; i < 3; i++)
-		Vec3TransformNormal(&this->axis[i], &this->axis[i], &matRotate);
+		Vec3TransformNormal(&this->_axis[i], &this->_axis[i], &matRotate);
 
 
-	if (this->_autoUpdate)
-		this->UpdateTransform();
+	
+	_transformDirty = true;
 }
 
 //부모가 있는 경우 부모 로컬의 축기준으로 회전
@@ -589,11 +576,11 @@ void TransformComponent::RotateLocal(float angleX, float angleY, float angleZ)
 
 	//최종 회전 행렬 대로 회전 시킨다.
 	for (int i = 0; i < 3; i++)
-		Vec3TransformNormal(&this->axis[i], &this->axis[i], &matRotate);
+		Vec3TransformNormal(&this->_axis[i], &this->_axis[i], &matRotate);
 
 
-	if (this->_autoUpdate)
-		this->UpdateTransform();
+	
+	_transformDirty = true;
 }
 
 void TransformComponent::RotateLocal(Vector3 angle)
@@ -613,10 +600,10 @@ void TransformComponent::RotateLocal(Vector3 angle)
 
 	//최종 회전 행렬 대로 회전 시킨다.
 	for (int i = 0; i < 3; i++)
-		Vec3TransformNormal(&this->axis[i], &this->axis[i], &matRotate);
+		Vec3TransformNormal(&this->_axis[i], &this->_axis[i], &matRotate);
 
-	if (this->_autoUpdate)
-		this->UpdateTransform();
+	
+	_transformDirty = true;
 }
 
 
@@ -655,8 +642,8 @@ void TransformComponent::LookDirection(Vector3 dir, Vector3 _up /*= Vector3(0, 1
 		this->_up = newUp;
 	}
 
-	if (this->_autoUpdate)
-		this->UpdateTransform();
+	
+	_transformDirty = true;
 }
 
 //특정 방향을 바라보는데 angle 각만큼만 회전 해라
@@ -693,10 +680,10 @@ void TransformComponent::LookDirection(Vector3 dir, float angle)
 
 	//적용
 	for (int i = 0; i < 3; i++)
-		Vec3TransformNormal(this->axis + i, worldAxis + i, &matRotate);
+		Vec3TransformNormal(this->_axis + i, worldAxis + i, &matRotate);
 
-	if (this->_autoUpdate)
-		this->UpdateTransform();
+	
+	_transformDirty = true;
 }
 
 //특정위치를 바라보게 회전해라.
@@ -748,10 +735,9 @@ void TransformComponent::SetRotateWorld(float eAngleX, float eAngleY, float aAng
 
 	//최종 회전 행렬 대로 회전 시킨다.
 	for (int i = 0; i < 3; i++)
-		Vec3TransformNormal(&this->axis[i], &this->axis[i], &matRotate);
+		Vec3TransformNormal(&this->_axis[i], &this->_axis[i], &matRotate);
 
-	if (this->_autoUpdate)
-		this->UpdateTransform();
+	_transformDirty = true;
 }
 
 void TransformComponent::SetRotateLocal(float eAngleX, float eAngleY, float aAngleZ)
@@ -771,10 +757,9 @@ void TransformComponent::SetRotateLocal(float eAngleX, float eAngleY, float aAng
 
 	//최종 회전 행렬 대로 회전 시킨다.
 	for (int i = 0; i < 3; i++)
-		Vec3TransformNormal(&this->axis[i], &this->axis[i], &matRotate);
+		Vec3TransformNormal(&this->_axis[i], &this->_axis[i], &matRotate);
 
-	if (this->_autoUpdate)
-		this->UpdateTransform();
+	_transformDirty = true;
 }
 
 // 회전 행렬을 넣어주면 그 회전 행렬대로 회전한다.
@@ -798,10 +783,9 @@ void TransformComponent::SetRotateWorld(const Matrix& matWorldRotate)
 
 	//최종 회전 행렬 대로 회전 시킨다.
 	for (int i = 0; i < 3; i++)
-		Vec3TransformNormal(&this->axis[i], &this->axis[i], &matRotate);
+		Vec3TransformNormal(&this->_axis[i], &this->_axis[i], &matRotate);
 
-	if (this->_autoUpdate)
-		this->UpdateTransform();
+	_transformDirty = true;
 }
 
 void TransformComponent::SetRotateLocal(const Matrix& matWorldRotate)
@@ -815,10 +799,9 @@ void TransformComponent::SetRotateLocal(const Matrix& matWorldRotate)
 
 	//최종 회전 행렬 대로 회전 시킨다.
 	for (int i = 0; i < 3; i++)
-		Vec3TransformNormal(&this->axis[i], &this->axis[i], &matRotate);
+		Vec3TransformNormal(&this->_axis[i], &this->_axis[i], &matRotate);
 
-	if (this->_autoUpdate)
-		this->UpdateTransform();
+	_transformDirty = true;
 }
 
 // 회전 사원수를 넣어주면 그 회전값 대로 회전한다.
@@ -847,10 +830,9 @@ void TransformComponent::SetRotateWorld(const Quaternion& matWorldRotate)
 
 	//최종 회전 행렬 대로 회전 시킨다.
 	for (int i = 0; i < 3; i++)
-		Vec3TransformNormal(&this->axis[i], &this->axis[i], &matRotate);
+		Vec3TransformNormal(&this->_axis[i], &this->_axis[i], &matRotate);
 
-	if (this->_autoUpdate)
-		this->UpdateTransform();
+	_transformDirty = true;
 }
 
 void TransformComponent::SetRotateLocal(const Quaternion& matWorldRotate)
@@ -869,10 +851,9 @@ void TransformComponent::SetRotateLocal(const Quaternion& matWorldRotate)
 
 	//최종 회전 행렬 대로 회전 시킨다.
 	for (int i = 0; i < 3; i++)
-		Vec3TransformNormal(&this->axis[i], &this->axis[i], &matRotate);
+		Vec3TransformNormal(&this->_axis[i], &this->_axis[i], &matRotate);
 
-	if (this->_autoUpdate)
-		this->UpdateTransform();
+	_transformDirty = true;
 }
 
 
@@ -992,81 +973,26 @@ void TransformComponent::Interpolate(const TransformComponent& from, const Trans
 
 	}
 
+	
+
+	//TODO : Interpolation을 어떻게 해야할까????
 	//너가 기존에 어떤 값을 지니고 있었니?
-	bool bPrevAutoUpdate = this->_autoUpdate;
+	//bool bPrevAutoUpdate = this->_autoUpdate;
 
-	//일단 오토업데이트 막는다
-	this->_autoUpdate = false;
+	////일단 오토업데이트 막는다
+	//this->_autoUpdate = false;
 
-	this->SetScale(resultScale);
-	this->SetWorldPosition(resultPosition);
-	this->SetRotateWorld(resultRotate);
+	//this->SetScale(resultScale);
+	//this->SetWorldPosition(resultPosition);
+	//this->SetRotateWorld(resultRotate);
 
-	//돌려
-	this->_autoUpdate = bPrevAutoUpdate;
+	////돌려
+	//this->_autoUpdate = bPrevAutoUpdate;
 
-	if (this->_autoUpdate)
-		this->UpdateTransform();
+	//if (this->_autoUpdate)
+	//	this->UpdateTransform();
 }
 
-
-
-void TransformComponent::UpdateTransform()
-{
-	//자신의 정보로 matLocal 행렬을 갱신한다.
-	MatrixIdentity(&this->_matLocal);
-
-	//스케일 먹은 축정보
-	Vector3 scaledRight = this->_right * this->_scale.x;
-	Vector3 scaledUp = this->_up * this->_scale.y;
-	Vector3 scaledForward = this->_forward * this->_scale.z;
-
-	memcpy(&this->_matLocal._11, &scaledRight, sizeof(Vector3));
-	memcpy(&this->_matLocal._21, &scaledUp, sizeof(Vector3));
-	memcpy(&this->_matLocal._31, &scaledForward, sizeof(Vector3));
-	memcpy(&this->_matLocal._41, &this->_position, sizeof(Vector3));
-
-	//나의 최종 행렬
-	if (this->_pParent == NULL)
-	{
-		this->_matFinal = _matLocal;
-	}
-
-	//내가 부모가 있다면...
-	else 
-	{
-		this->_matFinal = _matLocal * this->_pParent->_matFinal;
-	}
-
-	//자식 업데이트
-	TransformComponent* pChild = this->_pFirstChild;
-
-	//자식들아 너희들도 업데이트
-	while (pChild != NULL)
-	{
-		pChild->UpdateTransform();
-		pChild = pChild->_pNextSibling;
-	}
-}
-
-
-//Device 에 자신의 Tansform 을 월드로 셋팅
-void TransformComponent::SetDeviceWorld(LPDIRECT3DDEVICE9 pDevice)
-{
-	pDevice->SetTransform(D3DTS_WORLD, &_matFinal);
-}
-
-//Device 에 자신의 Tansform 을 뷰로 셋팅
-void TransformComponent::SetDeviceView(LPDIRECT3DDEVICE9 pDevice)
-{
-	Matrix matView;
-	MatrixInverse(&matView, NULL, &_matFinal);
-
-	pDevice->SetTransform(D3DTS_VIEW, &matView);
-}
-
-
-//
 // Get 들..................
 //
 //최종 행렬을 얻는다.
@@ -1082,13 +1008,13 @@ Matrix TransformComponent::GetWorldRotateMatrix() const
 	MatrixIdentity(&matRotate);
 
 	//3축을 얻는다.
-	Vector3 axis[3];
-	this->GetUnitAxies(axis);
+	Vector3 _axis[3];
+	this->GetUnitAxies(_axis);
 
 	//행렬에 적용
-	memcpy(&matRotate._11, axis + 0, sizeof(Vector3));
-	memcpy(&matRotate._21, axis + 1, sizeof(Vector3));
-	memcpy(&matRotate._31, axis + 2, sizeof(Vector3));
+	memcpy(&matRotate._11, _axis + 0, sizeof(Vector3));
+	memcpy(&matRotate._21, _axis + 1, sizeof(Vector3));
+	memcpy(&matRotate._31, _axis + 2, sizeof(Vector3));
 
 	return matRotate;
 }
@@ -1126,7 +1052,7 @@ Vector3 TransformComponent::GetLocalPosition() const
 void TransformComponent::GetScaledAxies(Vector3* pVecArr) const
 {
 	for (int i = 0; i < 3; i++) {
-		pVecArr[i] = this->axis[i];
+		pVecArr[i] = this->_axis[i];
 	}
 
 	//부모가 있다면..
@@ -1141,7 +1067,7 @@ void TransformComponent::GetScaledAxies(Vector3* pVecArr) const
 void TransformComponent::GetUnitAxies(Vector3* pVecArr) const
 {
 	for (int i = 0; i < 3; i++) {
-		Vec3Normalize(pVecArr + i, this->axis + i);
+		Vec3Normalize(pVecArr + i, this->_axis + i);
 	}
 
 	//부모가 있다면..
@@ -1155,7 +1081,7 @@ void TransformComponent::GetUnitAxies(Vector3* pVecArr) const
 
 Vector3 TransformComponent::GetScaledAxis(int axisNum) const
 {
-	Vector3 result = this->axis[axisNum];
+	Vector3 result = this->_axis[axisNum];
 
 	//부모가 있다면..
 	if (this->_pParent) {
@@ -1169,7 +1095,7 @@ Vector3 TransformComponent::GetScaledAxis(int axisNum) const
 Vector3 TransformComponent::GetUnitAxis(int axisNum) const
 {
 	Vector3 result;
-	Vec3Normalize(&result, this->axis + axisNum);
+	Vec3Normalize(&result, this->_axis + axisNum);
 
 	//부모가 있다면..
 	if (this->_pParent) {
@@ -1199,160 +1125,25 @@ Vector3 TransformComponent::GetUp(bool bNormalize /*= true*/) const
 Vector3 TransformComponent::GetRight(bool bNormalize /*= true*/) const
 {
 	if (bNormalize)
+	{
 		return this->GetUnitAxis(AXIS_X);
-
+	}
 	return this->GetScaledAxis(AXIS_X);
 }
 
-////디폴트 컨트롤 을해준다.
-//void TransformComponent::DefaultControl(float timeDelta)
-//{
-//	//디폴트 컨트롤을 위한 카메라 Angle 값
-//	static float nowAngleH = 0.0f;			//수평앵글
-//	static float nowAngleV = 0.0f;			//수직앵글
-//	static float maxAngleV = 85.0f;			//수직 최대 앵글
-//	static float minAngleV = -85.0f;			//수직 최저 앵글
-//	static float sensitivityH = 1.0f;					//가로 민감도
-//	static float sensitivityV = 1.0f;					//세로 민감도 ( 이값이 음수면 Invert Mouse )
-//	static Vector3 nowVelocity(0, 0, 0);			//현제 방향과 속도를 가진 벡터
-//
-//	static float accelate = 30.0f;						//초당 이동 증가값
-//	static float nowSpeed = 3.0f;						//현재 속도
-//	static float maxSpeed = 10.0f;						//최고 속도 
-//
-//
-//														//최초 누를때는 마우스 위치를 가운데로 놓고 시작
-//	if (KEY_MGR->IsOnceDown(VK_RBUTTON)) {
-//
-//		//화면의 중심위치
-//		int screenCenterX = WINSIZE_X / 2;
-//		int screenCenterY = WINSIZE_Y / 2;
-//
-//		//다시 마우스 위치를 센터로...
-//		SetMousePos(screenCenterX, screenCenterY);
-//	}
-//
-//	//우클릭을 할때만 Default Control 을 한다
-//	else if (KEY_MGR->IsStayDown(VK_RBUTTON)) {
-//
-//		//
-//		// 이동 처리
-//		//
-//
-//		//입력 방향벡터
-//		Vector3 inputVector(0, 0, 0);
-//
-//		if (KEY_MGR->IsStayDown('W')) {
-//			inputVector.z = 1.0f;
-//		}
-//
-//		else if (KEY_MGR->IsStayDown('S')) {
-//			inputVector.z = -1.0f;
-//		}
-//
-//		if (KEY_MGR->IsStayDown('A')) {
-//			inputVector.x = -1.0f;
-//		}
-//
-//		else if (KEY_MGR->IsStayDown('D')) {
-//			inputVector.x = 1.0f;
-//		}
-//
-//		if (KEY_MGR->IsStayDown('R')) {
-//			inputVector.y = 1.0f;
-//		}
-//
-//		else if (KEY_MGR->IsStayDown('F')) {
-//			inputVector.y = -1.0f;
-//		}
-//
-//		//제로 벡터가 아닐때
-//		if (VECTORZERO(inputVector) == false)
-//		{
-//			//정규화
-//			Vec3Normalize(&inputVector, &inputVector);
-//		}
-//
-//		//이동 해라
-//		//타겟벡터 
-//		Vector3 target = inputVector * maxSpeed;
-//		this->MovePositionSelf(target * timeDelta);
-//
-//		//
-//		// 회전 처리
-//		// 
-//		//화면의 중심위치
-//		int screenCenterX = WINSIZE_X / 2;
-//		int screenCenterY = WINSIZE_Y / 2;
-//
-//		//현재 마우스 위치
-//		POINT mousePos = GetMousePos();
-//
-//		//이동량 ( 중앙에서 멀어진 량 )
-//		float deltaX = mousePos.x - screenCenterX;
-//		float deltaY = mousePos.y - screenCenterY;
-//
-//		//앵글 추가
-//		nowAngleH += deltaX * sensitivityH;
-//		nowAngleV += deltaY * sensitivityV;
-//
-//		//앵글값을 min max 범위 안으로
-//		nowAngleV = Clamp(nowAngleV, minAngleV, maxAngleV);
-//
-//		//다시 마우스 위치를 센터로...
-//		SetMousePos(screenCenterX, screenCenterY);
-//
-//
-//		this->SetRotateWorld(nowAngleV * ONE_RAD, nowAngleH * ONE_RAD, 0.0f);
-//
-//	}
-//}
-//
-//void TransformComponent::DefaultControl2(float timeDelta)
-//{
-//	float deltaMove = 3.0f * timeDelta;
-//	float deltaAngle = 90.0f * ONE_RAD * timeDelta;
-//
-//	if (KEY_MGR->IsStayDown(VK_RBUTTON) == false)
-//	{
-//		if (KEY_MGR->IsStayDown('A'))
-//			this->MovePositionSelf(-deltaMove, 0.0f, 0.0f);
-//		else if (KEY_MGR->IsStayDown('D'))
-//			this->MovePositionSelf(deltaMove, 0.0f, 0.0f);
-//
-//		if (KEY_MGR->IsStayDown('W'))
-//			this->MovePositionSelf(0.0f, 0.0f, deltaMove);
-//		else if (KEY_MGR->IsStayDown('S'))
-//			this->MovePositionSelf(0.0f, 0.0f, -deltaMove);
-//
-//		if (KEY_MGR->IsStayDown(VK_LEFT))
-//			this->RotateSelf(0.0f, -deltaAngle, 0.0f);
-//		else if (KEY_MGR->IsStayDown(VK_RIGHT))
-//			this->RotateSelf(0.0f, deltaAngle, 0.0f);
-//
-//		if (KEY_MGR->IsStayDown(VK_UP))
-//			this->RotateSelf(-deltaAngle, 0.0f, 0.0f);
-//		else if (KEY_MGR->IsStayDown(VK_DOWN))
-//			this->RotateSelf(deltaAngle, 0.0f, 0.0f);
-//	}
-//}
-
-
 //TransformComponent 에 대한 기즈모를 그린다.
-void TransformComponent::RenderGizmo(bool applyScale /*= false*/)
-{
-	Vector3 worldPos = this->GetWorldPosition();
-	Vector3 axis[3];
-
-	if (applyScale)
-		this->GetScaledAxies(axis);
-	else
-		this->GetUnitAxies(axis);
-
-	//GIZMO_MGR->Line(worldPos, worldPos + axis[2], 0xff0000ff);
-	//GIZMO_MGR->Line(worldPos, worldPos + axis[1], 0xff00ff00);
-	//GIZMO_MGR->Line(worldPos, worldPos + axis[0], 0xffff0000);
-
-}
-
-
+//void TransformComponent::RenderGizmo(bool applyScale /*= false*/)
+//{
+//	Vector3 worldPos = this->GetWorldPosition();
+//	Vector3 _axis[3];
+//
+//	if (applyScale)
+//		this->GetScaledAxies(_axis);
+//	else
+//		this->GetUnitAxies(_axis);
+//
+//	//GIZMO_MGR->Line(worldPos, worldPos + _axis[2], 0xff0000ff);
+//	//GIZMO_MGR->Line(worldPos, worldPos + _axis[1], 0xff00ff00);
+//	//GIZMO_MGR->Line(worldPos, worldPos + _axis[0], 0xffff0000);
+//
+//}

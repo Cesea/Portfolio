@@ -3,10 +3,17 @@
 
 #include <cstdlib>
 
-#include "DataPackage.h"
 #include "BitFlags.h"	
 
 #include "TypeTraits.h"
+
+#include "Hash.h"
+
+//TODO :
+#define BX_ALIGN_MASK(_value, _mask) ( ( (_value)+(_mask) ) & ( (~0)&(~(_mask) ) ) )
+#define BX_ALIGN_16(_value) BX_ALIGN_MASK(_value, 0xf)
+#define BX_ALIGN_256(_value) BX_ALIGN_MASK(_value, 0xff)
+#define BX_ALIGN_4096(_value) BX_ALIGN_MASK(_value, 0xfff)
 
 constexpr float EPSILON = 0.001f;
 constexpr float ONE_RAD = 0.017453f;
@@ -156,24 +163,56 @@ inline float InterpolateFloat(float start, float end, float t)
 	return start + ((end - start) * t);
 }
 
-inline uint32 uint32_min(uint32 a, uint32 b)
+inline uint32 Uint32Min(uint32 a, uint32 b)
 {
 	return (a < b) ? a : b;
 }
 
-inline uint32 uint32_max(uint32 a, uint32 b)
+inline uint32 Uint32Max(uint32 a, uint32 b)
 {
 	return (a > b) ? a : b;
 }
 
-inline int32 int32_min(int32 a, int32 b)
+inline int32 Int32Min(int32 a, int32 b)
 {
 	return (a < b) ? a : b;
 }
 
-inline int32 int32_max(int32 a, int32 b)
+inline int32 Int32Max(int32 a, int32 b)
 {
 	return (a > b) ? a : b;
+}
+
+inline uint32 Uint32CountBits(uint32 val)
+{
+	return __popcnt(val);
+}
+
+inline uint32 Uint32BitScan(uint32 val)
+{
+	unsigned long index;
+	_BitScanForward(&index, val);
+	return index;
+}
+
+inline uint32 Uint32And(uint32 a, uint32 b)
+{
+	return a & b;
+}
+inline uint32 Uint32AndC(uint32 a, uint32 b)
+{
+	return a & (~b);
+}
+inline uint32 Uint32Or(uint32 a, uint32 b)
+{
+	return a | b;
+}
+inline uint32 Uint32Selb(uint32 mask, uint32 a, uint32 b)
+{
+	const uint32 sel_a = Uint32And(a, mask);
+	const uint32 sel_b = Uint32AndC(b, mask);
+	const uint32 result = Uint32Or(sel_a, sel_b);
+	return result;
 }
 
 float RandFloat();

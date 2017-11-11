@@ -18,11 +18,6 @@ struct TransformComponent : public Component
 	TransformComponent();
 	~TransformComponent();
 
-	void SetAutoUpdate(bool bauto)
-	{
-		this->_autoUpdate = bauto;
-	}
-
 	void Reset(int resetFlag = -1);
 
 	void AddChild(TransformComponent* pChild);
@@ -163,7 +158,8 @@ struct TransformComponent : public Component
 	TransformComponent* _pFirstChild;
 	TransformComponent* _pNextSibling;
 
-	bool32 _autoUpdate;
+	bool32 _transformDirty;
+
 };
 
 #endif

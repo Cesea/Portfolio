@@ -41,17 +41,12 @@ protected :
 
 	int32 _scroll{ 0 };
 
-	IDirect3DVertexDeclaration9 *_pDecl;
-
-	VertexBufferHandle _vertexHandle;
-	IndexBufferHandle _indexHandle;
-
 	bool _checked{ false };
 
 	World _world;
 
-	MoveSystem _moveSystem;
-	RenderSystem _renderSystem;
+	//MoveSystem _moveSystem;
+	//RenderSystem _renderSystem;
 
 };
 

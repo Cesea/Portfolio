@@ -4,6 +4,7 @@
 #define HUNTER_DEBUG 1
 
 Engine *gEngine;
+HWND gWindowHandle;
 
 LRESULT CALLBACK WindowProc(HWND windowHandle, UINT msg, WPARAM wParam, LPARAM lParam)
 {
@@ -59,9 +60,8 @@ void Engine::Run()
 		float deltaTime = APPTIMER->GetTargetTime();
 
 		_pScene->Update(deltaTime);
-		_pVideo->Update(deltaTime);
-
-		_pVideo->Render();
+		video::Submit(0);
+		video::DoFrame();
 
 		APPTIMER->Tick();
 
@@ -164,6 +164,8 @@ bool Engine::InitializePlatform(HINSTANCE instanceHandle)
 		return false;
 	}
 
+	gWindowHandle = _windowHandle;
+
 	ShowWindow(_windowHandle, SW_SHOW);
 	UpdateWindow(_windowHandle);
 
@@ -172,12 +174,6 @@ bool Engine::InitializePlatform(HINSTANCE instanceHandle)
 
 bool Engine::InitializeSystems()
 {
-	_pVideo = std::make_shared<video::VideoDevice>(video::VideoDevice());
-
-	if (!_pVideo->Init())
-	{
-		return false;
-	}
 
 	_pInput= std::make_shared<InputManager>(InputManager());
 	if (!_pInput->Init())
@@ -198,6 +194,13 @@ bool Engine::InitializeSystems()
 	{
 		return false;
 	}
+
+	video::Init();
+	video::Reset(WINSIZEX, WINSIZEY);
+
+	video::SetViewRect(0, 0, 0, WINSIZEX, WINSIZEY);
+	video::SetViewClear(0, VIDEO_CLEAR_COLOR_BIT | VIDEO_CLEAR_DEPTH_BIT, 0xff00ff00, 1.0f, 0);
+
 
 	return true;
 }

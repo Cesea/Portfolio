@@ -246,13 +246,13 @@ void StrPair::CollapseWhitespace()
 
     if ( *_start ) {
         const char* p = _start;	// the read pointer
-        char* q = _start;	// the write pointer
+        char* q = _start;	// the Write pointer
 
         while( *p ) {
             if ( XMLUtil::IsWhiteSpace( *p )) {
                 p = XMLUtil::SkipWhiteSpace( p, 0 );
                 if ( *p == 0 ) {
-                    break;    // don't write to q; this trims the trailing space.
+                    break;    // don't Write to q; this trims the trailing space.
                 }
                 *q = ' ';
                 ++q;
@@ -276,7 +276,7 @@ const char* StrPair::GetStr()
 
         if ( _flags ) {
             const char* p = _start;	// the read pointer
-            char* q = _start;	// the write pointer
+            char* q = _start;	// the Write pointer
 
             while( p < _end ) {
                 if ( (_flags & NEEDS_NEWLINE_NORMALIZATION) && *p == CR ) {
@@ -2453,7 +2453,7 @@ void XMLPrinter::PrintString( const char* p, bool restricted )
             // Remember, char is sometimes signed. (How many times has that bitten me?)
             if ( *q > 0 && *q < ENTITY_RANGE ) {
                 // Check for entities. If one is found, flush
-                // the stream up until the entity, write the
+                // the stream up until the entity, Write the
                 // entity, and keep looking.
                 if ( flag[(unsigned char)(*q)] ) {
                     while ( p < q ) {

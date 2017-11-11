@@ -17,7 +17,7 @@ void MoveSystem::Update(float deltaTime)
 	auto &entities = GetEntities();
 	for (int32 i = 0; i < entities.size(); ++i)
 	{
-		Vector3 &refPosition = entities[i].GetComponent<PositionComponent>().position;
+		Vector3 &refPosition = entities[i].GetComponent<TransformComponent>()._position;
 		MoveComponent &refMoveComponent = entities[i].GetComponent<MoveComponent>();
 
 		refMoveComponent.velocity += refMoveComponent.accel;

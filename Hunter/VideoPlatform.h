@@ -9,27 +9,29 @@
 
 #include <unordered_map>
 
-
 	#define VIDEO_RENDERER_DIRECT3D (BX_PLATFORM_WINDOWS|BX_PLATFORM_XBOX360)
 	#define VIDEO_MULTITHREADED  \
-		( (BX_PLATFORM_WINDOWS|BX_PLATFORM_XBOX360|BX_PLATFORM_NACL|BX_PLATFORM_LINUX)&(!BGFX_CONFIG_RENDERER_NULL) )
+		( (VIDEO_PLATFORM_WINDOWS | VIDEOBX_PLATFORM_XBOX360 | VIDEOBX_PLATFORM_NACL | VIDEOBX_PLATFORM_LINUX) & (!BGFX_CONFIG_RENDERER_NULL) )
 	#define VIDEO_MAX_DRAW_CALLS (8<<10)
 	#define VIDEO_MAX_MATRIX_CACHE (16<<10)
 	#define VIDEO_MAX_VIEWS 32
 	#define VIDEO_MAX_INDEX_BUFFERS (4<<10)
 	#define VIDEO_MAX_VERTEX_DECLS 64
 	#define VIDEO_MAX_VERTEX_BUFFERS (4<<10)
-	#define VIDEO_MAX_EFFECT 256
-	#define VIDEO_MAX_MATERIALS 512
+	#define VIDEO_MAX_VERTEX_SHADERS 128
+	#define VIDEO_MAX_FRAGMENT_SHADERS 128
+	#define VIDEO_MAX_SURFACE_MATERIALS 512
 	#define VIDEO_MAX_TEXTURES (4<<10)
 	#define VIDEO_MAX_RENDER_TARGETS 64
 	#define VIDEO_MAX_UNIFORMS 512
 	#define VIDEO_MAX_COMMAND_BUFFER_SIZE (64<<10)
 	#define VIDEO_DYNAMIC_VERTEX_BUFFER_SIZE (6<<20)
 	#define VIDEO_DYNAMIC_INDEX_BUFFER_SIZE (2<<20)
-	#define MAX_CONSTANT_BUFFER_SIZE (512<<10)
+	#define VIDEO_MAX_CONSTANT_BUFFER_SIZE (512<<10)
 
-
+#if VIDEO_MULTITHREADED
+#include "Semaphore.h"
+#endif
 	#define VIDEO_DRAW_WHOLE_INDEX_BUFFER 0xffffffff
 
 	#define VIDEO_DEFAULT_WIDTH  1280
@@ -51,65 +53,68 @@
 namespace video
 {
 
-	extern const uint32_t gConstantTypeSize[ConstantType::Count];
+	extern const uint32 gConstantTypeSize[ConstantType::Count];
 	extern ReallocFunction gRealloc;
 	extern FreeFunction gFree;
 	extern void Free(Memory* _mem);
-	//extern void saveTga(const char* _filePath, uint32_t _width, uint32_t _height, uint32_t _pitch, const void* _data);
+	//extern void saveTga(const char* _filePath, uint32 _width, uint32 _height, uint32 _pitch, const void* _data);
 	extern const char* GetAttribName(Attrib::Enum _attr);
 
 
-	inline uint32_t uint16_min(uint16_t _a, uint16_t _b)
+	inline uint32 Uint16Min(uint16 _a, uint16 _b)
 	{
 		return _a > _b ? _b : _a;
 	}
 
-	inline uint32_t hash(const void* _data, uint32_t _size)
+	inline uint32 Hash(const void* data, uint32 size)
 	{
 		HashMurmur2A murmur;
-		murmur.begin();
-		murmur.add(_data, (int)_size);
-		return murmur.end();
+		murmur.Begin();
+		murmur.Add(data, (int)size);
+		return murmur.End();
 	}
 
-	inline uint32_t gcd(uint32_t _a, uint32_t _b)
+	inline uint32 GCD(uint32 a, uint32 b)
 	{
 		do
 		{
-			uint32_t tmp = _a % _b;
-			_a = _b;
-			_b = tmp;
-		} while (_b);
+			uint32 tmp = a % b;
+			a = b;
+			b = tmp;
+		} while (b);
 
-		return _a;
+		return a;
 	}
 
-	inline uint32_t lcm(uint32_t _a, uint32_t _b)
+	inline uint32 LCM(uint32 a, uint32 b)
 	{
-		return _a * (_b / gcd(_a, _b));
+		return a * (b / GCD(a, b));
 	}
 
-	inline uint32_t strideAlign(uint32_t _offset, uint32_t _stride)
-	{
-		const uint32_t mod = uint32_mod(_offset, _stride);
-		const uint32_t add = uint32_sub(_stride, mod);
-		const uint32_t mask = uint32_cmpeq(mod, 0);
-		const uint32_t tmp = uint32_selb(mask, 0, add);
-		const uint32_t result = uint32_add(_offset, tmp);
 
+	inline uint32 StrideAlign(uint32 offset, uint32 stride)
+	{
+		const uint32 mod = offset % stride;
+
+		const uint32 add = stride - mod;
+		const uint32 mask = -(mod == 0);
+
+		const uint32 tmp = Uint32Selb(mask, 0, add);
+
+		const uint32 result = offset + tmp;
 		return result;
 	}
 
-	inline uint32_t strideAlign16(uint32_t _offset, uint32_t _stride)
+	inline uint32 StrideAlign16(uint32 offset, uint32 stride)
 	{
-		uint32_t align = lcm(16, _stride);
-		return _offset + align - (_offset%align);
+		uint32 align = LCM(16, stride);
+		return offset + align - (offset % align);
 	}
 
-	inline uint32_t strideAlign256(uint32_t _offset, uint32_t _stride)
+	inline uint32 StrideAlign256(uint32 offset, uint32 stride)
 	{
-		uint32_t align = lcm(256, _stride);
-		return _offset + align - (_offset%align);
+		uint32 align = LCM(256, stride);
+		return offset + align - (offset % align);
 	}
 
 	void Dump(const VertexDecl &decl);
@@ -126,14 +131,14 @@ namespace video
 			gFree(_mem);
 		}
 
-		void Resize(bool sm = false, uint16_t width = VIDEO_DEFAULT_WIDTH, uint16 _height = BGFX_DEFAULT_HEIGHT)
+		void Resize(bool sm = false, uint16 width = VIDEO_DEFAULT_WIDTH, uint16 height = VIDEO_DEFAULT_HEIGHT)
 		{
 			_small = sm;
-			_width = uint32_max(1, _width / 8);
-			_height = uint32_max(1, _height / (_small ? 8 : 16));
+			_width = Uint32Max(1, width / 8);
+			_height = Uint32Max(1, height / (_small ? 8 : 16));
 			_size = _width * _height * 2;
 
-			_mem = (uint8_t*)g_realloc(_mem, _size);
+			_mem = (uint8*)gRealloc(_mem, _size);
 
 			Clear();
 		}
@@ -143,16 +148,16 @@ namespace video
 			memset(_mem, 0, _size);
 		}
 
-		void PrintfVargs(uint16_t x, uint16_t y, uint8_t attr, const char* format, va_list argList)
+		void PrintfVargs(uint16 x, uint16 y, uint8 attr, const char* format, va_list argList)
 		{
 			if (x < _width && y < _height)
 			{
 				char* temp = (char*)alloca(_width);
 
-				uint32_t num = vsnprintf(temp, _width, format, argList);
+				uint32 num = vsnprintf(temp, _width, format, argList);
 
-				uint8_t* mem = &_mem[(y * _width + x) * 2];
-				for (uint32_t i = 0, xx = x; i < num && xx < _width; ++i, ++xx)
+				uint8* mem = &_mem[(y * _width + x) * 2];
+				for (uint32 i = 0, xx = x; i < num && xx < _width; ++i, ++xx)
 				{
 					mem[0] = temp[i];
 					mem[1] = attr;
@@ -161,7 +166,7 @@ namespace video
 			}
 		}
 
-		void Printf(uint16_t x, uint16_t y, uint8_t attr, const char* format, ...)
+		void Printf(uint16 x, uint16 y, uint8 attr, const char* format, ...)
 		{
 			va_list argList;
 			va_start(argList, format);
@@ -169,10 +174,10 @@ namespace video
 			va_end(argList);
 		}
 
-		uint8_t* _mem;
-		uint32_t _size;
-		uint16_t _width;
-		uint16_t _height;
+		uint8* _mem;
+		uint32 _size;
+		uint16 _width;
+		uint16 _height;
 		bool _small;
 	};
 
@@ -181,7 +186,7 @@ namespace video
 		void Init();
 		void Blit(const TextVideoMem& _mem);
 		void Setup();
-		void Render(uint32_t _numIndices);
+		void Render(uint32 _numIndices);
 
 		video::TextureHandle _texture;
 		DynamicVertexBuffer* _vb;
@@ -205,7 +210,7 @@ namespace video
 			eModelViewProj,
 			eModelViewProjX,
 			eAlphaRef,
-			eCount
+			Count
 		};
 
 		uint8 _type;
@@ -216,10 +221,10 @@ namespace video
 	class StreamRead
 	{
 	public:
-		StreamRead(const void* _data, uint32_t _size)
-			: m_data((uint8_t*)_data)
-			, m_size(_size)
-			, m_pos(0)
+		StreamRead(const void* data, uint32 size)
+			: _data((uint8*)data)
+			, _size(size)
+			, _pos(0)
 		{
 		}
 
@@ -227,53 +232,53 @@ namespace video
 		{
 		}
 
-		void skip(uint32_t _size)
+		void Skip(uint32 size)
 		{
-			BX_CHECK(m_size - m_pos >= _size, "Available %d, requested %d.", m_size - m_pos, _size);
-			m_pos += _size;
+			Assert(_size - _pos >= size); //용량 확인
+			_pos += size;
 		}
 
-		void read(void* _data, uint32_t _size)
+		void Read(void* data, uint32 size)
 		{
-			BX_CHECK(m_size - m_pos >= _size, "Available %d, requested %d.", m_size - m_pos, _size);
-			memcpy(_data, &m_data[m_pos], _size);
-			m_pos += _size;
+			Assert(_size - _pos >= size); //용량 확인
+			memcpy(data, &_data[_pos], size);
+			_pos += size;
 		}
 
-		template<typename Ty>
-		void read(Ty& _value)
+		template<typename T>
+		void Read(T& value)
 		{
-			read(&_value, sizeof(Ty));
+			Read(&value, sizeof(T));
 		}
 
-		const uint8_t* getDataPtr() const
+		const uint8* GetDataPtr() const
 		{
-			return &m_data[m_pos];
+			return &_data[_pos];
 		}
 
-		uint32_t getPos() const
+		uint32 GetPos() const
 		{
-			return m_pos;
+			return _pos;
 		}
 
-		void align(uint16_t _align)
+		void Align(uint16 align)
 		{
-			m_pos = strideAlign(m_pos, _align);
+			_pos = StrideAlign(_pos, align);
 		}
 
 	private:
-		const uint8_t* m_data;
-		uint32_t m_size;
-		uint32_t m_pos;
+		const uint8* _data;
+		uint32 _size;
+		uint32 _pos;
 	};
 
 	class StreamWrite
 	{
 	public:
-		StreamWrite(void* _data, uint32_t _size)
-			: m_data((uint8_t*)_data)
-			, m_size(_size)
-			, m_pos(0)
+		StreamWrite(void* data, uint32 size)
+			: _data((uint8*)data)
+			, _size(size)
+			, _pos(0)
 		{
 		}
 
@@ -281,38 +286,38 @@ namespace video
 		{
 		}
 
-		void write(void* _data, uint32_t _size)
+		void Write(void* data, uint32 size)
 		{
-			BX_CHECK(m_size - m_pos >= _size, "Write out of bounds. Available %d, requested %d.", m_size - m_pos, _size);
-			memcpy(&m_data[m_pos], _data, _size);
-			m_pos += _size;
+			Assert(_size - _pos >= size); //용량 확인
+			memcpy(&_data[_pos], data, size);
+			_pos += size;
 		}
 
-		template<typename Ty>
-		void write(Ty& _value)
+		template<typename T>
+		void Write(T &value)
 		{
-			write(&_value, sizeof(Ty));
+			Write(&value, sizeof(T));
 		}
 
-		uint8_t* getDataPtr() const
+		uint8* GetDataPtr() const
 		{
-			return &m_data[m_pos];
+			return &_data[_pos];
 		}
 
-		uint32_t getPos() const
+		uint32 GetPos() const
 		{
-			return m_pos;
+			return _pos;
 		}
 
-		void align(uint16_t _align)
+		void Align(uint16 align)
 		{
-			m_pos = strideAlign(m_pos, _align);
+			_pos = StrideAlign(_pos, align);
 		}
 
 	private:
-		uint8_t* m_data;
-		uint32_t m_size;
-		uint32_t m_pos;
+		uint8* _data;
+		uint32 _size;
+		uint32 _pos;
 	};
 
 	struct CommandBuffer
@@ -358,7 +363,7 @@ namespace video
 		{
 			Assert(_pos < _size);
 			memcpy(&_buffer[_pos], data, size);
-			_pos += _size;
+			_pos += size;
 		}
 
 		template<typename T>
@@ -420,10 +425,10 @@ namespace video
 			return key;
 		}
 
-		void Eecode(uint64 key)
+		void Decode(uint64 key)
 		{
 			_depth = key & 0xffffffff;
-			_material = (key >> 0x18)&(VIDEO_MAX_MATERIALS - 1);
+			_material = (key >> 0x18) & (VIDEO_MAX_SURFACE_MATERIALS - 1);
 			_trans = (key >> 0x21) & 0x3;
 			_seq = (key >> 0x23) & 0x7ff;
 			_view = (key >> 0x2e)&(VIDEO_MAX_VIEWS - 1);
@@ -480,7 +485,7 @@ namespace video
 			{
 				Assert(_num + _num < VIDEO_MAX_MATRIX_CACHE);//용량 초과
 
-				uint32 num = min(VIDEO_MAX_MATRIX_CACHE - _num, num);
+				uint32 inum = min(VIDEO_MAX_MATRIX_CACHE - _num, num);
 				uint32 first = _num;
 				memcpy(&_cache[_num], matrix, sizeof(Matrix) * num);
 				_num += num;
@@ -496,7 +501,7 @@ namespace video
 
 	struct Sampler
 	{
-		uint16 _idx;
+		uint16 _index;
 		uint16 _flags;
 	};
 
@@ -505,6 +510,7 @@ namespace video
 		ConstantType::Enum _type;
 		uint16 _num;
 	};
+
 	#define CONSTANT_OPCODE_MASK(_bits) ( (1<<_bits)-1)
 
 	#define CONSTANT_OPCODE_TYPE_BITS 8
@@ -516,66 +522,67 @@ namespace video
 	#define CONSTANT_OPCODE_COPY_BITS 1
 	#define CONSTANT_OPCODE_COPY_MASK CONSTANT_OPCODE_MASK(CONSTANT_OPCODE_COPY_BITS)
 
-	#define BGFX_UNIFORM_FUNCTIONBIT UINT8_C(0x40)
-	#define BGFX_UNIFORM_FRAGMENTBIT UINT8_C(0x80)
-	#define BGFX_UNIFORM_TYPEMASK    UINT8_C(0x3f)
+	#define VIDEO_UNIFORM_FUNCTIONBIT UINT8_C(0x40)
+	#define VIDEO_UNIFORM_FRAGMENTBIT UINT8_C(0x80)
+	#define VIDEO_UNIFORM_TYPEMASK    UINT8_C(0x3f)
 
 	class ConstantBuffer
 	{
 	public:
-		static ConstantBuffer* Create(uint32_t _size)
+		static ConstantBuffer* Create(uint32 _size)
 		{
-			uint32_t size = BX_ALIGN_16(uint32_max(_size, sizeof(ConstantBuffer)));
-			void* data = g_realloc(NULL, size);
+			uint32 size = BX_ALIGN_16(Uint32Max(_size, sizeof(ConstantBuffer)));
+			void* data = gRealloc(NULL, size);
 			return ::new(data) ConstantBuffer(_size);
 		}
 
-		static void Destroy(ConstantBuffer* _constantBuffer)
+		static void Destroy(ConstantBuffer* constantBuffer)
 		{
-			_constantBuffer->~ConstantBuffer();
-			g_free(_constantBuffer);
+			constantBuffer->~ConstantBuffer();
+			gFree(constantBuffer);
 		}
 
-		static uint32_t EncodeOpcode(ConstantType::Enum _type, uint16_t _loc, uint16_t _num, uint16_t _copy)
+		static uint32 EncodeOpcode(ConstantType::Enum type, uint16 loc, uint16 num, uint16 copy)
 		{
-			uint32_t opcode = 0;
+			uint32 opcode = 0;
 
 			opcode <<= CONSTANT_OPCODE_TYPE_BITS;
-			opcode |= _type&CONSTANT_OPCODE_TYPE_MASK;
+			opcode |= type & CONSTANT_OPCODE_TYPE_MASK;
 
 			opcode <<= CONSTANT_OPCODE_LOC_BITS;
-			opcode |= _loc&CONSTANT_OPCODE_LOC_MASK;
+			opcode |= loc & CONSTANT_OPCODE_LOC_MASK;
 
 			opcode <<= CONSTANT_OPCODE_NUM_BITS;
-			opcode |= _num&CONSTANT_OPCODE_NUM_MASK;
+			opcode |= num & CONSTANT_OPCODE_NUM_MASK;
 
 			opcode <<= CONSTANT_OPCODE_COPY_BITS;
-			opcode |= _copy&CONSTANT_OPCODE_COPY_MASK;
+			opcode |= copy & CONSTANT_OPCODE_COPY_MASK;
 
 			return opcode;
 		}
 
-		static void DecodeOpcode(uint32_t _opcode, ConstantType::Enum& _type, uint16_t& _loc, uint16_t& _num, uint16_t& _copy)
+		static void DecodeOpcode(uint32 opcode, ConstantType::Enum& type, 
+			uint16& loc, uint16& num, uint16& copy)
 		{
-			uint32_t copy;
-			uint32_t num;
-			uint32_t loc;
+			uint32 icopy;
+			uint32 inum;
+			uint32 iloc;
 
-			copy = _opcode&CONSTANT_OPCODE_COPY_MASK;
-			_opcode >>= CONSTANT_OPCODE_COPY_BITS;
+			icopy = opcode & CONSTANT_OPCODE_COPY_MASK;
+			opcode >>= CONSTANT_OPCODE_COPY_BITS;
 
-			num = _opcode&CONSTANT_OPCODE_NUM_MASK;
-			_opcode >>= CONSTANT_OPCODE_NUM_BITS;
+			inum = opcode & CONSTANT_OPCODE_NUM_MASK;
+			opcode >>= CONSTANT_OPCODE_NUM_BITS;
 
-			loc = _opcode&CONSTANT_OPCODE_LOC_MASK;
-			_opcode >>= CONSTANT_OPCODE_LOC_BITS;
+			iloc = opcode & CONSTANT_OPCODE_LOC_MASK;
+			opcode >>= CONSTANT_OPCODE_LOC_BITS;
 
-			_type = (ConstantType::Enum)(_opcode&CONSTANT_OPCODE_TYPE_MASK);
-			_opcode >>= CONSTANT_OPCODE_TYPE_BITS;
+			type = (ConstantType::Enum)(opcode & CONSTANT_OPCODE_TYPE_MASK);
+			opcode >>= CONSTANT_OPCODE_TYPE_BITS;
 
-			_copy = (uint16_t)copy;
-			_num = (uint16_t)num;
-			_loc = (uint16_t)loc;
+			copy = (uint16)icopy;
+			num = (uint16)inum;
+			loc = (uint16)iloc;
 		}
 
 		void Write(const void* data, uint32 size)
@@ -628,16 +635,15 @@ namespace video
 			_pos = 0;
 		}
 
-		void WriteUniform(ConstantType::Enum _type, uint16_t _loc, const void* _value, uint16_t _num = 1);
-		void WriteUniformRef(ConstantType::Enum _type, uint16_t _loc, const void* _value, uint16_t _num = 1);
-		void Commit(bool _force);
+		void WriteUniform(ConstantType::Enum type, uint16 loc, const void* value, uint16 num = 1);
+		void WriteUniformRef(ConstantType::Enum type, uint16 loc, const void* value, uint16 num = 1);
+		void Commit(bool force);
 
 	private:
-		ConstantBuffer(uint32 _size)
-			: _size(_size - sizeof(_buffer))
+		ConstantBuffer(uint32 size)
+			: _size(size - sizeof(_buffer))
 			, _pos(0)
 		{
-			BX_TRACE("ConstantBuffer %d, %d", _size, m_size);
 			Finish();
 		}
 
@@ -651,6 +657,7 @@ namespace video
 	};
 
 	typedef const void *(*UniformFunction)(const void *data);
+
 	struct UniformInfo
 	{
 		const void *_data;
@@ -688,10 +695,10 @@ namespace video
 				info._data = data;
 				info._function = func;
 
-				std::pair<UniformHashMap::iterator, bool> result = _uniforms.insert(UniformHashMap::value_type(_name, info) );
+				std::pair<UniformHashMap::iterator, bool> result = 
+					_uniforms.insert(UniformHashMap::value_type(name, info));
 				return result.first->second;	
 			}
-
 			return it->second;
 		}
 
@@ -699,7 +706,6 @@ namespace video
  		typedef std::unordered_map<std::string, UniformInfo> UniformHashMap;
  		UniformHashMap _uniforms;
  	};
-
 
 	struct RenderState
 	{
@@ -725,7 +731,7 @@ namespace video
 
 			for (uint32 i = 0; i < VIDEO_STATE_TEX_COUNT; ++i)
 			{
-				_sampler[i]._idx = video::invalidHandle;
+				_sampler[i]._index = video::invalidHandle;
 				_sampler[i]._flags = VIDEO_SAMPLER_NONE;
 			}
 		}
@@ -762,7 +768,7 @@ namespace video
 
 	struct Frame
 	{
-		VIDEO_CACHE_LINE_ALIGN_MARKER();
+		//VIDEO_CACHE_LINE_ALIGN_MARKER();
 
 		Frame()
 		{
@@ -836,12 +842,13 @@ namespace video
 
 		void SetViewTransformMask(uint32 viewMask, const Matrix* view, const Matrix* proj, uint8 other)
 		{
-			for (uint32 id = 0, viewMask = viewMask, ntz = uint32_cnttz(_viewMask); 0 != viewMask; viewMask >>= 1, id += 1, ntz = uint32_cnttz(viewMask))
+			for (uint32 id = 0, iviewMask = viewMask, ntz = Uint32BitScan(viewMask); 
+				0 != iviewMask; iviewMask >>= 1, id += 1, ntz = Uint32BitScan(iviewMask))
 			{
 				viewMask >>= ntz;
 				id += ntz;
 
-				SetViewTransform(id, _view, proj, other);
+				SetViewTransform(id, view, proj, other);
 			}
 		}
 
@@ -873,7 +880,7 @@ namespace video
 			_state._indexBuffer = handle;
 		}
 
-		void SetIndexBuffer(const DynamicIndexBuffer* ib, uint32 numIndices)
+		void SetIndexBuffer(const DynamicIndexBuffer *ib, uint32 numIndices)
 		{
 			_state._indexBuffer = ib->_handle;
 			_state._startIndex = ib->_startIndex;
@@ -899,37 +906,38 @@ namespace video
 			gFree(const_cast<DynamicVertexBuffer*>(vb));
 		}
 
-		void SetMaterial(SurfaceMaterialHandle handle)
+		void SetSurfaceMaterial(SurfaceMaterialHandle handle)
 		{
-			Assert(invalidHandle = handle.index);
+			Assert(invalidHandle == handle.index);
 			_key._material = handle.index;
 		}
 
 		void SetTexture(uint8 stage, UniformHandle uniformSampler, TextureHandle textureHandle)
 		{
-			_flags |= VIDEO_STATE_TEX0 << _stage;
-			Sampler& sampler = _state._sampler[_stage];
-			sampler.index = handle.index;
+			_flags |= VIDEO_STATE_TEX0 << stage;
+
+			Sampler& sampler = _state._sampler[stage];
+			sampler._index = textureHandle.index;
 			sampler._flags = VIDEO_SAMPLER_NONE;
 
-			if (video::invalidHandle != sampler.idx)
+			if (video::invalidHandle != uniformSampler.index)
 			{
-				uint32 stage = _stage;
-				SetUniform(_sampler, &stage);
+				uint32 istage = stage;
+				SetUniform(uniformSampler, &istage);
 			}
 		}
 
 		void SetTexture(uint8 stage, UniformHandle uniformSampler, RenderTargetHandle handle, bool depth)
 		{
 			_flags |= VIDEO_STATE_TEX0 << stage;
-			Sampler& sampler = _state._sampler[_stage];
-			sampler._idx = handle.idx;
-			sampler._flags = _depth ? BGFX_SAMPLER_RENDERTARGET_DEPTH : BGFX_SAMPLER_RENDERTARGET_COLOR;
+			Sampler& sampler = _state._sampler[stage];
+			sampler._index = handle.index;
+			sampler._flags = depth ? VIDEO_SAMPLER_RENDERTARGET_DEPTH : VIDEO_SAMPLER_RENDERTARGET_COLOR;
 
-			if (video::invalidHandle != _sampler.idx)
+			if (video::invalidHandle != uniformSampler.index)
 			{
-				uint32 stage = _stage;
-				SetUniform(_sampler, &stage);
+				uint32 istage = stage;
+				SetUniform(uniformSampler, &istage);
 			}
 		}
 
@@ -937,45 +945,46 @@ namespace video
 		void SubmitMask(uint32 viewMask);
 		void Sort();
 
+		//TODO
 		bool CheckAvailDynamicIndexBuffer(uint16 num)
 		{
 			uint32 offset = _iboffset;
-			uint32 iboffset = offset + _num * sizeof(uint16);
-			iboffset = uint32_min(iboffset, VIDEO_DYNAMIC_INDEX_BUFFER_SIZE);
-			uint32 num = (iboffset - offset) / sizeof(uint16);
-			return num == _num;
+			uint32 iboffset = offset + num * sizeof(uint16);
+			iboffset = Uint32Min(iboffset, VIDEO_DYNAMIC_INDEX_BUFFER_SIZE);
+			uint32 inum = (iboffset - offset) / sizeof(uint16);
+			return inum == num;
 		}
 
-		uint32 AllocDynamicIndexBuffer(uint16& _num)
+		uint32 AllocDynamicIndexBuffer(uint16& num)
 		{
 			uint32 offset = _iboffset;
 			_iboffset = offset + _num * sizeof(uint16);
-			_iboffset = uint32_min(_iboffset, VIDEO_DYNAMIC_INDEX_BUFFER_SIZE);
+			_iboffset = Uint32Min(_iboffset, VIDEO_DYNAMIC_INDEX_BUFFER_SIZE);
 			_num = uint16((_iboffset - offset) / sizeof(uint16));
 			return offset;
 		}
 
 		bool CheckAvailDynamicVertexBuffer(uint16 num, uint16 stride)
 		{
-			uint32 offset = strideAlign(_vboffset, stride);
+			uint32 offset = StrideAlign(_vboffset, stride);
 			uint32 vboffset = offset + num * stride;
-			vboffset = uint32_min(vboffset, VIDEO_DYNAMIC_VERTEX_BUFFER_SIZE);
-			uint32 num = (vboffset - offset) / stride;
-			return num == num;
+			vboffset = Uint32Min(vboffset, VIDEO_DYNAMIC_VERTEX_BUFFER_SIZE);
+			uint32 inum = (vboffset - offset) / stride;
+			return inum == num;
 		}
 
 		uint32 AllocDynamicVertexBuffer(uint16& num, uint16 stride)
 		{
-			uint32 offset = strideAlign(_vboffset, stride);
+			uint32 offset = StrideAlign(_vboffset, stride);
 			_vboffset = offset + _num * stride;
-			_vboffset = uint32_min(_vboffset, VIDEO_DYNAMIC_VERTEX_BUFFER_SIZE);
+			_vboffset = Uint32Min(_vboffset, VIDEO_DYNAMIC_VERTEX_BUFFER_SIZE);
 			_num = uint16((_vboffset - offset) / stride);
 			return offset;
 		}
 
-		void WriteConstant(ConstantType::Enum _type, UniformHandle _handle, const void* _value, uint16 _num)
+		void WriteConstant(ConstantType::Enum type, UniformHandle handle, const void* value, uint16 num)
 		{
-			_constantBuffer->WriteUniform(_type, _handle.index, _value, _num);
+			_constantBuffer->WriteUniform(type, handle.index, value, num);
 		}
 
 		void Free(IndexBufferHandle handle)
@@ -1004,14 +1013,14 @@ namespace video
 
 		void Free(FragmentShaderHandle handle)
 		{
-			_freeFragmentShaderHandle[m_numFreeFragmentShaderHandles] = handle;
+			_freeFragmentShaderHandle[_numFreeFragmentShaderHandles] = handle;
 			++_numFreeFragmentShaderHandles;
 		}
 
 		void Free(SurfaceMaterialHandle handle)
 		{
-			_freeMaterialHandle[_numFreeMaterialHandles] = handle;
-			++_numFreeMaterialHandles;
+			_freeSurfaceMaterialHandle[_numFreeSurfaceMaterialHandles] = handle;
+			++_numFreeSurfaceMaterialHandles;
 		}
 
 		void Free(TextureHandle _handle)
@@ -1037,7 +1046,10 @@ namespace video
 			_numFreeIndexBufferHandles = 0;
 			_numFreeVertexDeclHandles = 0;
 			_numFreeVertexBufferHandles = 0;
-			_numFreeEffectHandles = 0;
+
+			_numFreeVertexShaderHandles = 0;
+			_numFreeFragmentShaderHandles = 0;
+
 			_numFreeSurfaceMaterialHandles = 0;
 			_numFreeTextureHandles = 0;
 			_numFreeRenderTargetHandles = 0;
@@ -1046,7 +1058,7 @@ namespace video
 
 		SortKey _key;
 
-		RenderTargetHandle _renderTargets[VIDEO_MAX_VIEWS];
+		RenderTargetHandle _renderTarget[VIDEO_MAX_VIEWS];
 		Clear _clear[VIDEO_MAX_VIEWS];
 		Rect _rect[VIDEO_MAX_VIEWS];
 		Matrix _view[VIDEO_MAX_VIEWS];
@@ -1081,7 +1093,8 @@ namespace video
 		uint16 _numFreeIndexBufferHandles;
 		uint16 _numFreeVertexDeclHandles;
 		uint16 _numFreeVertexBufferHandles;
-		uint16 _numFreeEffectHandles;
+		uint16 _numFreeVertexShaderHandles;
+		uint16 _numFreeFragmentShaderHandles;
 		uint16 _numFreeSurfaceMaterialHandles;
 		uint16 _numFreeTextureHandles;
 		uint16 _numFreeRenderTargetHandles;
@@ -1090,9 +1103,9 @@ namespace video
 		IndexBufferHandle _freeIndexBufferHandle[VIDEO_MAX_INDEX_BUFFERS];
 		VertexDeclHandle _freeVertexDeclHandle[VIDEO_MAX_VERTEX_DECLS];
 		VertexBufferHandle _freeVertexBufferHandle[VIDEO_MAX_VERTEX_BUFFERS];
-		VertexShaderHandle _freeVertexShaderHandle[VIDEO_MAX_VERTEXSHADERS]
-		FragmentShaderHandle _freeFragmentShaderHandle[VIDEO_MAX_FRAGMENTSHADERS]
-		SurfaceMaterialHandle _freeMaterialHandle[VIDEO_MAX_MATERIALS];
+		VertexShaderHandle _freeVertexShaderHandle[VIDEO_MAX_VERTEX_SHADERS];
+		FragmentShaderHandle _freeFragmentShaderHandle[VIDEO_MAX_FRAGMENT_SHADERS];
+		SurfaceMaterialHandle _freeSurfaceMaterialHandle[VIDEO_MAX_SURFACE_MATERIALS];
 		TextureHandle _freeTextureHandle[VIDEO_MAX_TEXTURES];
 		RenderTargetHandle _freeRenderTargetHandle[VIDEO_MAX_RENDER_TARGETS];
 		UniformHandle _freeUniformHandle[VIDEO_MAX_UNIFORMS];
@@ -1103,6 +1116,84 @@ namespace video
 		bool _discard;
 	};
 
+	struct SurfaceMaterialRef
+	{
+		SurfaceMaterialRef()
+		{
+		}
+
+		SurfaceMaterialHandle Find(uint32 hash)
+		{
+			SurfaceMaterialMap::const_iterator it = _surfaceMaterialMap.find(hash);
+			if (it != _surfaceMaterialMap.end())
+			{
+				return it->second;
+			}
+
+			SurfaceMaterialHandle result;
+			result.index = INVALID_HANDLE;
+			return result;
+		}
+
+		void Add(SurfaceMaterialHandle handle, uint32_t hash)
+		{
+			_surfaceMaterialMap.insert(std::make_pair(hash, handle));
+		}
+
+		typedef std::unordered_map<uint32_t, SurfaceMaterialHandle> SurfaceMaterialMap;
+		SurfaceMaterialMap _surfaceMaterialMap;
+	};
+
+	struct VertexDeclRef
+	{
+		VertexDeclRef()
+		{
+			memset(_vertexDeclRef, 0, sizeof(_vertexDeclRef));
+			memset(_vertexBufferRef, 0xff, sizeof(_vertexBufferRef));
+		}
+
+		VertexDeclHandle Find(uint32_t hash)
+		{
+			VertexDeclMap::const_iterator it = _vertexDeclMap.find(hash);
+			if (it != _vertexDeclMap.end())
+			{
+				return it->second;
+			}
+
+			VertexDeclHandle result;
+			result.index = INVALID_HANDLE;
+			return result;
+		}
+
+		void Add(VertexBufferHandle handle, VertexDeclHandle declHandle, uint32 hash)
+		{
+			_vertexBufferRef[handle.index] = declHandle;
+			_vertexDeclRef[declHandle.index]++;
+			_vertexDeclMap.insert(std::make_pair(hash, declHandle));
+		}
+
+		VertexDeclHandle Release(VertexBufferHandle handle)
+		{
+			VertexDeclHandle declHandle = _vertexBufferRef[handle.index];
+			_vertexDeclRef[declHandle.index]--;
+
+			if (0 != _vertexDeclRef[declHandle.index])
+			{
+				VertexDeclHandle invalid;
+				invalid.index = INVALID_HANDLE;
+				return invalid;
+			}
+			return declHandle;
+		}
+
+		typedef std::unordered_map<uint32, VertexDeclHandle> VertexDeclMap;
+		VertexDeclMap _vertexDeclMap;
+		uint16_t _vertexDeclRef[VIDEO_MAX_VERTEX_DECLS];
+		VertexDeclHandle _vertexBufferRef[VIDEO_MAX_VERTEX_BUFFERS];
+	};
+
+	DWORD WINAPI RenderThread(LPVOID param);
+
 	struct Context
 	{
 		Context()
@@ -1110,12 +1201,12 @@ namespace video
 			_submit(&_frame[1]),
 			_indexBufferHandle(VIDEO_MAX_INDEX_BUFFERS),
 			_vertexDeclHandle(VIDEO_MAX_VERTEX_DECLS),
-			_vertexShaderHandle(),
-			_fragmentShaderHandle,
-			_effectHandle(VIDEO_MAX_EFFECTS),
-			_materialHandle(VIDEO_MAX_MATERIALS),
+			_vertexBufferHandle(VIDEO_MAX_VERTEX_BUFFERS),
+			_vertexShaderHandle(VIDEO_MAX_VERTEX_SHADERS),
+			_fragmentShaderHandle(VIDEO_MAX_FRAGMENT_SHADERS),
+			_surfaceMaterialHandle(VIDEO_MAX_SURFACE_MATERIALS),
 			_textureHandle(VIDEO_MAX_TEXTURES),
-			_renderTargetHandle(VIDEO_MAX_RENDER_TARGETS),
+			_renderTargetHandle(VIDEO_MAX_VIEWS),
 			_uniformHandle(VIDEO_MAX_UNIFORMS),
 			_frames(0),
 			_debug(VIDEO_DEBUG_NONE),
@@ -1132,7 +1223,7 @@ namespace video
 		void Init(bool createRenderThread);
 		void Shutdown();
 
-		void Frame()
+		void DoFrame()
 		{
 			// wait for render thread to finish
 			RenderSemWait();
@@ -1159,9 +1250,9 @@ namespace video
 		{
 			_resolution._width = width;
 			_resolution._height = height;
-			_resolution._flags = flags&(~VIDEO_RESET_FULLSCREEN_FAKE);
+			_resolution._flags = flags & (~VIDEO_RESET_FULLSCREEN_FAKE);
 
-			memset(_rt, 0xff, sizeof(m_rt));
+			memset(_renderTarget, 0xff, sizeof(_renderTarget));
 
 			#if BX_PLATFORM_WINDOWS
 			uint32 fullscreen = (_flags&BGFX_RESET_FULLSCREEN_MASK) >> BGFX_RESET_FULLSCREEN_SHIFT;
@@ -1169,17 +1260,17 @@ namespace video
 			#endif // BX_PLATFORM_WINDOWS
 		}
 
-		void DEBUG_TextClear(uint8_t _attr, bool _small)
+		void DEBUG_TextClear(uint8 _attr, bool _small)
 		{
 		}
 
-		void DEBUG_TextPrintfVargs(uint16 _x, uint16 _y, uint8_t _attr, const char* _format, va_list _argList)
+		void DEBUG_TextPrintfVargs(uint16 _x, uint16 _y, uint8 _attr, const char* _format, va_list _argList)
 		{
 		}
 
 		IndexBufferHandle CreateIndexBuffer(const Memory* mem)
 		{
-			IndexBufferHandle handle = { _indexBufferHandle.alloc() };
+			IndexBufferHandle handle = { _indexBufferHandle.Alloc() };
 			CommandBuffer& cmdbuf = GetCommandBuffer(CommandBuffer::eCreateIndexBuffer);
 			cmdbuf.Write(handle);
 			cmdbuf.Write(mem);
@@ -1195,12 +1286,12 @@ namespace video
 
 		DynamicIndexBuffer* CreateDynamicIndexBuffer(uint32 size)
 		{
-			IndexBufferHandle handle = { _indexBufferHandle.alloc() };
+			IndexBufferHandle handle = { _indexBufferHandle.Alloc() };
 			CommandBuffer& cmdbuf = GetCommandBuffer(CommandBuffer::eCreateDynamicIndexBuffer);
 			cmdbuf.Write(handle);
 			cmdbuf.Write(size);
 
-			DynamicIndexBuffer* ib = (DynamicIndexBuffer*)g_realloc(NULL, sizeof(DynamicIndexBuffer) + size);
+			DynamicIndexBuffer* ib = (DynamicIndexBuffer*)gRealloc(NULL, sizeof(DynamicIndexBuffer) + size);
 			ib->_data = (uint8*)&ib[1];
 			ib->_size = size;
 			ib->_handle = handle;
@@ -1214,7 +1305,7 @@ namespace video
 			cmdbuf.Write(ib->_handle);
 
 			_submit->Free(ib->_handle);
-			g_free(const_cast<DynamicIndexBuffer*>(ib));
+			gFree(const_cast<DynamicIndexBuffer*>(ib));
 		}
 
 		const DynamicIndexBuffer* AllocDynamicIndexBuffer(uint16 num)
@@ -1223,7 +1314,7 @@ namespace video
 
 			DynamicIndexBuffer& dib = *_submit->_dynamicIb;
 
-			DynamicIndexBuffer* ib = (DynamicIndexBuffer*)g_realloc(NULL, sizeof(DynamicIndexBuffer));
+			DynamicIndexBuffer* ib = (DynamicIndexBuffer*)gRealloc(NULL, sizeof(DynamicIndexBuffer));
 			ib->_data = &dib._data[offset];
 			ib->_size = num * sizeof(uint16);
 			ib->_handle = dib._handle;
@@ -1233,17 +1324,17 @@ namespace video
 		}
 
 		//TODO Implementt this again
-		VertexDeclHandle FindVertexDecl(const VertexDecl& _decl)
+		VertexDeclHandle FindVertexDecl(const VertexDecl& decl)
 		{
-			VertexDeclHandle declHandle = _declRef.find(_decl._hash);
+			VertexDeclHandle declHandle = _declRef.Find(decl._hash);
 
 			if (video::invalidHandle == declHandle.index)
 			{
-				VertexDeclHandle temp = { _vertexDeclHandle.alloc() };
+				VertexDeclHandle temp = { _vertexDeclHandle.Alloc() };
 				declHandle = temp;
 				CommandBuffer& cmdbuf = GetCommandBuffer(CommandBuffer::eCreateVertexDecl);
 				cmdbuf.Write(declHandle);
-				cmdbuf.Write(_decl);
+				cmdbuf.Write(decl);
 			}
 
 			return declHandle;
@@ -1251,10 +1342,10 @@ namespace video
 
 		VertexBufferHandle CreateVertexBuffer(const Memory* mem, const VertexDecl& decl)
 		{
-			VertexBufferHandle handle = { _vertexBufferHandle.alloc() };
+			VertexBufferHandle handle = { _vertexBufferHandle.Alloc() };
 
 			VertexDeclHandle declHandle = FindVertexDecl(decl);
-			_declRef.add(handle, declHandle, _decl.m_hash);
+			_declRef.Add(handle, declHandle, decl._hash);
 
 			CommandBuffer& cmdbuf = GetCommandBuffer(CommandBuffer::eCreateVertexBuffer);
 			cmdbuf.Write(handle);
@@ -1265,7 +1356,7 @@ namespace video
 
 		void DestroyVertexBuffer(VertexBufferHandle handle)
 		{
-			VertexDeclHandle declHandle = m_declRef.release(handle);
+			VertexDeclHandle declHandle = _declRef.Release(handle);
 			if (video::invalidHandle != declHandle.index)
 			{
 				CommandBuffer& cmdbuf = GetCommandBuffer(CommandBuffer::eDestroyVertexDecl);
@@ -1274,31 +1365,32 @@ namespace video
 
 			CommandBuffer& cmdbuf = GetCommandBuffer(CommandBuffer::eDestroyVertexBuffer);
 			cmdbuf.Write(handle);
-			_submit->free(handle);
+			_submit->Free(handle);
 		}
 
-		DynamicVertexBuffer* CreateDynamicVertexBuffer(uint32 _size, const VertexDecl* _decl = NULL)
+		DynamicVertexBuffer* CreateDynamicVertexBuffer(uint32 size, const VertexDecl* decl = nullptr)
 		{
-			VertexBufferHandle handle = { _vertexBufferHandle.alloc() };
+			VertexBufferHandle handle = { _vertexBufferHandle.Alloc() };
 
 			uint16 stride = 0;
-			VertexDeclHandle declHandle = INVALID_HANDLE;
+			VertexDeclHandle declHandle;
+			declHandle.index = INVALID_HANDLE;
 
-			if (NULL != _decl)
+			if (nullptr != decl)
 			{
-				declHandle = findVertexDecl(*_decl);
-				_declRef.add(handle, declHandle, _decl->m_hash);
+				declHandle = FindVertexDecl(*decl);
+				_declRef.Add(handle, declHandle, decl->_hash);
 
-				stride = _decl->m_stride;
+				stride = decl->_stride;
 			}
 
 			CommandBuffer& cmdbuf = GetCommandBuffer(CommandBuffer::eCreateDynamicVertexBuffer);
 			cmdbuf.Write(handle);
-			cmdbuf.Write(_size);
+			cmdbuf.Write(size);
 
-			DynamicVertexBuffer* vb = (DynamicVertexBuffer*)g_realloc(NULL, sizeof(DynamicVertexBuffer) + _size);
-			vb->_data = (uint8_t*)&vb[1];
-			vb->_size = _size;
+			DynamicVertexBuffer* vb = (DynamicVertexBuffer*)gRealloc(NULL, sizeof(DynamicVertexBuffer) + size);
+			vb->_data = (uint8*)&vb[1];
+			vb->_size = size;
 			vb->_startVertex = 0;
 			vb->_stride = stride;
 			vb->_handle = handle;
@@ -1312,292 +1404,290 @@ namespace video
 			CommandBuffer& cmdbuf = GetCommandBuffer(CommandBuffer::eDestroyDynamicVertexBuffer);
 			cmdbuf.Write(vb->_handle);
 
-			_submit->free(vb->_handle);
-			g_free(const_cast<DynamicVertexBuffer*>(vb));
+			_submit->Free(vb->_handle);
+			gFree(const_cast<DynamicVertexBuffer*>(vb));
 		}
 
 		const DynamicVertexBuffer* AllocDynamicVertexBuffer(uint16 num, const VertexDecl& decl)
 		{
-			VertexDeclHandle declHandle = _declRef.find(decl._hash);
+			VertexDeclHandle declHandle = _declRef.Find(decl._hash);
 
 			DynamicVertexBuffer& dvb = *_submit->_dynamicVb;
 
 			if (video::invalidHandle == declHandle.index)
 			{
-				VertexDeclHandle temp = { _vertexDeclHandle.alloc() };
+				VertexDeclHandle temp = { _vertexDeclHandle.Alloc() };
 				declHandle = temp;
 				CommandBuffer& cmdbuf = GetCommandBuffer(CommandBuffer::eCreateVertexDecl);
 				cmdbuf.Write(declHandle);
 				cmdbuf.Write(decl);
-				m_declRef.add(dvb.handle, declHandle, _decl.m_hash);
+				_declRef.Add(dvb._handle, declHandle, decl._hash);
 			}
 
-			uint32 offset = m_submit->allocDynamicVertexBuffer(num, _decl.m_stride);
+			uint32 offset = _submit->AllocDynamicVertexBuffer(num, decl._stride);
 
-			DynamicVertexBuffer* vb = (DynamicVertexBuffer*)g_realloc(NULL, sizeof(DynamicVertexBuffer));
-			vb->_data = &dvb.data[offset];
-			vb->_size = _num * _decl.m_stride;
+			DynamicVertexBuffer* vb = (DynamicVertexBuffer*)gRealloc(NULL, sizeof(DynamicVertexBuffer));
+			vb->_data = &dvb._data[offset];
+			vb->_size = num * decl._stride;
 			vb->_startVertex = offset / decl._stride;
-			vb->_stride = _decl.m_stride;
-			vb->_handle = dvb.handle;
+			vb->_stride = decl._stride;
+			vb->_handle = dvb._handle;
 			vb->_decl = declHandle;
 
 			return vb;
 		}
 
-		//VertexShaderHandle createVertexShader(const Memory* _mem)
-		//{
-		//	VertexShaderHandle handle = { m_vertexShaderHandle.alloc() };
-		//	CommandBuffer& cmdbuf = getCommandBuffer(CommandBuffer::CreateVertexShader);
-		//	cmdbuf.write(handle);
-		//	cmdbuf.write(_mem);
-		//	return handle;
-		//}
-
-		//void destroyVertexShader(VertexShaderHandle _handle)
-		//{
-		//	CommandBuffer& cmdbuf = getCommandBuffer(CommandBuffer::DestroyVertexShader);
-		//	cmdbuf.write(_handle);
-		//	m_submit->free(_handle);
-		//}
-
-		//FragmentShaderHandle createFragmentShader(const Memory* _mem)
-		//{
-		//	FragmentShaderHandle handle = { m_fragmentShaderHandle.alloc() };
-		//	CommandBuffer& cmdbuf = getCommandBuffer(CommandBuffer::CreateFragmentShader);
-		//	cmdbuf.write(handle);
-		//	cmdbuf.write(_mem);
-		//	return handle;
-		//}
-
-		//void destroyFragmentShader(FragmentShaderHandle _handle)
-		//{
-		//	CommandBuffer& cmdbuf = getCommandBuffer(CommandBuffer::DestroyFragmentShader);
-		//	cmdbuf.write(_handle);
-		//	m_submit->free(_handle);
-		//}
-
-		EffectHandle CreateEffect(const Memory *mem)
+		VertexShaderHandle CreateVertexShader(const Memory* mem)
 		{
-
+			VertexShaderHandle handle = { _vertexShaderHandle.Alloc() };
+			CommandBuffer& cmdbuf = GetCommandBuffer(CommandBuffer::eCreateVertexShader);
+			cmdbuf.Write(handle);
+			cmdbuf.Write(mem);
+			return handle;
 		}
 
-		void destroyEffect(EffectHandle handle)
+		void DestroyVertexShader(VertexShaderHandle handle)
 		{
-
+			CommandBuffer& cmdbuf = GetCommandBuffer(CommandBuffer::eDestroyVertexShader);
+			cmdbuf.Write(handle);
+			_submit->Free(handle);
 		}
 
-		MaterialHandle createMaterial(VertexShaderHandle _vsh, FragmentShaderHandle _fsh)
+		FragmentShaderHandle CreateFragmentShader(const Memory* mem)
 		{
-			MaterialHandle handle;
-			// 			uint32 hash = _vsh.idx<<16 | _fsh.idx;
+			FragmentShaderHandle handle = { _fragmentShaderHandle.Alloc() };
+			CommandBuffer& cmdbuf = GetCommandBuffer(CommandBuffer::eCreateFragmentShader);
+			cmdbuf.Write(handle);
+			cmdbuf.Write(mem);
+			return handle;
+		}
+
+		void DestroyFragmentShader(FragmentShaderHandle handle)
+		{
+			CommandBuffer& cmdbuf = GetCommandBuffer(CommandBuffer::eDestroyFragmentShader);
+			cmdbuf.Write(handle);
+			_submit->Free(handle);
+		}
+
+		SurfaceMaterialHandle CreateSurfaceMaterial(VertexShaderHandle vsh, FragmentShaderHandle fsh)
+		{
+			SurfaceMaterialHandle handle;
+			// 			uint32 hash = _vsh.index<<16 | _fsh.index;
 			// 
 			// 			MaterialHandle handle = m_materialRef.find(hash);
 			// 
-			// 			if (bgfx::invalidHandle != handle.idx)
+			// 			if (video::invalidHandle != handle.index)
 			// 			{
 			// 				return handle;
 			// 			}
 			// 
-			handle.idx = m_materialHandle.alloc();
+			handle.index = _surfaceMaterialHandle.Alloc();
 			// 			m_materialRef.add(handle, hash);
 
-			CommandBuffer& cmdbuf = getCommandBuffer(CommandBuffer::CreateMaterial);
-			cmdbuf.write(handle);
-			cmdbuf.write(_vsh);
-			cmdbuf.write(_fsh);
+			CommandBuffer& cmdbuf = GetCommandBuffer(CommandBuffer::eCreateMaterial);
+			cmdbuf.Write(handle);
+			cmdbuf.Write(vsh);
+			cmdbuf.Write(fsh);
 			return handle;
 		}
 
-		void destroyMaterial(MaterialHandle _handle)
+		void DestroySurfaceMaterial(SurfaceMaterialHandle handle)
 		{
-			CommandBuffer& cmdbuf = getCommandBuffer(CommandBuffer::DestroyMaterial);
-			cmdbuf.write(_handle);
-			m_submit->free(_handle);
+			CommandBuffer& cmdbuf = GetCommandBuffer(CommandBuffer::eDestroyMaterial);
+			cmdbuf.Write(handle);
+			_submit->Free(handle);
 		}
 
-		TextureHandle createTexture(const Memory* _mem, uint32 _flags, uint16* _width, uint16* _height)
+		TextureHandle CreateTexture(const Memory* _mem, uint32 _flags, uint16* _width, uint16* _height)
 		{
-			if (NULL != _width
-				|| NULL != _height)
+			if (nullptr != _width || nullptr!= _height)
 			{
 				int width = 0;
 				int height = 0;
 
-				Dds dds;
-				if (parseDds(dds, _mem))
-				{
-					width = dds.m_width;
-					height = dds.m_height;
-				}
+				//Dds dds;
+				//if (parseDds(dds, _mem))
+				//{
+				//	width = dds._width;
+				//	height = dds._height;
+				//}
 
-				if (NULL != _width)
-				{
-					*_width = (uint16)width;
-				}
+				//if (NULL != _width)
+				//{
+				//	*_width = (uint16)width;
+				//}
 
-				if (NULL != _height)
-				{
-					*_height = (uint16)height;
-				}
+				//if (NULL != _height)
+				//{
+				//	*_height = (uint16)height;
+				//}
 			}
 
-			TextureHandle handle = { m_textureHandle.alloc() };
-			CommandBuffer& cmdbuf = getCommandBuffer(CommandBuffer::CreateTexture);
-			cmdbuf.write(handle);
-			cmdbuf.write(_mem);
-			cmdbuf.write(_flags);
+			TextureHandle handle = { _textureHandle.Alloc() };
+			CommandBuffer& cmdbuf = GetCommandBuffer(CommandBuffer::eCreateTexture);
+			cmdbuf.Write(handle);
+			cmdbuf.Write(_mem);
+			cmdbuf.Write(_flags);
 			return handle;
 		}
 
-		void destroyTexture(TextureHandle _handle)
+		void DestroyTexture(TextureHandle _handle)
 		{
-			CommandBuffer& cmdbuf = getCommandBuffer(CommandBuffer::DestroyTexture);
-			cmdbuf.write(_handle);
-			m_submit->free(_handle);
+			CommandBuffer& cmdbuf = GetCommandBuffer(CommandBuffer::eDestroyTexture);
+			cmdbuf.Write(_handle);
+			_submit->Free(_handle);
 		}
 
-		RenderTargetHandle createRenderTarget(uint16 _width, uint16 _height, uint32 _flags)
+		RenderTargetHandle CreateRenderTarget(uint16 width, uint16 height, uint32 flags)
 		{
-			RenderTargetHandle handle = { m_renderTargetHandle.alloc() };
+			RenderTargetHandle handle = { _renderTargetHandle.Alloc() };
 
-			CommandBuffer& cmdbuf = getCommandBuffer(CommandBuffer::CreateRenderTarget);
-			cmdbuf.write(handle);
-			cmdbuf.write(_width);
-			cmdbuf.write(_height);
-			cmdbuf.write(_flags);
+			CommandBuffer& cmdbuf = GetCommandBuffer(CommandBuffer::eCreateRenderTarget);
+			cmdbuf.Write(handle);
+			cmdbuf.Write(width);
+			cmdbuf.Write(height);
+			cmdbuf.Write(flags);
 			return handle;
 		}
 
-		void destroyRenderTarget(RenderTargetHandle _handle)
+		void DestroyRenderTarget(RenderTargetHandle handle)
 		{
-			CommandBuffer& cmdbuf = getCommandBuffer(CommandBuffer::DestroyRenderTarget);
-			cmdbuf.write(_handle);
-			m_submit->free(_handle);
+			CommandBuffer& cmdbuf = GetCommandBuffer(CommandBuffer::eDestroyRenderTarget);
+			cmdbuf.Write(handle);
+			_submit->Free(handle);
 		}
 
-		UniformHandle createUniform(const char* _name, ConstantType::Enum _type, uint16 _num)
+		UniformHandle CreateUniform(const char* name, ConstantType::Enum type, uint16 num)
 		{
-			BX_CHECK(PredefinedUniform::Count == nameToPredefinedUniformEnum(_name), "%s is predefined uniform name.", _name);
+			Assert(PredefinedUniform::Count == NameToPredefinedUniformEnum(name));
 
-			UniformHandle handle = { m_uniformHandle.alloc() };
+			UniformHandle handle = { _uniformHandle.Alloc() };
 
-			Constant& constant = m_constant[handle.idx];
-			constant.m_type = _type;
-			constant.m_num = _num;
+			Constant& constant = _constant[handle.index];
+			constant._type = type;
+			constant._num = num;
 
-			CommandBuffer& cmdbuf = getCommandBuffer(CommandBuffer::CreateUniform);
-			cmdbuf.write(handle);
-			cmdbuf.write(_type);
-			cmdbuf.write(_num);
-			uint8_t len = (uint8_t)strlen(_name);
-			cmdbuf.write(len);
-			cmdbuf.write(_name, len);
+			CommandBuffer& cmdbuf = GetCommandBuffer(CommandBuffer::eCreateUniform);
+			cmdbuf.Write(handle);
+			cmdbuf.Write(type);
+			cmdbuf.Write(num);
+			uint8 len = (uint8)strlen(name);
+			cmdbuf.Write(len);
+			cmdbuf.Write(name, len);
 			return handle;
 		}
 
-		void destroyUniform(UniformHandle _handle)
+		void DestroyUniform(UniformHandle handle)
 		{
-			CommandBuffer& cmdbuf = getCommandBuffer(CommandBuffer::DestroyUniform);
-			cmdbuf.write(_handle);
-			m_submit->free(_handle);
+			CommandBuffer& cmdbuf = GetCommandBuffer(CommandBuffer::eDestroyUniform);
+			cmdbuf.Write(handle);
+			_submit->Free(handle);
 		}
 
-		void saveScreenShot(const Memory* _mem)
+		void SaveScreenShot(const Memory* _mem)
 		{
-			CommandBuffer& cmdbuf = getCommandBuffer(CommandBuffer::SaveScreenShot);
-			cmdbuf.write(_mem);
+			CommandBuffer& cmdbuf = GetCommandBuffer(CommandBuffer::eSaveScreenShot);
+			cmdbuf.Write(_mem);
 		}
 
-		void setUniform(UniformHandle _handle, const void* _value, uint16 _num)
+		void SetUniform(UniformHandle handle, const void* value, uint16 num)
 		{
-			Constant& constant = m_constant[_handle.idx];
-			BX_CHECK(constant.m_num >= _num, "Truncated uniform update. %d (max: %d)", _num, constant.m_num);
-			m_submit->writeConstant(constant.m_type, _handle, _value, uint16_min(constant.m_num, _num));
+			Constant& constant = _constant[handle.index];
+			Assert(constant._num >= num);
+			//BX_CHECK(, "Truncated uniform update. %d (max: %d)", _num, constant._num);
+			_submit->WriteConstant(constant._type, handle, value, Uint16Min(constant._num, num));
 		}
 
-		void setUniform(MaterialHandle _material, UniformHandle _handle, const void* _value)
+		void SetUniform(SurfaceMaterialHandle material, UniformHandle handle, const void* value)
 		{
-			BX_CHECK(false, "NOT IMPLEMENTED!");
+			Assert(false); //Not implemented
 		}
 
-		void setViewRect(uint8_t _id, uint16 _x, uint16 _y, uint16 _width, uint16 _height)
+		void SetViewRect(uint8 id, uint16 x, uint16 y, uint16 width, uint16 height)
 		{
-			Rect& rect = m_rect[_id];
-			rect.m_x = _x;
-			rect.m_y = _y;
-			rect.m_width = _width;
-			rect.m_height = _height;
+			Rect& rect = _rect[id];
+			rect._x = x;
+			rect._y = y;
+			rect._width = width;
+			rect._height = height;
 		}
 
-		void setViewRectMask(uint32 _viewMask, uint16 _x, uint16 _y, uint16 _width, uint16 _height)
+		void SetViewRectMask(uint32 viewMask, uint16 x, uint16 y, uint16 width, uint16 height)
 		{
-			for (uint32 id = 0, viewMask = _viewMask, ntz = uint32_cnttz(_viewMask); 0 != viewMask; viewMask >>= 1, id += 1, ntz = uint32_cnttz(viewMask))
+			for (uint32 id = 0, iviewMask = viewMask, ntz = Uint32BitScan(viewMask); 
+				0 != iviewMask; 
+				iviewMask >>= 1, id += 1, ntz = Uint32BitScan(iviewMask))
 			{
 				viewMask >>= ntz;
 				id += ntz;
 
-				setViewRect(id, _x, _y, _width, _height);
+				SetViewRect(id, x, y, width, height);
 			}
 		}
 
-		void setViewClear(uint8_t _id, uint8_t _flags, uint32 _rgba, float _depth, uint8_t _stencil)
+		void SetViewClear(uint8 id, uint8 flags, uint32 rgba, float depth, uint8 stencil)
 		{
-			Clear& clear = m_clear[_id];
-			clear.m_flags = _flags;
-			clear.m_rgba = _rgba;
-			clear.m_depth = _depth;
-			clear.m_stencil = _stencil;
+			Clear& clear = _clear[id];
+			clear._flags = flags;
+			clear._rgba = rgba;
+			clear._depth = depth;
+			clear._stencil = stencil;
 		}
 
-		void setViewClearMask(uint32 _viewMask, uint8_t _flags, uint32 _rgba, float _depth, uint8_t _stencil)
+		void SetViewClearMask(uint32 viewMask, uint8 flags, uint32 rgba, float depth, uint8 stencil)
 		{
-			for (uint32 id = 0, viewMask = _viewMask, ntz = uint32_cnttz(_viewMask); 0 != viewMask; viewMask >>= 1, id += 1, ntz = uint32_cnttz(viewMask))
+			for (uint32 id = 0, iviewMask = viewMask, ntz = Uint32BitScan(viewMask); 
+				0 != iviewMask; 
+				iviewMask >>= 1, id += 1, ntz = Uint32BitScan(iviewMask))
 			{
-				viewMask >>= ntz;
+				iviewMask >>= ntz;
 				id += ntz;
 
-				setViewClear(id, _flags, _rgba, _depth, _stencil);
+				SetViewClear(id, flags, rgba, depth, stencil);
 			}
 		}
 
-		void setViewSeq(uint8_t _id, bool _enabled)
+		void SetViewSeq(uint8 id, bool enabled)
 		{
-			m_seqMask[_id] = _enabled ? 0xffff : 0x0;
+			_seqMask[id] = enabled ? 0xffff : 0x0;
 		}
 
-		void setViewSeqMask(uint32 _viewMask, bool _enabled)
+		void SetViewSeqMask(uint32 viewMask, bool enabled)
 		{
-			uint16 mask = _enabled ? 0xffff : 0x0;
-			for (uint32 id = 0, viewMask = _viewMask, ntz = uint32_cnttz(_viewMask); 0 != viewMask; viewMask >>= 1, id += 1, ntz = uint32_cnttz(viewMask))
+			uint16 mask = enabled ? 0xffff : 0x0;
+			for (uint32 id = 0, iviewMask = viewMask, ntz = Uint32BitScan(viewMask); 
+				0 != iviewMask; 
+				iviewMask >>= 1, id += 1, ntz = Uint32BitScan(iviewMask))
 			{
-				viewMask >>= ntz;
+				iviewMask >>= ntz;
 				id += ntz;
 
-				m_seqMask[id] = mask;
+				_seqMask[id] = mask;
 			}
 		}
 
-		void setViewRenderTarget(uint8_t _id, RenderTargetHandle _handle)
+		void SetViewRenderTarget(uint8 id, RenderTargetHandle handle)
 		{
-			m_rt[_id] = _handle;
+			_renderTarget[id] = handle;
 		}
 
-		void setViewRenderTargetMask(uint32 _viewMask, RenderTargetHandle _handle)
+		void SetViewRenderTargetMask(uint32 viewMask, RenderTargetHandle handle)
 		{
-			for (uint32 id = 0, viewMask = _viewMask, ntz = uint32_cnttz(_viewMask); 0 != viewMask; viewMask >>= 1, id += 1, ntz = uint32_cnttz(viewMask))
+			for (uint32 id = 0, iviewMask = viewMask, ntz = Uint32BitScan(viewMask); 
+				0 != iviewMask; 
+				iviewMask >>= 1, id += 1, ntz = Uint32BitScan(iviewMask))
 			{
-				viewMask >>= ntz;
+				iviewMask >>= ntz;
 				id += ntz;
 
-				m_rt[id] = _handle;
+				_renderTarget[id] = handle;
 			}
 		}
 
-		void dumpViewStats()
+		void DumpViewStats()
 		{
 			#if 0 // BGFX_DEBUG
-			for (uint8_t view = 0; view < BGFX_CONFIG_MAX_VIEWS; ++view)
+			for (uint8 view = 0; view < BGFX_CONFIG_MAX_VIEWS; ++view)
 			{
 				if (0 < m_seq[view])
 				{
@@ -1611,47 +1701,47 @@ namespace video
 		{
 			for (uint16 i = 0, num = _frame->_numFreeIndexBufferHandles; i < num; ++i)
 			{
-				_indexBufferHandle.free(_frame->_freeIndexBufferHandle[i].idx);
+				_indexBufferHandle.Free(_frame->_freeIndexBufferHandle[i].index);
 			}
 
 			for (uint16 i = 0, num = _frame->_numFreeVertexDeclHandles; i < num; ++i)
 			{
-				_vertexDeclHandle.free(_frame->_freeVertexDeclHandle[i].idx);
+				_vertexDeclHandle.Free(_frame->_freeVertexDeclHandle[i].index);
 			}
 
 			for (uint16 i = 0, num = _frame->_numFreeVertexBufferHandles; i < num; ++i)
 			{
-				_vertexBufferHandle.free(_frame->_freeVertexBufferHandle[i].idx);
+				_vertexBufferHandle.Free(_frame->_freeVertexBufferHandle[i].index);
 			}
 
 			for (uint16 i = 0, num = _frame->_numFreeVertexShaderHandles; i < num; ++i)
 			{
-				_vertexShaderHandle.free(_frame->_freeVertexShaderHandle[i].idx);
+				_vertexShaderHandle.Free(_frame->_freeVertexShaderHandle[i].index);
 			}
 
 			for (uint16 i = 0, num = _frame->_numFreeFragmentShaderHandles; i < num; ++i)
 			{
-				_fragmentShaderHandle.free(_frame->_freeFragmentShaderHandle[i].idx);
+				_fragmentShaderHandle.Free(_frame->_freeFragmentShaderHandle[i].index);
 			}
 
-			for (uint16 i = 0, num = _frame->_numFreeMaterialHandles; i < num; ++i)
+			for (uint16 i = 0, num = _frame->_numFreeSurfaceMaterialHandles; i < num; ++i)
 			{
-				_materialHandle.free(_frame->_freeMaterialHandle[i].idx);
+				_surfaceMaterialHandle.Free(_frame->_freeSurfaceMaterialHandle[i].index);
 			}
 
 			for (uint16 i = 0, num = _frame->_numFreeTextureHandles; i < num; ++i)
 			{
-				_textureHandle.free(_frame->_freeTextureHandle[ii].idx);
+				_textureHandle.Free(_frame->_freeTextureHandle[i].index);
 			}
 
 			for (uint16 i = 0, num = _frame->_numFreeRenderTargetHandles; i < num; ++i)
 			{
-				_renderTargetHandle.free(_frame->_freeRenderTargetHandle[i].idx);
+				_renderTargetHandle.Free(_frame->_freeRenderTargetHandle[i].index);
 			}
 
 			for (uint16 i = 0, num = _frame->_numFreeUniformHandles; i < num; ++i)
 			{
-				_uniformHandle.free(_frame->_freeUniformHandle[i].idx);
+				_uniformHandle.Free(_frame->_freeUniformHandle[i].index);
 			}
 		}
 
@@ -1659,10 +1749,10 @@ namespace video
 		{
 			_submit->_resolution = _resolution;
 			_submit->_debug = _debug;
-			memcpy(_submit->_rt, _rt, sizeof(_rt));
+			memcpy(_submit->_freeRenderTargetHandle, _renderTarget, sizeof(_renderTarget));
 			memcpy(_submit->_clear, _clear, sizeof(_clear));
 			memcpy(_submit->_rect, _rect, sizeof(_rect));
-			_submit->finish();
+			_submit->Finish();
 
 			DumpViewStats();
 
@@ -1676,10 +1766,13 @@ namespace video
 			_submit->Reset();
 		}
 
-		void Flip();
+		void Flip()
+		{
+			//sContext
+		}
 
 		// render thread
-		void enderFrame()
+		void RenderFrame()
 		{
 			#if BX_PLATFORM_NACL
 			// on NaCl swap buffers generates callback and this is handled inside callback
@@ -1706,38 +1799,39 @@ namespace video
 		void RendererShutdown();
 		void RendererCreateIndexBuffer(IndexBufferHandle handle, Memory* mem);
 		void RendererDestroyIndexBuffer(IndexBufferHandle handle);
-		void RendererCreateDynamicIndexBuffer(IndexBufferHandle handle, uint32 _size);
+		void RendererCreateDynamicIndexBuffer(IndexBufferHandle handle, uint32 size);
 		void RendererDestroyDynamicIndexBuffer(IndexBufferHandle handle);
-		void RendererCreateVertexBuffer(VertexBufferHandle handle, Memory* _mem, VertexDeclHandle _declHandle);
+		void RendererCreateVertexBuffer(VertexBufferHandle handle, Memory* mem, VertexDeclHandle declHandle);
 		void RendererDestroyVertexBuffer(VertexBufferHandle handle);
-		void RendererCreateDynamicVertexBuffer(VertexBufferHandle handle, uint32 _size);
+		void RendererCreateDynamicVertexBuffer(VertexBufferHandle handle, uint32 size);
 		void RendererDestroyDynamicVertexBuffer(VertexBufferHandle handle);
-		void RendererCreateVertexDecl(VertexDeclHandle handle, const VertexDecl& _decl);
-		void RendererDestroyVertexDecl(VertexDeclHandle _handle);
-		//void RendererCreateVertexShader(VertexShaderHandle handle, Memory* _mem);
-		//void RendererDestroyVertexShader(VertexShaderHandle _handle);
-		//void RendererCreateFragmentShader(FragmentShaderHandle _handle, Memory* _mem);
-		//void RendererDestroyFragmentShader(FragmentShaderHandle _handle);
-		void RendererCreateMaterial(SurfaceMaterialHandle _handle, 
-				VertexShaderHandle _vsh, FragmentShaderHandle _fsh);
-		void RendererDestroyMaterial(FragmentShaderHandle _handle);
-		void RendererCreateTexture(TextureHandle _handle, Memory* _mem, uint32 _flags);
-		void RendererDestroyTexture(TextureHandle _handle);
-		void RendererCreateRenderTarget(RenderTargetHandle _handle, uint16 _width, uint16 _height, uint32 _flags);
-		void RendererDestroyRenderTarget(RenderTargetHandle _handle);
-		void RendererCreateUniform(UniformHandle _handle, ConstantType::Enum _type, uint16 _num, const char* _name);
-		void RendererDestroyUniform(UniformHandle _handle);
-		void RendererSaveScreenShot(Memory* _mem);
-		void RendererUpdateUniform(uint16 _loc, const void* _data, uint32 _size);
+		void RendererCreateVertexDecl(VertexDeclHandle handle, const VertexDecl& decl);
+		void RendererDestroyVertexDecl(VertexDeclHandle handle);
+		void RendererCreateVertexShader(VertexShaderHandle handle, Memory* mem);
+		void RendererDestroyVertexShader(VertexShaderHandle handle);
+		void RendererCreateFragmentShader(FragmentShaderHandle handle, Memory* mem);
+		void RendererDestroyFragmentShader(FragmentShaderHandle handle);
+		void RendererCreateMaterial(SurfaceMaterialHandle handle, 
+				VertexShaderHandle vsh, FragmentShaderHandle fsh);
+		void RendererDestroyMaterial(FragmentShaderHandle handle);
+		void RendererCreateTexture(TextureHandle handle, Memory* mem, uint32 flags);
+		void RendererDestroyTexture(TextureHandle handle);
+		void RendererCreateRenderTarget(RenderTargetHandle handle, uint16 width, uint16 height, uint32 flags);
+		void RendererDestroyRenderTarget(RenderTargetHandle handle);
+		void RendererCreateUniform(UniformHandle handle, ConstantType::Enum type, uint16 num, const char* name);
+		void RendererDestroyUniform(UniformHandle handle);
+		void RendererSaveScreenShot(Memory* mem);
+		void RendererUpdateUniform(uint16 loc, const void* data, uint32 size);
+		void RendererSubmit();
 
 		void RendererUpdateUniforms(ConstantBuffer* constantBuffer, uint32 begin, uint32 end)
 		{
-			_constantBuffer->reset(_begin);
-			while (_constantBuffer->getPos() < _end)
+			constantBuffer->Reset(begin);
+			while (constantBuffer->GetPos() < end)
 			{
-				uint32 opcode = _constantBuffer->read();
+				uint32 opcode = constantBuffer->Read();
 
-				if (ConstantType::End == opcode)
+				if (ConstantType::eEnd == opcode)
 				{
 					break;
 				}
@@ -1746,12 +1840,12 @@ namespace video
 				uint16 loc;
 				uint16 num;
 				uint16 copy;
-				ConstantBuffer::decodeOpcode(opcode, type, loc, num, copy);
+				ConstantBuffer::DecodeOpcode(opcode, type, loc, num, copy);
 
 				const char* data;
-				uint32 size = g_constantTypeSize[type] * num;
-				data = _constantBuffer->read(size);
-				rendererUpdateUniform(loc, data, size);
+				uint32 size = gConstantTypeSize[type] * num;
+				data = constantBuffer->Read(size);
+				RendererUpdateUniform(loc, data, size);
 			}
 		}
 
@@ -1763,7 +1857,7 @@ namespace video
 
 			do
 			{
-				uint8_t command;
+				uint8 command;
 				cmdbuf.Read(command);
 
 				switch (command)
@@ -1843,7 +1937,7 @@ namespace video
 					VertexDeclHandle handle;
 					cmdbuf.Read(handle);
 
-					rendererDestroyVertexDecl(handle);
+					RendererDestroyVertexDecl(handle);
 				}
 				break;
 
@@ -1894,49 +1988,49 @@ namespace video
 				}
 				break;
 
-				case CommandBuffer::CreateVertexShader:
+				case CommandBuffer::eCreateVertexShader:
 				{
 					VertexShaderHandle handle;
-					cmdbuf.read(handle);
+					cmdbuf.Read(handle);
 
 					Memory* mem;
-					cmdbuf.read(mem);
+					cmdbuf.Read(mem);
 
-					rendererCreateVertexShader(handle, mem);
+					RendererCreateVertexShader(handle, mem);
 
 					free(mem);
 				}
 				break;
 
-				case CommandBuffer::DestroyVertexShader:
+				case CommandBuffer::eDestroyVertexShader:
 				{
 					VertexShaderHandle handle;
-					cmdbuf.read(handle);
+					cmdbuf.Read(handle);
 
-					rendererDestroyVertexShader(handle);
+					RendererDestroyVertexShader(handle);
 				}
 				break;
 
-				case CommandBuffer::CreateFragmentShader:
+				case CommandBuffer::eCreateFragmentShader:
 				{
 					FragmentShaderHandle handle;
-					cmdbuf.read(handle);
+					cmdbuf.Read(handle);
 
 					Memory* mem;
-					cmdbuf.read(mem);
+					cmdbuf.Read(mem);
 
-					rendererCreateFragmentShader(handle, mem);
+					RendererCreateFragmentShader(handle, mem);
 
 					free(mem);
 				}
 				break;
 
-				case CommandBuffer::DestroyFragmentShader:
+				case CommandBuffer::eDestroyFragmentShader:
 				{
 					FragmentShaderHandle handle;
-					cmdbuf.read(handle);
+					cmdbuf.Read(handle);
 
-					rendererDestroyFragmentShader(handle);
+					RendererDestroyFragmentShader(handle);
 				}
 				break;
 
@@ -2028,7 +2122,7 @@ namespace video
 					uint16 num;
 					cmdbuf.Read(num);
 
-					uint8_t len;
+					uint8 len;
 					cmdbuf.Read(len);
 
 					char name[256];
@@ -2070,7 +2164,6 @@ namespace video
 			} while (!end);
 		}
 
-		void RendererSubmit();
 
 		#if VIDEO_CONFIG_MULTITHREADED
 		void gameSemPost()
@@ -2084,7 +2177,7 @@ namespace video
 			// 			BX_TRACE("game wait");
 			int64_t start = bx::getHPCounter();
 			m_gameSem.wait();
-			m_render->m_waitSubmit = bx::getHPCounter() - start;
+			_render->m_waitSubmit = bx::getHPCounter() - start;
 		}
 
 		void renderSemPost()
@@ -2098,7 +2191,7 @@ namespace video
 			// 			BX_TRACE("render wait");
 			int64_t start = bx::getHPCounter();
 			m_renderSem.wait();
-			m_submit->m_waitRender = bx::getHPCounter() - start;
+			_submit->m_waitRender = bx::getHPCounter() - start;
 		}
 
 		Semaphore m_renderSem;
@@ -2112,11 +2205,11 @@ namespace video
 		{
 		}
 
-		void EenderSemPost()
+		void RenderSemPost()
 		{
 		}
 
-		void EenderSemWait()
+		void RenderSemWait()
 		{
 		}
 		#endif // BGFX_CONFIG_MULTITHREADED
@@ -2133,15 +2226,15 @@ namespace video
 		HandleAlloc _vertexBufferHandle;
 		HandleAlloc _vertexShaderHandle;
 		HandleAlloc _fragmentShaderHandle;
-		HandleAlloc _materialHandle;
+		HandleAlloc _surfaceMaterialHandle;
 		HandleAlloc _textureHandle;
 		HandleAlloc _renderTargetHandle;
 		HandleAlloc _uniformHandle;
 
-		MaterialRef _materialRef;
+		SurfaceMaterialRef _surfaceMaterialRef;
 		VertexDeclRef _declRef;
 
-		RenderTargetHandle _renderTargetHandle[VIDEO_MAX_VIEWS];
+		RenderTargetHandle _renderTarget[VIDEO_MAX_VIEWS];
 		Clear _clear[VIDEO_MAX_VIEWS];
 		Rect _rect[VIDEO_MAX_VIEWS];
 		Constant _constant[VIDEO_MAX_UNIFORMS];
@@ -2189,19 +2282,19 @@ namespace video
 
 				if (m_frame)
 				{
-					GetWindowRect(bgfxHwnd, &m_rect);
+					GetWindowRect(bgfxHwnd, &_rect);
 					m_style = GetWindowLong(bgfxHwnd, GWL_STYLE);
 				}
 
 				if (_windowFrame)
 				{
-					rect = m_rect;
+					rect = _rect;
 					style = m_style;
 				}
 				else
 				{
 					#if defined(__MINGW32__)
-					rect = m_rect;
+					rect = _rect;
 					style = m_style;
 					#else
 					HMONITOR monitor = MonitorFromWindow(bgfxHwnd, MONITOR_DEFAULTTONEAREST);
@@ -2238,7 +2331,7 @@ namespace video
 				m_frame = _windowFrame;
 			}
 
-			RECT m_rect;
+			RECT _rect;
 			DWORD m_style;
 			bool m_frame;
 		};
@@ -2249,7 +2342,6 @@ namespace video
 		bool _initialized;
 		bool _rendererInitialized;
 	};
-
 }
 #endif
 

@@ -7,6 +7,7 @@ public :
 	Plane();
 	Plane(float a, float b, float c, float d);
 	Plane(const Plane &other);
+	Plane(const Vector3 &a, const Vector3 &b, const Vector3 &c);
 
 	Plane operator= (const Plane &other);
 

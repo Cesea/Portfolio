@@ -6,23 +6,11 @@
       <Filter>Core</Filter>
     </ClCompile>
     <ClCompile Include="stdafx.cpp" />
-    <ClCompile Include="DataPackage.cpp">
-      <Filter>Sub</Filter>
-    </ClCompile>
     <ClCompile Include="Console.cpp">
       <Filter>Core</Filter>
     </ClCompile>
     <ClCompile Include="CommonUtils.cpp">
       <Filter>Sub</Filter>
-    </ClCompile>
-    <ClCompile Include="Control.cpp">
-      <Filter>GUI\Retained\Controls</Filter>
-    </ClCompile>
-    <ClCompile Include="Dialog.cpp">
-      <Filter>GUI\Retained\Controls</Filter>
-    </ClCompile>
-    <ClCompile Include="StaticControl.cpp">
-      <Filter>GUI\Retained\Controls</Filter>
     </ClCompile>
     <ClCompile Include="Meta.cpp">
       <Filter>Sub\Reflection</Filter>
@@ -38,12 +26,6 @@
     </ClCompile>
     <ClCompile Include="BaseScene.cpp">
       <Filter>GameScene</Filter>
-    </ClCompile>
-    <ClCompile Include="Gui.cpp">
-      <Filter>GUI\Retained</Filter>
-    </ClCompile>
-    <ClCompile Include="GuiResource.cpp">
-      <Filter>GUI\Retained</Filter>
     </ClCompile>
     <ClCompile Include="tinyxml2.cpp">
       <Filter>Sub\tinyxml</Filter>
@@ -93,17 +75,11 @@
     <ClCompile Include="Camera.cpp">
       <Filter>Sub\GameUtils</Filter>
     </ClCompile>
-    <ClCompile Include="MatrixCache.cpp">
-      <Filter>Sub</Filter>
-    </ClCompile>
     <ClCompile Include="Node.cpp">
       <Filter>Sub\GameUtils</Filter>
     </ClCompile>
     <ClCompile Include="TerrainConfig.cpp">
       <Filter>Sub\GameUtils\Terrain</Filter>
-    </ClCompile>
-    <ClCompile Include="VideoDevice.cpp">
-      <Filter>Core\SubSystem\VideoDevice</Filter>
     </ClCompile>
     <ClCompile Include="SceneManager.cpp">
       <Filter>Core\SubSystem\SceneeManager</Filter>
@@ -132,23 +108,14 @@
     <ClCompile Include="Allocators.cpp">
       <Filter>Core\Memory</Filter>
     </ClCompile>
-    <ClCompile Include="RenderSystem.cpp">
-      <Filter>GameSystem</Filter>
-    </ClCompile>
     <ClCompile Include="RenderComponent.cpp">
       <Filter>GameComponent</Filter>
     </ClCompile>
     <ClCompile Include="MoveComponent.cpp">
       <Filter>GameComponent</Filter>
     </ClCompile>
-    <ClCompile Include="MoveSystem.cpp">
-      <Filter>GameSystem</Filter>
-    </ClCompile>
     <ClCompile Include="TransformComponent.cpp">
       <Filter>GameComponent</Filter>
-    </ClCompile>
-    <ClCompile Include="PhysicsSystem.cpp">
-      <Filter>GameSystem</Filter>
     </ClCompile>
     <ClCompile Include="CollisionComponent.cpp">
       <Filter>GameComponent</Filter>
@@ -156,8 +123,33 @@
     <ClCompile Include="AnimationComponent.cpp">
       <Filter>GameComponent</Filter>
     </ClCompile>
-    <ClCompile Include="AnimationSystem.cpp" />
-    <ClCompile Include="Video.cpp" />
+    <ClCompile Include="Video.cpp">
+      <Filter>Core\SubSystem\VideoDevice</Filter>
+    </ClCompile>
+    <ClCompile Include="AnimationSystem.cpp">
+      <Filter>GameSystem\AnimationSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="MoveSystem.cpp">
+      <Filter>GameSystem\MovementSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="ColiisionSystem.cpp">
+      <Filter>GameSystem\CollisionSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderSystem.cpp">
+      <Filter>GameSystem\RenderSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="TransformSystem.cpp">
+      <Filter>GameSystem\TransformSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="VideoDevice9.cpp">
+      <Filter>Core\SubSystem\VideoDevice</Filter>
+    </ClCompile>
+    <ClCompile Include="CollisionUtils.cpp">
+      <Filter>GameSystem\CollisionSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="Hash.cpp">
+      <Filter>Sub</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -176,9 +168,6 @@
     <ClInclude Include="EventQueue.h">
       <Filter>Sub\Event</Filter>
     </ClInclude>
-    <ClInclude Include="DataPackage.h">
-      <Filter>Sub</Filter>
-    </ClInclude>
     <ClInclude Include="Typedefs.h">
       <Filter>Sub</Filter>
     </ClInclude>
@@ -193,18 +182,6 @@
     </ClInclude>
     <ClInclude Include="XMLManager.h">
       <Filter>Managers</Filter>
-    </ClInclude>
-    <ClInclude Include="Control.h">
-      <Filter>GUI\Retained\Controls</Filter>
-    </ClInclude>
-    <ClInclude Include="StaticControl.h">
-      <Filter>GUI\Retained\Controls</Filter>
-    </ClInclude>
-    <ClInclude Include="ButtonControl.h">
-      <Filter>GUI\Retained\Controls</Filter>
-    </ClInclude>
-    <ClInclude Include="Dialog.h">
-      <Filter>GUI\Retained\Controls</Filter>
     </ClInclude>
     <ClInclude Include="SingletonBase.h">
       <Filter>Managers</Filter>
@@ -229,12 +206,6 @@
     </ClInclude>
     <ClInclude Include="BaseScene.h">
       <Filter>GameScene</Filter>
-    </ClInclude>
-    <ClInclude Include="Gui.h">
-      <Filter>GUI\Retained</Filter>
-    </ClInclude>
-    <ClInclude Include="GuiResource.h">
-      <Filter>GUI\Retained</Filter>
     </ClInclude>
     <ClInclude Include="imguiRenderer.h">
       <Filter>GUI</Filter>
@@ -296,9 +267,6 @@
     <ClInclude Include="Camera.h">
       <Filter>Sub\GameUtils</Filter>
     </ClInclude>
-    <ClInclude Include="MatrixCache.h">
-      <Filter>Sub</Filter>
-    </ClInclude>
     <ClInclude Include="Node.h">
       <Filter>Sub\GameUtils</Filter>
     </ClInclude>
@@ -314,9 +282,6 @@
     <ClInclude Include="TerrainQuadTree.h">
       <Filter>Sub\GameUtils\Terrain</Filter>
     </ClInclude>
-    <ClInclude Include="VideoDevice.h">
-      <Filter>Core\SubSystem\VideoDevice</Filter>
-    </ClInclude>
     <ClInclude Include="WorldEditor.h">
       <Filter>Sub\WorldEditor</Filter>
     </ClInclude>
@@ -325,9 +290,6 @@
     </ClInclude>
     <ClInclude Include="InputManager.h">
       <Filter>Core\SubSystem\InputManager</Filter>
-    </ClInclude>
-    <ClInclude Include="Handle.h">
-      <Filter>Sub</Filter>
     </ClInclude>
     <ClInclude Include="BaseSystem.h">
       <Filter>ECS\System</Filter>
@@ -374,29 +336,17 @@
     <ClInclude Include="Allocators.h">
       <Filter>Core\Memory</Filter>
     </ClInclude>
-    <ClInclude Include="RenderSystem.h">
-      <Filter>GameSystem</Filter>
-    </ClInclude>
     <ClInclude Include="RenderComponent.h">
       <Filter>GameComponent</Filter>
     </ClInclude>
     <ClInclude Include="MoveComponent.h">
       <Filter>GameComponent</Filter>
     </ClInclude>
-    <ClInclude Include="MoveSystem.h">
-      <Filter>GameSystem</Filter>
-    </ClInclude>
     <ClInclude Include="TransformComponent.h">
       <Filter>GameComponent</Filter>
     </ClInclude>
-    <ClInclude Include="PhysicsSystem.h">
-      <Filter>GameSystem</Filter>
-    </ClInclude>
     <ClInclude Include="CollisionComponent.h">
       <Filter>GameComponent</Filter>
-    </ClInclude>
-    <ClInclude Include="TransformSystem.h">
-      <Filter>GameSystem</Filter>
     </ClInclude>
     <ClInclude Include="AnimationComponent.h">
       <Filter>GameComponent</Filter>
@@ -404,11 +354,41 @@
     <ClInclude Include="DataBase.h">
       <Filter>Core\SubSystem\DataBase</Filter>
     </ClInclude>
-    <ClInclude Include="AnimationSystem.h">
-      <Filter>GameSystem</Filter>
-    </ClInclude>
     <ClInclude Include="Video.h">
       <Filter>Core\SubSystem\VideoDevice</Filter>
+    </ClInclude>
+    <ClInclude Include="VideoPlatform.h">
+      <Filter>Core\SubSystem\VideoDevice</Filter>
+    </ClInclude>
+    <ClInclude Include="AnimationSystem.h">
+      <Filter>GameSystem\AnimationSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="MoveSystem.h">
+      <Filter>GameSystem\MovementSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="CollisionSystem.h">
+      <Filter>GameSystem\CollisionSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderSystem.h">
+      <Filter>GameSystem\RenderSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="TransformSystem.h">
+      <Filter>GameSystem\TransformSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="CollisionUtils.h">
+      <Filter>GameSystem\CollisionSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="VideoDevice9.h">
+      <Filter>Core\SubSystem\VideoDevice</Filter>
+    </ClInclude>
+    <ClInclude Include="SceneChangeEffect.h">
+      <Filter>Core\SubSystem\SceneeManager</Filter>
+    </ClInclude>
+    <ClInclude Include="CharSet.h">
+      <Filter>Core\SubSystem\VideoDevice</Filter>
+    </ClInclude>
+    <ClInclude Include="Hash.h">
+      <Filter>Sub</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -423,9 +403,6 @@
     </Filter>
     <Filter Include="GUI\Retained">
       <UniqueIdentifier>{2a13886c-38b1-4b75-8384-e30c2d02c998}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="GUI\Retained\Controls">
-      <UniqueIdentifier>{57d48df4-4e4b-40f8-9c08-49981fe29a16}</UniqueIdentifier>
     </Filter>
     <Filter Include="Sub">
       <UniqueIdentifier>{f0b23895-3d21-4c5e-b58d-d8cf44373094}</UniqueIdentifier>
@@ -450,9 +427,6 @@
     </Filter>
     <Filter Include="Debug">
       <UniqueIdentifier>{76a6963c-195a-47f4-bb35-80dc0a39ec35}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Sub\Geometry">
-      <UniqueIdentifier>{af510b90-b9d7-4a38-a5b2-3d59f833cb99}</UniqueIdentifier>
     </Filter>
     <Filter Include="Sub\GameUtils">
       <UniqueIdentifier>{563f8004-6a59-40ad-a91c-8b90fd7fda6e}</UniqueIdentifier>
@@ -507,6 +481,21 @@
     </Filter>
     <Filter Include="Core\SubSystem\DataBase">
       <UniqueIdentifier>{04c70aa2-d19a-4fe2-b716-14917758bb68}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GameSystem\AnimationSystem">
+      <UniqueIdentifier>{54ca3728-3afd-4619-9f24-f1739ad0e775}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GameSystem\MovementSystem">
+      <UniqueIdentifier>{b0f7ecfb-8121-4aa0-88ba-91bf94352179}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GameSystem\CollisionSystem">
+      <UniqueIdentifier>{3c44ec6d-ab6d-4798-af60-0326aa391024}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GameSystem\RenderSystem">
+      <UniqueIdentifier>{1761486d-4c7d-4da8-a16c-8f00c672cb74}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GameSystem\TransformSystem">
+      <UniqueIdentifier>{cc7732c0-c4e6-44ef-8c20-c09d11e7a848}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

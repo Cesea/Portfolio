@@ -10,11 +10,11 @@ public:
 	virtual ~RenderComponent() {}
 
 public :
-	VertexBufferHandle _vertexBufferHandle;
-	IndexBufferHandle _indexBufferHandle;
+	//VertexBufferHandle _vertexBufferHandle;
+	//IndexBufferHandle _indexBufferHandle;
 
-	EffectHandle _effectHandle;
-	SurfaceMaterialHandle _materialHandle;
+	//EffectHandle _effectHandle;
+	//SurfaceMaterialHandle _materialHandle;
 
 };
 

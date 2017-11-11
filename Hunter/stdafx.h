@@ -58,7 +58,7 @@
 #include "GameUtils.h"
 #include "D3DCommon.h"
 
+extern HWND gWindowHandle;
 extern Engine *gEngine;
-extern IDirect3DDevice9 *gpDevice;
 
 #endif

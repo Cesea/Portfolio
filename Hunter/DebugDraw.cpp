@@ -18,19 +18,19 @@ namespace  debugdraw
 	{
 		//이전 월드 행렬을 기억하자
 		Matrix matPrevWorld;
-		gpDevice->GetTransform(D3DTS_WORLD, &matPrevWorld);
+		//gpDevice->GetTransform(D3DTS_WORLD, &matPrevWorld);
 
 		//사용할 월드
 		D3DXMATRIXA16 matIdentity;
 		D3DXMatrixIdentity(&matIdentity);
-		gpDevice->SetTransform(D3DTS_WORLD, &matIdentity);
+		//gpDevice->SetTransform(D3DTS_WORLD, &matIdentity);
 
 		//이전 라이트 기억
 		DWORD prevLight = 0;
-		gpDevice->GetRenderState(D3DRS_LIGHTING, &prevLight);
+		//gpDevice->GetRenderState(D3DRS_LIGHTING, &prevLight);
 
 		//라이트 끄자
-		gpDevice->SetRenderState(D3DRS_LIGHTING, FALSE);
+		//gpDevice->SetRenderState(D3DRS_LIGHTING, FALSE);
 
 		GizmoVertex vertices[2];
 		vertices[0].pos = startPos;
@@ -38,12 +38,12 @@ namespace  debugdraw
 		vertices[1].pos = endPos;
 		vertices[1].color = color;
 
-		gpDevice->SetFVF(GizmoVertex::FVF);
-		gpDevice->DrawPrimitiveUP(
-			D3DPT_LINELIST, 1, vertices, sizeof(GizmoVertex));
+		//gpDevice->SetFVF(GizmoVertex::FVF);
+		//gpDevice->DrawPrimitiveUP(
+		//	D3DPT_LINELIST, 1, vertices, sizeof(GizmoVertex));
 
-		gpDevice->SetTransform(D3DTS_WORLD, &matPrevWorld);
-		gpDevice->SetRenderState(D3DRS_LIGHTING, prevLight);
+		//gpDevice->SetTransform(D3DTS_WORLD, &matPrevWorld);
+		//gpDevice->SetRenderState(D3DRS_LIGHTING, prevLight);
 	}
 
 	void WorldGrid(float cellsize, int cellNum)

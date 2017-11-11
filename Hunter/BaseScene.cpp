@@ -158,13 +158,13 @@ bool32 BaseScene::Init()
 	//	}
 	//}
 
-	_world.AddSystem(_moveSystem);
-	_world.AddSystem(_renderSystem);
+	//_world.AddSystem(_moveSystem);
+	//_world.AddSystem(_renderSystem);
 
 	for (int32 i = 0; i < 2; ++i)
 	{
 		Entity entity = _world.CreateEntity();
-		entity.AddComponent<TransformComponent>(Vector3(RandFloat(), RandFloat(), RandFloat()));
+		entity.AddComponent<TransformComponent>();
 		entity.AddComponent<MoveComponent>();
 		entity.AddComponent<RenderComponent>();
 		entity.Activate();
@@ -185,14 +185,6 @@ bool32 BaseScene::Init()
 	indices[2] = 2;
 	//_indexHandle = VIDEO->GetIndexBufferManager()->CreateStatic(3, IndexBuffer::IndexFormat::Uint16, indices);
 
-	D3DVERTEXELEMENT9 elements[3] =
-	{
-		{0, 0, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0},
-		{0, 12, D3DDECLTYPE_D3DCOLOR, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_COLOR, 0},
-		D3DDECL_END()
-	};
-
-	gpDevice->CreateVertexDeclaration(elements, &_pDecl);
 
 	_firstWindowPos.x = 100;
 	_firstWindowPos.y = 100;
@@ -210,7 +202,7 @@ bool32 BaseScene::Update(float deltaTime)
 
 	_world.Refresh();
 
-	_moveSystem.Update(deltaTime);
+	//_moveSystem.Update(deltaTime);
 
 	//_camera.UpdateMatrix();
 	//_camera.UpdateCamToDevice(gpDevice);
@@ -223,108 +215,87 @@ bool32 BaseScene::Render()
 {
 	bool32 result = true;
 
-	im::BeginFrame(gEngine->GetInput()->mouse, 
-		gEngine->GetInput()->keyboard.GetCharInput(), 
-		gEngine->GetInput()->keyboard.GetShiftDown());
+	//im::BeginFrame(gEngine->GetInput()->mouse, 
+	//	gEngine->GetInput()->keyboard.GetCharInput(), 
+	//	gEngine->GetInput()->keyboard.GetShiftDown());
 
-	im::BeginScrollArea("Editor", _firstWindowPos, 400, 600, &_scroll);
+	//im::BeginScrollArea("Editor", _firstWindowPos, 400, 600, &_scroll);
 
-	im::Button("X");
-	im::Button("Y");
-	im::Button("Z");
+	//im::Button("X");
+	//im::Button("Y");
+	//im::Button("Z");
 
-	if (im::Collapse("col", _collapse))
-	{
-		_collapse = !_collapse;
-	}
-	if (!_collapse)
-	{
-		im::Indent();
+	//if (im::Collapse("col", _collapse))
+	//{
+	//	_collapse = !_collapse;
+	//}
+	//if (!_collapse)
+	//{
+	//	im::Indent();
 
-		im::Button("yaya");
-		im::Button("tototo");
+	//	im::Button("yaya");
+	//	im::Button("tototo");
 
-		im::Unindent();
-	}
-	
-	im::Slider("Slider", &_sliderValue, -10, 10, 0.1);
+	//	im::Unindent();
+	//}
+	//
+	//im::Slider("Slider", &_sliderValue, -10, 10, 0.1);
 
-	static int test = 0;
-	if (test % 20 == 0)
-	{
-		std::cout << _sliderValue << std::endl;
-	}
-	test++;
+	//static int test = 0;
+	//if (test % 20 == 0)
+	//{
+	//	std::cout << _sliderValue << std::endl;
+	//}
+	//test++;
 
-	if (im::Check("toto", _checked))
-	{
-		_checked = !_checked;
-	}
+	//if (im::Check("toto", _checked))
+	//{
+	//	_checked = !_checked;
+	//}
 
-	im::EndScrollArea();
-
-
-	im::BeginScrollArea("Editor", _secondWindowPos, 400, 600, &_scroll);
-
-	im::Button("X");
-	im::Button("Y");
-	im::Button("Z");
-
-	if (im::Collapse("col", _collapse))
-	{
-		_collapse = !_collapse;
-	}
-	if (!_collapse)
-	{
-		im::Indent();
-
-		im::Button("yaya");
-		im::Button("tototo");
-
-		im::Unindent();
-	}
-
-	im::Slider("Slider", &_sliderValue, -10, 10, 0.1);
+	//im::EndScrollArea();
 
 
-	if (im::Check("toto", _checked))
-	{
-		_checked = !_checked;
-	}
+	//im::BeginScrollArea("Editor", _secondWindowPos, 400, 600, &_scroll);
 
-	if (im::Edit(_strings1))
-	{
-		std::cout << _strings1 << std::endl;
-	}
-	if (im::Edit(_strings2))
-	{
-		std::cout << _strings2 << std::endl;
-	}
+	//im::Button("X");
+	//im::Button("Y");
+	//im::Button("Z");
 
-	im::EndScrollArea();
+	//if (im::Collapse("col", _collapse))
+	//{
+	//	_collapse = !_collapse;
+	//}
+	//if (!_collapse)
+	//{
+	//	im::Indent();
 
-	im::EndFrame();
+	//	im::Button("yaya");
+	//	im::Button("tototo");
+
+	//	im::Unindent();
+	//}
+
+	//im::Slider("Slider", &_sliderValue, -10, 10, 0.1);
 
 
-	_renderSystem.Update(0.0f);
+	//if (im::Check("toto", _checked))
+	//{
+	//	_checked = !_checked;
+	//}
 
-	//GenerateKey();
+	//if (im::Edit(_strings1))
+	//{
+	//	std::cout << _strings1 << std::endl;
+	//}
+	//if (im::Edit(_strings2))
+	//{
+	//	std::cout << _strings2 << std::endl;
+	//}
+	//im::EndScrollArea();
+	//im::EndFrame();
 
-	//commands::DrawIndexed *dc =  VIDEO->GetCommandBucket().AddCommand<commands::DrawIndexed>(10, 0);
-	//dc->primitiveCount = 1;
-	//dc->numVertex = 3;
-	//dc->startIndex = 0;
-	//dc->vertexBufferHandle = _vertexHandle;
-	//dc->worldMatrix = VIDEO->GetMatrixCache().AddMatrix(world);
-
-	//MatrixTranslation(&world, 0.5f, 0.0f, 0.0f);
-	//commands::DrawIndexed *dc2 =  VIDEO->GetCommandBucket().AddCommand<commands::DrawIndexed>(10, 0);
-	//dc2->primitiveCount = 1;
-	//dc2->numVertex = 3;
-	//dc2->startIndex = 0;
-	//dc2->vertexBufferHandle = _vertexHandle;
-	//dc2->worldMatrix = VIDEO->GetMatrixCache().AddMatrix(world);
-
+	//_renderSystem.Update(0.0f);
 	return result;
 }
 

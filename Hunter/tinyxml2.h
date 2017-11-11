@@ -1043,7 +1043,7 @@ private:
 		<?xml version="1.0" standalone="yes"?>
 	@endverbatim
 
-	TinyXML-2 will happily read or write files without a declaration,
+	TinyXML-2 will happily read or Write files without a declaration,
 	however.
 
 	The text of the declaration isn't interpreted. It is parsed
@@ -1264,7 +1264,7 @@ public:
 
     	The 'value' parameter is normally null. However, if specified,
     	the attribute will only be returned if the 'name' and 'value'
-    	match. This allow you to write code:
+    	match. This allow you to Write code:
 
     	@verbatim
     	if ( ele->Attribute( "foo", "bar" ) ) callFooIsBar();
@@ -1710,7 +1710,7 @@ public:
     bool HasBOM() const {
         return _writeBOM;
     }
-    /** Sets whether to write the BOM when writing the file.
+    /** Sets whether to Write the BOM when writing the file.
     */
     void SetBOM( bool useBOM ) {
         _writeBOM = useBOM;
@@ -1905,7 +1905,7 @@ inline NodeType* XMLDocument::CreateUnlinkedNode( MemPoolT<PoolElementSize>& poo
 	@endverbatim
 
 	Assuming you want the value of "attributeB" in the 2nd "Child" element, it's very
-	easy to write a *lot* of code that looks like:
+	easy to Write a *lot* of code that looks like:
 
 	@verbatim
 	XMLElement* root = document.FirstChildElement( "Document" );
@@ -2141,7 +2141,7 @@ public:
     XMLPrinter( FILE* file=0, bool compact = false, int depth = 0 );
     virtual ~XMLPrinter()	{}
 
-    /** If streaming, write the BOM and declaration. */
+    /** If streaming, Write the BOM and declaration. */
     void PushHeader( bool writeBOM, bool writeDeclaration );
     /** If streaming, start writing an element.
         The element must be closed with CloseElement()
