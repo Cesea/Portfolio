@@ -6,10 +6,10 @@
 #include "Console.h"
 
 #include "InputManager.h"
-#include "VideoDevice9.h"
+#include "VideoDevice.h"
 #include "SceneManager.h"
 
-#include "Video.h"
+#include "VideoDevice.h"
 
 #include <memory>
 
@@ -30,7 +30,7 @@ public :
 
 	LRESULT CALLBACK EngineWindowCallback(HWND windowHandle, UINT msg, WPARAM wParam, LPARAM lParam);
 
-	//video::VideoDevice *GetVideo() { return _pVideo.get(); }
+	video::VideoDevice *GetVideo() { return _pVideo.get(); }
 	InputManager *GetInput() { return _pInput.get(); }
 	SceneManager *GetScene() { return _pScene.get(); }
 
@@ -48,7 +48,7 @@ private :
 
 	Console _console;
 
-	//std::shared_ptr<video::VideoDevice> _pVideo;
+	std::shared_ptr<video::VideoDevice> _pVideo;
 	std::shared_ptr<InputManager> _pInput;
 	std::shared_ptr<SceneManager> _pScene;
 

@@ -20,7 +20,6 @@ namespace im
 		int32 y;
 	};
 
-
 	enum GfxCommandType
 	{
 		GFXCOMMAND_RECT,

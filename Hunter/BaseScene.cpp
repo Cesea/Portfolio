@@ -3,10 +3,12 @@
 
 #include "tinyxml2.h"
 
+using namespace video;
+
 struct Vertex
 {
 	Vector3 position;
-	D3DCOLOR color;
+	D3DXCOLOR color;
 
 	enum
 	{
@@ -161,14 +163,34 @@ bool32 BaseScene::Init()
 	//_world.AddSystem(_moveSystem);
 	//_world.AddSystem(_renderSystem);
 
-	for (int32 i = 0; i < 2; ++i)
-	{
-		Entity entity = _world.CreateEntity();
-		entity.AddComponent<TransformComponent>();
-		entity.AddComponent<MoveComponent>();
-		entity.AddComponent<RenderComponent>();
-		entity.Activate();
-	}
+	//for (int32 i = 0; i < 2; ++i)
+	//{
+	//	Entity entity = _world.CreateEntity();
+	//	entity.AddComponent<TransformComponent>();
+	//	entity.AddComponent<MoveComponent>();
+	//	entity.AddComponent<RenderComponent>();
+	//	entity.Activate();
+	//}
+
+	_effect = VIDEO->CreateEffect("../resources/shaders/basic.fx", "BasicShader");
+
+	video::RenderViewHandle renderViewHandle= VIDEO->CreateRenderView();
+	_renderView = VIDEO->GetRenderView(renderViewHandle);
+	_renderView->_clearColor = 0xff50ff50;
+
+	Matrix view;
+	MatrixLookAtLH(&view, &Vector3(0.0f, -0.0f, -2.0f), &Vector3(0.0f, 0.0f, 0.0f), &Vector3(0.0f, 1.0f, 0.0f));
+	Matrix projection;
+	MatrixPerspectiveFovLH(&projection, D3DX_PI / 2.0f, (float)WINSIZEX / (float)WINSIZEY, 0.1f, 1000.0f);
+	_renderView->SetViewProjection(view, projection);
+
+	VertexDecl vertexDecl;
+	vertexDecl.Begin();
+	vertexDecl.Add(VertexElement(0, 0, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0));
+	vertexDecl.Add(VertexElement(0, sizeof(Vector3), D3DDECLTYPE_FLOAT4, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_COLOR, 0));
+	vertexDecl.End(sizeof(Vertex));
+
+	VertexDeclHandle declHandle = VIDEO->CreateVertexDecl(&vertexDecl);
 
 	Vertex vertices[3];
 	vertices[0].position = Vector3(0.0f, 0.5f, 0.5f);
@@ -177,14 +199,36 @@ bool32 BaseScene::Init()
 	vertices[1].color = 0xff00ff00;
 	vertices[2].position = Vector3(-0.5f, -0.5f, 0.5f);
 	vertices[2].color = 0xff0000ff;
-	//_vertexHandle =  VIDEO->GetVertexBufferManager()->CreateStatic(3, sizeof(Vertex), vertices);
+
+	Memory mem;
+	mem._data = vertices;
+	mem._size = sizeof(vertices);
+
+	_vertexBuffer0 = VIDEO->CreateVertexBuffer(&mem, declHandle);
+
+	Vertex vertices1[3];
+	vertices1[0].position = Vector3(0.0f, -0.5f, 0.5f);
+	vertices1[0].color = 0xffff0050;
+	vertices1[1].position = Vector3(-0.5f, 0.5f, 0.5f);
+	vertices1[1].color = 0xff002f00;
+	vertices1[2].position = Vector3(0.5f, 0.5f, 0.5f);
+	vertices1[2].color = 0xff0090ff;
+
+	mem._data = vertices1;
+	mem._size = sizeof(vertices1);
+
+	_vertexBuffer1 = VIDEO->CreateVertexBuffer(&mem, declHandle);
+	_vertexBuffer2 = _vertexBuffer0;
 
 	uint16 indices[3];
+
 	indices[0] = 0;
 	indices[1] = 1;
 	indices[2] = 2;
-	//_indexHandle = VIDEO->GetIndexBufferManager()->CreateStatic(3, IndexBuffer::IndexFormat::Uint16, indices);
 
+	mem._data = indices;
+	mem._size = sizeof(indices);
+	_indexBuffer = VIDEO->CreateIndexBuffer(&mem);
 
 	_firstWindowPos.x = 100;
 	_firstWindowPos.y = 100;
@@ -199,14 +243,31 @@ bool32 BaseScene::Init()
 bool32 BaseScene::Update(float deltaTime)
 {
 	bool32 result = true;
+	_renderView->Begin();
 
-	_world.Refresh();
+	_renderView->SetEffect(_effect);
 
-	//_moveSystem.Update(deltaTime);
+	_renderView->Submit(_vertexBuffer0);
+	_renderView->Submit(_indexBuffer);
+	_renderView->Draw();
 
-	//_camera.UpdateMatrix();
-	//_camera.UpdateCamToDevice(gpDevice);
+	Matrix world;
+	MatrixTranslation(&world, 1.0f, 0.0f, 0.0f);
 
+	_renderView->SetTransform(world);
+	_renderView->Submit(_vertexBuffer1);
+	_renderView->Submit(_indexBuffer);
+	_renderView->Draw();
+
+	MatrixTranslation(&world, -1.0f, 0.0f, 0.0f);
+	_renderView->SetTransform(world);
+	_renderView->Submit(_vertexBuffer2);
+	_renderView->Submit(_indexBuffer);
+	_renderView->Draw();
+
+	_renderView->End();
+
+	VIDEO->Render(*_renderView);
 	return result;
 }
 
@@ -215,87 +276,7 @@ bool32 BaseScene::Render()
 {
 	bool32 result = true;
 
-	//im::BeginFrame(gEngine->GetInput()->mouse, 
-	//	gEngine->GetInput()->keyboard.GetCharInput(), 
-	//	gEngine->GetInput()->keyboard.GetShiftDown());
 
-	//im::BeginScrollArea("Editor", _firstWindowPos, 400, 600, &_scroll);
-
-	//im::Button("X");
-	//im::Button("Y");
-	//im::Button("Z");
-
-	//if (im::Collapse("col", _collapse))
-	//{
-	//	_collapse = !_collapse;
-	//}
-	//if (!_collapse)
-	//{
-	//	im::Indent();
-
-	//	im::Button("yaya");
-	//	im::Button("tototo");
-
-	//	im::Unindent();
-	//}
-	//
-	//im::Slider("Slider", &_sliderValue, -10, 10, 0.1);
-
-	//static int test = 0;
-	//if (test % 20 == 0)
-	//{
-	//	std::cout << _sliderValue << std::endl;
-	//}
-	//test++;
-
-	//if (im::Check("toto", _checked))
-	//{
-	//	_checked = !_checked;
-	//}
-
-	//im::EndScrollArea();
-
-
-	//im::BeginScrollArea("Editor", _secondWindowPos, 400, 600, &_scroll);
-
-	//im::Button("X");
-	//im::Button("Y");
-	//im::Button("Z");
-
-	//if (im::Collapse("col", _collapse))
-	//{
-	//	_collapse = !_collapse;
-	//}
-	//if (!_collapse)
-	//{
-	//	im::Indent();
-
-	//	im::Button("yaya");
-	//	im::Button("tototo");
-
-	//	im::Unindent();
-	//}
-
-	//im::Slider("Slider", &_sliderValue, -10, 10, 0.1);
-
-
-	//if (im::Check("toto", _checked))
-	//{
-	//	_checked = !_checked;
-	//}
-
-	//if (im::Edit(_strings1))
-	//{
-	//	std::cout << _strings1 << std::endl;
-	//}
-	//if (im::Edit(_strings2))
-	//{
-	//	std::cout << _strings2 << std::endl;
-	//}
-	//im::EndScrollArea();
-	//im::EndFrame();
-
-	//_renderSystem.Update(0.0f);
 	return result;
 }
 

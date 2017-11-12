@@ -4,6 +4,7 @@
 #define SAFE_DELETE(p) if(p) {delete p; p = nullptr;}
 #define SAFE_DELETE_ARRAY(p) if(p) {delete [] p; p = nullptr;}
 #define COM_RELEASE(p) if(p) {p->Release(); p = nullptr;}
+#define SAFE_RELEASE(p) if(p) {p->Release(); p = nullptr;}
 
 #define HRESULT_CHECK(expression)  \
 { \
@@ -59,6 +60,7 @@
 #include "D3DCommon.h"
 
 extern HWND gWindowHandle;
+extern IDirect3DDevice9 *gpDevice;
 extern Engine *gEngine;
 
 #endif

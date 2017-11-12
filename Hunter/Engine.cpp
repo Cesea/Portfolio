@@ -60,8 +60,6 @@ void Engine::Run()
 		float deltaTime = APPTIMER->GetTargetTime();
 
 		_pScene->Update(deltaTime);
-		video::Submit(0);
-		video::DoFrame();
 
 		APPTIMER->Tick();
 
@@ -174,33 +172,23 @@ bool Engine::InitializePlatform(HINSTANCE instanceHandle)
 
 bool Engine::InitializeSystems()
 {
-
 	_pInput= std::make_shared<InputManager>(InputManager());
 	if (!_pInput->Init())
 	{
 		return false;
 	}
 
-	//_pInput->GetChannel().Add<InputSystem::KeyDownEvent, InputHandler>(handler);
-	//_pInput->GetChannel().Add<InputSystem::KeyPressedEvent, InputHandler>(handler);
-	//_pInput->GetChannel().Add<InputSystem::KeyReleasedEvent, InputHandler>(handler);
-	//_pInput->GetChannel().Add<InputSystem::MouseMoveEvent, InputHandler>(handler);
-	//_pInput->GetChannel().Add<InputSystem::MousePressedEvent, InputHandler>(handler);
-	//_pInput->GetChannel().Add<InputSystem::MouseReleasedEvent, InputHandler>(handler);
-	//_pInput->GetChannel().Add<InputSystem::MouseDownEvent, InputHandler>(handler);
+	_pVideo = std::shared_ptr<video::VideoDevice>(new video::VideoDevice());
+	if (!_pVideo->Init())
+	{
+		return false;
+	}
 
 	_pScene = std::make_shared<SceneManager>(SceneManager());
 	if (!_pScene->Init())
 	{
 		return false;
 	}
-
-	video::Init();
-	video::Reset(WINSIZEX, WINSIZEY);
-
-	video::SetViewRect(0, 0, 0, WINSIZEX, WINSIZEY);
-	video::SetViewClear(0, VIDEO_CLEAR_COLOR_BIT | VIDEO_CLEAR_DEPTH_BIT, 0xff00ff00, 1.0f, 0);
-
 
 	return true;
 }

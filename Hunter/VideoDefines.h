@@ -1,0 +1,38 @@
+#ifndef VIDEO_DEFINES_H
+#define VIDEO_DEFINES_H
+
+#define VIDEO_CHECK( expression )  \
+	{ \
+		if (FAILED(expression)) \
+		{ \
+			Assert(false); \
+		} \
+	}
+
+#define VIDEO_CHECK_TRACE(expression, text) \
+	{ \
+		if (FAILED(expression)) \
+		{ \
+			Console::Log(text); \
+			Assert(false); \
+		} \
+	}
+#define VIDEO_CONFIG_MAX_NUM_VERTEX_ELEMENTS 16
+#define INVALID_INDEX  0xffff
+
+#define VIDEO_CONFIG_VERTEXBUFFER_MAX_NUM 1024
+#define VIDEO_CONFIG_INDEXBUFFER_MAX_NUM 1024
+#define VIDEO_CONFIG_TEXTURE_MAX_NUM 512
+#define VIDEO_CONFIG_EFFECT_MAX_NUM 128
+#define VIDEO_CONFIG_DECL_MAX_NUM 128
+#define VIDEO_CONFIG_RENDER_VIEW_MAX_NUM 8 
+
+#define VIDEO_CONFIG_RESOURCE_INDEX_BIT 16 
+#define VIDEO_CONFIG_RESOURCE_COUNT_BIT 16 
+
+#define VIDEO_CONFIG_MATERIAL_TEXTURE_MAX_NUM 8
+
+#define VIDEO_CONFIG_MAX_MATRIX_CACHE 512
+#define VIDEO_CONFIG_MAX_COMMAND_BUFFER_SIZE (1024 * 6)
+
+#endif

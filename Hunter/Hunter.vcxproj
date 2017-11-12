@@ -166,8 +166,8 @@
     <ClCompile Include="Vector2.cpp" />
     <ClCompile Include="Vector3.cpp" />
     <ClCompile Include="Vector4.cpp" />
-    <ClCompile Include="Video.cpp" />
-    <ClCompile Include="VideoDevice9.cpp" />
+    <ClCompile Include="VideoDevice.cpp" />
+    <ClCompile Include="VideoResource.cpp" />
     <ClCompile Include="World.cpp" />
     <ClCompile Include="XMLManager.cpp" />
     <ClCompile Include="XmlSerializer.cpp" />
@@ -179,9 +179,7 @@
     <ClInclude Include="Assert.h" />
     <ClInclude Include="BaseScene.h" />
     <ClInclude Include="BaseSystem.h" />
-    <ClInclude Include="BitFlags.h" />
     <ClInclude Include="Camera.h" />
-    <ClInclude Include="CharSet.h" />
     <ClInclude Include="ClassTypeID.h" />
     <ClInclude Include="CollisionUtils.h" />
     <ClInclude Include="Color4F.h" />
@@ -246,9 +244,10 @@
     <ClInclude Include="Vector2.h" />
     <ClInclude Include="Vector3.h" />
     <ClInclude Include="Vector4.h" />
-    <ClInclude Include="Video.h" />
-    <ClInclude Include="VideoDevice9.h" />
-    <ClInclude Include="VideoPlatform.h" />
+    <ClInclude Include="VideoDefines.h" />
+    <ClInclude Include="VideoDevice.h" />
+    <ClInclude Include="VideoResource.h" />
+    <ClInclude Include="VideoResourceHandles.h" />
     <ClInclude Include="World.h" />
     <ClInclude Include="WorldEditor.h" />
     <ClInclude Include="XMLManager.h" />

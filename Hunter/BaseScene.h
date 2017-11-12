@@ -43,10 +43,15 @@ protected :
 
 	bool _checked{ false };
 
-	World _world;
+	video::RenderView *_renderView;
 
-	//MoveSystem _moveSystem;
-	//RenderSystem _renderSystem;
+	video::VertexBufferHandle _vertexBuffer0;
+	video::VertexBufferHandle _vertexBuffer1;
+	video::VertexBufferHandle _vertexBuffer2;
+
+	video::IndexBufferHandle _indexBuffer;
+
+	video::EffectHandle _effect;
 
 };
 
