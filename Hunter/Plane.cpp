@@ -21,10 +21,6 @@ Plane::Plane(const Plane & other)
 	this->d = other.d;
 }
 
-Plane::Plane(const Vector3 & a, const Vector3 & b, const Vector3 & c)
-{
-}
-
 Plane Plane::operator=(const Plane & other)
 {
 	return Plane(other.a, other.b, other.c, other.d);
@@ -79,6 +75,25 @@ bool Plane::operator==(const Plane &other) const
 bool Plane::operator!=(const Plane &other) const
 {
 	return !(*this == other);
+}
+
+void Plane::Create(const Vector3 & a, const Vector3 & b, const Vector3 & c)
+{
+	//평면의 노말 
+	Vector3 normal;
+	Vector3 edge1 = b - a;
+	Vector3 edge2 = c - a;
+	Vec3Cross(&normal, &edge1, &edge2);
+	Vec3Normalize(&normal, &normal);
+
+	//평면의 노말 방향으로 원점까지의 최단 거리
+	float dist = -Vec3Dot(&normal, &a);
+
+	//평면값 쓰자
+	this->a = normal.x;
+	this->b = normal.y;
+	this->c = normal.z;
+	this->d = dist;
 }
 
 Plane operator*(float f, const Plane & other)

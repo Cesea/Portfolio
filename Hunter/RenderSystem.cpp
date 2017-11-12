@@ -9,23 +9,28 @@ RenderSystem::~RenderSystem()
 {
 }
 
-void RenderSystem::Render(video::RenderView &renderView)
+void RenderSystem::Render(video::RenderView &renderView, const Camera &camera)
 {
 	auto &entities = GetEntities();
+	renderView.SetViewProjection(camera.GetViewMatrix(), camera.GetProjectionMatrix());
+
 	renderView.PreRender();
 	renderView.Begin();
 	for (int32 i = 0; i < entities.size(); ++i)
 	{
-
-		Matrix world = entities[i].GetComponent<TransformComponent>().GetFinalMatrix();
+		TransformComponent &transformComponent = entities[i].GetComponent<TransformComponent>();
 		RenderComponent &refRenderComponent = entities[i].GetComponent<RenderComponent>();
 
-		renderView.SetTransform(world);
-		//renderView->SetMaterial(refRenderComponent._material);
-		renderView.SetEffect(refRenderComponent._effect);
-		renderView.Submit(refRenderComponent._vertexBuffer);
-		renderView.Submit(refRenderComponent._indexBuffer);
-		renderView.Draw();
+		if (camera.GetFrustum().IsSphereInFrustum(transformComponent.GetWorldPosition(), 1.0f))
+		{
+			renderView.SetTransform(transformComponent.GetFinalMatrix());
+
+			renderView.SetMaterial(refRenderComponent._material);
+			renderView.SetEffect(refRenderComponent._effect);
+			renderView.Submit(refRenderComponent._vertexBuffer);
+			renderView.Submit(refRenderComponent._indexBuffer);
+			renderView.Draw();
+		}
 	}
 	renderView.End();
 	renderView.PostRender();
@@ -45,3 +50,8 @@ void RenderSystem::OnEntityAdded(Entity & entity)
 void RenderSystem::OnEntityRemoved(Entity & entity)
 {
 }
+
+//void RenderSystem::SubmitMesh(Mesh & mesh)
+//{
+//
+//}

@@ -1,18 +1,18 @@
 #include "stdafx.h"
 #include "BaseScene.h"
 
-#include "tinyxml2.h"
+#include "XMesh.h"
 
 using namespace video;
 
 struct Vertex
 {
 	Vector3 position;
-	D3DXCOLOR color;
+	Vector2 uv;
 
 	enum
 	{
-		FVF = D3DFVF_XYZ | D3DFVF_DIFFUSE
+		FVF = D3DFVF_XYZ | D3DFVF_TEX1
 	};
 };
 
@@ -33,42 +33,38 @@ bool32 BaseScene::Init()
 {
 	bool32 result = true;
 
-	_effect = VIDEO->CreateEffect("../resources/shaders/basic.fx", "BasicShader");
+	_effect = VIDEO->CreateEffect("../resources/shaders/basicUV.fx", "BasicShaderUV");
 
 	video::RenderViewHandle renderViewHandle= VIDEO->CreateRenderView();
 	_renderView = VIDEO->GetRenderView(renderViewHandle);
 	_renderView->_clearColor = 0xff55330;
 
-	Matrix view;
-	MatrixLookAtLH(&view, &Vector3(0.0f, -0.0f, -2.0f), &Vector3(0.0f, 0.0f, 0.0f), &Vector3(0.0f, 1.0f, 0.0f));
-	Matrix projection;
-	MatrixPerspectiveFovLH(&projection, D3DX_PI / 2.0f, (float)WINSIZEX / (float)WINSIZEY, 0.1f, 1000.0f);
-	_renderView->SetViewProjection(view, projection);
 
 	VertexDecl vertexDecl;
 	vertexDecl.Begin();
 	vertexDecl.Add(VertexElement(0, 0, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0));
-	vertexDecl.Add(VertexElement(0, sizeof(Vector3), D3DDECLTYPE_FLOAT4, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_COLOR, 0));
+	vertexDecl.Add(VertexElement(0, sizeof(Vector3), D3DDECLTYPE_FLOAT2, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 0));
 	vertexDecl.End(sizeof(Vertex));
 
 	VertexDeclHandle declHandle = VIDEO->CreateVertexDecl(&vertexDecl);
 
 	Vertex vertices[3];
 	vertices[0].position = Vector3(0.0f, 0.5f, 0.5f);
-	vertices[0].color = 0xffff0000;
+	vertices[0].uv = Vector2(0.5f, 0.0f);
 	vertices[1].position = Vector3(0.5f, -0.5f, 0.5f);
-	vertices[1].color = 0xff00ff00;
+	vertices[1].uv = Vector2(1.0f, 1.0f);
 	vertices[2].position = Vector3(-0.5f, -0.5f, 0.5f);
-	vertices[2].color = 0xff0000ff;
+	vertices[2].uv = Vector2(0.0f, 1.0f);
 
 	Memory mem;
 	mem._data = vertices;
 	mem._size = sizeof(vertices);
 
-	_vertexBuffer0 = VIDEO->CreateVertexBuffer(&mem, declHandle);
+	_vertexBuffer0 = VIDEO->CreateVertexBuffer(&mem, declHandle, "testVertex");
+
+	VertexBufferHandle test = VIDEO->GetVertexBuffer("testVertex");
 
 	uint16 indices[3];
-
 	indices[0] = 0;
 	indices[1] = 1;
 	indices[2] = 2;
@@ -77,16 +73,27 @@ bool32 BaseScene::Init()
 	mem._size = sizeof(indices);
 	_indexBuffer = VIDEO->CreateIndexBuffer(&mem);
 
+	TextureHandle textureHandle0 = VIDEO->CreateTexture("../resources/textures/test.png", "test1");
+	TextureHandle textureHandle1 = VIDEO->CreateTexture("../resources/textures/test2.png", "test2");
+
+	_material0 = VIDEO->CreateMaterial("test");
+	VIDEO->AddTextureToMaterial(_material0, VIDEO_TEXTURE0, textureHandle0);
+
+	_material1 = VIDEO->CreateMaterial("test2");
+	VIDEO->AddTextureToMaterial(_material1, VIDEO_TEXTURE0, textureHandle1);
+
+
 	_world.AddSystem<RenderSystem>(_renderSystem);
 	_world.AddSystem<TransformSystem>(_transformSystem);
 
 	_world.Refresh();
 
-
-	for (int32 y = 0; y < 20; ++y)
+	for (int32 y = 0; y < 40; ++y)
 	{
-		for (uint32 x = 0; x < 20; ++x)
+		for (uint32 x = 0; x < 40; ++x)
 		{
+			uint32 index = x + y * 40;
+
 			_entities.push_back(_world.CreateEntity());
 			Entity &entity = _entities.back();
 			entity.Activate();
@@ -94,11 +101,19 @@ bool32 BaseScene::Init()
 			RenderComponent &triangleRender = entity.AddComponent<RenderComponent>();
 			triangleRender._effect = _effect;
 			triangleRender._vertexBuffer = _vertexBuffer0;
+			triangleRender._material = (index % 2) ? _material0 : _material1;
+			triangleRender.radius = 1.0f;
 
 			TransformComponent &triangleTransform = entity.AddComponent<TransformComponent>();
 			triangleTransform.MovePositionWorld(x, y, 0);
 		}
 	}
+
+	
+	XMesh mesh;
+	mesh.Init("../resources/models/knight/Knight.x");
+
+	_camera.GetTransform().MovePositionSelf(0.0f, 0.0f, -20.0f);
 
 	_active = true;
 	return result;
@@ -116,8 +131,6 @@ bool32 BaseScene::Update(float deltaTime)
 	//Update Camera
 	_transformSystem.UpdateTransform(_camera.GetTransform());
 	_camera.UpdateMatrix();
-	_renderView->SetViewProjection(_camera.GetViewMatrix(), _camera.GetProjectionMatrix());
-
 	return result;
 }
 
@@ -125,24 +138,7 @@ bool32 BaseScene::Render()
 {
 	bool32 result = true;
 
-	_renderSystem.Render(*_renderView);
-
-	//_renderView->Begin();
-	//_renderView->SetEffect(_effect);
-	//_renderView->Submit(_vertexBuffer0);
-	//_renderView->Submit(_indexBuffer);
-	//_renderView->Draw();
-	//Matrix world;
-	//MatrixTranslation(&world, 1.0f, 0.0f, 0.0f);
-	//_renderView->SetTransform(world);
-	//_renderView->Submit(_vertexBuffer1);
-	//_renderView->Submit(_indexBuffer);
-	//_renderView->Draw();
-	//MatrixTranslation(&world, -1.0f, 0.0f, 0.0f);
-	//_renderView->SetTransform(world);
-	//_renderView->Submit(_vertexBuffer2);
-	//_renderView->Draw();
-	//_renderView->End();
+	_renderSystem.Render(*_renderView, _camera);
 
 	VIDEO->Render(*_renderView);
 

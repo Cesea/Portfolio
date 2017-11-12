@@ -10,13 +10,15 @@ public:
 	RenderSystem();
 	virtual ~RenderSystem() override;
 
-	void Render(video::RenderView &renderView);
+	void Render(video::RenderView &renderView, const Camera &camera);
 
 	virtual void Initialize();
 
 	virtual void OnEntityAdded(Entity& entity);
 
 	virtual void OnEntityRemoved(Entity& entity);
+
+	//void SubmitMesh(Mesh &mesh);
 
 };
 

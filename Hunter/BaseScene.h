@@ -66,16 +66,18 @@ protected :
 	video::VertexBufferHandle _vertexBuffer0;
 	video::VertexBufferHandle _vertexBuffer1;
 	video::VertexBufferHandle _vertexBuffer2;
-
 	video::IndexBufferHandle _indexBuffer;
 
 	video::EffectHandle _effect;
+
+	video::MaterialHandle _material0;
+	video::MaterialHandle _material1;
+
 
 	World _world;
 
 	TransformSystem _transformSystem;
 	RenderSystem _renderSystem;
-
 
 	std::vector<Entity> _entities;
 

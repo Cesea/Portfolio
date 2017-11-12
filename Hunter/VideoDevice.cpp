@@ -15,7 +15,9 @@ VideoDevice::VideoDevice()
 	_textureHandlePool(VIDEO_CONFIG_VERTEXBUFFER_MAX_NUM),
 	_effectHandlePool(VIDEO_CONFIG_VERTEXBUFFER_MAX_NUM),
 	_vertexDeclHandlePool(VIDEO_CONFIG_VERTEXBUFFER_MAX_NUM),
-	_renderViewHandlePool(VIDEO_CONFIG_RENDER_VIEW_MAX_NUM)
+	_renderViewHandlePool(VIDEO_CONFIG_RENDER_VIEW_MAX_NUM),
+	_materialHandlePool(VIDEO_CONFIG_MATERIAL_MAX_NUM),
+	_modelHandlePool(VIDEO_CONFIG_MODEL_MAX_NUM)
 {
 }
 
@@ -39,8 +41,6 @@ bool VideoDevice::Init()
 	MatrixLookAtLH(&view, &Vector3(0.0f, 0.0f, -2.0f), &Vector3(0.0f, 0.0f, 0.0f), &Vector3(0.0f, 1.0f, 0.0f));
 	MatrixPerspectiveFovLH(&projection, D3DX_PI * 0.5f, (float)WINSIZEX / (float)WINSIZEY, 0.1f, 1000.0f);
 
-	//_commandBucket.Init(1000, view, projection);
-
 	return true;
 }
 
@@ -59,6 +59,10 @@ void VideoDevice::Update(float deltaTime)
 
 void video::VideoDevice::Render(RenderView & renderView)
 {
+	static uint32 count = 0;
+
+	uint32 drawCount = 0;
+
 	renderView.PreRender();
 
 	_pDevice->Clear(0, nullptr, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER | D3DCLEAR_STENCIL, renderView._clearColor, 1.0f, 0);
@@ -66,6 +70,7 @@ void video::VideoDevice::Render(RenderView & renderView)
 
 	CommandBuffer::Enum command;
 	renderView._commandBuffer.Read<CommandBuffer::Enum>(command);
+
 
 	RenderState sendingState{};
 	Matrix sendingMatrix[3];
@@ -101,6 +106,9 @@ void video::VideoDevice::Render(RenderView & renderView)
 				VertexBufferHandle handle;
 				renderView._commandBuffer.Read<VertexBufferHandle>(handle);
 				sendingState._vertexBuffer= handle;
+
+				renderView._commandBuffer.Read<uint32>(sendingState._startVertex);
+				renderView._commandBuffer.Read<uint32>(sendingState._numPrim);
 			} break;
 
 			case video::CommandBuffer::eSetIndexBuffer:
@@ -108,6 +116,11 @@ void video::VideoDevice::Render(RenderView & renderView)
 				IndexBufferHandle handle;
 				renderView._commandBuffer.Read<IndexBufferHandle>(handle);
 				sendingState._indexBuffer= handle;
+
+				renderView._commandBuffer.Read<uint32>(sendingState._startIndex);
+				renderView._commandBuffer.Read<uint32>(sendingState._numVertices);
+				renderView._commandBuffer.Read<uint32>(sendingState._numPrim);
+
 			} break;
 
 			//case video::CommandBuffer::eSetMesh:
@@ -117,12 +130,12 @@ void video::VideoDevice::Render(RenderView & renderView)
 			{
 				MaterialHandle handle;
 				renderView._commandBuffer.Read<MaterialHandle>(handle);
-
 				sendingState._material= handle;
 
 			} break;
 			case video::CommandBuffer::eDraw:
 			{
+				drawCount++;
 				if (sendingState._vertexBuffer.IsValid())
 				{
 					if (sendingState._indexBuffer.IsValid())
@@ -144,9 +157,18 @@ void video::VideoDevice::Render(RenderView & renderView)
 		}
 	}
 	renderView.PostRender();
-
+	
 	_pDevice->EndScene();
 	_pDevice->Present(nullptr, nullptr, NULL, nullptr);
+
+#if defined (DEBUG) || defined (_DEBUG) 
+	count++;
+	if (count % 60 == 0)
+	{
+		Console::Log("Draw Count : % d\n", drawCount);
+	}
+#endif
+
 }
 
 bool VideoDevice::InitD3D(HWND windowHandle)
@@ -254,20 +276,16 @@ void video::VideoDevice::DrawPrimitive(const video::RenderState & renderState, M
 	Material *materialPtr {};
 	VertexDecl *declPtr{};
 
-	bool bufferDirty = false;
-	bool materialDirty = false;
-	bool declDirty = false;
-
 	//머테리얼 설정 여부 확인
-	//if (renderState._materialHandle != _activeMaterialHandle)
-	//{
-	//	_activeMaterialHandle = renderState._materialHandle;
-	//}
-	//else
-	//{
-	//	materialPtr = &_materials[_activeMaterialHandle.index];
-	//}
+	if (renderState._material != _activeState._material)
+	{
+		_activeState._material = renderState._material;
+	}
 
+	if (_activeState._material.IsValid())
+	{
+		materialPtr = &_materials[_activeState._material.index];
+	}
 
 	if (renderState._vertexBuffer != _activeState._vertexBuffer)
 	{
@@ -292,7 +310,6 @@ void video::VideoDevice::DrawPrimitive(const video::RenderState & renderState, M
 		declPtr = &_vertexDecls[_activeState._vertexBuffer.index];
 	}
 
-
 	if (renderState._effect != _activeState._effect)
 	{
 		_activeState._effect = renderState._effect;
@@ -303,13 +320,28 @@ void video::VideoDevice::DrawPrimitive(const video::RenderState & renderState, M
 	effectPtr->SetMatrix("gView", matrices[1]);
 	effectPtr->SetMatrix("gProjection", matrices[2]);
 
-	uint32 numPrim = (vertexPtr->_size / declPtr->_stride);
+	if (materialPtr)
+	{
+		for (uint32 i = 0; i < VIDEO_CONFIG_MATERIAL_TEXTURE_MAX_NUM; ++i)
+		{
+			if (materialPtr->_textureHandles[i].IsValid())
+			{
+				effectPtr->SetTexture(PredefinedUniform::ParamName[PredefinedUniform::Enum::eTexture0 + i], 
+					_textures[materialPtr->_textureHandles[i].index]);
+			}
+		}
+	}
+	uint32 numPrim{};
+	uint32 startVertex{};
+
+	numPrim = (0 != renderState._numVertices) ? (renderState._numPrim) : (vertexPtr->_size / declPtr->_stride);
+	startVertex = (0 != renderState._startVertex) ? (renderState._startVertex) : (0);
 
 	uint32 numPass = effectPtr->BeginEffect();
 	for (uint32 i = 0; i < numPass; ++i)
 	{
 		effectPtr->BeginPass(i);
-		_pDevice->DrawPrimitive(D3DPT_TRIANGLELIST, 0, numPrim);
+		_pDevice->DrawPrimitive(D3DPT_TRIANGLELIST, startVertex, numPrim);
 		effectPtr->EndPass();
 	}
 	effectPtr->EndEffect();
@@ -323,19 +355,15 @@ void video::VideoDevice::DrawIndexPrimitive(const video::RenderState & renderSta
 	Material *materialPtr{};
 	VertexDecl *declPtr{};
 
-	bool bufferDirty = false;
-	bool materialDirty = false;
-	bool declDirty = false;
-
 	//머테리얼 설정 여부 확인
-	//if (renderState._materialHandle != _activeMaterialHandle)
-	//{
-	//	_activeMaterialHandle = renderState._materialHandle;
-	//}
-	//else
-	//{
-	//	materialPtr = &_materials[_activeMaterialHandle.index];
-	//}
+	if (renderState._material != _activeState._material)
+	{
+		_activeState._material = renderState._material;
+	}
+	if (_activeState._material.IsValid())
+	{
+		materialPtr = &_materials[_activeState._material.index];
+	}
 
 	if (renderState._vertexBuffer!= _activeState._vertexBuffer)
 	{
@@ -377,15 +405,31 @@ void video::VideoDevice::DrawIndexPrimitive(const video::RenderState & renderSta
 	effectPtr->SetMatrix("gView", matrices[1]);
 	effectPtr->SetMatrix("gProjection", matrices[2]);
 
-	uint32 numVertices = (vertexPtr->_size / declPtr->_stride);
-	uint32 numIndices = (indexPtr->_size / 2);
-	uint32 numPrim = (numIndices / 3);
+	if (materialPtr)
+	{
+		for (uint32 i = 0; i < VIDEO_CONFIG_MATERIAL_TEXTURE_MAX_NUM; ++i)
+		{
+			if (materialPtr->_textureHandles[i].IsValid())
+			{
+				effectPtr->SetTexture(PredefinedUniform::ParamName[PredefinedUniform::Enum::eTexture0 + i],
+					_textures[materialPtr->_textureHandles[i].index]);
+			}
+		}
+	}
+
+	uint32 numVertices{};
+	uint32 numPrim{};
+	uint32 startIndex{};
+
+	numVertices = (0 != renderState._numVertices) ? (renderState._numVertices) : (vertexPtr->_size / declPtr->_stride);
+	numPrim = (0 != renderState._numPrim) ? (renderState._numPrim) : ((indexPtr->_size / 2 ) / 3);
+	startIndex = (0 != renderState._startIndex) ? (renderState._startIndex) : 0;
 
 	uint32 numPass = effectPtr->BeginEffect();
 	for (uint32 i = 0; i < numPass; ++i)
 	{
 		effectPtr->BeginPass(i);
-		_pDevice->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, 0, numVertices, 0, numPrim);
+		_pDevice->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, 0, numVertices, startIndex, numPrim);
 		effectPtr->EndPass();
 	}
 	effectPtr->EndEffect();
@@ -410,6 +454,11 @@ VertexBufferHandle video::VideoDevice::CreateVertexBuffer(Memory * memory, Verte
 	return result;
 }
 
+VertexBufferHandle video::VideoDevice::GetVertexBuffer(const std::string & name)
+{
+	return _vertexBufferPool.Get(name);
+}
+
 void video::VideoDevice::DestroyVertexBuffer(VertexBufferHandle handle)
 {
 	_vertexBuffers[handle.index].Destroy();
@@ -426,6 +475,11 @@ IndexBufferHandle video::VideoDevice::CreateIndexBuffer(Memory * memory, const s
 	return result;
 }
 
+IndexBufferHandle video::VideoDevice::GetIndexBuffer(const std::string & name)
+{
+	return _indexBufferPool.Get(name);
+}
+
 void video::VideoDevice::DestroyIndexBuffer(IndexBufferHandle handle)
 {
 	_indexBuffers[handle.index].Destroy();
@@ -437,6 +491,11 @@ VertexDeclHandle video::VideoDevice::CreateVertexDecl(const VertexDecl *decl)
 	VertexDeclHandle result = _vertexDeclHandlePool.Create();
 	memcpy(&_vertexDecls[result.index], decl, sizeof(VertexDecl));
 	return result;
+}
+
+VertexDeclHandle video::VideoDevice::GetVertexDecl(const std::string & name)
+{
+	return _vertexDeclHandlePool.Get(name);
 }
 
 void video::VideoDevice::DestroyVertexDecl(VertexDeclHandle handle)
@@ -455,6 +514,11 @@ TextureHandle video::VideoDevice::CreateTexture(const std::string &fileName, con
 	return result;
 }
 
+TextureHandle video::VideoDevice::GetTexture(const std::string & name)
+{
+	return _textureHandlePool.Get(name);
+}
+
 void video::VideoDevice::DestroyTexture(TextureHandle handle)
 {
 	_textures[handle.index].Destroy();
@@ -471,6 +535,11 @@ EffectHandle video::VideoDevice::CreateEffect(const std::string &fileName, const
 	return result;
 }
 
+EffectHandle video::VideoDevice::GetEffect(const std::string & name)
+{
+	return _effectHandlePool.Get(name);
+}
+
 void video::VideoDevice::DestroyEffect(EffectHandle handle)
 {
 	_effects[handle.index].Destroy();
@@ -484,10 +553,38 @@ RenderViewHandle video::VideoDevice::CreateRenderView(const std::string & name)
 	return result;
 }
 
+RenderViewHandle video::VideoDevice::GetRenderView(const std::string & name)
+{
+	return _renderViewHandlePool.Get(name);
+}
+
 void video::VideoDevice::DestroyRenderView(RenderViewHandle handle)
 {
 	_renderViews[handle.index].Destroy();
 	_renderViewHandlePool.Remove(handle);
+}
+
+MaterialHandle video::VideoDevice::CreateMaterial(const std::string & name)
+{
+	MaterialHandle result = _materialHandlePool.Create(name);
+	_materials[result.index].Create();
+	return result;
+}
+
+MaterialHandle video::VideoDevice::GetMaterial(const std::string & name)
+{
+	return _materialHandlePool.Get(name);
+}
+
+void video::VideoDevice::DestroyMaterial(MaterialHandle handle)
+{
+	_materials[handle.index].Destroy();
+	_materialHandlePool.Remove(handle);
+}
+
+void video::VideoDevice::AddTextureToMaterial(MaterialHandle material, uint32 textureSlot, TextureHandle texture)
+{
+	_materials[material.index].AddTexture(textureSlot, texture);
 }
 
 void video::VideoDevice::SetCurrentRenderView(RenderViewHandle handle)

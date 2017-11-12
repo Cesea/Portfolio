@@ -1,6 +1,8 @@
 #ifndef COLLISION_COMPONENT_H
 #define COLLISION_COMPONENT_H
 
+#include "Component.h"
+
 struct BoundingSphere
 {
 	Vector3 _localCenter;
@@ -22,18 +24,13 @@ struct CollisionComponent : public Component
 	CollisionComponent();
 	virtual ~CollisionComponent();
 
-	enum BoundingType
-	{
-		eBoundingBox = 0,
-		eBoundingSphere
-	};
+	Vector3 _localCenter;
+	float _radius;
 
-	BoundingType _type;
-	union
-	{
-		BoundingBox boundingBox;
-		BoundingSphere boundingSphere;
-	};
+	Vector3 _hafSize;
+
+	Vector3 _locaMinPos;
+	Vector3 _locaMaxPos;
 };
 
 

@@ -351,16 +351,28 @@ namespace video
 		_commandBuffer.Write<EffectHandle>(handle);
 	}
 
-	void RenderView::Submit(VertexBufferHandle handle)
+	void RenderView::SetMaterial(MaterialHandle handle)
+	{
+		_commandBuffer.Write<CommandBuffer::Enum>(CommandBuffer::Enum::eSetMaterial);
+		_commandBuffer.Write<MaterialHandle>(handle);
+	}
+
+	void RenderView::Submit(VertexBufferHandle handle, uint32 startVertex, uint32 primCount)
 	{
 		_commandBuffer.Write<CommandBuffer::Enum>(CommandBuffer::eSetVertexBuffer);
 		_commandBuffer.Write<VertexBufferHandle>(handle);
+		_commandBuffer.Write<uint32>(startVertex);
+		_commandBuffer.Write<uint32>(primCount);
 	}
 
-	void RenderView::Submit(IndexBufferHandle handle)
+	void RenderView::Submit(IndexBufferHandle handle, uint32 startIndex, uint32 numVertices, uint32 primCount)
 	{
 		_commandBuffer.Write<CommandBuffer::Enum>(CommandBuffer::eSetIndexBuffer);
 		_commandBuffer.Write<IndexBufferHandle>(handle);
+
+		_commandBuffer.Write<uint32>(startIndex);
+		_commandBuffer.Write<uint32>(numVertices);
+		_commandBuffer.Write<uint32>(primCount);
 	}
 
 	void RenderView::Draw()
@@ -382,4 +394,25 @@ namespace video
 	{
 	}
 
+	bool Material::Create()
+	{
+		for (uint32 i = 0; i < VIDEO_CONFIG_MATERIAL_TEXTURE_MAX_NUM; ++i)
+		{
+			_textureHandles[i].MakeInvalid();
+		}
+		return true;
+	}
+
+	void Material::Destroy()
+	{
+		for (uint32 i = 0; i < VIDEO_CONFIG_MATERIAL_TEXTURE_MAX_NUM; ++i)
+		{
+			_textureHandles[i].MakeInvalid();
+		}
+	}
+	void Material::AddTexture(uint32 textureSlot, TextureHandle handle)
+	{
+		Assert(textureSlot < VIDEO_CONFIG_MATERIAL_TEXTURE_MAX_NUM);
+		_textureHandles[textureSlot] = handle;
+	}
 }

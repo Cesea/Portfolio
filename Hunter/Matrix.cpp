@@ -135,7 +135,9 @@ Matrix Matrix::operator-() const
 
 Matrix Matrix::operator*(const Matrix & other) const
 {
-	return D3DXMATRIX::operator*(other);
+	Matrix result;
+	MatrixMultiply(&result, this, &other);
+	return result;
 }
 
 Matrix Matrix::operator+(const Matrix & other) const

@@ -148,6 +148,20 @@ namespace video
 		}
 	};
 
+	struct ModelHandle : public VideoResourceHandle
+	{
+		ModelHandle()
+		{
+			this->index = 0;
+			this->count = 0;
+		}
+		ModelHandle(uint16 index, uint16 count)
+		{
+			this->index = index;
+			this->count = count;
+		}
+	};
+
 	struct FrameBufferHandle : public VideoResourceHandle
 	{
 		FrameBufferHandle()

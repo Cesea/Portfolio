@@ -98,10 +98,15 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PrecompiledHeader>Use</PrecompiledHeader>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalDependencies>d3d9.lib;d3dx9.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Lib\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -134,8 +139,10 @@
     <ClCompile Include="EntityComponentStorage.cpp" />
     <ClCompile Include="EntityIDPool.cpp" />
     <ClCompile Include="Filter.cpp" />
+    <ClCompile Include="Frustum.cpp" />
     <ClCompile Include="Hash.cpp" />
     <ClCompile Include="imguiRenderer.cpp" />
+    <ClCompile Include="MathUtils.cpp" />
     <ClCompile Include="Matrix.cpp" />
     <ClCompile Include="MoveComponent.cpp" />
     <ClCompile Include="Node.cpp" />
@@ -159,6 +166,7 @@
     <ClCompile Include="SceneManager.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="TransformSystem.cpp" />
     <ClCompile Include="Variant.cpp" />
@@ -169,6 +177,7 @@
     <ClCompile Include="VideoDevice.cpp" />
     <ClCompile Include="VideoResource.cpp" />
     <ClCompile Include="World.cpp" />
+    <ClCompile Include="XMesh.cpp" />
     <ClCompile Include="XMLManager.cpp" />
     <ClCompile Include="XmlSerializer.cpp" />
   </ItemGroup>
@@ -189,16 +198,19 @@
     <ClInclude Include="ContainerCheck.h" />
     <ClInclude Include="DataBase.h" />
     <ClInclude Include="DebugDraw.h" />
+    <ClInclude Include="DXUtils.h" />
     <ClInclude Include="Entity.h" />
     <ClInclude Include="EntityComponentStorage.h" />
     <ClInclude Include="EntityComponentSystem.h" />
     <ClInclude Include="EntityIDPool.h" />
     <ClInclude Include="Filter.h" />
+    <ClInclude Include="Frustum.h" />
     <ClInclude Include="GameUtils.h" />
     <ClInclude Include="Hash.h" />
     <ClInclude Include="imguiRenderer.h" />
     <ClInclude Include="Allocators.h" />
     <ClInclude Include="Math.h" />
+    <ClInclude Include="MathUtils.h" />
     <ClInclude Include="Matrix.h" />
     <ClInclude Include="Memory.h" />
     <ClInclude Include="MoveComponent.h" />
@@ -250,6 +262,7 @@
     <ClInclude Include="VideoResourceHandles.h" />
     <ClInclude Include="World.h" />
     <ClInclude Include="WorldEditor.h" />
+    <ClInclude Include="XMesh.h" />
     <ClInclude Include="XMLManager.h" />
     <ClInclude Include="XmlSerializer.h" />
   </ItemGroup>

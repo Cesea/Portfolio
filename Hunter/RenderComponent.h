@@ -3,6 +3,9 @@
 
 #include "Component.h"
 
+
+
+
 struct RenderComponent : public Component
 {
 public:
@@ -10,11 +13,14 @@ public:
 	virtual ~RenderComponent() {}
 
 public :
-	video::VertexBufferHandle _vertexBuffer;
-	video::IndexBufferHandle _indexBuffer;
+	video::VertexBufferHandle _vertexBuffer{};
+	video::IndexBufferHandle _indexBuffer{};
+	video::MaterialHandle _material{};
 
-	video::EffectHandle _effect;
-	//SurfaceMaterialHandle _materialHandle;
+	video::EffectHandle _effect{};
+
+	float radius{};
+
 };
 
 #endif

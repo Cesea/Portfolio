@@ -7,6 +7,8 @@
 #include "imguiRenderer.h"
 #include "DebugDraw.h"
 
+#include "DXUtils.h"
+
 
 //TODOs
 //1. DynamicVertexBuffer, DynamicIndexBuffer를 만들자... Update
@@ -50,103 +52,51 @@ namespace video
 		LPDIRECT3DDEVICE9 GetDevice() { return _pDevice; }
 		EventChannel GetChannel() { return _channel; }
 
-		//CommandBucket<uint32> &GetCommandBucket() { return _commandBucket; }
-
-		//이 모양으로 가자....
-		//IndexBufferHandle CreateIndexBuffer(DataPackage* mem, uint16 flags)
-		//{
-		//	IndexBufferHandle result = _indexPool.GetNextFreeHandle();
-		//	_indexBuffers[result.index].Create(mem->Size(), mem->Data(), flags);
-		//	return result;
-		//}
-		//void DestroyIndexBuffer(IndexBufferHandle handle)
-		//{
-		//	_indexBuffers[handle.index].Destroy();
-		//}
-		//void CreateVertexDecl(VertexDeclHandle handle, const VertexDecl& decl)
-		//{
-		//	VertexDecl& refDecl = _vertexDecls[handle.index];
-		//	memcpy(&refDecl, &decl, sizeof(VertexDecl));
-		//}
-		//void DestroyVertexDecl(VertexDeclHandle /*handle*/)
-		//{
-		//}
-		//void CreateVertexBuffer(VertexBufferHandle handle, DataPackage* mem,
-		//	VertexDeclHandle declHandle, uint16 /*_flags*/)
-		//{
-		//	_vertexBuffers[handle.index].Create(mem->Size(), mem->Data(), declHandle);
-		//}
-		//void DestroyVertexBuffer(VertexBufferHandle handle)
-		//{
-		//	_vertexBuffers[handle.index].Destroy();
-		//}
-		//void CreateDynamicIndexBuffer(DynamicIndexBufferHandle handle, uint32_t size, uint16 flags)
-		//{
-		//	_indexBuffers[handle.index].Create(size, NULL, flags);
-		//}
-		////void UpdateDynamicIndexBuffer(IndexBufferHandle handle, uint32_t _offset,
-		////	uint32_t _size, DataPackage* _mem)
-		////{
-		////	_indexBuffers[handle.index].Update(_offset, bx::uint32_min(_size, _mem->size), _mem->data);
-		////}
-		//void DestroyDynamicIndexBuffer(DynamicIndexBufferHandle handle)
-		//{
-		//	_indexBuffers[handle.index].Destroy();
-		//}
-		//void CreateDynamicVertexBuffer(DynamicVertexBufferHandle handle, uint32_t _size, uint16 /*_flags*/)
-		//{
-		//	VertexDeclHandle decl = INVALID_HANDLE;
-		//	_vertexBuffers[handle.index].Create(_size, NULL, decl);
-		//}
-		////void UpdateDynamicVertexBuffer(VertexBufferHandle handle, uint32_t _offset,
-		////	uint32_t _size, DataPackage* _mem)
-		////{
-		////	_vertexBuffers[handle.index].Update(_offset, bx::uint32_min(_size, _mem->size), _mem->data);
-		////}
-		//void DestroyDynamicVertexBuffer(DynamicVertexBufferHandle handle)
-		//{
-		//	_vertexBuffers[handle.index].Destroy();
-		//}
-		//void CreateEffect(EffectHandle handle, const std::string &fileName)
-		//{
-		//	_effects[handle.index].Create(fileName);
-		//}
-		//void DestroyEffect(EffectHandle handle)
-		//{
-		//	_effects[handle.index].Destroy();
-		//}
-		////void CreateTexture(TextureHandle handle, DataPackage* mem, uint32_t flags, uint8_t skip)
-		////{
-		////	_textures[handle.index].Create(mem, flags, skip);
-		////}
-		//void CreateTextureFromFile(TextureHandle handle, const std::string &fileName)
-		//{
-		//	_textures[handle.index].CreateFromFile(fileName);
-		//}
-
 		RenderView *GetRenderView(RenderViewHandle handle);
 
+		//버텍스 버퍼 생성
 		VertexBufferHandle CreateVertexBuffer(Memory *memory, VertexDeclHandle declHandle, const std::string &name = "");
+		VertexBufferHandle GetVertexBuffer(const std::string &name);
 		void DestroyVertexBuffer(VertexBufferHandle handle);
 
+		//인덱스 버퍼 생성
 		IndexBufferHandle CreateIndexBuffer(Memory *memory, const std::string &name = "");
+		IndexBufferHandle GetIndexBuffer(const std::string &name);
 		void DestroyIndexBuffer(IndexBufferHandle handle);
 
+		//버텍스 데클 생성
 		VertexDeclHandle CreateVertexDecl(const VertexDecl *decl);
+		VertexDeclHandle GetVertexDecl(const std::string &name);
 		void DestroyVertexDecl(VertexDeclHandle handle);
 
+		//텍스쳐 생성
 		TextureHandle CreateTexture(const std::string &fileName, const std::string &name = "");
+		TextureHandle GetTexture(const std::string &name);
 		void DestroyTexture(TextureHandle handle);
 
+		//이펙트 생성
 		EffectHandle CreateEffect(const std::string &fileName, const std::string &name = "");
+		EffectHandle GetEffect(const std::string &name);
 		void DestroyEffect(EffectHandle handle);
 
+		//렌더 뷰 생성
 		RenderViewHandle CreateRenderView(const std::string &name = "");
+		RenderViewHandle GetRenderView(const std::string &name);
 		void DestroyRenderView(RenderViewHandle handle);
+		
+		MaterialHandle CreateMaterial(const std::string &name = "");
+		MaterialHandle GetMaterial(const std::string &name);
+		void DestroyMaterial(MaterialHandle handle);
+
+		void AddTextureToMaterial(MaterialHandle material, uint32 textureSlot, TextureHandle texture);
 
 		void SetCurrentRenderView(RenderViewHandle handle);
 		void SetRenderViewProjectionMatrix(RenderViewHandle handle, const Matrix &view, const Matrix &projection);
 		void SetCurrentRenderViewProjectionMatrix(const Matrix &view, const Matrix &projection);
+
+		ModelHandle CreateModelFromX(const std::string &fileName, const std::string &name = "");
+		ModelHandle GetModel(const std::string &name);
+		void DestroyModel(ModelHandle handle);
 
 
 	private:
@@ -182,6 +132,9 @@ namespace video
 		RenderView _renderViews[VIDEO_CONFIG_RENDER_VIEW_MAX_NUM];
 		RenderView *_pCurrentView{};
 
+		Material _materials[VIDEO_CONFIG_MATERIAL_MAX_NUM];
+		Model _models[VIDEO_CONFIG_MODEL_MAX_NUM];
+
 		ResourceHandlePool<VertexBufferHandle> _vertexBufferPool;
 		ResourceHandlePool<IndexBufferHandle> _indexBufferPool;
 		ResourceHandlePool<TextureHandle> _textureHandlePool;
@@ -189,6 +142,10 @@ namespace video
 		ResourceHandlePool<VertexDeclHandle> _vertexDeclHandlePool;
 
 		ResourceHandlePool<RenderViewHandle> _renderViewHandlePool;
+
+		ResourceHandlePool<MaterialHandle> _materialHandlePool;
+		ResourceHandlePool<ModelHandle> _modelHandlePool;
+
 	};
 }
 #endif

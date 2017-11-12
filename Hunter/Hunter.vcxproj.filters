@@ -72,14 +72,11 @@
     <ClCompile Include="Ray.cpp">
       <Filter>Math</Filter>
     </ClCompile>
-    <ClCompile Include="Camera.cpp">
-      <Filter>Sub\GameUtils</Filter>
-    </ClCompile>
     <ClCompile Include="Node.cpp">
-      <Filter>Sub\GameUtils</Filter>
+      <Filter>Game\GameUtils</Filter>
     </ClCompile>
     <ClCompile Include="TerrainConfig.cpp">
-      <Filter>Sub\GameUtils\Terrain</Filter>
+      <Filter>Game\GameUtils\Terrain</Filter>
     </ClCompile>
     <ClCompile Include="SceneManager.cpp">
       <Filter>Core\SubSystem\SceneeManager</Filter>
@@ -149,6 +146,18 @@
     </ClCompile>
     <ClCompile Include="VideoResource.cpp">
       <Filter>Core\SubSystem\VideoDevice</Filter>
+    </ClCompile>
+    <ClCompile Include="Camera.cpp">
+      <Filter>Game\GameUtils\Camera</Filter>
+    </ClCompile>
+    <ClCompile Include="Frustum.cpp">
+      <Filter>Game\GameUtils\Camera</Filter>
+    </ClCompile>
+    <ClCompile Include="MathUtils.cpp">
+      <Filter>Math</Filter>
+    </ClCompile>
+    <ClCompile Include="XMesh.cpp">
+      <Filter>Sub\DirectX</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -259,25 +268,22 @@
       <Filter>Core</Filter>
     </ClInclude>
     <ClInclude Include="GameUtils.h">
-      <Filter>Sub\GameUtils</Filter>
-    </ClInclude>
-    <ClInclude Include="Camera.h">
-      <Filter>Sub\GameUtils</Filter>
+      <Filter>Game\GameUtils</Filter>
     </ClInclude>
     <ClInclude Include="Node.h">
-      <Filter>Sub\GameUtils</Filter>
+      <Filter>Game\GameUtils</Filter>
     </ClInclude>
     <ClInclude Include="Terrain.h">
-      <Filter>Sub\GameUtils\Terrain</Filter>
+      <Filter>Game\GameUtils\Terrain</Filter>
     </ClInclude>
     <ClInclude Include="TerrainConfig.h">
-      <Filter>Sub\GameUtils\Terrain</Filter>
+      <Filter>Game\GameUtils\Terrain</Filter>
     </ClInclude>
     <ClInclude Include="TerrainNode.h">
-      <Filter>Sub\GameUtils\Terrain</Filter>
+      <Filter>Game\GameUtils\Terrain</Filter>
     </ClInclude>
     <ClInclude Include="TerrainQuadTree.h">
-      <Filter>Sub\GameUtils\Terrain</Filter>
+      <Filter>Game\GameUtils\Terrain</Filter>
     </ClInclude>
     <ClInclude Include="WorldEditor.h">
       <Filter>Sub\WorldEditor</Filter>
@@ -387,6 +393,21 @@
     <ClInclude Include="VideoResourceHandles.h">
       <Filter>Core\SubSystem\VideoDevice</Filter>
     </ClInclude>
+    <ClInclude Include="Camera.h">
+      <Filter>Game\GameUtils\Camera</Filter>
+    </ClInclude>
+    <ClInclude Include="Frustum.h">
+      <Filter>Game\GameUtils\Camera</Filter>
+    </ClInclude>
+    <ClInclude Include="MathUtils.h">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="XMesh.h">
+      <Filter>Sub\DirectX</Filter>
+    </ClInclude>
+    <ClInclude Include="DXUtils.h">
+      <Filter>Sub\DirectX</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Core">
@@ -424,12 +445,6 @@
     </Filter>
     <Filter Include="Debug">
       <UniqueIdentifier>{76a6963c-195a-47f4-bb35-80dc0a39ec35}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Sub\GameUtils">
-      <UniqueIdentifier>{563f8004-6a59-40ad-a91c-8b90fd7fda6e}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Sub\GameUtils\Terrain">
-      <UniqueIdentifier>{753fe9ca-8a91-47dd-af3d-e4e9932dbc8b}</UniqueIdentifier>
     </Filter>
     <Filter Include="Core\SubSystem">
       <UniqueIdentifier>{e5f48745-5d7e-4565-bd8e-8884a513ad53}</UniqueIdentifier>
@@ -496,6 +511,18 @@
     </Filter>
     <Filter Include="Game\GameScene\TestScene">
       <UniqueIdentifier>{5a71353e-00bc-4729-92c9-598c2955957d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\GameUtils">
+      <UniqueIdentifier>{563f8004-6a59-40ad-a91c-8b90fd7fda6e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\GameUtils\Terrain">
+      <UniqueIdentifier>{753fe9ca-8a91-47dd-af3d-e4e9932dbc8b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\GameUtils\Camera">
+      <UniqueIdentifier>{276b7112-dd8a-413b-9624-b56d5e5e91b8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sub\DirectX">
+      <UniqueIdentifier>{5645eb42-e5b5-4684-807e-a68f4076dc84}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

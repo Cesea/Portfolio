@@ -89,45 +89,7 @@ namespace video
 	};
 
 
-	template <typename HandleType>
-	class ResourceHandlePool
-	{
-		//Handle의 Index값이 map에 들어간다..
-		typedef std::map<uint16, std::string> NameTable;
-	public:
-		explicit ResourceHandlePool(uint32 poolSize);
-
-		ResourceHandlePool(const ResourceHandlePool&) = delete;
-		ResourceHandlePool(ResourceHandlePool&&) = delete;
-		ResourceHandlePool& operator=(const ResourceHandlePool&) = delete;
-		ResourceHandlePool& operator=(ResourceHandlePool&&) = delete;
-
-		HandleType Create(const std::string &name = "");
-		void Remove(HandleType handle);
-
-		void SetName(HandleType id, const std::string &name);
-
-		HandleType Get(uint32 index) const;
-		const std::string &GetName(HandleType id) const;
-
-		bool32 IsValid(HandleType id) const;
-		uint32 GetSize() const;
-		void Resize(uint32 amount);
-		void Clear();
-
-		const HandleType BuildHandle(uint16 index, uint16 count) const;
-
-	private:
-
-		uint32 _defaultPoolSize;
-
-		uint32 _nextID;
-
-		std::vector<HandleType> _freeList;
-		std::vector<uint32> _counts;
-		NameTable _nameTable;
-	};
-
+	
 	//Vertex Buffer
 	struct VertexBuffer
 	{
@@ -200,10 +162,47 @@ namespace video
 		uint32 _height{};
 	};
 
+	//머테리얼은 단순히 여러 텍스쳐의 집합이다.
 	struct Material
 	{
-		D3DMATERIAL9 _d3dMateirla{};
+		bool Create();
+		void Destroy();
+
 		TextureHandle _textureHandles[VIDEO_CONFIG_MATERIAL_TEXTURE_MAX_NUM];
+
+		void AddTexture(uint32 textureSlot, TextureHandle handle);
+	};
+
+	struct Model
+	{
+		void Create();
+
+		void Destroy();
+
+		struct AttributeRange
+		{
+			uint32 attribId;
+			uint32 faceStart;
+			uint32 faceCount;
+			uint32 vertexStart;
+			uint32 vertexCount;
+		};
+
+		struct Group
+		{
+			video::VertexBufferHandle _vertexBuffer;
+			video::IndexBufferHandle _indexBuffer;
+			//Sphere _sphere;
+			//AABB _aabb;
+			AttributeRange _attributeRange;
+		};
+
+		std::vector<video::MaterialHandle> _materials;
+		std::vector<Group> _groups;
+
+		video::EffectHandle _effect;
+		//Sphere _sphere;
+		//AABB _aabb;
 	};
 
 	struct PredefinedUniform
@@ -262,7 +261,6 @@ namespace video
 
 		ID3DXEffect *_ptr{};
 	};
-
 	
 
 	//FrameBuffer
@@ -324,7 +322,6 @@ namespace video
 	//NOTE : 만약 deffered rendering을 하게된다면  RenderView의 FrameBuffer에 이미지들을 렌더 한 후에 여러 RenderView의 
 	// FrameBuffer를 합성하여 그린다??
 	//Context와 같은 역할
-
 	struct RenderState
 	{
 		VertexBufferHandle _vertexBuffer{};
@@ -332,6 +329,14 @@ namespace video
 		IndexBufferHandle _indexBuffer{};
 		MaterialHandle _material{};
 		EffectHandle _effect{};
+
+		//버텍스 버퍼로만 그릴때 사용된다
+		uint32 _startVertex{};
+
+		//인덱스 버퍼로 그릴 때 사용된다
+		uint32 _startIndex{};
+		uint32 _numVertices{};
+		uint32 _numPrim{};
 	};
 
 	struct RenderView
@@ -346,8 +351,10 @@ namespace video
 
 		void SetEffect(EffectHandle handle);
 
-		void Submit(VertexBufferHandle handle);
-		void Submit(IndexBufferHandle iHandle);
+		void SetMaterial(MaterialHandle handle);
+
+		void Submit(VertexBufferHandle handle, uint32 startVertex = 0, uint32 primCount = 0);
+		void Submit(IndexBufferHandle handle, uint32 startIndex = 0, uint32 numVertices = 0, uint32 primCount = 0);
 
 		void Draw();
 
@@ -364,6 +371,47 @@ namespace video
 		MatrixCache _matrixCache;
 		CommandBuffer _commandBuffer;
 	};
+
+
+	template <typename HandleType>
+	class ResourceHandlePool
+	{
+		typedef std::map<uint16, std::string> HandleTable;
+		typedef std::map<std::string, HandleType> NameTable;
+	public:
+		explicit ResourceHandlePool(uint32 poolSize);
+
+		ResourceHandlePool(const ResourceHandlePool&) = delete;
+		ResourceHandlePool(ResourceHandlePool&&) = delete;
+		ResourceHandlePool& operator=(const ResourceHandlePool&) = delete;
+		ResourceHandlePool& operator=(ResourceHandlePool&&) = delete;
+
+		HandleType Create(const std::string &name = "");
+		void Remove(HandleType handle);
+
+		void SetName(HandleType id, const std::string &name);
+
+		HandleType Get(uint32 index) const;
+		const std::string &GetName(HandleType id) const;
+		HandleType Get(const std::string &name) const;
+
+		bool32 IsValid(HandleType id) const;
+		uint32 GetSize() const;
+		void Resize(uint32 amount);
+		void Clear();
+
+		const HandleType BuildHandle(uint16 index, uint16 count) const;
+
+	private:
+		uint32 _defaultPoolSize;
+		uint32 _nextID;
+
+		std::vector<HandleType> _freeList;
+		std::vector<uint32> _counts;
+		HandleTable _handleTable;
+		NameTable _nameTable;
+	};
+
 
 	//ResourceHandlePool
 	template<typename HandleType>
@@ -390,13 +438,17 @@ namespace video
 		//이름을 지정 해 주었다면 이름 추가한다
 		if (name.length() > 0)
 		{
-			auto &iter = _nameTable.find(result.index);
-			if (iter != _nameTable.end())
+			auto &handleIter = _handleTable.find(result.index);
+			if (handleIter == _handleTable.end())
 			{
-				_nameTable[result.index] = name;
+				_handleTable[result.index] = name;
+			}
+			auto &nameIter = _nameTable.find(name);
+			if (nameIter == _nameTable.end())
+			{
+				_nameTable[name] = result;
 			}
 		}
-
 		return result;
 	}
 
@@ -407,21 +459,26 @@ namespace video
 		++counter; // increment the counter in the cache
 		_freeList.push_back(BuildHandle(handle.index, handle.count)); // add the ID to the freeList
 
-		auto found = _nameTable.find(handle.index);
-		if (found != _nameTable.end())
+		auto handleFound = _handleTable.find(handle.index);
+		if (handleFound != _handleTable.end())
 		{
-			_nameTable.erase(found);
+			auto nameFound = _nameTable.find(handleFound->second);
+			if (nameFound != _nameTable.end())
+			{
+				_nameTable.erase(nameFound);
+			}
+			_handleTable.erase(handleFound);
 		}
 	}
 
 	template<typename HandleType>
 	inline void ResourceHandlePool<HandleType>::SetName(HandleType handle, const std::string & name)
 	{
-		auto find = _nameTable.find(handle.index);
-		if (find != _nameTable.end())
-		{
-			_nameTable[handle.index] = name;
-		}
+		auto handleFound = _handleTable.find(handle.index);
+		_handleTable[handle.index] = name;
+
+		auto nameFound = _nameTable.find(name);
+		_nameTable[name] = handle;
 	}
 
 	template<typename HandleType>
@@ -433,21 +490,35 @@ namespace video
 		}
 		else
 		{
-			return BuildHandle(index);
+			return BuildHandle(0, 0);
 		}
 	}
 
 	template<typename HandleType>
 	inline const std::string & ResourceHandlePool<HandleType>::GetName(HandleType handle) const
 	{
-		auto &find = _nameTable.find(handle.index);
-		if (find != _nameTable.end())
+		auto &find = _handleTable.find(handle.index);
+		if (find != _handleTable.end())
 		{
-			return find.second;
+			return find->second;
 		}
 		else
 		{
 			return std::string();
+		}
+	}
+
+	template<typename HandleType>
+	inline HandleType ResourceHandlePool<HandleType>::Get(const std::string & name) const
+	{
+		auto &find = _nameTable.find(name);
+		if (find != _nameTable.end())
+		{
+			return find->second;
+		}
+		else
+		{
+			return BuildHandle(0, 0);
 		}
 	}
 
@@ -481,6 +552,9 @@ namespace video
 	{
 		_counts.clear();
 		_freeList.clear();
+
+		_handleTable.clear();
+		_nameTable.clear();
 		_nextID = 0;
 	}
 

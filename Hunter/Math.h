@@ -13,4 +13,6 @@
 #include "Quaternion.h"
 #include "Matrix.h"
 
+#include "MathUtils.h"
+
 #endif
