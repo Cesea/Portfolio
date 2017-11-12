@@ -93,21 +93,21 @@ void video::VideoDevice::Render(RenderView & renderView)
 				EffectHandle handle;
 				renderView._commandBuffer.Read<EffectHandle>(handle);
 
-				sendingState._effectHandle = handle;
+				sendingState._effect= handle;
 			} break;
 
 			case video::CommandBuffer::eSetVertexBuffer:
 			{
 				VertexBufferHandle handle;
 				renderView._commandBuffer.Read<VertexBufferHandle>(handle);
-				sendingState._vertexBufferHandle = handle;
+				sendingState._vertexBuffer= handle;
 			} break;
 
 			case video::CommandBuffer::eSetIndexBuffer:
 			{
 				IndexBufferHandle handle;
 				renderView._commandBuffer.Read<IndexBufferHandle>(handle);
-				sendingState._indexBufferHandle = handle;
+				sendingState._indexBuffer= handle;
 			} break;
 
 			//case video::CommandBuffer::eSetMesh:
@@ -118,14 +118,14 @@ void video::VideoDevice::Render(RenderView & renderView)
 				MaterialHandle handle;
 				renderView._commandBuffer.Read<MaterialHandle>(handle);
 
-				sendingState._materialHandle = handle;
+				sendingState._material= handle;
 
 			} break;
 			case video::CommandBuffer::eDraw:
 			{
-				if (sendingState._vertexBufferHandle.IsValid())
+				if (sendingState._vertexBuffer.IsValid())
 				{
-					if (sendingState._indexBufferHandle.IsValid())
+					if (sendingState._indexBuffer.IsValid())
 					{
 						DrawIndexPrimitive(sendingState, sendingMatrix);
 					}
@@ -134,7 +134,7 @@ void video::VideoDevice::Render(RenderView & renderView)
 						DrawPrimitive(sendingState, sendingMatrix);
 					}
 				}
-				sendingState._indexBufferHandle.MakeInvalid();
+				sendingState._indexBuffer.MakeInvalid();
 				MatrixIdentity(&sendingMatrix[0]);
 			} break;
 			default:
@@ -268,49 +268,48 @@ void video::VideoDevice::DrawPrimitive(const video::RenderState & renderState, M
 	//	materialPtr = &_materials[_activeMaterialHandle.index];
 	//}
 
-	if (renderState._vertexBufferHandle != _activeVertexBufferHandle)
+
+	if (renderState._vertexBuffer != _activeState._vertexBuffer)
 	{
-		_activeVertexBufferHandle = renderState._vertexBufferHandle;
-		vertexPtr = &_vertexBuffers[_activeVertexBufferHandle.index];
+		_activeState._vertexBuffer = renderState._vertexBuffer;
+		vertexPtr = &_vertexBuffers[_activeState._vertexBuffer.index];
 		//Vertex Decl설정여부 확인
-		if (_activeVertexDeclHandle != vertexPtr->_decl)
+		if (_activeState._vertexDecl != vertexPtr->_decl)
 		{
-			_activeVertexDeclHandle = vertexPtr->_decl;
-			declPtr = &_vertexDecls[_activeVertexDeclHandle.index];
+			_activeState._vertexDecl = vertexPtr->_decl;
+			declPtr = &_vertexDecls[_activeState._vertexDecl.index];
 			_pDevice->SetVertexDeclaration(declPtr->_ptr);
 		}
 		else
 		{
-			declPtr = &_vertexDecls[_activeVertexDeclHandle.index];
+			declPtr = &_vertexDecls[_activeState._vertexDecl.index];
 		}
 		_pDevice->SetStreamSource(0, vertexPtr->_ptr, 0, declPtr->_stride);
 	}
 	else
 	{
-		vertexPtr = &_vertexBuffers[_activeVertexBufferHandle.index];
-		declPtr = &_vertexDecls[_activeVertexDeclHandle.index];
+		vertexPtr = &_vertexBuffers[_activeState._vertexBuffer.index];
+		declPtr = &_vertexDecls[_activeState._vertexBuffer.index];
 	}
 
 
-	if (renderState._effectHandle != _activeEffectHandle)
+	if (renderState._effect != _activeState._effect)
 	{
-		_activeEffectHandle = renderState._effectHandle;
-		effectPtr = &_effects[_activeEffectHandle.index];
+		_activeState._effect = renderState._effect;
 	}
-	else
-	{
-		effectPtr = &_effects[_activeEffectHandle.index];
-	}
+	effectPtr = &_effects[_activeState._effect.index];
 
 	effectPtr->SetMatrix("gWorld", matrices[0]);
 	effectPtr->SetMatrix("gView", matrices[1]);
 	effectPtr->SetMatrix("gProjection", matrices[2]);
 
+	uint32 numPrim = (vertexPtr->_size / declPtr->_stride);
+
 	uint32 numPass = effectPtr->BeginEffect();
 	for (uint32 i = 0; i < numPass; ++i)
 	{
 		effectPtr->BeginPass(i);
-		_pDevice->DrawPrimitive(D3DPT_TRIANGLELIST, 0, vertexPtr->_size / declPtr->_stride);
+		_pDevice->DrawPrimitive(D3DPT_TRIANGLELIST, 0, numPrim);
 		effectPtr->EndPass();
 	}
 	effectPtr->EndEffect();
@@ -338,54 +337,55 @@ void video::VideoDevice::DrawIndexPrimitive(const video::RenderState & renderSta
 	//	materialPtr = &_materials[_activeMaterialHandle.index];
 	//}
 
-	if (renderState._vertexBufferHandle != _activeVertexBufferHandle)
+	if (renderState._vertexBuffer!= _activeState._vertexBuffer)
 	{
-		_activeVertexBufferHandle = renderState._vertexBufferHandle;
-		vertexPtr = &_vertexBuffers[_activeVertexBufferHandle.index];
+		_activeState._vertexBuffer = renderState._vertexBuffer;
+		vertexPtr = &_vertexBuffers[_activeState._vertexBuffer.index];
 		//Vertex Decl설정여부 확인
-		if (_activeVertexDeclHandle != vertexPtr->_decl)
+		if (_activeState._vertexDecl != vertexPtr->_decl)
 		{
-			_activeVertexDeclHandle = vertexPtr->_decl;
-			declPtr = &_vertexDecls[_activeVertexDeclHandle.index];
+			_activeState._vertexDecl = vertexPtr->_decl;
+			declPtr = &_vertexDecls[_activeState._vertexDecl.index];
 			_pDevice->SetVertexDeclaration(declPtr->_ptr);
 		}
 		else
 		{
-			declPtr = &_vertexDecls[_activeVertexDeclHandle.index];
+			declPtr = &_vertexDecls[_activeState._vertexDecl.index];
 		}
 		_pDevice->SetStreamSource(0, vertexPtr->_ptr, 0, declPtr->_stride);
 	}
 	else
 	{
-		vertexPtr = &_vertexBuffers[_activeVertexBufferHandle.index];
-		declPtr = &_vertexDecls[_activeVertexDeclHandle.index];
+		vertexPtr = &_vertexBuffers[_activeState._vertexBuffer.index];
+		declPtr = &_vertexDecls[_activeState._vertexBuffer.index];
 	}
 
-	if (renderState._indexBufferHandle != _activeIndexBufferHandle)
+	if (renderState._indexBuffer != _activeState._indexBuffer)
 	{
-		_activeIndexBufferHandle = renderState._indexBufferHandle;
-		_pDevice->SetIndices(_indexBuffers[_activeIndexBufferHandle.index]._ptr);
+		_activeState._indexBuffer = renderState._indexBuffer;
 	}
+	indexPtr = &_indexBuffers[_activeState._indexBuffer.index];
+	_pDevice->SetIndices(indexPtr->_ptr);
 
-	if (renderState._effectHandle != _activeEffectHandle)
+	if (renderState._effect != _activeState._effect)
 	{
-		_activeEffectHandle = renderState._effectHandle;
-		effectPtr = &_effects[_activeEffectHandle.index];
+		_activeState._effect = renderState._effect;
 	}
-	else
-	{
-		effectPtr = &_effects[_activeEffectHandle.index];
-	}
+	effectPtr = &_effects[_activeState._effect.index];
 
 	effectPtr->SetMatrix("gWorld", matrices[0]);
 	effectPtr->SetMatrix("gView", matrices[1]);
 	effectPtr->SetMatrix("gProjection", matrices[2]);
 
+	uint32 numVertices = (vertexPtr->_size / declPtr->_stride);
+	uint32 numIndices = (indexPtr->_size / 2);
+	uint32 numPrim = (numIndices / 3);
+
 	uint32 numPass = effectPtr->BeginEffect();
 	for (uint32 i = 0; i < numPass; ++i)
 	{
 		effectPtr->BeginPass(i);
-		_pDevice->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, 0, , 0, );
+		_pDevice->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, 0, numVertices, 0, numPrim);
 		effectPtr->EndPass();
 	}
 	effectPtr->EndEffect();

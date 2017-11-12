@@ -10,12 +10,11 @@ public:
 	virtual ~RenderComponent() {}
 
 public :
-	//VertexBufferHandle _vertexBufferHandle;
-	//IndexBufferHandle _indexBufferHandle;
+	video::VertexBufferHandle _vertexBuffer;
+	video::IndexBufferHandle _indexBuffer;
 
-	//EffectHandle _effectHandle;
+	video::EffectHandle _effect;
 	//SurfaceMaterialHandle _materialHandle;
-
 };
 
 #endif

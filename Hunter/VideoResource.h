@@ -327,10 +327,11 @@ namespace video
 
 	struct RenderState
 	{
-		VertexBufferHandle _vertexBufferHandle{};
-		IndexBufferHandle _indexBufferHandle{};
-		MaterialHandle _materialHandle{};
-		EffectHandle _effectHandle{};
+		VertexBufferHandle _vertexBuffer{};
+		VertexDeclHandle _vertexDecl{};
+		IndexBufferHandle _indexBuffer{};
+		MaterialHandle _material{};
+		EffectHandle _effect{};
 	};
 
 	struct RenderView

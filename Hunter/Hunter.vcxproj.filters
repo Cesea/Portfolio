@@ -25,7 +25,7 @@
       <Filter>Sub\Reflection\Variant</Filter>
     </ClCompile>
     <ClCompile Include="BaseScene.cpp">
-      <Filter>GameScene</Filter>
+      <Filter>Game\GameScene</Filter>
     </ClCompile>
     <ClCompile Include="tinyxml2.cpp">
       <Filter>Sub\tinyxml</Filter>
@@ -64,7 +64,7 @@
       <Filter>Core\Timers</Filter>
     </ClCompile>
     <ClCompile Include="TestScene.cpp">
-      <Filter>GameScene\TestScene</Filter>
+      <Filter>Game\GameScene\TestScene</Filter>
     </ClCompile>
     <ClCompile Include="DebugDraw.cpp">
       <Filter>Debug</Filter>
@@ -109,37 +109,37 @@
       <Filter>Core\Memory</Filter>
     </ClCompile>
     <ClCompile Include="RenderComponent.cpp">
-      <Filter>GameComponent</Filter>
+      <Filter>Game\GameComponent</Filter>
     </ClCompile>
     <ClCompile Include="MoveComponent.cpp">
-      <Filter>GameComponent</Filter>
+      <Filter>Game\GameComponent</Filter>
     </ClCompile>
     <ClCompile Include="TransformComponent.cpp">
-      <Filter>GameComponent</Filter>
+      <Filter>Game\GameComponent</Filter>
     </ClCompile>
     <ClCompile Include="CollisionComponent.cpp">
-      <Filter>GameComponent</Filter>
+      <Filter>Game\GameComponent</Filter>
     </ClCompile>
     <ClCompile Include="AnimationComponent.cpp">
-      <Filter>GameComponent</Filter>
+      <Filter>Game\GameComponent</Filter>
     </ClCompile>
     <ClCompile Include="AnimationSystem.cpp">
-      <Filter>GameSystem\AnimationSystem</Filter>
+      <Filter>Game\GameSystem\AnimationSystem</Filter>
     </ClCompile>
     <ClCompile Include="MoveSystem.cpp">
-      <Filter>GameSystem\MovementSystem</Filter>
+      <Filter>Game\GameSystem\MovementSystem</Filter>
     </ClCompile>
     <ClCompile Include="ColiisionSystem.cpp">
-      <Filter>GameSystem\CollisionSystem</Filter>
+      <Filter>Game\GameSystem\CollisionSystem</Filter>
     </ClCompile>
     <ClCompile Include="RenderSystem.cpp">
-      <Filter>GameSystem\RenderSystem</Filter>
+      <Filter>Game\GameSystem\RenderSystem</Filter>
     </ClCompile>
     <ClCompile Include="TransformSystem.cpp">
-      <Filter>GameSystem\TransformSystem</Filter>
+      <Filter>Game\GameSystem\TransformSystem</Filter>
     </ClCompile>
     <ClCompile Include="CollisionUtils.cpp">
-      <Filter>GameSystem\CollisionSystem</Filter>
+      <Filter>Game\GameSystem\CollisionSystem</Filter>
     </ClCompile>
     <ClCompile Include="Hash.cpp">
       <Filter>Sub</Filter>
@@ -178,7 +178,7 @@
       <Filter>Sub</Filter>
     </ClInclude>
     <ClInclude Include="IScene.h">
-      <Filter>GameScene</Filter>
+      <Filter>Game\GameScene</Filter>
     </ClInclude>
     <ClInclude Include="XMLManager.h">
       <Filter>Managers</Filter>
@@ -205,7 +205,7 @@
       <Filter>Sub\Reflection\Variant</Filter>
     </ClInclude>
     <ClInclude Include="BaseScene.h">
-      <Filter>GameScene</Filter>
+      <Filter>Game\GameScene</Filter>
     </ClInclude>
     <ClInclude Include="imguiRenderer.h">
       <Filter>GUI</Filter>
@@ -247,7 +247,7 @@
       <Filter>Core\Timers</Filter>
     </ClInclude>
     <ClInclude Include="TestScene.h">
-      <Filter>GameScene\TestScene</Filter>
+      <Filter>Game\GameScene\TestScene</Filter>
     </ClInclude>
     <ClInclude Include="DebugDraw.h">
       <Filter>Debug</Filter>
@@ -334,40 +334,40 @@
       <Filter>Core\Memory</Filter>
     </ClInclude>
     <ClInclude Include="RenderComponent.h">
-      <Filter>GameComponent</Filter>
+      <Filter>Game\GameComponent</Filter>
     </ClInclude>
     <ClInclude Include="MoveComponent.h">
-      <Filter>GameComponent</Filter>
+      <Filter>Game\GameComponent</Filter>
     </ClInclude>
     <ClInclude Include="TransformComponent.h">
-      <Filter>GameComponent</Filter>
+      <Filter>Game\GameComponent</Filter>
     </ClInclude>
     <ClInclude Include="CollisionComponent.h">
-      <Filter>GameComponent</Filter>
+      <Filter>Game\GameComponent</Filter>
     </ClInclude>
     <ClInclude Include="AnimationComponent.h">
-      <Filter>GameComponent</Filter>
+      <Filter>Game\GameComponent</Filter>
     </ClInclude>
     <ClInclude Include="DataBase.h">
       <Filter>Core\SubSystem\DataBase</Filter>
     </ClInclude>
     <ClInclude Include="AnimationSystem.h">
-      <Filter>GameSystem\AnimationSystem</Filter>
+      <Filter>Game\GameSystem\AnimationSystem</Filter>
     </ClInclude>
     <ClInclude Include="MoveSystem.h">
-      <Filter>GameSystem\MovementSystem</Filter>
+      <Filter>Game\GameSystem\MovementSystem</Filter>
     </ClInclude>
     <ClInclude Include="CollisionSystem.h">
-      <Filter>GameSystem\CollisionSystem</Filter>
+      <Filter>Game\GameSystem\CollisionSystem</Filter>
     </ClInclude>
     <ClInclude Include="RenderSystem.h">
-      <Filter>GameSystem\RenderSystem</Filter>
+      <Filter>Game\GameSystem\RenderSystem</Filter>
     </ClInclude>
     <ClInclude Include="TransformSystem.h">
-      <Filter>GameSystem\TransformSystem</Filter>
+      <Filter>Game\GameSystem\TransformSystem</Filter>
     </ClInclude>
     <ClInclude Include="CollisionUtils.h">
-      <Filter>GameSystem\CollisionSystem</Filter>
+      <Filter>Game\GameSystem\CollisionSystem</Filter>
     </ClInclude>
     <ClInclude Include="SceneChangeEffect.h">
       <Filter>Core\SubSystem\SceneeManager</Filter>
@@ -449,38 +449,11 @@
     <Filter Include="Core\SubSystem\InputManager">
       <UniqueIdentifier>{f1cfac8a-df1c-4e77-a1c0-7b9851f84811}</UniqueIdentifier>
     </Filter>
-    <Filter Include="GameScene">
-      <UniqueIdentifier>{8c9cd546-7171-45e7-b49f-873d7745382f}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="GameScene\TestScene">
-      <UniqueIdentifier>{5a71353e-00bc-4729-92c9-598c2955957d}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="GameSystem">
-      <UniqueIdentifier>{d7142de2-c937-4586-a206-5c7d6e472e49}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Sub\Event">
       <UniqueIdentifier>{bbbb774f-e8d3-496c-b00f-420486f5d176}</UniqueIdentifier>
     </Filter>
-    <Filter Include="GameComponent">
-      <UniqueIdentifier>{65ee613f-7f85-4217-9267-1fdc8aebf75e}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Core\SubSystem\DataBase">
       <UniqueIdentifier>{04c70aa2-d19a-4fe2-b716-14917758bb68}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="GameSystem\AnimationSystem">
-      <UniqueIdentifier>{54ca3728-3afd-4619-9f24-f1739ad0e775}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="GameSystem\MovementSystem">
-      <UniqueIdentifier>{b0f7ecfb-8121-4aa0-88ba-91bf94352179}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="GameSystem\CollisionSystem">
-      <UniqueIdentifier>{3c44ec6d-ab6d-4798-af60-0326aa391024}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="GameSystem\RenderSystem">
-      <UniqueIdentifier>{1761486d-4c7d-4da8-a16c-8f00c672cb74}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="GameSystem\TransformSystem">
-      <UniqueIdentifier>{cc7732c0-c4e6-44ef-8c20-c09d11e7a848}</UniqueIdentifier>
     </Filter>
     <Filter Include="Core\ECS">
       <UniqueIdentifier>{b95cc362-b92e-4594-9f7e-f616decbab66}</UniqueIdentifier>
@@ -493,6 +466,36 @@
     </Filter>
     <Filter Include="Core\ECS\System">
       <UniqueIdentifier>{73e7c0f0-6155-478f-bc21-3ff3236126e8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game">
+      <UniqueIdentifier>{ccb6b439-1fce-4344-9649-1f6d55627f0e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\GameComponent">
+      <UniqueIdentifier>{65ee613f-7f85-4217-9267-1fdc8aebf75e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\GameSystem">
+      <UniqueIdentifier>{d7142de2-c937-4586-a206-5c7d6e472e49}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\GameSystem\AnimationSystem">
+      <UniqueIdentifier>{54ca3728-3afd-4619-9f24-f1739ad0e775}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\GameSystem\MovementSystem">
+      <UniqueIdentifier>{b0f7ecfb-8121-4aa0-88ba-91bf94352179}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\GameSystem\CollisionSystem">
+      <UniqueIdentifier>{3c44ec6d-ab6d-4798-af60-0326aa391024}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\GameSystem\RenderSystem">
+      <UniqueIdentifier>{1761486d-4c7d-4da8-a16c-8f00c672cb74}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\GameSystem\TransformSystem">
+      <UniqueIdentifier>{cc7732c0-c4e6-44ef-8c20-c09d11e7a848}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\GameScene">
+      <UniqueIdentifier>{8c9cd546-7171-45e7-b49f-873d7745382f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\GameScene\TestScene">
+      <UniqueIdentifier>{5a71353e-00bc-4729-92c9-598c2955957d}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

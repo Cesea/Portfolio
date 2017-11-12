@@ -10,7 +10,7 @@ public:
 	RenderSystem();
 	virtual ~RenderSystem() override;
 
-	void Update(float deltaTime);
+	void Render(video::RenderView &renderView);
 
 	virtual void Initialize();
 

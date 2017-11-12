@@ -7,10 +7,16 @@
 #include "MoveSystem.h"
 #include "RenderSystem.h"
 
+#include "TransformSystem.h"
+
+#include "Camera.h"
+
 class BaseScene : public IScene
 {
 public :
-	BaseScene() {};
+	BaseScene() 
+		:_world(4096)
+	{};
 	virtual ~BaseScene() {}
 
 	virtual bool32 Load();
@@ -24,6 +30,18 @@ public :
 
 	virtual const char *GetSceneName();
 	virtual bool32 IsActive();
+
+protected :
+	void RegisterEvents();
+
+	void Handle(const InputManager::KeyDownEvent &event);
+	void Handle(const InputManager::KeyPressedEvent &event);
+	void Handle(const InputManager::KeyReleasedEvent &event);
+	void Handle(const InputManager::MouseMoveEvent &event);
+	void Handle(const InputManager::MouseDownEvent &event);
+	void Handle(const InputManager::MousePressedEvent &event);
+	void Handle(const InputManager::MouseReleasedEvent &event);
+	void Handle(const InputManager::MouseWheelEvent &event);
 
 protected :
 	bool32 _active;
@@ -53,6 +71,15 @@ protected :
 
 	video::EffectHandle _effect;
 
+	World _world;
+
+	TransformSystem _transformSystem;
+	RenderSystem _renderSystem;
+
+
+	std::vector<Entity> _entities;
+
+	Camera _camera;
 };
 
 

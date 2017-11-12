@@ -9,20 +9,28 @@ RenderSystem::~RenderSystem()
 {
 }
 
-void RenderSystem::Update(float deltaTime)
+void RenderSystem::Render(video::RenderView &renderView)
 {
 	auto &entities = GetEntities();
+	renderView.PreRender();
+	renderView.Begin();
 	for (int32 i = 0; i < entities.size(); ++i)
 	{
-		Vector3 &refPosition = entities[i].GetComponent<TransformComponent>()._position;
 
-		Matrix world;
-		MatrixTranslation(&world, 0.0f, 0.0f, 0.0f);
-
+		Matrix world = entities[i].GetComponent<TransformComponent>().GetFinalMatrix();
 		RenderComponent &refRenderComponent = entities[i].GetComponent<RenderComponent>();
 
-		std::cout << "Rendering " << std::endl;
+		renderView.SetTransform(world);
+		//renderView->SetMaterial(refRenderComponent._material);
+		renderView.SetEffect(refRenderComponent._effect);
+		renderView.Submit(refRenderComponent._vertexBuffer);
+		renderView.Submit(refRenderComponent._indexBuffer);
+		renderView.Draw();
 	}
+	renderView.End();
+	renderView.PostRender();
+
+	VIDEO->Render(renderView);
 }
 
 void RenderSystem::Initialize()

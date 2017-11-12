@@ -170,11 +170,8 @@ namespace video
 
 		EventChannel _channel;
 
-		VertexBufferHandle _activeVertexBufferHandle;
-		IndexBufferHandle _activeIndexBufferHandle;
-		EffectHandle _activeEffectHandle;
-		MaterialHandle _activeMaterialHandle;
-		VertexDeclHandle _activeVertexDeclHandle;
+
+		RenderState _activeState;
 
 		VertexBuffer _vertexBuffers[VIDEO_CONFIG_VERTEXBUFFER_MAX_NUM];
 		IndexBuffer _indexBuffers[VIDEO_CONFIG_INDEXBUFFER_MAX_NUM];
