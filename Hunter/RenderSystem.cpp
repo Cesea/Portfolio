@@ -25,11 +25,17 @@ void RenderSystem::Render(video::RenderView &renderView, const Camera &camera)
 		{
 			renderView.SetTransform(transformComponent.GetFinalMatrix());
 
-			renderView.SetMaterial(refRenderComponent._material);
-			renderView.SetEffect(refRenderComponent._effect);
-			renderView.Submit(refRenderComponent._vertexBuffer);
-			renderView.Submit(refRenderComponent._indexBuffer);
-			renderView.Draw();
+			renderView.SubmitModel(refRenderComponent.model);
+			//for (uint32 i = 0; i < refRenderComponent.model._groups.size(); ++i)
+			//{
+			//	renderView.Submit(refRenderComponent.model._groups[i]._vertexBuffer);
+			//	renderView.Submit(refRenderComponent.model._groups[i]._indexBuffer);
+			//	renderView.Draw();
+			//}
+			//renderView.SetMaterial(refRenderComponent._material);
+			//renderView.SetEffect(refRenderComponent._effect);
+			//renderView.Submit(refRenderComponent._vertexBuffer);
+			//renderView.Submit(refRenderComponent._indexBuffer);
 		}
 	}
 	renderView.End();

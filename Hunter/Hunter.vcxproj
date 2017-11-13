@@ -176,6 +176,7 @@
     <ClCompile Include="Vector4.cpp" />
     <ClCompile Include="VideoDevice.cpp" />
     <ClCompile Include="VideoResource.cpp" />
+    <ClCompile Include="VideoVertexFormat.cpp" />
     <ClCompile Include="World.cpp" />
     <ClCompile Include="XMesh.cpp" />
     <ClCompile Include="XMLManager.cpp" />
@@ -260,6 +261,7 @@
     <ClInclude Include="VideoDevice.h" />
     <ClInclude Include="VideoResource.h" />
     <ClInclude Include="VideoResourceHandles.h" />
+    <ClInclude Include="VideoVertexFormat.h" />
     <ClInclude Include="World.h" />
     <ClInclude Include="WorldEditor.h" />
     <ClInclude Include="XMesh.h" />

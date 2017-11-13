@@ -215,6 +215,39 @@ inline uint32 Uint32Selb(uint32 mask, uint32 a, uint32 b)
 	return result;
 }
 
+inline std::string GetFilePath(std::string &str)
+{
+	std::string path;
+	int lastPathIndex = 0;		
+	lastPathIndex = str.find_last_of('/');		
+	if (lastPathIndex == -1) 
+	{			
+		lastPathIndex = str.find_last_of('\\');
+	}
+	if (lastPathIndex != -1) 
+	{
+		path = str.substr(0, lastPathIndex + 1);
+	}
+	return path;
+}
+
+inline std::string GetFileName(std::string &str)
+{
+	std::string name;
+	int lastPathIndex = 0;		
+	lastPathIndex = str.find_last_of('/');		
+	if (lastPathIndex == -1) 
+	{			
+		lastPathIndex = str.find_last_of('\\');
+	}
+
+	if (lastPathIndex != -1) 
+	{
+		name = str.substr(lastPathIndex, str.length() - lastPathIndex);
+	}
+	return name;
+}
+
 float RandFloat();
 float RandFloat(float max);
 float RandFloat(float min, float max);

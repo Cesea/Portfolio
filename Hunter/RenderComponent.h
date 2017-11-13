@@ -3,9 +3,7 @@
 
 #include "Component.h"
 
-
-
-
+//COmponent는 model에 대하여 소유권을 가지지 않는다
 struct RenderComponent : public Component
 {
 public:
@@ -13,14 +11,14 @@ public:
 	virtual ~RenderComponent() {}
 
 public :
-	video::VertexBufferHandle _vertexBuffer{};
-	video::IndexBufferHandle _indexBuffer{};
-	video::MaterialHandle _material{};
+	video::Model *model;
 
-	video::EffectHandle _effect{};
+	//video::VertexBufferHandle _vertexBuffer{};
+	//video::IndexBufferHandle _indexBuffer{};
+	//video::MaterialHandle _material{};
+	//video::EffectHandle _effect{};
 
 	float radius{};
-
 };
 
 #endif

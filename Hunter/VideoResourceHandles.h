@@ -148,14 +148,14 @@ namespace video
 		}
 	};
 
-	struct ModelHandle : public VideoResourceHandle
+	struct RenderGroupHandle : public VideoResourceHandle
 	{
-		ModelHandle()
+		RenderGroupHandle()
 		{
 			this->index = 0;
 			this->count = 0;
 		}
-		ModelHandle(uint16 index, uint16 count)
+		RenderGroupHandle(uint16 index, uint16 count)
 		{
 			this->index = index;
 			this->count = count;

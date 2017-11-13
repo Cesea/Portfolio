@@ -29,6 +29,7 @@ namespace video
 	};
 
 
+	//TODO : 지금 현재 다이나믹 버퍼는 지원이 되지 않는다. 만들자....
 	bool VertexBuffer::Create(uint32 size, void *data, VertexDeclHandle decl)
 	{
 		if (nullptr == data)
@@ -375,6 +376,12 @@ namespace video
 		_commandBuffer.Write<uint32>(primCount);
 	}
 
+	void RenderView::SubmitModel(ModelHandle handle)
+	{
+		_commandBuffer.Write<CommandBuffer::Enum>(CommandBuffer::eSubmitModel);
+		_commandBuffer.Write<ModelHandle>(handle);
+	}
+
 	void RenderView::Draw()
 	{
 		_commandBuffer.Write<CommandBuffer::Enum>(CommandBuffer::eDraw);
@@ -414,5 +421,96 @@ namespace video
 	{
 		Assert(textureSlot < VIDEO_CONFIG_MATERIAL_TEXTURE_MAX_NUM);
 		_textureHandles[textureSlot] = handle;
+	}
+
+	bool Model::CreateFromX(const std::string & fileName)
+	{
+		std::string nameCopy = fileName;
+		_name = GetFileName(nameCopy);
+
+		VertexBufferHandle vertexHandle;
+		IndexBufferHandle indexHandle;
+
+		XMesh xMesh;
+		HRESULT hresult = xMesh.Load(fileName);
+		if (FAILED(hresult))
+		{
+			Assert(false);// xmesh load failed
+			return false;
+		}
+		//우선 버텍스 버퍼랑 인덱스 퍼버의 정보를 가져온다
+		IDirect3DVertexBuffer9 *pVertexBuffer = nullptr;
+		IDirect3DIndexBuffer9 *pIndexBuffer = nullptr;
+		xMesh._pMesh->GetVertexBuffer(&pVertexBuffer);
+		xMesh._pMesh->GetIndexBuffer(&pIndexBuffer);
+
+		D3DVERTEXBUFFER_DESC vertexDesc;
+		pVertexBuffer->GetDesc(&vertexDesc);
+
+		D3DINDEXBUFFER_DESC indexDesc;
+		pIndexBuffer->GetDesc(&indexDesc);
+
+		VertexDeclHandle declHandle = VIDEO->GetVertexDecl("static");
+		//static decl이 이미 없다면
+		if (!declHandle.IsValid())
+		{
+			VertexDecl decl;
+			decl.Begin();
+			for (uint32 i = 0; i < MAX_FVF_DECL_SIZE; ++i)
+			{
+				//D3DDECLUSAGE_BINORMAL
+				//Decl end를 만나면 그만..
+				if (0xff == xMesh._pVerElement[i].Stream )
+				{
+					break;
+				}
+				decl.Add(xMesh._pVerElement[i]);
+			}
+			decl.End(sizeof(StaticMeshVertex));
+
+			declHandle = VIDEO->CreateVertexDecl(&decl);
+		}
+		Memory mem;
+
+		//버텍스 버퍼 락 하고 정보를 가져온다
+		void *pVertexData = nullptr;
+		pVertexBuffer->Lock(0, 0, (void **)&pVertexData, 0);
+		mem._size = vertexDesc.Size;
+		mem._data = pVertexData;
+		vertexHandle =  VIDEO->CreateVertexBuffer(&mem, declHandle, _name);
+		pVertexBuffer->Unlock();
+
+		//인덱스 버퍼 락 하고 정보를 가져온다
+		void *pIndexData = nullptr;
+		pIndexBuffer->Lock(0, 0, (void **)&pIndexData, 0);
+		mem._size = indexDesc.Size;
+		mem._data = pIndexData;
+		indexHandle = VIDEO->CreateIndexBuffer(&mem, _name);
+		pIndexBuffer->Unlock();
+
+		COM_RELEASE(pVertexBuffer);
+		COM_RELEASE(pIndexBuffer);
+
+		//머테리얼 정보도 가져와야한다
+		
+		//Material Range정보를 xMesh에서 가져온다
+		for (uint32 i = 0; i < xMesh._materialNum; ++i)
+		{
+			Group group;
+			group._attributeRange.materialID = xMesh._attributeRange[i].AttribId;
+			group._attributeRange.faceStart = xMesh._attributeRange[i].FaceStart;
+			group._attributeRange.faceCount = xMesh._attributeRange[i].FaceCount;
+			group._attributeRange.vertexStart = xMesh._attributeRange[i].VertexStart;
+			group._attributeRange.vertexCount = xMesh._attributeRange[i].VertexCount;
+
+			group._vertexBuffer = vertexHandle;
+			group._indexBuffer = indexHandle;
+
+			this->_groups.push_back(group);
+		}
+		xMesh.Release();
+	}
+	void Model::Destroy()
+	{
 	}
 }

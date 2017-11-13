@@ -159,6 +159,9 @@
     <ClCompile Include="XMesh.cpp">
       <Filter>Sub\DirectX</Filter>
     </ClCompile>
+    <ClCompile Include="VideoVertexFormat.cpp">
+      <Filter>Core\SubSystem\VideoDevice</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -407,6 +410,9 @@
     </ClInclude>
     <ClInclude Include="DXUtils.h">
       <Filter>Sub\DirectX</Filter>
+    </ClInclude>
+    <ClInclude Include="VideoVertexFormat.h">
+      <Filter>Core\SubSystem\VideoDevice</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

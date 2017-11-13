@@ -73,6 +73,8 @@ protected :
 	video::MaterialHandle _material0;
 	video::MaterialHandle _material1;
 
+	video::ModelHandle _model0;
+
 
 	World _world;
 

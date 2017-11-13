@@ -33,7 +33,7 @@ bool32 BaseScene::Init()
 {
 	bool32 result = true;
 
-	_effect = VIDEO->CreateEffect("../resources/shaders/basicUV.fx", "BasicShaderUV");
+	_effect = VIDEO->CreateEffect("../resources/shaders/staticMesh.fx", "staticMesh");
 
 	video::RenderViewHandle renderViewHandle= VIDEO->CreateRenderView();
 	_renderView = VIDEO->GetRenderView(renderViewHandle);
@@ -77,43 +77,55 @@ bool32 BaseScene::Init()
 	TextureHandle textureHandle1 = VIDEO->CreateTexture("../resources/textures/test2.png", "test2");
 
 	_material0 = VIDEO->CreateMaterial("test");
-	VIDEO->AddTextureToMaterial(_material0, VIDEO_TEXTURE0, textureHandle0);
+	VIDEO->MaterialAddTexture(_material0, VIDEO_TEXTURE0, textureHandle0);
 
 	_material1 = VIDEO->CreateMaterial("test2");
-	VIDEO->AddTextureToMaterial(_material1, VIDEO_TEXTURE0, textureHandle1);
+	VIDEO->MaterialAddTexture(_material1, VIDEO_TEXTURE0, textureHandle1);
 
+	_model0 = VIDEO->CreateModelFromX("../resources/models/aa.x");
+	VIDEO->ModelSetEffect(_model0, _effect);
 
 	_world.AddSystem<RenderSystem>(_renderSystem);
 	_world.AddSystem<TransformSystem>(_transformSystem);
 
 	_world.Refresh();
 
-	for (int32 y = 0; y < 40; ++y)
-	{
-		for (uint32 x = 0; x < 40; ++x)
 		{
-			uint32 index = x + y * 40;
+	_entities.push_back(_world.CreateEntity());
+	Entity &entity = _entities.back();
 
-			_entities.push_back(_world.CreateEntity());
-			Entity &entity = _entities.back();
-			entity.Activate();
+	RenderComponent &renderComp = entity.AddComponent<RenderComponent>();
+	//renderComp._effect = _effect;
+	//renderComp._vertexBuffer = _vertexBuffer0;
+	//renderComp._material = (index % 2) ? _material0 : _material1;
+	renderComp.model = _model0;
+	renderComp.radius = 1.0f;
 
-			RenderComponent &triangleRender = entity.AddComponent<RenderComponent>();
-			triangleRender._effect = _effect;
-			triangleRender._vertexBuffer = _vertexBuffer0;
-			triangleRender._material = (index % 2) ? _material0 : _material1;
-			triangleRender.radius = 1.0f;
+	TransformComponent &transComp = entity.AddComponent<TransformComponent>();
+	transComp.MovePositionWorld(0, 0, 0);
 
-			TransformComponent &triangleTransform = entity.AddComponent<TransformComponent>();
-			triangleTransform.MovePositionWorld(x, y, 0);
-		}
-	}
+	//for (int32 y = 0; y < 40; ++y)
+	//{
+	//	for (uint32 x = 0; x < 40; ++x)
+	//	{
+	//		uint32 index = x + y * 40;
 
+	//		_entities.push_back(_world.CreateEntity());
+	//		Entity &entity = _entities.back();
+	//		entity.Activate();
+
+	//		RenderComponent &triangleRender = entity.AddComponent<RenderComponent>();
+	//		triangleRender._effect = _effect;
+	//		triangleRender._vertexBuffer = _vertexBuffer0;
+	//		triangleRender._material = (index % 2) ? _material0 : _material1;
+	//		triangleRender.radius = 1.0f;
+
+	//		TransformComponent &triangleTransform = entity.AddComponent<TransformComponent>();
+	//		triangleTransform.MovePositionWorld(x, y, 0);
+	//	}
+	//}
 	
-	XMesh mesh;
-	mesh.Init("../resources/models/knight/Knight.x");
-
-	_camera.GetTransform().MovePositionSelf(0.0f, 0.0f, -20.0f);
+	_camera.GetTransform().MovePositionSelf(0.0f, 0.0f, -5.0f);
 
 	_active = true;
 	return result;

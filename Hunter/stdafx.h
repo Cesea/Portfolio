@@ -53,6 +53,7 @@
 #include "EntityComponentSystem.h"
 
 #include "Math.h"
+#include "DXUtils.h"
 #include "CommonUtils.h"
 
 #include "Engine.h"

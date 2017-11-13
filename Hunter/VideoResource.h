@@ -4,6 +4,8 @@
 #include "VideoDefines.h"
 #include "VideoResourceHandles.h"
 
+#include "VideoVertexFormat.h"
+
 #include <map>
 #include <string>
 
@@ -30,6 +32,7 @@ namespace video
 			eRendererInit,
 			eSetTransform,
 			eSetEffect,
+			eSetModel,
 			eSetVertexBuffer,
 			eSetIndexBuffer,
 			eSetMaterial,
@@ -173,34 +176,40 @@ namespace video
 		void AddTexture(uint32 textureSlot, TextureHandle handle);
 	};
 
-	struct Model
+
+	struct RenderGroup
 	{
-		void Create();
-
-		void Destroy();
-
-		struct AttributeRange
+		//머테리얼의 범위...
+		struct MaterialRange
 		{
-			uint32 attribId;
+			MaterialHandle material;
 			uint32 faceStart;
 			uint32 faceCount;
 			uint32 vertexStart;
 			uint32 vertexCount;
 		};
 
-		struct Group
-		{
-			video::VertexBufferHandle _vertexBuffer;
-			video::IndexBufferHandle _indexBuffer;
-			//Sphere _sphere;
-			//AABB _aabb;
-			AttributeRange _attributeRange;
-		};
+		video::VertexBufferHandle _vertexBuffer;
+		video::IndexBufferHandle _indexBuffer;
+		//Sphere _sphere;
+		//AABB _aabb;
+		MaterialRange _attributeRange;
+
+	};
+
+	struct Model
+	{
+		//XFile을 먼저 로드 하고 정보를 추출하여 내가 원하는 포멧으로 변환한다.
+		bool CreateFromX(const std::string &fileName);
+		void Destroy();
+
 
 		std::vector<video::MaterialHandle> _materials;
 		std::vector<Group> _groups;
 
 		video::EffectHandle _effect;
+		std::string _name;
+
 		//Sphere _sphere;
 		//AABB _aabb;
 	};
@@ -355,6 +364,7 @@ namespace video
 
 		void Submit(VertexBufferHandle handle, uint32 startVertex = 0, uint32 primCount = 0);
 		void Submit(IndexBufferHandle handle, uint32 startIndex = 0, uint32 numVertices = 0, uint32 primCount = 0);
+		void SubmitModel(ModelHandle handle);
 
 		void Draw();
 

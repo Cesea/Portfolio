@@ -582,7 +582,7 @@ void video::VideoDevice::DestroyMaterial(MaterialHandle handle)
 	_materialHandlePool.Remove(handle);
 }
 
-void video::VideoDevice::AddTextureToMaterial(MaterialHandle material, uint32 textureSlot, TextureHandle texture)
+void video::VideoDevice::MaterialAddTexture(MaterialHandle material, uint32 textureSlot, TextureHandle texture)
 {
 	_materials[material.index].AddTexture(textureSlot, texture);
 }
@@ -604,5 +604,28 @@ void video::VideoDevice::SetCurrentRenderViewProjectionMatrix(const Matrix & vie
 	Assert(_pCurrentView);
 	_pCurrentView->_viewMatrix = view;
 	_pCurrentView->_projectionMatrix = projection;
+}
+
+ModelHandle video::VideoDevice::CreateModelFromX(const std::string & fileName)
+{
+	ModelHandle result = _modelHandlePool.Create(fileName);
+	_models[result.index].CreateFromX(fileName);
+	return result;
+}
+
+ModelHandle video::VideoDevice::GetModel(const std::string & name)
+{
+	return ModelHandle();
+}
+
+void video::VideoDevice::DestroyModel(ModelHandle handle)
+{
+	_models[handle.index].Destroy();
+	_modelHandlePool.Remove(handle);
+}
+
+void video::VideoDevice::ModelSetEffect(ModelHandle model, EffectHandle effect)
+{
+	_models[model.index]._effect = effect;
 }
 

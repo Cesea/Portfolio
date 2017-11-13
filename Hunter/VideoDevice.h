@@ -87,16 +87,17 @@ namespace video
 		MaterialHandle CreateMaterial(const std::string &name = "");
 		MaterialHandle GetMaterial(const std::string &name);
 		void DestroyMaterial(MaterialHandle handle);
-
-		void AddTextureToMaterial(MaterialHandle material, uint32 textureSlot, TextureHandle texture);
+		void MaterialAddTexture(MaterialHandle material, uint32 textureSlot, TextureHandle texture);
 
 		void SetCurrentRenderView(RenderViewHandle handle);
 		void SetRenderViewProjectionMatrix(RenderViewHandle handle, const Matrix &view, const Matrix &projection);
 		void SetCurrentRenderViewProjectionMatrix(const Matrix &view, const Matrix &projection);
 
-		ModelHandle CreateModelFromX(const std::string &fileName, const std::string &name = "");
+		//CreateModelFromX 함수는 불러온 파일 경로에서 이름을 추출하여 HandlePool에 자동으로 이름을 등록한다
+		ModelHandle CreateModelFromX(const std::string &fileName);
 		ModelHandle GetModel(const std::string &name);
 		void DestroyModel(ModelHandle handle);
+		void ModelSetEffect(ModelHandle model, EffectHandle effect);
 
 
 	private:

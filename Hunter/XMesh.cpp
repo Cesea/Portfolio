@@ -9,50 +9,40 @@ XMesh::~XMesh(void)
 {
 }
 
-HRESULT XMesh::Init(std::string filePath, const D3DXMATRIXA16* matCorrection /*= NULL */)
+HRESULT XMesh::Load(const std::string &fileName, const Matrix* matCorrection /*= NULL */)
 {
-
-	LPD3DXBUFFER pAdjacency = nullptr;		//인접 버퍼
-	LPD3DXBUFFER pMaterial = nullptr;		//재질 버퍼
-
-												//XFile 로 부터 메쉬를 불러오는 함수
+	DWORD dwMatNum{};
+	
 	if (FAILED(D3DXLoadMeshFromX(
-		filePath.c_str(),			
+		fileName.c_str(),
 		D3DXMESH_MANAGED,			
 		gpDevice,						
-		&pAdjacency,				
-		&pMaterial,					
+		&_pAdjacency,				
+		&_pMaterial,					
 		NULL,					
-		&this->dwMaterialsNum,
-		&this->pMesh))) 
+		&dwMatNum,
+		&this->_pMesh))) 
 	{
-		SAFE_RELEASE(pAdjacency);
-		SAFE_RELEASE(pMaterial);
+		SAFE_RELEASE(_pAdjacency);
+		SAFE_RELEASE(_pMaterial);
 		return E_FAIL;
 	}
 
+	_materialNum = dwMatNum;
+
 	//로딩 경로에서 파일명만 제거하고 경로만 받는다.
 	std::string path;
-	int lastPathIndex = 0;		//마지막 \ 의 위치
 
-								//filePath.find_first_of( 'A' );		filePath 문자열에 'A' 가 들어있는 위치 리턴 ( 앞에서 부터 검색 )
-	lastPathIndex = filePath.find_last_of('/');		//뒤에서 부터 검색
-	if (lastPathIndex == -1) {			//못찾으면 -1 을 리턴
-		lastPathIndex = filePath.find_last_of('\\');	//경로 구분을 하는 / 을 못찾으면 \ 를 찾는다.
-	}
-	//경로 구분이 있다면...
-	if (lastPathIndex != -1) {
-		//filePath.substr( /*시작위치*/, /*갯수*/ );
-		path = filePath.substr(0, lastPathIndex + 1);
-	}
+	std::string nameCopy = fileName;
+	path = GetFilePath(nameCopy);
 
 	std::string texFilePath;	//최종 경로...
 	std::string texExp;			//파일 확장자 명
 	std::string texFile;		//파일 명	
 
-	LPD3DXMATERIAL	pMaterials = (LPD3DXMATERIAL)pMaterial->GetBufferPointer();
+	LPD3DXMATERIAL pMaterials = (LPD3DXMATERIAL)_pMaterial->GetBufferPointer();
 
-	for (uint32 i = 0; i < this->dwMaterialsNum; i++) {
+	for (uint32 i = 0; i < this->_materialNum; i++) {
 
 		D3DMATERIAL9 mtrl = pMaterials[i].MatD3D;
 
@@ -67,6 +57,8 @@ HRESULT XMesh::Init(std::string filePath, const D3DXMATRIXA16* matCorrection /*=
 
 			//tex 파일경로는 Mesh 파일경로 + texture 파일이름
 			texFilePath = path + pMaterials[i].pTextureFilename;
+
+			texturePaths.push_back(texFilePath);
 
 			//Texture 로딩하고 푸쉬
 			//vecDiffuseTex.push_back(RESOURCE_TEXTURE->GetResource(texFilePath));
@@ -103,19 +95,33 @@ HRESULT XMesh::Init(std::string filePath, const D3DXMATRIXA16* matCorrection /*=
 			////없다면...
 			//	this->vecEmissionTex.push_back(pEmiTex);
 		}
-
 	}
-
 	//얻어온 재질 정보를 다 사용하여 재질과 Texture 를 로딩 했기때문에 
 	//더이상 pMaterial 재질 버퍼는 필요 없어 꼭 메모리 해재를 해주어야 한다.
-	SAFE_RELEASE(pMaterial);
+	SAFE_RELEASE(_pMaterial);
+
+	//if (desiredFVF != 0)
+	//{
+	//	// 만약 Mesh의 FVF가 인자로 넘긴 desiredFVF와 다르다면 처리를 해 주어야 한다
+	//	DWORD originalFVF = _pMesh->GetFVF();
+	//	ID3DXMesh *cloneMesh = nullptr;
+	//	if (originalFVF != desiredFVF)
+	//	{
+	//		CloneMeshFVF(D3DXMESH_MANAGED, desiredFVF, cloneMesh);
+	//	}
+	//	if (cloneMesh)
+	//	{
+	//		COM_RELEASE(_pMesh);
+	//		_pMesh = cloneMesh;
+	//	}
+	//}
 
 	//메쉬 최적화 ( 인접 버퍼를 이용하여 메쉬를 최적화 한다 )
-	this->pMesh->OptimizeInplace(
+	_pMesh->OptimizeInplace(
 		D3DXMESHOPT_ATTRSORT |		//메쉬 서브셋순서대로 정렬 ( DrawSubset 효율을 높인다 )
 		D3DXMESHOPT_COMPACT |		//메쉬에서 사용되지 않는 정점과 인덱스 해제
 		D3DXMESHOPT_VERTEXCACHE,	//정점 Cache 히트율 높힌다.
-		(DWORD*)pAdjacency->GetBufferPointer(),		//인접버퍼 넘겨야 한다.
+		(DWORD*)_pAdjacency->GetBufferPointer(),		//인접버퍼 넘겨야 한다.
 		nullptr,			//최적화를 마지고 결과로 얻는 인접정보 ( 더이상 필요없으면 NULL )
 		nullptr,			//최적화된 인덱스 정보
 		nullptr			//최적화된 정점 버퍼 정보 
@@ -123,12 +129,9 @@ HRESULT XMesh::Init(std::string filePath, const D3DXMATRIXA16* matCorrection /*=
 
 	//attribute table은 Optimization을 할때 D3DXMESHOPT_ATTSORT를 함으로서 생성된다
 	DWORD attributeTableSize{};
-	pMesh->GetAttributeTable(nullptr, &attributeTableSize);
-	D3DXATTRIBUTERANGE *range = new D3DXATTRIBUTERANGE[attributeTableSize];
-	pMesh->GetAttributeTable(range, &attributeTableSize);
-
-	//최적화가 끝났으니 해재
-	SAFE_RELEASE(pAdjacency);
+	_pMesh->GetAttributeTable(nullptr, &attributeTableSize);
+	_attributeRange = new D3DXATTRIBUTERANGE[attributeTableSize];
+	_pMesh->GetAttributeTable(_attributeRange, &attributeTableSize);
 
 	//
 	// 메쉬 보정 처리
@@ -149,7 +152,9 @@ HRESULT XMesh::Init(std::string filePath, const D3DXMATRIXA16* matCorrection /*=
 
 void XMesh::Release()
 {
-	SAFE_RELEASE(pMesh);
+	SAFE_RELEASE(_pAdjacency);
+	SAFE_DELETE_ARRAY(_attributeRange);
+	SAFE_RELEASE(_pMesh);
 }
 
 void XMesh::Render()
@@ -198,8 +203,6 @@ void XMesh::Render()
 
 	//sStaticMeshEffect->End();
 
-
-
 }
 
 
@@ -207,13 +210,10 @@ void XMesh::Render()
 ////////////////////////////////////////////////////////////////////////
 
 //보정행렬대로 메쉬를 수정한다.
-void XMesh::MeshCorrection(const D3DXMATRIXA16* pmatCorrection)
+void XMesh::MeshCorrection(const Matrix* pMatCorrection)
 {
-	//정점 Element 를 얻어 정점 정보를 얻자
-	D3DVERTEXELEMENT9 pVerElement[MAX_FVF_DECL_SIZE];
-
 	//pVerElement 배열에는 정점의 요소 정보가 들어가게 된다.
-	pMesh->GetDeclaration(pVerElement);
+	_pMesh->GetDeclaration(_pVerElement);
 
 	//정점 Position Offset;
 	int positionOffset = -1;
@@ -231,145 +231,129 @@ void XMesh::MeshCorrection(const D3DXMATRIXA16* pmatCorrection)
 	for (DWORD i = 0; i < MAX_FVF_DECL_SIZE; i++) {
 
 		//마지막을 만났다면....
-		if (pVerElement[i].Type == D3DDECLTYPE_UNUSED)
+		if (_pVerElement[i].Type == D3DDECLTYPE_UNUSED)
 		{
 			//탈출
 			break;
 		}
 
 		//정점위치 정보를 만났다면....
-		if (pVerElement[i].Usage == D3DDECLUSAGE_POSITION)
+		if (_pVerElement[i].Usage == D3DDECLUSAGE_POSITION)
 		{
-			positionOffset = pVerElement[i].Offset;
+			positionOffset = _pVerElement[i].Offset;
 		}
 
 		//정점노말 정보를 만났다면...
-		else if (pVerElement[i].Usage == D3DDECLUSAGE_NORMAL)
+		else if (_pVerElement[i].Usage == D3DDECLUSAGE_NORMAL)
 		{
-			normalOffet = pVerElement[i].Offset;
+			normalOffet = _pVerElement[i].Offset;
 		}
 
 		//정점탄젠트 정보를 만났다면...
-		else if (pVerElement[i].Usage == D3DDECLUSAGE_TANGENT)
+		else if (_pVerElement[i].Usage == D3DDECLUSAGE_TANGENT)
 		{
-			tangentOffet = pVerElement[i].Offset;
+			tangentOffet = _pVerElement[i].Offset;
 		}
 
 		//정점바이노말 정보를 만났다면...
-		else if (pVerElement[i].Usage == D3DDECLUSAGE_BINORMAL)
+		else if (_pVerElement[i].Usage == D3DDECLUSAGE_BINORMAL)
 		{
-			binormalOffet = pVerElement[i].Offset;
+			binormalOffet = _pVerElement[i].Offset;
 		}
 	}
 
 
 	//버텍스 갯수
-	DWORD verNum = pMesh->GetNumVertices();
-
+	uint32 verNum = _pMesh->GetNumVertices();
 	//메쉬의 정점 FVF 정보혹은 Decl 정보를 이용하여 정점하나당 크기를 알아내자.
 	//DWORD verSize = D3DXGetFVFVertexSize( pMesh->GetFVF() );
-	DWORD verSize = D3DXGetDeclVertexSize(pVerElement, 0);
+	DWORD verSize = D3DXGetDeclVertexSize(_pVerElement, 0);
 
 	//메쉬의 버텍스 버퍼를 Lock 한다
 	void* p = NULL;
-	pMesh->LockVertexBuffer(0, &p);
+	_pMesh->LockVertexBuffer(0, &p);
 
 	//바운드 MinMax 계산을 위한 초기화......
-	this->Bound_Min = D3DXVECTOR3(0, 0, 0);
-	this->Bound_Max = D3DXVECTOR3(0, 0, 0);
-
-
+	this->_boundMin = Vector3(0, 0, 0);
+	this->_boundMax = Vector3(0, 0, 0);
 
 	//버텍스 수만클 돌아 재낀다....
-	for (DWORD i = 0; i < verNum; i++) {
-
+	for (uint32 i = 0; i < verNum; i++) 
+	{
 		//버텍스 시작 주소
 		char* pVertex = ((char*)p + (i * verSize));
 
 		//정점 위치가 있다면...
-		if (positionOffset != -1) {
-			D3DXVECTOR3* pos = (D3DXVECTOR3*)(pVertex + positionOffset);
+		if (positionOffset != -1) 
+		{
+			Vector3* pos = (Vector3*)(pVertex + positionOffset);
 
-			D3DXVec3TransformCoord(
-				pos,
-				pos,
-				pmatCorrection);
+			Vec3TransformCoord( pos, pos, pMatCorrection);
 
 			//정점 최소 값갱신
-			if (Bound_Min.x > pos->x)		Bound_Min.x = pos->x;
-			if (Bound_Min.y > pos->y)		Bound_Min.y = pos->y;
-			if (Bound_Min.z > pos->z)		Bound_Min.z = pos->z;
+			if (_boundMin.x > pos->x)		_boundMin.x = pos->x;
+			if (_boundMin.y > pos->y)		_boundMin.y = pos->y;
+			if (_boundMin.z > pos->z)		_boundMin.z = pos->z;
 
 			//정점 최대 값갱신
-			if (Bound_Max.x < pos->x)		Bound_Max.x = pos->x;
-			if (Bound_Max.y < pos->y)		Bound_Max.y = pos->y;
-			if (Bound_Max.z < pos->z)		Bound_Max.z = pos->z;
+			if (_boundMax.x < pos->x)		_boundMax.x = pos->x;
+			if (_boundMax.y < pos->y)		_boundMax.y = pos->y;
+			if (_boundMax.z < pos->z)		_boundMax.z = pos->z;
 
 			//정점 위치 푸쉬
-			this->Vertices.push_back(*pos);
+			_vertices.push_back(*pos);
 		}
 
 		//노말정보가 있다면..
-		if (normalOffet != -1) {
-			D3DXVECTOR3* nor = (D3DXVECTOR3*)(pVertex + normalOffet);
+		if (normalOffet != -1) 
+		{
+			Vector3* nor = (Vector3*)(pVertex + normalOffet);
 
-			D3DXVec3TransformNormal(
-				nor,
-				nor,
-				pmatCorrection);
+			Vec3TransformNormal( nor, nor, pMatCorrection);
 
-			D3DXVec3Normalize(nor, nor);
+			Vec3Normalize(nor, nor);
 
 			//정점 노말 푸쉬
-			Normals.push_back(*nor);
+			_normals.push_back(*nor);
 		}
 
 
 		//tangent 정보가 있다면.
-		if (tangentOffet != -1) {
-			D3DXVECTOR3* tangent = (D3DXVECTOR3*)(pVertex + tangentOffet);
+		if (tangentOffet != -1) 
+		{
+			Vector3* tangent = (Vector3*)(pVertex + tangentOffet);
 
-			D3DXVec3TransformNormal(
-				tangent,
-				tangent,
-				pmatCorrection);
+			Vec3TransformNormal( tangent, tangent, pMatCorrection);
 
-			D3DXVec3Normalize(tangent, tangent);
+			Vec3Normalize(tangent, tangent);
 
 		}
 
 		//binormal 정보가 있다면
-		if (binormalOffet != -1) {
-			D3DXVECTOR3* binor = (D3DXVECTOR3*)(pVertex + binormalOffet);
-
-			D3DXVec3TransformNormal(
-				binor,
-				binor,
-				pmatCorrection);
-
-			D3DXVec3Normalize(binor, binor);
+		if (binormalOffet != -1) 
+		{
+			Vector3* binor = (Vector3*)(pVertex + binormalOffet);
+			Vec3TransformNormal( binor, binor, pMatCorrection);
+			Vec3Normalize(binor, binor);
 		}
 	}
-	pMesh->UnlockVertexBuffer();
+	_pMesh->UnlockVertexBuffer();
 
 	//Bound 추가 계산
-	this->Bound_Center = (this->Bound_Min + this->Bound_Max) * 0.5f;
-	this->Bound_Size = D3DXVECTOR3(
-		Bound_Max.x - Bound_Min.x,
-		Bound_Max.y - Bound_Min.y,
-		Bound_Max.z - Bound_Min.z);
-	this->Bound_HalfSize = this->Bound_Size * 0.5f;
-	this->Bound_Radius = D3DXVec3Length(&(this->Bound_Center - this->Bound_Min));
+	this->_boundCenter = (this->_boundMin + this->_boundMax) * 0.5f;
+	this->_boundSize = Vector3( _boundMax.x - _boundMin.x, _boundMax.y - _boundMin.y, _boundMax.z - _boundMin.z);
+	this->_boundHalfSize = this->_boundSize * 0.5f;
+	this->_boundRadius = D3DXVec3Length(&(this->_boundCenter - this->_boundMin));
 
 
 	//
 	// 인덱스 버퍼를 얻는다
 	//
 	LPDIRECT3DINDEXBUFFER9 pIndexBuffer;
-	this->pMesh->GetIndexBuffer(&pIndexBuffer);
+	_pMesh->GetIndexBuffer(&pIndexBuffer);
 
 	//면의 갯수
-	this->TriNum = pMesh->GetNumFaces();
+	_triNum = _pMesh->GetNumFaces();
 
 	//인덱스 버퍼에 대한 정보를 얻는다.
 	D3DINDEXBUFFER_DESC desc;
@@ -377,32 +361,28 @@ void XMesh::MeshCorrection(const D3DXMATRIXA16* pmatCorrection)
 
 	if (desc.Format == D3DFMT_INDEX16)
 	{
-		WORD* p = NULL;
+		uint16* p = NULL;
 		pIndexBuffer->Lock(0, 0, (void**)&p, 0);
 
-		for (DWORD i = 0; i < TriNum; i++)
+		for (DWORD i = 0; i < _triNum; i++)
 		{
-			this->Indices.push_back(p[i * 3 + 0]);
-			this->Indices.push_back(p[i * 3 + 1]);
-			this->Indices.push_back(p[i * 3 + 2]);
+			_indices.push_back(p[i * 3 + 0]);
+			_indices.push_back(p[i * 3 + 1]);
+			_indices.push_back(p[i * 3 + 2]);
 
 		}
-
-
 		pIndexBuffer->Unlock();
-
 	}
-
 	else if (desc.Format == D3DFMT_INDEX32)
 	{
-		DWORD* p = NULL;
+		uint32* p = NULL;
 		pIndexBuffer->Lock(0, 0, (void**)&p, 0);
 
-		for (DWORD i = 0; i < TriNum; i++)
+		for (uint32 i = 0; i < _triNum; i++)
 		{
-			this->Indices.push_back(p[i * 3 + 0]);
-			this->Indices.push_back(p[i * 3 + 1]);
-			this->Indices.push_back(p[i * 3 + 2]);
+			_indices.push_back(p[i * 3 + 0]);
+			_indices.push_back(p[i * 3 + 1]);
+			_indices.push_back(p[i * 3 + 2]);
 		}
 
 		pIndexBuffer->Unlock();
@@ -411,3 +391,25 @@ void XMesh::MeshCorrection(const D3DXMATRIXA16* pmatCorrection)
 	//얻어온 인덱스 버퍼는 해재
 	SAFE_RELEASE(pIndexBuffer);
 }
+
+//HRESULT XMesh::CloneMeshFVF(DWORD options, DWORD fvf, HRESULT hRet);
+//	LPD3DXMESH pCloneMesh = nullptr;
+//
+//	// Validate requirements
+//	if (!_pMesh || !pMeshOut)
+//	{
+//		return D3DERR_INVALIDCALL;
+//	}
+//	  // Attempt to clone the mesh
+//	hRet = _pMesh->CloneMeshFVF(options, fvf, gpDevice, &pCloneMesh);
+//	if (FAILED(hRet))
+//	{
+//		Assert(false)//Mesh Cloning failed;
+//		return E_FAIL;
+//	}
+//	pMeshOut = pCloneMesh;
+//	pCloneMesh = nullptr;
+//
+//	// Success!!
+//	return S_OK;
+//}

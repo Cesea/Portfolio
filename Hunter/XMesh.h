@@ -1,51 +1,50 @@
 #ifndef XMESH_H
 #define XMESH_H
 
-class XMesh 
+struct XMesh 
 {
 public:
-	LPD3DXMESH							pMesh;
-	DWORD								dwMaterialsNum;			//로딩된 매쉬의 재질 갯수
-	std::vector<LPDIRECT3DTEXTURE9>		vecDiffuseTex;			//로딩된 메쉬에서 사용하는 DiffuseTexture
-	std::vector<LPDIRECT3DTEXTURE9>		vecNormalTex;			//로딩된 메쉬에서 사용하는 NormalTexture
-	std::vector<LPDIRECT3DTEXTURE9>		vecSpecularTex;			//로딩된 메쉬에서 사용하는 SpecularTexture
-	std::vector<LPDIRECT3DTEXTURE9>		vecEmissionTex;			//로딩된 메쉬에서 사용하는 EmissionTexture
-	std::vector<D3DMATERIAL9>			vecMaterials;			//로딩된 메쉬에서 사용하는 매터리얼...
+	LPD3DXMESH _pMesh;
+	uint32 _materialNum;			//로딩된 매쉬의 재질 갯수
 
-	std::vector<D3DXVECTOR3>			Vertices;				//정점들
-	std::vector<D3DXVECTOR3>			Normals;				//점정 노말
-	std::vector<DWORD>					Indices;				//인덱스
-	DWORD								TriNum;					//삼각면의 갯수
+	std::vector<std::string> texturePaths;	
+	std::vector<D3DMATERIAL9> vecMaterials;	
 
-	D3DXVECTOR3							Bound_Min;					//바운드의 최소 위치 
-	D3DXVECTOR3							Bound_Max;					//바운드의 최대 위치 
-	D3DXVECTOR3							Bound_Center;				//바운드의 센터	( 주의 사항 피봇이 아니다 )
-	D3DXVECTOR3							Bound_Size;					//바운드의 크기
-	D3DXVECTOR3							Bound_HalfSize;				//바운드의 절반크기
-	float								Bound_Radius;				//바운드의 외접구 반지름
+	std::vector<Vector3> _vertices;				//정점들
+	std::vector<Vector3> _normals;				//점정 노말
+	std::vector<uint32>	_indices;				//인덱스
+	uint32 _triNum;					//삼각면의 갯수
 
-																	//물리매니져는 내친구.....
-	friend class cPhysicManager;
+	Vector3	_boundMin;					//바운드의 최소 위치 
+	Vector3	_boundMax;					//바운드의 최대 위치 
+	Vector3	_boundCenter;				//바운드의 센터	( 주의 사항 피봇이 아니다 )
+	Vector3	_boundSize;					//바운드의 크기
+	Vector3	_boundHalfSize;				//바운드의 절반크기
+	float _boundRadius;				//바운드의 외접구 반지름
+
+	D3DVERTEXELEMENT9 _pVerElement[MAX_FVF_DECL_SIZE];
+	D3DXATTRIBUTERANGE *_attributeRange{nullptr};
+
+	LPD3DXBUFFER _pAdjacency{};
+	LPD3DXBUFFER _pMaterial{};
 
 public:
 	XMesh(void);
 	~XMesh(void);
 
-	virtual HRESULT Init(std::string filePath, const D3DXMATRIXA16* matCorrection = NULL);
+	virtual HRESULT Load(const std::string &fileName, const Matrix* matCorrection = nullptr);
 
 	virtual void Release();
 
 	virtual void Render();
 
-
-private:
 	//보정행렬대로 메쉬를 수정한다.
-	void MeshCorrection(const D3DXMATRIXA16* pmatCorrection);
+	void MeshCorrection(const Matrix* pMatCorrection);
 
+	//Utils
+	//HRESULT CloneMeshFVF(DWORD options, DWORD fvf, ID3DXMesh *pMeshOut);
 
 public:
 };
-
-
 
 #endif
