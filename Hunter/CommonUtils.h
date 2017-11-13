@@ -231,7 +231,24 @@ inline std::string GetFilePath(std::string &str)
 	return path;
 }
 
-inline std::string GetFileName(std::string &str)
+inline std::string GetFileExtension(std::string &str)
+{
+	std::string extension;
+	int lastPathIndex = 0;
+	lastPathIndex = str.find_last_of('.');
+	if (lastPathIndex == -1)
+	{
+		Assert(false); //주어진 str에 .문자가 없다
+	}
+
+	if (lastPathIndex != -1)
+	{
+		extension = str.substr(lastPathIndex + 1, str.length() - lastPathIndex);
+	}
+	return extension;
+}
+
+inline std::string GetFileName(std::string &str, bool removeExtension)
 {
 	std::string name;
 	int lastPathIndex = 0;		
@@ -243,10 +260,32 @@ inline std::string GetFileName(std::string &str)
 
 	if (lastPathIndex != -1) 
 	{
-		name = str.substr(lastPathIndex, str.length() - lastPathIndex);
+		name = str.substr(lastPathIndex + 1, str.length() - lastPathIndex);
+	}
+
+	if (removeExtension)
+	{
+		lastPathIndex = name.find_last_of('.');
+		if (lastPathIndex == -1)
+		{
+			Assert(false); //주어진 str에 .문자가 없다
+		}
+		if (lastPathIndex != -1)
+		{
+			name = name.substr(0, lastPathIndex);
+		}
 	}
 	return name;
 }
+
+inline void SplitFilePathToNamePathExtension(std::string &original,
+	std::string &name, std::string &path, std::string &extension)
+{
+	name = GetFileName(original, true);
+	path = GetFilePath(original);
+	extension = GetFileExtension(original);
+}
+
 
 float RandFloat();
 float RandFloat(float max);

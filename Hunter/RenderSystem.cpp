@@ -21,14 +21,19 @@ void RenderSystem::Render(video::RenderView &renderView, const Camera &camera)
 		TransformComponent &transformComponent = entities[i].GetComponent<TransformComponent>();
 		RenderComponent &refRenderComponent = entities[i].GetComponent<RenderComponent>();
 
-
-		if (camera.GetFrustum().IsSphereInFrustum(transformComponent.GetWorldPosition(), 1.0f))
+		//if (camera.GetFrustum().IsSphereInFrustum(transformComponent.GetWorldPosition(), 50.0f))
 		{
+			//변환 행렬을 설정한다
 			renderView.SetTransform(transformComponent.GetFinalMatrix());
 
+			//이펙트를 설정한다
+			renderView.SetEffect(refRenderComponent.model._effect);
+
+			//RenderGroup을 돌면서 각각의 그룹을 제출한다
 			for (uint32 i = 0; i < refRenderComponent.model._groups.size(); ++i)
 			{
 				renderView.SubmitGroup(refRenderComponent.model._groups[i]);
+				renderView.Draw();
 			}
 
 			//for (uint32 i = 0; i < refRenderComponent.model._groups.size(); ++i)

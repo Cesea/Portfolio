@@ -210,7 +210,7 @@ namespace video
 	struct Model
 	{
 		//XFile을 먼저 로드 하고 정보를 추출하여 내가 원하는 포멧으로 변환한다.
-		bool CreateFromX(const std::string &fileName);
+		bool CreateFromX(const std::string &filePath, const Matrix *pMatCorrection = nullptr);
 		void Destroy();
 
 		std::vector<video::RenderGroupHandle> _groups;
@@ -304,7 +304,7 @@ namespace video
 		bool _needResolve;
 	};
 
-	//이거 만들어야 함...
+	//TODO : Matrix Cache에서 여러개의 행렬을 넣을 수 있게끔 지원하라
 	struct MatrixCache
 	{
 		MatrixCache() 

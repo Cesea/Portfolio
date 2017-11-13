@@ -100,8 +100,8 @@ namespace video
 		void DestroyRenderGroup(RenderGroupHandle handle);
 		void RenderGroupSetEffect(RenderGroupHandle group, EffectHandle effect);
 
-
 	private:
+		//Private Functions
 		bool InitD3D(HWND windowHandle);
 
 		bool InitDefaultRenderState();
@@ -109,7 +109,11 @@ namespace video
 		void DrawPrimitive(const video::RenderState &renderState, Matrix *matrices);
 		void DrawIndexPrimitive(const video::RenderState &renderState, Matrix *matrices);
 
+		void LoadDefaultTextures();
+		void LoadDefaultEffects();
+
 	private :
+		//Private Variables
 
 		LPDIRECT3D9 _pD3D;
 		LPDIRECT3DDEVICE9 _pDevice;
@@ -121,7 +125,6 @@ namespace video
 		RenderWindow _renderWindow;
 
 		EventChannel _channel;
-
 
 		RenderState _activeState;
 
@@ -147,7 +150,6 @@ namespace video
 
 		ResourceHandlePool<MaterialHandle> _materialHandlePool;
 		ResourceHandlePool<RenderGroupHandle> _renderGroupHandlePool;
-
 	};
 }
 #endif

@@ -28,7 +28,7 @@ HRESULT XMesh::Load(const std::string &fileName, const Matrix* matCorrection /*=
 		return E_FAIL;
 	}
 
-	_materialNum = dwMatNum;
+	_numMaterial = dwMatNum;
 
 	//로딩 경로에서 파일명만 제거하고 경로만 받는다.
 	std::string path;
@@ -42,7 +42,7 @@ HRESULT XMesh::Load(const std::string &fileName, const Matrix* matCorrection /*=
 
 	LPD3DXMATERIAL pMaterials = (LPD3DXMATERIAL)_pMaterial->GetBufferPointer();
 
-	for (uint32 i = 0; i < this->_materialNum; i++) {
+	for (uint32 i = 0; i < this->_numMaterial; i++) {
 
 		D3DMATERIAL9 mtrl = pMaterials[i].MatD3D;
 
@@ -50,7 +50,7 @@ HRESULT XMesh::Load(const std::string &fileName, const Matrix* matCorrection /*=
 		mtrl.Ambient = mtrl.Diffuse;
 
 		//메터리얼 정보 푸쉬
-		this->vecMaterials.push_back(mtrl);
+		this->_vecMaterials.push_back(mtrl);
 
 		//메터리얼의 Texture 정보가 있다면..
 		if (pMaterials[i].pTextureFilename != NULL) {
@@ -58,63 +58,10 @@ HRESULT XMesh::Load(const std::string &fileName, const Matrix* matCorrection /*=
 			//tex 파일경로는 Mesh 파일경로 + texture 파일이름
 			texFilePath = path + pMaterials[i].pTextureFilename;
 
-			texturePaths.push_back(texFilePath);
-
-			//Texture 로딩하고 푸쉬
-			//vecDiffuseTex.push_back(RESOURCE_TEXTURE->GetResource(texFilePath));
-
-			//파일 이름과 확장자 위치
-			//int dotIndex = texFilePath.find_last_of(".");
-
-			//파일 명과 확장자를 나눈다.
-			//texFile = texFilePath.substr(0, dotIndex);
-			//texExp = texFilePath.substr(dotIndex + 1, filePath.length());
-
-			////
-			//// 노말말 맵은 _N 이 붙는다.
-			////
-			//texFilePath = texFile + "_N." + texExp;
-			//LPDIRECT3DTEXTURE9 pNorTex = RESOURCE_TEXTURE->GetResource(texFilePath);
-			////없다면...
-			//	this->vecNormalTex.push_back(pNorTex);
-
-			////
-			//// 스펙큘러 맵은 _S 이 붙는다.
-			////
-			//texFilePath = texFile + "_S." + texExp;
-			//LPDIRECT3DTEXTURE9 pSpecTex = RESOURCE_TEXTURE->GetResource(texFilePath);
-			////없다면...
-			//	this->vecSpecularTex.push_back(pSpecTex);
-
-
-			////
-			//// 이미션 맵은 _E 이 붙는다.
-			////
-			//texFilePath = texFile + "_E." + texExp;
-			//LPDIRECT3DTEXTURE9 pEmiTex = RESOURCE_TEXTURE->GetResource(texFilePath);
-			////없다면...
-			//	this->vecEmissionTex.push_back(pEmiTex);
+			_texturePaths.push_back(texFilePath);
 		}
 	}
-	//얻어온 재질 정보를 다 사용하여 재질과 Texture 를 로딩 했기때문에 
-	//더이상 pMaterial 재질 버퍼는 필요 없어 꼭 메모리 해재를 해주어야 한다.
 	SAFE_RELEASE(_pMaterial);
-
-	//if (desiredFVF != 0)
-	//{
-	//	// 만약 Mesh의 FVF가 인자로 넘긴 desiredFVF와 다르다면 처리를 해 주어야 한다
-	//	DWORD originalFVF = _pMesh->GetFVF();
-	//	ID3DXMesh *cloneMesh = nullptr;
-	//	if (originalFVF != desiredFVF)
-	//	{
-	//		CloneMeshFVF(D3DXMESH_MANAGED, desiredFVF, cloneMesh);
-	//	}
-	//	if (cloneMesh)
-	//	{
-	//		COM_RELEASE(_pMesh);
-	//		_pMesh = cloneMesh;
-	//	}
-	//}
 
 	//메쉬 최적화 ( 인접 버퍼를 이용하여 메쉬를 최적화 한다 )
 	_pMesh->OptimizeInplace(
@@ -148,66 +95,18 @@ HRESULT XMesh::Load(const std::string &fileName, const Matrix* matCorrection /*=
 		MatrixIdentity(&matIden);
 		this->MeshCorrection(&matIden);
 	}
+
+	//머테리얼마다 Bound정보를 얻는다
+	BuidSubMeshBoundInfo();
 }
 
 void XMesh::Release()
 {
 	SAFE_RELEASE(_pAdjacency);
 	SAFE_DELETE_ARRAY(_attributeRange);
+	SAFE_DELETE_ARRAY(_subMeshBoundInfo);
 	SAFE_RELEASE(_pMesh);
 }
-
-void XMesh::Render()
-{
-	//월드행렬 셋팅
-	//D3DXMATRIXA16 matWorld = Trans->GetFinalMatrix();
-	//sStaticMeshEffect->SetMatrix("matWorld", &matWorld);
-
-	////광원 방향 일단...
-	//D3DXVECTOR4 lightDir(1, -1, 1, 1);
-	//sStaticMeshEffect->SetVector("vLightDir", &lightDir);
-
-	////라이트 컬러 일단 흰색
-	//D3DXVECTOR4 lightColor(1, 1, 1, 1);
-	//sStaticMeshEffect->SetVector("vLightColor", &lightColor);
-
-
-	//Effect 로 그리기 시작
-
-	////UINT passNum;
-	////sStaticMeshEffect->Begin(&passNum, 0);
-
-	//for (UINT i = 0; i < passNum; i++)
-	//{
-	//	//sStaticMeshEffect->BeginPass(i);
-
-	//	//서브셋수만큼 돌아 재낀다...
-	//	for (int m = 0; m < this->dwMaterialsNum; m++) {
-
-	//		//텍스쳐 셋팅
-	//		sStaticMeshEffect->SetTexture("Diffuse_Tex", this->vecDiffuseTex[m]);
-	//		sStaticMeshEffect->SetTexture("Normal_Tex", this->vecNormalTex[m]);
-	//		sStaticMeshEffect->SetTexture("Specular_Tex", this->vecSpecularTex[m]);
-	//		sStaticMeshEffect->SetTexture("Emission_Tex", this->vecEmissionTex[m]);
-	//		//스펙파워
-	//		sStaticMeshEffect->SetFloat("fSpecPower", this->vecMaterials[m].Power);
-
-	//		//Begin 이 들어오고 난후 값이 바뀌면 다음과 같이 실행
-	//		sStaticMeshEffect->CommitChanges();
-
-	//		this->pMesh->DrawSubset(m);
-	//	}
-
-	//	sStaticMeshEffect->EndPass();
-	//}
-
-	//sStaticMeshEffect->End();
-
-}
-
-
-
-////////////////////////////////////////////////////////////////////////
 
 //보정행렬대로 메쉬를 수정한다.
 void XMesh::MeshCorrection(const Matrix* pMatCorrection)
@@ -228,8 +127,8 @@ void XMesh::MeshCorrection(const Matrix* pMatCorrection)
 	int binormalOffet = -1;
 
 	//일단 돌아재낀다..
-	for (DWORD i = 0; i < MAX_FVF_DECL_SIZE; i++) {
-
+	for (DWORD i = 0; i < MAX_FVF_DECL_SIZE; i++) 
+	{
 		//마지막을 만났다면....
 		if (_pVerElement[i].Type == D3DDECLTYPE_UNUSED)
 		{
@@ -262,7 +161,6 @@ void XMesh::MeshCorrection(const Matrix* pMatCorrection)
 		}
 	}
 
-
 	//버텍스 갯수
 	uint32 verNum = _pMesh->GetNumVertices();
 	//메쉬의 정점 FVF 정보혹은 Decl 정보를 이용하여 정점하나당 크기를 알아내자.
@@ -274,8 +172,8 @@ void XMesh::MeshCorrection(const Matrix* pMatCorrection)
 	_pMesh->LockVertexBuffer(0, &p);
 
 	//바운드 MinMax 계산을 위한 초기화......
-	this->_boundMin = Vector3(0, 0, 0);
-	this->_boundMax = Vector3(0, 0, 0);
+	_meshBoundInfo._boundMin = Vector3(0, 0, 0);
+	_meshBoundInfo._boundMax = Vector3(0, 0, 0);
 
 	//버텍스 수만클 돌아 재낀다....
 	for (uint32 i = 0; i < verNum; i++) 
@@ -291,14 +189,14 @@ void XMesh::MeshCorrection(const Matrix* pMatCorrection)
 			Vec3TransformCoord( pos, pos, pMatCorrection);
 
 			//정점 최소 값갱신
-			if (_boundMin.x > pos->x)		_boundMin.x = pos->x;
-			if (_boundMin.y > pos->y)		_boundMin.y = pos->y;
-			if (_boundMin.z > pos->z)		_boundMin.z = pos->z;
+			if (_meshBoundInfo._boundMin.x > pos->x)		_meshBoundInfo._boundMin.x = pos->x;
+			if (_meshBoundInfo._boundMin.y > pos->y)		_meshBoundInfo._boundMin.y = pos->y;
+			if (_meshBoundInfo._boundMin.z > pos->z)		_meshBoundInfo._boundMin.z = pos->z;
 
 			//정점 최대 값갱신
-			if (_boundMax.x < pos->x)		_boundMax.x = pos->x;
-			if (_boundMax.y < pos->y)		_boundMax.y = pos->y;
-			if (_boundMax.z < pos->z)		_boundMax.z = pos->z;
+			if (_meshBoundInfo._boundMax.x < pos->x)		_meshBoundInfo._boundMax.x = pos->x;
+			if (_meshBoundInfo._boundMax.y < pos->y)		_meshBoundInfo._boundMax.y = pos->y;
+			if (_meshBoundInfo._boundMax.z < pos->z)		_meshBoundInfo._boundMax.z = pos->z;
 
 			//정점 위치 푸쉬
 			_vertices.push_back(*pos);
@@ -340,11 +238,15 @@ void XMesh::MeshCorrection(const Matrix* pMatCorrection)
 	_pMesh->UnlockVertexBuffer();
 
 	//Bound 추가 계산
-	this->_boundCenter = (this->_boundMin + this->_boundMax) * 0.5f;
-	this->_boundSize = Vector3( _boundMax.x - _boundMin.x, _boundMax.y - _boundMin.y, _boundMax.z - _boundMin.z);
-	this->_boundHalfSize = this->_boundSize * 0.5f;
-	this->_boundRadius = D3DXVec3Length(&(this->_boundCenter - this->_boundMin));
+	_meshBoundInfo._boundCenter = (_meshBoundInfo._boundMin + _meshBoundInfo._boundMax) * 0.5f;
 
+	_meshBoundInfo._boundSize = 
+		Vector3( _meshBoundInfo._boundMax.x - _meshBoundInfo._boundMin.x, 
+			_meshBoundInfo._boundMax.y - _meshBoundInfo._boundMin.y, 
+			_meshBoundInfo._boundMax.z - _meshBoundInfo._boundMin.z);
+
+	_meshBoundInfo._boundHalfSize = _meshBoundInfo._boundSize * 0.5f;
+	_meshBoundInfo._boundRadius = D3DXVec3Length(&(_meshBoundInfo._boundCenter - _meshBoundInfo._boundMin));
 
 	//
 	// 인덱스 버퍼를 얻는다
@@ -390,6 +292,54 @@ void XMesh::MeshCorrection(const Matrix* pMatCorrection)
 
 	//얻어온 인덱스 버퍼는 해재
 	SAFE_RELEASE(pIndexBuffer);
+}
+
+void XMesh::BuidSubMeshBoundInfo()
+{
+	//머테리얼의 갯수가 2개 이상일때만 이 함수가 실행 되도록 한다.
+	//한개일때는 이미 MatCorrection함수를 통하여 BoundInfo가 생성되므로 그 함수를 사용하도록 한다
+	if (_numMaterial > 1)
+	{
+		_subMeshBoundInfo = new BoundInfo[_numMaterial];
+		Assert(_subMeshBoundInfo);
+
+		for (uint32 i = 0; i < _numMaterial; ++i)
+		{
+			CalculateBoundingInfo(_vertices, &_subMeshBoundInfo[i],
+				_attributeRange[i].VertexStart, _attributeRange[i].VertexStart + _attributeRange[i].VertexCount);
+		}
+	}
+}
+
+void XMesh::CalculateBoundingInfo(std::vector<Vector3>& positions, BoundInfo * pOutBoundInfo, uint32 startVertex, uint32 endVertex)
+{
+	memset(pOutBoundInfo, 0, sizeof(BoundInfo));
+	Assert(startVertex >= 0);
+	Assert(endVertex <= _vertices.size());
+	for (uint32 i = startVertex; i < endVertex; ++i)
+	{
+		const Vector3 &refVertex = _vertices[i];
+		//정점 최소 값갱신
+		if (pOutBoundInfo->_boundMin.x > refVertex.x)		pOutBoundInfo->_boundMin.x = refVertex.x;
+		if (pOutBoundInfo->_boundMin.y > refVertex.y)		pOutBoundInfo->_boundMin.y = refVertex.y;
+		if (pOutBoundInfo->_boundMin.z > refVertex.z)		pOutBoundInfo->_boundMin.z = refVertex.z;
+
+		//정점 최대 값갱신
+		if (pOutBoundInfo->_boundMax.x < refVertex.x)		pOutBoundInfo->_boundMax.x = refVertex.x;
+		if (pOutBoundInfo->_boundMax.y < refVertex.y)		pOutBoundInfo->_boundMax.y = refVertex.y;
+		if (pOutBoundInfo->_boundMax.z < refVertex.z)		pOutBoundInfo->_boundMax.z = refVertex.z;
+
+	}
+	//Bound 추가 계산
+	pOutBoundInfo->_boundCenter = (pOutBoundInfo->_boundMin + pOutBoundInfo->_boundMax) * 0.5f;
+
+	pOutBoundInfo->_boundSize =
+		Vector3(pOutBoundInfo->_boundMax.x - pOutBoundInfo->_boundMin.x,
+			pOutBoundInfo->_boundMax.y - pOutBoundInfo->_boundMin.y,
+			pOutBoundInfo->_boundMax.z - pOutBoundInfo->_boundMin.z);
+
+	pOutBoundInfo->_boundHalfSize = pOutBoundInfo->_boundSize * 0.5f;
+	pOutBoundInfo->_boundRadius = D3DXVec3Length(&(pOutBoundInfo->_boundCenter - pOutBoundInfo->_boundMin));
 }
 
 //HRESULT XMesh::CloneMeshFVF(DWORD options, DWORD fvf, HRESULT hRet);

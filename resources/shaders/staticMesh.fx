@@ -2,6 +2,16 @@ uniform extern float4x4 gWorld;
 uniform extern float4x4 gView;
 uniform extern float4x4 gProjection;
 
+// Diffuse, Normal, Specular, Emission 순으로 0, 1, 2, 3이렇게 간다
+
+uniform extern texture gTexture0;
+
+sampler texture0Sampler = sampler_state
+{
+	Texture = <gTexture0>;
+	MinFilter = LINEAR;
+	MagFilter = LINEAR;
+};
 
 //---------------------------------------------------------------
 // Base 관련
@@ -10,15 +20,18 @@ struct vs_input
 {
    float4 position : POSITION0;
    float3 normal : NORMAL0;
-   float3 binormal : BINORMAL0;
-   float3 tangent : TANGENT0;
-   float2 texcoord : TEXCOORD0;
+	float2 texcoord : TEXCOORD0;
+
+   //float3 binormal : BINORMAL0;
+   //float3 tangent : TANGENT0;
+   //float2 texcoord : TEXCOORD0;
 };
 
 struct vs_output 
 {
    float4 position : POSITION0;
-   //float2 Texcoord : TEXCOORD0;
+   float2 texcoord : TEXCOORD0;
+
    //float3 Normal : TEXCOORD1;
    //float3 Binormal : TEXCOORD2;
    //float3 Tangent : TEXCOORD3;
@@ -35,7 +48,7 @@ vs_output vs_main( vs_input input )
    result.position = mul( worldPos, gView);
    result.position = mul( result.position, gProjection);
    
-   //result.Texcoord = Input.Texcoord;
+   result.texcoord = input.texcoord;
    
    //result.Normal = mul( Input.Normal, (float3x3)matWorld );
    //result.Binormal = mul( Input.Binormal, (float3x3)matWorld );  
@@ -51,7 +64,7 @@ vs_output vs_main( vs_input input )
 
 float4 ps_main(vs_output input) : COLOR
 {
-	return float4(1.0f, 1.0f, 0.0f, 1.0f);
+	return tex2D(texture0Sampler, input.texcoord);
 }
 
 //--------------------------------------------------------------//

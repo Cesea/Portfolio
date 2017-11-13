@@ -1,4 +1,4 @@
-#include "stdafx.h"
+ï»¿#include "stdafx.h"
 #include "VideoResource.h"
 
 namespace video
@@ -29,7 +29,7 @@ namespace video
 	};
 
 
-	//TODO : Áö±İ ÇöÀç ´ÙÀÌ³ª¹Í ¹öÆÛ´Â Áö¿øÀÌ µÇÁö ¾Ê´Â´Ù. ¸¸µéÀÚ....
+	//TODO : ì§€ê¸ˆ í˜„ì¬ ë‹¤ì´ë‚˜ë¯¹ ë²„í¼ëŠ” ì§€ì›ì´ ë˜ì§€ ì•ŠëŠ”ë‹¤. ë§Œë“¤ì....
 	bool VertexBuffer::Create(uint32 size, void *data, VertexDeclHandle decl)
 	{
 		if (nullptr == data)
@@ -261,9 +261,6 @@ namespace video
 
 	void VertexDecl::End(uint32 stride)
 	{
-		D3DVERTEXELEMENT9 end = D3DDECL_END();
-		memcpy(&_elements[_count], &end, sizeof(D3DVERTEXELEMENT9));
-
 		_stride = stride;
 		VIDEO_CHECK(gpDevice->CreateVertexDeclaration(_elements, &_ptr));
 	}
@@ -276,13 +273,18 @@ namespace video
 	bool Texture::Create(const std::string fileName)
 	{
 		D3DXIMAGE_INFO imageInfo;
-		VIDEO_CHECK(D3DXGetImageInfoFromFile(fileName.c_str(), &imageInfo));
+		if (FAILED(D3DXGetImageInfoFromFile(fileName.c_str(), &imageInfo)))
+		{
+			return false;
+		}
 
-		VIDEO_CHECK(D3DXCreateTextureFromFile(gpDevice, fileName.c_str(), &_ptr));
+		if (FAILED(D3DXCreateTextureFromFile(gpDevice, fileName.c_str(), &_ptr)))
+		{
+			return false;
+		}
 
 		_width = imageInfo.Width;
 		_height = imageInfo.Height;
-
 		_format = imageInfo.Format;
 
 		return true;
@@ -376,9 +378,10 @@ namespace video
 		_commandBuffer.Write<uint32>(primCount);
 	}
 
+	//SubmitGroupì€ effectë¥¼ ì…‹íŒ…í•˜ì§€ëŠ” ì•ŠëŠ”ë‹¤
 	void RenderView::SubmitGroup(RenderGroupHandle handle)
 	{
-		_commandBuffer.Write<CommandBuffer::Enum>(CommandBuffer::eSetIndexBuffer);
+		_commandBuffer.Write<CommandBuffer::Enum>(CommandBuffer::eSetRenderGroup);
 		_commandBuffer.Write<RenderGroupHandle>(handle);
 	}
 
@@ -423,22 +426,47 @@ namespace video
 		_textureHandles[textureSlot] = handle;
 	}
 
-	bool Model::CreateFromX(const std::string & fileName)
+
+	//Free Function
+	TextureHandle LoadTextureWithStrings(const std::string &filePath, const std::string &fileName, const std::string &fileExtension, const std::string &userStr)
 	{
-		std::string nameCopy = fileName;
-		_name = GetFileName(nameCopy);
+		TextureHandle resultHandle;
+		//í…ìŠ¤ì³ë¥¼ ë¡œë“œí•˜ëŠ”ë° í…ìŠ¤ì³ê°€ ì´ë¯¸ ìˆë‹¤ë©´ ê·¸ê²ƒì„ ë°˜í™˜í•˜ê³ 
+		resultHandle = VIDEO->GetTexture(fileName + userStr + fileExtension);
+		if (!resultHandle.IsValid())
+		{
+			//ë§Œì•½ ì—†ë‹¤ë©´ ìƒˆë¡œ ë¡œë“œí•œë‹¤
+			resultHandle = VIDEO->CreateTexture(filePath + fileName + userStr + fileExtension, 
+				fileName + userStr + fileExtension);
+			//ìƒˆë¡œ ë¡œë“œí•œ í…ìŠ¤ì³ê°€ ìœ íš¨í•˜ì§€ ì•Šë‹¤ë©´
+			if (!resultHandle.IsValid())
+			{
+				//ê¸°ë³¸ í° í…ìŠ¤ì³ë¥¼ ë¶ˆëŸ¬ì˜¨ë‹¤
+				resultHandle = VIDEO->GetTexture("diffuseDefault.png");
+			}
+		}
+		return resultHandle;
+	}
+
+	bool Model::CreateFromX(const std::string & filePath, const Matrix *pMatCorrection)
+	{
+		std::string nameCopy = filePath;
+		std::string path;
+		std::string extension;
+
+		SplitFilePathToNamePathExtension(nameCopy, _name, path, extension);
 
 		VertexBufferHandle vertexHandle;
 		IndexBufferHandle indexHandle;
 
 		XMesh xMesh;
-		HRESULT hresult = xMesh.Load(fileName);
+		HRESULT hresult = xMesh.Load(filePath, pMatCorrection);
 		if (FAILED(hresult))
 		{
 			Assert(false);// xmesh load failed
 			return false;
 		}
-		//¿ì¼± ¹öÅØ½º ¹öÆÛ¶û ÀÎµ¦½º ÆÛ¹öÀÇ Á¤º¸¸¦ °¡Á®¿Â´Ù
+		//ìš°ì„  ë²„í…ìŠ¤ ë²„í¼ë‘ ì¸ë±ìŠ¤ í¼ë²„ì˜ ì •ë³´ë¥¼ ê°€ì ¸ì˜¨ë‹¤
 		IDirect3DVertexBuffer9 *pVertexBuffer = nullptr;
 		IDirect3DIndexBuffer9 *pIndexBuffer = nullptr;
 		xMesh._pMesh->GetVertexBuffer(&pVertexBuffer);
@@ -451,28 +479,30 @@ namespace video
 		pIndexBuffer->GetDesc(&indexDesc);
 
 		VertexDeclHandle declHandle = VIDEO->GetVertexDecl("static");
-		//static declÀÌ ÀÌ¹Ì ¾ø´Ù¸é
+		//static declì´ ì´ë¯¸ ì—†ë‹¤ë©´
 		if (!declHandle.IsValid())
 		{
 			VertexDecl decl;
 			decl.Begin();
-			for (uint32 i = 0; i < MAX_FVF_DECL_SIZE; ++i)
+			for (uint32 i = 0; i < MAX_FVF_DECL_SIZE; i++)
 			{
-				//D3DDECLUSAGE_BINORMAL
-				//Decl end¸¦ ¸¸³ª¸é ±×¸¸..
-				if (0xff == xMesh._pVerElement[i].Stream )
+				if (xMesh._pVerElement[i].Type == D3DDECLTYPE_UNUSED)
 				{
 					break;
 				}
+
 				decl.Add(xMesh._pVerElement[i]);
 			}
-			decl.End(sizeof(StaticMeshVertex));
+
+			D3DVERTEXELEMENT9 end = D3DDECL_END();
+			decl.Add(end);
+			decl.End(D3DXGetDeclVertexSize(decl._elements, 0));
 
 			declHandle = VIDEO->CreateVertexDecl(&decl);
 		}
 		Memory mem;
 
-		//¹öÅØ½º ¹öÆÛ ¶ô ÇÏ°í Á¤º¸¸¦ °¡Á®¿Â´Ù
+		//ë²„í…ìŠ¤ ë²„í¼ ë½ í•˜ê³  ì •ë³´ë¥¼ ê°€ì ¸ì˜¨ë‹¤
 		void *pVertexData = nullptr;
 		pVertexBuffer->Lock(0, 0, (void **)&pVertexData, 0);
 		mem._size = vertexDesc.Size;
@@ -480,7 +510,7 @@ namespace video
 		vertexHandle =  VIDEO->CreateVertexBuffer(&mem, declHandle, _name);
 		pVertexBuffer->Unlock();
 
-		//ÀÎµ¦½º ¹öÆÛ ¶ô ÇÏ°í Á¤º¸¸¦ °¡Á®¿Â´Ù
+		//ì¸ë±ìŠ¤ ë²„í¼ ë½ í•˜ê³  ì •ë³´ë¥¼ ê°€ì ¸ì˜¨ë‹¤
 		void *pIndexData = nullptr;
 		pIndexBuffer->Lock(0, 0, (void **)&pIndexData, 0);
 		mem._size = indexDesc.Size;
@@ -491,25 +521,58 @@ namespace video
 		COM_RELEASE(pVertexBuffer);
 		COM_RELEASE(pIndexBuffer);
 
-		//¸ÓÅ×¸®¾ó Á¤º¸µµ °¡Á®¿Í¾ßÇÑ´Ù
-		
-		//Material RangeÁ¤º¸¸¦ xMesh¿¡¼­ °¡Á®¿Â´Ù
-		for (uint32 i = 0; i < xMesh._materialNum; ++i)
+		std::string texturePath;
+		std::string textureName;
+		std::string textureExtension;
+
+		//Material Rangeì •ë³´ì™€ ë¨¸í…Œë¦¬ì–¼ ì •ë³´ë¥¼ xMeshì—ì„œ ê°€ì ¸ì˜¨ë‹¤
+		for (uint32 i = 0; i < xMesh._numMaterial; ++i)
 		{
+			TextureHandle diffuseHandle;
+			TextureHandle normalHandle;
+			TextureHandle specularHandle;
+			TextureHandle emissionHandle;
+			//í…ìŠ¤ì³ë¥¼ ë¡œë”©í•œë‹¤
+			//í…ìŠ¤ì³ ì •ë³´ê°€ ì—†ë‹¤ë©´ í°ìƒ‰ í…ìŠ¤ì³ë¥¼ ë¡œë“œë¥¼ ì‹œí‚¨ë‹¤
+			if (0 == xMesh._texturePaths[i].size())
+			{
+				diffuseHandle = VIDEO->GetTexture("diffuseDefault.png");
+				normalHandle = VIDEO->GetTexture("normalDefault.png");
+				specularHandle = VIDEO->GetTexture("specularDefault.png");
+				emissionHandle = VIDEO->GetTexture("emissionDefault.png");
+			}
+			//í…ìŠ¤ì³ ì •ë³´ê°€ ìˆë‹¤ë©´ ë””í“¨ì¦ˆë¥¼ ë¨¼ì € ë¡œë”©í•˜ê³ , ìŠ¤í™, ë…¸ë§, ì´ë¯¸ì…˜... ë“±ë“±ì„ ë¡œë”©í•œë‹¤
+			//í…ìŠ¤Âˆì³ëŠ” video deviceì— ì´ë¦„ë§Œìœ¼ë¡œ ì €ì¥ì´ ë˜ì–´ìˆë‹¤. ì´ë¯¸ ìˆëŠ”ì§€ ì²´í¬í• ë•Œ ì´ë¦„ë§Œ ì‚¬ìš©í•˜ë„ë¡ í•˜ì.
+			else
+			{
+				SplitFilePathToNamePathExtension(xMesh._texturePaths[i], textureName, texturePath, textureExtension);
+
+				diffuseHandle = LoadTextureWithStrings(texturePath, textureName, textureExtension, ".");
+				normalHandle = LoadTextureWithStrings(texturePath, textureName, textureExtension, "_N.");
+				specularHandle = LoadTextureWithStrings(texturePath, textureName, textureExtension, "_S.");
+				emissionHandle = LoadTextureWithStrings(texturePath, textureName, textureExtension, "_E.");
+			}
 			RenderGroup::MaterialRange matRange;
 
-			//matRange._material
+			//ë¨¸í…Œë¦¬ì–¼ì„ ì°¾ì•„ë³´ê³  ì—†ë‹¤ë©´ ë§Œë“ ë‹¤
+			std::string renderGroupName = _name + "_subset_" + std::to_string(i);
+			MaterialHandle matHandle = VIDEO->GetMaterial(renderGroupName);
+			if (!matHandle.IsValid())
+			{
+				matHandle = VIDEO->CreateMaterial(renderGroupName);
+			}
+			matRange._material = matHandle;
+
+			VIDEO->MaterialAddTexture(matRange._material, VIDEO_TEXTURE_DIFFUSE, diffuseHandle);
+			VIDEO->MaterialAddTexture(matRange._material, VIDEO_TEXTURE_NORMAL, normalHandle);
+			VIDEO->MaterialAddTexture(matRange._material, VIDEO_TEXTURE_SPECULAR, specularHandle);
+			VIDEO->MaterialAddTexture(matRange._material, VIDEO_TEXTURE_EMMISIVE, emissionHandle);
+
+			//MaterialRangeë¥¼ ë¶ˆëŸ¬ì˜¨ë‹¤
 			matRange._numPrim = xMesh._attributeRange[i].FaceCount;
 			matRange._numVertices = xMesh._attributeRange[i].VertexCount;
 			matRange._startIndex = xMesh._attributeRange[i].FaceStart * 3;
 			matRange._startVertex = xMesh._attributeRange[i].VertexStart;
-
-			//TODO : material handle ¸¸µç°Å °¡Á®¿Í¼­ ÇÏÀÚ
-			//group._attributeRange._material = MaterialHandle();/*xMesh._attributeRange[i].AttribId;*/
-			//group._attributeRange._faceStart = xMesh._attributeRange[i].FaceStart;
-			//group._attributeRange._faceCount = xMesh._attributeRange[i].FaceCount;
-			//group._attributeRange._vertexStart = xMesh._attributeRange[i].VertexStart;
-			//group._attributeRange._vertexCount = xMesh._attributeRange[i].VertexCount;
 
 			RenderGroupHandle renderGroup = VIDEO->CreateRenderGroup(vertexHandle, indexHandle, matRange, _name + "subset_" + std::to_string(i));
 			this->_groups.push_back(renderGroup);

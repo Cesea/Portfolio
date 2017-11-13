@@ -3,8 +3,7 @@
 
 #include "CollisionComponent.h"
 #include "TransformComponent.h"
-//
-//
+
 ////Shpere BoundingVolume에 대한 함수들...
 //void GetWorldCenterRadiusShere(const BoundingSphere &sphere, 
 //	TransformComponent *pOutTransform, Vector3 *pOutCenter, float *pOutRadius);

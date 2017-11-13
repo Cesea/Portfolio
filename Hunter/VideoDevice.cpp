@@ -34,12 +34,9 @@ bool VideoDevice::Init()
 
 	im::GuiRenderer::GetInstance()->Init(gpDevice, "consolas", WINSIZEX, WINSIZEY);
 
-	Matrix view;
-	Matrix projection;
+	LoadDefaultTextures();
+	LoadDefaultEffects();
 
-
-	MatrixLookAtLH(&view, &Vector3(0.0f, 0.0f, -2.0f), &Vector3(0.0f, 0.0f, 0.0f), &Vector3(0.0f, 1.0f, 0.0f));
-	MatrixPerspectiveFovLH(&projection, D3DX_PI * 0.5f, (float)WINSIZEX / (float)WINSIZEY, 0.1f, 1000.0f);
 
 	return true;
 }
@@ -452,6 +449,21 @@ void video::VideoDevice::DrawIndexPrimitive(const video::RenderState & renderSta
 	effectPtr->EndEffect();
 }
 
+//TODO : Default texture들을 로드 하자
+void video::VideoDevice::LoadDefaultTextures()
+{
+	VIDEO->CreateTexture("../resources/diffuseDefault.png", "diffuseDefault.png");
+	VIDEO->CreateTexture("../resources/emissionDefault.png", "emissionDefault.png");
+	VIDEO->CreateTexture("../resources/normalDefault.png", "normalDefault.png");
+	VIDEO->CreateTexture("../resources/specularDefault.png", "specularDefault.png");
+}
+
+//TODO : Default Shaders들을 로드하자
+void video::VideoDevice::LoadDefaultEffects()
+{
+
+}
+
 RenderView *video::VideoDevice::GetRenderView(RenderViewHandle handle)
 {
 	if (handle.IsValid())
@@ -526,7 +538,9 @@ TextureHandle video::VideoDevice::CreateTexture(const std::string &fileName, con
 	TextureHandle result = _textureHandlePool.Create(name);
 	if (!_textures[result.index].Create(fileName))
 	{
-		Assert(false);
+		//텍스쳐의 생성에 실패했다면 만든 핸들은 지우고 빈 핸들을 반환한다
+		_textureHandlePool.Remove(result);
+		return TextureHandle();
 	}
 	return result;
 }

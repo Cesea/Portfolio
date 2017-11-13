@@ -18,6 +18,9 @@ public:
 	//View 행렬과 투영 행렬을 셋팅
 	void UpdateCamToDevice(LPDIRECT3DDEVICE9 pDevice);
 
+	void SetMoveSpeed(float speed) { _moveSpeed = speed; }
+	void SetRotationSpeed(float speed) { _rotationSpeed = speed; }
+
 	//카메라 관련 행렬을 얻는다.
 	const Matrix &GetViewMatrix() const { return _matView; }
 	const Matrix &GetProjectionMatrix() const { return _matProjection; }
@@ -51,8 +54,8 @@ protected:
 
 	bool _bOrtho;		//직교니?
 
-	float _moveSpeed;
-	float _rotationSpeed;
+	float _moveSpeed{1.0f};
+	float _rotationSpeed{1.0f};
 
 	Vector3 _toMove;
 	//float _friction;

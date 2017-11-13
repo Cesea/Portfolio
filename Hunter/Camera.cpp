@@ -14,7 +14,7 @@ Camera::Camera()
 	_camNear = 0.001f;
 
 	//±âº» Far
-	_camFar = 1000.f;
+	_camFar = 4000.f;
 
 	_moveSpeed = 1.0f;
 	_rotationSpeed = 1.0f;
@@ -137,6 +137,7 @@ void Camera::Handle(const InputManager::KeyDownEvent & event)
 {
 	Vector3 diff = Vector3(0.0f, 0.0f, 0.0f);
 	float deltaTime = APPTIMER->GetTargetTime();
+
 	//move forward
 	if (event.code == 'W')
 	{
