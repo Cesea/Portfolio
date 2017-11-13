@@ -32,7 +32,7 @@ namespace video
 			eRendererInit,
 			eSetTransform,
 			eSetEffect,
-			eSetModel,
+			eSetRenderGroup,
 			eSetVertexBuffer,
 			eSetIndexBuffer,
 			eSetMaterial,
@@ -176,25 +176,35 @@ namespace video
 		void AddTexture(uint32 textureSlot, TextureHandle handle);
 	};
 
-
+	//디바이스에 실질적으로 저장되는 것은 model이 아니라 이거다
 	struct RenderGroup
 	{
 		//머테리얼의 범위...
 		struct MaterialRange
 		{
-			MaterialHandle material;
-			uint32 faceStart;
-			uint32 faceCount;
-			uint32 vertexStart;
-			uint32 vertexCount;
+			MaterialHandle _material;
+			uint32 _startIndex;
+			uint32 _numPrim;
+			uint32 _startVertex;
+			uint32 _numVertices;
+
+			MaterialRange &operator== (const MaterialRange &other)
+			{
+				_material = other._material;
+				_startIndex = other._startIndex;
+				_numPrim = other._numPrim;
+				_startVertex = other._startVertex;
+				_numVertices = other._numVertices;
+			}
 		};
+		bool Create(video::VertexBufferHandle vHandle, video::IndexBufferHandle iHandle, const RenderGroup::MaterialRange &materialRange);
+		void Destroy();
 
 		video::VertexBufferHandle _vertexBuffer;
 		video::IndexBufferHandle _indexBuffer;
 		//Sphere _sphere;
 		//AABB _aabb;
-		MaterialRange _attributeRange;
-
+		MaterialRange _materialRange;
 	};
 
 	struct Model
@@ -203,9 +213,7 @@ namespace video
 		bool CreateFromX(const std::string &fileName);
 		void Destroy();
 
-
-		std::vector<video::MaterialHandle> _materials;
-		std::vector<Group> _groups;
+		std::vector<video::RenderGroupHandle> _groups;
 
 		video::EffectHandle _effect;
 		std::string _name;
@@ -364,7 +372,7 @@ namespace video
 
 		void Submit(VertexBufferHandle handle, uint32 startVertex = 0, uint32 primCount = 0);
 		void Submit(IndexBufferHandle handle, uint32 startIndex = 0, uint32 numVertices = 0, uint32 primCount = 0);
-		void SubmitModel(ModelHandle handle);
+		void SubmitGroup(RenderGroupHandle handle);
 
 		void Draw();
 

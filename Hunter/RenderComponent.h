@@ -11,7 +11,7 @@ public:
 	virtual ~RenderComponent() {}
 
 public :
-	video::Model *model;
+	video::Model model;
 
 	//video::VertexBufferHandle _vertexBuffer{};
 	//video::IndexBufferHandle _indexBuffer{};

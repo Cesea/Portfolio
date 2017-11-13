@@ -82,15 +82,14 @@ bool32 BaseScene::Init()
 	_material1 = VIDEO->CreateMaterial("test2");
 	VIDEO->MaterialAddTexture(_material1, VIDEO_TEXTURE0, textureHandle1);
 
-	_model0 = VIDEO->CreateModelFromX("../resources/models/aa.x");
-	VIDEO->ModelSetEffect(_model0, _effect);
+	//_model0 = VIDEO->CreateModelFromX("../resources/models/aa.x");
+	//VIDEO->ModelSetEffect(_model0, _effect);
 
 	_world.AddSystem<RenderSystem>(_renderSystem);
 	_world.AddSystem<TransformSystem>(_transformSystem);
 
 	_world.Refresh();
 
-		{
 	_entities.push_back(_world.CreateEntity());
 	Entity &entity = _entities.back();
 
@@ -98,7 +97,7 @@ bool32 BaseScene::Init()
 	//renderComp._effect = _effect;
 	//renderComp._vertexBuffer = _vertexBuffer0;
 	//renderComp._material = (index % 2) ? _material0 : _material1;
-	renderComp.model = _model0;
+	//renderComp.model = _model0;
 	renderComp.radius = 1.0f;
 
 	TransformComponent &transComp = entity.AddComponent<TransformComponent>();

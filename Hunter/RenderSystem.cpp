@@ -21,11 +21,16 @@ void RenderSystem::Render(video::RenderView &renderView, const Camera &camera)
 		TransformComponent &transformComponent = entities[i].GetComponent<TransformComponent>();
 		RenderComponent &refRenderComponent = entities[i].GetComponent<RenderComponent>();
 
+
 		if (camera.GetFrustum().IsSphereInFrustum(transformComponent.GetWorldPosition(), 1.0f))
 		{
 			renderView.SetTransform(transformComponent.GetFinalMatrix());
 
-			renderView.SubmitModel(refRenderComponent.model);
+			for (uint32 i = 0; i < refRenderComponent.model._groups.size(); ++i)
+			{
+				renderView.SubmitGroup(refRenderComponent.model._groups[i]);
+			}
+
 			//for (uint32 i = 0; i < refRenderComponent.model._groups.size(); ++i)
 			//{
 			//	renderView.Submit(refRenderComponent.model._groups[i]._vertexBuffer);

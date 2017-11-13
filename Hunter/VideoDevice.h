@@ -94,10 +94,11 @@ namespace video
 		void SetCurrentRenderViewProjectionMatrix(const Matrix &view, const Matrix &projection);
 
 		//CreateModelFromX 함수는 불러온 파일 경로에서 이름을 추출하여 HandlePool에 자동으로 이름을 등록한다
-		ModelHandle CreateModelFromX(const std::string &fileName);
-		ModelHandle GetModel(const std::string &name);
-		void DestroyModel(ModelHandle handle);
-		void ModelSetEffect(ModelHandle model, EffectHandle effect);
+		RenderGroupHandle CreateRenderGroup(video::VertexBufferHandle vHandle, video::IndexBufferHandle iHandle, 
+			const RenderGroup::MaterialRange &materialRange, const std::string &name = "");
+		RenderGroupHandle GetRenderGroup(const std::string &name);
+		void DestroyRenderGroup(RenderGroupHandle handle);
+		void RenderGroupSetEffect(RenderGroupHandle group, EffectHandle effect);
 
 
 	private:
@@ -134,7 +135,7 @@ namespace video
 		RenderView *_pCurrentView{};
 
 		Material _materials[VIDEO_CONFIG_MATERIAL_MAX_NUM];
-		Model _models[VIDEO_CONFIG_MODEL_MAX_NUM];
+		RenderGroup _renderGroups[VIDEO_CONFIG_RENDER_GROUP_MAX_NUM];
 
 		ResourceHandlePool<VertexBufferHandle> _vertexBufferPool;
 		ResourceHandlePool<IndexBufferHandle> _indexBufferPool;
@@ -145,7 +146,7 @@ namespace video
 		ResourceHandlePool<RenderViewHandle> _renderViewHandlePool;
 
 		ResourceHandlePool<MaterialHandle> _materialHandlePool;
-		ResourceHandlePool<ModelHandle> _modelHandlePool;
+		ResourceHandlePool<RenderGroupHandle> _renderGroupHandlePool;
 
 	};
 }

@@ -376,10 +376,10 @@ namespace video
 		_commandBuffer.Write<uint32>(primCount);
 	}
 
-	void RenderView::SubmitModel(ModelHandle handle)
+	void RenderView::SubmitGroup(RenderGroupHandle handle)
 	{
-		_commandBuffer.Write<CommandBuffer::Enum>(CommandBuffer::eSubmitModel);
-		_commandBuffer.Write<ModelHandle>(handle);
+		_commandBuffer.Write<CommandBuffer::Enum>(CommandBuffer::eSetIndexBuffer);
+		_commandBuffer.Write<RenderGroupHandle>(handle);
 	}
 
 	void RenderView::Draw()
@@ -496,21 +496,41 @@ namespace video
 		//Material Range정보를 xMesh에서 가져온다
 		for (uint32 i = 0; i < xMesh._materialNum; ++i)
 		{
-			Group group;
-			group._attributeRange.materialID = xMesh._attributeRange[i].AttribId;
-			group._attributeRange.faceStart = xMesh._attributeRange[i].FaceStart;
-			group._attributeRange.faceCount = xMesh._attributeRange[i].FaceCount;
-			group._attributeRange.vertexStart = xMesh._attributeRange[i].VertexStart;
-			group._attributeRange.vertexCount = xMesh._attributeRange[i].VertexCount;
+			RenderGroup::MaterialRange matRange;
 
-			group._vertexBuffer = vertexHandle;
-			group._indexBuffer = indexHandle;
+			//matRange._material
+			matRange._numPrim = xMesh._attributeRange[i].FaceCount;
+			matRange._numVertices = xMesh._attributeRange[i].VertexCount;
+			matRange._startIndex = xMesh._attributeRange[i].FaceStart * 3;
+			matRange._startVertex = xMesh._attributeRange[i].VertexStart;
 
-			this->_groups.push_back(group);
+			//TODO : material handle 만든거 가져와서 하자
+			//group._attributeRange._material = MaterialHandle();/*xMesh._attributeRange[i].AttribId;*/
+			//group._attributeRange._faceStart = xMesh._attributeRange[i].FaceStart;
+			//group._attributeRange._faceCount = xMesh._attributeRange[i].FaceCount;
+			//group._attributeRange._vertexStart = xMesh._attributeRange[i].VertexStart;
+			//group._attributeRange._vertexCount = xMesh._attributeRange[i].VertexCount;
+
+			RenderGroupHandle renderGroup = VIDEO->CreateRenderGroup(vertexHandle, indexHandle, matRange, _name + "subset_" + std::to_string(i));
+			this->_groups.push_back(renderGroup);
 		}
 		xMesh.Release();
 	}
+
 	void Model::Destroy()
 	{
+	}
+
+	bool RenderGroup::Create(video::VertexBufferHandle vHandle, video::IndexBufferHandle iHandle, const RenderGroup::MaterialRange & materialRange)
+	{
+		_vertexBuffer = vHandle;
+		_indexBuffer = iHandle;
+		
+		_materialRange = materialRange;
+		return true;
+	}
+	void RenderGroup::Destroy()
+	{
+		return;
 	}
 }

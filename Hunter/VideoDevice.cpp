@@ -17,7 +17,7 @@ VideoDevice::VideoDevice()
 	_vertexDeclHandlePool(VIDEO_CONFIG_VERTEXBUFFER_MAX_NUM),
 	_renderViewHandlePool(VIDEO_CONFIG_RENDER_VIEW_MAX_NUM),
 	_materialHandlePool(VIDEO_CONFIG_MATERIAL_MAX_NUM),
-	_modelHandlePool(VIDEO_CONFIG_MODEL_MAX_NUM)
+	_renderGroupHandlePool(VIDEO_CONFIG_RENDER_GROUP_MAX_NUM)
 {
 }
 
@@ -120,8 +120,25 @@ void video::VideoDevice::Render(RenderView & renderView)
 				renderView._commandBuffer.Read<uint32>(sendingState._startIndex);
 				renderView._commandBuffer.Read<uint32>(sendingState._numVertices);
 				renderView._commandBuffer.Read<uint32>(sendingState._numPrim);
-
 			} break;
+
+			//TODO : 이거 만들자
+			case video::CommandBuffer::eSetRenderGroup :
+			{
+				RenderGroupHandle handle;
+				renderView._commandBuffer.Read<RenderGroupHandle>(handle);
+
+				const RenderGroup &refRenderGroup = _renderGroups[handle.index];
+
+				sendingState._vertexBuffer = refRenderGroup._vertexBuffer;
+				sendingState._indexBuffer = refRenderGroup._indexBuffer;
+
+				sendingState._material = refRenderGroup._materialRange._material;
+				
+				sendingState._startIndex = refRenderGroup._materialRange._startIndex;
+				sendingState._numVertices = refRenderGroup._materialRange._numVertices;
+				sendingState._numPrim = refRenderGroup._materialRange._numPrim;
+			}break;
 
 			//case video::CommandBuffer::eSetMesh:
 			//{
@@ -606,26 +623,25 @@ void video::VideoDevice::SetCurrentRenderViewProjectionMatrix(const Matrix & vie
 	_pCurrentView->_projectionMatrix = projection;
 }
 
-ModelHandle video::VideoDevice::CreateModelFromX(const std::string & fileName)
+RenderGroupHandle video::VideoDevice::CreateRenderGroup(video::VertexBufferHandle vHandle, video::IndexBufferHandle iHandle,
+	const RenderGroup::MaterialRange &materialRange, const std::string &name)
 {
-	ModelHandle result = _modelHandlePool.Create(fileName);
-	_models[result.index].CreateFromX(fileName);
+	RenderGroupHandle result = _renderGroupHandlePool.Create(name);
+	_renderGroups[result.index].Create(vHandle, iHandle, materialRange);
 	return result;
 }
 
-ModelHandle video::VideoDevice::GetModel(const std::string & name)
+RenderGroupHandle video::VideoDevice::GetRenderGroup(const std::string & name)
 {
-	return ModelHandle();
+	return _renderGroupHandlePool.Get(name);
 }
 
-void video::VideoDevice::DestroyModel(ModelHandle handle)
+void video::VideoDevice::DestroyRenderGroup(RenderGroupHandle handle)
 {
-	_models[handle.index].Destroy();
-	_modelHandlePool.Remove(handle);
+	_renderGroups[handle.index].Destroy();
+	_renderGroupHandlePool.Remove(handle);
 }
 
-void video::VideoDevice::ModelSetEffect(ModelHandle model, EffectHandle effect)
+void video::VideoDevice::RenderGroupSetEffect(RenderGroupHandle group, EffectHandle effect)
 {
-	_models[model.index]._effect = effect;
 }
-
