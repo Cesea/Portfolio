@@ -18,13 +18,11 @@ sampler texture0Sampler = sampler_state
 //---------------------------------------------------------------
 struct vs_input 
 {
-   float4 position : POSITION0;
-   float3 normal : NORMAL0;
-	float2 texcoord : TEXCOORD0;
-
-   //float3 binormal : BINORMAL0;
-   //float3 tangent : TANGENT0;
-   //float2 texcoord : TEXCOORD0;
+   	float3 position : POSITION0;
+   	float3 normal : NORMAL0;
+   	float3 binormal : BINORMAL0;
+   	float3 tangent : TANGENT0;
+   	float2 texcoord : TEXCOORD0;
 };
 
 struct vs_output 
@@ -44,7 +42,7 @@ vs_output vs_main( vs_input input )
 {
    vs_output result = (vs_output)0;
 
-   float4 worldPos = mul( input.position, gWorld );
+   float4 worldPos = mul( (float4)(input.position, 1.0f), gWorld );
    result.position = mul( worldPos, gView);
    result.position = mul( result.position, gProjection);
    
@@ -78,7 +76,6 @@ technique Base
       VertexShader = compile vs_3_0 vs_main();
       PixelShader = compile ps_3_0 ps_main();
 
-	  FillMode = WireFrame;
    }
 }
 

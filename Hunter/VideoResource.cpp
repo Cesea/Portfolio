@@ -262,6 +262,12 @@ namespace video
 	void VertexDecl::End(uint32 stride)
 	{
 		_stride = stride;
+
+		D3DVERTEXELEMENT9 end = D3DDECL_END();
+		memcpy(&_elements[_count], &end, sizeof(D3DVERTEXELEMENT9));
+
+		HRESULT result = D3DXFVFFromDeclarator(_elements, &_fvf);
+
 		VIDEO_CHECK(gpDevice->CreateVertexDeclaration(_elements, &_ptr));
 	}
 
@@ -454,6 +460,15 @@ namespace video
 		return resultHandle;
 	}
 
+	bool Skeleton::Create()
+	{
+		return false;
+	}
+
+	void Skeleton::Destroy()
+	{
+	}
+
 	bool Model::CreateFromXStatic(const std::string & filePath, const Matrix *pMatCorrection)
 	{
 		std::string nameCopy = filePath;
@@ -484,7 +499,8 @@ namespace video
 		D3DINDEXBUFFER_DESC indexDesc;
 		pIndexBuffer->GetDesc(&indexDesc);
 
-		VertexDeclHandle declHandle = VIDEO->GetVertexDecl("static");
+		VertexDeclHandle declHandle = VertexDeclHandle();
+		//VertexDeclHandle declHandle = VIDEO->GetVertexDecl("StaticTestVertex");
 		//static decl이 이미 없다면
 		if (!declHandle.IsValid())
 		{
@@ -500,16 +516,12 @@ namespace video
 				decl.Add(xMesh._pVerElement[i]);
 			}
 
-			D3DVERTEXELEMENT9 end = D3DDECL_END();
-
 			//이미 셋팅된 vertexElement에서 알맞은 fvf를 추출하는 함수이다.
-			D3DXFVFFromDeclarator(decl._elements, &decl._fvf);
-
-			decl.Add(end);
-			decl.End(D3DXGetDeclVertexSize(decl._elements, 0));
+			decl.End(D3DXGetDeclVertexSize(xMesh._pVerElement, 0));
 
 			declHandle = VIDEO->CreateVertexDecl(&decl);
 		}
+
 		Memory mem;
 
 		//버텍스 버퍼 락 하고 정보를 가져온다
@@ -671,15 +683,12 @@ namespace video
 		// fvf나 다른 device와 관련된 셋팅을 변경했을 가능성이 있으므로 상태를 리셋해준다
 		if (!_effect.IsValid())
 		{
-			//if (_fillMode != FillMode::eFillSolid)
-			//{
 			_fillMode = FillMode::eFillSolid;
 			gpDevice->SetRenderState(D3DRS_FILLMODE, D3DFILL_SOLID);
-			//}
-		}
-		else
-		{
-			_effect.MakeInvalid();
+			gpDevice->SetFVF(0);
 		}
 	}
+
+	
+
 }

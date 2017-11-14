@@ -5,17 +5,41 @@
 
 namespace video
 {
+	struct StaticTestVertex
+	{
+		StaticTestVertex();
+		StaticTestVertex(const Vector3 &position, const Vector3 &normal, const Vector2 &uv);
+
+		Vector3 _position;
+		Vector3 _normal;
+		Vector2 _uv;
+
+		static std::string _name;
+	};
+
 	struct StaticMeshVertex
 	{
 		StaticMeshVertex();
 		StaticMeshVertex(const Vector3 &position, const Vector3 &normal, const Vector3 &binormal, const Vector3 &tangent, const Vector2 &uv);
-
 
 		Vector3 _position;
 		Vector3 _normal;
 		Vector3 _binormal;
 		Vector3 _tangent;
 		Vector2 _uv;
+
+		static std::string _name;
+	};
+
+	struct LineVertex
+	{
+		LineVertex();
+		LineVertex(const Vector3 &position, const uint32 color);
+
+		Vector3 _position;
+		uint32 _color;
+
+		static std::string _name;
 	};
 
 }

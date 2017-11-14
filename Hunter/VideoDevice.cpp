@@ -36,7 +36,7 @@ bool VideoDevice::Init()
 
 	LoadDefaultTextures();
 	LoadDefaultEffects();
-
+	MakeDefaultVertexDecls();
 
 	return true;
 }
@@ -141,16 +141,13 @@ void video::VideoDevice::Render(RenderView & renderView)
 				sendingState._drawData._numPrim = refRenderGroup._materialRange._numPrim;
 			}break;
 
-			//case video::CommandBuffer::eSetMesh:
-			//{
-			//} break;
 			case video::CommandBuffer::eSetMaterial:
 			{
 				MaterialHandle handle;
 				renderView._commandBuffer.Read<MaterialHandle>(handle);
 				sendingState._material= handle;
 
-			} break;
+			}break;
 
 			case video::CommandBuffer::eSetFillMode :
 			{
@@ -166,7 +163,6 @@ void video::VideoDevice::Render(RenderView & renderView)
 
 				if (sendingState._vertexBuffer.IsValid())
 				{
-
 					//NOTE : FillMode 처리해준다 Solid가 default 값
 					//if (sendingState._fillMode != RenderState::FillMode::eFillSolid)
 					//{
@@ -179,7 +175,6 @@ void video::VideoDevice::Render(RenderView & renderView)
 					//		gpDevice->SetRenderState(D3DRS_FILLMODE, D3DFILL_WIREFRAME);
 					//	}
 					//}
-
 					if (sendingState._effect.IsValid())
 					{
 						DrawWithEffect(sendingState, sendingMatrix);
@@ -189,11 +184,9 @@ void video::VideoDevice::Render(RenderView & renderView)
 						DrawWithoutEffect(sendingState, sendingMatrix);
 					}
 				}
-
 				//한번의 렌더를 끝내면 RenderState를 Default 값으로 되돌린다.
 				sendingState.ResetDefault();
 				MatrixIdentity(&sendingMatrix[0]);
-
 			} break;
 			default:
 			{
@@ -272,17 +265,15 @@ bool VideoDevice::InitD3D(HWND windowHandle)
 	gpDevice = _pDevice;
 
 	InitDefaultRenderState();
-
-	gpDevice = _pDevice;
-
 	return result;
 }
 
 bool VideoDevice::InitDefaultRenderState()
 {
 	bool result = true;
-	gpDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_ONE);
-	gpDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_ONE);
+
+	gpDevice->SetRenderState(D3DRS_LIGHTING, FALSE);
+	
 	gpDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);
 	gpDevice->SetRenderState(D3DRS_SHADEMODE, D3DSHADE_GOURAUD);
 	gpDevice->SetRenderState(D3DRS_DITHERENABLE, TRUE );
@@ -294,22 +285,8 @@ bool VideoDevice::InitDefaultRenderState()
  	gpDevice->SetRenderState(D3DRS_ALPHABLENDENABLE, FALSE );
  	gpDevice->SetRenderState(D3DRS_SPECULARENABLE, FALSE );
 
-	gpDevice->SetRenderState(D3DRS_LIGHTING, TRUE);
-	gpDevice->SetRenderState(D3DRS_AMBIENT, 0x02020202);
-
 	gpDevice->SetRenderState( D3DRS_COLORVERTEX ,   FALSE );
-
-	gpDevice->SetRenderState( D3DRS_DIFFUSEMATERIALSOURCE, D3DMCS_MATERIAL);	
-	gpDevice->SetRenderState( D3DRS_SPECULARMATERIALSOURCE , D3DMCS_MATERIAL);	
-	gpDevice->SetRenderState( D3DRS_AMBIENTMATERIALSOURCE  , D3DMCS_MATERIAL);	
-	gpDevice->SetRenderState( D3DRS_EMISSIVEMATERIALSOURCE , D3DMCS_MATERIAL);
 	
-	// initialize the world transform matrix as the identity
-	Matrix matrix;
-	MatrixIdentity(&matrix);
-	gpDevice->SetTransform(D3DTS_WORLD , &matrix);
-	gpDevice->SetTransform(D3DTS_VIEW , &matrix);
-	gpDevice->SetTransform(D3DTS_PROJECTION, &matrix);	
 	return result;
 }
 
@@ -320,6 +297,9 @@ void video::VideoDevice::DrawWithEffect(const video::RenderState & renderState, 
 	IndexBuffer *indexPtr{};
 	Material *materialPtr{};
 	VertexDecl *declPtr{};
+
+	DWORD fvf{};
+	_pDevice->GetFVF(&fvf);
 
 	//머테리얼 설정 여부 확인
 	if (renderState._material != _activeState._material)
@@ -352,7 +332,7 @@ void video::VideoDevice::DrawWithEffect(const video::RenderState & renderState, 
 	else
 	{
 		vertexPtr = &_vertexBuffers[_activeState._vertexBuffer.index];
-		declPtr = &_vertexDecls[_activeState._vertexBuffer.index];
+		declPtr = &_vertexDecls[_activeState._vertexDecl.index];
 	}
 
 	if (renderState._effect != _activeState._effect)
@@ -376,13 +356,13 @@ void video::VideoDevice::DrawWithEffect(const video::RenderState & renderState, 
 			}
 		}
 	}
-
 	//머테리얼까지 설정이 끝났다면 여기서 인덱스 버퍼가 있는지 없는지를 판별하여 분기를 나눈다.
 	//인덱스 버퍼가 있다..
 	if (renderState._indexBuffer.IsValid())
 	{
-
-		_pDevice->SetIndices(_indexBuffers[renderState._indexBuffer.index]._ptr);
+		_activeState._indexBuffer = renderState._indexBuffer;
+		indexPtr = &_indexBuffers[renderState._indexBuffer.index];
+		_pDevice->SetIndices(indexPtr->_ptr);
 		uint32 numVertices{};
 		uint32 numPrim{};
 		uint32 startIndex{};
@@ -394,17 +374,26 @@ void video::VideoDevice::DrawWithEffect(const video::RenderState & renderState, 
 		startIndex = (0 != renderState._drawData._startIndex) ? (renderState._drawData._startIndex) : 0;
 
 		uint32 numPass = effectPtr->BeginEffect();
-		for (uint32 i = 0; i < numPass; ++i)
-		{
-			effectPtr->BeginPass(i);
+			effectPtr->BeginPass(0);
 			_pDevice->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, 0, numVertices, startIndex, numPrim);
 			effectPtr->EndPass();
-		}
 		effectPtr->EndEffect();
+
+		//video::StaticTestVertex vertex[3];
+		//vertex[0] = video::StaticTestVertex(Vector3(0.0f, 0.5f, 0.5f), Vector3(0.0f, 0.0f, -1.0f), Vector2(0.5f, 0.0f));
+		//vertex[1] = video::StaticTestVertex(Vector3(0.5f, -0.5f, 0.5f), Vector3(0.0f, 0.0f, -1.0f), Vector2(1.0f, 1.0f));
+		//vertex[2] = video::StaticTestVertex(Vector3(-0.5f, -0.5f, 0.5f), Vector3(0.0f, 0.0f, -1.0f), Vector2(0.0f, 1.0f));
+		//uint16 index[3];
+		//index[0] = 0;
+		//index[1] = 1;
+		//index[2] = 2;
+		//_pDevice->DrawIndexedPrimitiveUP(D3DPT_TRIANGLELIST, 0, 3, 1,
+		//	(void *)index, D3DFMT_INDEX16, (void *)vertex, sizeof(video::StaticTestVertex));
 	}
 	//인덱스 버퍼가 없다..
 	else
 	{
+		_pDevice->SetIndices(nullptr);
 		uint32 numPrim{};
 		uint32 startVertex{};
 
@@ -418,6 +407,7 @@ void video::VideoDevice::DrawWithEffect(const video::RenderState & renderState, 
 		{
 			effectPtr->BeginPass(i);
 			_pDevice->DrawPrimitive(D3DPT_TRIANGLELIST, startVertex, numPrim);
+
 			effectPtr->EndPass();
 		}
 		effectPtr->EndEffect();
@@ -459,20 +449,14 @@ void video::VideoDevice::DrawWithoutEffect(const video::RenderState & renderStat
 		}
 		//NOTE : 기본적으로 렌더러는 이펙트를 사용하여 렌더하도록 하기때문에 항상 
 		// FVF를 설정 해 주고 reset부분에서 꺼 주도록 하자...
-		_pDevice->SetFVF(declPtr->_fvf);
-
 		_pDevice->SetStreamSource(0, vertexPtr->_ptr, 0, declPtr->_stride);
 	}
 	else
 	{
 		vertexPtr = &_vertexBuffers[_activeState._vertexBuffer.index];
-		declPtr = &_vertexDecls[_activeState._vertexBuffer.index];
+		declPtr = &_vertexDecls[_activeState._vertexDecl.index];
 	}
-
-	if (renderState._effect != _activeState._effect)
-	{
-		_activeState._effect = renderState._effect;
-	}
+	_pDevice->SetFVF(declPtr->_fvf);
 
 	_pDevice->SetTransform(D3DTS_WORLD, &matrices[0]);
 
@@ -492,7 +476,8 @@ void video::VideoDevice::DrawWithoutEffect(const video::RenderState & renderStat
 	//인덱스 버퍼가 있다..
 	if (renderState._indexBuffer.IsValid())
 	{
-		_pDevice->SetIndices(_indexBuffers[renderState._indexBuffer.index]._ptr);
+		indexPtr = &_indexBuffers[renderState._indexBuffer.index];
+		_pDevice->SetIndices(indexPtr->_ptr);
 
 		uint32 numVertices{};
 		uint32 numPrim{};
@@ -518,6 +503,7 @@ void video::VideoDevice::DrawWithoutEffect(const video::RenderState & renderStat
 			(renderState._drawData._startVertex) : (0);
 		_pDevice->DrawPrimitive(D3DPT_TRIANGLELIST, startVertex, numPrim);
 	}
+
 }
 
 
@@ -696,10 +682,47 @@ void video::VideoDevice::LoadDefaultTextures()
 	VIDEO->CreateTexture("../resources/textures/specularDefault.png", "specularDefault.png");
 }
 
+void video::VideoDevice::MakeDefaultVertexDecls()
+{
+	//StaticVertex Decl
+	VertexDecl staticVertex;
+	staticVertex.Begin();
+	staticVertex.Add(VertexElement(0, 0, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0));
+	staticVertex.Add(VertexElement(0, sizeof(Vector3), D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_NORMAL, 0));
+	staticVertex.Add(VertexElement(0, sizeof(Vector3) * 2, 
+		D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_BINORMAL, 0));
+	staticVertex.Add(VertexElement(0, sizeof(Vector3) * 3, 
+		D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TANGENT, 0));
+	staticVertex.Add(VertexElement(0, sizeof(Vector3) * 4, 
+		D3DDECLTYPE_FLOAT2, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 0));
+	staticVertex.End(sizeof(StaticMeshVertex));
+	VIDEO->CreateVertexDecl(&staticVertex, StaticMeshVertex::_name);
+
+	//LineVertex Decl
+	VertexDecl lineVertex;
+	lineVertex.Begin();
+	lineVertex.Add(VertexElement(0, 0, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0));
+	lineVertex.Add(VertexElement(0, sizeof(Vector3), D3DDECLTYPE_D3DCOLOR, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_COLOR, 0));
+	lineVertex.End(sizeof(LineVertex));
+	VIDEO->CreateVertexDecl(&lineVertex, LineVertex::_name);
+
+	//StaticTestVertex Decl
+	VertexDecl staticTestVertex;
+	staticTestVertex.Begin();
+	staticTestVertex.Add(VertexElement(0, 0, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0));
+	staticTestVertex.Add(VertexElement(0, sizeof(Vector3), D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_NORMAL, 0));
+	staticTestVertex.Add(VertexElement(0, sizeof(Vector3) * 2, D3DDECLTYPE_FLOAT2, 
+		D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 0));
+	staticTestVertex.End(sizeof(StaticTestVertex));
+	VIDEO->CreateVertexDecl(&staticTestVertex, StaticTestVertex::_name);
+
+}
+
 //TODO : Default Shaders들을 로드하자
 void video::VideoDevice::LoadDefaultEffects()
 {
-
+	VIDEO->CreateEffect("../resources/shaders/staticMesh.fx", "staticMesh.fx");
+	VIDEO->CreateEffect("../resources/shaders/staticTestMesh.fx", "staticTestMesh.fx");
 }
 
 RenderView *video::VideoDevice::GetRenderView(RenderViewHandle handle)
@@ -753,9 +776,9 @@ void video::VideoDevice::DestroyIndexBuffer(IndexBufferHandle handle)
 	_indexBufferPool.Remove(handle);
 }
 
-VertexDeclHandle video::VideoDevice::CreateVertexDecl(const VertexDecl *decl)
+VertexDeclHandle video::VideoDevice::CreateVertexDecl(const VertexDecl *decl, const std::string &name)
 {
-	VertexDeclHandle result = _vertexDeclHandlePool.Create();
+	VertexDeclHandle result = _vertexDeclHandlePool.Create(name);
 	memcpy(&_vertexDecls[result.index], decl, sizeof(VertexDecl));
 	return result;
 }
@@ -763,6 +786,12 @@ VertexDeclHandle video::VideoDevice::CreateVertexDecl(const VertexDecl *decl)
 VertexDeclHandle video::VideoDevice::GetVertexDecl(const std::string & name)
 {
 	return _vertexDeclHandlePool.Get(name);
+}
+
+const VertexDecl & video::VideoDevice::GetVertexDecl(VertexDeclHandle handle)
+{
+	Assert(handle.IsValid());
+	return _vertexDecls[handle.index];
 }
 
 void video::VideoDevice::DestroyVertexDecl(VertexDeclHandle handle)

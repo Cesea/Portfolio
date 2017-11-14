@@ -148,8 +148,8 @@ namespace video
 		D3DVERTEXELEMENT9 _elements[VIDEO_CONFIG_MAX_NUM_VERTEX_ELEMENTS];
 		IDirect3DVertexDeclaration9 *_ptr{};
 		uint32 _count{};
-		uint32 _stride;
-		DWORD _fvf;
+		uint32 _stride{};
+		DWORD _fvf{};
 	};
 
 
@@ -209,6 +209,9 @@ namespace video
 
 	struct Skeleton
 	{
+		bool Create();
+		void Destroy();
+
 		struct SkeletonName
 		{
 			char _name[64];
@@ -217,6 +220,7 @@ namespace video
 		uint16 *_hierachy{};
 		Matrix *_localPoses{};
 		Matrix *_globalPoses{};
+		RenderGroup *_renderGroups{};
 		SkeletonName *_names;
 
 		uint32 _numhierachy{};
@@ -369,7 +373,7 @@ namespace video
 		uint32 _numVertices{};
 		uint32 _numPrim{};
 
-		PrimitiveType _primitiveType;
+		PrimitiveType _primitiveType{};
 	};
 
 	//NOTE : 만약 deffered rendering을 하게된다면  RenderView의 FrameBuffer에 이미지들을 렌더 한 후에 여러 RenderView의 
@@ -394,7 +398,7 @@ namespace video
 
 
 		//device state
-		FillMode _fillMode;
+		FillMode _fillMode{FillMode::eFillSolid};
 
 		DrawData _drawData;
 

@@ -3,6 +3,20 @@
 
 namespace video
 {
+	std::string StaticTestVertex::_name = "StaticTestVertex";
+	std::string StaticMeshVertex::_name = "StaticMeshVertex";
+	std::string LineVertex::_name = "LineVertex";
+
+	StaticTestVertex::StaticTestVertex()
+		:_position(), _normal(), _uv()
+	{
+	}
+
+	StaticTestVertex::StaticTestVertex(const Vector3 & position, const Vector3 & normal, const Vector2 & uv)
+		: _position(position), _normal(normal), _uv(uv)
+	{
+	}
+
 	StaticMeshVertex::StaticMeshVertex()
 		:_position(), _normal(), _binormal(), _tangent(), _uv()
 	{
@@ -15,4 +29,14 @@ namespace video
 	{
 	}
 	
+	LineVertex::LineVertex()
+		:_position(), _color(0xff00ff00)
+	{
+	}
+
+	LineVertex::LineVertex(const Vector3 & position, const uint32 color)
+		: _position(position), _color(color)
+	{
+	}
+
 }

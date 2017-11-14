@@ -24,20 +24,26 @@ void RenderSystem::Render(video::RenderView &renderView, const Camera &camera)
 		//if (camera.GetFrustum().IsSphereInFrustum(transformComponent.GetWorldPosition(), 50.0f))
 		{
 
-			renderView.SetFillMode(video::RenderState::FillMode::eFillPoint);
+			//renderView.SetFillMode(video::RenderState::FillMode::eFillPoint);
+			//변환 행렬을 설정한다
 
 			renderView.SetEffect(refRenderComponent.model._effect);
-			//변환 행렬을 설정한다
-			for (uint32 i = 0; i < refRenderComponent.model._skeleton._numhierachy; ++i)
-			{
-				renderView.SetTransform(refRenderComponent.model._skeleton._globalPoses[i]);
-				
-				for (uint32 j = 0; j < refRenderComponent.model._groups.size(); ++j)
-				{
-					renderView.SubmitGroup(refRenderComponent.model._groups[j]);
-					renderView.Draw();
-				}
-			}
+			
+			renderView.SetTransform(transformComponent.GetFinalMatrix());
+			renderView.SubmitGroup(refRenderComponent.model._groups[0]);
+			renderView.Draw();
+
+			//for (uint32 i = 0; i < refRenderComponent.model._skeleton._numhierachy; ++i)
+			//{
+			//	renderView.SetTransform(refRenderComponent.model._skeleton._globalPoses[i]);
+			//	
+			//	for (uint32 j = 0; j < refRenderComponent.model._groups.size(); ++j)
+			//	{
+			//		renderView.SubmitGroup(refRenderComponent.model._groups[j]);
+			//		renderView.Draw();
+			//	}
+			//}
+
 			//renderView.SetTransform(transformComponent.GetFinalMatrix());
 
 			//이펙트를 설정한다
@@ -59,7 +65,6 @@ void RenderSystem::Render(video::RenderView &renderView, const Camera &camera)
 	renderView.End();
 	renderView.PostRender();
 
-	VIDEO->Render(renderView);
 }
 
 void RenderSystem::Initialize()

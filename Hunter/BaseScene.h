@@ -34,15 +34,6 @@ public :
 protected :
 	void RegisterEvents();
 
-	void Handle(const InputManager::KeyDownEvent &event);
-	void Handle(const InputManager::KeyPressedEvent &event);
-	void Handle(const InputManager::KeyReleasedEvent &event);
-	void Handle(const InputManager::MouseMoveEvent &event);
-	void Handle(const InputManager::MouseDownEvent &event);
-	void Handle(const InputManager::MousePressedEvent &event);
-	void Handle(const InputManager::MouseReleasedEvent &event);
-	void Handle(const InputManager::MouseWheelEvent &event);
-
 protected :
 	bool32 _active;
 
@@ -81,6 +72,14 @@ protected :
 	std::vector<Entity> _entities;
 
 	Camera _camera;
+
+
+	IDirect3DVertexBuffer9 *_pVertexBuffer;
+	IDirect3DIndexBuffer9 *_pIndexBuffer;
+
+	ID3DXEffect *_pEffect;
+
+	IDirect3DVertexDeclaration9 *_pDecl;
 };
 
 

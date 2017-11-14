@@ -65,8 +65,9 @@ namespace video
 		void DestroyIndexBuffer(IndexBufferHandle handle);
 
 		//버텍스 데클 생성
-		VertexDeclHandle CreateVertexDecl(const VertexDecl *decl);
+		VertexDeclHandle CreateVertexDecl(const VertexDecl *decl, const std::string &name = "");
 		VertexDeclHandle GetVertexDecl(const std::string &name);
+		const VertexDecl &GetVertexDecl(VertexDeclHandle handle);
 		void DestroyVertexDecl(VertexDeclHandle handle);
 
 		//텍스쳐 생성
@@ -113,6 +114,7 @@ namespace video
 		//void DrawIndexPrimitive(const video::RenderState &renderState, Matrix *matrices);
 
 		void LoadDefaultTextures();
+		void MakeDefaultVertexDecls();
 		void LoadDefaultEffects();
 
 	private :
