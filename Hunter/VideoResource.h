@@ -27,6 +27,8 @@ namespace video
 			Finish();
 		}
 
+		//Change는 Device의 상태를 변경시키는 것이다
+		//ChangePrimitive는 TRIANGLELIST와 LineStrip4
 		enum Enum
 		{
 			eRendererInit,
@@ -36,7 +38,8 @@ namespace video
 			eSetVertexBuffer,
 			eSetIndexBuffer,
 			eSetMaterial,
-			eSetFillMode,
+			eChangeFillMode,
+			eChangePrimitiveType,
 			eDraw,
 			eEnd
 		};
@@ -220,7 +223,8 @@ namespace video
 		uint16 *_hierachy{};
 		Matrix *_localPoses{};
 		Matrix *_globalPoses{};
-		RenderGroup *_renderGroups{};
+		Matrix *_offsetMatrices{};
+		RenderGroupHandle *_renderGroups{};
 		SkeletonName *_names;
 
 		uint32 _numhierachy{};
@@ -358,12 +362,6 @@ namespace video
 	//TODO : 아래의 RenderState의 정보들을 DrawData로 교체하자..
 	struct DrawData
 	{
-		enum PrimitiveType
-		{
-			eTriangleList = 0,
-			eLineList,
-			Count
-		};
 
 		//버텍스 버퍼로만 그릴때 사용된다
 		uint32 _startVertex{};
@@ -373,7 +371,7 @@ namespace video
 		uint32 _numVertices{};
 		uint32 _numPrim{};
 
-		PrimitiveType _primitiveType{};
+		D3DPRIMITIVETYPE _primitiveType{D3DPRIMITIVETYPE::D3DPT_TRIANGLELIST};
 	};
 
 	//NOTE : 만약 deffered rendering을 하게된다면  RenderView의 FrameBuffer에 이미지들을 렌더 한 후에 여러 RenderView의 
@@ -395,7 +393,6 @@ namespace video
 		IndexBufferHandle _indexBuffer{};
 		MaterialHandle _material{};
 		EffectHandle _effect{};
-
 
 		//device state
 		FillMode _fillMode{FillMode::eFillSolid};

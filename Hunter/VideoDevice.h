@@ -23,7 +23,6 @@ constexpr uint16 INVALID_BUFFER = 0;
 
 namespace video
 {
-
 	struct RenderWindow
 	{
 		int32 width;

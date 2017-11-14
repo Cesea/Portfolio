@@ -2,21 +2,17 @@ uniform extern float4x4 gWorld;
 uniform extern float4x4 gView;
 uniform extern float4x4 gProjection;
 
-// Diffuse, Normal, Specular, Emission 순으로 0, 1, 2, 3이렇게 간다
-
 struct vs_input 
 {
    	float3 position : POSITION0;
-	float4 color : COLOR0; 
-   	//float3 normal : NORMAL0;
-   	//float2 texcoord : TEXCOORD0;
+   	float3 normal : NORMAL0;
+   	float2 texcoord : TEXCOORD0;
 };
 
 struct vs_output 
 {
    float4 position : POSITION0;
-   float4 color : COLOR0;
-   //float2 texcoord : TEXCOORD0;
+   float2 texcoord : TEXCOORD0;
 };
 
 vs_output vs_main( vs_input input )
@@ -26,8 +22,6 @@ vs_output vs_main( vs_input input )
    float4 worldPos = mul(float4(input.position, 1.0f), gWorld);
    result.position = mul(worldPos, gView);
    result.position = mul(result.position, gProjection);
-
-   result.color = input.color;
    
    //result.texcoord = input.texcoord;
 
@@ -36,18 +30,17 @@ vs_output vs_main( vs_input input )
 
 float4 ps_main(vs_output input) : COLOR
 {
-	return input.color;
+	return float4(0.0f, 1.0f, 1.0f, 1.0f);
 };
 
-//--------------------------------------------------------------//
-// Technique Section for Mesh
-//--------------------------------------------------------------//
 technique Base
 {
    pass pass0
    {
       vertexShader = compile vs_2_0 vs_main();
       pixelShader = compile ps_2_0 ps_main();
+
+	  FillMode = WireFrame;
    }
 }
 

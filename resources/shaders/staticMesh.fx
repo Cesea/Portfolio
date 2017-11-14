@@ -42,7 +42,7 @@ vs_output vs_main( vs_input input )
 {
    vs_output result = (vs_output)0;
 
-   float4 worldPos = mul( (float4)(input.position, 1.0f), gWorld );
+   float4 worldPos = mul( float4(input.position, 1.0f), gWorld );
    result.position = mul( worldPos, gView);
    result.position = mul( result.position, gProjection);
    
@@ -62,7 +62,6 @@ vs_output vs_main( vs_input input )
 
 float4 ps_main(vs_output input) : COLOR
 {
-	//return tex2D(texture0Sampler, input.texcoord);
 	return float4(1.0f, 1.0f, 0.0f, 1.0f);
 }
 
@@ -76,6 +75,7 @@ technique Base
       VertexShader = compile vs_3_0 vs_main();
       PixelShader = compile ps_3_0 ps_main();
 
+	  FillMode = Wireframe;
    }
 }
 

@@ -286,6 +286,17 @@ inline void SplitFilePathToNamePathExtension(std::string &original,
 	extension = GetFileExtension(original);
 }
 
+inline void SplitNameToNameExtension(std::string &original,
+	std::string &name, std::string &extension)
+{
+	extension = GetFileExtension(original);
+	name = original;
+	for (int i = 0; i < extension.size() + 1; ++i)
+	{
+		name.pop_back();
+	}
+}
+
 
 float RandFloat();
 float RandFloat(float max);

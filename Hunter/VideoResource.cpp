@@ -3,6 +3,279 @@
 
 namespace video
 {
+	//Free Function
+	TextureHandle LoadTextureWithStrings(const std::string &filePath, const std::string &fileName, const std::string &fileExtension, const std::string &userStr)
+	{
+		TextureHandle resultHandle;
+		//텍스쳐를 로드하는데 텍스쳐가 이미 있다면 그것을 반환하고
+		resultHandle = VIDEO->GetTexture(fileName + userStr + fileExtension);
+		if (!resultHandle.IsValid())
+		{
+			//만약 없다면 새로 로드한다
+			resultHandle = VIDEO->CreateTexture(filePath + fileName + userStr + fileExtension, 
+				fileName + userStr + fileExtension);
+			//새로 로드한 텍스쳐가 유효하지 않다면
+			if (!resultHandle.IsValid())
+			{
+				//기본 흰 텍스쳐를 불러온다
+				if (userStr == ".")
+				{
+					resultHandle = VIDEO->GetTexture("diffuseDefault.png");
+				}
+				else if (userStr == "_N.")
+				{
+					resultHandle = VIDEO->GetTexture("normalDefault.png");
+				}
+				else if (userStr == "_S.")
+				{
+					resultHandle = VIDEO->GetTexture("specularDefault.png");
+				}
+				else if (userStr == "_E.")
+				{
+					resultHandle = VIDEO->GetTexture("emissionDefault.png");
+				}
+			}
+		}
+		return resultHandle;
+	}
+
+	//Free Function
+	void ExtractMeshFromXStatic(XMeshStatic &xMesh, Model *model, const std::string &filePath)
+	{
+		std::string nameCopy = filePath;
+		std::string path;
+		std::string extension;
+
+		SplitFilePathToNamePathExtension(nameCopy, model->_name, path, extension);
+
+		VertexBufferHandle vertexHandle;
+		IndexBufferHandle indexHandle;
+
+		//우선 버텍스 버퍼랑 인덱스 퍼버의 정보를 가져온다
+		IDirect3DVertexBuffer9 *pVertexBuffer = nullptr;
+		IDirect3DIndexBuffer9 *pIndexBuffer = nullptr;
+		xMesh._pMesh->GetVertexBuffer(&pVertexBuffer);
+		xMesh._pMesh->GetIndexBuffer(&pIndexBuffer);
+
+		D3DVERTEXBUFFER_DESC vertexDesc;
+		pVertexBuffer->GetDesc(&vertexDesc);
+
+		D3DINDEXBUFFER_DESC indexDesc;
+		pIndexBuffer->GetDesc(&indexDesc);
+
+		//TODO : VertexDecl을 미리 만들어두고 하도록 하자....
+		VertexDeclHandle declHandle = VertexDeclHandle();
+		//VertexDeclHandle declHandle = VIDEO->GetVertexDecl("StaticTestVertex");
+		//static decl이 이미 없다면
+		if (!declHandle.IsValid())
+		{
+			VertexDecl decl;
+			decl.Begin();
+			for (uint32 i = 0; i < MAX_FVF_DECL_SIZE; i++)
+			{
+				if (xMesh._pVerElement[i].Type == D3DDECLTYPE_UNUSED)
+				{
+					break;
+				}
+				decl.Add(xMesh._pVerElement[i]);
+			}
+
+			//이미 셋팅된 vertexElement에서 알맞은 fvf를 추출하는 함수이다.
+			decl.End(D3DXGetDeclVertexSize(xMesh._pVerElement, 0));
+
+			declHandle = VIDEO->CreateVertexDecl(&decl);
+		}
+
+		Memory mem;
+
+		//버텍스 버퍼 락 하고 정보를 가져온다
+		void *pVertexData = nullptr;
+		pVertexBuffer->Lock(0, 0, (void **)&pVertexData, 0);
+		mem._size = vertexDesc.Size;
+		mem._data = pVertexData;
+		vertexHandle =  VIDEO->CreateVertexBuffer(&mem, declHandle, model->_name);
+		pVertexBuffer->Unlock();
+
+		//인덱스 버퍼 락 하고 정보를 가져온다
+		void *pIndexData = nullptr;
+		pIndexBuffer->Lock(0, 0, (void **)&pIndexData, 0);
+		mem._size = indexDesc.Size;
+		mem._data = pIndexData;
+		indexHandle = VIDEO->CreateIndexBuffer(&mem, model->_name);
+		pIndexBuffer->Unlock();
+
+		COM_RELEASE(pVertexBuffer);
+		COM_RELEASE(pIndexBuffer);
+
+		std::string texturePath;
+		std::string textureName;
+		std::string textureExtension;
+
+		//Material Range정보와 머테리얼 정보를 xMesh에서 가져온다
+		for (uint32 i = 0; i < xMesh._numMaterial; ++i)
+		{
+			TextureHandle diffuseHandle;
+			TextureHandle normalHandle;
+			TextureHandle specularHandle;
+			TextureHandle emissionHandle;
+			//텍스쳐를 로딩한다
+			//텍스쳐 정보가 없다면 흰색 텍스쳐를 로드를 시킨다
+			if (0 == xMesh._texturePaths[i].size())
+			{
+				diffuseHandle = VIDEO->GetTexture("diffuseDefault.png");
+				normalHandle = VIDEO->GetTexture("normalDefault.png");
+				specularHandle = VIDEO->GetTexture("specularDefault.png");
+				emissionHandle = VIDEO->GetTexture("emissionDefault.png");
+			}
+			//텍스쳐 정보가 있다면 디퓨즈를 먼저 로딩하고, 스펙, 노말, 이미션... 등등을 로딩한다
+			//텍스쳐는 video device에 이름만으로 저장이 되어있다. 이미 있는지 체크할때 이름만 사용하도록 하자.
+			else
+			{
+				SplitFilePathToNamePathExtension(xMesh._texturePaths[i], textureName, texturePath, textureExtension);
+
+				diffuseHandle = LoadTextureWithStrings(texturePath, textureName, textureExtension, ".");
+				normalHandle = LoadTextureWithStrings(texturePath, textureName, textureExtension, "_N.");
+				specularHandle = LoadTextureWithStrings(texturePath, textureName, textureExtension, "_S.");
+				emissionHandle = LoadTextureWithStrings(texturePath, textureName, textureExtension, "_E.");
+			}
+			RenderGroup::MaterialRange matRange;
+
+			//머테리얼을 찾아보고 없다면 만든다
+			std::string renderGroupName = model->_name + "_subset_" + std::to_string(i);
+			MaterialHandle matHandle = VIDEO->GetMaterial(renderGroupName);
+			if (!matHandle.IsValid())
+			{
+				matHandle = VIDEO->CreateMaterial(renderGroupName);
+			}
+			matRange._material = matHandle;
+
+			VIDEO->MaterialAddTexture(matRange._material, VIDEO_TEXTURE_DIFFUSE, diffuseHandle);
+			VIDEO->MaterialAddTexture(matRange._material, VIDEO_TEXTURE_NORMAL, normalHandle);
+			VIDEO->MaterialAddTexture(matRange._material, VIDEO_TEXTURE_SPECULAR, specularHandle);
+			VIDEO->MaterialAddTexture(matRange._material, VIDEO_TEXTURE_EMMISIVE, emissionHandle);
+
+			//MaterialRange를 불러온다
+			matRange._numPrim = xMesh._attributeRange[i].FaceCount;
+			matRange._numVertices = xMesh._attributeRange[i].VertexCount;
+			matRange._startIndex = xMesh._attributeRange[i].FaceStart * 3;
+			matRange._startVertex = xMesh._attributeRange[i].VertexStart;
+
+			RenderGroupHandle renderGroup = VIDEO->CreateRenderGroup(vertexHandle, indexHandle, 
+				matRange, model->_name + "subset_" + std::to_string(i));
+			model->_groups.push_back(renderGroup);
+		}
+	}
+
+	//Free Function
+	void ExtractModelFromContainerEX(ContainerEX &container, Model *model, uint32 index, const std::string filePath)
+	{
+		std::string nameCopy = filePath;
+		std::string path;
+		std::string extension;
+
+		SplitFilePathToNamePathExtension(nameCopy, model->_name, path, extension);
+
+		VertexBufferHandle vertexHandle;
+		IndexBufferHandle indexHandle;
+
+		//우선 버텍스 버퍼랑 인덱스 퍼버의 정보를 가져온다
+		IDirect3DVertexBuffer9 *pVertexBuffer = nullptr;
+		IDirect3DIndexBuffer9 *pIndexBuffer = nullptr;
+		container.MeshData.pMesh->GetVertexBuffer(&pVertexBuffer);
+		container.MeshData.pMesh->GetIndexBuffer(&pIndexBuffer);
+
+		D3DVERTEXBUFFER_DESC vertexDesc;
+		pVertexBuffer->GetDesc(&vertexDesc);
+
+		D3DINDEXBUFFER_DESC indexDesc;
+		pIndexBuffer->GetDesc(&indexDesc);
+
+		//TODO : VertexDecl을 미리 만들어두고 하도록 하자....
+		VertexDeclHandle declHandle = VIDEO->GetVertexDecl(video::StaticMeshVertex::_name);
+		Assert(declHandle.IsValid());
+
+		Memory mem;
+
+		//버텍스 버퍼 락 하고 정보를 가져온다
+		void *pVertexData = nullptr;
+		pVertexBuffer->Lock(0, 0, (void **)&pVertexData, 0);
+		mem._size = vertexDesc.Size;
+		mem._data = pVertexData;
+		vertexHandle = VIDEO->CreateVertexBuffer(&mem, declHandle, model->_name);
+		pVertexBuffer->Unlock();
+
+		//인덱스 버퍼 락 하고 정보를 가져온다
+		void *pIndexData = nullptr;
+		pIndexBuffer->Lock(0, 0, (void **)&pIndexData, 0);
+		mem._size = indexDesc.Size;
+		mem._data = pIndexData;
+		indexHandle = VIDEO->CreateIndexBuffer(&mem, model->_name);
+		pIndexBuffer->Unlock();
+
+		COM_RELEASE(pVertexBuffer);
+		COM_RELEASE(pIndexBuffer);
+
+		std::string texturePath;
+		std::string textureName;
+		std::string textureExtension;
+
+		//Material Range정보와 머테리얼 정보를 xMesh에서 가져온다
+		for (uint32 i = 0; i < container._texturePaths.size(); ++i)
+		{
+			TextureHandle diffuseHandle;
+			TextureHandle normalHandle;
+			TextureHandle specularHandle;
+			TextureHandle emissionHandle;
+			//텍스쳐를 로딩한다
+			//텍스쳐 정보가 없다면 흰색 텍스쳐를 로드를 시킨다
+			if (0 == container._texturePaths[i].size())
+			{
+				diffuseHandle = VIDEO->GetTexture("diffuseDefault.png");
+				normalHandle = VIDEO->GetTexture("normalDefault.png");
+				specularHandle = VIDEO->GetTexture("specularDefault.png");
+				emissionHandle = VIDEO->GetTexture("emissionDefault.png");
+			}
+			//텍스쳐 정보가 있다면 디퓨즈를 먼저 로딩하고, 스펙, 노말, 이미션... 등등을 로딩한다
+			//텍스쳐는 video device에 이름만으로 저장이 되어있다. 이미 있는지 체크할때 이름만 사용하도록 하자.
+			else
+			{
+				texturePath = path;
+				SplitNameToNameExtension(container._texturePaths[i], textureName, textureExtension);
+
+				diffuseHandle = LoadTextureWithStrings(texturePath, textureName, textureExtension, ".");
+				normalHandle = LoadTextureWithStrings(texturePath, textureName, textureExtension, "_N.");
+				specularHandle = LoadTextureWithStrings(texturePath, textureName, textureExtension, "_S.");
+				emissionHandle = LoadTextureWithStrings(texturePath, textureName, textureExtension, "_E.");
+			}
+			RenderGroup::MaterialRange matRange;
+
+			//머테리얼을 찾아보고 없다면 만든다
+			std::string renderGroupName = model->_name + "_subset_" + std::to_string(i);
+			MaterialHandle matHandle = VIDEO->GetMaterial(renderGroupName);
+			if (!matHandle.IsValid())
+			{
+				matHandle = VIDEO->CreateMaterial(renderGroupName);
+			}
+			matRange._material = matHandle;
+
+			VIDEO->MaterialAddTexture(matRange._material, VIDEO_TEXTURE_DIFFUSE, diffuseHandle);
+			VIDEO->MaterialAddTexture(matRange._material, VIDEO_TEXTURE_NORMAL, normalHandle);
+			VIDEO->MaterialAddTexture(matRange._material, VIDEO_TEXTURE_SPECULAR, specularHandle);
+			VIDEO->MaterialAddTexture(matRange._material, VIDEO_TEXTURE_EMMISIVE, emissionHandle);
+
+			//MaterialRange를 불러온다
+			matRange._numPrim = container._attributeRange[i].FaceCount;
+			matRange._numVertices = container._attributeRange[i].VertexCount;
+			matRange._startIndex = container._attributeRange[i].FaceStart * 3;
+			matRange._startVertex = container._attributeRange[i].VertexStart;
+
+			RenderGroupHandle renderGroup = VIDEO->CreateRenderGroup(vertexHandle, indexHandle,
+				matRange, model->_name + "subset_" + std::to_string(i));
+			model->_skeleton._renderGroups[index] = renderGroup;
+		}
+	}
+
+
 	LPCSTR PredefinedUniform::ParamName[Enum::Count] = 
 	{
 		"gWorld",
@@ -83,7 +356,6 @@ namespace video
 #if defined (DEBUG) || defined (_DEBUG)
 		flags |= D3DXSHADER_DEBUG;
 #endif
-		
 		LPD3DXBUFFER errorBuffer;
 		HRESULT hresult = D3DXCreateEffectFromFile(gpDevice, fileName.c_str(), nullptr, nullptr, flags, nullptr, &_ptr, &errorBuffer);
 		if (FAILED(hresult))
@@ -368,7 +640,7 @@ namespace video
 
 	void RenderView::SetFillMode(RenderState::FillMode mode)
 	{
-		_commandBuffer.Write<CommandBuffer::Enum>(CommandBuffer::Enum::eSetFillMode);
+		_commandBuffer.Write<CommandBuffer::Enum>(CommandBuffer::Enum::eChangeFillMode);
 		_commandBuffer.Write<RenderState::FillMode>(mode);
 	}
 
@@ -439,27 +711,8 @@ namespace video
 	}
 
 
-	//Free Function
-	TextureHandle LoadTextureWithStrings(const std::string &filePath, const std::string &fileName, const std::string &fileExtension, const std::string &userStr)
-	{
-		TextureHandle resultHandle;
-		//텍스쳐를 로드하는데 텍스쳐가 이미 있다면 그것을 반환하고
-		resultHandle = VIDEO->GetTexture(fileName + userStr + fileExtension);
-		if (!resultHandle.IsValid())
-		{
-			//만약 없다면 새로 로드한다
-			resultHandle = VIDEO->CreateTexture(filePath + fileName + userStr + fileExtension, 
-				fileName + userStr + fileExtension);
-			//새로 로드한 텍스쳐가 유효하지 않다면
-			if (!resultHandle.IsValid())
-			{
-				//기본 흰 텍스쳐를 불러온다
-				resultHandle = VIDEO->GetTexture("diffuseDefault.png");
-			}
-		}
-		return resultHandle;
-	}
 
+	//NOTE : Implement this
 	bool Skeleton::Create()
 	{
 		return false;
@@ -468,18 +721,8 @@ namespace video
 	void Skeleton::Destroy()
 	{
 	}
-
 	bool Model::CreateFromXStatic(const std::string & filePath, const Matrix *pMatCorrection)
 	{
-		std::string nameCopy = filePath;
-		std::string path;
-		std::string extension;
-
-		SplitFilePathToNamePathExtension(nameCopy, _name, path, extension);
-
-		VertexBufferHandle vertexHandle;
-		IndexBufferHandle indexHandle;
-
 		XMeshStatic xMesh;
 		HRESULT hresult = xMesh.Load(filePath, pMatCorrection);
 		if (FAILED(hresult))
@@ -487,118 +730,7 @@ namespace video
 			Assert(false);// xmesh load failed
 			return false;
 		}
-		//우선 버텍스 버퍼랑 인덱스 퍼버의 정보를 가져온다
-		IDirect3DVertexBuffer9 *pVertexBuffer = nullptr;
-		IDirect3DIndexBuffer9 *pIndexBuffer = nullptr;
-		xMesh._pMesh->GetVertexBuffer(&pVertexBuffer);
-		xMesh._pMesh->GetIndexBuffer(&pIndexBuffer);
-
-		D3DVERTEXBUFFER_DESC vertexDesc;
-		pVertexBuffer->GetDesc(&vertexDesc);
-
-		D3DINDEXBUFFER_DESC indexDesc;
-		pIndexBuffer->GetDesc(&indexDesc);
-
-		VertexDeclHandle declHandle = VertexDeclHandle();
-		//VertexDeclHandle declHandle = VIDEO->GetVertexDecl("StaticTestVertex");
-		//static decl이 이미 없다면
-		if (!declHandle.IsValid())
-		{
-			VertexDecl decl;
-			decl.Begin();
-			for (uint32 i = 0; i < MAX_FVF_DECL_SIZE; i++)
-			{
-				if (xMesh._pVerElement[i].Type == D3DDECLTYPE_UNUSED)
-				{
-					break;
-				}
-
-				decl.Add(xMesh._pVerElement[i]);
-			}
-
-			//이미 셋팅된 vertexElement에서 알맞은 fvf를 추출하는 함수이다.
-			decl.End(D3DXGetDeclVertexSize(xMesh._pVerElement, 0));
-
-			declHandle = VIDEO->CreateVertexDecl(&decl);
-		}
-
-		Memory mem;
-
-		//버텍스 버퍼 락 하고 정보를 가져온다
-		void *pVertexData = nullptr;
-		pVertexBuffer->Lock(0, 0, (void **)&pVertexData, 0);
-		mem._size = vertexDesc.Size;
-		mem._data = pVertexData;
-		vertexHandle =  VIDEO->CreateVertexBuffer(&mem, declHandle, _name);
-		pVertexBuffer->Unlock();
-
-		//인덱스 버퍼 락 하고 정보를 가져온다
-		void *pIndexData = nullptr;
-		pIndexBuffer->Lock(0, 0, (void **)&pIndexData, 0);
-		mem._size = indexDesc.Size;
-		mem._data = pIndexData;
-		indexHandle = VIDEO->CreateIndexBuffer(&mem, _name);
-		pIndexBuffer->Unlock();
-
-		COM_RELEASE(pVertexBuffer);
-		COM_RELEASE(pIndexBuffer);
-
-		std::string texturePath;
-		std::string textureName;
-		std::string textureExtension;
-
-		//Material Range정보와 머테리얼 정보를 xMesh에서 가져온다
-		for (uint32 i = 0; i < xMesh._numMaterial; ++i)
-		{
-			TextureHandle diffuseHandle;
-			TextureHandle normalHandle;
-			TextureHandle specularHandle;
-			TextureHandle emissionHandle;
-			//텍스쳐를 로딩한다
-			//텍스쳐 정보가 없다면 흰색 텍스쳐를 로드를 시킨다
-			if (0 == xMesh._texturePaths[i].size())
-			{
-				diffuseHandle = VIDEO->GetTexture("diffuseDefault.png");
-				normalHandle = VIDEO->GetTexture("normalDefault.png");
-				specularHandle = VIDEO->GetTexture("specularDefault.png");
-				emissionHandle = VIDEO->GetTexture("emissionDefault.png");
-			}
-			//텍스쳐 정보가 있다면 디퓨즈를 먼저 로딩하고, 스펙, 노말, 이미션... 등등을 로딩한다
-			//텍스쳐는 video device에 이름만으로 저장이 되어있다. 이미 있는지 체크할때 이름만 사용하도록 하자.
-			else
-			{
-				SplitFilePathToNamePathExtension(xMesh._texturePaths[i], textureName, texturePath, textureExtension);
-
-				diffuseHandle = LoadTextureWithStrings(texturePath, textureName, textureExtension, ".");
-				normalHandle = LoadTextureWithStrings(texturePath, textureName, textureExtension, "_N.");
-				specularHandle = LoadTextureWithStrings(texturePath, textureName, textureExtension, "_S.");
-				emissionHandle = LoadTextureWithStrings(texturePath, textureName, textureExtension, "_E.");
-			}
-			RenderGroup::MaterialRange matRange;
-
-			//머테리얼을 찾아보고 없다면 만든다
-			std::string renderGroupName = _name + "_subset_" + std::to_string(i);
-			MaterialHandle matHandle = VIDEO->GetMaterial(renderGroupName);
-			if (!matHandle.IsValid())
-			{
-				matHandle = VIDEO->CreateMaterial(renderGroupName);
-			}
-			matRange._material = matHandle;
-
-			VIDEO->MaterialAddTexture(matRange._material, VIDEO_TEXTURE_DIFFUSE, diffuseHandle);
-			VIDEO->MaterialAddTexture(matRange._material, VIDEO_TEXTURE_NORMAL, normalHandle);
-			VIDEO->MaterialAddTexture(matRange._material, VIDEO_TEXTURE_SPECULAR, specularHandle);
-			VIDEO->MaterialAddTexture(matRange._material, VIDEO_TEXTURE_EMMISIVE, emissionHandle);
-
-			//MaterialRange를 불러온다
-			matRange._numPrim = xMesh._attributeRange[i].FaceCount;
-			matRange._numVertices = xMesh._attributeRange[i].VertexCount;
-			matRange._startIndex = xMesh._attributeRange[i].FaceStart * 3;
-			matRange._startVertex = xMesh._attributeRange[i].VertexStart;
-
-			RenderGroupHandle renderGroup = VIDEO->CreateRenderGroup(vertexHandle, indexHandle, matRange, _name + "subset_" + std::to_string(i));
-			this->_groups.push_back(renderGroup);
-		}
+		ExtractMeshFromXStatic(xMesh, this, filePath);
 		xMesh.Release();
 	}
 
@@ -628,13 +760,17 @@ namespace video
 		_skeleton._hierachy = new uint16[numBone];
 		_skeleton._globalPoses = new Matrix[numBone];
 		_skeleton._localPoses = new Matrix[numBone];
+		_skeleton._offsetMatrices = new Matrix[numBone];
 		_skeleton._names = new Skeleton::SkeletonName[numBone];
+		_skeleton._renderGroups = new video::RenderGroupHandle[numBone];
 		_skeleton._numhierachy = numBone;
 
 		_skeleton._hierachy[0] = 0;
 		MatrixIdentity(&_skeleton._globalPoses[0]);
 		MatrixIdentity(&_skeleton._localPoses[0]);
 
+
+		std::vector<std::string> texturePaths;
 		for (uint32 i = 0; i < numBone; ++i)
 		{
 			_skeleton._hierachy[i] = xMesh._frameIndex[i];
@@ -649,6 +785,16 @@ namespace video
 				char buffer[64] = {0,};
 				sprintf(buffer, "Bone %d", i);
 				strncpy(_skeleton._names[i]._name, buffer, 64);
+			}
+
+			if (nullptr != xMesh._linearFrames[i]->pMeshContainer)
+			{
+				ContainerEX *pContainerMesh = (ContainerEX *)xMesh._linearFrames[i]->pMeshContainer;
+				if (pContainerMesh->_texturePaths.size() > 0)
+				{
+					memcpy(_skeleton._offsetMatrices, pContainerMesh->_pBoneOffsetMatices, sizeof(Matrix) * numBone);
+					ExtractModelFromContainerEX(*pContainerMesh, this, i, filePath);
+				}
 			}
 		}
 
@@ -687,6 +833,7 @@ namespace video
 			gpDevice->SetRenderState(D3DRS_FILLMODE, D3DFILL_SOLID);
 			gpDevice->SetFVF(0);
 		}
+		_drawData._primitiveType = D3DPRIMITIVETYPE::D3DPT_TRIANGLELIST;
 	}
 
 	

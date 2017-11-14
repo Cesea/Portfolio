@@ -118,61 +118,61 @@ STDMETHODIMP HierachyEX::CreateMeshContainer(LPCSTR Name,
 
 	//																							
 	//스키닝 정보 가 있다면....
-	//if (pSkinInfo != NULL)
-	//{
-	//	//스키닝 정보를 물어놓는다
-	//	meshContainer->pSkinInfo = pSkinInfo;
-	//	//스킨정보 레퍼런스 카운트 증가 ( 위의 메시데이터의 레퍼런스 카운트와 동일한 과정 )
-	//	pSkinInfo->AddRef();
-	//	//이메시에 사용되는 본의 수를 얻는다.
-	//	int numBone = pSkinInfo->GetNumBones();
-	//	//사용되는 본의 수만큼 행렬 동적할당
-	//	meshContainer->pBoneOffsetMatices = new Matrix[numBone];
-	//	//본 Offset 행렬 셋팅
-	//	for (int i = 0; i < numBone; i++)
-	//	{
-	//		meshContainer->pBoneOffsetMatices[i] = *(Matrix *)(meshContainer->pSkinInfo->GetBoneOffsetMatrix(i));
-	//	}
-	//	//Effect 에서 사용되는 행렬 팔래트 쵀대 수를 얻는다.
-	//	UINT iPaletteSize = 0;
-	//	m_pSkinnedMesh->m_pSkinnedEffect->GetInt("MATRIX_PALETTE_SIZE", (INT*)&iPaletteSize);
+	if (pSkinInfo != NULL)
+	{
+		//스키닝 정보를 물어놓는다
+		meshContainer->pSkinInfo = pSkinInfo;
+		//스킨정보 레퍼런스 카운트 증가 ( 위의 메시데이터의 레퍼런스 카운트와 동일한 과정 )
+		pSkinInfo->AddRef();
+		//이메시에 사용되는 본의 수를 얻는다.
+		int numBone = pSkinInfo->GetNumBones();
+		//사용되는 본의 수만큼 행렬 동적할당
+		meshContainer->_pBoneOffsetMatices = new Matrix[numBone];
+		//본 Offset 행렬 셋팅
+		for (int i = 0; i < numBone; i++)
+		{
+			meshContainer->_pBoneOffsetMatices[i] = *(Matrix *)(meshContainer->pSkinInfo->GetBoneOffsetMatrix(i));
+		}
+		//Effect 에서 사용되는 행렬 팔래트 쵀대 수를 얻는다.
+		//UINT iPaletteSize = 0;
+		//m_pSkinnedMesh->m_pSkinnedEffect->GetInt("MATRIX_PALETTE_SIZE", (INT*)&iPaletteSize);
 
-	//	//기본적으로 적용되는 본수 만큼 팔래트를 할당하는데 Effect 의 최대 MATRIX_PALETTE_SIZE 보다 적용되는 본의 
-	//	//수가 많다면 팔래트 수는 Effect MATRIX_PALETTE_SIZE 수로 고정 한다.
-	//	meshContainer->NumPaletteEntries = min(iPaletteSize, meshContainer->pSkinInfo->GetNumBones());
+		//기본적으로 적용되는 본수 만큼 팔래트를 할당하는데 Effect 의 최대 MATRIX_PALETTE_SIZE 보다 적용되는 본의 
+		//수가 많다면 팔래트 수는 Effect MATRIX_PALETTE_SIZE 수로 고정 한다.
+		//meshContainer->NumPaletteEntries = min(iPaletteSize, meshContainer->pSkinInfo->GetNumBones());
 
-	//	//위의 작업에이어 Mesh에  적용되는 bone의 수가 Effect 에서 지원되는 MATRIX_PALETTE_SIZE 수보다 많은 경우
-	//	//boneMesh->NumPaletteEntries 수에 맞추어서 Mesh 의 SubSet 을 나눌 필요가 있다.
-	//	//아래의 함수는 그러한 작업 들을 WorkingMesh 에 해주고 또한 WorkingMesh 에 
-	//	//정점 가중치 개념을 추가해준다.
+		//위의 작업에이어 Mesh에  적용되는 bone의 수가 Effect 에서 지원되는 MATRIX_PALETTE_SIZE 수보다 많은 경우
+		//boneMesh->NumPaletteEntries 수에 맞추어서 Mesh 의 SubSet 을 나눌 필요가 있다.
+		//아래의 함수는 그러한 작업 들을 WorkingMesh 에 해주고 또한 WorkingMesh 에 
+		//정점 가중치 개념을 추가해준다.
 
-	//	meshContainer->pSkinInfo->ConvertToIndexedBlendedMesh(
-	//		meshContainer->MeshData.pMesh,		//원본 메쉬
-	//		D3DXMESH_MANAGED | D3DXMESHOPT_VERTEXCACHE,	//메쉬 옵션
-	//		meshContainer->NumPaletteEntries,		//본 팔래트 수를 넘긴다.
-	//		meshContainer->pAdjacency,			//인접 버퍼를 넘긴다.
-	//		NULL,							//갱신된 인접 버퍼를 받아온다 ( 필요없으면 NULL )
-	//		NULL,							//갱신된 폴리곤(감각인덱스) 버퍼를 받아온다 ( 필요없으면 NULL )
-	//		NULL,							//갱신된 정점 버퍼를 받아온다 ( 필요없으면 NULL )
-	//		&meshContainer->MaxNumFaceInfls,		//한 버텍스에 영향을 주는 본의 최대 갯수를 얻는더.
-	//		&meshContainer->NumAttributesGroup,	//본의 컴비네이션 속성그룹의 수를 얻는다ㅓ.
-	//		&meshContainer->BufBoneCombos,		//본의 컴비네이션 버퍼를 얻는다.
-	//		&meshContainer->WorkingMesh			//원본메쉬에서 작업된 메쉬
-	//	);
-	//	//본의 컴비네이션 은 메쉬의 Subset 별로 어떠한 본에 영향을 받는지에 대한 정보를 지니게 된다.
-	//	//본매트릭스 인덱스 = 본컴비네이션[Subset].BoneID[팔래트]
+		//meshContainer->pSkinInfo->ConvertToIndexedBlendedMesh(
+		//	meshContainer->MeshData.pMesh,		//원본 메쉬
+		//	D3DXMESH_MANAGED | D3DXMESHOPT_VERTEXCACHE,	//메쉬 옵션
+		//	meshContainer->NumPaletteEntries,		//본 팔래트 수를 넘긴다.
+		//	meshContainer->pAdjacency,			//인접 버퍼를 넘긴다.
+		//	NULL,							//갱신된 인접 버퍼를 받아온다 ( 필요없으면 NULL )
+		//	NULL,							//갱신된 폴리곤(감각인덱스) 버퍼를 받아온다 ( 필요없으면 NULL )
+		//	NULL,							//갱신된 정점 버퍼를 받아온다 ( 필요없으면 NULL )
+		//	&meshContainer->MaxNumFaceInfls,		//한 버텍스에 영향을 주는 본의 최대 갯수를 얻는더.
+		//	&meshContainer->NumAttributesGroup,	//본의 컴비네이션 속성그룹의 수를 얻는다ㅓ.
+		//	&meshContainer->BufBoneCombos,		//본의 컴비네이션 버퍼를 얻는다.
+		//	&meshContainer->WorkingMesh			//원본메쉬에서 작업된 메쉬
+		//);
+		//본의 컴비네이션 은 메쉬의 Subset 별로 어떠한 본에 영향을 받는지에 대한 정보를 지니게 된다.
+		//본매트릭스 인덱스 = 본컴비네이션[Subset].BoneID[팔래트]
 
-	//	//cMesh_Skinned 에 작업에 사용되는 팔래트 행렬 수가 부족하면 
-	//	//다시 재할당 한다.
-	//	if (m_pSkinnedMesh->m_dwWorkingPaletteSize < meshContainer->NumPaletteEntries)
-	//	{
-	//		if (m_pSkinnedMesh->m_pmWorkingPalette)
-	//			delete[] m_pSkinnedMesh->m_pmWorkingPalette;
+		//cMesh_Skinned 에 작업에 사용되는 팔래트 행렬 수가 부족하면 
+		//다시 재할당 한다.
+		//if (m_pSkinnedMesh->m_dwWorkingPaletteSize < meshContainer->NumPaletteEntries)
+		//{
+		//	if (m_pSkinnedMesh->m_pmWorkingPalette)
+		//		delete[] m_pSkinnedMesh->m_pmWorkingPalette;
 
-	//		m_pSkinnedMesh->m_dwWorkingPaletteSize = meshContainer->NumPaletteEntries;
-	//		m_pSkinnedMesh->m_pmWorkingPalette = new D3DXMATRIXA16[meshContainer->NumPaletteEntries];
-	//	}
-	//}
+		//	m_pSkinnedMesh->m_dwWorkingPaletteSize = meshContainer->NumPaletteEntries;
+		//	m_pSkinnedMesh->m_pmWorkingPalette = new D3DXMATRIXA16[meshContainer->NumPaletteEntries];
+		//}
+	}
 
 	////밖으로 리턴될 LPD3DXMESHCONTAINER 에 본메쉬 대입
 	//*ppNewMeshContainer = meshContainer;
@@ -201,6 +201,7 @@ STDMETHODIMP HierachyEX::DestroyMeshContainer(LPD3DXMESHCONTAINER pMeshContainer
 	ContainerEX *toFree = (ContainerEX *)(pMeshContainerToFree);
 	SAFE_DELETE_ARRAY(toFree->_attributeRange);
 	SAFE_DELETE_ARRAY(toFree->Name);
+	SAFE_DELETE_ARRAY(toFree->_pBoneOffsetMatices);
 
 	SAFE_DELETE(toFree);
 
@@ -275,7 +276,7 @@ HRESULT XMeshAnimated::Load(const std::string & filePath, const Matrix * pMatCor
 	}
 
 	//본 매트릭스 포인터 생성
-	InitBoneMatrixPointer((FrameEX*)_pRootbone);
+	//InitBoneMatrixPointer((FrameEX*)_pRootbone);
 
 	//uint32 totalNumFrame{};
 	//GetTotalNumFrame(&totalNumFrame);
@@ -302,58 +303,58 @@ void XMeshAnimated::BuidSubMeshBoundInfo()
 {
 }
 
-void XMeshAnimated::InitBoneMatrixPointer(FrameEX * pFrame)
-{
-	if (pFrame == nullptr)
-	{
-		return;
-	}
-
-	//해당 본프레임에 메쉬 컨테이너 가 존재한다면...
-	if (pFrame->pMeshContainer)
-	{
-		//메쉬 컨테이너를 BONE_MESH 형으로 형변환
-		ContainerEX* containerMesh = (ContainerEX*)pFrame->pMeshContainer;
-
-		//메쉬에 스키닝 정보가 있다면
-		if (containerMesh->pSkinInfo)
-		{
-			//해당 스킨에 적용되는 본의 갯수만큼
-			int numBones = containerMesh->pSkinInfo->GetNumBones();
-
-			//Matrix 포인터 할당
-			containerMesh->ppBoneMatrixPtrs = new Matrix*[numBones];
-
-			//적용되는 폰 프레임의 매트릭스를 찾아 해당 본프레임의 행렬 포인터를 물린다.
-			for (int32 i = 0; i < numBones; i++)
-			{
-				//해당 스킨에 적용되는 i 번째의 본이름으로 해당 본 프레임을 루프 본부터 찾아 들어간가
-				FrameEX* frameFound = (FrameEX*)D3DXFrameFind(_pRootbone, containerMesh->pSkinInfo->GetBoneName(i));
-				//찾았다면
-				if (nullptr != frameFound)
-				{
-					containerMesh->ppBoneMatrixPtrs[i] = &frameFound->CombinedTransformationMatrix;
-				}
-				else
-				{
-					containerMesh->ppBoneMatrixPtrs[i] = NULL;
-				}
-			}
-		}
-	}
-
-	//이웃 본이 존재한다면...
-	if (pFrame->pFrameSibling)
-	{
-		InitBoneMatrixPointer((FrameEX*)pFrame->pFrameSibling);
-	}
-
-	//자식 본이 존재한다면...
-	if (pFrame->pFrameFirstChild)
-	{
-		InitBoneMatrixPointer((FrameEX*)pFrame->pFrameFirstChild);
-	}
-}
+//void XMeshAnimated::InitBoneMatrixPointer(FrameEX * pFrame)
+//{
+//	if (pFrame == nullptr)
+//	{
+//		return;
+//	}
+//
+//	//해당 본프레임에 메쉬 컨테이너 가 존재한다면...
+//	if (pFrame->pMeshContainer)
+//	{
+//		//메쉬 컨테이너를 BONE_MESH 형으로 형변환
+//		ContainerEX* containerMesh = (ContainerEX*)pFrame->pMeshContainer;
+//
+//		//메쉬에 스키닝 정보가 있다면
+//		if (containerMesh->pSkinInfo)
+//		{
+//			//해당 스킨에 적용되는 본의 갯수만큼
+//			int numBones = containerMesh->pSkinInfo->GetNumBones();
+//
+//			//Matrix 포인터 할당
+//			containerMesh->_ppBoneMatrixPtrs = new Matrix*[numBones];
+//
+//			//적용되는 폰 프레임의 매트릭스를 찾아 해당 본프레임의 행렬 포인터를 물린다.
+//			for (int32 i = 0; i < numBones; i++)
+//			{
+//				//해당 스킨에 적용되는 i 번째의 본이름으로 해당 본 프레임을 루프 본부터 찾아 들어간가
+//				FrameEX* frameFound = (FrameEX*)D3DXFrameFind(_pRootbone, containerMesh->pSkinInfo->GetBoneName(i));
+//				//찾았다면
+//				if (nullptr != frameFound)
+//				{
+//					containerMesh->_ppBoneMatrixPtrs[i] = &frameFound->CombinedTransformationMatrix;
+//				}
+//				else
+//				{
+//					containerMesh->_ppBoneMatrixPtrs[i] = NULL;
+//				}
+//			}
+//		}
+//	}
+//
+//	//이웃 본이 존재한다면...
+//	if (pFrame->pFrameSibling)
+//	{
+//		InitBoneMatrixPointer((FrameEX*)pFrame->pFrameSibling);
+//	}
+//
+//	//자식 본이 존재한다면...
+//	if (pFrame->pFrameFirstChild)
+//	{
+//		InitBoneMatrixPointer((FrameEX*)pFrame->pFrameFirstChild);
+//	}
+//}
 
 void XMeshAnimated::GetTotalNumFrame(uint32 *pOutCount, FrameEX *frame)
 {

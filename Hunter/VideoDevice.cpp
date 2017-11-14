@@ -149,12 +149,20 @@ void video::VideoDevice::Render(RenderView & renderView)
 
 			}break;
 
-			case video::CommandBuffer::eSetFillMode :
+			case video::CommandBuffer::eChangeFillMode :
 			{
 				RenderState::FillMode fillMode;
 				renderView._commandBuffer.Read<RenderState::FillMode>(fillMode);
 				
 				sendingState._fillMode = fillMode;
+			}break;
+
+			case video::CommandBuffer::eChangePrimitiveType :
+			{
+				D3DPRIMITIVETYPE type;
+				renderView._commandBuffer.Read<D3DPRIMITIVETYPE>(type);
+				
+				sendingState._drawData._primitiveType = type;
 			}break;
 
 			case video::CommandBuffer::eDraw:
@@ -290,6 +298,7 @@ bool VideoDevice::InitDefaultRenderState()
 	return result;
 }
 
+//NOTE : 만약 이펙트로 렌더 한다면 항상 D3DPT_TRIANGLELIST라고 가정한다....
 void video::VideoDevice::DrawWithEffect(const video::RenderState & renderState, Matrix * matrices)
 {
 	Effect *effectPtr{};
@@ -367,6 +376,7 @@ void video::VideoDevice::DrawWithEffect(const video::RenderState & renderState, 
 		uint32 numPrim{};
 		uint32 startIndex{};
 
+
 		numVertices = (0 != renderState._drawData._numVertices) ? 
 			(renderState._drawData._numVertices) : (vertexPtr->_size / declPtr->_stride);
 		numPrim = (0 != renderState._drawData._numPrim) ? 
@@ -374,21 +384,14 @@ void video::VideoDevice::DrawWithEffect(const video::RenderState & renderState, 
 		startIndex = (0 != renderState._drawData._startIndex) ? (renderState._drawData._startIndex) : 0;
 
 		uint32 numPass = effectPtr->BeginEffect();
-			effectPtr->BeginPass(0);
+		for (uint32 i = 0; i < numPass; ++i)
+		{
+			effectPtr->BeginPass(i);
 			_pDevice->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, 0, numVertices, startIndex, numPrim);
 			effectPtr->EndPass();
+		}
 		effectPtr->EndEffect();
 
-		//video::StaticTestVertex vertex[3];
-		//vertex[0] = video::StaticTestVertex(Vector3(0.0f, 0.5f, 0.5f), Vector3(0.0f, 0.0f, -1.0f), Vector2(0.5f, 0.0f));
-		//vertex[1] = video::StaticTestVertex(Vector3(0.5f, -0.5f, 0.5f), Vector3(0.0f, 0.0f, -1.0f), Vector2(1.0f, 1.0f));
-		//vertex[2] = video::StaticTestVertex(Vector3(-0.5f, -0.5f, 0.5f), Vector3(0.0f, 0.0f, -1.0f), Vector2(0.0f, 1.0f));
-		//uint16 index[3];
-		//index[0] = 0;
-		//index[1] = 1;
-		//index[2] = 2;
-		//_pDevice->DrawIndexedPrimitiveUP(D3DPT_TRIANGLELIST, 0, 3, 1,
-		//	(void *)index, D3DFMT_INDEX16, (void *)vertex, sizeof(video::StaticTestVertex));
 	}
 	//인덱스 버퍼가 없다..
 	else
@@ -414,6 +417,7 @@ void video::VideoDevice::DrawWithEffect(const video::RenderState & renderState, 
 	}
 }
 
+//NOTE : 만약 이펙트로 렌더 한다면 항상 D3DPT_TRIANGLELIST라고 가정한다....
 void video::VideoDevice::DrawWithoutEffect(const video::RenderState & renderState, Matrix * matrices)
 {
 	VertexBuffer *vertexPtr{};
@@ -483,13 +487,28 @@ void video::VideoDevice::DrawWithoutEffect(const video::RenderState & renderStat
 		uint32 numPrim{};
 		uint32 startIndex{};
 
-		numVertices = (0 != renderState._drawData._numVertices) ? 
-			(renderState._drawData._numVertices) : (vertexPtr->_size / declPtr->_stride);
-		numPrim = (0 != renderState._drawData._numPrim) ? 
-			(renderState._drawData._numPrim) : ((indexPtr->_size / 2) / 3);
-		startIndex = (0 != renderState._drawData._startIndex) ? (renderState._drawData._startIndex) : 0;
+		//TriangleList일때...
+		if ( D3DPT_TRIANGLELIST == renderState._drawData._primitiveType)
+		{
+			numVertices = (0 != renderState._drawData._numVertices) ?
+				(renderState._drawData._numVertices) : (vertexPtr->_size / declPtr->_stride);
+			numPrim = (0 != renderState._drawData._numPrim) ?
+				(renderState._drawData._numPrim) : ((indexPtr->_size / 2) / 3);
+			startIndex = (0 != renderState._drawData._startIndex) ? (renderState._drawData._startIndex) : 0;
 
-		_pDevice->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, 0, numVertices, startIndex, numPrim);
+			_pDevice->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, 0, numVertices, startIndex, numPrim);
+		}
+		//LineList일때
+		else if(D3DPT_LINELIST == renderState._drawData._primitiveType)
+		{
+			numVertices = (0 != renderState._drawData._numVertices) ?
+				(renderState._drawData._numVertices) : (vertexPtr->_size / declPtr->_stride);
+			numPrim = (0 != renderState._drawData._numPrim) ?
+				(renderState._drawData._numPrim) : ((indexPtr->_size / 2) / 2);
+			startIndex = (0 != renderState._drawData._startIndex) ? (renderState._drawData._startIndex) : 0;
+			_pDevice->DrawIndexedPrimitive(D3DPT_LINELIST, 0, 0, numVertices, startIndex, numPrim);
+		}
+
 	}
 	//인덱스 버퍼가 없다..
 	else
@@ -497,11 +516,23 @@ void video::VideoDevice::DrawWithoutEffect(const video::RenderState & renderStat
 		uint32 numPrim{};
 		uint32 startVertex{};
 
-		numPrim = (0 != renderState._drawData._numVertices) ? 
-			(renderState._drawData._numPrim) : (vertexPtr->_size / declPtr->_stride);
-		startVertex = (0 != renderState._drawData._startVertex) ? 
-			(renderState._drawData._startVertex) : (0);
-		_pDevice->DrawPrimitive(D3DPT_TRIANGLELIST, startVertex, numPrim);
+		if ( D3DPT_TRIANGLELIST == renderState._drawData._primitiveType)
+		{
+			numPrim = (0 != renderState._drawData._numVertices) ?
+				(renderState._drawData._numPrim) : (vertexPtr->_size / declPtr->_stride);
+			startVertex = (0 != renderState._drawData._startVertex) ?
+				(renderState._drawData._startVertex) : (0);
+			_pDevice->DrawPrimitive(D3DPT_TRIANGLELIST, startVertex, numPrim);
+		}
+		//LineList일때
+		else if (D3DPT_LINELIST == renderState._drawData._primitiveType)
+		{
+			numPrim = (0 != renderState._drawData._numVertices) ?
+				(renderState._drawData._numPrim) : (vertexPtr->_size / declPtr->_stride);
+			startVertex = (0 != renderState._drawData._startVertex) ?
+				(renderState._drawData._startVertex) : (0);
+			_pDevice->DrawPrimitive(D3DPT_LINELIST, startVertex, numPrim);
+		}
 	}
 
 }

@@ -17,8 +17,8 @@ struct ContainerEX : public D3DXMESHCONTAINER
 	//DWORD								NumAttributesGroup;		//메시의 속성 그룹수 ( 해당 메시에 
 	//D3DXATTRIBUTERANGE*				AttributeTable;			//메시의 속성 테이블 ( 해당 본에 적용된 Mesh 의 Subset, MaterialID 같은 정보를 담고 있다 )
 
-	Matrix** ppBoneMatrixPtrs;		//본들의 행렬 [ 포인터 배열 ]
-	Matrix*	pBoneOffsetMatices;		//자신의 기본 행렬 배열
+	//Matrix** _ppBoneMatrixPtrs;		//본들의 행렬 [ 포인터 배열 ]
+	Matrix*	_pBoneOffsetMatices;		//자신의 기본 행렬 배열
 														//D3DXMATRIXA16* pCurrentBoneMatrices;	//현제 Animation 이 적용된 행렬
 	DWORD NumPaletteEntries;		//현본메쉬의 행렬팔래트 수
 	DWORD MaxNumFaceInfls;		//해당 메시에 적용되는 정점하나당 최대 가중치 갯수
