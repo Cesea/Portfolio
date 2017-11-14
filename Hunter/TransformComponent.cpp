@@ -457,7 +457,7 @@ void TransformComponent::RotateWorld(float angleX, float angleY, float angleZ)
 
 }
 
-void TransformComponent::RotateWorld(Vector3 angle)
+void TransformComponent::RotateWorld(const Vector3 &angle)
 {
 	//부모가 있는 경우
 	if (this->_pParent)
@@ -531,7 +531,7 @@ void TransformComponent::RotateSelf(float angleX, float angleY, float angleZ)
 	_transformDirty = true;
 }
 
-void TransformComponent::RotateSelf(Vector3 angle)
+void TransformComponent::RotateSelf(const Vector3 &angle)
 {
 	//각 축에 대한 회전 행렬
 	Matrix matRotateX;
@@ -583,7 +583,7 @@ void TransformComponent::RotateLocal(float angleX, float angleY, float angleZ)
 	_transformDirty = true;
 }
 
-void TransformComponent::RotateLocal(Vector3 angle)
+void TransformComponent::RotateLocal(const Vector3 &angle)
 {
 	//각 축에 대한 회전 행렬
 	Matrix matRotateX;
@@ -608,7 +608,7 @@ void TransformComponent::RotateLocal(Vector3 angle)
 
 
 //특정 방향을 바라보게 회전해라.
-void TransformComponent::LookDirection(Vector3 dir, Vector3 _up /*= Vector3(0, 1, 0)*/)
+void TransformComponent::LookDirection(const Vector3 &dir, const Vector3 &_up /*= Vector3(0, 1, 0)*/)
 {
 	//정면 벡터
 	Vector3 newForward = dir;
@@ -647,7 +647,7 @@ void TransformComponent::LookDirection(Vector3 dir, Vector3 _up /*= Vector3(0, 1
 }
 
 //특정 방향을 바라보는데 angle 각만큼만 회전 해라
-void TransformComponent::LookDirection(Vector3 dir, float angle)
+void TransformComponent::LookDirection(const Vector3 &dir, float angle)
 {
 	//진짜로월드 축
 	Vector3 worldAxis[3];
@@ -687,7 +687,7 @@ void TransformComponent::LookDirection(Vector3 dir, float angle)
 }
 
 //특정위치를 바라보게 회전해라.
-void TransformComponent::LookPosition(Vector3 pos, Vector3 _up /*= Vector3(0, 1, 0)*/)
+void TransformComponent::LookPosition(const Vector3 &pos, const Vector3 &_up /*= Vector3(0, 1, 0)*/)
 {
 	//위치에 대한 방향벡터를 얻는다.
 	Vector3 worldPos = this->GetWorldPosition();
@@ -698,7 +698,7 @@ void TransformComponent::LookPosition(Vector3 pos, Vector3 _up /*= Vector3(0, 1,
 }
 
 //특정위치를  바라보는데 angle 각만큼만 회전 해라
-void TransformComponent::LookPosition(Vector3 pos, float angle)
+void TransformComponent::LookPosition(const Vector3 &pos, float angle)
 {
 	//위치에 대한 방향벡터를 얻는다.
 	Vector3 worldPos = this->GetWorldPosition();

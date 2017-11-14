@@ -64,7 +64,8 @@ vs_output vs_main( vs_input input )
 
 float4 ps_main(vs_output input) : COLOR
 {
-	return tex2D(texture0Sampler, input.texcoord);
+	//return tex2D(texture0Sampler, input.texcoord);
+	return float4(1.0f, 1.0f, 0.0f, 1.0f);
 }
 
 //--------------------------------------------------------------//

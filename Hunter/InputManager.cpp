@@ -130,7 +130,8 @@ void Mouse::UpdateWithMessage(WPARAM wParam, LPARAM lParam)
 
 	if (_currentPoint.x != _oldPoint.x || _currentPoint.y != _oldPoint.y)
 	{
-		_pParent->_channel.Broadcast<InputManager::MouseMoveEvent>(InputManager::MouseMoveEvent(PointMake(_currentPoint.x, _currentPoint.y)));
+		_pParent->_channel.Broadcast<InputManager::MouseMoveEvent>(
+			InputManager::MouseMoveEvent(PointMake(_currentPoint.x, _currentPoint.y),PointMake(_oldPoint.x, _oldPoint.y)));
 	}
 
 	//constexpr로 버튼이 정의 되어있다

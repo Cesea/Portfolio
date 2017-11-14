@@ -211,6 +211,8 @@
     <ClInclude Include="EntityIDPool.h" />
     <ClInclude Include="Filter.h" />
     <ClInclude Include="Frustum.h" />
+    <ClInclude Include="GameComponent.h" />
+    <ClInclude Include="GameSystems.h" />
     <ClInclude Include="GameUtils.h" />
     <ClInclude Include="Hash.h" />
     <ClInclude Include="imguiRenderer.h" />

@@ -105,21 +105,6 @@
     <ClCompile Include="Allocators.cpp">
       <Filter>Core\Memory</Filter>
     </ClCompile>
-    <ClCompile Include="RenderComponent.cpp">
-      <Filter>Game\GameComponent</Filter>
-    </ClCompile>
-    <ClCompile Include="MoveComponent.cpp">
-      <Filter>Game\GameComponent</Filter>
-    </ClCompile>
-    <ClCompile Include="TransformComponent.cpp">
-      <Filter>Game\GameComponent</Filter>
-    </ClCompile>
-    <ClCompile Include="CollisionComponent.cpp">
-      <Filter>Game\GameComponent</Filter>
-    </ClCompile>
-    <ClCompile Include="AnimationComponent.cpp">
-      <Filter>Game\GameComponent</Filter>
-    </ClCompile>
     <ClCompile Include="AnimationSystem.cpp">
       <Filter>Game\GameSystem\AnimationSystem</Filter>
     </ClCompile>
@@ -165,7 +150,24 @@
     <ClCompile Include="XMeshAnimated.cpp">
       <Filter>Sub\DirectX</Filter>
     </ClCompile>
-    <ClCompile Include="AnimationUtils.cpp" />
+    <ClCompile Include="AnimationComponent.cpp">
+      <Filter>Game\GameComponent\AnimationComponent</Filter>
+    </ClCompile>
+    <ClCompile Include="CollisionComponent.cpp">
+      <Filter>Game\GameComponent\CollisionComponent</Filter>
+    </ClCompile>
+    <ClCompile Include="MoveComponent.cpp">
+      <Filter>Game\GameComponent\MoveComponent</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderComponent.cpp">
+      <Filter>Game\GameComponent\RenderComponent</Filter>
+    </ClCompile>
+    <ClCompile Include="TransformComponent.cpp">
+      <Filter>Game\GameComponent\TransfromComponent</Filter>
+    </ClCompile>
+    <ClCompile Include="AnimationUtils.cpp">
+      <Filter>Game\GameSystem\AnimationSystem</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -346,21 +348,6 @@
     <ClInclude Include="Allocators.h">
       <Filter>Core\Memory</Filter>
     </ClInclude>
-    <ClInclude Include="RenderComponent.h">
-      <Filter>Game\GameComponent</Filter>
-    </ClInclude>
-    <ClInclude Include="MoveComponent.h">
-      <Filter>Game\GameComponent</Filter>
-    </ClInclude>
-    <ClInclude Include="TransformComponent.h">
-      <Filter>Game\GameComponent</Filter>
-    </ClInclude>
-    <ClInclude Include="CollisionComponent.h">
-      <Filter>Game\GameComponent</Filter>
-    </ClInclude>
-    <ClInclude Include="AnimationComponent.h">
-      <Filter>Game\GameComponent</Filter>
-    </ClInclude>
     <ClInclude Include="DataBase.h">
       <Filter>Core\SubSystem\DataBase</Filter>
     </ClInclude>
@@ -421,8 +408,29 @@
     <ClInclude Include="AnimationUtils.h">
       <Filter>Game\GameSystem\AnimationSystem</Filter>
     </ClInclude>
+    <ClInclude Include="GameSystems.h">
+      <Filter>Game\GameSystem</Filter>
+    </ClInclude>
     <ClInclude Include="RenderSystem.h">
-      <Filter>Game\GameSystem\TransformSystem</Filter>
+      <Filter>Game\GameSystem\RenderSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="GameComponent.h">
+      <Filter>Game\GameComponent</Filter>
+    </ClInclude>
+    <ClInclude Include="AnimationComponent.h">
+      <Filter>Game\GameComponent\AnimationComponent</Filter>
+    </ClInclude>
+    <ClInclude Include="CollisionComponent.h">
+      <Filter>Game\GameComponent\CollisionComponent</Filter>
+    </ClInclude>
+    <ClInclude Include="MoveComponent.h">
+      <Filter>Game\GameComponent\MoveComponent</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderComponent.h">
+      <Filter>Game\GameComponent\RenderComponent</Filter>
+    </ClInclude>
+    <ClInclude Include="TransformComponent.h">
+      <Filter>Game\GameComponent\TransfromComponent</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -539,6 +547,21 @@
     </Filter>
     <Filter Include="Sub\DirectX">
       <UniqueIdentifier>{5645eb42-e5b5-4684-807e-a68f4076dc84}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\GameComponent\AnimationComponent">
+      <UniqueIdentifier>{50fe04da-648f-4b00-98e1-d5c5f3736830}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\GameComponent\CollisionComponent">
+      <UniqueIdentifier>{1f11db7f-2aa1-4a9a-81ab-03b8b476aca2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\GameComponent\MoveComponent">
+      <UniqueIdentifier>{4fee0c64-cec2-4c14-b81f-933a66b3a09c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\GameComponent\RenderComponent">
+      <UniqueIdentifier>{41f7ad9e-814b-41a9-9d48-8945cea0acbc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\GameComponent\TransfromComponent">
+      <UniqueIdentifier>{2fb70df9-3f23-48a0-9663-092d7ddb399f}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

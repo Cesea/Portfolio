@@ -20,7 +20,10 @@ Camera::Camera()
 	_rotationSpeed = 1.0f;
 
 	EventChannel channel;
-	channel.Add<InputManager::KeyDownEvent, Camera>(*this) ;
+	channel.Add<InputManager::KeyDownEvent, Camera>(*this);
+	channel.Add<InputManager::MousePressedEvent, Camera>(*this);
+	channel.Add<InputManager::MouseReleasedEvent, Camera>(*this);
+	channel.Add<InputManager::MouseMoveEvent, Camera>(*this);
 }
 
 Camera::~Camera()
@@ -162,5 +165,44 @@ void Camera::Handle(const InputManager::KeyDownEvent & event)
 	else if (event.code == 'E')
 	{
 		_toMove.y -= _moveSpeed * deltaTime;
+	}
+}
+
+void Camera::Handle(const InputManager::MousePressedEvent & event)
+{
+	if (event.code == MOUSE_BUTTON_LEFT)
+	{
+		_rotating = true;
+	}
+}
+
+void Camera::Handle(const InputManager::MouseReleasedEvent & event)
+{
+	if (event.code == MOUSE_BUTTON_LEFT)
+	{
+		_rotating = false;
+	}
+}
+
+void Camera::Handle(const InputManager::MouseMoveEvent & event)
+{
+	if (_rotating)
+	{
+		float deltaTime = APPTIMER->GetTargetTime();
+		Vector3 rot{};
+		int32 deltaX = event.current.x - event.old.x;
+		int32 deltaY = event.current.y - event.old.y;
+
+		if (deltaX != 0)
+		{
+			rot.y = _rotationSpeed * deltaTime * (float)deltaX;
+		}
+
+		if (deltaY != 0)
+		{
+			rot.x = _rotationSpeed * deltaTime * (float)deltaY;
+		}
+
+		_transform.RotateSelf(rot);
 	}
 }

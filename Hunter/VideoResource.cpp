@@ -606,6 +606,7 @@ namespace video
 		_skeleton._hierachy = new uint16[numBone];
 		_skeleton._globalPoses = new Matrix[numBone];
 		_skeleton._localPoses = new Matrix[numBone];
+		_skeleton._names = new Skeleton::SkeletonName[numBone];
 		_skeleton._numhierachy = numBone;
 
 		_skeleton._hierachy[0] = 0;
@@ -616,11 +617,22 @@ namespace video
 		{
 			_skeleton._hierachy[i] = xMesh._frameIndex[i];
 			_skeleton._localPoses[i] = xMesh._linearFrames[i]->TransformationMatrix;
+
+			if (nullptr != xMesh._linearFrames[i]->Name)
+			{
+				strncpy(_skeleton._names[i]._name, xMesh._linearFrames[i]->Name, 64);
+			}
+			else
+			{
+				char buffer[64] = {0,};
+				sprintf(buffer, "Bone %d", i);
+				strncpy(_skeleton._names[i]._name, buffer, 64);
+			}
 		}
 
+		animation::UpdateSkeleton(&_skeleton, nullptr);
 
 		xMesh.Release();
-
 	}
 
 	void Model::Destroy()

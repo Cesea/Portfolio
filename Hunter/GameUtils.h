@@ -2,6 +2,7 @@
 #define GAME_UTILS_H
 
 #include "Camera.h"
-#include "TransformComponent.h"
+#include "GameComponent.h"
+#include "GameSystems.h"
 
 #endif

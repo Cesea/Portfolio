@@ -209,10 +209,15 @@ namespace video
 
 	struct Skeleton
 	{
+		struct SkeletonName
+		{
+			char _name[64];
+		};
+
 		uint16 *_hierachy{};
 		Matrix *_localPoses{};
 		Matrix *_globalPoses{};
-		char *_names[64];
+		SkeletonName *_names;
 
 		uint32 _numhierachy{};
 	};

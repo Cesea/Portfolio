@@ -30,7 +30,7 @@ public:
 	void SetFov(float fov) { _fov = fov; }
 	float GetFov() { return _fov; }
 
-	void OrthoToggle() { _bOrtho = !_bOrtho; }
+	void OrthoToggle() { _ortho = !_ortho; }
 
 	//화면의 위치를 가지고 카메라의 투영 레이를 얻는다
 	void ComputeRay(const Vector2 &screenPos, Ray *pOutRay);
@@ -43,6 +43,9 @@ public:
 	TransformComponent &GetTransform() { return _transform; }
 
 	void Handle(const InputManager::KeyDownEvent &event);
+	void Handle(const InputManager::MousePressedEvent &event);
+	void Handle(const InputManager::MouseReleasedEvent &event);
+	void Handle(const InputManager::MouseMoveEvent &event);
 protected:
 	float _fov;			//카메라 화각
 	float _camNear;		//카메라 Near
@@ -51,21 +54,20 @@ protected:
 	Matrix _matView;		//뷰행렬
 	Matrix _matProjection;	//투영행렬
 	Matrix _matViewProjection;	//뷰 * 투영행렬
+	TransformComponent _transform;
 
-	bool _bOrtho;		//직교니?
+	bool32 _ortho;		//직교니?
+	bool32 _rotating{false};
 
 	float _moveSpeed{1.0f};
-	float _rotationSpeed{1.0f};
+	float _rotationSpeed{0.4f};
 
 	Vector3 _toMove;
 	//float _friction;
 	//float _aceel;
 
 	Frustum _frustum;
-
 	void UpdateFrustum();
-
-	TransformComponent _transform;
 };
 
 

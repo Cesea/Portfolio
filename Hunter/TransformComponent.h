@@ -58,16 +58,16 @@ struct TransformComponent : public Component
 
 	//월드 기준으로 회전 
 	void RotateWorld(float angleX, float angleY, float angleZ);
-	void RotateWorld(Vector3 angle);
+	void RotateWorld(const Vector3 &angle);
 
 	//자신의 축기준으로 회전
 	void RotateSelf(float angleX, float angleY, float angleZ);
-	void RotateSelf(Vector3 angle);
+	void RotateSelf(const Vector3 &angle);
 
 
 	//부모가 있는 경우 부모 로컬의 축기준으로 회전
 	void RotateLocal(float angleX, float angleY, float angleZ);
-	void RotateLocal(Vector3 angle);
+	void RotateLocal(const Vector3 &angle);
 
 
 	//사원수를 이용한 특정 회전값으로 회전량을 가져라....
@@ -83,16 +83,16 @@ struct TransformComponent : public Component
 	void SetRotateLocal(const Quaternion& matWorldRotate);
 
 	//특정 방향을 바라보게 회전해라.
-	void LookDirection(Vector3 dir, Vector3 up = Vector3(0, 1, 0));
+	void LookDirection(const Vector3 &dir, const Vector3 &up = Vector3(0, 1, 0));
 
 	//특정 방향을 바라보는데 angle 각만큼만 회전 해라
-	void LookDirection(Vector3 dir, float angle);
+	void LookDirection(const Vector3 &dir, float angle);
 
 	//특정위치를 바라보게 회전해라.
-	void LookPosition(Vector3 pos, Vector3 up = Vector3(0, 1, 0));
+	void LookPosition(const Vector3 &pos, const Vector3 &up = Vector3(0, 1, 0));
 
 	//특정위치를  바라보는데 angle 각만큼만 회전 해라
-	void LookPosition(Vector3 pos, float angle);
+	void LookPosition(const Vector3 &pos, float angle);
 
 	// 자신의 회전 값을 from 과 to 사이의 회전량만큼 회전보간(구면보간) 하여 적용
 	void RotateSlerp(const TransformComponent& from, const TransformComponent& to, float t);

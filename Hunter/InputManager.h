@@ -125,10 +125,11 @@ public :
 	//Mouse에서의 code는 위의 정의에 따른다
 	struct MouseMoveEvent
 	{
-		MouseMoveEvent(POINT coord) :
-			coord(coord)
+		MouseMoveEvent(POINT current, POINT old) :
+			current(current), old(old)
 		{}
-		POINT coord;
+		POINT current;
+		POINT old;
 	};
 	struct MouseDownEvent
 	{

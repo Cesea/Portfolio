@@ -37,7 +37,7 @@ bool32 BaseScene::Init()
 	_renderView = VIDEO->GetRenderView(renderViewHandle);
 	_renderView->_clearColor = 0xff55330;
 
-	_camera.SetMoveSpeed(20.0f);
+	_camera.SetMoveSpeed(30.0f);
 
 	//VertexDecl vertexDecl;
 	//vertexDecl.Begin();
@@ -90,13 +90,14 @@ bool32 BaseScene::Init()
 	Entity &entity = _entities.back();
 
 	Matrix correctionMat;
-	MatrixScaling(&correctionMat, 0.1f, 0.1f, 0.1f);
+	MatrixScaling(&correctionMat, 1.0f, 1.0f, 1.0f);
 
 	RenderComponent &renderComp = entity.AddComponent<RenderComponent>();
 	//renderComp.model.CreateFromXStatic("../resources/models/car/Car.x", &correctionMat);
 	//renderComp.model.CreateFromXAnimated("../resources/models/car/Car.x", &correctionMat);
 
-	renderComp.model.CreateFromXAnimated("../resources/models/knight/Knight.X", &correctionMat);
+	renderComp.model.CreateFromXStatic("../resources/models/sphere.X", &correctionMat);
+	renderComp.model.CreateFromXAnimated("../resources/models/sphereSkinned.X", &correctionMat);
 
 	renderComp.model._effect = _effect;
 

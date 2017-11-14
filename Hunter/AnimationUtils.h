@@ -94,7 +94,7 @@ namespace animation
 	//Functions////////////////////////////////////////////////////////////////////////
 
 	//void BuildSkeleton(Skeleton *pSkeleton,);
-	//void UpdateSkeleton(Skeleton *pSkeleton, const Matrix *pWorldMatrix);
+	void UpdateSkeleton(video::Skeleton *pSkeleton, const Matrix *pWorldMatrix);
 	//void RenderSkeleton();
 
 }
