@@ -207,17 +207,28 @@ namespace video
 		MaterialRange _materialRange;
 	};
 
+	struct Skeleton
+	{
+		uint16 *_hierachy{};
+		Matrix *_localPoses{};
+		Matrix *_globalPoses{};
+		char *_names[64];
+
+		uint32 _numhierachy{};
+	};
+
 	struct Model
 	{
 		//XFile을 먼저 로드 하고 정보를 추출하여 내가 원하는 포멧으로 변환한다.
-		bool CreateFromX(const std::string &filePath, const Matrix *pMatCorrection = nullptr);
+		bool CreateFromXStatic(const std::string &filePath, const Matrix *pMatCorrection = nullptr);
+		bool CreateFromXAnimated(const std::string &filePath, const Matrix *pMatCorrection = nullptr);
 		void Destroy();
 
 		std::vector<video::RenderGroupHandle> _groups;
+		Skeleton _skeleton;
 
 		video::EffectHandle _effect;
 		std::string _name;
-
 		//Sphere _sphere;
 		//AABB _aabb;
 	};
@@ -335,6 +346,26 @@ namespace video
 		uint32 _num;
 	};
 
+	//TODO : 아래의 RenderState의 정보들을 DrawData로 교체하자..
+	struct DrawData
+	{
+		enum PrimitiveType
+		{
+			eTriangleList,
+			eLineList,
+			Count
+		};
+
+		//버텍스 버퍼로만 그릴때 사용된다
+		uint32 _startVertex{};
+
+		//인덱스 버퍼로 그릴 때 사용된다
+		uint32 _startIndex{};
+		uint32 _numVertices{};
+		uint32 _numPrim{};
+
+		PrimitiveType _primitiveType;
+	};
 
 	//NOTE : 만약 deffered rendering을 하게된다면  RenderView의 FrameBuffer에 이미지들을 렌더 한 후에 여러 RenderView의 
 	// FrameBuffer를 합성하여 그린다??

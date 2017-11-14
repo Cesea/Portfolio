@@ -1,15 +1,15 @@
 #include "stdafx.h"
-#include "XMesh.h"
+#include "XMeshStatic.h"
 
-XMesh::XMesh(void)
+XMeshStatic::XMeshStatic(void)
 {
 }
 
-XMesh::~XMesh(void)
+XMeshStatic::~XMeshStatic(void)
 {
 }
 
-HRESULT XMesh::Load(const std::string &fileName, const Matrix* matCorrection /*= NULL */)
+HRESULT XMeshStatic::Load(const std::string &fileName, const Matrix* matCorrection /*= NULL */)
 {
 	DWORD dwMatNum{};
 	
@@ -53,12 +53,15 @@ HRESULT XMesh::Load(const std::string &fileName, const Matrix* matCorrection /*=
 		this->_vecMaterials.push_back(mtrl);
 
 		//메터리얼의 Texture 정보가 있다면..
-		if (pMaterials[i].pTextureFilename != NULL) {
-
+		if (nullptr != pMaterials[i].pTextureFilename ) 
+		{
 			//tex 파일경로는 Mesh 파일경로 + texture 파일이름
 			texFilePath = path + pMaterials[i].pTextureFilename;
-
 			_texturePaths.push_back(texFilePath);
+		}
+		else
+		{
+			_texturePaths.push_back(std::string());
 		}
 	}
 	SAFE_RELEASE(_pMaterial);
@@ -100,7 +103,7 @@ HRESULT XMesh::Load(const std::string &fileName, const Matrix* matCorrection /*=
 	BuidSubMeshBoundInfo();
 }
 
-void XMesh::Release()
+void XMeshStatic::Release()
 {
 	SAFE_RELEASE(_pAdjacency);
 	SAFE_DELETE_ARRAY(_attributeRange);
@@ -109,7 +112,7 @@ void XMesh::Release()
 }
 
 //보정행렬대로 메쉬를 수정한다.
-void XMesh::MeshCorrection(const Matrix* pMatCorrection)
+void XMeshStatic::MeshCorrection(const Matrix* pMatCorrection)
 {
 	//pVerElement 배열에는 정점의 요소 정보가 들어가게 된다.
 	_pMesh->GetDeclaration(_pVerElement);
@@ -294,7 +297,7 @@ void XMesh::MeshCorrection(const Matrix* pMatCorrection)
 	SAFE_RELEASE(pIndexBuffer);
 }
 
-void XMesh::BuidSubMeshBoundInfo()
+void XMeshStatic::BuidSubMeshBoundInfo()
 {
 	//머테리얼의 갯수가 2개 이상일때만 이 함수가 실행 되도록 한다.
 	//한개일때는 이미 MatCorrection함수를 통하여 BoundInfo가 생성되므로 그 함수를 사용하도록 한다
@@ -311,7 +314,7 @@ void XMesh::BuidSubMeshBoundInfo()
 	}
 }
 
-void XMesh::CalculateBoundingInfo(std::vector<Vector3>& positions, BoundInfo * pOutBoundInfo, uint32 startVertex, uint32 endVertex)
+void XMeshStatic::CalculateBoundingInfo(std::vector<Vector3>& positions, BoundInfo * pOutBoundInfo, uint32 startVertex, uint32 endVertex)
 {
 	memset(pOutBoundInfo, 0, sizeof(BoundInfo));
 	Assert(startVertex >= 0);
@@ -342,7 +345,7 @@ void XMesh::CalculateBoundingInfo(std::vector<Vector3>& positions, BoundInfo * p
 	pOutBoundInfo->_boundRadius = D3DXVec3Length(&(pOutBoundInfo->_boundCenter - pOutBoundInfo->_boundMin));
 }
 
-//HRESULT XMesh::CloneMeshFVF(DWORD options, DWORD fvf, HRESULT hRet);
+//HRESULT XMeshStatic::CloneMeshFVF(DWORD options, DWORD fvf, HRESULT hRet);
 //	LPD3DXMESH pCloneMesh = nullptr;
 //
 //	// Validate requirements

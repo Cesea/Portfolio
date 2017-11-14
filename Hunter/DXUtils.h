@@ -1,7 +1,8 @@
 #ifndef DXUTILS_H
 #define DXUTILS_H
 
-#include "XMesh.h"
+#include "XMeshStatic.h"
+#include "XMeshAnimated.h"
 
 
 

@@ -448,7 +448,7 @@ namespace video
 		return resultHandle;
 	}
 
-	bool Model::CreateFromX(const std::string & filePath, const Matrix *pMatCorrection)
+	bool Model::CreateFromXStatic(const std::string & filePath, const Matrix *pMatCorrection)
 	{
 		std::string nameCopy = filePath;
 		std::string path;
@@ -459,7 +459,7 @@ namespace video
 		VertexBufferHandle vertexHandle;
 		IndexBufferHandle indexHandle;
 
-		XMesh xMesh;
+		XMeshStatic xMesh;
 		HRESULT hresult = xMesh.Load(filePath, pMatCorrection);
 		if (FAILED(hresult))
 		{
@@ -578,6 +578,49 @@ namespace video
 			this->_groups.push_back(renderGroup);
 		}
 		xMesh.Release();
+	}
+
+	bool Model::CreateFromXAnimated(const std::string & filePath, const Matrix * pMatCorrection)
+	{
+		std::string nameCopy = filePath;
+		std::string path;
+		std::string extension;
+
+		SplitFilePathToNamePathExtension(nameCopy, _name, path, extension);
+
+		VertexBufferHandle vertexHandle;
+		IndexBufferHandle indexHandle;
+
+		XMeshAnimated xMesh;
+		HRESULT hresult = xMesh.Load(filePath, pMatCorrection);
+		if (FAILED(hresult))
+		{
+			Assert(false);// xmesh load failed
+			return false;
+		}
+
+		uint32 numBone;
+		xMesh.GetTotalNumFrame(&numBone);
+		Assert(numBone > 0);
+
+		_skeleton._hierachy = new uint16[numBone];
+		_skeleton._globalPoses = new Matrix[numBone];
+		_skeleton._localPoses = new Matrix[numBone];
+		_skeleton._numhierachy = numBone;
+
+		_skeleton._hierachy[0] = 0;
+		MatrixIdentity(&_skeleton._globalPoses[0]);
+		MatrixIdentity(&_skeleton._localPoses[0]);
+
+		for (uint32 i = 0; i < numBone; ++i)
+		{
+			_skeleton._hierachy[i] = xMesh._frameIndex[i];
+			_skeleton._localPoses[i] = xMesh._linearFrames[i]->TransformationMatrix;
+		}
+
+
+		xMesh.Release();
+
 	}
 
 	void Model::Destroy()

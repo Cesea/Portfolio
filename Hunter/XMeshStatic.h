@@ -1,5 +1,5 @@
-#ifndef XMESH_H
-#define XMESH_H
+#ifndef XMESH_STATIC_H
+#define XMESH_STATIC_H
 
 //TODO : XMesh에서 하나의 서브셋 별로 BoundInfo를 만들어서 RenderGroup에 전달 할 수 있게끔 만들자
 
@@ -12,7 +12,7 @@ struct TriangleGroup
 	std::vector<uint16> _indices;
 };
 
-struct XMesh 
+struct XMeshStatic 
 {
 	struct BoundInfo
 	{
@@ -24,10 +24,10 @@ struct XMesh
 		float _boundRadius;
 	};
 
-	XMesh(void);
-	~XMesh(void);
-	virtual HRESULT Load(const std::string &fileName, const Matrix* matCorrection = nullptr);
-	virtual void Release();
+	XMeshStatic(void);
+	~XMeshStatic(void);
+	HRESULT Load(const std::string &fileName, const Matrix* matCorrection = nullptr);
+	void Release();
 	//보정행렬대로 메쉬를 수정한다.
 	void MeshCorrection(const Matrix* pMatCorrection);
 	void BuidSubMeshBoundInfo();

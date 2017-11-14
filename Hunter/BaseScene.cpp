@@ -1,8 +1,6 @@
 #include "stdafx.h"
 #include "BaseScene.h"
 
-#include "XMesh.h"
-
 using namespace video;
 
 struct Vertex
@@ -39,7 +37,7 @@ bool32 BaseScene::Init()
 	_renderView = VIDEO->GetRenderView(renderViewHandle);
 	_renderView->_clearColor = 0xff55330;
 
-	_camera.SetMoveSpeed(40.0f);
+	_camera.SetMoveSpeed(20.0f);
 
 	//VertexDecl vertexDecl;
 	//vertexDecl.Begin();
@@ -93,13 +91,16 @@ bool32 BaseScene::Init()
 
 	Matrix correctionMat;
 	MatrixScaling(&correctionMat, 0.1f, 0.1f, 0.1f);
+
 	RenderComponent &renderComp = entity.AddComponent<RenderComponent>();
-	renderComp.model.CreateFromX("../resources/models/knight/Knight.X", &correctionMat);
+	//renderComp.model.CreateFromXStatic("../resources/models/car/Car.x", &correctionMat);
+	//renderComp.model.CreateFromXAnimated("../resources/models/car/Car.x", &correctionMat);
+
+	renderComp.model.CreateFromXAnimated("../resources/models/knight/Knight.X", &correctionMat);
+
 	renderComp.model._effect = _effect;
-	//renderComp._effect = _effect;
-	//renderComp._vertexBuffer = _vertexBuffer0;
-	//renderComp._material = (index % 2) ? _material0 : _material1;
-	//renderComp.model = _model0;
+
+	//Radius 설정 해주자...
 	renderComp.radius = 1.0f;
 
 	TransformComponent &transComp = entity.AddComponent<TransformComponent>();

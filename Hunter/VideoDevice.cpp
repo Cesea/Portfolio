@@ -452,10 +452,10 @@ void video::VideoDevice::DrawIndexPrimitive(const video::RenderState & renderSta
 //TODO : Default texture들을 로드 하자
 void video::VideoDevice::LoadDefaultTextures()
 {
-	VIDEO->CreateTexture("../resources/diffuseDefault.png", "diffuseDefault.png");
-	VIDEO->CreateTexture("../resources/emissionDefault.png", "emissionDefault.png");
-	VIDEO->CreateTexture("../resources/normalDefault.png", "normalDefault.png");
-	VIDEO->CreateTexture("../resources/specularDefault.png", "specularDefault.png");
+	VIDEO->CreateTexture("../resources/textures/diffuseDefault.png", "diffuseDefault.png");
+	VIDEO->CreateTexture("../resources/textures/emissionDefault.png", "emissionDefault.png");
+	VIDEO->CreateTexture("../resources/textures/normalDefault.png", "normalDefault.png");
+	VIDEO->CreateTexture("../resources/textures/specularDefault.png", "specularDefault.png");
 }
 
 //TODO : Default Shaders들을 로드하자

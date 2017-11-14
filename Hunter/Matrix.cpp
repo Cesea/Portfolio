@@ -62,6 +62,17 @@ Matrix::Matrix(float _11, float _12, float _13, float _14,
 	this->_41 = _41; this->_42 = _42; this->_43 = _43; this->_44 = _44;
 }
 
+Matrix::Matrix(const D3DMATRIX & other)
+{
+	for (int32 row = 0; row < 4; ++row)
+	{
+		for (int32 col = 0; col < 4; ++col)
+		{
+			m[row][col] = other.m[row][col];
+		}
+	}
+}
+
 float & Matrix::operator()(uint32 row, uint32 col)
 {
 	return m[row][col];

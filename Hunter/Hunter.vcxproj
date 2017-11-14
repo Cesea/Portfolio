@@ -128,6 +128,7 @@
     <ClCompile Include="Allocators.cpp" />
     <ClCompile Include="AnimationComponent.cpp" />
     <ClCompile Include="AnimationSystem.cpp" />
+    <ClCompile Include="AnimationUtils.cpp" />
     <ClCompile Include="ApplicationTimer.cpp" />
     <ClCompile Include="BaseScene.cpp" />
     <ClCompile Include="BaseSystem.cpp" />
@@ -180,13 +181,15 @@
     <ClCompile Include="VideoResource.cpp" />
     <ClCompile Include="VideoVertexFormat.cpp" />
     <ClCompile Include="World.cpp" />
-    <ClCompile Include="XMesh.cpp" />
+    <ClCompile Include="XMeshAnimated.cpp" />
+    <ClCompile Include="XMeshStatic.cpp" />
     <ClCompile Include="XMLManager.cpp" />
     <ClCompile Include="XmlSerializer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AnimationComponent.h" />
     <ClInclude Include="AnimationSystem.h" />
+    <ClInclude Include="AnimationUtils.h" />
     <ClInclude Include="ApplicationTimer.h" />
     <ClInclude Include="Assert.h" />
     <ClInclude Include="BaseScene.h" />
@@ -266,7 +269,8 @@
     <ClInclude Include="VideoVertexFormat.h" />
     <ClInclude Include="World.h" />
     <ClInclude Include="WorldEditor.h" />
-    <ClInclude Include="XMesh.h" />
+    <ClInclude Include="XMeshAnimated.h" />
+    <ClInclude Include="XMeshStatic.h" />
     <ClInclude Include="XMLManager.h" />
     <ClInclude Include="XmlSerializer.h" />
   </ItemGroup>

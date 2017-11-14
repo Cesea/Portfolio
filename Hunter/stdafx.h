@@ -31,6 +31,8 @@
 
 #include <d3d9.h>
 #include <d3dx9.h>
+#include <rmxfguid.h>
+#include <rmxftmpl.h>
 
 #include <math.h>
 
@@ -38,6 +40,7 @@
 #include <array>
 #include <algorithm>
 #include <type_traits>
+#include <stack>
 
 #include <assert.h>
 
