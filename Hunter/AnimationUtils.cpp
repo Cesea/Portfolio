@@ -24,8 +24,8 @@ namespace animation
 		{
 			const uint16 parentJoint = pSkeleton->_hierachy[i];
 			MatrixMultiply(&pSkeleton->_globalPoses[i],
-				&pSkeleton->_globalPoses[parentJoint],
-				&pSkeleton->_localPoses[i]);
+				&pSkeleton->_localPoses[i],
+				&pSkeleton->_globalPoses[parentJoint]);
 		}
 	}
 }

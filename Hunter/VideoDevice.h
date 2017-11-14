@@ -106,8 +106,11 @@ namespace video
 
 		bool InitDefaultRenderState();
 
-		void DrawPrimitive(const video::RenderState &renderState, Matrix *matrices);
-		void DrawIndexPrimitive(const video::RenderState &renderState, Matrix *matrices);
+		void DrawWithEffect(const video::RenderState &renderState, Matrix *matrices);
+		void DrawWithoutEffect(const video::RenderState &renderState, Matrix *matrices);
+
+		//void DrawPrimitive(const video::RenderState &renderState, Matrix *matrices);
+		//void DrawIndexPrimitive(const video::RenderState &renderState, Matrix *matrices);
 
 		void LoadDefaultTextures();
 		void LoadDefaultEffects();

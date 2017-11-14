@@ -97,7 +97,7 @@ bool32 BaseScene::Init()
 	//renderComp.model.CreateFromXAnimated("../resources/models/car/Car.x", &correctionMat);
 
 	renderComp.model.CreateFromXStatic("../resources/models/sphere.X", &correctionMat);
-	renderComp.model.CreateFromXAnimated("../resources/models/sphereSkinned.X", &correctionMat);
+	renderComp.model.CreateFromXAnimated("../resources/models/knight/Knight.X", &correctionMat);
 
 	renderComp.model._effect = _effect;
 

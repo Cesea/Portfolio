@@ -360,6 +360,12 @@ namespace video
 		_commandBuffer.Write<MaterialHandle>(handle);
 	}
 
+	void RenderView::SetFillMode(RenderState::FillMode mode)
+	{
+		_commandBuffer.Write<CommandBuffer::Enum>(CommandBuffer::Enum::eSetFillMode);
+		_commandBuffer.Write<RenderState::FillMode>(mode);
+	}
+
 	void RenderView::Submit(VertexBufferHandle handle, uint32 startVertex, uint32 primCount)
 	{
 		_commandBuffer.Write<CommandBuffer::Enum>(CommandBuffer::eSetVertexBuffer);
@@ -647,8 +653,22 @@ namespace video
 		_materialRange = materialRange;
 		return true;
 	}
+
 	void RenderGroup::Destroy()
 	{
 		return;
+	}
+
+	void RenderState::ResetDefault()
+	{
+		_indexBuffer.MakeInvalid();
+		_effect.MakeInvalid();
+
+		if (_fillMode != FillMode::eFillSolid)
+		{
+			_fillMode = FillMode::eFillSolid;
+			gpDevice->SetRenderState(D3DRS_FILLMODE, D3DFILL_SOLID);
+		}
+
 	}
 }

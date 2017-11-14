@@ -23,6 +23,9 @@ void RenderSystem::Render(video::RenderView &renderView, const Camera &camera)
 
 		//if (camera.GetFrustum().IsSphereInFrustum(transformComponent.GetWorldPosition(), 50.0f))
 		{
+
+			renderView.SetFillMode(video::RenderState::FillMode::eFillPoint);
+
 			renderView.SetEffect(refRenderComponent.model._effect);
 			//변환 행렬을 설정한다
 			for (uint32 i = 0; i < refRenderComponent.model._skeleton._numhierachy; ++i)

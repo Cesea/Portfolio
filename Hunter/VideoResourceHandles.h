@@ -26,7 +26,7 @@ namespace video
 		{
 			return (count << VIDEO_CONFIG_RESOURCE_COUNT_BIT) | index;
 		}
-		bool32 IsValid()
+		bool32 IsValid() const
 		{
 			return (Value() != 0);
 		}

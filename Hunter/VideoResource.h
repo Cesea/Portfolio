@@ -36,6 +36,7 @@ namespace video
 			eSetVertexBuffer,
 			eSetIndexBuffer,
 			eSetMaterial,
+			eSetFillMode,
 			eDraw,
 			eEnd
 		};
@@ -356,7 +357,7 @@ namespace video
 	{
 		enum PrimitiveType
 		{
-			eTriangleList,
+			eTriangleList = 0,
 			eLineList,
 			Count
 		};
@@ -377,19 +378,27 @@ namespace video
 	//Context와 같은 역할
 	struct RenderState
 	{
+		enum FillMode
+		{
+			eFillPoint = 0,
+			eFillWireFrame,
+			eFillSolid,
+			Count
+		};
+
+		//리소스 핸들
 		VertexBufferHandle _vertexBuffer{};
 		VertexDeclHandle _vertexDecl{};
 		IndexBufferHandle _indexBuffer{};
 		MaterialHandle _material{};
 		EffectHandle _effect{};
 
-		//버텍스 버퍼로만 그릴때 사용된다
-		uint32 _startVertex{};
+		//device state
+		FillMode _fillMode;
 
-		//인덱스 버퍼로 그릴 때 사용된다
-		uint32 _startIndex{};
-		uint32 _numVertices{};
-		uint32 _numPrim{};
+		DrawData _drawData;
+
+		void ResetDefault();
 	};
 
 	struct RenderView
@@ -405,6 +414,8 @@ namespace video
 		void SetEffect(EffectHandle handle);
 
 		void SetMaterial(MaterialHandle handle);
+
+		void SetFillMode(RenderState::FillMode mode);
 
 		void Submit(VertexBufferHandle handle, uint32 startVertex = 0, uint32 primCount = 0);
 		void Submit(IndexBufferHandle handle, uint32 startIndex = 0, uint32 numVertices = 0, uint32 primCount = 0);
