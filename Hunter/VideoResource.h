@@ -91,8 +91,6 @@ namespace video
 		{
 		}
 	};
-
-
 	
 	//Vertex Buffer
 	struct VertexBuffer
@@ -151,6 +149,7 @@ namespace video
 		IDirect3DVertexDeclaration9 *_ptr{};
 		uint32 _count{};
 		uint32 _stride;
+		DWORD _fvf;
 	};
 
 
@@ -392,6 +391,7 @@ namespace video
 		IndexBufferHandle _indexBuffer{};
 		MaterialHandle _material{};
 		EffectHandle _effect{};
+
 
 		//device state
 		FillMode _fillMode;

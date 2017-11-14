@@ -36,85 +36,88 @@ STDMETHODIMP HierachyEX::CreateMeshContainer(LPCSTR Name,
 	LPD3DXSKININFO pSkinInfo, 
 	LPD3DXMESHCONTAINER * ppNewMeshContainer)
 {
-	*ppNewMeshContainer = new ContainerEX;
-	memset(*ppNewMeshContainer, 0, sizeof(ContainerEX));
-
 	////ppNewMeshContainer 로 넘겨줄 새로운 BONEMESH 생성
-	//ContainerEX* meshContainer = new ContainerEX;
-	//ZeroMemory(meshContainer, sizeof(ContainerEX));
+	ContainerEX* meshContainer = new ContainerEX;
+	ZeroMemory(meshContainer, sizeof(ContainerEX));
 
 	////매개변수로 받은 메쉬 데이터의 Device 를 얻는다.
-	//LPDIRECT3DDEVICE9 d3dDevice = NULL;
-	//pMeshData->pMesh->GetDevice(&d3dDevice);
+	LPDIRECT3DDEVICE9 d3dDevice = NULL;
+	pMeshData->pMesh->GetDevice(&d3dDevice);
 
 	////메시데이터를 물린다.
-	//meshContainer->MeshData.pMesh = pMeshData->pMesh;
-	//meshContainer->MeshData.Type = D3DXMESHTYPE_MESH;
+	meshContainer->MeshData.pMesh = pMeshData->pMesh;
+	meshContainer->MeshData.Type = D3DXMESHTYPE_MESH;
 
 	////메시데이터의 레퍼런스 카운트 증가
-	//pMeshData->pMesh->AddRef();
+	pMeshData->pMesh->AddRef();
 	////레퍼런스 카운트를 명시적으로 해주지 않는다면 매개변수로 받은 pMeshData 가 함수 호출후 해제 되어 버린다!
 	////즉 함수 호출후에도 내부적으로 참조수가 0 이면 자동으로 해제되는 식이다.
 	////따라서 새로만들어진 BONEMESH 맴버데이터에 pMeshData 포인터를 물고있으니
 	////레퍼런스 카운트 수를 증가 시켜 함수가 끈난뒤에도 해제를 막는다.
 
 	////이름 복사
-	//if (nullptr != Name)
-	//{
-	//	int32 len = strlen(Name);
-	//	meshContainer->Name = new char[len + 1];
-	//	strcpy_s(meshContainer->Name, len + 1, Name);
-	//}
+	if (nullptr != Name)
+	{
+		int32 len = strlen(Name);
+		meshContainer->Name = new char[len + 1];
+		strcpy_s(meshContainer->Name, len + 1, Name);
+	}
 
 	////인접정보 복사 ( 인접 정보는 면단 3개씩 지니게 된다 왜냐면 폴리곤의 인접수는 3개니깐 )
-	//DWORD numAdjacency = 3 * (meshContainer->MeshData.pMesh->GetNumFaces());		//인접정보의 수
-	//meshContainer->pAdjacency = new DWORD[numAdjacency];							//인접 정보의 수만큼 증가
-	//memcpy(meshContainer->pAdjacency, pAdjacency, sizeof(DWORD) * numAdjacency);
+	DWORD numAdjacency = 3 * (meshContainer->MeshData.pMesh->GetNumFaces());		//인접정보의 수
+	meshContainer->pAdjacency = new DWORD[numAdjacency];							//인접 정보의 수만큼 증가
+	memcpy(meshContainer->pAdjacency, pAdjacency, sizeof(DWORD) * numAdjacency);
 
-	//std::string texFilePath;
-	//std::string texExp;			//파일 확장자 명
-	//std::string texFile;		//파일 명`
+	std::string texFilePath;
+	std::string texExp;			//파일 확장자 명
+	std::string texFile;		//파일 명
 
-	//							//재질정보
-	//std::string texPath;
+								//재질정보
+	std::string texPath;
 
-	//meshContainer->NumMaterials = NumMaterials;
-	//meshContainer->pMaterials = new D3DXMATERIAL[NumMaterials];
-	//for (DWORD i = 0; i < NumMaterials; i++)
-	//{
-	//	//메터리얼 정보 복사
-	//	memcpy(&meshContainer->pMaterials[i], &pMaterials[i], sizeof(D3DXMATERIAL));
+	meshContainer->NumMaterials = NumMaterials;
+	meshContainer->pMaterials = new D3DXMATERIAL[NumMaterials];
+	for (DWORD i = 0; i < NumMaterials; i++)
+	{
+		//메터리얼 정보 복사
+		memcpy(&meshContainer->pMaterials[i], &pMaterials[i], sizeof(D3DXMATERIAL));
 
-	//	//메터리얼정보 푸쉬
-	//	D3DMATERIAL9 mtrl;
-	//	memcpy(&mtrl, &pMaterials[i].MatD3D, sizeof(D3DMATERIAL9));
-	//	mtrl.Ambient = mtrl.Diffuse;		//재질 Ambient
-	//	meshContainer->Materials.push_back(mtrl);
+		//메터리얼정보 푸쉬
+		//D3DMATERIAL9 mtrl;
+		//memcpy(&mtrl, &pMaterials[i].MatD3D, sizeof(D3DMATERIAL9));
+		//mtrl.Ambient = mtrl.Diffuse;		//재질 Ambient
+		//meshContainer->Materials.push_back(mtrl);
 
-	//	//Texture 가 존재한다면...
-	//	if (pMaterials[i].pTextureFilename != NULL)
-	//	{
-	//		//이름 깊은 복사
-	//		int len = strlen(pMaterials[i].pTextureFilename);
-	//		meshContainer->pMaterials[i].pTextureFilename = new char[len + 1];
-	//		strcpy_s(meshContainer->pMaterials[i].pTextureFilename, len + 1, pMaterials[i].pTextureFilename);
-	//	}
-	//	//Texture의 이름은 존재하지 않는다.
-	//	else
-	//	{
-	//		meshContainer->pMaterials[i].pTextureFilename = NULL;
+		//Texture 가 존재한다면 texture경로를 저장하고 
+		if (nullptr != pMaterials[i].pTextureFilename)
+		{
+			meshContainer->_texturePaths.push_back(std::string(pMaterials[i].pTextureFilename));
+		}
+		//아니라면 이름을 저장하지 않는다
+		else
+		{
+			meshContainer->_texturePaths.push_back(std::string());
+		}
+	}
 
-	//		//NULL 값이라도 대입해야 한다
-	//		meshContainer->DiffuseTexs.push_back(NULL);
-	//		meshContainer->NormalTexs.push_back(NULL);
-	//		meshContainer->SpecularTexs.push_back(NULL);
-	//		meshContainer->EmissionTexs.push_back(NULL);
-	//	}
-	//}
-	////속성테이블을 얻는다.
-	//meshContainer->MeshData.pMesh->GetAttributeTable(NULL, &meshContainer->NumAttributesGroup);	//속성 그룹 갯수를 얻는다.
-	//meshContainer->MeshData.pMesh->GetAttributeTable( meshContainer->AttributeTable, NULL );			//속성 테이블을 얻는다.
-	//																							//스키닝 정보 가 있다면....
+
+	//NOTE : OptimizeInplace를 하지 않았는데도 GetAttributeTable을 가져왔다...???
+	//Static Mesh에서 했을때는 optimizeInPlace를 하지 않았을때는 GetAttributeTable함수가 제대로 작동하지 않았다
+	//실험해보자...
+	//속성테이블을 얻는다.
+	meshContainer->MeshData.pMesh->GetAttributeTable(
+		NULL, &meshContainer->_numAttributeGroup);	//속성 그룹 갯수를 얻는다.
+	if (meshContainer->_numAttributeGroup)
+	{
+		meshContainer->_attributeRange = new D3DXATTRIBUTERANGE[meshContainer->_numAttributeGroup];
+			meshContainer->MeshData.pMesh->GetAttributeTable(
+				meshContainer->_attributeRange, nullptr);  //속성 테이블을 얻는다.
+	}
+
+	*ppNewMeshContainer = meshContainer;
+
+	//																							
+	//스키닝 정보 가 있다면....
 	//if (pSkinInfo != NULL)
 	//{
 	//	//스키닝 정보를 물어놓는다
@@ -195,7 +198,11 @@ STDMETHODIMP HierachyEX::DestroyFrame(LPD3DXFRAME pFrameToFree)
 
 STDMETHODIMP HierachyEX::DestroyMeshContainer(LPD3DXMESHCONTAINER pMeshContainerToFree)
 {
-	SAFE_DELETE(pMeshContainerToFree);
+	ContainerEX *toFree = (ContainerEX *)(pMeshContainerToFree);
+	SAFE_DELETE_ARRAY(toFree->_attributeRange);
+	SAFE_DELETE_ARRAY(toFree->Name);
+
+	SAFE_DELETE(toFree);
 
 	//boneMesh 로 형변환
 	//ContainerEX* meshContainer = (ContainerEX*)pMeshContainerToFree;

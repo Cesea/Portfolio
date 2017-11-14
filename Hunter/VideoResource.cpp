@@ -254,7 +254,7 @@ namespace video
 	{
 	}
 
-	void VertexDecl::Add(D3DVERTEXELEMENT9 & element)
+	void VertexDecl::Add(D3DVERTEXELEMENT9 &element)
 	{
 		memcpy(&_elements[_count++], &element, sizeof(D3DVERTEXELEMENT9));
 	}
@@ -501,6 +501,10 @@ namespace video
 			}
 
 			D3DVERTEXELEMENT9 end = D3DDECL_END();
+
+			//이미 셋팅된 vertexElement에서 알맞은 fvf를 추출하는 함수이다.
+			D3DXFVFFromDeclarator(decl._elements, &decl._fvf);
+
 			decl.Add(end);
 			decl.End(D3DXGetDeclVertexSize(decl._elements, 0));
 
@@ -662,13 +666,20 @@ namespace video
 	void RenderState::ResetDefault()
 	{
 		_indexBuffer.MakeInvalid();
-		_effect.MakeInvalid();
 
-		if (_fillMode != FillMode::eFillSolid)
+		//NOTE : 전에 렌더를 했을때 이펙트를 사용하여 렌더 하지 않않다
+		// fvf나 다른 device와 관련된 셋팅을 변경했을 가능성이 있으므로 상태를 리셋해준다
+		if (!_effect.IsValid())
 		{
+			//if (_fillMode != FillMode::eFillSolid)
+			//{
 			_fillMode = FillMode::eFillSolid;
 			gpDevice->SetRenderState(D3DRS_FILLMODE, D3DFILL_SOLID);
+			//}
 		}
-
+		else
+		{
+			_effect.MakeInvalid();
+		}
 	}
 }

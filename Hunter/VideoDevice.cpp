@@ -168,17 +168,17 @@ void video::VideoDevice::Render(RenderView & renderView)
 				{
 
 					//NOTE : FillMode 처리해준다 Solid가 default 값
-					if (sendingState._fillMode != RenderState::FillMode::eFillSolid)
-					{
-						if (sendingState._fillMode == RenderState::FillMode::eFillPoint)
-						{
-							gpDevice->SetRenderState(D3DRS_FILLMODE, D3DFILL_POINT);
-						}
-						else if (sendingState._fillMode == RenderState::FillMode::eFillWireFrame)
-						{
-							gpDevice->SetRenderState(D3DRS_FILLMODE, D3DFILL_WIREFRAME);
-						}
-					}
+					//if (sendingState._fillMode != RenderState::FillMode::eFillSolid)
+					//{
+					//	if (sendingState._fillMode == RenderState::FillMode::eFillPoint)
+					//	{
+					//		gpDevice->SetRenderState(D3DRS_FILLMODE, D3DFILL_POINT);
+					//	}
+					//	else if (sendingState._fillMode == RenderState::FillMode::eFillWireFrame)
+					//	{
+					//		gpDevice->SetRenderState(D3DRS_FILLMODE, D3DFILL_WIREFRAME);
+					//	}
+					//}
 
 					if (sendingState._effect.IsValid())
 					{
@@ -188,16 +188,6 @@ void video::VideoDevice::Render(RenderView & renderView)
 					{
 						DrawWithoutEffect(sendingState, sendingMatrix);
 					}
-
-					//실제로 그리기....
-					//if (sendingState._indexBuffer.IsValid())
-					//{
-					//	DrawIndexPrimitive(sendingState, sendingMatrix);
-					//}
-					//else
-					//{
-					//	DrawPrimitive(sendingState, sendingMatrix);
-					//}
 				}
 
 				//한번의 렌더를 끝내면 RenderState를 Default 값으로 되돌린다.
@@ -391,12 +381,16 @@ void video::VideoDevice::DrawWithEffect(const video::RenderState & renderState, 
 	//인덱스 버퍼가 있다..
 	if (renderState._indexBuffer.IsValid())
 	{
+
+		_pDevice->SetIndices(_indexBuffers[renderState._indexBuffer.index]._ptr);
 		uint32 numVertices{};
 		uint32 numPrim{};
 		uint32 startIndex{};
 
-		numVertices = (0 != renderState._drawData._numVertices) ? (renderState._drawData._numVertices) : (vertexPtr->_size / declPtr->_stride);
-		numPrim = (0 != renderState._drawData._numPrim) ? (renderState._drawData._numPrim) : ((indexPtr->_size / 2) / 3);
+		numVertices = (0 != renderState._drawData._numVertices) ? 
+			(renderState._drawData._numVertices) : (vertexPtr->_size / declPtr->_stride);
+		numPrim = (0 != renderState._drawData._numPrim) ? 
+			(renderState._drawData._numPrim) : ((indexPtr->_size / 2) / 3);
 		startIndex = (0 != renderState._drawData._startIndex) ? (renderState._drawData._startIndex) : 0;
 
 		uint32 numPass = effectPtr->BeginEffect();
@@ -414,8 +408,10 @@ void video::VideoDevice::DrawWithEffect(const video::RenderState & renderState, 
 		uint32 numPrim{};
 		uint32 startVertex{};
 
-		numPrim = (0 != renderState._drawData._numVertices) ? (renderState._drawData._numPrim) : (vertexPtr->_size / declPtr->_stride);
-		startVertex = (0 != renderState._drawData._startVertex) ? (renderState._drawData._startVertex) : (0);
+		numPrim = (0 != renderState._drawData._numVertices) ? 
+			(renderState._drawData._numPrim) : (vertexPtr->_size / declPtr->_stride);
+		startVertex = (0 != renderState._drawData._startVertex) ? 
+			(renderState._drawData._startVertex) : (0);
 
 		uint32 numPass = effectPtr->BeginEffect();
 		for (uint32 i = 0; i < numPass; ++i)
@@ -430,6 +426,98 @@ void video::VideoDevice::DrawWithEffect(const video::RenderState & renderState, 
 
 void video::VideoDevice::DrawWithoutEffect(const video::RenderState & renderState, Matrix * matrices)
 {
+	VertexBuffer *vertexPtr{};
+	IndexBuffer *indexPtr{};
+	Material *materialPtr{};
+	VertexDecl *declPtr{};
+
+	//머테리얼 설정 여부 확인
+	if (renderState._material != _activeState._material)
+	{
+		_activeState._material = renderState._material;
+	}
+
+	if (_activeState._material.IsValid())
+	{
+		materialPtr = &_materials[_activeState._material.index];
+	}
+
+	if (renderState._vertexBuffer != _activeState._vertexBuffer)
+	{
+		_activeState._vertexBuffer = renderState._vertexBuffer;
+		vertexPtr = &_vertexBuffers[_activeState._vertexBuffer.index];
+		//Vertex Decl설정여부 확인
+		//effect를 사용하지 않기때문에 device의 fvf를 설정 해 주어야 한다.
+		if (_activeState._vertexDecl != vertexPtr->_decl)
+		{
+			_activeState._vertexDecl = vertexPtr->_decl;
+			declPtr = &_vertexDecls[_activeState._vertexDecl.index];
+		}
+		else
+		{
+			declPtr = &_vertexDecls[_activeState._vertexDecl.index];
+		}
+		//NOTE : 기본적으로 렌더러는 이펙트를 사용하여 렌더하도록 하기때문에 항상 
+		// FVF를 설정 해 주고 reset부분에서 꺼 주도록 하자...
+		_pDevice->SetFVF(declPtr->_fvf);
+
+		_pDevice->SetStreamSource(0, vertexPtr->_ptr, 0, declPtr->_stride);
+	}
+	else
+	{
+		vertexPtr = &_vertexBuffers[_activeState._vertexBuffer.index];
+		declPtr = &_vertexDecls[_activeState._vertexBuffer.index];
+	}
+
+	if (renderState._effect != _activeState._effect)
+	{
+		_activeState._effect = renderState._effect;
+	}
+
+	_pDevice->SetTransform(D3DTS_WORLD, &matrices[0]);
+
+	if (materialPtr)
+	{
+		for (uint32 i = 0; i < VIDEO_CONFIG_MATERIAL_TEXTURE_MAX_NUM; ++i)
+		{
+			if (materialPtr->_textureHandles[i].IsValid())
+			{
+				//NOTE : SetTexture의 첫번째 인자에 어떤 값이 들어가야 맞는걸까?
+				_pDevice->SetTexture(i, _textures[materialPtr->_textureHandles[i].index]._ptr);
+			}
+		}
+	}
+
+	//머테리얼까지 설정이 끝났다면 여기서 인덱스 버퍼가 있는지 없는지를 판별하여 분기를 나눈다.
+	//인덱스 버퍼가 있다..
+	if (renderState._indexBuffer.IsValid())
+	{
+		_pDevice->SetIndices(_indexBuffers[renderState._indexBuffer.index]._ptr);
+
+		uint32 numVertices{};
+		uint32 numPrim{};
+		uint32 startIndex{};
+
+		numVertices = (0 != renderState._drawData._numVertices) ? 
+			(renderState._drawData._numVertices) : (vertexPtr->_size / declPtr->_stride);
+		numPrim = (0 != renderState._drawData._numPrim) ? 
+			(renderState._drawData._numPrim) : ((indexPtr->_size / 2) / 3);
+		startIndex = (0 != renderState._drawData._startIndex) ? (renderState._drawData._startIndex) : 0;
+
+		_pDevice->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, 0, numVertices, startIndex, numPrim);
+	}
+	//인덱스 버퍼가 없다..
+	else
+	{
+		uint32 numPrim{};
+		uint32 startVertex{};
+
+		numPrim = (0 != renderState._drawData._numVertices) ? 
+			(renderState._drawData._numPrim) : (vertexPtr->_size / declPtr->_stride);
+		startVertex = (0 != renderState._drawData._startVertex) ? 
+			(renderState._drawData._startVertex) : (0);
+		_pDevice->DrawPrimitive(D3DPT_TRIANGLELIST, startVertex, numPrim);
+	}
 }
 
 

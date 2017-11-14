@@ -12,7 +12,7 @@ struct ContainerEX : public D3DXMESHCONTAINER
 {
 	//LPD3DXMESH						OriginalMesh;			//변환전 메시 데이터
 	LPD3DXMESH WorkingMesh;			//정점셰이더를 사용하기위해 최대 팔래트수 MATRIX_PALETTE_SIZE 대로 서브셋으로 나눠진 메쉬 
-	std::vector<std::string> TexturePaths;
+	std::vector<std::string> _texturePaths;
 
 	//DWORD								NumAttributesGroup;		//메시의 속성 그룹수 ( 해당 메시에 
 	//D3DXATTRIBUTERANGE*				AttributeTable;			//메시의 속성 테이블 ( 해당 본에 적용된 Mesh 의 Subset, MaterialID 같은 정보를 담고 있다 )
@@ -22,7 +22,8 @@ struct ContainerEX : public D3DXMESHCONTAINER
 														//D3DXMATRIXA16* pCurrentBoneMatrices;	//현제 Animation 이 적용된 행렬
 	DWORD NumPaletteEntries;		//현본메쉬의 행렬팔래트 수
 	DWORD MaxNumFaceInfls;		//해당 메시에 적용되는 정점하나당 최대 가중치 갯수
-	DWORD NumAttributesGroup;		//메시의 속성 그룹수 ( 해당 메시에 메터리얼정보가 몇개있니? )
+	DWORD _numAttributeGroup;		//메시의 속성 그룹수 ( 해당 메시에 메터리얼정보가 몇개있니? )
+	D3DXATTRIBUTERANGE *_attributeRange{};
 	LPD3DXBUFFER BufBoneCombos;			//본컴비네이션 ( 메시에 적용되는 본 ID 정보와 메터리얼 정보 )
 };
 
