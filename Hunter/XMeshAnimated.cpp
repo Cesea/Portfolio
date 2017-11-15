@@ -313,7 +313,7 @@ void XMeshAnimated::BuidSubMeshBoundInfo()
 //	//해당 본프레임에 메쉬 컨테이너 가 존재한다면...
 //	if (pFrame->pMeshContainer)
 //	{
-//		//메쉬 컨테이너를 BONE_MESH 형으로 형변환
+//		//메쉬 컨테이너를 BoneMesh 형으로 형변환
 //		ContainerEX* containerMesh = (ContainerEX*)pFrame->pMeshContainer;
 //
 //		//메쉬에 스키닝 정보가 있다면

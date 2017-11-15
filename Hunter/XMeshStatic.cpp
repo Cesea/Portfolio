@@ -176,7 +176,7 @@ void XMeshStatic::MeshCorrection(const Matrix* pMatCorrection)
 
 	//바운드 MinMax 계산을 위한 초기화......
 	_meshBoundInfo._boundMin = Vector3(0, 0, 0);
-	_meshBoundInfo._boundMax = Vector3(0, 0, 0);
+	_meshBoundInfo._max = Vector3(0, 0, 0);
 
 	//버텍스 수만클 돌아 재낀다....
 	for (uint32 i = 0; i < verNum; i++) 
@@ -197,9 +197,9 @@ void XMeshStatic::MeshCorrection(const Matrix* pMatCorrection)
 			if (_meshBoundInfo._boundMin.z > pos->z)		_meshBoundInfo._boundMin.z = pos->z;
 
 			//정점 최대 값갱신
-			if (_meshBoundInfo._boundMax.x < pos->x)		_meshBoundInfo._boundMax.x = pos->x;
-			if (_meshBoundInfo._boundMax.y < pos->y)		_meshBoundInfo._boundMax.y = pos->y;
-			if (_meshBoundInfo._boundMax.z < pos->z)		_meshBoundInfo._boundMax.z = pos->z;
+			if (_meshBoundInfo._max.x < pos->x)		_meshBoundInfo._max.x = pos->x;
+			if (_meshBoundInfo._max.y < pos->y)		_meshBoundInfo._max.y = pos->y;
+			if (_meshBoundInfo._max.z < pos->z)		_meshBoundInfo._max.z = pos->z;
 
 			//정점 위치 푸쉬
 			_vertices.push_back(*pos);
@@ -241,12 +241,12 @@ void XMeshStatic::MeshCorrection(const Matrix* pMatCorrection)
 	_pMesh->UnlockVertexBuffer();
 
 	//Bound 추가 계산
-	_meshBoundInfo._boundCenter = (_meshBoundInfo._boundMin + _meshBoundInfo._boundMax) * 0.5f;
+	_meshBoundInfo._boundCenter = (_meshBoundInfo._boundMin + _meshBoundInfo._max) * 0.5f;
 
 	_meshBoundInfo._boundSize = 
-		Vector3( _meshBoundInfo._boundMax.x - _meshBoundInfo._boundMin.x, 
-			_meshBoundInfo._boundMax.y - _meshBoundInfo._boundMin.y, 
-			_meshBoundInfo._boundMax.z - _meshBoundInfo._boundMin.z);
+		Vector3( _meshBoundInfo._max.x - _meshBoundInfo._boundMin.x, 
+			_meshBoundInfo._max.y - _meshBoundInfo._boundMin.y, 
+			_meshBoundInfo._max.z - _meshBoundInfo._boundMin.z);
 
 	_meshBoundInfo._boundHalfSize = _meshBoundInfo._boundSize * 0.5f;
 	_meshBoundInfo._boundRadius = D3DXVec3Length(&(_meshBoundInfo._boundCenter - _meshBoundInfo._boundMin));
@@ -328,18 +328,18 @@ void XMeshStatic::CalculateBoundingInfo(std::vector<Vector3>& positions, BoundIn
 		if (pOutBoundInfo->_boundMin.z > refVertex.z)		pOutBoundInfo->_boundMin.z = refVertex.z;
 
 		//정점 최대 값갱신
-		if (pOutBoundInfo->_boundMax.x < refVertex.x)		pOutBoundInfo->_boundMax.x = refVertex.x;
-		if (pOutBoundInfo->_boundMax.y < refVertex.y)		pOutBoundInfo->_boundMax.y = refVertex.y;
-		if (pOutBoundInfo->_boundMax.z < refVertex.z)		pOutBoundInfo->_boundMax.z = refVertex.z;
+		if (pOutBoundInfo->_max.x < refVertex.x)		pOutBoundInfo->_max.x = refVertex.x;
+		if (pOutBoundInfo->_max.y < refVertex.y)		pOutBoundInfo->_max.y = refVertex.y;
+		if (pOutBoundInfo->_max.z < refVertex.z)		pOutBoundInfo->_max.z = refVertex.z;
 
 	}
 	//Bound 추가 계산
-	pOutBoundInfo->_boundCenter = (pOutBoundInfo->_boundMin + pOutBoundInfo->_boundMax) * 0.5f;
+	pOutBoundInfo->_boundCenter = (pOutBoundInfo->_boundMin + pOutBoundInfo->_max) * 0.5f;
 
 	pOutBoundInfo->_boundSize =
-		Vector3(pOutBoundInfo->_boundMax.x - pOutBoundInfo->_boundMin.x,
-			pOutBoundInfo->_boundMax.y - pOutBoundInfo->_boundMin.y,
-			pOutBoundInfo->_boundMax.z - pOutBoundInfo->_boundMin.z);
+		Vector3(pOutBoundInfo->_max.x - pOutBoundInfo->_boundMin.x,
+			pOutBoundInfo->_max.y - pOutBoundInfo->_boundMin.y,
+			pOutBoundInfo->_max.z - pOutBoundInfo->_boundMin.z);
 
 	pOutBoundInfo->_boundHalfSize = pOutBoundInfo->_boundSize * 0.5f;
 	pOutBoundInfo->_boundRadius = D3DXVec3Length(&(pOutBoundInfo->_boundCenter - pOutBoundInfo->_boundMin));

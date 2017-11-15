@@ -291,7 +291,7 @@ inline void SplitNameToNameExtension(std::string &original,
 {
 	extension = GetFileExtension(original);
 	name = original;
-	for (int i = 0; i < extension.size() + 1; ++i)
+	for (uint32 i = 0; i < extension.size() + 1; ++i)
 	{
 		name.pop_back();
 	}

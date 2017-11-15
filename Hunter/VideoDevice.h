@@ -3,6 +3,7 @@
 
 
 #include "VideoResource.h"
+#include "VideoResource_Mesh.h"
 
 #include "imguiRenderer.h"
 #include "DebugDraw.h"
@@ -56,11 +57,13 @@ namespace video
 		//버텍스 버퍼 생성
 		VertexBufferHandle CreateVertexBuffer(Memory *memory, VertexDeclHandle declHandle, const std::string &name = "");
 		VertexBufferHandle GetVertexBuffer(const std::string &name);
+		const VertexBuffer *GetVertexBuffer(VertexBufferHandle handle);
 		void DestroyVertexBuffer(VertexBufferHandle handle);
 
 		//인덱스 버퍼 생성
 		IndexBufferHandle CreateIndexBuffer(Memory *memory, const std::string &name = "");
 		IndexBufferHandle GetIndexBuffer(const std::string &name);
+		const IndexBuffer *GetIndexBuffer(IndexBufferHandle handle);
 		void DestroyIndexBuffer(IndexBufferHandle handle);
 
 		//버텍스 데클 생성
@@ -72,11 +75,13 @@ namespace video
 		//텍스쳐 생성
 		TextureHandle CreateTexture(const std::string &fileName, const std::string &name = "");
 		TextureHandle GetTexture(const std::string &name);
+		const Texture *GetTexture(TextureHandle handle);
 		void DestroyTexture(TextureHandle handle);
 
 		//이펙트 생성
 		EffectHandle CreateEffect(const std::string &fileName, const std::string &name = "");
 		EffectHandle GetEffect(const std::string &name);
+		const Effect *GetEffect(EffectHandle handle);
 		void DestroyEffect(EffectHandle handle);
 
 		//렌더 뷰 생성
@@ -86,6 +91,7 @@ namespace video
 		
 		MaterialHandle CreateMaterial(const std::string &name = "");
 		MaterialHandle GetMaterial(const std::string &name);
+		const Material *GetMaterial(MaterialHandle handle);
 		void DestroyMaterial(MaterialHandle handle);
 		void MaterialAddTexture(MaterialHandle material, uint32 textureSlot, TextureHandle texture);
 
@@ -99,6 +105,17 @@ namespace video
 		RenderGroupHandle GetRenderGroup(const std::string &name);
 		void DestroyRenderGroup(RenderGroupHandle handle);
 		void RenderGroupSetEffect(RenderGroupHandle group, EffectHandle effect);
+
+		StaticXMeshHandle CreateStaticXMesh(const std::string fileName, const Matrix *pCorrection, const std::string &name);
+		StaticXMeshHandle GetStaticXMesh(const std::string &name);
+		const StaticXMesh *GetStaticXMesh(StaticXMeshHandle handle);
+		void  DestroyStaticXMesh(StaticXMeshHandle handle);
+
+		SkinnedXMeshHandle CreateSkinnedXMesh(const std::string fileName, const Matrix *pCorrection, const std::string &name);
+		SkinnedXMeshHandle GetSkinnedXMesh(const std::string &name);
+		const SkinnedXMesh *GetSkinnedXMesh(SkinnedXMeshHandle handle);
+		void DestroySkinnedMesh(SkinnedXMeshHandle handle);
+
 
 	private:
 		//Private Functions
@@ -144,6 +161,10 @@ namespace video
 		Material _materials[VIDEO_CONFIG_MATERIAL_MAX_NUM];
 		RenderGroup _renderGroups[VIDEO_CONFIG_RENDER_GROUP_MAX_NUM];
 
+		StaticXMesh _staticMeshes[VIDEO_CONFIG_STATIC_XMESH_MAX_NUM];
+		SkinnedXMesh _skinnedMeshes[VIDEO_CONFIG_SKINNED_XMESH_MAX_NUM];
+
+
 		ResourceHandlePool<VertexBufferHandle> _vertexBufferPool;
 		ResourceHandlePool<IndexBufferHandle> _indexBufferPool;
 		ResourceHandlePool<TextureHandle> _textureHandlePool;
@@ -154,6 +175,9 @@ namespace video
 
 		ResourceHandlePool<MaterialHandle> _materialHandlePool;
 		ResourceHandlePool<RenderGroupHandle> _renderGroupHandlePool;
+
+		ResourceHandlePool<video::StaticXMeshHandle> _staticXMeshHandlePool;
+		ResourceHandlePool<video::SkinnedXMeshHandle> _skinnedXMeshHandlePool;
 	};
 }
 #endif

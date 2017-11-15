@@ -11,13 +11,23 @@ public:
 	virtual ~RenderComponent() {}
 
 public :
-	video::Model model;
+	enum MeshType
+	{
+		eBuffer,
+		eStatic,
+		eSkinned
+	};
 
-	//video::VertexBufferHandle _vertexBuffer{};
-	//video::IndexBufferHandle _indexBuffer{};
-	//video::MaterialHandle _material{};
-	//video::EffectHandle _effect{};
-
+	union
+	{
+		struct
+		{
+			video::VertexBufferHandle _vb;
+			video::IndexBufferHandle _ib;
+		};
+		video::SkinnedXMeshHandle _skinned;
+		video::StaticXMeshHandle _static;
+	};
 	float radius{};
 };
 

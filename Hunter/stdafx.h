@@ -47,7 +47,6 @@
 #define WINSIZEX (1600)
 #define WINSIZEY (900)
 
-#define MAX_PATH (256)
 
 #include "Typedefs.h"
 #include "Memory.h"

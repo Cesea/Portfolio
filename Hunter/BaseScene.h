@@ -54,32 +54,17 @@ protected :
 
 	video::RenderView *_renderView;
 
-	video::VertexBufferHandle _vertexBuffer0;
-	video::VertexBufferHandle _vertexBuffer1;
-	video::VertexBufferHandle _vertexBuffer2;
-	video::IndexBufferHandle _indexBuffer;
-
-	video::EffectHandle _effect;
-
-	video::MaterialHandle _material0;
-	video::MaterialHandle _material1;
-
 	World _world;
 
 	TransformSystem _transformSystem;
 	RenderSystem _renderSystem;
 
 	std::vector<Entity> _entities;
-
 	Camera _camera;
 
-
-	IDirect3DVertexBuffer9 *_pVertexBuffer;
-	IDirect3DIndexBuffer9 *_pIndexBuffer;
-
-	ID3DXEffect *_pEffect;
-
-	IDirect3DVertexDeclaration9 *_pDecl;
+	video::SkinnedXMeshHandle _skinnedMeshHandle;
+	video::StaticXMeshHandle _statkcMeshHandle;
+	video::EffectHandle _effect;
 };
 
 

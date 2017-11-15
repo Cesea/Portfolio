@@ -17,7 +17,7 @@ struct XMeshStatic
 	struct BoundInfo
 	{
 		Vector3 _boundMin;
-		Vector3 _boundMax;
+		Vector3 _max;
 		Vector3 _boundCenter;
 		Vector3 _boundSize;
 		Vector3 _boundHalfSize;
@@ -57,5 +57,4 @@ struct XMeshStatic
 	void CalculateBoundingInfo(std::vector<Vector3> &positions, BoundInfo *pOutBoundInfo, 
 		uint32 startVertex, uint32 endVertex);
 };
-
 #endif

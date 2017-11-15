@@ -179,6 +179,7 @@
     <ClCompile Include="Vector4.cpp" />
     <ClCompile Include="VideoDevice.cpp" />
     <ClCompile Include="VideoResource.cpp" />
+    <ClCompile Include="VideoResource_Mesh.cpp" />
     <ClCompile Include="VideoVertexFormat.cpp" />
     <ClCompile Include="World.cpp" />
     <ClCompile Include="XMeshAnimated.cpp" />
@@ -268,6 +269,7 @@
     <ClInclude Include="VideoDevice.h" />
     <ClInclude Include="VideoResource.h" />
     <ClInclude Include="VideoResourceHandles.h" />
+    <ClInclude Include="VideoResource_Mesh.h" />
     <ClInclude Include="VideoVertexFormat.h" />
     <ClInclude Include="World.h" />
     <ClInclude Include="WorldEditor.h" />

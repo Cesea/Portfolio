@@ -214,7 +214,6 @@ namespace video
 	{
 		bool Create();
 		void Destroy();
-
 		struct SkeletonName
 		{
 			char _name[64];
@@ -245,6 +244,7 @@ namespace video
 		//Sphere _sphere;
 		//AABB _aabb;
 	};
+
 
 	struct PredefinedUniform
 	{
@@ -630,6 +630,8 @@ namespace video
 		HandleType result(index, count);
 		return result;
 	}
-
 }
+
+#include "VideoResource_Mesh.h"
+
 #endif

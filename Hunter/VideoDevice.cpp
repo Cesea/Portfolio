@@ -17,7 +17,9 @@ VideoDevice::VideoDevice()
 	_vertexDeclHandlePool(VIDEO_CONFIG_VERTEXBUFFER_MAX_NUM),
 	_renderViewHandlePool(VIDEO_CONFIG_RENDER_VIEW_MAX_NUM),
 	_materialHandlePool(VIDEO_CONFIG_MATERIAL_MAX_NUM),
-	_renderGroupHandlePool(VIDEO_CONFIG_RENDER_GROUP_MAX_NUM)
+	_renderGroupHandlePool(VIDEO_CONFIG_RENDER_GROUP_MAX_NUM),
+	_staticXMeshHandlePool(VIDEO_CONFIG_STATIC_XMESH_MAX_NUM),
+	_skinnedXMeshHandlePool(VIDEO_CONFIG_SKINNED_XMESH_MAX_NUM)
 {
 }
 
@@ -707,10 +709,16 @@ void video::VideoDevice::DrawWithoutEffect(const video::RenderState & renderStat
 //TODO : Default texture들을 로드 하자
 void video::VideoDevice::LoadDefaultTextures()
 {
-	VIDEO->CreateTexture("../resources/textures/diffuseDefault.png", "diffuseDefault.png");
-	VIDEO->CreateTexture("../resources/textures/emissionDefault.png", "emissionDefault.png");
-	VIDEO->CreateTexture("../resources/textures/normalDefault.png", "normalDefault.png");
-	VIDEO->CreateTexture("../resources/textures/specularDefault.png", "specularDefault.png");
+	TextureHandle diffuse = VIDEO->CreateTexture("../resources/textures/diffuseDefault.png", "diffuseDefault.png");
+	TextureHandle normal = VIDEO->CreateTexture("../resources/textures/normalDefault.png", "normalDefault.png");
+	TextureHandle specular = VIDEO->CreateTexture("../resources/textures/specularDefault.png", "specularDefault.png");
+	TextureHandle emission = VIDEO->CreateTexture("../resources/textures/emissionDefault.png", "emissionDefault.png");
+
+	MaterialHandle material = VIDEO->CreateMaterial("default");
+	VIDEO->MaterialAddTexture(material, VIDEO_TEXTURE0, diffuse);
+	VIDEO->MaterialAddTexture(material, VIDEO_TEXTURE1, normal);
+	VIDEO->MaterialAddTexture(material, VIDEO_TEXTURE2, specular);
+	VIDEO->MaterialAddTexture(material, VIDEO_TEXTURE3, emission);
 }
 
 void video::VideoDevice::MakeDefaultVertexDecls()
@@ -754,6 +762,7 @@ void video::VideoDevice::LoadDefaultEffects()
 {
 	VIDEO->CreateEffect("../resources/shaders/staticMesh.fx", "staticMesh.fx");
 	VIDEO->CreateEffect("../resources/shaders/staticTestMesh.fx", "staticTestMesh.fx");
+	VIDEO->CreateEffect("../resources/shaders/skinnedMesh.fx", "skinnedMesh.fx");
 }
 
 RenderView *video::VideoDevice::GetRenderView(RenderViewHandle handle)
@@ -780,6 +789,15 @@ VertexBufferHandle video::VideoDevice::GetVertexBuffer(const std::string & name)
 	return _vertexBufferPool.Get(name);
 }
 
+const VertexBuffer * video::VideoDevice::GetVertexBuffer(VertexBufferHandle handle)
+{
+	if (handle.IsValid())
+	{
+		return &_vertexBuffers[handle.index];
+	}
+	return nullptr;
+}
+
 void video::VideoDevice::DestroyVertexBuffer(VertexBufferHandle handle)
 {
 	_vertexBuffers[handle.index].Destroy();
@@ -799,6 +817,15 @@ IndexBufferHandle video::VideoDevice::CreateIndexBuffer(Memory * memory, const s
 IndexBufferHandle video::VideoDevice::GetIndexBuffer(const std::string & name)
 {
 	return _indexBufferPool.Get(name);
+}
+
+const IndexBuffer * video::VideoDevice::GetIndexBuffer(IndexBufferHandle handle)
+{
+	if (handle.IsValid())
+	{
+		return &_indexBuffers[handle.index];
+	}
+	return nullptr;
 }
 
 void video::VideoDevice::DestroyIndexBuffer(IndexBufferHandle handle)
@@ -848,6 +875,15 @@ TextureHandle video::VideoDevice::GetTexture(const std::string & name)
 	return _textureHandlePool.Get(name);
 }
 
+const Texture * video::VideoDevice::GetTexture(TextureHandle handle)
+{
+	if (handle.IsValid())
+	{
+		return &_textures[handle.index];
+	}
+	return nullptr;
+}
+
 void video::VideoDevice::DestroyTexture(TextureHandle handle)
 {
 	_textures[handle.index].Destroy();
@@ -867,6 +903,15 @@ EffectHandle video::VideoDevice::CreateEffect(const std::string &fileName, const
 EffectHandle video::VideoDevice::GetEffect(const std::string & name)
 {
 	return _effectHandlePool.Get(name);
+}
+
+const Effect * video::VideoDevice::GetEffect(EffectHandle handle)
+{
+	if (handle.IsValid())
+	{
+		return &_effects[handle.index];
+	}
+	return nullptr;
 }
 
 void video::VideoDevice::DestroyEffect(EffectHandle handle)
@@ -903,6 +948,15 @@ MaterialHandle video::VideoDevice::CreateMaterial(const std::string & name)
 MaterialHandle video::VideoDevice::GetMaterial(const std::string & name)
 {
 	return _materialHandlePool.Get(name);
+}
+
+const Material * video::VideoDevice::GetMaterial(MaterialHandle handle)
+{
+	if (handle.IsValid())
+	{
+		return &_materials[handle.index];
+	}
+	return nullptr;
 }
 
 void video::VideoDevice::DestroyMaterial(MaterialHandle handle)
@@ -956,4 +1010,69 @@ void video::VideoDevice::DestroyRenderGroup(RenderGroupHandle handle)
 
 void video::VideoDevice::RenderGroupSetEffect(RenderGroupHandle group, EffectHandle effect)
 {
+}
+
+StaticXMeshHandle video::VideoDevice::CreateStaticXMesh(const std::string fileName, const Matrix * pCorrection, const std::string &name)
+{
+	StaticXMeshHandle result = _staticXMeshHandlePool.Create(name);
+	if (!_staticMeshes[result.index].Create(fileName, pCorrection))
+	{
+		Console::Log("StaticMesh %s create failed\n", fileName);
+		return StaticXMeshHandle();
+	}
+	return result;
+}
+
+StaticXMeshHandle video::VideoDevice::GetStaticXMesh(const std::string & name)
+{
+	return _staticXMeshHandlePool.Get(name);
+}
+
+const StaticXMesh *video::VideoDevice::GetStaticXMesh(StaticXMeshHandle handle)
+{
+	if (handle.IsValid())
+	{
+		return &_staticMeshes[handle.index];
+	}
+	return nullptr;
+}
+
+void video::VideoDevice::DestroyStaticXMesh(StaticXMeshHandle handle)
+{
+	_staticMeshes[handle.index].Destroy();
+	_staticXMeshHandlePool.Remove(handle);
+}
+
+SkinnedXMeshHandle video::VideoDevice::CreateSkinnedXMesh(const std::string fileName, const Matrix * pCorrection, const std::string & name)
+{
+	SkinnedXMeshHandle result = _skinnedXMeshHandlePool.Create(name);
+	if (!_skinnedMeshes[result.index].Create(fileName, pCorrection))
+	{
+		Console::Log("SkinnedMesh %s create failed\n", fileName);
+		return SkinnedXMeshHandle();
+	}
+	return result;
+}
+
+SkinnedXMeshHandle video::VideoDevice::GetSkinnedXMesh(const std::string & name)
+{
+	return _skinnedXMeshHandlePool.Get(name);
+}
+
+const SkinnedXMesh * video::VideoDevice::GetSkinnedXMesh(SkinnedXMeshHandle handle)
+{
+	if (handle.IsValid())
+	{
+		return &_skinnedMeshes[handle.index];
+	}
+	return nullptr;
+}
+
+void video::VideoDevice::DestroySkinnedMesh(SkinnedXMeshHandle handle)
+{
+	if (handle.IsValid())
+	{
+		_skinnedMeshes[handle.index].Destroy();
+	}
+	_skinnedXMeshHandlePool.Remove(handle);
 }

@@ -168,6 +168,9 @@
     <ClCompile Include="AnimationUtils.cpp">
       <Filter>Game\GameSystem\AnimationSystem</Filter>
     </ClCompile>
+    <ClCompile Include="VideoResource_Mesh.cpp">
+      <Filter>Core\SubSystem\VideoDevice</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -431,6 +434,9 @@
     </ClInclude>
     <ClInclude Include="TransformComponent.h">
       <Filter>Game\GameComponent\TransfromComponent</Filter>
+    </ClInclude>
+    <ClInclude Include="VideoResource_Mesh.h">
+      <Filter>Core\SubSystem\VideoDevice</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

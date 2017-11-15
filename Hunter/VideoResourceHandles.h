@@ -64,6 +64,7 @@ namespace video
 			this->count = count;
 		}
 	};
+
 	struct IndexBufferHandle : public VideoResourceHandle
 	{
 		IndexBufferHandle()
@@ -170,6 +171,36 @@ namespace video
 			this->count = 0;
 		}
 		FrameBufferHandle(uint16 index, uint16 count)
+		{
+			this->index = index;
+			this->count = count;
+		}
+	};
+
+	struct StaticXMeshHandle : public VideoResourceHandle
+	{
+		StaticXMeshHandle()
+		{
+			this->index = 0;
+			this->count = 0;
+		}
+
+		StaticXMeshHandle(uint16 index, uint16 count)
+		{
+			this->index = index;
+			this->count = count;
+		}
+	};
+
+	struct SkinnedXMeshHandle : public VideoResourceHandle
+	{
+		SkinnedXMeshHandle()
+		{
+			this->index = 0;
+			this->count = 0;
+		}
+
+		SkinnedXMeshHandle(uint16 index, uint16 count)
 		{
 			this->index = index;
 			this->count = count;
