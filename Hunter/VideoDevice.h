@@ -106,12 +106,12 @@ namespace video
 
 		StaticXMeshHandle CreateStaticXMesh(const std::string fileName, const Matrix *pCorrection, const std::string &name);
 		StaticXMeshHandle GetStaticXMesh(const std::string &name);
-		const StaticXMesh *GetStaticXMesh(StaticXMeshHandle handle);
+		StaticXMesh *GetStaticXMesh(StaticXMeshHandle handle);
 		void  DestroyStaticXMesh(StaticXMeshHandle handle);
 
 		SkinnedXMeshHandle CreateSkinnedXMesh(const std::string fileName, const Matrix *pCorrection, const std::string &name);
 		SkinnedXMeshHandle GetSkinnedXMesh(const std::string &name);
-		const SkinnedXMesh *GetSkinnedXMesh(SkinnedXMeshHandle handle);
+		SkinnedXMesh *GetSkinnedXMesh(SkinnedXMeshHandle handle);
 		void DestroySkinnedMesh(SkinnedXMeshHandle handle);
 
 

@@ -25,13 +25,14 @@ bool32 BaseScene::Unload()
 bool32 BaseScene::Init()
 {
 	bool32 result = true;
+	RegisterEvents();
 
 	video::RenderViewHandle renderViewHandle= VIDEO->CreateRenderView();
 	_renderView = VIDEO->GetRenderView(renderViewHandle);
 	_renderView->_clearColor = 0xff55330;
 
 	_camera.SetRotationSpeed(0.1f);
-	_camera.SetMoveSpeed(1.0f);
+	_camera.SetMoveSpeed(3.0f);
 
 	_world.AddSystem<RenderSystem>(_renderSystem);
 	_world.AddSystem<TransformSystem>(_transformSystem);
@@ -46,19 +47,16 @@ bool32 BaseScene::Init()
 	//_meshHandle = VIDEO->CreateStaticXMesh("../resources/models/Knight/Knight.x", &correctionMat, "Knight");
 
 
-	_staticMeshHandle = VIDEO->CreateStaticXMesh("../resources/models/Snake/Snake.X", &correctionMat, "Snake");
+	//_staticMeshHandle = VIDEO->CreateStaticXMesh("../resources/models/Snake/Snake.X", &correctionMat, "Snake");
 	_skinnedMeshHandle = VIDEO->CreateSkinnedXMesh("../resources/models/Snake/Snake.X", &correctionMat, "Snake");
+	//_skinnedMeshHandle = VIDEO->CreateSkinnedXMesh("../resources/models/Knight/Knight.X", &correctionMat, "Knight");
 
 	_staticEffect = VIDEO->GetEffect("staticMesh.fx");
 	_skinnedEffect = VIDEO->GetEffect("skinnedMesh.fx");
 
-
-	//renderComp.model.CreateFromXAnimated("../resources/models/Snake/Snake.X", &correctionMat);
-	//renderComp.model._effect = VIDEO->GetEffect("staticMesh.fx");
-	//renderComp.model.CreateFromXAnimated("../resources/models/Knight/Knight.X", &correctionMat);
-	//renderComp.model._effect = VIDEO->GetEffect("staticTestMesh.fx");
-
 	_camera.GetTransform().MovePositionSelf(0.0f, 0.0f, -1.0f);
+
+	_pMesh = VIDEO->GetSkinnedXMesh(_skinnedMeshHandle);
 
 	_active = true;
 	return result;
@@ -71,6 +69,12 @@ bool32 BaseScene::Update(float deltaTime)
 	_world.Refresh();
 
 	_transformSystem.PreUpdate(deltaTime);
+
+
+	Matrix world;
+	MatrixIdentity(&world);
+	_pMesh->Update(deltaTime, &world);
+
 
 	//Update Camera
 	_transformSystem.UpdateTransform(_camera.GetTransform());
@@ -91,22 +95,15 @@ bool32 BaseScene::Render()
 	gpDevice->Clear(0, nullptr, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER | D3DCLEAR_STENCIL, 0xff208020, 1.0f, 0);
 	gpDevice->BeginScene();
 
-	//const video::SkinnedXMesh *mesh = VIDEO->GetSkinnedXMesh(_skinnedMeshHandle);
-	const video::StaticXMesh *mesh = VIDEO->GetStaticXMesh(_staticMeshHandle);
-	const video::Effect *effect = VIDEO->GetEffect(_staticEffect);
+	const video::Effect *effect = VIDEO->GetEffect(_skinnedEffect);
 
 	Matrix world;
 	MatrixIdentity(&world);
 	effect->SetMatrix("matWorld", world);
 	effect->SetMatrix("matViewProjection", _camera.GetViewMatrix() * _camera.GetProjectionMatrix());
-	effect->DrawStaticMesh(*mesh);
+	//effect->DrawStaticMesh(*staticMesh);
+	effect->DrawSkinnedMesh(*_pMesh);
 
-	//for (uint32 i = 0; i < mesh->_numMaterial; ++i)
-	//{
-	//	const Material *pMat = VIDEO->GetMaterial(mesh->_materialHandles[i]);
-	//	gpDevice->SetTexture(0, VIDEO->GetTexture(pMat->_textureHandles[0])->_ptr);
-	//	mesh->_pMesh->DrawSubset(i);
-	//}
 
 	gpDevice->EndScene();
 	gpDevice->Present(nullptr, nullptr, NULL, nullptr);
@@ -126,4 +123,54 @@ const char * BaseScene::GetSceneName()
 bool32 BaseScene::IsActive()
 {
 	return _active;
+}
+
+void BaseScene::RegisterEvents()
+{
+	EventChannel channel;
+	channel.Add<InputManager::KeyPressedEvent, BaseScene>(*this);
+}
+
+void BaseScene::Handle(const InputManager::KeyPressedEvent & event)
+{
+	switch (event.code)
+	{
+	case '1':
+	{
+		_pMesh->Play(1, 1.0f);
+	}break;
+	case '2':
+	{
+		_pMesh->Play(2, 1.0f);
+	}break;
+	case '3':
+	{
+		_pMesh->Play(3, 1.0f);
+	}break;
+	case '4':
+	{
+		_pMesh->Play(4, 1.0f);
+	}break;
+	case '5':
+	{
+		_pMesh->Play(5, 1.0f);
+	}break;
+	case '6':
+	{
+		_pMesh->Play(6, 1.0f);
+	}break;
+	case '7':
+	{
+		_pMesh->Play(7, 1.0f);
+	}break;
+	case '8':
+	{
+		_pMesh->Play(8, 1.0f);
+	}break;
+	case '9':
+	{
+		_pMesh->Play(9, 1.0f);
+	}break;
+	}
+
 }

@@ -296,14 +296,16 @@ namespace video
 		void SetUniform(PredefinedUniform::Enum uniform, void *data);
 
 		void SetMatrix(LPCSTR name, Matrix &matrix) const;
+		void SetMatrices(LPCSTR name, const Matrix *matrix, uint32 numMatrices) const;
 		void SetTexture(const std::string &name, const Texture &texture) const;
 		void SetMaterial(const Material &material) const;
+		void SetInt(LPCSTR name, const int32 value) const;
 
 		void SetValue(LPCSTR name, void *value, size_t size);
 		void CommitChanges() const;
 
 		void DrawStaticMesh(const StaticXMesh &mesh, LPCSTR technique = nullptr) const;
-		void DrawSkinnedMesh(const SkinnedXMesh &mesh, LPCSTR technique = nullptr);
+		void DrawSkinnedMesh(const SkinnedXMesh &mesh, LPCSTR technique = nullptr) const;
 
 		ID3DXEffect *_ptr{};
 	};

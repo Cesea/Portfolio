@@ -200,6 +200,13 @@ namespace video
 	{
 		_ptr->SetMatrix(name, &matrix);
 	}
+
+	void Effect::SetMatrices(LPCSTR name, const Matrix *matrices, uint32 numMatrices) const
+	{
+		HRESULT re = _ptr->SetMatrixArray(name, matrices, numMatrices);
+		int a = 0;
+	}
+
 	void Effect::SetTexture(const std::string &name, const Texture &texture) const
 	{
 		HRESULT re = _ptr->SetTexture(name.c_str(), texture._ptr);
@@ -215,6 +222,11 @@ namespace video
 				this->SetTexture("gTexture" + std::to_string(i), *VIDEO->GetTexture(material._textureHandles[i]));
 			}
 		}
+	}
+
+	void Effect::SetInt(LPCSTR name, const int32 value) const
+	{
+		_ptr->SetInt(name, value);
 	}
 
 	void Effect::CommitChanges() const
@@ -241,9 +253,9 @@ namespace video
 		}
 	}
 
-	void Effect::DrawSkinnedMesh(const SkinnedXMesh &mesh, LPCSTR technique)
+	void Effect::DrawSkinnedMesh(const SkinnedXMesh &mesh, LPCSTR technique) const
 	{
-
+		mesh.RenderBone(*this, mesh._pRootBone);
 	}
 
 	bool IndexBuffer::Create(uint32 size, void * data)

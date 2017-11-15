@@ -1028,7 +1028,7 @@ StaticXMeshHandle video::VideoDevice::GetStaticXMesh(const std::string & name)
 	return _staticXMeshHandlePool.Get(name);
 }
 
-const StaticXMesh *video::VideoDevice::GetStaticXMesh(StaticXMeshHandle handle)
+StaticXMesh *video::VideoDevice::GetStaticXMesh(StaticXMeshHandle handle)
 {
 	if (handle.IsValid())
 	{
@@ -1059,7 +1059,7 @@ SkinnedXMeshHandle video::VideoDevice::GetSkinnedXMesh(const std::string & name)
 	return _skinnedXMeshHandlePool.Get(name);
 }
 
-const SkinnedXMesh * video::VideoDevice::GetSkinnedXMesh(SkinnedXMeshHandle handle)
+SkinnedXMesh * video::VideoDevice::GetSkinnedXMesh(SkinnedXMeshHandle handle)
 {
 	if (handle.IsValid())
 	{

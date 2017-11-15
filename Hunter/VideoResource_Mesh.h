@@ -100,20 +100,30 @@ namespace video
 		std::vector<uint16> _indices;
 	};
 
+	typedef std::vector<LPD3DXANIMATIONSET> AnimationSetVector;
+	typedef std::map<std::string, LPD3DXANIMATIONSET> AnimationTable;
+
 	struct SkinnedXMesh
 	{
 		bool Create(const std::string &fileName, const Matrix* matCorrection = nullptr);
 		void Destroy();
 
 		void InitBoneMatrixPointer(Bone *pBone);
-		void UpdateMatrices(Bone *pBone, Matrix *pParentMatrix);
 
-		void Update(const Matrix *pWorld);
-		void Render();
-		void RenderBone(Bone* pBone);
+		void Update(float deltaTime, const Matrix *pWorld);
+		void UpdateMatrices(Bone *pBone, Matrix *pParentMatrix) const;
 
-		//void RenderChildBoneName(cCamera* pCam, Bone* pBone, D3DXVECTOR3* parentPos);
-		void SetAnimation(LPD3DXANIMATIONSET animSet);
+		//NOTE : 직접 사용하지 않고 밖에서 쓴다
+		void RenderBone(const video::Effect &effect, Bone *pBone) const;
+
+		void Play(const std::string &animName, float crossFadeTime = 0.0);
+		void Play(int32 animIndex, float crossFadeTime = 0.0);
+		void PlayOneShot(const std::string &animName, float inCrossFadeTime = 0.0, float outCrossFadeTime = 0.0f);
+		void PlayOneShotAfterHold(const std::string &animName, float crossFadeTime = 0.0);
+		void Stop() { _playing = false; }
+		void SetPlaySpeed(float speed);
+
+		void SetAnimation(LPD3DXANIMATIONSET animation);
 
 		Matrix _matCorrection;
 
@@ -122,6 +132,65 @@ namespace video
 		Matrix *_workingPalettes;
 
 		ID3DXAnimationController *_pAnimationController;
+
+		AnimationSetVector _animations;
+		AnimationTable _animationTable;
+
+		LPD3DXANIMATIONSET _pPlayingAnimationSet{};
+		D3DXTRACK_DESC _playingTrackDesc{};
+
+		LPD3DXANIMATIONSET _pPrevPlayAnimationSet{};//OneShot 플레이시 한번 Animation 플레이되고 다시 되돌아갈 Animaiton
+
+		float _crossFadeTime{};
+		float _leftCrossFadeTime{};
+		float _outCrossFadeTime{};
+		double _animationPlayFactor{};
+
+		uint32 _numAnimations{};
+
+		bool32 _playing{};
+		bool32 _looping{};
+	};
+
+	//SkinnedMesh는 한번만 불러오고, SkinnedAnimation은 여러개를 만들어서 사용하라....
+	struct SkinnedAnimation
+	{
+		SkinnedXMesh *_pSkinnedMesh{};
+
+		ID3DXAnimationController *_pAnimationController;
+		uint32 _animNum;
+		AnimationSetVector _animations;
+		AnimationTable _animationTable;
+
+		LPD3DXANIMATIONSET _pPlayingAnimationSet{};
+		D3DXTRACK_DESC _playingTrackDesc{};
+
+		bool32 _playing{};
+		bool32 _looping{};
+		LPD3DXANIMATIONSET _pPrevPlayAnimationSet{};
+
+		float _crossFadeTime{};
+		float _leftCrossFadeTime{};
+		float _outCrossFadeTime{};
+		double _animationPlayFactor{};
+
+		float _animDelta{};
+
+		HRESULT	Create(video::SkinnedXMeshHandle handle);
+		void	Destroy();
+		void	Update(float timeDelta, const Matrix *pMatrix);
+		void	Render();
+		//void	RenderBoneName(cCamera* pCam, cTransform* pTransform);
+
+		void Play(const std::string &animName, float crossFadeTime = 0.0);
+		void Play(int32 animIndex, float crossFadeTime = 0.0);
+		void PlayOneShot(const std::string &animName, float inCrossFadeTime = 0.0, float outCrossFadeTime = 0.0f);
+		void PlayOneShotAfterHold(const std::string &animName, float crossFadeTime = 0.0);
+		void Stop() { _playing = false; }
+		void SetPlaySpeed(float speed);
+
+		void SetAnimation(LPD3DXANIMATIONSET animation);
+
 	};
 }
 

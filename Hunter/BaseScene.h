@@ -31,8 +31,11 @@ public :
 	virtual const char *GetSceneName();
 	virtual bool32 IsActive();
 
-protected :
 	void RegisterEvents();
+
+	void Handle(const InputManager::KeyPressedEvent &event);
+
+protected :
 
 protected :
 	bool32 _active;
@@ -66,6 +69,8 @@ protected :
 	video::StaticXMeshHandle _staticMeshHandle;
 	video::EffectHandle _staticEffect;
 	video::EffectHandle _skinnedEffect;
+
+	video::SkinnedXMesh *_pMesh;
 };
 
 
