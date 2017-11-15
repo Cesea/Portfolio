@@ -100,7 +100,7 @@ namespace video
 		COM_RELEASE(_ptr);
 	}
 
-	uint32 Effect::BeginEffect()
+	uint32 Effect::BeginEffect() const
 	{
 		Assert(_ptr);
 		uint32 result{};
@@ -108,17 +108,17 @@ namespace video
 		return result;
 	}
 
-	void Effect::BeginPass(uint32 passNum)
+	void Effect::BeginPass(uint32 passNum) const
 	{
 		_ptr->BeginPass(passNum);
 	}
 
-	void Effect::EndPass()
+	void Effect::EndPass() const
 	{
 		_ptr->EndPass();
 	}
 
-	void Effect::EndEffect()
+	void Effect::EndEffect() const
 	{
 		_ptr->End();
 	}
@@ -196,13 +196,54 @@ namespace video
 		}
 	}
 
-	void Effect::SetMatrix(LPCSTR name, Matrix &matrix)
+	void Effect::SetMatrix(LPCSTR name, Matrix &matrix) const
 	{
 		_ptr->SetMatrix(name, &matrix);
 	}
-	void Effect::SetTexture(LPCSTR name, Texture &texture)
+	void Effect::SetTexture(const std::string &name, const Texture &texture) const
 	{
-		_ptr->SetTexture(name, texture._ptr);
+		HRESULT re = _ptr->SetTexture(name.c_str(), texture._ptr);
+		int a = 0;
+	}
+
+	void Effect::SetMaterial(const Material & material) const
+	{
+		for (uint32 i = 0; i < VIDEO_CONFIG_MATERIAL_TEXTURE_MAX_NUM; ++i)
+		{
+			if (material._textureHandles[i].IsValid())
+			{
+				this->SetTexture("gTexture" + std::to_string(i), *VIDEO->GetTexture(material._textureHandles[i]));
+			}
+		}
+	}
+
+	void Effect::CommitChanges() const
+	{
+		_ptr->CommitChanges();
+	}
+
+	void Effect::DrawStaticMesh(const StaticXMesh &mesh, LPCSTR technique) const
+	{
+		for (uint32 i = 0; i < mesh._numMaterial; ++i)
+		{
+			uint32 numPass = this->BeginEffect();
+			const Material *mat = VIDEO->GetMaterial(mesh._materialHandles[i]);
+			this->SetMaterial(*mat);
+			this->CommitChanges();
+
+			for (uint32 j = 0; j < numPass; ++j)
+			{
+				this->BeginPass(j);
+				mesh._pMesh->DrawSubset(j);
+				this->EndPass();
+			}
+			this->EndEffect();
+		}
+	}
+
+	void Effect::DrawSkinnedMesh(const SkinnedXMesh &mesh, LPCSTR technique)
+	{
+
 	}
 
 	bool IndexBuffer::Create(uint32 size, void * data)

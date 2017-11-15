@@ -44,10 +44,14 @@ bool32 BaseScene::Init()
 	Matrix correctionMat;
 	MatrixScaling(&correctionMat, 0.1f, 0.1f, 0.1f);
 	//_meshHandle = VIDEO->CreateStaticXMesh("../resources/models/Knight/Knight.x", &correctionMat, "Knight");
-	//_meshHandle = VIDEO->CreateStaticXMesh("../resources/models/Snake/Snake.X", &correctionMat, "Snake");
 
+
+	_staticMeshHandle = VIDEO->CreateStaticXMesh("../resources/models/Snake/Snake.X", &correctionMat, "Snake");
 	_skinnedMeshHandle = VIDEO->CreateSkinnedXMesh("../resources/models/Snake/Snake.X", &correctionMat, "Snake");
-	_effect = VIDEO->GetEffect("skinnedMesh.fx");
+
+	_staticEffect = VIDEO->GetEffect("staticMesh.fx");
+	_skinnedEffect = VIDEO->GetEffect("skinnedMesh.fx");
+
 
 	//renderComp.model.CreateFromXAnimated("../resources/models/Snake/Snake.X", &correctionMat);
 	//renderComp.model._effect = VIDEO->GetEffect("staticMesh.fx");
@@ -87,7 +91,15 @@ bool32 BaseScene::Render()
 	gpDevice->Clear(0, nullptr, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER | D3DCLEAR_STENCIL, 0xff208020, 1.0f, 0);
 	gpDevice->BeginScene();
 
-	//const video::StaticXMesh *mesh = VIDEO->GetStaticXMesh(_meshHandle);
+	//const video::SkinnedXMesh *mesh = VIDEO->GetSkinnedXMesh(_skinnedMeshHandle);
+	const video::StaticXMesh *mesh = VIDEO->GetStaticXMesh(_staticMeshHandle);
+	const video::Effect *effect = VIDEO->GetEffect(_staticEffect);
+
+	Matrix world;
+	MatrixIdentity(&world);
+	effect->SetMatrix("matWorld", world);
+	effect->SetMatrix("matViewProjection", _camera.GetViewMatrix() * _camera.GetProjectionMatrix());
+	effect->DrawStaticMesh(*mesh);
 
 	//for (uint32 i = 0; i < mesh->_numMaterial; ++i)
 	//{

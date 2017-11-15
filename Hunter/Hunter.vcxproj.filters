@@ -144,12 +144,6 @@
     <ClCompile Include="VideoVertexFormat.cpp">
       <Filter>Core\SubSystem\VideoDevice</Filter>
     </ClCompile>
-    <ClCompile Include="XMeshStatic.cpp">
-      <Filter>Sub\DirectX</Filter>
-    </ClCompile>
-    <ClCompile Include="XMeshAnimated.cpp">
-      <Filter>Sub\DirectX</Filter>
-    </ClCompile>
     <ClCompile Include="AnimationComponent.cpp">
       <Filter>Game\GameComponent\AnimationComponent</Filter>
     </ClCompile>
@@ -396,17 +390,8 @@
     <ClInclude Include="MathUtils.h">
       <Filter>Math</Filter>
     </ClInclude>
-    <ClInclude Include="DXUtils.h">
-      <Filter>Sub\DirectX</Filter>
-    </ClInclude>
     <ClInclude Include="VideoVertexFormat.h">
       <Filter>Core\SubSystem\VideoDevice</Filter>
-    </ClInclude>
-    <ClInclude Include="XMeshStatic.h">
-      <Filter>Sub\DirectX</Filter>
-    </ClInclude>
-    <ClInclude Include="XMeshAnimated.h">
-      <Filter>Sub\DirectX</Filter>
     </ClInclude>
     <ClInclude Include="AnimationUtils.h">
       <Filter>Game\GameSystem\AnimationSystem</Filter>
@@ -550,9 +535,6 @@
     </Filter>
     <Filter Include="Game\GameUtils\Camera">
       <UniqueIdentifier>{276b7112-dd8a-413b-9624-b56d5e5e91b8}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Sub\DirectX">
-      <UniqueIdentifier>{5645eb42-e5b5-4684-807e-a68f4076dc84}</UniqueIdentifier>
     </Filter>
     <Filter Include="Game\GameComponent\AnimationComponent">
       <UniqueIdentifier>{50fe04da-648f-4b00-98e1-d5c5f3736830}</UniqueIdentifier>

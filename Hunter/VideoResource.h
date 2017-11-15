@@ -19,6 +19,8 @@ struct Memory
 
 namespace video
 {
+	struct StaticXMesh;
+	struct SkinnedXMesh;
 
 	struct CommandBuffer
 	{
@@ -284,21 +286,24 @@ namespace video
 		bool Create(const std::string fileName);
 		void Destroy();
 
-		uint32 BeginEffect();
+		uint32 BeginEffect() const;
 
-		void BeginPass(uint32 passNum);
-		void EndPass();
+		void BeginPass(uint32 passNum) const;
+		void EndPass() const;
 
-		void EndEffect();
+		void EndEffect() const;
 
 		void SetUniform(PredefinedUniform::Enum uniform, void *data);
 
-		void SetMatrix(LPCSTR name, Matrix &matrix);
-		void SetTexture(LPCSTR name, Texture &texture);
-		void SetMaterial(Material &material);
+		void SetMatrix(LPCSTR name, Matrix &matrix) const;
+		void SetTexture(const std::string &name, const Texture &texture) const;
+		void SetMaterial(const Material &material) const;
 
 		void SetValue(LPCSTR name, void *value, size_t size);
+		void CommitChanges() const;
 
+		void DrawStaticMesh(const StaticXMesh &mesh, LPCSTR technique = nullptr) const;
+		void DrawSkinnedMesh(const SkinnedXMesh &mesh, LPCSTR technique = nullptr);
 
 		ID3DXEffect *_ptr{};
 	};

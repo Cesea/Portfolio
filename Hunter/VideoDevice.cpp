@@ -875,7 +875,7 @@ TextureHandle video::VideoDevice::GetTexture(const std::string & name)
 	return _textureHandlePool.Get(name);
 }
 
-const Texture * video::VideoDevice::GetTexture(TextureHandle handle)
+const Texture * video::VideoDevice::GetTexture(TextureHandle handle) 
 {
 	if (handle.IsValid())
 	{

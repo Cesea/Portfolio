@@ -105,10 +105,13 @@ namespace video
 		bool Create(const std::string &fileName, const Matrix* matCorrection = nullptr);
 		void Destroy();
 
-		void InitBoneMatrixPointer(Bone* pBone);
-		void UpdateMatrices(Bone* pBone, D3DXMATRIXA16* pParentMatrix);
-		void UpdateSkinnedMesh(Bone* pBone);
+		void InitBoneMatrixPointer(Bone *pBone);
+		void UpdateMatrices(Bone *pBone, Matrix *pParentMatrix);
+
+		void Update(const Matrix *pWorld);
+		void Render();
 		void RenderBone(Bone* pBone);
+
 		//void RenderChildBoneName(cCamera* pCam, Bone* pBone, D3DXVECTOR3* parentPos);
 		void SetAnimation(LPD3DXANIMATIONSET animSet);
 

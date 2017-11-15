@@ -5,7 +5,7 @@
 //------------------------------------------------------------------------------------
 
 #ifndef MATRIX_PALETTE_SIZE_DEFAULT
-#define MATRIX_PALETTE_SIZE_DEFAULT 35
+#define MATRIX_PALETTE_SIZE_DEFAULT 45
 #endif
 
 const int MATRIX_PALETTE_SIZE = MATRIX_PALETTE_SIZE_DEFAULT;
@@ -132,12 +132,6 @@ VS_SKIN_OUTPUT3 VS_Skin3( VS_SKIN_INPUT3 Input, int iNumBones )
 
     return Output;
 }
-
-
-
-
-
-
 
 //------------------------------------------------------------------------------------
 // SkinnedMesh Base 
@@ -356,8 +350,6 @@ technique Toon
 	}
 }
 
-
-
 technique CreateShadow
 {
     pass p0
@@ -367,7 +359,6 @@ technique CreateShadow
     }
 }
 
-
 technique ReciveShadow
 {
     pass p0
@@ -376,10 +367,6 @@ technique ReciveShadow
         PixelShader = compile ps_3_0 ps_ReciveShadow();
     }
 }
-
-
-
-
 
 technique ReciveShadowToon
 {
