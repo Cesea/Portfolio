@@ -864,16 +864,13 @@ namespace video
 		_looping = true;
 
 		AnimationTable::iterator find = _animationTable.find(animName);
-		if (find != _animationTable.end()) {
-
-			//현재 Animaiton 을 기억한다.
+		if (find != _animationTable.end()) 
+		{
 			_pPrevPlayAnimationSet = _pPlayingAnimationSet;
 
-			//크로스 페이드 타임 기억
 			_crossFadeTime = inCrossFadeTime;
 			_leftCrossFadeTime = inCrossFadeTime;
 
-			//나갈때 크로스페이드 타입 기억
 			_outCrossFadeTime = outCrossFadeTime;
 
 			this->SetAnimation(find->second);
@@ -937,45 +934,200 @@ namespace video
 		}
 	}
 
-	HRESULT SkinnedAnimation::Create(video::SkinnedXMeshHandle handle)
+	bool SkinnedAnimation::Create(video::SkinnedXMeshHandle handle)
 	{
-		return E_NOTIMPL;
+		if (!handle.IsValid())
+		{
+			return false;
+		}
+
+		_pSkinnedMesh = VIDEO->GetSkinnedXMesh(handle);
+
+		//SKinned Mesh 에 Animation 를 복사한다.
+		_pSkinnedMesh->_pAnimationController->CloneAnimationController(
+			_pSkinnedMesh->_pAnimationController->GetMaxNumAnimationOutputs(),
+			_pSkinnedMesh->_pAnimationController->GetMaxNumAnimationSets(),
+			_pSkinnedMesh->_pAnimationController->GetMaxNumTracks(),
+			_pSkinnedMesh->_pAnimationController->GetMaxNumEvents(),
+			&_pAnimationController);
+
+		//Animation 갯수를 얻는다.
+		_numAnimation = _pAnimationController->GetNumAnimationSets();
+		for (UINT i = 0; i < _numAnimation; i++)
+		{
+			LPD3DXANIMATIONSET animSet;
+			_pAnimationController->GetAnimationSet(i, &animSet);
+			this->_animations.push_back(animSet);
+			this->_animationTable.insert(std::make_pair( animSet->GetName(), animSet));
+		}
+		this->Play(0);
 	}
 
 	void SkinnedAnimation::Destroy()
 	{
+		COM_RELEASE(_pAnimationController);
 	}
 
-	void SkinnedAnimation::Update(float timeDelta, const Matrix * pMatrix)
+	void SkinnedAnimation::UpdateAnimation(float deltaTime, const Matrix * pWorld)
 	{
+		//우선 에니메이션을 업데이트 한다..
+		_pAnimationController->GetTrackDesc(0, &_playingTrackDesc);
+		//현재 얼마나 왔는지..
+		_animationPlayFactor = _playingTrackDesc.Position / _pPlayingAnimationSet->GetPeriod();
+
+		//마지막에 도달했다면...
+		if (_animationPlayFactor >= 1.0)
+		{
+			if (false == _looping)
+			{
+				//돌아갈 Animation 이 있다면..
+				if (nullptr != _pPrevPlayAnimationSet)
+				{
+					_crossFadeTime = _outCrossFadeTime;
+					_leftCrossFadeTime = _outCrossFadeTime;
+					_looping = true;
+					SetAnimation(_pPrevPlayAnimationSet);
+					_pPrevPlayAnimationSet = nullptr;
+				}
+				else
+				{
+					this->Stop();
+				}
+			}
+		}
+
+		_animationPlayFactor = _animationPlayFactor - (int32)_animationPlayFactor;
+
+		if (_playing)
+		{
+			_animDelta = deltaTime;
+		}
+
+		//크로스 페이드가 진행중이라면..
+		if (_leftCrossFadeTime > 0.0f)
+		{
+			//남은 크로스페이드 시간 뺀다
+			_leftCrossFadeTime -= deltaTime;
+
+			//크로스페이드 가끝났다.
+			if (_leftCrossFadeTime <= 0.0f)
+			{
+				_pAnimationController->SetTrackWeight(0, 1);
+				_pAnimationController->SetTrackEnable(1, false);
+			}
+			else
+			{
+				float w1 = (_leftCrossFadeTime / _crossFadeTime);		//1번 Track 가중치
+				float w0 = 1.0f - w1;										//0번 Track 가중치
+
+				_pAnimationController->SetTrackWeight(0, w0);
+				_pAnimationController->SetTrackWeight(1, w1);
+			}
+		}
 	}
 
-	void SkinnedAnimation::Render()
+	void SkinnedAnimation::UpdateMesh(const Matrix * pWorld)
 	{
+		_pSkinnedMesh->Update(_animDelta, pWorld);
 	}
 
 	void SkinnedAnimation::Play(const std::string & animName, float crossFadeTime)
 	{
+		_playing = true;
+		_looping = true;
+
+		AnimationTable::iterator find = _animationTable.find(animName);
+		if (find != _animationTable.end())
+		{
+			//크로스 페이드 타임 기억
+			_crossFadeTime = crossFadeTime;
+			_leftCrossFadeTime = crossFadeTime;
+
+			this->SetAnimation(find->second);
+		}
 	}
 
 	void SkinnedAnimation::Play(int32 animIndex, float crossFadeTime)
 	{
+		_playing = true;
+		_looping = true;
+
+		if (animIndex < _numAnimation)
+		{
+			_crossFadeTime = crossFadeTime;
+			_leftCrossFadeTime = crossFadeTime;
+
+			this->SetAnimation(_animations[animIndex]);
+		}
 	}
 
 	void SkinnedAnimation::PlayOneShot(const std::string & animName, float inCrossFadeTime, float outCrossFadeTime)
 	{
+		_playing = true;
+		_looping = true;
+
+		AnimationTable::iterator find = _animationTable.find(animName);
+		if (find != _animationTable.end())
+		{
+			_pPrevPlayAnimationSet = _pPlayingAnimationSet;
+
+			_crossFadeTime = inCrossFadeTime;
+			_leftCrossFadeTime = inCrossFadeTime;
+
+			_outCrossFadeTime = outCrossFadeTime;
+
+			this->SetAnimation(find->second);
+		}
 	}
 
 	void SkinnedAnimation::PlayOneShotAfterHold(const std::string & animName, float crossFadeTime)
 	{
+		_playing = true;
+		_looping = true;
+
+		AnimationTable::iterator find = _animationTable.find(animName);
+		if (find != _animationTable.end()) 
+		{
+			_pPrevPlayAnimationSet = nullptr;
+			_crossFadeTime = crossFadeTime;
+			_leftCrossFadeTime = crossFadeTime;
+			this->SetAnimation(find->second);
+		}
 	}
 
 	void SkinnedAnimation::SetPlaySpeed(float speed)
 	{
+		_pAnimationController->SetTrackSpeed(0, speed);
 	}
 
 	void SkinnedAnimation::SetAnimation(LPD3DXANIMATIONSET animation)
 	{
+		if ((nullptr != _pPlayingAnimationSet) && (_pPlayingAnimationSet == animation))
+		{
+			return;
+		}
+
+		//크로스 페이드가 존재한다면..
+		if (_crossFadeTime > 0.0f)
+		{
+			//현제 Animation 을 1 번Track 으로 셋팅
+			_pAnimationController->SetTrackAnimationSet(1, _pPlayingAnimationSet);
+			_pAnimationController->SetTrackPosition(1, _playingTrackDesc.Position);	//이전에 플레이 되던 위치로 셋팅
+			_pAnimationController->SetTrackEnable(1, true); //1 번 Track 활성화
+			_pAnimationController->SetTrackWeight(1, 1.0f); //1 번 Track 가중치
+			_pAnimationController->SetTrackSpeed(1, _playingTrackDesc.Speed);		//속도 
+
+			_pAnimationController->SetTrackAnimationSet(0, animation);
+			_pAnimationController->SetTrackPosition(0, 0.0f);
+			_pAnimationController->SetTrackWeight(0, 0.0f);	//가중치는 0 으로 
+			_pPlayingAnimationSet = animation;
+		}
+		else
+		{
+			_pAnimationController->SetTrackPosition(0, 0.0);
+			_pAnimationController->SetTrackAnimationSet(0, animation);
+			_pPlayingAnimationSet = animation;
+		}
 	}
 }
 

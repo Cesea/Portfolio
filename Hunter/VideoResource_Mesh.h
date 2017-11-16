@@ -158,7 +158,7 @@ namespace video
 		SkinnedXMesh *_pSkinnedMesh{};
 
 		ID3DXAnimationController *_pAnimationController;
-		uint32 _animNum;
+		uint32 _numAnimation;
 		AnimationSetVector _animations;
 		AnimationTable _animationTable;
 
@@ -176,10 +176,11 @@ namespace video
 
 		float _animDelta{};
 
-		HRESULT	Create(video::SkinnedXMeshHandle handle);
-		void	Destroy();
-		void	Update(float timeDelta, const Matrix *pMatrix);
-		void	Render();
+		bool Create(video::SkinnedXMeshHandle handle);
+		void Destroy();
+		void UpdateAnimation(float deltaTime, const Matrix *pMatrix);
+		void UpdateMesh(const Matrix *pWorld);
+
 		//void	RenderBoneName(cCamera* pCam, cTransform* pTransform);
 
 		void Play(const std::string &animName, float crossFadeTime = 0.0);

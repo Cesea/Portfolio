@@ -71,6 +71,8 @@ protected :
 	video::EffectHandle _skinnedEffect;
 
 	video::SkinnedXMesh *_pMesh;
+
+	video::SkinnedAnimation *_animation;
 };
 
 

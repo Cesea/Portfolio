@@ -51,6 +51,9 @@ bool32 BaseScene::Init()
 	_skinnedMeshHandle = VIDEO->CreateSkinnedXMesh("../resources/models/Snake/Snake.X", &correctionMat, "Snake");
 	//_skinnedMeshHandle = VIDEO->CreateSkinnedXMesh("../resources/models/Knight/Knight.X", &correctionMat, "Knight");
 
+	_animation = new video::SkinnedAnimation;
+	_animation->Create(_skinnedMeshHandle);
+
 	_staticEffect = VIDEO->GetEffect("staticMesh.fx");
 	_skinnedEffect = VIDEO->GetEffect("skinnedMesh.fx");
 
