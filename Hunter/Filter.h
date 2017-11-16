@@ -16,11 +16,9 @@ struct BaseExcludes { };
 struct Filter
 {
 public:
-
 	Filter(ComponentTypeList requires, ComponentTypeList excludes) :
 		_requires(requires), _excludes(excludes)
 	{ }
-
 	bool32 DoesPassFilter(const ComponentTypeList& typeList) const;
 
 private:

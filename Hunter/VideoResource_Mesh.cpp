@@ -675,8 +675,7 @@ namespace video
 			_pSkinnedMesh->_pAnimationController->GetMaxNumAnimationOutputs(),
 			_pSkinnedMesh->_pAnimationController->GetMaxNumAnimationSets(),
 			_pSkinnedMesh->_pAnimationController->GetMaxNumTracks(),
-			_pSkinnedMesh->_pAnimationController->GetMaxNumEvents(),
-			&_pAnimationController);
+			_pSkinnedMesh->_pAnimationController->GetMaxNumEvents(), &_pAnimationController);
 
 		//Animation 갯수를 얻는다.
 		_numAnimation = _pAnimationController->GetNumAnimationSets();

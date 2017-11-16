@@ -14,7 +14,6 @@ bool Terrain::Create(const Terrain::TerrainConfig &config, int32 smoothLevel)
 	_cellScale = config._cellScale;
 
 	//높이맵 불러온다
-
 	_heightMapHandle = VIDEO->CreateTexture(config._heightFileName, config._heightFileName);
 	video::Texture *heightMap = VIDEO->GetTexture(_heightMapHandle);
 
@@ -44,7 +43,18 @@ bool Terrain::Create(const Terrain::TerrainConfig &config, int32 smoothLevel)
 	//총 삼각형수는
 	_numTotalFace = _totalCellNum * 2;
 
-	//터레인을 만든다.
+	//Section 설정
+	_sectionResolution = config._sectionResolution;
+		
+	_numSectionX = _numCellX / _sectionResolution;
+	_numSectionZ = _numCellZ / _sectionResolution;
+
+	_sectionNumCellX = _sectionResolution;
+	_sectionNumCellZ = _sectionResolution;
+
+	_sectionNumVertexX = _sectionNumCellX + 1;
+	_sectionNumVertexZ = _sectionNumCellZ + 1;
+
 	if (!(CreateTerrain(smoothLevel, config._textureMult))) 
 	{
 		Destroy();
@@ -83,8 +93,13 @@ bool Terrain::Create(const Terrain::TerrainConfig &config, int32 smoothLevel)
 
 void Terrain::Destroy()
 {
-	VIDEO->DestroyVertexBuffer(_vHandle);
-	VIDEO->DestroyIndexBuffer(_iHandle);
+	for (int32 i = 0; i < _numSectionX * _numSectionZ; ++i)
+	{
+		VIDEO->DestroyVertexBuffer(_pSections[i]._vHandle);
+		VIDEO->DestroyIndexBuffer(_pSections[i]._iHandle);
+	}
+	SAFE_DELETE_ARRAY(_pSections);
+
 	VIDEO->DestroyVertexDecl(_declHandle);
 
 	VIDEO->DestroyTexture(_tile0Handle);
@@ -99,14 +114,14 @@ void Terrain::Destroy()
 	SAFE_DELETE(_pQuadTree);
 }
 
-void Terrain::Render(const video::Effect &effect, const Matrix &viewProjection)
+void Terrain::Render(const video::Effect &effect, const Camera &camera)
 {
 	////월드행렬 셋팅
 	Matrix matWorld;
 	MatrixIdentity(&matWorld);
 	effect.SetMatrix("matWorld", matWorld);
 	//뷰 행렬
-	effect.SetMatrix("matViewProjection", viewProjection);
+	effect.SetMatrix("matViewProjection", camera.GetViewProjectionMatrix());
 	////Texture 
 	//m_pTerrainEffect->SetTexture("Terrain0_Tex", m_pTexTile_0);
 	//m_pTerrainEffect->SetTexture("Terrain1_Tex", m_pTexTile_1);
@@ -117,37 +132,43 @@ void Terrain::Render(const video::Effect &effect, const Matrix &viewProjection)
 	//광원 셋팅
 	//Vector3 dirLight = pDirectionLight->pTransform->GetForward();
 	//m_pTerrainEffect->SetVector("worldLightDir", &D3DXVECTOR4(dirLight, 1));
-	effect.DrawPrimitiveIndex(_vHandle, _iHandle, _mHandle);
+	for (int32 i = 0; i < _numSectionX * _numSectionZ; ++i)
+	{
+		Terrain::TerrainSection &refSection = _pSections[i];
+		if(camera.GetFrustum().IsSphereInFrustum(Vector3(refSection._centerX, 0.0f, refSection._centerZ), refSection._radius))
+		effect.DrawPrimitiveIndex(refSection._vHandle, refSection._iHandle, _mHandle);
+	}
+
 }
 
 
 //TODO : Implement this
 bool Terrain::IsIntersectRay(Ray * pRay, Vector3 pOut)
 {
-	//std::vector<D3DXVECTOR3> hits;
+	std::vector<D3DXVECTOR3> hits;
 
-	////최상단 쿼드 트리 부터 Ray Check 들어간다.
-	//_pQuadTree->GetRayHits(&hits, pRay);
+	//최상단 쿼드 트리 부터 Ray Check 들어간다.
+	_pQuadTree->GetRayHits(&hits, pRay);
 
-	//if (hits.size() == 0)
-	//	return false;
-	////먼저 처음 위치화 처음 위치에 대한 거리 대입
-	//D3DXVECTOR3 hitPos = hits[0];
-	//D3DXVECTOR3 dir = hitPos - pRay->origin;
-	//float distSq = D3DXVec3LengthSq(&dir);
+	if (hits.size() == 0)
+		return false;
+	//먼저 처음 위치화 처음 위치에 대한 거리 대입
+	D3DXVECTOR3 hitPos = hits[0];
+	D3DXVECTOR3 dir = hitPos - pRay->origin;
+	float distSq = D3DXVec3LengthSq(&dir);
 
-	//for (int i = 1; i < hits.size(); i++)
-	//{
-	//	dir = hits[i] - pRay->origin;
-	//	float newDist = D3DXVec3LengthSq(&dir);
-	//	if (newDist < distSq)
-	//	{
-	//		distSq = newDist;
-	//		hitPos = hits[i];
-	//	}
-	//}
-	////
-	//*pOut = hitPos;
+	for (int i = 1; i < hits.size(); i++)
+	{
+		dir = hits[i] - pRay->origin;
+		float newDist = D3DXVec3LengthSq(&dir);
+		if (newDist < distSq)
+		{
+			distSq = newDist;
+			hitPos = hits[i];
+		}
+	}
+	//
+	*pOut = hitPos;
 
 	return true;
 }
@@ -224,10 +245,10 @@ float Terrain::GetSlant(Vector3 * pOut, float gravityPower, float x, float z)
 {
 	//터레인 범위을 넘어가면 0.0 값을 리턴한다
 	if (x < _terrainStartX || x > _terrainEndX ||
-		z > _terrainStartZ || z < _terrainEndZ) {
+		z > _terrainStartZ || z < _terrainEndZ) 
+	{
 		return false;
 	}
-
 
 	//Terrain 의 좌상단 0 을 기준으로 월드 Terrain 의 상태적 위치를 찾자
 	float pX = x - _terrainStartX;
@@ -237,7 +258,6 @@ float Terrain::GetSlant(Vector3 * pOut, float gravityPower, float x, float z)
 	float invCell = 1.0f / _cellScale;
 	pX *= invCell;
 	pZ *= invCell;
-
 
 	//해당 위치의 셀 인덱스
 	int idxX = static_cast<int>(pX);
@@ -251,7 +271,6 @@ float Terrain::GetSlant(Vector3 * pOut, float gravityPower, float x, float z)
 	//  | /   |
 	//  |/    |
 	// lb-----rb
-
 	Vector3 lt = _terrainVertices[idxZ * _numVertexX + idxX]._pos;
 	Vector3 rt = _terrainVertices[idxZ * _numVertexX + idxX + 1]._pos;
 	Vector3 lb = _terrainVertices[(idxZ + 1) * _numVertexX + idxX]._pos;
@@ -311,10 +330,6 @@ bool Terrain::CreateTerrain(int32 smooth, int32 tileNum)
 	D3DLOCKED_RECT lockRect;
 	video::Texture *heightMap = VIDEO->GetTexture(_heightMapHandle);
 	heightMap->_ptr->LockRect(0, &lockRect, 0, 0);
-
-	//lockRect->Pitch	lock 을 한 영역 이미지의 가로 byte 크기 ( 얻어온 바이트크기는 다음을 성립한다 pitch % 4 == 0 ) < 3byte 컬러시 pitch byte 구하는 공식 ( 가로 픽셀수 * 3 + 3 ) & ~3 = pitch  >
-	//lockRect->pBits	이미지데이터가 시작되는 포인터 주소
-	//정정위치와 정점 UV 를 계산했음....
 
 	for (int32 z = 0; z < _numVertexZ; z++) 
 	{
@@ -384,25 +399,15 @@ bool Terrain::CreateTerrain(int32 smooth, int32 tileNum)
 
 	//터레인 스무싱 
 	SmoothTerrain(smooth);
-	//
 	// 정점 인덱스를 구한다.....
-	//
 	TerrainFace *faces = new TerrainFace[_numTotalFace];
 
-	//인덱스 배열 인덱스
 	int32 idx = 0;
 
 	for (uint32 z = 0; z < _numCellZ; z++)
 	{
 		for (uint32 x = 0; x < _numCellX; x++) 
 		{
-			//  1-----2
-			//  |    /|
-			//  |   / |
-			//  |  /  |
-			//  | /   |
-			//  |/    |
-			//  0-----3
 			//해당 셀에 대한 정점 인덱스를 얻자
 			uint32 lb = z * _numVertexX + x;
 			uint32 lt = (z + 1) * _numVertexX + x;
@@ -422,7 +427,6 @@ bool Terrain::CreateTerrain(int32 smooth, int32 tileNum)
 			idx++;
 		}
 	}
-
 	//
 	// 노말이랑 Binormal 이랑 Tangent 계산하자...
 	//
@@ -467,15 +471,16 @@ bool Terrain::CreateTerrain(int32 smooth, int32 tileNum)
 
 	_declHandle = VIDEO->CreateVertexDecl(&decl, "TerrainDecl");
 
-	Memory mem;
-	mem._data = _terrainVertices;
-	mem._size = sizeof(video::TerrainVertex) * _numTotalVertex;
+	_pSections = new Terrain::TerrainSection[_numSectionX * _numSectionZ];
+	Assert(_pSections);
 
-	_vHandle = VIDEO->CreateVertexBuffer(&mem, _declHandle, "TerrainVB");
-
-	mem._data = faces;
-	mem._size = sizeof(TerrainFace) * _numTotalFace;
-	_iHandle = VIDEO->CreateIndexBuffer(&mem, 4,  "TerrainIB");
+	for (uint32 z = 0; z < _numSectionZ; ++z)
+	{
+		for (uint32 x = 0; x < _numSectionX; ++x)
+		{
+			CreateTerrainSection(x, z, _terrainVertices);
+		}
+	}
 
 	SAFE_DELETE_ARRAY(poses);
 	SAFE_DELETE_ARRAY(normals);
@@ -483,6 +488,83 @@ bool Terrain::CreateTerrain(int32 smooth, int32 tileNum)
 	SAFE_DELETE_ARRAY(binormals);
 	SAFE_DELETE_ARRAY(uvs);
 	SAFE_DELETE_ARRAY(indices);
+
+	return true;
+}
+
+bool Terrain::CreateTerrainSection(int32 x, int32 z, const video::TerrainVertex * pTerrainVertices)
+{
+	int32 sectionIndex = Index2D(x, z, _numSectionX);
+
+	TerrainSection &refSection = _pSections[sectionIndex];
+
+	refSection._indexX = x;
+	refSection._indexZ = z;
+
+	int32 globalStartX = x * _sectionResolution;
+	int32 globalStartZ = z * _sectionResolution;
+
+	std::vector<video::TerrainVertex> vertices;
+	std::vector<uint16> indices;
+
+	vertices.reserve(((_sectionNumVertexX + 1) * (_sectionNumVertexZ + 1)) + 1);
+	indices.reserve((_sectionNumCellX * _sectionNumCellZ) * 3 * 2 + 1);
+
+	//버텍스 정보 넣기...
+	for (int32 localZ = 0; localZ < _sectionNumVertexZ; localZ++)
+	{
+		for (int32 localX = 0; localX < _sectionNumVertexX; localX++)
+		{
+			int32 globalX = globalStartX + localX;
+			int32 globalZ = globalStartZ + localZ;
+
+			int32 globalIndex = Index2D(globalX, globalZ, _numVertexX);
+
+			vertices.push_back(pTerrainVertices[globalIndex]);
+		}
+	}
+
+	refSection._startX = vertices[0]._pos.x;
+	refSection._startZ = vertices[0]._pos.z;
+
+	refSection._endX = vertices.back()._pos.x;
+	refSection._endZ = vertices.back()._pos.z;
+
+	for (uint32 z = 0; z <= _sectionResolution; z++)
+	{
+		for (uint32 x = 0; x < _sectionResolution; x++)
+		{
+			uint32 lb = z * _sectionResolution + x;
+			uint32 lt = (z + 1) * _sectionResolution + x;
+			uint32 rt = ((z + 1)* _sectionResolution) + (x + 1);
+			uint32 rb = (z * _sectionResolution) + (x + 1);
+
+			indices.push_back(lb);
+			indices.push_back(lt);
+			indices.push_back(rt);
+
+			indices.push_back(lb);
+			indices.push_back(rt);
+			indices.push_back(rb);
+		}
+	}
+
+	Memory mem;
+	mem._data = &vertices[0];
+	mem._size = sizeof(video::TerrainVertex) * vertices.size();
+
+	refSection._vHandle = VIDEO->CreateVertexBuffer(&mem, _declHandle);
+	Assert(refSection._vHandle.IsValid());
+
+	mem._data = &indices[0];
+	mem._size = sizeof(uint16) * indices.size();
+
+	refSection._iHandle = VIDEO->CreateIndexBuffer(&mem, sizeof(uint16));
+	Assert(refSection._iHandle.IsValid());
+
+	refSection._centerX = (refSection._startX + refSection._endX) * 0.5f;
+	refSection._centerZ = (refSection._startZ + refSection._endZ) * 0.5f;
+	refSection._radius = (refSection._centerX - refSection._startX) * 1.3f;
 
 	return true;
 }

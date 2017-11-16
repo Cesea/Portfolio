@@ -12,21 +12,17 @@ public:
 	Camera();
 	~Camera();
 
-	//투영행렬과 View 행렬, 절두체를 최신화 한다
 	void UpdateMatrix();
 
-	//View 행렬과 투영 행렬을 셋팅
 	void UpdateCamToDevice(LPDIRECT3DDEVICE9 pDevice);
 
 	void SetMoveSpeed(float speed) { _moveSpeed = speed; }
 	void SetRotationSpeed(float speed) { _rotationSpeed = speed; }
 
-	//카메라 관련 행렬을 얻는다.
 	const Matrix &GetViewMatrix() const { return _matView; }
 	const Matrix &GetProjectionMatrix() const { return _matProjection; }
 	const Matrix &GetViewProjectionMatrix() const { return _matViewProjection; }
 
-	//화각 셋팅
 	void SetFov(float fov) { _fov = fov; }
 	float GetFov() { return _fov; }
 
@@ -47,29 +43,24 @@ public:
 	void Handle(const InputManager::MouseReleasedEvent &event);
 	void Handle(const InputManager::MouseMoveEvent &event);
 protected:
-	float _fov;			//카메라 화각
-	float _camNear;		//카메라 Near
-	float _camFar;		//카메라 Far
+	float _fov;
+	float _camNear;
+	float _camFar;	
 
-	Matrix _matView;		//뷰행렬
-	Matrix _matProjection;	//투영행렬
-	Matrix _matViewProjection;	//뷰 * 투영행렬
+	Matrix _matView;
+	Matrix _matProjection;
+	Matrix _matViewProjection;
 	TransformComponent _transform;
 
-	bool32 _ortho;		//직교니?
+	bool32 _ortho;
 	bool32 _rotating{false};
 
 	float _moveSpeed{1.0f};
 	float _rotationSpeed{0.4f};
 
 	Vector3 _toMove;
-	//float _friction;
-	//float _aceel;
 
 	Frustum _frustum;
-	void UpdateFrustum();
 };
-
-
 
 #endif

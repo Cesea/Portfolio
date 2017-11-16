@@ -23,6 +23,12 @@ inline int32 Index2D(int32 x, int32 y, int32 xMax)
 	return x + (xMax * y);
 }
 
+//TODO : Implement this
+inline int32 ClosestPowerOfTow(int32 val)
+{
+	return 0;
+}
+
 //NOTE : 이게 맞나??
 //inline int32 index3D(int32 x, int32 y, int32 z, int32 xMax, int32 yMax)
 //{

@@ -1,10 +1,6 @@
 #include "stdafx.h"
 #include "Camera.h"
 
-void Camera::UpdateFrustum()
-{
-}
-
 Camera::Camera()
 {
 	//기본 화각 설정

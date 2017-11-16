@@ -33,7 +33,7 @@ public:
 
 	void CreateChildTree();
 
-	void GetRayHits(const Ray *pRay, std::vector<Vector3>* pOutHit);
+	void GetRayHits(const Ray &ray, std::vector<Vector3>* pOutHit);
 
 };
 #endif

@@ -1,6 +1,74 @@
 #include "stdafx.h"
 #include "QuadTree.h"
 
+
+bool32 IsRayHitBoundSphere(const Ray &ray, const Vector3 &center, float radius,
+	Vector3 *pOutHitPos, Vector3 *pOutHitNormal)
+{
+	//레이의 오리진에서 부터 구의 센터까지의 방향벡터
+	Vector3 dirToCenter = center - ray.origin;
+
+	//길이의 제곱
+	float lengthSq = Vec3LengthSq(&dirToCenter);
+
+	//반지름의 제곱
+	float r2 = radius * radius;
+
+	//만약 광선이 구안에 있다면..
+	if (r2 > lengthSq)
+	{
+		//광선이 안에서 나가는 것은 체크 안된다.
+		return false;
+	}
+
+	//여기까지오면 오리진은 구밖에 있다는예기
+	//구센터까지의 방향벡터와 레이의 방향벡터가 직각을 포함한 
+	//둔각이라면 죽었다깨어나도 충돌될일없다
+	float dot = Vec3Dot(&dirToCenter, &ray.direction);
+	if (dot <= 0.0f)
+	{
+		return false;
+	}
+
+	// 피타고라스의 정리를 하기위해 직각 삼각형 공식유도
+	// d2 = x2 + y2;
+	// d = sqrt( x2 + y2 );
+
+	float x2 = dot * dot;
+	float d2 = lengthSq;
+	//d2 - x2 = y2;
+	float y2 = d2 - x2;
+
+	//광선이 원밖을 벗어났다.
+	if (y2 > r2)
+	{
+		return false;
+	}
+
+	//여기까지온다면 일단은 히트
+	//만약 얻아가야알 HitPoint 가있다면..
+	if (nullptr != pOutHitPos)
+	{
+		//d를 raius 제곱
+		d2 = r2;
+		//d2 = y2 + x2
+		//float x2 = d2 - y2;
+		float x = sqrt(d2 - y2);
+
+		//
+		*pOutHitPos = ray.origin + (ray.direction * (dot - x));
+
+		//Hit 된 위치의 노말을 얻겠다면..
+		if (nullptr != pOutHitNormal)
+		{
+			*pOutHitNormal = *pOutHitPos - center;
+			Vec3Normalize(pOutHitNormal, pOutHitNormal);
+		}
+	}
+
+	return true;
+}
+
 QuadTree::QuadTree()
 {
 	//차일드 포인터 NULL 처리
@@ -94,66 +162,56 @@ void QuadTree::CreateChildTree()
 	}
 }
 
-void QuadTree::GetRayHits(const Ray * pRay, std::vector<Vector3>* pOutHit)
+void QuadTree::GetRayHits(const Ray &ray, std::vector<Vector3>* pOutHit)
 {
-	//TODO : Collision Utils을 사용하여 계산하도록 하자....
-	//if (PHYSICS_MGR->IsRayHitSphere(pRay, &_centerPos, this->_radius, NULL, NULL))
-	//{
-	//	//자식이 있냐?
-	//	if ((_corners[eCornerRT] - _corners[eCornerLT]) > 1)
-	//	{
-	//		//자식 재귀
-	//		for (int32 i = 0; i < 4; i++)
-	//		{
-	//			_pChilds[i]->GetRayHits(pRay, pOutHit);
-	//		}
-	//	}
-	//	//자식이 없는 마지막 노드일떄
-	//	else
-	//	{
-	//		//lt--rt
-	//		//|   /|
-	//		//|  / |
-	//		//| /  |
-	//		//|/   |
-	//		//lb--rb
+	if (IsRayHitBoundSphere(ray, _centerPos, _radius, NULL, NULL))
+	{
+		//자식이 있냐?
+		if ((_corners[eCornerRT] - _corners[eCornerLT]) > 1)
+		{
+			//자식 재귀
+			for (int32 i = 0; i < 4; i++)
+			{
+				_pChilds[i]->GetRayHits(pRay, pOutHit);
+			}
+		}
+		//자식이 없는 마지막 노드일떄
+		else
+		{
+			//lt--rt
+			//|   /|
+			//|  / |
+			//| /  |
+			//|/   |
+			//lb--rb
 
-	//		//나(타일)의 폴리곤과 Ray의 hit지점을 얻자
-	//		float dist = 0.0f;
-	//		Vector3 lt = this->_pTerrainVertices[_corners[eCornerLT]]._pos;
-	//		Vector3 rt = this->_pTerrainVertices[_corners[eCornerRT]]._pos;
-	//		Vector3 lb = this->_pTerrainVertices[_corners[eCornerLB]]._pos;
-	//		Vector3 rb = this->_pTerrainVertices[_corners[eCornerRB]]._pos;
+			//나(타일)의 폴리곤과 Ray의 hit지점을 얻자
+			float dist = 0.0f;
+			Vector3 lt = this->_pTerrainVertices[_corners[eCornerLT]]._pos;
+			Vector3 rt = this->_pTerrainVertices[_corners[eCornerRT]]._pos;
+			Vector3 lb = this->_pTerrainVertices[_corners[eCornerLB]]._pos;
+			Vector3 rb = this->_pTerrainVertices[_corners[eCornerRB]]._pos;
 
-	//		//좌상단 폴리곤 체크
-	//		if (D3DXIntersectTri(
-	//			&lt, &rt, &lb,
-	//			&pRay->origin,
-	//			&pRay->direction,
-	//			nullptr, nullptr,
-	//			&dist))			//히트가 되었다면 origin에서 부터 hit위치까지의 거리
-	//		{
-	//			//히트 지점
-	//			Vector3 hitPos = pRay->origin + pRay->direction * dist;
+			//좌상단 폴리곤 체크
+			if (D3DXIntersectTri( &lt, &rt, &lb, &ray.origin, &ray.direction,
+				nullptr, nullptr, &dist))
+			{
+				Vector3 hitPos = ray.origin + ray.direction * dist;
 
-	//			//푸쉬
-	//			pOutHit->push_back(hitPos);
-	//			return;
-	//		}
-	//		//우하단 폴리곤 체크
-	//		if (D3DXIntersectTri(
-	//			&rt, &rb, &lb,
-	//			&pRay->origin,
-	//			&pRay->direction,
-	//			nullptr, nullptr,
-	//			&dist))			//히트가 되었다면 origin에서 부터 hit위치까지의 거리
-	//		{
-	//			//히트 지점
-	//			Vector3 hitPos = pRay->origin + pRay->direction * dist;
-	//			//푸쉬
-	//			pOutHit->push_back(hitPos);
-	//			return;
-	//		}
-	//	}
-	//}
+				//푸쉬
+				pOutHit->push_back(hitPos);
+				return;
+			}
+			//우하단 폴리곤 체크
+			if (D3DXIntersectTri( &rt, &rb, &lb, &ray.origin, &ray.direction,
+				nullptr, nullptr, &dist))			
+			{
+				//히트 지점
+				Vector3 hitPos = pRay->origin + pRay->direction * dist;
+				//푸쉬
+				pOutHit->push_back(hitPos);
+				return;
+			}
+		}
+	}
 }

@@ -30,7 +30,6 @@ void Frustum::UpdateFrustum(const Matrix & matViewProj)
 	}
 
 	//정면플랜
-
 	_plane[0].Create(_pos[0], _pos[1], _pos[2]);
 	//후면
 	_plane[1].Create(_pos[5], _pos[4], _pos[7]);

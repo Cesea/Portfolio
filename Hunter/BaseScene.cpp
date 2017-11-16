@@ -127,7 +127,7 @@ bool32 BaseScene::Render()
 	}
 
 	const video::Effect *terrainEffect = VIDEO->GetEffect(_terrainEffect);
-	_terrain.Render(*terrainEffect, _camera.GetViewMatrix() * _camera.GetProjectionMatrix());
+	_terrain.Render(*terrainEffect, _camera);
 
 	gpDevice->EndScene();
 	gpDevice->Present(nullptr, nullptr, NULL, nullptr);
