@@ -30,7 +30,7 @@ sampler2D Specular = sampler_state
 };
 
 
-extern float4x4 FinalTransforms[60]; 
+extern float4x4 FinalTransforms[45]; 
 extern int NumVertInfluences = 2; // <--- Normally set dynamically.
 
 float4x4 matWorld : World;
@@ -43,8 +43,8 @@ struct VS_INPUT
     float3  BlendWeights    : BLENDWEIGHT;
     float4  BlendIndices    : BLENDINDICES;
     float3  Normal          : NORMAL;
-    float3  Tangent         : TANGENT;
-    float3  Binormal        : Binormal;
+    //float3  Tangent         : TANGENT;
+    //float3  Binormal        : Binormal;
     float2  Texcoord        : TEXCOORD0;
 };
 

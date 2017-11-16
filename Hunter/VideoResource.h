@@ -21,6 +21,7 @@ namespace video
 {
 	struct StaticXMesh;
 	struct SkinnedXMesh;
+	struct SkinnedAnimation;
 
 	struct CommandBuffer
 	{
@@ -305,7 +306,7 @@ namespace video
 		void CommitChanges() const;
 
 		void DrawStaticMesh(const StaticXMesh &mesh, LPCSTR technique = nullptr) const;
-		void DrawSkinnedMesh(const SkinnedXMesh &mesh, const Matrix *matrixPalettes, LPCSTR technique = nullptr) const;
+		void DrawSkinnedMesh(const SkinnedXMesh &mesh, SkinnedAnimation &animation, LPCSTR technique = nullptr) const;
 
 		ID3DXEffect *_ptr{};
 	};

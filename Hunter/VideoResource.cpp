@@ -253,9 +253,9 @@ namespace video
 		}
 	}
 
-	void Effect::DrawSkinnedMesh(const SkinnedXMesh &mesh, const Matrix *matrixPalettes, LPCSTR technique) const
+	void Effect::DrawSkinnedMesh(const SkinnedXMesh &mesh, SkinnedAnimation &animation, LPCSTR technique) const
 	{
-		mesh.RenderBone(*this, mesh._pRootBone, matrixPalettes);
+		mesh.RenderBone(*this, mesh._pRootBone, animation);
 	}
 
 	bool IndexBuffer::Create(uint32 size, void * data)

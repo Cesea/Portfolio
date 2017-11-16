@@ -6,6 +6,7 @@
 namespace video
 {
 	struct SkinnedXMesh;
+	struct SkinnedAnimation;
 }
 
 struct Bone : public D3DXFRAME
@@ -105,7 +106,6 @@ namespace video
 
 	struct SkinnedXMesh
 	{
-
 		bool Create(const std::string &fileName, const Matrix* matCorrection = nullptr);
 		void Destroy();
 
@@ -115,7 +115,7 @@ namespace video
 		void UpdateMatrices(Bone *pBone, Matrix *pParentMatrix) const;
 
 		//NOTE : 직접 사용하지 않고 밖에서 쓴다
-		void RenderBone(const video::Effect &effect, Bone *pBone, const Matrix *matrixPalettes) const;
+		void RenderBone(const video::Effect &effect, Bone *pBone, SkinnedAnimation &animation) const;
 
 		//void Play(const std::string &animName, float crossFadeTime = 0.0);
 		//void Play(int32 animIndex, float crossFadeTime = 0.0);

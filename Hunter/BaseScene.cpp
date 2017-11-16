@@ -43,7 +43,7 @@ bool32 BaseScene::Init()
 	Entity &entity = _entities.back();
 
 	Matrix correctionMat;
-	MatrixScaling(&correctionMat, 0.05f, 0.05f, 0.05f);
+	MatrixScaling(&correctionMat, 0.02f, 0.02f, 0.02f);
 	//_meshHandle = VIDEO->CreateStaticXMesh("../resources/models/Knight/Knight.x", &correctionMat, "Knight");
 
 
@@ -86,7 +86,6 @@ bool32 BaseScene::Update(float deltaTime)
 			MatrixTranslation(&world, x, 0.0f, y);
 			_animation[index].UpdateAnimation(deltaTime);
 			_animation[index].UpdateMatrixPalettes(&world);
-
 		}
 	}
 
@@ -117,9 +116,9 @@ bool32 BaseScene::Render()
 	effect->SetMatrix("matViewProjection", _camera.GetViewMatrix() * _camera.GetProjectionMatrix());
 	//effect->DrawStaticMesh(*staticMesh);
 
-	for (uint32 i = 0; i < 1; ++i)
+	for (uint32 i = 0; i < 20; ++i)
 	{
-		effect->DrawSkinnedMesh(*_pMesh, _animation[i]._workingPalettes);
+		effect->DrawSkinnedMesh(*_pMesh, _animation[i]);
 	}
 
 	gpDevice->EndScene();

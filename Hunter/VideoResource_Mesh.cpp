@@ -707,7 +707,7 @@ namespace video
 		UpdateMatrices(_pRootBone, &finalWorld);
 	}
 
-	void SkinnedXMesh::RenderBone(const video::Effect &effect, Bone *pBone, const Matrix *matrixPalettes) const
+	void SkinnedXMesh::RenderBone(const video::Effect &effect, Bone *pBone, video::SkinnedAnimation &animation) const
 	{
 		if (nullptr == pBone)
 		{
@@ -723,8 +723,28 @@ namespace video
 				//본에 물려있는 메쉬의 서브셋갯수을 속성그룹수와 같다
 				for (DWORD i = 0; i < pBoneMesh->NumAttributesGroup; i++)
 				{
+					if (nullptr != pBoneMesh->BufBoneCombos)
+					{
+						LPD3DXBONECOMBINATION pBoneCombinations = (LPD3DXBONECOMBINATION)pBoneMesh->BufBoneCombos->GetBufferPointer();
+
+						for (uint32 palEntry = 0; palEntry < pBoneMesh->NumPaletteEntries; palEntry++)
+						{
+							//적용되는 행렬 ID 를 얻는다
+							DWORD dwMatrixIndex = pBoneCombinations[i].BoneId[palEntry];
+
+							//행렬 인덱스가 유효하다면...
+							if (dwMatrixIndex != UINT_MAX)
+							{
+								//작업 앵렬을 만든다.
+								MatrixMultiply(&animation._workingPalettes[palEntry],
+									&(pBoneMesh->pBoneOffsetMatices[dwMatrixIndex]),
+									pBoneMesh->ppBoneMatrixPtrs[dwMatrixIndex]);
+							}
+						}
+					}
+
 					////위에서 셋팅됭 작업행렬을 Effect 팔래스에 적용한다.
-					HRESULT hr = effect._ptr->SetMatrixArray("FinalTransforms", (D3DXMATRIX *)matrixPalettes, pBoneMesh->NumPaletteEntries);
+					HRESULT hr = effect._ptr->SetMatrixArray("FinalTransforms", (D3DXMATRIX *)animation._workingPalettes, pBoneMesh->NumPaletteEntries);
 					//effect.SetMatrices("FinalTransforms", _workingPalettes, pBoneMesh->NumPaletteEntries);
 
 					////적용되는 정점의 본최대 영향수 를 대입 최대 영향수  -1 
@@ -746,11 +766,11 @@ namespace video
 		}
 		if (pBone->pFrameSibling)
 		{
-			RenderBone(effect, (Bone*)pBone->pFrameSibling, matrixPalettes);
+			RenderBone(effect, (Bone*)pBone->pFrameSibling, animation);
 		}
 		if (pBone->pFrameFirstChild)
 		{
-			RenderBone(effect, (Bone*)pBone->pFrameFirstChild, matrixPalettes);
+			RenderBone(effect, (Bone*)pBone->pFrameFirstChild, animation);
 		}
 	}
 
@@ -1253,7 +1273,10 @@ STDMETHODIMP BoneHierachy::CreateMeshContainer(LPCSTR Name, CONST D3DXMESHDATA *
 
 		//본의 컴비네이션 은 메쉬의 Subset 별로 어떠한 본에 영향을 받는지에 대한 정보를 지니게 된다.
 		//본매트릭스 인덱스 = 본컴비네이션[Subset].BoneID[팔래트]
-		_pSkinnedMesh->_numWorkingPalette += boneMesh->NumPaletteEntries;
+		if (_pSkinnedMesh->_numWorkingPalette < boneMesh->NumPaletteEntries)
+		{
+			_pSkinnedMesh->_numWorkingPalette = boneMesh->NumPaletteEntries;
+		}
 
 	}
 	*ppNewMeshContainer = boneMesh;
