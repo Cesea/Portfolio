@@ -196,7 +196,6 @@ inline int32 Int32Max(int32 a, int32 b)
 
 inline uint32 Uint32CountBits(uint32 val)
 {
-	return __popcnt(val);
 }
 
 inline uint32 Uint32BitScan(uint32 val)

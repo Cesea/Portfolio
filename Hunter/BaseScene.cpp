@@ -3,12 +3,6 @@
 
 using namespace video;
 
-struct PosVertex
-{
-	Vector3 position;
-	Vector4 color;
-	enum {FVF = D3DFVF_XYZ | D3DFVF_DIFFUSE};
-};
 
 bool32 BaseScene::Load()
 {
@@ -43,26 +37,41 @@ bool32 BaseScene::Init()
 	Entity &entity = _entities.back();
 
 	Matrix correctionMat;
-	MatrixScaling(&correctionMat, 0.02f, 0.02f, 0.02f);
+	MatrixScaling(&correctionMat, 0.01f, 0.01f, 0.01f);
 	//_meshHandle = VIDEO->CreateStaticXMesh("../resources/models/Knight/Knight.x", &correctionMat, "Knight");
-
 
 	//_staticMeshHandle = VIDEO->CreateStaticXMesh("../resources/models/Snake/Snake.X", &correctionMat, "Snake");
 	//_skinnedMeshHandle = VIDEO->CreateSkinnedXMesh("../resources/models/Snake/Snake.X", &correctionMat, "Snake");
-	_skinnedMeshHandle = VIDEO->CreateSkinnedXMesh("../resources/models/Knight/Knight.X", &correctionMat, "Knight");
 
-	for (int32 i = 0; i < 100; ++i)
+	_skinnedMeshHandle = VIDEO->CreateSkinnedXMesh("../resources/Models/Knight/Knight.X", &correctionMat, "Knight");
+
+	for (int32 i = 0; i < 9; ++i)
 	{
 		_animation[i].Create(_skinnedMeshHandle);
-		_animation[i].Play(i % 10);
+		_animation[i].Play(i % 9);
 	}
 
-	_staticEffect = VIDEO->GetEffect("staticMesh.fx");
-	_skinnedEffect = VIDEO->GetEffect("skinnedMesh.fx");
+	_pMesh = VIDEO->GetSkinnedXMesh(_skinnedMeshHandle);
+
+	_staticEffect = VIDEO->GetEffect("StaticMesh.fx");
+	_skinnedEffect = VIDEO->GetEffect("SkinnedMesh.fx");
+	_terrainEffect = VIDEO->GetEffect("TerrainBase.fx");
 
 	_camera.GetTransform().MovePositionSelf(0.0f, 0.0f, -1.0f);
 
-	_pMesh = VIDEO->GetSkinnedXMesh(_skinnedMeshHandle);
+	Terrain::TerrainConfig config;
+	config._heightFileName = "../resources/Textures/Height_map1024.jpg";
+	config._tile0FileName = "../resources/Textures/terrain1.jpg";
+	config._tile1FileName = "../resources/Textures/terrain2.png";
+	config._tile2FileName = "../resources/Textures/terrain3.png";
+	config._tile3FileName = "../resources/Textures/terrain4.png";
+	config._splatFileName = "../resources/Textures/Splat.png";
+
+	config._cellScale = 1.0f;
+	config._heightScale = 5.0f;
+	config._textureMult = 100;
+
+	_terrain.Create(config, 0);
 
 	_active = true;
 	return result;
@@ -76,16 +85,14 @@ bool32 BaseScene::Update(float deltaTime)
 
 	_transformSystem.PreUpdate(deltaTime);
 
-
 	Matrix world;
-	for (int32 y = 0; y < 10; ++y)
+	for (int32 y = 0; y < 3; ++y)
 	{
-		for (int32 x = 0; x < 10; ++x)
+		for (int32 x = 0; x < 3; ++x)
 		{
-			int32 index = Index2D(x, y, 10);
 			MatrixTranslation(&world, x, 0.0f, y);
-			_animation[index].UpdateAnimation(deltaTime);
-			_animation[index].UpdateMatrixPalettes(&world);
+			int32 index = Index2D(x, y, 3);
+			_animation[index].UpdateAnimation(deltaTime, world);
 		}
 	}
 
@@ -102,33 +109,34 @@ bool32 BaseScene::Update(float deltaTime)
 bool32 BaseScene::Render()
 {
 	//_renderSystem.Render(*_renderView, _camera);
-
 	//VIDEO->Render(*_renderView);
 
 	gpDevice->Clear(0, nullptr, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER | D3DCLEAR_STENCIL, 0xff208020, 1.0f, 0);
 	gpDevice->BeginScene();
 
-	const video::Effect *effect = VIDEO->GetEffect(_skinnedEffect);
+	const video::Effect *skinnedEffect = VIDEO->GetEffect(_skinnedEffect);
 
 	Matrix world;
 	MatrixIdentity(&world);
-	effect->SetMatrix("matWorld", world);
-	effect->SetMatrix("matViewProjection", _camera.GetViewMatrix() * _camera.GetProjectionMatrix());
-	//effect->DrawStaticMesh(*staticMesh);
+	skinnedEffect->SetMatrix("matWorld", world);
+	skinnedEffect->SetMatrix("matViewProjection", _camera.GetViewMatrix() * _camera.GetProjectionMatrix());
 
-	for (uint32 i = 0; i < 20; ++i)
+	for (uint32 i = 0; i < 9; ++i)
 	{
-		effect->DrawSkinnedMesh(*_pMesh, _animation[i]);
+		skinnedEffect->DrawSkinnedMesh(*_pMesh, _animation[i]);
 	}
+
+	const video::Effect *terrainEffect = VIDEO->GetEffect(_terrainEffect);
+	_terrain.Render(*terrainEffect, _camera.GetViewMatrix() * _camera.GetProjectionMatrix());
 
 	gpDevice->EndScene();
 	gpDevice->Present(nullptr, nullptr, NULL, nullptr);
-
 	return true;
 }
 
 void BaseScene::Release()
 {
+	_terrain.Destroy();
 }
 
 const char * BaseScene::GetSceneName()

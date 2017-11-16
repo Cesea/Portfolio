@@ -128,7 +128,6 @@
     <ClCompile Include="Allocators.cpp" />
     <ClCompile Include="AnimationComponent.cpp" />
     <ClCompile Include="AnimationSystem.cpp" />
-    <ClCompile Include="AnimationUtils.cpp" />
     <ClCompile Include="ApplicationTimer.cpp" />
     <ClCompile Include="BaseScene.cpp" />
     <ClCompile Include="BaseSystem.cpp" />
@@ -148,15 +147,15 @@
     <ClCompile Include="MathUtils.cpp" />
     <ClCompile Include="Matrix.cpp" />
     <ClCompile Include="MoveComponent.cpp" />
-    <ClCompile Include="Node.cpp" />
     <ClCompile Include="ColiisionSystem.cpp" />
     <ClCompile Include="Plane.cpp" />
     <ClCompile Include="MoveSystem.cpp" />
+    <ClCompile Include="QuadTree.cpp" />
     <ClCompile Include="Quaternion.cpp" />
     <ClCompile Include="Ray.cpp" />
     <ClCompile Include="RenderComponent.cpp" />
     <ClCompile Include="RenderSystem.cpp" />
-    <ClCompile Include="TerrainConfig.cpp" />
+    <ClCompile Include="Terrain.cpp" />
     <ClCompile Include="TestScene.cpp" />
     <ClCompile Include="TextSerializer.cpp" />
     <ClCompile Include="tinyxml2.cpp" />
@@ -188,7 +187,6 @@
   <ItemGroup>
     <ClInclude Include="AnimationComponent.h" />
     <ClInclude Include="AnimationSystem.h" />
-    <ClInclude Include="AnimationUtils.h" />
     <ClInclude Include="ApplicationTimer.h" />
     <ClInclude Include="Assert.h" />
     <ClInclude Include="BaseScene.h" />
@@ -220,11 +218,11 @@
     <ClInclude Include="Matrix.h" />
     <ClInclude Include="Memory.h" />
     <ClInclude Include="MoveComponent.h" />
-    <ClInclude Include="Node.h" />
     <ClInclude Include="CollisionComponent.h" />
     <ClInclude Include="CollisionSystem.h" />
     <ClInclude Include="Plane.h" />
     <ClInclude Include="MoveSystem.h" />
+    <ClInclude Include="QuadTree.h" />
     <ClInclude Include="Quaternion.h" />
     <ClInclude Include="Ray.h" />
     <ClInclude Include="RenderComponent.h" />
@@ -232,9 +230,6 @@
     <ClInclude Include="SceneChangeEffect.h" />
     <ClInclude Include="System.h" />
     <ClInclude Include="Terrain.h" />
-    <ClInclude Include="TerrainConfig.h" />
-    <ClInclude Include="TerrainNode.h" />
-    <ClInclude Include="TerrainQuadTree.h" />
     <ClInclude Include="TestScene.h" />
     <ClInclude Include="TextSerializer.h" />
     <ClInclude Include="tinyxml2.h" />

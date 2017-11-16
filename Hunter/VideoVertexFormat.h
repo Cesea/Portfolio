@@ -5,6 +5,18 @@
 
 namespace video
 {
+	struct TerrainVertex
+	{
+		Vector3 _pos;
+		Vector3 _normal;
+		Vector3 _binormal;
+		Vector3 _tangent;
+		Vector2 _baseUV;
+		Vector2 _tileUV;
+
+		static std::string _name;
+	};
+
 	struct StaticTestVertex
 	{
 		StaticTestVertex();

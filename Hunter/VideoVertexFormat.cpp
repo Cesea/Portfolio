@@ -3,6 +3,7 @@
 
 namespace video
 {
+	std::string TerrainVertex::_name = "TerrainVertex";
 	std::string StaticTestVertex::_name = "StaticTestVertex";
 	std::string StaticMeshVertex::_name = "StaticMeshVertex";
 	std::string LineVertex::_name = "LineVertex";

@@ -123,6 +123,11 @@ namespace video
 		_ptr->End();
 	}
 
+
+	void Effect::SetTechnique(LPCSTR name) const
+	{
+		_ptr->SetTechnique(name);
+	}
 	void Effect::SetUniform(PredefinedUniform::Enum uniform, void *data)
 	{
 		switch (uniform)
@@ -196,7 +201,7 @@ namespace video
 		}
 	}
 
-	void Effect::SetMatrix(LPCSTR name, Matrix &matrix) const
+	void Effect::SetMatrix(LPCSTR name, const Matrix &matrix) const
 	{
 		_ptr->SetMatrix(name, &matrix);
 	}
@@ -234,6 +239,54 @@ namespace video
 		_ptr->CommitChanges();
 	}
 
+	void Effect::DrawPrimitive(video::VertexBufferHandle vHandle, video::MaterialHandle mHandle) const
+	{
+		video::VertexBuffer *vertexBuffer = VIDEO->GetVertexBuffer(vHandle);
+		video::VertexDecl *decl = VIDEO->GetVertexDecl(vertexBuffer->_decl);
+
+		const Material *mat = VIDEO->GetMaterial(mHandle);
+		this->SetMaterial(*mat);
+
+		gpDevice->SetVertexDeclaration(decl->_ptr);
+		gpDevice->SetStreamSource(0, vertexBuffer->_ptr, 0, decl->_stride);
+
+		uint32 numPass = this->BeginEffect();
+		for (uint32 j = 0; j < numPass; ++j)
+		{
+			this->BeginPass(j);
+			gpDevice->DrawPrimitive(D3DPT_TRIANGLELIST, 0, vertexBuffer->_size / decl->_stride);
+			this->EndPass();
+		}
+		this->EndEffect();
+	}
+
+	void Effect::DrawPrimitiveIndex(video::VertexBufferHandle vHandle, video::IndexBufferHandle iHandle,
+		video::MaterialHandle mHandle) const
+	{
+		video::VertexBuffer *vertexBuffer = VIDEO->GetVertexBuffer(vHandle);
+		video::VertexDecl *decl = VIDEO->GetVertexDecl(vertexBuffer->_decl);
+		video::IndexBuffer *indexBuffer = VIDEO->GetIndexBuffer(iHandle);
+
+		const Material *mat = VIDEO->GetMaterial(mHandle);
+		this->SetMaterial(*mat);
+
+		gpDevice->SetVertexDeclaration(decl->_ptr);
+		gpDevice->SetStreamSource(0, vertexBuffer->_ptr, 0, decl->_stride);
+		gpDevice->SetIndices(indexBuffer->_ptr);
+
+		uint32 numPass = this->BeginEffect();
+		for (uint32 j = 0; j < numPass; ++j)
+		{
+			this->BeginPass(j);
+			gpDevice->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, 0, 
+				vertexBuffer->_size / decl->_stride, 0, 
+				(indexBuffer->_stride == 2) ? (indexBuffer->_size / 2) : (indexBuffer->_size / 4));
+			this->EndPass();
+		}
+		this->EndEffect();
+
+	}
+
 	void Effect::DrawStaticMesh(const StaticXMesh &mesh, LPCSTR technique) const
 	{
 		for (uint32 i = 0; i < mesh._numMaterial; ++i)
@@ -255,10 +308,11 @@ namespace video
 
 	void Effect::DrawSkinnedMesh(const SkinnedXMesh &mesh, SkinnedAnimation &animation, LPCSTR technique) const
 	{
+		animation.UpdateMesh();
 		mesh.RenderBone(*this, mesh._pRootBone, animation);
 	}
 
-	bool IndexBuffer::Create(uint32 size, void * data)
+	bool IndexBuffer::Create(uint32 size, void * data, uint32 stride)
 	{
 		if (nullptr == data)
 		{
@@ -273,7 +327,8 @@ namespace video
 			usage |= D3DUSAGE_DYNAMIC;
 		}
 
-		VIDEO_CHECK(gpDevice->CreateIndexBuffer(size, usage, D3DFMT_INDEX16, D3DPOOL_DEFAULT, &_ptr, nullptr));
+		VIDEO_CHECK(gpDevice->CreateIndexBuffer(size, usage, (stride == 2) ? (D3DFMT_INDEX16) : (D3DFMT_INDEX32),
+			D3DPOOL_DEFAULT, &_ptr, nullptr));
 
 		if (nullptr != data)
 		{

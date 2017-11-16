@@ -760,9 +760,10 @@ void video::VideoDevice::MakeDefaultVertexDecls()
 //TODO : Default Shaders들을 로드하자
 void video::VideoDevice::LoadDefaultEffects()
 {
-	VIDEO->CreateEffect("../resources/shaders/staticMesh.fx", "staticMesh.fx");
-	VIDEO->CreateEffect("../resources/shaders/staticTestMesh.fx", "staticTestMesh.fx");
-	VIDEO->CreateEffect("../resources/shaders/skinnedMesh.fx", "skinnedMesh.fx");
+	VIDEO->CreateEffect("../resources/Shaders/StaticMesh.fx", "StaticMesh.fx");
+	VIDEO->CreateEffect("../resources/Shaders/StaticTestMesh.fx", "StaticTestMesh.fx");
+	VIDEO->CreateEffect("../resources/Shaders/SkinnedMesh.fx", "SkinnedMesh.fx");
+	VIDEO->CreateEffect("../resources/Shaders/TerrainBase.fx", "TerrainBase.fx");
 }
 
 RenderView *video::VideoDevice::GetRenderView(RenderViewHandle handle)
@@ -789,7 +790,7 @@ VertexBufferHandle video::VideoDevice::GetVertexBuffer(const std::string & name)
 	return _vertexBufferPool.Get(name);
 }
 
-const VertexBuffer * video::VideoDevice::GetVertexBuffer(VertexBufferHandle handle)
+VertexBuffer * video::VideoDevice::GetVertexBuffer(VertexBufferHandle handle)
 {
 	if (handle.IsValid())
 	{
@@ -804,10 +805,10 @@ void video::VideoDevice::DestroyVertexBuffer(VertexBufferHandle handle)
 	_vertexBufferPool.Remove(handle);
 }
 
-IndexBufferHandle video::VideoDevice::CreateIndexBuffer(Memory * memory, const std::string & name)
+IndexBufferHandle video::VideoDevice::CreateIndexBuffer(Memory * memory, uint32 stride, const std::string & name)
 {
 	IndexBufferHandle result = _indexBufferPool.Create(name);
-	if (!_indexBuffers[result.index].Create(memory->_size, memory->_data))
+	if (!_indexBuffers[result.index].Create(memory->_size, memory->_data, stride))
 	{
 		Assert(false);//Creation failed
 	}
@@ -819,7 +820,7 @@ IndexBufferHandle video::VideoDevice::GetIndexBuffer(const std::string & name)
 	return _indexBufferPool.Get(name);
 }
 
-const IndexBuffer * video::VideoDevice::GetIndexBuffer(IndexBufferHandle handle)
+IndexBuffer * video::VideoDevice::GetIndexBuffer(IndexBufferHandle handle)
 {
 	if (handle.IsValid())
 	{
@@ -846,10 +847,10 @@ VertexDeclHandle video::VideoDevice::GetVertexDecl(const std::string & name)
 	return _vertexDeclHandlePool.Get(name);
 }
 
-const VertexDecl & video::VideoDevice::GetVertexDecl(VertexDeclHandle handle)
+VertexDecl * video::VideoDevice::GetVertexDecl(VertexDeclHandle handle)
 {
 	Assert(handle.IsValid());
-	return _vertexDecls[handle.index];
+	return &_vertexDecls[handle.index];
 }
 
 void video::VideoDevice::DestroyVertexDecl(VertexDeclHandle handle)
@@ -875,7 +876,7 @@ TextureHandle video::VideoDevice::GetTexture(const std::string & name)
 	return _textureHandlePool.Get(name);
 }
 
-const Texture * video::VideoDevice::GetTexture(TextureHandle handle) 
+Texture * video::VideoDevice::GetTexture(TextureHandle handle) 
 {
 	if (handle.IsValid())
 	{
@@ -905,7 +906,7 @@ EffectHandle video::VideoDevice::GetEffect(const std::string & name)
 	return _effectHandlePool.Get(name);
 }
 
-const Effect * video::VideoDevice::GetEffect(EffectHandle handle)
+Effect * video::VideoDevice::GetEffect(EffectHandle handle)
 {
 	if (handle.IsValid())
 	{

@@ -118,7 +118,7 @@ namespace video
 	//Index Buffer
 	struct IndexBuffer
 	{
-		bool Create(uint32 size, void *data);
+		bool Create(uint32 size, void *data, uint32 stride);
 		void Update(uint32 size, void *data);
 		void Destroy();
 
@@ -127,6 +127,7 @@ namespace video
 
 		IDirect3DIndexBuffer9 *_ptr;
 		uint32 _size;
+		uint32 _stride;
 		bool32 _dynamic;
 	};
 
@@ -294,9 +295,11 @@ namespace video
 
 		void EndEffect() const;
 
+		void SetTechnique(LPCSTR name) const;
+
 		void SetUniform(PredefinedUniform::Enum uniform, void *data);
 
-		void SetMatrix(LPCSTR name, Matrix &matrix) const;
+		void SetMatrix(LPCSTR name, const Matrix &matrix) const;
 		void SetMatrices(LPCSTR name, const Matrix *matrix, uint32 numMatrices) const;
 		void SetTexture(const std::string &name, const Texture &texture) const;
 		void SetMaterial(const Material &material) const;
@@ -305,6 +308,9 @@ namespace video
 		void SetValue(LPCSTR name, void *value, size_t size);
 		void CommitChanges() const;
 
+		void DrawPrimitive(video::VertexBufferHandle vHandle, video::MaterialHandle mHandle) const;
+		void DrawPrimitiveIndex(video::VertexBufferHandle vHandle, video::IndexBufferHandle iHandle, 
+			video::MaterialHandle mHandle) const;
 		void DrawStaticMesh(const StaticXMesh &mesh, LPCSTR technique = nullptr) const;
 		void DrawSkinnedMesh(const SkinnedXMesh &mesh, SkinnedAnimation &animation, LPCSTR technique = nullptr) const;
 

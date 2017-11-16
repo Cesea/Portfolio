@@ -72,12 +72,6 @@
     <ClCompile Include="Ray.cpp">
       <Filter>Math</Filter>
     </ClCompile>
-    <ClCompile Include="Node.cpp">
-      <Filter>Game\GameUtils</Filter>
-    </ClCompile>
-    <ClCompile Include="TerrainConfig.cpp">
-      <Filter>Game\GameUtils\Terrain</Filter>
-    </ClCompile>
     <ClCompile Include="SceneManager.cpp">
       <Filter>Core\SubSystem\SceneeManager</Filter>
     </ClCompile>
@@ -159,11 +153,14 @@
     <ClCompile Include="TransformComponent.cpp">
       <Filter>Game\GameComponent\TransfromComponent</Filter>
     </ClCompile>
-    <ClCompile Include="AnimationUtils.cpp">
-      <Filter>Game\GameSystem\AnimationSystem</Filter>
-    </ClCompile>
     <ClCompile Include="VideoResource_Mesh.cpp">
       <Filter>Core\SubSystem\VideoDevice</Filter>
+    </ClCompile>
+    <ClCompile Include="QuadTree.cpp">
+      <Filter>Game\GameUtils\Terrain</Filter>
+    </ClCompile>
+    <ClCompile Include="Terrain.cpp">
+      <Filter>Game\GameUtils\Terrain</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -276,19 +273,7 @@
     <ClInclude Include="GameUtils.h">
       <Filter>Game\GameUtils</Filter>
     </ClInclude>
-    <ClInclude Include="Node.h">
-      <Filter>Game\GameUtils</Filter>
-    </ClInclude>
     <ClInclude Include="Terrain.h">
-      <Filter>Game\GameUtils\Terrain</Filter>
-    </ClInclude>
-    <ClInclude Include="TerrainConfig.h">
-      <Filter>Game\GameUtils\Terrain</Filter>
-    </ClInclude>
-    <ClInclude Include="TerrainNode.h">
-      <Filter>Game\GameUtils\Terrain</Filter>
-    </ClInclude>
-    <ClInclude Include="TerrainQuadTree.h">
       <Filter>Game\GameUtils\Terrain</Filter>
     </ClInclude>
     <ClInclude Include="WorldEditor.h">
@@ -393,9 +378,6 @@
     <ClInclude Include="VideoVertexFormat.h">
       <Filter>Core\SubSystem\VideoDevice</Filter>
     </ClInclude>
-    <ClInclude Include="AnimationUtils.h">
-      <Filter>Game\GameSystem\AnimationSystem</Filter>
-    </ClInclude>
     <ClInclude Include="GameSystems.h">
       <Filter>Game\GameSystem</Filter>
     </ClInclude>
@@ -422,6 +404,9 @@
     </ClInclude>
     <ClInclude Include="VideoResource_Mesh.h">
       <Filter>Core\SubSystem\VideoDevice</Filter>
+    </ClInclude>
+    <ClInclude Include="QuadTree.h">
+      <Filter>Game\GameUtils\Terrain</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

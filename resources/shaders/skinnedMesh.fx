@@ -30,88 +30,123 @@ sampler2D Specular = sampler_state
 };
 
 
-extern float4x4 FinalTransforms[45]; 
+extern float4x4 FinalTransforms[40]; 
 extern int NumVertInfluences = 2; // <--- Normally set dynamically.
 
 float4x4 matWorld : World;
+float4x4 staticWorld;
 float4x4 matViewProjection : ViewProjection;
 float4 vEyePos;
 
-struct VS_INPUT
+struct vs_input
 {
-    float3  Position        : POSITION;
-    float3  BlendWeights    : BLENDWEIGHT;
-    float4  BlendIndices    : BLENDINDICES;
-    float3  Normal          : NORMAL;
+    float3  position        : POSITION;
+    float3  blendWeights    : BLENDWEIGHT;
+    float4  blendIndices    : BLENDINDICES;
+    float3  normal          : NORMAL;
     //float3  Tangent         : TANGENT;
     //float3  Binormal        : Binormal;
-    float2  Texcoord        : TEXCOORD0;
+    float2  texcoord        : TEXCOORD0;
 };
 
-struct VS_OUTPUT
+struct vs_out 
 {
-    float4  Position		: POSITION;
-    float2  Texcoord        : TEXCOORD0;
-	float3  Normal          : TEXCOORD1;
-	float3  Binormal        : TEXCOORD2;
-	float3  Tangent         : TEXCOORD3;
+    float4  position		: POSITION;
+    float2  texcoord        : TEXCOORD0;
+	float3  normal          : TEXCOORD1;
+	float3  binormal        : TEXCOORD2;
+	float3  tangent         : TEXCOORD3;
 	float3  viewDir			: TEXCOORD4;
 	float3  worldPos		: TEXCOORD5;
-	float4 FinalPos : TEXCOORD6;
+	float4 finalPos : TEXCOORD6;
 };
 
-//버택스 진입
-VS_OUTPUT VertSkinning(VS_INPUT Input)
+//Skinning Vertex Shader//////////////////
+vs_out vs_skinning(vs_input input)
 {
-    VS_OUTPUT Output;
+    vs_out result;
 
     float4 p = float4(0.0f, 0.0f, 0.0f, 1.0f);
     float3 norm = float3(0.0f, 0.0f, 0.0f);
     float lastWeight = 0.0f;
     int n = NumVertInfluences - 1;
 
-	Input.Normal = normalize(Input.Normal);
+	input.normal = normalize(input.normal);
 
     for(int i = 0; i < n; ++i)
     {
-        lastWeight += Input.BlendWeights[i];
-	    p += Input.BlendWeights[i] * mul(float4(Input.Position, 1.0f), FinalTransforms[Input.BlendIndices[i]]);
-	    norm += Input.BlendWeights[i] * (float3)mul(float4(Input.Normal, 0.0f), FinalTransforms[Input.BlendIndices[i]]);
+        lastWeight += input.blendWeights[i];
+	    p += input.blendWeights[i] * mul(float4(input.position, 1.0f), FinalTransforms[input.blendIndices[i]]);
+	    norm += input.blendWeights[i] * (float3)mul(float4(input.normal, 0.0f), FinalTransforms[input.blendIndices[i]]);
     }
     lastWeight = 1.0f - lastWeight;
 
-	p += lastWeight *  mul(float4(Input.Position, 1.0f), FinalTransforms[Input.BlendIndices[n]]);
-	norm += lastWeight * (float3)mul(float4(Input.Normal, 0.0f), FinalTransforms[Input.BlendIndices[n]]);
+	p += lastWeight *  mul(float4(input.position, 1.0f), FinalTransforms[input.blendIndices[n]]);
+	norm += lastWeight * (float3)mul(float4(input.normal, 0.0f), FinalTransforms[input.blendIndices[n]]);
 
     p.w = 1.0f;    	
 	float4 posWorld = mul(p, matWorld);
-    Output.Position = mul(posWorld, matViewProjection);
-    Output.Texcoord = Input.Texcoord;
+    result.position = mul(posWorld, matViewProjection);
+    result.texcoord = input.texcoord;
 
-	Output.Normal = float3(0.0f, 0.0f, 0.0f);
-	Output.Binormal = float3(0.0f, 0.0f, 0.0f);
-	Output.Tangent = float3(0.0f, 0.0f, 0.0f);
-	Output.viewDir = float3(0.0f, 0.0f, 0.0f);
-	Output.worldPos = float3(0.0f, 0.0f, 0.0f);
-	Output.FinalPos = float4(0.0f, 0.0f, 0.0f, 0.0f);
+	result.normal = float3(0.0f, 0.0f, 0.0f);
+	result.binormal = float3(0.0f, 0.0f, 0.0f);
+	result.tangent = float3(0.0f, 0.0f, 0.0f);
+	result.viewDir = float3(0.0f, 0.0f, 0.0f);
+	result.worldPos = float3(0.0f, 0.0f, 0.0f);
+	result.finalPos = float4(0.0f, 0.0f, 0.0f, 0.0f);
 
-    return Output;
+    return result;
 }
 
-float4 ps_main(VS_OUTPUT input) : COLOR
+//Normal Vertex Shader //////////////////
+vs_out vs_normal(vs_input input)
 {
-	return tex2D(Diffuse, input.Texcoord);
+	vs_out result = (vs_out)0;
+
+    float4 p = float4(0.0f, 0.0f, 0.0f, 1.0f);
+    float3 norm = float3(0.0f, 0.0f, 0.0f);
+
+	input.normal = normalize(input.normal);
+
+	p = mul(float4(input.position, 1.0f), staticWorld);
+	result.position = mul(p, matViewProjection);
+	result.texcoord = input.texcoord;
+
+	result.normal = float3(0.0f, 0.0f, 0.0f);
+	result.binormal = float3(0.0f, 0.0f, 0.0f);
+	result.tangent = float3(0.0f, 0.0f, 0.0f);
+	result.viewDir = float3(0.0f, 0.0f, 0.0f);
+	result.worldPos = float3(0.0f, 0.0f, 0.0f);
+	result.finalPos = float4(0.0f, 0.0f, 0.0f, 0.0f);
+
+    return result;
+}
+
+
+float4 ps_main(vs_out input) : COLOR
+{
+	return tex2D(Diffuse, input.texcoord);
 }
 
 //--------------------------------------------------------------------------------------
 // Techniques
 //--------------------------------------------------------------------------------------
 
-technique Base
+technique Skinning
 {
     pass p0
     {
-        VertexShader = compile vs_3_0 VertSkinning();
+        VertexShader = compile vs_3_0 vs_skinning();
+		PixelShader = compile ps_3_0 ps_main();
+    }
+}
+
+technique Basic
+{
+    pass p0
+    {
+        VertexShader = compile vs_3_0 vs_normal();
 		PixelShader = compile ps_3_0 ps_main();
     }
 }

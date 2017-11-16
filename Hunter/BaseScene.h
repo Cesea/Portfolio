@@ -9,6 +9,8 @@
 
 #include "TransformSystem.h"
 
+#include "Terrain.h"
+
 #include "Camera.h"
 
 class BaseScene : public IScene
@@ -69,10 +71,13 @@ protected :
 	video::StaticXMeshHandle _staticMeshHandle;
 	video::EffectHandle _staticEffect;
 	video::EffectHandle _skinnedEffect;
+	video::EffectHandle _terrainEffect;
 
 	video::SkinnedXMesh *_pMesh;
 
-	video::SkinnedAnimation _animation[100];
+	video::SkinnedAnimation _animation[9];
+
+	Terrain _terrain;
 };
 
 

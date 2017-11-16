@@ -55,31 +55,31 @@ namespace video
 		//버텍스 버퍼 생성
 		VertexBufferHandle CreateVertexBuffer(Memory *memory, VertexDeclHandle declHandle, const std::string &name = "");
 		VertexBufferHandle GetVertexBuffer(const std::string &name);
-		const VertexBuffer *GetVertexBuffer(VertexBufferHandle handle);
+		VertexBuffer *GetVertexBuffer(VertexBufferHandle handle);
 		void DestroyVertexBuffer(VertexBufferHandle handle);
 
 		//인덱스 버퍼 생성
-		IndexBufferHandle CreateIndexBuffer(Memory *memory, const std::string &name = "");
+		IndexBufferHandle CreateIndexBuffer(Memory *memory, uint32 stride, const std::string &name = "");
 		IndexBufferHandle GetIndexBuffer(const std::string &name);
-		const IndexBuffer *GetIndexBuffer(IndexBufferHandle handle);
+		IndexBuffer *GetIndexBuffer(IndexBufferHandle handle);
 		void DestroyIndexBuffer(IndexBufferHandle handle);
 
 		//버텍스 데클 생성
 		VertexDeclHandle CreateVertexDecl(const VertexDecl *decl, const std::string &name = "");
 		VertexDeclHandle GetVertexDecl(const std::string &name);
-		const VertexDecl &GetVertexDecl(VertexDeclHandle handle);
+		VertexDecl *GetVertexDecl(VertexDeclHandle handle);
 		void DestroyVertexDecl(VertexDeclHandle handle);
 
 		//텍스쳐 생성
 		TextureHandle CreateTexture(const std::string &fileName, const std::string &name = "");
 		TextureHandle GetTexture(const std::string &name);
-		const Texture *GetTexture(TextureHandle handle);
+		Texture *GetTexture(TextureHandle handle);
 		void DestroyTexture(TextureHandle handle);
 
 		//이펙트 생성
 		EffectHandle CreateEffect(const std::string &fileName, const std::string &name = "");
 		EffectHandle GetEffect(const std::string &name);
-		const Effect *GetEffect(EffectHandle handle);
+		Effect *GetEffect(EffectHandle handle);
 		void DestroyEffect(EffectHandle handle);
 
 		//렌더 뷰 생성
