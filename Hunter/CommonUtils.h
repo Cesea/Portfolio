@@ -18,6 +18,17 @@
 constexpr float EPSILON = 0.001f;
 constexpr float ONE_RAD = 0.017453f;
 
+inline int32 Index2D(int32 x, int32 y, int32 xMax)
+{
+	return x + (xMax * y);
+}
+
+//NOTE : 이게 맞나??
+//inline int32 index3D(int32 x, int32 y, int32 z, int32 xMax, int32 yMax)
+//{
+//	return x + (x * y) + (x * y * z);
+//}
+
 inline bool IsCharacter(WPARAM wParam)
 {
 	bool result = false;

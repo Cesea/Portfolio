@@ -32,7 +32,7 @@ bool32 BaseScene::Init()
 	_renderView->_clearColor = 0xff55330;
 
 	_camera.SetRotationSpeed(0.1f);
-	_camera.SetMoveSpeed(3.0f);
+	_camera.SetMoveSpeed(20.0f);
 
 	_world.AddSystem<RenderSystem>(_renderSystem);
 	_world.AddSystem<TransformSystem>(_transformSystem);
@@ -43,16 +43,19 @@ bool32 BaseScene::Init()
 	Entity &entity = _entities.back();
 
 	Matrix correctionMat;
-	MatrixScaling(&correctionMat, 0.1f, 0.1f, 0.1f);
+	MatrixScaling(&correctionMat, 0.05f, 0.05f, 0.05f);
 	//_meshHandle = VIDEO->CreateStaticXMesh("../resources/models/Knight/Knight.x", &correctionMat, "Knight");
 
 
 	//_staticMeshHandle = VIDEO->CreateStaticXMesh("../resources/models/Snake/Snake.X", &correctionMat, "Snake");
-	_skinnedMeshHandle = VIDEO->CreateSkinnedXMesh("../resources/models/Snake/Snake.X", &correctionMat, "Snake");
-	//_skinnedMeshHandle = VIDEO->CreateSkinnedXMesh("../resources/models/Knight/Knight.X", &correctionMat, "Knight");
+	//_skinnedMeshHandle = VIDEO->CreateSkinnedXMesh("../resources/models/Snake/Snake.X", &correctionMat, "Snake");
+	_skinnedMeshHandle = VIDEO->CreateSkinnedXMesh("../resources/models/Knight/Knight.X", &correctionMat, "Knight");
 
-	_animation = new video::SkinnedAnimation;
-	_animation->Create(_skinnedMeshHandle);
+	for (int32 i = 0; i < 100; ++i)
+	{
+		_animation[i].Create(_skinnedMeshHandle);
+		_animation[i].Play(i % 10);
+	}
 
 	_staticEffect = VIDEO->GetEffect("staticMesh.fx");
 	_skinnedEffect = VIDEO->GetEffect("skinnedMesh.fx");
@@ -75,9 +78,17 @@ bool32 BaseScene::Update(float deltaTime)
 
 
 	Matrix world;
-	MatrixIdentity(&world);
-	_pMesh->Update(deltaTime, &world);
+	for (int32 y = 0; y < 10; ++y)
+	{
+		for (int32 x = 0; x < 10; ++x)
+		{
+			int32 index = Index2D(x, y, 10);
+			MatrixTranslation(&world, x, 0.0f, y);
+			_animation[index].UpdateAnimation(deltaTime);
+			_animation[index].UpdateMatrixPalettes(&world);
 
+		}
+	}
 
 	//Update Camera
 	_transformSystem.UpdateTransform(_camera.GetTransform());
@@ -105,8 +116,11 @@ bool32 BaseScene::Render()
 	effect->SetMatrix("matWorld", world);
 	effect->SetMatrix("matViewProjection", _camera.GetViewMatrix() * _camera.GetProjectionMatrix());
 	//effect->DrawStaticMesh(*staticMesh);
-	effect->DrawSkinnedMesh(*_pMesh);
 
+	for (uint32 i = 0; i < 1; ++i)
+	{
+		effect->DrawSkinnedMesh(*_pMesh, _animation[i]._workingPalettes);
+	}
 
 	gpDevice->EndScene();
 	gpDevice->Present(nullptr, nullptr, NULL, nullptr);
@@ -136,44 +150,43 @@ void BaseScene::RegisterEvents()
 
 void BaseScene::Handle(const InputManager::KeyPressedEvent & event)
 {
-	switch (event.code)
-	{
-	case '1':
-	{
-		_pMesh->Play(1, 1.0f);
-	}break;
-	case '2':
-	{
-		_pMesh->Play(2, 1.0f);
-	}break;
-	case '3':
-	{
-		_pMesh->Play(3, 1.0f);
-	}break;
-	case '4':
-	{
-		_pMesh->Play(4, 1.0f);
-	}break;
-	case '5':
-	{
-		_pMesh->Play(5, 1.0f);
-	}break;
-	case '6':
-	{
-		_pMesh->Play(6, 1.0f);
-	}break;
-	case '7':
-	{
-		_pMesh->Play(7, 1.0f);
-	}break;
-	case '8':
-	{
-		_pMesh->Play(8, 1.0f);
-	}break;
-	case '9':
-	{
-		_pMesh->Play(9, 1.0f);
-	}break;
-	}
-
+	//switch (event.code)
+	//{
+	//case '1':
+	//{
+	//	_pMesh->Play(1, 1.0f);
+	//}break;
+	//case '2':
+	//{
+	//	_pMesh->Play(2, 1.0f);
+	//}break;
+	//case '3':
+	//{
+	//	_pMesh->Play(3, 1.0f);
+	//}break;
+	//case '4':
+	//{
+	//	_pMesh->Play(4, 1.0f);
+	//}break;
+	//case '5':
+	//{
+	//	_pMesh->Play(5, 1.0f);
+	//}break;
+	//case '6':
+	//{
+	//	_pMesh->Play(6, 1.0f);
+	//}break;
+	//case '7':
+	//{
+	//	_pMesh->Play(7, 1.0f);
+	//}break;
+	//case '8':
+	//{
+	//	_pMesh->Play(8, 1.0f);
+	//}break;
+	//case '9':
+	//{
+	//	_pMesh->Play(9, 1.0f);
+	//}break;
+	//}
 }

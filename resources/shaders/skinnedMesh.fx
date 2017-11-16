@@ -2,12 +2,6 @@
 // SkinnedMesh Vertex Processing
 //------------------------------------------------------------------------------------
 
-#ifndef MATRIX_PALETTE_SIZE_DEFAULT
-#define MATRIX_PALETTE_SIZE_DEFAULT 35
-#endif
-
-
-
 uniform extern texture gTexture0;
 sampler2D Diffuse = sampler_state
 {
@@ -36,7 +30,7 @@ sampler2D Specular = sampler_state
 };
 
 
-extern float4x4 FinalTransforms[45]; 
+extern float4x4 FinalTransforms[60]; 
 extern int NumVertInfluences = 2; // <--- Normally set dynamically.
 
 float4x4 matWorld : World;

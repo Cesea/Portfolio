@@ -590,31 +590,30 @@ namespace video
 		//본 매트릭스 포인터 생성
 		InitBoneMatrixPointer((Bone*)_pRootBone);
 
-		_numAnimations = _pAnimationController->GetNumAnimationSets();
-		for (UINT i = 0; i < _numAnimations; i++)
-		{
-			LPD3DXANIMATIONSET animSet;
-			_pAnimationController->GetAnimationSet(i, &animSet);
-			_animations.push_back(animSet);
-			_animationTable.insert(std::make_pair( animSet->GetName(), animSet));
-			animSet->Release();
-		}
-
-		_pAnimationController->SetTrackAnimationSet(0, _animations[0]);
-
-		Play(0);
+		//_numAnimations = _pAnimationController->GetNumAnimationSets();
+		//for (UINT i = 0; i < _numAnimations; i++)
+		//{
+		//	LPD3DXANIMATIONSET animSet;
+		//	_pAnimationController->GetAnimationSet(i, &animSet);
+		//	_animations.push_back(animSet);
+		//	_animationTable.insert(std::make_pair( animSet->GetName(), animSet));
+		//	animSet->Release();
+		//}
+		//_pAnimationController->SetTrackAnimationSet(0, _animations[0]);
+		//Play(0);
 	}
 
 	void SkinnedXMesh::Destroy()
 	{
-		for (uint32 i = 0; i < _animations.size(); ++i)
-		{
-			COM_RELEASE(_animations[i]);
-		}
-		for (auto animSet : _animationTable)
-		{
-			COM_RELEASE(animSet.second);
-		}
+		//for (uint32 i = 0; i < _animations.size(); ++i)
+		//{
+		//	COM_RELEASE(_animations[i]);
+		//}
+		//for (auto animSet : _animationTable)
+		//{
+		//	COM_RELEASE(animSet.second);
+		//}
+
 		COM_RELEASE(_pAnimationController);
 
 		BoneHierachy hierarchy;
@@ -694,62 +693,8 @@ namespace video
 		}
 	}
 
-	void SkinnedXMesh::Update(float deltaTime, const Matrix * pWorld) 
+	void SkinnedXMesh::Update(const Matrix * pWorld) 
 	{
-		//우선 에니메이션을 업데이트 한다..
-		_pAnimationController->GetTrackDesc(0, &_playingTrackDesc);
-		//현재 얼마나 왔는지..
-		_animationPlayFactor = _playingTrackDesc.Position / _pPlayingAnimationSet->GetPeriod();
-
-		//마지막에 도달했다면...
-		if (_animationPlayFactor >= 1.0)
-		{
-			if (false == _looping)
-			{
-				//돌아갈 Animation 이 있다면..
-				if (nullptr != _pPrevPlayAnimationSet)
-				{
-					_crossFadeTime = _outCrossFadeTime;
-					_leftCrossFadeTime = _outCrossFadeTime;
-					_looping = true;
-					SetAnimation(_pPrevPlayAnimationSet);
-					_pPrevPlayAnimationSet = nullptr;
-				}
-				else
-				{
-					this->Stop();
-				}
-			}
-		}
-		_animationPlayFactor = _animationPlayFactor - (int32)_animationPlayFactor;
-
-		if (_playing)
-		{
-			_pAnimationController->AdvanceTime(deltaTime, nullptr);
-		}
-
-		//크로스 페이드가 진행중이라면..
-		if (_leftCrossFadeTime > 0.0f)
-		{
-			//남은 크로스페이드 시간 뺀다
-			_leftCrossFadeTime -= deltaTime;
-
-			//크로스페이드 가끝났다.
-			if (_leftCrossFadeTime <= 0.0f)
-			{
-				_pAnimationController->SetTrackWeight(0, 1);
-				_pAnimationController->SetTrackEnable(1, false);
-			}
-			else
-			{
-				float w1 = (_leftCrossFadeTime / _crossFadeTime);		//1번 Track 가중치
-				float w0 = 1.0f - w1;										//0번 Track 가중치
-
-				_pAnimationController->SetTrackWeight(0, w0);
-				_pAnimationController->SetTrackWeight(1, w1);
-			}
-		}
-
 		Matrix finalWorld;
 		if (nullptr != pWorld)
 		{
@@ -762,7 +707,7 @@ namespace video
 		UpdateMatrices(_pRootBone, &finalWorld);
 	}
 
-	void SkinnedXMesh::RenderBone(const video::Effect &effect, Bone *pBone) const
+	void SkinnedXMesh::RenderBone(const video::Effect &effect, Bone *pBone, const Matrix *matrixPalettes) const
 	{
 		if (nullptr == pBone)
 		{
@@ -775,30 +720,11 @@ namespace video
 			BoneMesh *pBoneMesh = (BoneMesh*)pBone->pMeshContainer;
 			if (nullptr != pBoneMesh->BufBoneCombos)
 			{
-				//해당 본의 컴비네이션 정보를 얻는다.
-				LPD3DXBONECOMBINATION pBoneComb = (LPD3DXBONECOMBINATION)(pBoneMesh->BufBoneCombos->GetBufferPointer());
-
 				//본에 물려있는 메쉬의 서브셋갯수을 속성그룹수와 같다
 				for (DWORD i = 0; i < pBoneMesh->NumAttributesGroup; i++)
 				{
-					//해당 속성의 팔래트 엔트리 수만큼 돌면서 작업용 팔래트 행렬 갱신
-					for (DWORD palEntry = 0; palEntry < pBoneMesh->NumPaletteEntries; palEntry++)
-					{
-						//적용되는 행렬 ID 를 얻는다
-						DWORD dwMatrixIndex = pBoneComb[i].BoneId[palEntry];
-
-						//행렬 인덱스가 유효하다면...
-						if (dwMatrixIndex != UINT_MAX)
-						{
-							//작업 앵렬을 만든다.
-							MatrixMultiply(&_workingPalettes[palEntry],
-								&(pBoneMesh->pBoneOffsetMatices[dwMatrixIndex]),
-								pBoneMesh->ppBoneMatrixPtrs[dwMatrixIndex]);
-						}
-					}
-
 					////위에서 셋팅됭 작업행렬을 Effect 팔래스에 적용한다.
-					HRESULT hr = effect._ptr->SetMatrixArray("FinalTransforms", (D3DXMATRIX *)_workingPalettes, pBoneMesh->NumPaletteEntries);
+					HRESULT hr = effect._ptr->SetMatrixArray("FinalTransforms", (D3DXMATRIX *)matrixPalettes, pBoneMesh->NumPaletteEntries);
 					//effect.SetMatrices("FinalTransforms", _workingPalettes, pBoneMesh->NumPaletteEntries);
 
 					////적용되는 정점의 본최대 영향수 를 대입 최대 영향수  -1 
@@ -820,119 +746,100 @@ namespace video
 		}
 		if (pBone->pFrameSibling)
 		{
-			RenderBone(effect, (Bone*)pBone->pFrameSibling);
+			RenderBone(effect, (Bone*)pBone->pFrameSibling, matrixPalettes);
 		}
 		if (pBone->pFrameFirstChild)
 		{
-			RenderBone(effect, (Bone*)pBone->pFrameFirstChild);
+			RenderBone(effect, (Bone*)pBone->pFrameFirstChild, matrixPalettes);
 		}
 	}
 
-	void SkinnedXMesh::Play(const std::string & animName, float crossFadeTime)
-	{
-		_playing = true;
-		_looping = true;
-
-		AnimationTable::iterator find = _animationTable.find(animName);
-		if (find != _animationTable.end()) 
-		{
-			//크로스 페이드 타임 기억
-			_crossFadeTime = crossFadeTime;
-			_leftCrossFadeTime = crossFadeTime;
-
-			this->SetAnimation(find->second);
-		}
-	}
-
-	void SkinnedXMesh::Play(int32 animIndex, float crossFadeTime)
-	{
-		_playing = true;
-		_looping = true;
-
-		if (animIndex < _numAnimations) 
-		{
-			_crossFadeTime = crossFadeTime;
-			_leftCrossFadeTime = crossFadeTime;
-
-			this->SetAnimation(_animations[animIndex]);
-		}
-	}
-
-	void SkinnedXMesh::PlayOneShot(const std::string & animName, float inCrossFadeTime, float outCrossFadeTime)
-	{
-		_playing = true;
-		_looping = true;
-
-		AnimationTable::iterator find = _animationTable.find(animName);
-		if (find != _animationTable.end()) 
-		{
-			_pPrevPlayAnimationSet = _pPlayingAnimationSet;
-
-			_crossFadeTime = inCrossFadeTime;
-			_leftCrossFadeTime = inCrossFadeTime;
-
-			_outCrossFadeTime = outCrossFadeTime;
-
-			this->SetAnimation(find->second);
-		}
-	}
-
-	void SkinnedXMesh::PlayOneShotAfterHold(const std::string & animName, float crossFadeTime)
-	{
-		_playing = true;
-		_looping = true;
-
-		AnimationTable::iterator find = _animationTable.find(animName);
-		if (find != _animationTable.end()) {
-
-			//돌아갈 Animation 은 없다
-			_pPrevPlayAnimationSet = nullptr;
-
-			//크로스 페이드 타임 기억
-			_crossFadeTime = crossFadeTime;
-			_leftCrossFadeTime = crossFadeTime;
-
-			this->SetAnimation(find->second);
-		}
-	}
-
-	void SkinnedXMesh::SetPlaySpeed(float speed)
-	{
-		_pAnimationController->SetTrackSpeed(0, speed);
-	}
-
-	void SkinnedXMesh::SetAnimation(LPD3DXANIMATIONSET animation)
-	{
-		if ((nullptr != _pPlayingAnimationSet) && (_pPlayingAnimationSet == animation))
-		{
-			return;
-		}
-
-		//크로스 페이드가 존재한다면..
-		if (_crossFadeTime > 0.0f)
-		{
-			//현제 Animation 을 1 번Track 으로 셋팅
-			_pAnimationController->SetTrackAnimationSet(1, _pPlayingAnimationSet);
-			_pAnimationController->SetTrackPosition(1, _playingTrackDesc.Position);	//이전에 플레이 되던 위치로 셋팅
-			_pAnimationController->SetTrackEnable(1, true); //1 번 Track 활성화
-			_pAnimationController->SetTrackWeight(1, 1.0f); //1 번 Track 가중치
-			_pAnimationController->SetTrackSpeed(1, _playingTrackDesc.Speed);		//속도 
-
-			_pAnimationController->SetTrackAnimationSet(0, animation);
-			_pAnimationController->SetTrackPosition(0, 0.0f);
-			_pAnimationController->SetTrackWeight(0, 0.0f);	//가중치는 0 으로 
-			_pPlayingAnimationSet = animation;
-		}
-		else
-		{
-			//Track 의 포지션을 맨압으로 돌린다.
-			_pAnimationController->SetTrackPosition(0, 0.0);
-			//매개변수로 받은 AnimationSet 으로 Animation 0 번 Track에 플레이
-			_pAnimationController->SetTrackAnimationSet(0, animation);
-			//현재 플레이 되고 있는 AnimationSet 갱신
-			_pPlayingAnimationSet = animation;
-		}
-	}
+	//void SkinnedXMesh::Play(const std::string & animName, float crossFadeTime)
+	//{
+	//	_playing = true;
+	//	_looping = true;
+	//	AnimationTable::iterator find = _animationTable.find(animName);
+	//	if (find != _animationTable.end()) 
+	//	{
+	//		//크로스 페이드 타임 기억
+	//		_crossFadeTime = crossFadeTime;
+	//		_leftCrossFadeTime = crossFadeTime;
+	//		this->SetAnimation(find->second);
+	//	}
+	//}
+	//void SkinnedXMesh::Play(int32 animIndex, float crossFadeTime)
+	//{
+	//	_playing = true;
+	//	_looping = true;
+	//	if (animIndex < _numAnimations) 
+	//	{
+	//		_crossFadeTime = crossFadeTime;
+	//		_leftCrossFadeTime = crossFadeTime;
+	//		this->SetAnimation(_animations[animIndex]);
+	//	}
+	//}
+	//void SkinnedXMesh::PlayOneShot(const std::string & animName, float inCrossFadeTime, float outCrossFadeTime)
+	//{
+	//	_playing = true;
+	//	_looping = true;
+	//	AnimationTable::iterator find = _animationTable.find(animName);
+	//	if (find != _animationTable.end()) 
+	//	{
+	//		_pPrevPlayAnimationSet = _pPlayingAnimationSet;
+	//		_crossFadeTime = inCrossFadeTime;
+	//		_leftCrossFadeTime = inCrossFadeTime;
+	//		_outCrossFadeTime = outCrossFadeTime;
+	//		this->SetAnimation(find->second);
+	//	}
+	//}
+	//void SkinnedXMesh::PlayOneShotAfterHold(const std::string & animName, float crossFadeTime)
+	//{
+	//	_playing = true;
+	//	_looping = true;
+	//	AnimationTable::iterator find = _animationTable.find(animName);
+	//	if (find != _animationTable.end()) {
+	//		//돌아갈 Animation 은 없다
+	//		_pPrevPlayAnimationSet = nullptr;
+	//		//크로스 페이드 타임 기억
+	//		_crossFadeTime = crossFadeTime;
+	//		_leftCrossFadeTime = crossFadeTime;
+	//		this->SetAnimation(find->second);
+	//	}
+	//}
+	//void SkinnedXMesh::SetPlaySpeed(float speed)
+	//{
+	//	_pAnimationController->SetTrackSpeed(0, speed);
+	//}
+	//void SkinnedXMesh::SetAnimation(LPD3DXANIMATIONSET animation)
+	//{
+	//	if ((nullptr != _pPlayingAnimationSet) && (_pPlayingAnimationSet == animation))
+	//	{
+	//		return;
+	//	}
+	//	//크로스 페이드가 존재한다면..
+	//	if (_crossFadeTime > 0.0f)
+	//	{
+	//		//현제 Animation 을 1 번Track 으로 셋팅
+	//		_pAnimationController->SetTrackAnimationSet(1, _pPlayingAnimationSet);
+	//		_pAnimationController->SetTrackPosition(1, _playingTrackDesc.Position);	//이전에 플레이 되던 위치로 셋팅
+	//		_pAnimationController->SetTrackEnable(1, true); //1 번 Track 활성화
+	//		_pAnimationController->SetTrackWeight(1, 1.0f); //1 번 Track 가중치
+	//		_pAnimationController->SetTrackSpeed(1, _playingTrackDesc.Speed);		//속도 
+	//		_pAnimationController->SetTrackAnimationSet(0, animation);
+	//		_pAnimationController->SetTrackPosition(0, 0.0f);
+	//		_pAnimationController->SetTrackWeight(0, 0.0f);	//가중치는 0 으로 
+	//		_pPlayingAnimationSet = animation;
+	//	}
+	//	else
+	//	{
+	//		//Track 의 포지션을 맨압으로 돌린다.
+	//		_pAnimationController->SetTrackPosition(0, 0.0);
+	//		//매개변수로 받은 AnimationSet 으로 Animation 0 번 Track에 플레이
+	//		_pAnimationController->SetTrackAnimationSet(0, animation);
+	//		//현재 플레이 되고 있는 AnimationSet 갱신
+	//		_pPlayingAnimationSet = animation;
+	//	}
+	//}
 
 	bool SkinnedAnimation::Create(video::SkinnedXMeshHandle handle)
 	{
@@ -942,6 +849,11 @@ namespace video
 		}
 
 		_pSkinnedMesh = VIDEO->GetSkinnedXMesh(handle);
+		Assert(_pSkinnedMesh);
+
+		_numPalette = _pSkinnedMesh->_numWorkingPalette;
+		Assert(_numPalette);
+		_workingPalettes = new Matrix[_numPalette];
 
 		//SKinned Mesh 에 Animation 를 복사한다.
 		_pSkinnedMesh->_pAnimationController->CloneAnimationController(
@@ -968,7 +880,7 @@ namespace video
 		COM_RELEASE(_pAnimationController);
 	}
 
-	void SkinnedAnimation::UpdateAnimation(float deltaTime, const Matrix * pWorld)
+	void SkinnedAnimation::UpdateAnimation(float deltaTime)
 	{
 		//우선 에니메이션을 업데이트 한다..
 		_pAnimationController->GetTrackDesc(0, &_playingTrackDesc);
@@ -1000,6 +912,7 @@ namespace video
 
 		if (_playing)
 		{
+			_pAnimationController->AdvanceTime(deltaTime, nullptr);
 			_animDelta = deltaTime;
 		}
 
@@ -1026,9 +939,57 @@ namespace video
 		}
 	}
 
-	void SkinnedAnimation::UpdateMesh(const Matrix * pWorld)
+	void SkinnedAnimation::UpdateMatrixPalettes(const Matrix * pWorld)
 	{
-		_pSkinnedMesh->Update(_animDelta, pWorld);
+		//로컬 행렬을 업데이트 한 후에...
+		_pSkinnedMesh->Update(pWorld);
+
+		UpdateMatrixPalettesInternal(_pSkinnedMesh->_pRootBone);
+	}
+
+	void SkinnedAnimation::UpdateMatrixPalettesInternal(Bone * pBone)
+	{
+		if (nullptr == pBone)
+		{
+			return;
+		}
+
+		if (pBone->pMeshContainer)
+		{
+			BoneMesh* pBoneMesh = (BoneMesh*)pBone->pMeshContainer;
+
+			if (nullptr != pBoneMesh->BufBoneCombos)
+			{
+				LPD3DXBONECOMBINATION pBoneCombinations = (LPD3DXBONECOMBINATION)pBoneMesh->BufBoneCombos->GetBufferPointer();
+				for (uint32 i = 0; i < pBoneMesh->NumAttributesGroup; ++i)
+				{
+					//해당 속성의 팔래트 엔트리 수만큼 돌면서 작업용 팔래트 행렬 갱신
+					for (uint32 palEntry = 0; palEntry < pBoneMesh->NumPaletteEntries; palEntry++)
+					{
+						//적용되는 행렬 ID 를 얻는다
+						DWORD dwMatrixIndex = pBoneCombinations[i].BoneId[palEntry];
+
+						//행렬 인덱스가 유효하다면...
+						if (dwMatrixIndex != UINT_MAX)
+						{
+							//작업 앵렬을 만든다.
+							MatrixMultiply(&_workingPalettes[palEntry],
+								&(pBoneMesh->pBoneOffsetMatices[dwMatrixIndex]),
+								pBoneMesh->ppBoneMatrixPtrs[dwMatrixIndex]);
+						}
+					}
+				}
+			}
+		}
+
+		if (pBone->pFrameSibling)
+		{
+			UpdateMatrixPalettesInternal((Bone*)pBone->pFrameSibling);
+		}
+		if (pBone->pFrameFirstChild)
+		{
+			UpdateMatrixPalettesInternal((Bone*)pBone->pFrameFirstChild);
+		}
 	}
 
 	void SkinnedAnimation::Play(const std::string & animName, float crossFadeTime)
@@ -1292,19 +1253,8 @@ STDMETHODIMP BoneHierachy::CreateMeshContainer(LPCSTR Name, CONST D3DXMESHDATA *
 
 		//본의 컴비네이션 은 메쉬의 Subset 별로 어떠한 본에 영향을 받는지에 대한 정보를 지니게 된다.
 		//본매트릭스 인덱스 = 본컴비네이션[Subset].BoneID[팔래트]
+		_pSkinnedMesh->_numWorkingPalette += boneMesh->NumPaletteEntries;
 
-		//cMesh_Skinned 에 작업에 사용되는 팔래트 행렬 수가 부족하면 
-		//다시 재할당 한다.
-		if (_pSkinnedMesh->_numWorkingPalette < boneMesh->NumPaletteEntries)
-		{
-			if (_pSkinnedMesh->_numWorkingPalette)
-			{
-				SAFE_DELETE_ARRAY(_pSkinnedMesh->_workingPalettes);
-			}
-
-			_pSkinnedMesh->_numWorkingPalette = boneMesh->NumPaletteEntries;
-			_pSkinnedMesh->_workingPalettes = new Matrix[boneMesh->NumPaletteEntries];
-		}
 	}
 	*ppNewMeshContainer = boneMesh;
 

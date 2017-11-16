@@ -72,7 +72,7 @@ protected :
 
 	video::SkinnedXMesh *_pMesh;
 
-	video::SkinnedAnimation *_animation;
+	video::SkinnedAnimation _animation[100];
 };
 
 

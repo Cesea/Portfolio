@@ -305,7 +305,7 @@ namespace video
 		void CommitChanges() const;
 
 		void DrawStaticMesh(const StaticXMesh &mesh, LPCSTR technique = nullptr) const;
-		void DrawSkinnedMesh(const SkinnedXMesh &mesh, LPCSTR technique = nullptr) const;
+		void DrawSkinnedMesh(const SkinnedXMesh &mesh, const Matrix *matrixPalettes, LPCSTR technique = nullptr) const;
 
 		ID3DXEffect *_ptr{};
 	};
