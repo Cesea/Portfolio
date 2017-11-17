@@ -52,6 +52,9 @@ protected :
 	Camera _camera;
 
 	video::StaticXMeshHandle _staticMeshHandle;
+	video::SkinnedXMeshHandle _skinnedMeshHandle;
+
+	std::vector<video::SkinnedAnimationHandle> _animations;
 
 	video::EffectHandle _staticEffect;
 	video::EffectHandle _skinnedEffect;

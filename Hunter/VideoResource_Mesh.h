@@ -23,6 +23,8 @@ struct BoneMesh : public D3DXMESHCONTAINER
 	Matrix** ppBoneMatrixPtrs{};		//본들의 행렬 [ 포인터 배열 ]
 	Matrix* pBoneOffsetMatices{};		//자신의 기본 행렬 배열
 
+	D3DXATTRIBUTERANGE *_attributeRange{};
+
 	DWORD NumPaletteEntries{};		//현본메쉬의 행렬팔래트 수
 	DWORD MaxNumFaceInfls{};		//해당 메시에 적용되는 정점하나당 최대 가중치 갯수
 	DWORD NumAttributesGroup{};		//메시의 속성 그룹수 ( 해당 메시에 메터리얼정보가 몇개있니? )

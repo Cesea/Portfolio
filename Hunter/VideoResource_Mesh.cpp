@@ -392,7 +392,6 @@ namespace video
 		//본 매트릭스 포인터 생성
 		InitBoneMatrixPointer((Bone*)_pRootBone);
 
-		int a = 0;
 	}
 
 	void SkinnedXMesh::Destroy()
@@ -536,6 +535,7 @@ namespace video
 		MatrixIdentity(&_world);
 
 		this->Play(0);
+		return true;
 	}
 
 	void SkinnedAnimation::Destroy()
@@ -652,7 +652,8 @@ namespace video
 					MatrixCache::CacheRange range = renderView._matrixCache.Add(_workingPalettes, _numPalette);
 
 					RenderCommand &command = renderView.GetCommand();
-					command._drawType = RenderCommand::DrawType::eStatic;
+					command._drawType = RenderCommand::DrawType::eAnimated;
+					command._vertInfluence = pBoneMesh->MaxNumFaceInfls;
 
 					command._vHandle = pBoneMesh->_vHandle;
 					command._iHandle = pBoneMesh->_iHandle;
@@ -670,6 +671,25 @@ namespace video
 			//스킨 정보가 없다면...
 			else
 			{
+				MatrixCache::CacheRange range = renderView._matrixCache.Add(&pBone->CombinedTransformationMatrix);
+				Assert(pBoneMesh->_attributeRange);
+				for (uint32 i = 0; i < pBoneMesh->NumMaterials; ++i)
+				{
+					RenderCommand &command = renderView.GetCommand();
+					command._drawType = RenderCommand::DrawType::eStatic;
+
+					command._vHandle = pBoneMesh->_vHandle;
+					command._iHandle = pBoneMesh->_iHandle;
+					command._cacheRange = range;
+
+					command._startIndex = pBoneMesh->_attributeRange[i].FaceStart * 3;
+					command._numVertices = pBoneMesh->_attributeRange[i].VertexCount;
+					command._numPrim = pBoneMesh->_attributeRange[i].FaceCount;
+
+					command._primType = RenderCommand::PrimType::eTriangleList;
+					command._materialHandle = pBoneMesh->_materialHandles[i];
+					command._effectHandle = staticEffect;
+				}
 
 			}
 		}
@@ -680,7 +700,7 @@ namespace video
 		}
 		if (pBone->pFrameFirstChild)
 		{
-			FillRenderCommandInternal(renderView, skinnedEffect, staticEffect, (Bone*)pBone->pFrameSibling);
+			FillRenderCommandInternal(renderView, skinnedEffect, staticEffect, (Bone*)pBone->pFrameFirstChild);
 		}
 
 	}
@@ -1064,6 +1084,14 @@ STDMETHODIMP BoneHierachy::CreateMeshContainer(LPCSTR Name, CONST D3DXMESHDATA *
 	}
 	else
 	{
+		HRESULT re = boneMesh->MeshData.pMesh->OptimizeInplace(D3DXMESHOPT_ATTRSORT | D3DXMESHOPT_COMPACT | D3DXMESHOPT_VERTEXCACHE,
+			pAdjacency, nullptr, nullptr, nullptr);
+
+		boneMesh->_attributeRange = new D3DXATTRIBUTERANGE[boneMesh->NumAttributesGroup];
+		Assert(boneMesh->_attributeRange);
+
+		boneMesh->MeshData.pMesh->GetAttributeTable(boneMesh->_attributeRange, &boneMesh->NumAttributesGroup);
+
 		boneMesh->_vHandle = VIDEO->GetVertexBufferFromXMesh(boneMesh->MeshData.pMesh);
 		boneMesh->_iHandle = VIDEO->GetIndexBufferFromXMesh(boneMesh->MeshData.pMesh);
 	}
@@ -1119,6 +1147,7 @@ STDMETHODIMP BoneHierachy::DestroyMeshContainer(LPD3DXMESHCONTAINER pMeshContain
 	SAFE_DELETE_ARRAY(boneMesh->Name);
 	SAFE_DELETE_ARRAY(boneMesh->pMaterials);
 	SAFE_DELETE_ARRAY(boneMesh->pAdjacency);
+	SAFE_DELETE_ARRAY(boneMesh->_attributeRange);
 
 	SAFE_RELEASE(boneMesh->MeshData.pMesh);
 	SAFE_RELEASE(boneMesh->WorkingMesh);

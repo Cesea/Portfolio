@@ -34,7 +34,20 @@ bool32 BaseScene::Init()
 	Matrix correctionMat;
 	MatrixScaling(&correctionMat, 0.1f, 0.1f, 0.1f);
 
-	_staticMeshHandle = VIDEO->CreateStaticXMesh("../resources/models/knight/Knight.X", &correctionMat, "aa");
+	//_staticMeshHandle = VIDEO->CreateStaticXMesh("../resources/models/knight/Knight.X", &correctionMat, "aa");
+	_skinnedMeshHandle = VIDEO->CreateSkinnedXMesh("../resources/models/knight/Knight.X", &correctionMat, "Knight");
+
+	_animations.reserve(16);
+	for (int32 i = 0; i < 16; ++i)
+	{
+		_animations.push_back(VIDEO->CreateSkinnedAnimation(_skinnedMeshHandle, "Anim" + std::to_string(i)));
+	}
+	for (int32 i = 0; i < 16; ++i)
+	{
+		video::SkinnedAnimation *pAnimation = VIDEO->GetSkinnedAnimation(_animations[i]);
+		pAnimation->Play(i);
+	}
+
 
 	_world.AddSystem<RenderSystem>(_renderSystem);
 	_world.AddSystem<TransformSystem>(_transformSystem);
@@ -73,6 +86,16 @@ bool32 BaseScene::Update(float deltaTime)
 
 	_transformSystem.PreUpdate(deltaTime);
 
+	int32 count = 0;
+	Matrix world;
+	for (auto &animHandle : _animations)
+	{
+		video::SkinnedAnimation *pAnimation = VIDEO->GetSkinnedAnimation(animHandle);
+		MatrixTranslation(&world, count * 5, 0, 0);
+		pAnimation->UpdateAnimation(deltaTime, world);
+		count++;
+	}
+
 	//Update Camera
 	_transformSystem.UpdateTransform(_camera.GetTransform());
 	_camera.UpdateMatrix();
@@ -85,17 +108,24 @@ bool32 BaseScene::Update(float deltaTime)
 
 bool32 BaseScene::Render()
 {
-	video::StaticXMesh *pMesh = VIDEO->GetStaticXMesh(_staticMeshHandle);
+	//video::StaticXMesh *pMesh = VIDEO->GetStaticXMesh(_staticMeshHandle);
 
-	Matrix matrix;
-	for (int32 y = 0; y < 8; ++y)
+	for (auto &animHandle : _animations)
 	{
-		for (int32 x = 0; x < 8; ++x)
-		{
-			MatrixTranslation(&matrix, x * 5, 0, y * 5);
-			pMesh->FillRenderCommand(*_mainRenderView, _staticEffect, &matrix);
-		}
+		video::SkinnedAnimation *pAnimation = VIDEO->GetSkinnedAnimation(animHandle);
+		pAnimation->UpdateMesh();
+		pAnimation->FillRenderCommand(*_mainRenderView, _skinnedEffect, _staticEffect);
 	}
+
+	//Matrix matrix;
+	//for (int32 y = 0; y < 8; ++y)
+	//{
+	//	for (int32 x = 0; x < 8; ++x)
+	//	{
+	//		MatrixTranslation(&matrix, x * 5, 0, y * 5);
+	//		pMesh->FillRenderCommand(*_mainRenderView, _staticEffect, &matrix);
+	//	}
+	//}
 
 	_mainRenderView->PreRender();
 	_mainRenderView->ExecCommands();

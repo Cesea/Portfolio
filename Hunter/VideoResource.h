@@ -380,7 +380,7 @@ namespace video
 		VertexBufferHandle _vHandle;
 		IndexBufferHandle _iHandle;
 
-		//AnimationHandle animHandle;
+		int16 _vertInfluence;
 
 		//버텍스 버퍼로만 그릴때 사용된다
 		uint32 _startVertex{};
