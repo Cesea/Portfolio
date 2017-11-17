@@ -339,13 +339,23 @@ namespace video
 		//}
 	}
 
-	void StaticXMesh::FillRenderCommand(RenderView &renderView, video::EffectHandle effect)
+	void StaticXMesh::FillRenderCommand(RenderView &renderView, video::EffectHandle effect, const Matrix *pMatrix)
 	{
+		MatrixCache::CacheRange range;
+		if (nullptr != pMatrix)
+		{
+			range = renderView._matrixCache.Add(pMatrix);
+
+		}
+
 		for (uint32 i = 0; i < _numMaterial; ++i)
 		{
 			RenderCommand &command = renderView.GetCommand();
-			command.vHandle = _vHandle;
-			command.iHandle = _iHandle;
+			command._drawType = RenderCommand::DrawType::eStatic;
+
+			command._vHandle = _vHandle;
+			command._iHandle = _iHandle;
+			command._cacheRange = range;
 
 			command._startIndex = _attributeRange[i].FaceStart * 3;
 			command._numVertices = _attributeRange[i].VertexCount;
@@ -357,7 +367,7 @@ namespace video
 		}
 	}
 
-
+	//Skinned XMesh ////////////////////////////////////////////////////////
 	bool SkinnedXMesh::Create(const std::string & fileName, const Matrix * matCorrection)
 	{
 		if (nullptr != matCorrection)
@@ -490,103 +500,387 @@ namespace video
 		UpdateMatrices(_pRootBone, &finalWorld);
 	}
 
-	void SkinnedXMesh::RenderBone(const video::Effect &effect, Bone *pBone, animation::AnimationComponent &animation) const
+
+	//Skinned Animation ////////////////////////////////////////////////////////
+	bool SkinnedAnimation::Create(video::SkinnedXMeshHandle handle)
+	{
+		if (!handle.IsValid())
+		{
+			return false;
+		}
+
+		_pSkinnedMesh = VIDEO->GetSkinnedXMesh(handle);
+		Assert(_pSkinnedMesh);
+
+		_numPalette = _pSkinnedMesh->_numWorkingPalette;
+		Assert(_numPalette);
+		_workingPalettes = new Matrix[_numPalette];
+
+		//SKinned Mesh 에 Animation 를 복사한다.
+		_pSkinnedMesh->_pAnimationController->CloneAnimationController(
+			_pSkinnedMesh->_pAnimationController->GetMaxNumAnimationOutputs(),
+			_pSkinnedMesh->_pAnimationController->GetMaxNumAnimationSets(),
+			_pSkinnedMesh->_pAnimationController->GetMaxNumTracks(),
+			_pSkinnedMesh->_pAnimationController->GetMaxNumEvents(), &_pAnimationController);
+
+		//Animation 갯수를 얻는다.
+		_numAnimation = _pAnimationController->GetNumAnimationSets();
+		for (UINT i = 0; i < _numAnimation; i++)
+		{
+			LPD3DXANIMATIONSET animSet;
+			_pAnimationController->GetAnimationSet(i, &animSet);
+			this->_animations.push_back(animSet);
+			this->_animationTable.insert(std::make_pair(animSet->GetName(), animSet));
+		}
+
+		MatrixIdentity(&_world);
+
+		this->Play(0);
+	}
+
+	void SkinnedAnimation::Destroy()
+	{
+		COM_RELEASE(_pAnimationController);
+	}
+
+	void SkinnedAnimation::UpdateAnimation(float deltaTime, const Matrix &world)
+	{
+		_pAnimationController->GetTrackDesc(0, &_playingTrackDesc);
+		//현재 얼마나 왔는지..
+		_animationPlayFactor = _playingTrackDesc.Position / _pPlayingAnimationSet->GetPeriod();
+
+		//마지막에 도달했다면...
+		if (_animationPlayFactor >= 1.0)
+		{
+			if (false == _looping)
+			{
+				//돌아갈 Animation 이 있다면..
+				if (nullptr != _pPrevPlayAnimationSet)
+				{
+					_crossFadeTime = _outCrossFadeTime;
+					_leftCrossFadeTime = _outCrossFadeTime;
+					_looping = true;
+					SetAnimation(_pPrevPlayAnimationSet);
+					_pPrevPlayAnimationSet = nullptr;
+				}
+				else
+				{
+					this->Stop();
+				}
+			}
+		}
+
+		_animationPlayFactor = _animationPlayFactor - (int32)_animationPlayFactor;
+
+		if (_playing)
+		{
+			_animDelta = deltaTime;
+		}
+
+		//크로스 페이드가 진행중이라면..
+		if (_leftCrossFadeTime > 0.0f)
+		{
+			//남은 크로스페이드 시간 뺀다
+			_leftCrossFadeTime -= deltaTime;
+
+			//크로스페이드 가끝났다.
+			if (_leftCrossFadeTime <= 0.0f)
+			{
+				_pAnimationController->SetTrackWeight(0, 1);
+				_pAnimationController->SetTrackEnable(1, false);
+			}
+			else
+			{
+				float w1 = (_leftCrossFadeTime / _crossFadeTime);		//1번 Track 가중치
+				float w0 = 1.0f - w1;										//0번 Track 가중치
+
+				_pAnimationController->SetTrackWeight(0, w0);
+				_pAnimationController->SetTrackWeight(1, w1);
+			}
+		}
+		_world = world;
+	}
+
+	void SkinnedAnimation::UpdateMesh()
+	{
+		//로컬 행렬을 업데이트 한 후에...
+		_pSkinnedMesh->Update(&_world);
+		_pAnimationController->AdvanceTime(_animDelta, nullptr);
+		_animDelta = 0.0f;
+	}
+
+	void SkinnedAnimation::FillRenderCommand(RenderView & renderView, 
+		video::EffectHandle skinnedEffect, video::EffectHandle staticEffect)
+	{
+		FillRenderCommandInternal(renderView, skinnedEffect, staticEffect, _pSkinnedMesh->_pRootBone);
+	}
+
+	void SkinnedAnimation::FillRenderCommandInternal(RenderView & renderView, 
+		video::EffectHandle skinnedEffect, video::EffectHandle staticEffect, Bone *pBone)
 	{
 		if (nullptr == pBone)
 		{
 			return;
 		}
 
-		//본에 메쉬 컨테이너가 존재한다면 그려야한다.
 		if (pBone->pMeshContainer)
 		{
-			BoneMesh *pBoneMesh = (BoneMesh*)pBone->pMeshContainer;
-			//본이 있는 메쉬를 그릴때....
+			BoneMesh* pBoneMesh = (BoneMesh*)pBone->pMeshContainer;
+
+			//만약 본이 있고 스킨 정보가 있다면
 			if (nullptr != pBoneMesh->BufBoneCombos)
 			{
-				//TODO : 여기서 월드 행렬을 매번 설정 해 주어야 할까??
-				Matrix world;
-				MatrixIdentity(&world);
-				effect.SetMatrix("matWorld", world);
-
-				//본에 물려있는 메쉬의 서브셋갯수을 속성그룹수와 같다
-				for (DWORD i = 0; i < pBoneMesh->NumAttributesGroup; i++)
+				LPD3DXBONECOMBINATION pBoneCombinations = (LPD3DXBONECOMBINATION)pBoneMesh->BufBoneCombos->GetBufferPointer();
+				for (uint32 i = 0; i < pBoneMesh->NumAttributesGroup; ++i)
 				{
-					if (nullptr != pBoneMesh->BufBoneCombos)
+					//해당 속성의 팔래트 엔트리 수만큼 돌면서 작업용 팔래트 행렬 갱신
+					for (uint32 palEntry = 0; palEntry < pBoneMesh->NumPaletteEntries; palEntry++)
 					{
-						LPD3DXBONECOMBINATION pBoneCombinations =
-							(LPD3DXBONECOMBINATION)pBoneMesh->BufBoneCombos->GetBufferPointer();
+						//적용되는 행렬 ID 를 얻는다
+						DWORD dwMatrixIndex = pBoneCombinations[i].BoneId[palEntry];
 
-						for (uint32 palEntry = 0; palEntry < pBoneMesh->NumPaletteEntries; ++palEntry)
+						//행렬 인덱스가 유효하다면...
+						if (dwMatrixIndex != UINT_MAX)
 						{
-							//적용되는 행렬 ID 를 얻는다
-							DWORD dwMatrixIndex = pBoneCombinations[i].BoneId[palEntry];
-
-							//행렬 인덱스가 유효하다면...
-							if (dwMatrixIndex != UINT_MAX)
-							{
-								//작업 앵렬을 만든다.
-								MatrixMultiply(&animation._workingPalettes[palEntry],
-									&(pBoneMesh->pBoneOffsetMatices[dwMatrixIndex]),
-									pBoneMesh->ppBoneMatrixPtrs[dwMatrixIndex]);
-							}
+							//작업 앵렬을 만든다.
+							MatrixMultiply(&_workingPalettes[palEntry],
+								&(pBoneMesh->pBoneOffsetMatices[dwMatrixIndex]),
+								pBoneMesh->ppBoneMatrixPtrs[dwMatrixIndex]);
 						}
 					}
 
-					////위에서 셋팅됭 작업행렬을 Effect 팔래스에 적용한다.
-					HRESULT hr = effect._ptr->SetMatrixArray("FinalTransforms", (D3DXMATRIX *)animation._workingPalettes, pBoneMesh->NumPaletteEntries);
-					//effect.SetMatrices("FinalTransforms", _workingPalettes, pBoneMesh->NumPaletteEntries);
+					MatrixCache::CacheRange range = renderView._matrixCache.Add(_workingPalettes, _numPalette);
 
-					////적용되는 정점의 본최대 영향수 를 대입 최대 영향수  -1 
-					effect.SetInt("NumVertInfluences", pBoneMesh->MaxNumFaceInfls - 1);
+					RenderCommand &command = renderView.GetCommand();
+					command._drawType = RenderCommand::DrawType::eStatic;
 
-					const Material *mat = VIDEO->GetMaterial(pBoneMesh->_materialHandles[i]);
-					effect.SetMaterial(*mat);
+					command._vHandle = pBoneMesh->_vHandle;
+					command._iHandle = pBoneMesh->_iHandle;
+					command._cacheRange = range;
 
-					effect.SetTechnique("Skinning");
+					command._startIndex = pBoneCombinations[i].FaceStart * 3;
+					command._numVertices = pBoneCombinations[i].VertexCount;
+					command._numPrim = pBoneCombinations[i].FaceCount;
 
-					uint32 numPass = effect.BeginEffect();
-					for (uint32 j = 0; j < numPass; ++j)
-					{
-						effect.BeginPass(j);
-						pBoneMesh->WorkingMesh->DrawSubset(i);
-						effect.EndPass();
-					}
-					effect.EndEffect();
+					command._primType = RenderCommand::PrimType::eTriangleList;
+					command._materialHandle = pBoneMesh->_materialHandles[i];
+					command._effectHandle = skinnedEffect;
 				}
-
 			}
+			//스킨 정보가 없다면...
 			else
 			{
-				effect.SetMatrix("staticWorld", pBone->CombinedTransformationMatrix);
-				for (DWORD i = 0; i < pBoneMesh->NumAttributesGroup; i++)
-				{
-					const Material *mat = VIDEO->GetMaterial(pBoneMesh->_materialHandles[i]);
-					effect.SetMaterial(*mat);
 
-					effect.SetTechnique("Basic");
-
-					uint32 numPass = effect.BeginEffect();
-					for (uint32 j = 0; j < numPass; ++j)
-					{
-						effect.BeginPass(j);
-						pBoneMesh->MeshData.pMesh->DrawSubset(i);
-						effect.EndPass();
-					}
-					effect.EndEffect();
-
-				}
 			}
 		}
+
 		if (pBone->pFrameSibling)
 		{
-			RenderBone(effect, (Bone*)pBone->pFrameSibling, animation);
+			FillRenderCommandInternal(renderView, skinnedEffect, staticEffect, (Bone*)pBone->pFrameSibling);
 		}
 		if (pBone->pFrameFirstChild)
 		{
-			RenderBone(effect, (Bone*)pBone->pFrameFirstChild, animation);
+			FillRenderCommandInternal(renderView, skinnedEffect, staticEffect, (Bone*)pBone->pFrameSibling);
+		}
+
+	}
+
+	void SkinnedAnimation::Play(const std::string & animName, float crossFadeTime)
+	{
+		_playing = true;
+		_looping = true;
+
+		AnimationTable::iterator find = _animationTable.find(animName);
+		if (find != _animationTable.end())
+		{
+			//크로스 페이드 타임 기억
+			_crossFadeTime = crossFadeTime;
+			_leftCrossFadeTime = crossFadeTime;
+
+			this->SetAnimation(find->second);
 		}
 	}
+
+	void SkinnedAnimation::Play(int32 animIndex, float crossFadeTime)
+	{
+		_playing = true;
+		_looping = true;
+
+		if (animIndex < _numAnimation)
+		{
+			_crossFadeTime = crossFadeTime;
+			_leftCrossFadeTime = crossFadeTime;
+
+			this->SetAnimation(_animations[animIndex]);
+		}
+	}
+
+	void SkinnedAnimation::PlayOneShot(const std::string & animName, float inCrossFadeTime, float outCrossFadeTime)
+	{
+		_playing = true;
+		_looping = true;
+
+		AnimationTable::iterator find = _animationTable.find(animName);
+		if (find != _animationTable.end())
+		{
+			_pPrevPlayAnimationSet = _pPlayingAnimationSet;
+
+			_crossFadeTime = inCrossFadeTime;
+			_leftCrossFadeTime = inCrossFadeTime;
+
+			_outCrossFadeTime = outCrossFadeTime;
+
+			this->SetAnimation(find->second);
+		}
+	}
+
+	void SkinnedAnimation::PlayOneShotAfterHold(const std::string & animName, float crossFadeTime)
+	{
+		_playing = true;
+		_looping = true;
+
+		AnimationTable::iterator find = _animationTable.find(animName);
+		if (find != _animationTable.end())
+		{
+			_pPrevPlayAnimationSet = nullptr;
+			_crossFadeTime = crossFadeTime;
+			_leftCrossFadeTime = crossFadeTime;
+			this->SetAnimation(find->second);
+		}
+	}
+
+	void SkinnedAnimation::SetPlaySpeed(float speed)
+	{
+		_pAnimationController->SetTrackSpeed(0, speed);
+	}
+
+	void SkinnedAnimation::SetAnimation(LPD3DXANIMATIONSET animation)
+	{
+		if ((nullptr != _pPlayingAnimationSet) && (_pPlayingAnimationSet == animation))
+		{
+			return;
+		}
+
+		//크로스 페이드가 존재한다면..
+		if (_crossFadeTime > 0.0f)
+		{
+			//현제 Animation 을 1 번Track 으로 셋팅
+			_pAnimationController->SetTrackAnimationSet(1, _pPlayingAnimationSet);
+			_pAnimationController->SetTrackPosition(1, _playingTrackDesc.Position);	//이전에 플레이 되던 위치로 셋팅
+			_pAnimationController->SetTrackEnable(1, true); //1 번 Track 활성화
+			_pAnimationController->SetTrackWeight(1, 1.0f); //1 번 Track 가중치
+			_pAnimationController->SetTrackSpeed(1, _playingTrackDesc.Speed);		//속도 
+
+			_pAnimationController->SetTrackAnimationSet(0, animation);
+			_pAnimationController->SetTrackPosition(0, 0.0f);
+			_pAnimationController->SetTrackWeight(0, 0.0f);	//가중치는 0 으로 
+			_pPlayingAnimationSet = animation;
+		}
+		else
+		{
+			_pAnimationController->SetTrackPosition(0, 0.0);
+			_pAnimationController->SetTrackAnimationSet(0, animation);
+			_pPlayingAnimationSet = animation;
+		}
+	}
+
+	//	void SkinnedXMesh::RenderBone(RenderView &renderView, Bone *pBone, AnimationHandle animHandle, video::EffectHandle effect) const
+//	{
+//		if (nullptr == pBone)
+//		{
+//			return;
+//		}
+//
+//		//본에 메쉬 컨테이너가 존재한다면 그려야한다.
+//		if (pBone->pMeshContainer)
+//		{
+//			BoneMesh *pBoneMesh = (BoneMesh*)pBone->pMeshContainer;
+//			//본이 있는 메쉬를 그릴때....
+//			if (nullptr != pBoneMesh->BufBoneCombos)
+//			{
+//				//TODO : 여기서 월드 행렬을 매번 설정 해 주어야 할까??
+//				Matrix world;
+//				MatrixIdentity(&world);
+//				effect.SetMatrix("matWorld", world);
+//
+//				//본에 물려있는 메쉬의 서브셋갯수을 속성그룹수와 같다
+//				for (DWORD i = 0; i < pBoneMesh->NumAttributesGroup; i++)
+//				{
+//					if (nullptr != pBoneMesh->BufBoneCombos)
+//					{
+//						LPD3DXBONECOMBINATION pBoneCombinations =
+//							(LPD3DXBONECOMBINATION)pBoneMesh->BufBoneCombos->GetBufferPointer();
+//
+//						for (uint32 palEntry = 0; palEntry < pBoneMesh->NumPaletteEntries; ++palEntry)
+//						{
+//							//적용되는 행렬 ID 를 얻는다
+//							DWORD dwMatrixIndex = pBoneCombinations[i].BoneId[palEntry];
+//
+//							//행렬 인덱스가 유효하다면...
+//							if (dwMatrixIndex != UINT_MAX)
+//							{
+//								//작업 앵렬을 만든다.
+//								MatrixMultiply(&animation._workingPalettes[palEntry],
+//									&(pBoneMesh->pBoneOffsetMatices[dwMatrixIndex]),
+//									pBoneMesh->ppBoneMatrixPtrs[dwMatrixIndex]);
+//							}
+//						}
+//					}
+//
+//					////위에서 셋팅됭 작업행렬을 Effect 팔래스에 적용한다.
+//					HRESULT hr = effect._ptr->SetMatrixArray("FinalTransforms", (D3DXMATRIX *)animation._workingPalettes, pBoneMesh->NumPaletteEntries);
+//					//effect.SetMatrices("FinalTransforms", _workingPalettes, pBoneMesh->NumPaletteEntries);
+//
+//					////적용되는 정점의 본최대 영향수 를 대입 최대 영향수  -1 
+//					effect.SetInt("NumVertInfluences", pBoneMesh->MaxNumFaceInfls - 1);
+//
+//					const Material *mat = VIDEO->GetMaterial(pBoneMesh->_materialHandles[i]);
+//					effect.SetMaterial(*mat);
+//
+//					effect.SetTechnique("Skinning");
+//
+//					uint32 numPass = effect.BeginEffect();
+//					for (uint32 j = 0; j < numPass; ++j)
+//					{
+//						effect.BeginPass(j);
+//						pBoneMesh->WorkingMesh->DrawSubset(i);
+//						effect.EndPass();
+//					}
+//					effect.EndEffect();
+//				}
+//
+//			}
+//			else
+//			{
+//				effect.SetMatrix("staticWorld", pBone->CombinedTransformationMatrix);
+//				for (DWORD i = 0; i < pBoneMesh->NumAttributesGroup; i++)
+//				{
+//					const Material *mat = VIDEO->GetMaterial(pBoneMesh->_materialHandles[i]);
+//					effect.SetMaterial(*mat);
+//
+//					effect.SetTechnique("Basic");
+//
+//					uint32 numPass = effect.BeginEffect();
+//					for (uint32 j = 0; j < numPass; ++j)
+//					{
+//						effect.BeginPass(j);
+//						pBoneMesh->MeshData.pMesh->DrawSubset(i);
+//						effect.EndPass();
+//					}
+//					effect.EndEffect();
+//
+//				}
+//			}
+//		}
+//		if (pBone->pFrameSibling)
+//		{
+//			RenderBone(effect, (Bone*)pBone->pFrameSibling, animation);
+//		}
+//		if (pBone->pFrameFirstChild)
+//		{
+//			RenderBone(effect, (Bone*)pBone->pFrameFirstChild, animation);
+//		}
+//	}
 }
 
 
@@ -714,9 +1008,8 @@ STDMETHODIMP BoneHierachy::CreateMeshContainer(LPCSTR Name, CONST D3DXMESHDATA *
 	//속성테이블을 얻는다.
 	boneMesh->MeshData.pMesh->GetAttributeTable(NULL, &boneMesh->NumAttributesGroup);
 																					
-	//NOTE : 아래에서 converteToIndexedblendMesh로 변환할떄 bonCombo를 얻는데 그 정보를 사용한다...
-	//boneMesh->MeshData.pMesh->GetAttributeTable( boneMesh->AttributeTable, NULL );//속성 테이블을 얻는다.
 
+	//SkinInfo가 있다면, 여기서 WorkingMesh로 인덱스 버퍼를 얻고 아니라면 MeshData안에 있는 메쉬로 버퍼를 가져온다.
 	if (nullptr != pSkinInfo)
 	{
 		boneMesh->pSkinInfo = pSkinInfo;
@@ -766,10 +1059,16 @@ STDMETHODIMP BoneHierachy::CreateMeshContainer(LPCSTR Name, CONST D3DXMESHDATA *
 		{
 			_pSkinnedMesh->_numWorkingPalette = boneMesh->NumPaletteEntries;
 		}
-
+		boneMesh->_vHandle = VIDEO->GetVertexBufferFromXMesh(boneMesh->WorkingMesh);
+		boneMesh->_iHandle = VIDEO->GetIndexBufferFromXMesh(boneMesh->WorkingMesh);
 	}
-	*ppNewMeshContainer = boneMesh;
+	else
+	{
+		boneMesh->_vHandle = VIDEO->GetVertexBufferFromXMesh(boneMesh->MeshData.pMesh);
+		boneMesh->_iHandle = VIDEO->GetIndexBufferFromXMesh(boneMesh->MeshData.pMesh);
+	}
 
+	*ppNewMeshContainer = boneMesh;
 	
 	auto found = this->_pSkinnedMesh->_meshTable.find(Name);
 	if (found == this->_pSkinnedMesh->_meshTable.end())
@@ -804,6 +1103,8 @@ STDMETHODIMP BoneHierachy::DestroyMeshContainer(LPD3DXMESHCONTAINER pMeshContain
 	//boneMesh 로 형변환
 	BoneMesh* boneMesh = (BoneMesh*)pMeshContainerToFree;
 
+	VIDEO->DestroyVertexBuffer(boneMesh->_vHandle);
+	VIDEO->DestroyIndexBuffer(boneMesh->_iHandle);
 
 	//텍스쳐 해제
 	//해제 코드도 작성하자...

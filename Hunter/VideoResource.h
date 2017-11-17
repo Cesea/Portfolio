@@ -320,7 +320,7 @@ namespace video
 		//NOTE : end가 -1이면 하나만 쓰는거...
 		struct CacheRange
 		{
-			int32 _start{};
+			int32 _start{-1};
 			int32 _end{-1};
 		};
 
@@ -334,20 +334,29 @@ namespace video
 			_num = 0;
 		}
 
-		uint32 Add(const Matrix *matrix, int32 numMatrix = 1)
+		CacheRange Add(const Matrix *matrix, int32 numMatrix = 1)
 		{
+			CacheRange result;
 			if (nullptr != matrix)
 			{
 				Assert(_num + numMatrix < VIDEO_CONFIG_MAX_MATRIX_CACHE); 
 				uint32 first = _num;
 				memcpy(&_cache[_num], matrix, sizeof(Matrix) * numMatrix);
 				_num += numMatrix;
-				return first;
+
+				result._start = first;
+				result._end = (numMatrix == 1) ? (-1) : (_num - 1);
+				return result;
 			}
 			else
 			{
-				return 0;
+				return result;
 			}
+		}
+
+		uint32 Top()
+		{
+			return _num;
 		}
 
 		Matrix _cache[VIDEO_CONFIG_MAX_MATRIX_CACHE];
@@ -356,8 +365,22 @@ namespace video
 
 	struct RenderCommand
 	{
-		VertexBufferHandle vHandle;
-		IndexBufferHandle iHandle;
+		enum DrawType
+		{
+			eStatic,
+			eAnimated,
+		};
+
+		enum PrimType
+		{
+			eTriangleList,
+			eLineList
+		};
+
+		VertexBufferHandle _vHandle;
+		IndexBufferHandle _iHandle;
+
+		//AnimationHandle animHandle;
 
 		//버텍스 버퍼로만 그릴때 사용된다
 		uint32 _startVertex{};
@@ -367,17 +390,13 @@ namespace video
 		uint32 _numVertices{};
 		uint32 _numPrim{};
 
-		enum PrimType
-		{
-			eTriangleList,
-			eLineList
-		};
 		PrimType _primType;
+		DrawType _drawType;
 
 		EffectHandle _effectHandle;
 		MaterialHandle _materialHandle;
 
-		MatrixCache::CacheRange _matrixIndex{};
+		MatrixCache::CacheRange _cacheRange{};
 	};
 
 	struct RenderView
@@ -396,7 +415,7 @@ namespace video
 
 		Camera *_pCamera{};
 
-		RenderCommand _renderCommands[1024];
+		RenderCommand _renderCommands[VIDEO_CONFIG_MAX_RENDER_COMMAND_SIZE];
 		uint32 _commandCount{};
 
 		MatrixCache _matrixCache;

@@ -126,8 +126,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Allocators.cpp" />
-    <ClCompile Include="AnimationComponent.cpp" />
-    <ClCompile Include="AnimationSystem.cpp" />
     <ClCompile Include="ApplicationTimer.cpp" />
     <ClCompile Include="BaseScene.cpp" />
     <ClCompile Include="BaseSystem.cpp" />
@@ -185,8 +183,6 @@
     <ClCompile Include="XmlSerializer.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="AnimationComponent.h" />
-    <ClInclude Include="AnimationSystem.h" />
     <ClInclude Include="ApplicationTimer.h" />
     <ClInclude Include="Assert.h" />
     <ClInclude Include="BaseScene.h" />

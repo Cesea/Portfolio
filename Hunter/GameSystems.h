@@ -5,6 +5,5 @@
 #include "RenderSystem.h"
 #include "MoveSystem.h"
 #include "CollisionSystem.h"
-#include "AnimationSystem.h"
 
 #endif

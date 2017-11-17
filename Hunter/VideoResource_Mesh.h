@@ -27,6 +27,9 @@ struct BoneMesh : public D3DXMESHCONTAINER
 	DWORD MaxNumFaceInfls{};		//해당 메시에 적용되는 정점하나당 최대 가중치 갯수
 	DWORD NumAttributesGroup{};		//메시의 속성 그룹수 ( 해당 메시에 메터리얼정보가 몇개있니? )
 	LPD3DXBUFFER BufBoneCombos{};			//본컴비네이션 ( 메시에 적용되는 본 ID 정보와 메터리얼 정보 )
+
+	video::VertexBufferHandle _vHandle;
+	video::IndexBufferHandle _iHandle;
 };
 
 class BoneHierachy : public ID3DXAllocateHierarchy
@@ -88,7 +91,7 @@ namespace video
 		void Destroy();
 		void BuidSubMeshBoundInfo();
 
-		void FillRenderCommand(RenderView &renderView, video::EffectHandle effect);
+		void FillRenderCommand(RenderView &renderView, video::EffectHandle effect, const Matrix *pMatrix = nullptr);
 
 		bool32 _visible{ true };
 		ID3DXMesh *_pMesh{};
@@ -108,6 +111,8 @@ namespace video
 
 	//에니메이션을 위한 typedef
 
+	typedef std::vector<LPD3DXANIMATIONSET> AnimationSetVector;
+	typedef std::map<std::string, LPD3DXANIMATIONSET> AnimationTable;
 
 	typedef std::map<std::string, BoneMesh *> BoneMeshTable;
 	typedef std::map<std::string, Bone *> BoneTable;
@@ -123,7 +128,9 @@ namespace video
 		void UpdateMatrices(Bone *pBone, Matrix *pParentMatrix) const;
 
 		//NOTE : 직접 사용하지 않고 밖에서 쓴다
-		void RenderBone(const video::Effect &effect, Bone *pBone, animation::AnimationComponent &animation) const;
+
+		//void FillRenderCommand(RenderView &renderView, AnimationHandle animHandle, video::EffectHandle effect);
+		//void RenderBone(RenderView &renderView, Bone *pBone, AnimationHandle animHandle, video::EffectHandle effect) const;
 
 		Matrix _matCorrection;
 
@@ -135,6 +142,59 @@ namespace video
 
 		BoneMeshTable _meshTable;
 		BoneTable _boneTable;
+	};
+
+
+	//SkinnedMesh는 한번만 불러오고, SkinnedAnimation은 여러개를 만들어서 사용하라....
+	struct SkinnedAnimation
+	{
+		bool Create(video::SkinnedXMeshHandle handle);
+		void Destroy();
+		void UpdateAnimation(float deltaTime, const Matrix &world);
+		void UpdateMesh();
+
+		void FillRenderCommand(RenderView &renderView, 
+			video::EffectHandle skinnedEffect, video::EffectHandle staticEffect);
+		void FillRenderCommandInternal(RenderView &renderView, 
+			video::EffectHandle skinnedEffect, video::EffectHandle staticEffect, Bone *pBone);
+
+		//void	RenderBoneName(cCamera* pCam, cTransform* pTransform);
+
+		void Play(const std::string &animName, float crossFadeTime = 0.0);
+		void Play(int32 animIndex, float crossFadeTime = 0.0);
+		void PlayOneShot(const std::string &animName, float inCrossFadeTime = 0.0, float outCrossFadeTime = 0.0f);
+		void PlayOneShotAfterHold(const std::string &animName, float crossFadeTime = 0.0);
+		void Stop() { _playing = false; }
+		void SetPlaySpeed(float speed);
+
+		void SetAnimation(LPD3DXANIMATIONSET animation);
+
+		SkinnedXMesh *_pSkinnedMesh{};
+
+		Matrix _world;
+
+		ID3DXAnimationController *_pAnimationController{};
+		uint32 _numAnimation;
+
+		Matrix *_workingPalettes{};
+		uint32 _numPalette{};
+
+		AnimationSetVector _animations;
+		AnimationTable _animationTable;
+
+		LPD3DXANIMATIONSET _pPlayingAnimationSet{};
+		D3DXTRACK_DESC _playingTrackDesc{};
+
+		bool32 _playing{};
+		bool32 _looping{};
+		LPD3DXANIMATIONSET _pPrevPlayAnimationSet{};
+
+		float _crossFadeTime{};
+		float _leftCrossFadeTime{};
+		float _outCrossFadeTime{};
+		double _animationPlayFactor{};
+
+		float _animDelta{};
 	};
 
 }

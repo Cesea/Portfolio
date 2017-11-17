@@ -2,7 +2,6 @@
 #define RENDER_COMPONENT_H
 
 #include "Component.h"
-#include "AnimationComponent.h"
 
 //COmponent는 model에 대하여 소유권을 가지지 않는다
 struct RenderComponent : public Component

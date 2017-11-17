@@ -46,7 +46,6 @@ protected :
 	World _world;
 
 	TransformSystem _transformSystem;
-	animation::AnimationSystem _animationSystem;
 	RenderSystem _renderSystem;
 
 	std::vector<Entity> _entities;

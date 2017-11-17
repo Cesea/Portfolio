@@ -17,9 +17,10 @@ VideoDevice::VideoDevice()
 	_vertexDeclHandlePool(VIDEO_CONFIG_VERTEXBUFFER_MAX_NUM),
 	_renderViewHandlePool(VIDEO_CONFIG_RENDER_VIEW_MAX_NUM),
 	_materialHandlePool(VIDEO_CONFIG_MATERIAL_MAX_NUM),
-	_renderGroupHandlePool(VIDEO_CONFIG_RENDER_GROUP_MAX_NUM),
 	_staticXMeshHandlePool(VIDEO_CONFIG_STATIC_XMESH_MAX_NUM),
-	_skinnedXMeshHandlePool(VIDEO_CONFIG_SKINNED_XMESH_MAX_NUM)
+	_skinnedXMeshHandlePool(VIDEO_CONFIG_SKINNED_XMESH_MAX_NUM),
+	_skinnedAnimationHandlePool(VIDEO_CONFIG_ANIMATION_MAX_NUM)
+
 {
 }
 
@@ -77,22 +78,42 @@ void video::VideoDevice::Render(RenderView & renderView)
 	{
 		const RenderCommand &command = renderView._renderCommands[i];
 
-		VertexBuffer &vBuffer = *GetVertexBuffer(command.vHandle);
+		VertexBuffer &vBuffer = *GetVertexBuffer(command._vHandle);
 		const Effect &effect = *GetEffect(command._effectHandle);
 		const Material &material = *GetMaterial(command._materialHandle);
-
 		const VertexDecl &decl = *VIDEO->GetVertexDecl(vBuffer._decl);
 
-		if (!command.iHandle.IsValid())
+		effect.SetMaterial(material);
+		effect.SetMatrix("matViewProjection", sendingMatrix[2]);
+
+		if (command._drawType == RenderCommand::DrawType::eAnimated)
+		{
+			//메트릭스 행렬을 주자....
+			const MatrixCache::CacheRange &range = command._cacheRange;
+			if (range._end != -1)
+			{
+				effect.SetMatrices("FinalTransforms", &renderView._matrixCache._cache[range._start], range._end - range._start);
+			}
+		}
+		else
+		{
+			if (command._cacheRange._start == -1)
+			{
+				effect.SetMatrix("matWorld", sendingMatrix[0]);
+			}
+			else
+			{
+				effect.SetMatrix("matWorld", renderView._matrixCache._cache[command._cacheRange._start]);
+			}
+		}
+
+
+		if (!command._iHandle.IsValid())
 		{
 			gpDevice->SetVertexDeclaration(decl._ptr);
 			gpDevice->SetStreamSource(0, vBuffer._ptr, 0, decl._stride);
 
 			uint32 numPass = effect.BeginEffect();
-			effect.SetMaterial(material);
-			effect.SetMatrix("matWorld", sendingMatrix[0]);
-			effect.SetMatrix("matViewProjection", sendingMatrix[2]);
-
 			for (uint32 j = 0; j < numPass; ++j)
 			{
 				effect.BeginPass(j);
@@ -105,7 +126,7 @@ void video::VideoDevice::Render(RenderView & renderView)
 		}
 		else
 		{
-			const IndexBuffer &iBuffer = *GetIndexBuffer(command.iHandle);
+			const IndexBuffer &iBuffer = *GetIndexBuffer(command._iHandle);
 
 			gpDevice->SetVertexDeclaration(decl._ptr);
 			gpDevice->SetStreamSource(0, vBuffer._ptr, 0, decl._stride);
@@ -113,9 +134,6 @@ void video::VideoDevice::Render(RenderView & renderView)
 
 			uint32 numPass = effect.BeginEffect();
 
-			effect.SetMaterial(material);
-			effect.SetMatrix("matWorld", sendingMatrix[0]);
-			effect.SetMatrix("matViewProjection", sendingMatrix[2]);
 			for (uint32 j = 0; j < numPass; ++j)
 			{
 				effect.BeginPass(j);
@@ -950,28 +968,25 @@ void video::VideoDevice::SetCurrentRenderView(RenderViewHandle handle)
 	_pCurrentView = &_renderViews[handle.index];
 }
 
-RenderGroupHandle video::VideoDevice::CreateRenderGroup(video::VertexBufferHandle vHandle, video::IndexBufferHandle iHandle,
-	const RenderGroup::MaterialRange &materialRange, const std::string &name)
-{
-	RenderGroupHandle result = _renderGroupHandlePool.Create(name);
-	_renderGroups[result.index].Create(vHandle, iHandle, materialRange);
-	return result;
-}
-
-RenderGroupHandle video::VideoDevice::GetRenderGroup(const std::string & name)
-{
-	return _renderGroupHandlePool.Get(name);
-}
-
-void video::VideoDevice::DestroyRenderGroup(RenderGroupHandle handle)
-{
-	_renderGroups[handle.index].Destroy();
-	_renderGroupHandlePool.Remove(handle);
-}
-
-void video::VideoDevice::RenderGroupSetEffect(RenderGroupHandle group, EffectHandle effect)
-{
-}
+//RenderGroupHandle video::VideoDevice::CreateRenderGroup(video::VertexBufferHandle vHandle, video::IndexBufferHandle iHandle,
+//	const RenderGroup::MaterialRange &materialRange, const std::string &name)
+//{
+//	RenderGroupHandle result = _renderGroupHandlePool.Create(name);
+//	_renderGroups[result.index].Create(vHandle, iHandle, materialRange);
+//	return result;
+//}
+//RenderGroupHandle video::VideoDevice::GetRenderGroup(const std::string & name)
+//{
+//	return _renderGroupHandlePool.Get(name);
+//}
+//void video::VideoDevice::DestroyRenderGroup(RenderGroupHandle handle)
+//{
+//	_renderGroups[handle.index].Destroy();
+//	_renderGroupHandlePool.Remove(handle);
+//}
+//void video::VideoDevice::RenderGroupSetEffect(RenderGroupHandle group, EffectHandle effect)
+//{
+//}
 
 StaticXMeshHandle video::VideoDevice::CreateStaticXMesh(const std::string fileName, const Matrix * pCorrection, const std::string &name)
 {
@@ -1036,4 +1051,38 @@ void video::VideoDevice::DestroySkinnedMesh(SkinnedXMeshHandle handle)
 		_skinnedMeshes[handle.index].Destroy();
 	}
 	_skinnedXMeshHandlePool.Remove(handle);
+}
+
+SkinnedAnimationHandle video::VideoDevice::CreateSkinnedAnimation(SkinnedXMeshHandle xMesh, const std::string & name)
+{
+	SkinnedAnimationHandle result = _skinnedAnimationHandlePool.Create(name);
+	if (!_skinnedAnimations[result.index].Create(xMesh))
+	{
+		Console::Log("Skinned Animation create failed\n");
+		return SkinnedAnimationHandle();
+	}
+	return result;
+}
+
+SkinnedAnimationHandle video::VideoDevice::GetSkinnedAnimation(const std::string & name)
+{
+	return _skinnedAnimationHandlePool.Get(name);
+}
+
+SkinnedAnimation * video::VideoDevice::GetSkinnedAnimation(SkinnedAnimationHandle handle)
+{
+	if (handle.IsValid())
+	{
+		return &_skinnedAnimations[handle.index];
+	}
+	return nullptr;
+}
+
+void video::VideoDevice::DestroySkinnedAnimation(SkinnedAnimationHandle handle)
+{
+	if (handle.IsValid())
+	{
+		_skinnedAnimations[handle.index].Destroy();
+	}
+	_skinnedAnimationHandlePool.Remove(handle);
 }

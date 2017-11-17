@@ -208,5 +208,20 @@ namespace video
 			this->count = count;
 		}
 	};
+
+	struct SkinnedAnimationHandle : public ResourceHandle
+	{
+		SkinnedAnimationHandle()
+		{
+			this->index = 0;
+			this->count = 0;
+		}
+
+		SkinnedAnimationHandle(uint16 index, uint16 count)
+		{
+			this->index = index;
+			this->count = count;
+		}
+	};
 }
 #endif

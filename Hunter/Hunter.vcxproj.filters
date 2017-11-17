@@ -99,9 +99,6 @@
     <ClCompile Include="Allocators.cpp">
       <Filter>Core\Memory</Filter>
     </ClCompile>
-    <ClCompile Include="AnimationSystem.cpp">
-      <Filter>Game\GameSystem\AnimationSystem</Filter>
-    </ClCompile>
     <ClCompile Include="MoveSystem.cpp">
       <Filter>Game\GameSystem\MovementSystem</Filter>
     </ClCompile>
@@ -137,9 +134,6 @@
     </ClCompile>
     <ClCompile Include="VideoVertexFormat.cpp">
       <Filter>Core\SubSystem\VideoDevice</Filter>
-    </ClCompile>
-    <ClCompile Include="AnimationComponent.cpp">
-      <Filter>Game\GameComponent\AnimationComponent</Filter>
     </ClCompile>
     <ClCompile Include="CollisionComponent.cpp">
       <Filter>Game\GameComponent\CollisionComponent</Filter>
@@ -333,9 +327,6 @@
     <ClInclude Include="DataBase.h">
       <Filter>Core\SubSystem\DataBase</Filter>
     </ClInclude>
-    <ClInclude Include="AnimationSystem.h">
-      <Filter>Game\GameSystem\AnimationSystem</Filter>
-    </ClInclude>
     <ClInclude Include="MoveSystem.h">
       <Filter>Game\GameSystem\MovementSystem</Filter>
     </ClInclude>
@@ -386,9 +377,6 @@
     </ClInclude>
     <ClInclude Include="GameComponent.h">
       <Filter>Game\GameComponent</Filter>
-    </ClInclude>
-    <ClInclude Include="AnimationComponent.h">
-      <Filter>Game\GameComponent\AnimationComponent</Filter>
     </ClInclude>
     <ClInclude Include="CollisionComponent.h">
       <Filter>Game\GameComponent\CollisionComponent</Filter>
@@ -491,9 +479,6 @@
     <Filter Include="Game\GameSystem">
       <UniqueIdentifier>{d7142de2-c937-4586-a206-5c7d6e472e49}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Game\GameSystem\AnimationSystem">
-      <UniqueIdentifier>{54ca3728-3afd-4619-9f24-f1739ad0e775}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Game\GameSystem\MovementSystem">
       <UniqueIdentifier>{b0f7ecfb-8121-4aa0-88ba-91bf94352179}</UniqueIdentifier>
     </Filter>
@@ -520,9 +505,6 @@
     </Filter>
     <Filter Include="Game\GameUtils\Camera">
       <UniqueIdentifier>{276b7112-dd8a-413b-9624-b56d5e5e91b8}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Game\GameComponent\AnimationComponent">
-      <UniqueIdentifier>{50fe04da-648f-4b00-98e1-d5c5f3736830}</UniqueIdentifier>
     </Filter>
     <Filter Include="Game\GameComponent\CollisionComponent">
       <UniqueIdentifier>{1f11db7f-2aa1-4a9a-81ab-03b8b476aca2}</UniqueIdentifier>

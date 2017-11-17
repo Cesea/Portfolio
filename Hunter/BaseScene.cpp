@@ -21,6 +21,7 @@ bool32 BaseScene::Init()
 	bool32 result = true;
 	RegisterEvents();
 
+
 	video::RenderViewHandle renderViewHandle= VIDEO->CreateRenderView("Main");
 	_mainRenderView = VIDEO->GetRenderView(renderViewHandle);
 	_mainRenderView->_clearColor = 0xff55330;
@@ -37,7 +38,6 @@ bool32 BaseScene::Init()
 
 	_world.AddSystem<RenderSystem>(_renderSystem);
 	_world.AddSystem<TransformSystem>(_transformSystem);
-	_world.AddSystem<animation::AnimationSystem>(_animationSystem);
 
 	_staticEffect = VIDEO->GetEffect("StaticMesh.fx");
 	_skinnedEffect = VIDEO->GetEffect("SkinnedMesh.fx");
@@ -86,7 +86,16 @@ bool32 BaseScene::Update(float deltaTime)
 bool32 BaseScene::Render()
 {
 	video::StaticXMesh *pMesh = VIDEO->GetStaticXMesh(_staticMeshHandle);
-	pMesh->FillRenderCommand(*_mainRenderView, _staticEffect);
+
+	Matrix matrix;
+	for (int32 y = 0; y < 8; ++y)
+	{
+		for (int32 x = 0; x < 8; ++x)
+		{
+			MatrixTranslation(&matrix, x * 5, 0, y * 5);
+			pMesh->FillRenderCommand(*_mainRenderView, _staticEffect, &matrix);
+		}
+	}
 
 	_mainRenderView->PreRender();
 	_mainRenderView->ExecCommands();

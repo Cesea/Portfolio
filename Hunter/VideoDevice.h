@@ -98,11 +98,11 @@ namespace video
 		void SetCurrentRenderView(RenderViewHandle handle);
 
 		//CreateModelFromX 함수는 불러온 파일 경로에서 이름을 추출하여 HandlePool에 자동으로 이름을 등록한다
-		RenderGroupHandle CreateRenderGroup(video::VertexBufferHandle vHandle, video::IndexBufferHandle iHandle, 
-			const RenderGroup::MaterialRange &materialRange, const std::string &name = "");
-		RenderGroupHandle GetRenderGroup(const std::string &name);
-		void DestroyRenderGroup(RenderGroupHandle handle);
-		void RenderGroupSetEffect(RenderGroupHandle group, EffectHandle effect);
+		//RenderGroupHandle CreateRenderGroup(video::VertexBufferHandle vHandle, video::IndexBufferHandle iHandle, 
+		//	const RenderGroup::MaterialRange &materialRange, const std::string &name = "");
+		//RenderGroupHandle GetRenderGroup(const std::string &name);
+		//void DestroyRenderGroup(RenderGroupHandle handle);
+		//void RenderGroupSetEffect(RenderGroupHandle group, EffectHandle effect);
 
 		StaticXMeshHandle CreateStaticXMesh(const std::string fileName, const Matrix *pCorrection, const std::string &name);
 		StaticXMeshHandle GetStaticXMesh(const std::string &name);
@@ -113,6 +113,12 @@ namespace video
 		SkinnedXMeshHandle GetSkinnedXMesh(const std::string &name);
 		SkinnedXMesh *GetSkinnedXMesh(SkinnedXMeshHandle handle);
 		void DestroySkinnedMesh(SkinnedXMeshHandle handle);
+
+		SkinnedAnimationHandle CreateSkinnedAnimation(SkinnedXMeshHandle xMesh, const std::string &name);
+		SkinnedAnimationHandle GetSkinnedAnimation(const std::string &name);
+		SkinnedAnimation *GetSkinnedAnimation(SkinnedAnimationHandle handle);
+		void DestroySkinnedAnimation(SkinnedAnimationHandle handle);
+
 
 
 	private:
@@ -152,11 +158,11 @@ namespace video
 		RenderView *_pCurrentView{};
 
 		Material _materials[VIDEO_CONFIG_MATERIAL_MAX_NUM];
-		RenderGroup _renderGroups[VIDEO_CONFIG_RENDER_GROUP_MAX_NUM];
 
 		StaticXMesh _staticMeshes[VIDEO_CONFIG_STATIC_XMESH_MAX_NUM];
 		SkinnedXMesh _skinnedMeshes[VIDEO_CONFIG_SKINNED_XMESH_MAX_NUM];
 
+		SkinnedAnimation _skinnedAnimations[VIDEO_CONFIG_ANIMATION_MAX_NUM];
 
 		ResourceHandlePool<VertexBufferHandle> _vertexBufferPool;
 		ResourceHandlePool<IndexBufferHandle> _indexBufferPool;
@@ -167,10 +173,11 @@ namespace video
 		ResourceHandlePool<RenderViewHandle> _renderViewHandlePool;
 
 		ResourceHandlePool<MaterialHandle> _materialHandlePool;
-		ResourceHandlePool<RenderGroupHandle> _renderGroupHandlePool;
 
-		ResourceHandlePool<video::StaticXMeshHandle> _staticXMeshHandlePool;
-		ResourceHandlePool<video::SkinnedXMeshHandle> _skinnedXMeshHandlePool;
+		ResourceHandlePool<StaticXMeshHandle> _staticXMeshHandlePool;
+		ResourceHandlePool<SkinnedXMeshHandle> _skinnedXMeshHandlePool;
+
+		ResourceHandlePool<SkinnedAnimationHandle> _skinnedAnimationHandlePool;
 	};
 }
 #endif
