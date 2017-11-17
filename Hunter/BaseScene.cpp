@@ -26,7 +26,7 @@ bool32 BaseScene::Init()
 	_renderView->_clearColor = 0xff55330;
 
 	_camera.SetRotationSpeed(0.1f);
-	_camera.SetMoveSpeed(20.0f);
+	_camera.SetMoveSpeed(10.0f);
 
 	_world.AddSystem<RenderSystem>(_renderSystem);
 	_world.AddSystem<TransformSystem>(_transformSystem);
@@ -68,7 +68,7 @@ bool32 BaseScene::Init()
 	config._splatFileName = "../resources/Textures/Splat.png";
 
 	config._cellScale = 1.0f;
-	config._heightScale = 30.0f;
+	config._heightScale = 80.0f;
 	config._textureMult = 50;
 	config._sectionResolution;
 

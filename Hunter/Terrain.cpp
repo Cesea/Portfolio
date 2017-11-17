@@ -130,6 +130,9 @@ void Terrain::Render(const video::Effect &effect, const Camera &camera)
 	//Vector3 dirLight = pDirectionLight->pTransform->GetForward();
 	//m_pTerrainEffect->SetVector("worldLightDir", &D3DXVECTOR4(dirLight, 1));
 
+
+	//effect.DrawPrimitiveIndex(_vHandle, _iHandle, _mHandle);
+
 	for (int32 i = 0; i < _numSectionX * _numSectionZ; ++i)
 	{
 		Terrain::TerrainSection &refSection = _pSections[i];
@@ -507,8 +510,11 @@ bool Terrain::CreateTerrainSection(int32 x, int32 z, const video::TerrainVertex 
 	std::vector<video::TerrainVertex> vertices;
 	std::vector<uint16> indices;
 
-	vertices.reserve(((_sectionNumVertexX + 1) * (_sectionNumVertexZ + 1)) + 1);
-	indices.reserve((_sectionNumCellX * _sectionNumCellZ) * 3 * 2 + 1);
+	vertices.reserve(((_sectionNumVertexX ) * (_sectionNumVertexZ )) + 1);
+	indices.reserve((_sectionNumCellX * (_sectionNumCellZ + 1)) * 3 * 2 + 1);
+	
+	vertices.clear();
+	indices.clear();
 
 	//버텍스 정보 넣기...
 	for (int32 localZ = 0; localZ < _sectionNumVertexZ; localZ++)
@@ -530,36 +536,45 @@ bool Terrain::CreateTerrainSection(int32 x, int32 z, const video::TerrainVertex 
 	refSection._endX = vertices.back()._pos.x;
 	refSection._endZ = vertices.back()._pos.z;
 
-	for (uint32 z = 0; z <= _sectionResolution; z++)
+	for (uint32 z = 0; z < _sectionResolution; z++)
 	{
-		for (uint32 x = 0; x < _sectionResolution; x++)
+		for (uint32 x = 0; x < _sectionResolution ; x++)
 		{
-			uint32 lb = z * _sectionResolution + x;
-			uint32 lt = (z + 1) * _sectionResolution + x;
-			uint32 rt = ((z + 1)* _sectionResolution) + (x + 1);
-			uint32 rb = (z * _sectionResolution) + (x + 1);
+			uint32 lb = z * _sectionNumVertexX + x;
+			uint32 lt = (z + 1) * _sectionNumVertexX + x;
+			uint32 rt = ((z + 1)* _sectionNumVertexX) + (x + 1);
+			uint32 rb = (z * _sectionNumVertexX) + (x + 1);
 
-			indices.push_back(lb);
-			indices.push_back(lt);
-			indices.push_back(rt);
+			indices.push_back((uint16)lb);
+			indices.push_back((uint16)lt);
+			indices.push_back((uint16)rt);
 
-			indices.push_back(lb);
-			indices.push_back(rt);
-			indices.push_back(rb);
+			indices.push_back((uint16)lb);
+			indices.push_back((uint16)rt);
+			indices.push_back((uint16)rb);
 		}
 	}
 
 	Memory mem;
 	mem._data = &vertices[0];
-	mem._size = sizeof(video::TerrainVertex) * vertices.size();
+	mem._size = sizeof(video::TerrainVertex) * _sectionNumVertexX * _sectionNumVertexZ;
+
+	int32 size = sizeof(video::TerrainVertex) * vertices.size();
 
 	refSection._vHandle = VIDEO->CreateVertexBuffer(&mem, _declHandle);
 	Assert(refSection._vHandle.IsValid());
 
 	mem._data = &indices[0];
-	mem._size = sizeof(uint16) * indices.size();
+	mem._size = sizeof(uint16) * _sectionResolution * _sectionResolution * 3 * 2;
 
-	refSection._iHandle = VIDEO->CreateIndexBuffer(&mem, sizeof(uint16));
+	size = sizeof(uint16) * indices.size();
+
+	//refSection._iHandle = VIDEO->GetIndexBuffer("TerrainSectionIndex");
+	//if (!refSection._iHandle.IsValid())
+	{
+		refSection._iHandle = VIDEO->CreateIndexBuffer(&mem, sizeof(uint16));
+	}
+
 	Assert(refSection._iHandle.IsValid());
 
 	refSection._centerX = (refSection._startX + refSection._endX) * 0.5f;

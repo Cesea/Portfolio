@@ -773,6 +773,7 @@ VertexBufferHandle video::VideoDevice::CreateVertexBuffer(Memory * memory, Verte
 	VertexBufferHandle result = _vertexBufferPool.Create(name);
 	if (!_vertexBuffers[result.index].Create(memory->_size, memory->_data, declHandle))
 	{
+		_vertexBufferPool.Remove(result);
 		Assert(false);//Creation failed
 	}
 	return result;

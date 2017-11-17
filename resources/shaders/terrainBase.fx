@@ -101,9 +101,9 @@ sampler2D TerrainControl = sampler_state
    MIPFILTER = ANISOTROPIC;
 };
 
-ps_output ps_main( ps_input input ) : COLOR
+float4 ps_main( ps_input input ) : COLOR
 {   
-	ps_output output = (ps_output)0;
+	//ps_output output = (ps_output)0;
 
    //Terrain Tile 컬러를 얻는다.
    float3 terrain0 = tex2D( Terrain0, input.tileUV ).rgb;
@@ -127,10 +127,7 @@ ps_output ps_main( ps_input input ) : COLOR
    
    float3 finalColor = texColor1 + texColor2 + texColor3 + texColor4;
 
-   output.baseColor = float4(finalColor , 1);
-   output.normalDepth = float4(0.0f, 0.0f, 0.0f, 0.0f);
-
-   return output;
+   return  float4(finalColor , 1);
 }
 
 technique Base
@@ -140,5 +137,7 @@ technique Base
       VertexShader = compile vs_3_0 vs_main();
       PixelShader = compile ps_3_0 ps_main();
 
+	  //FillMode  = WireFrame;
+	  //CullMode  = None;
    }
 }

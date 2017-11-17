@@ -75,6 +75,8 @@ private:
 private:
 	video::VertexDeclHandle _declHandle{};
 	video::MaterialHandle _mHandle{};
+	video::VertexBufferHandle _vHandle{};
+	video::IndexBufferHandle _iHandle{};
 
 	//높이스케일(픽셀컬러가 255 일때 높이) 높이맵 y축 사이 간격 크기
 	float _heightScale{};

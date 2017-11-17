@@ -278,9 +278,11 @@ namespace video
 		for (uint32 j = 0; j < numPass; ++j)
 		{
 			this->BeginPass(j);
+			uint32 primCount = (indexBuffer->_stride == 2) ? (indexBuffer->_size / 2) / 3 : (indexBuffer->_size / 4) / 3;
+
 			gpDevice->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, 0, 
 				vertexBuffer->_size / decl->_stride, 0, 
-				(indexBuffer->_stride == 2) ? (indexBuffer->_size / 2) / 3 : (indexBuffer->_size / 4) / 3);
+				primCount);
 			this->EndPass();
 		}
 		this->EndEffect();
