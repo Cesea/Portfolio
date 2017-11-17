@@ -61,7 +61,7 @@ public:
 	bool Create(const Terrain::TerrainConfig &config, int32 smoothLevel);
 
 	void Destroy();
-	void Render(const video::Effect &effect, const Camera &camera);
+	void Render(video::RenderView &renderView);
 	bool IsIntersectRay(const Ray &ray, Vector3 *pOut);
 
 	float GetHeight(float x, float z);

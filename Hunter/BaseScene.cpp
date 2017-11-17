@@ -21,12 +21,14 @@ bool32 BaseScene::Init()
 	bool32 result = true;
 	RegisterEvents();
 
-	video::RenderViewHandle renderViewHandle= VIDEO->CreateRenderView();
+	video::RenderViewHandle renderViewHandle= VIDEO->CreateRenderView("Main");
 	_mainRenderView = VIDEO->GetRenderView(renderViewHandle);
 	_mainRenderView->_clearColor = 0xff55330;
 
 	_camera.SetRotationSpeed(0.1f);
 	_camera.SetMoveSpeed(10.0f);
+
+	_mainRenderView->_pCamera = &_camera;
 
 	Matrix correctionMat;
 	MatrixScaling(&correctionMat, 0.1f, 0.1f, 0.1f);
@@ -36,31 +38,6 @@ bool32 BaseScene::Init()
 	_world.AddSystem<RenderSystem>(_renderSystem);
 	_world.AddSystem<TransformSystem>(_transformSystem);
 	_world.AddSystem<animation::AnimationSystem>(_animationSystem);
-
-	//_world.Refresh();
-
-	//_entities.push_back(_world.CreateEntity());
-	//Entity &entity = _entities.back();
-
-	//RenderComponent &renderComp = entity.AddComponent<RenderComponent>();
-
-	//TransformComponent &transComp = entity.AddComponent<TransformComponent>();
-	//transComp.SetWorldPosition(0.0f, 0.0f, 0.0f);
-
-	//entity.Activate();
-
-	//Matrix correctionMat;
-	//MatrixScaling(&correctionMat, 0.01f, 0.01f, 0.01f);
-	//_meshHandle = VIDEO->CreateStaticXMesh("../resources/models/Knight/Knight.x", &correctionMat, "Knight");
-	//_staticMeshHandle = VIDEO->CreateStaticXMesh("../resources/models/Snake/Snake.X", &correctionMat, "Snake");
-	//_skinnedMeshHandle = VIDEO->CreateSkinnedXMesh("../resources/models/Snake/Snake.X", &correctionMat, "Snake");
-	//_skinnedMeshHandle = VIDEO->CreateSkinnedXMesh("../resources/Models/Knight/Knight.X", &correctionMat, "Knight");
-	//for (int32 i = 0; i < 9; ++i)
-	//{
-	//	_animation[i].Create(_skinnedMeshHandle);
-	//	_animation[i].Play(i % 9);
-	//}
-	//_pMesh = VIDEO->GetSkinnedXMesh(_skinnedMeshHandle);
 
 	_staticEffect = VIDEO->GetEffect("StaticMesh.fx");
 	_skinnedEffect = VIDEO->GetEffect("SkinnedMesh.fx");
@@ -96,17 +73,6 @@ bool32 BaseScene::Update(float deltaTime)
 
 	_transformSystem.PreUpdate(deltaTime);
 
-	//Matrix world;
-	//for (int32 y = 0; y < 3; ++y)
-	//{
-	//	for (int32 x = 0; x < 3; ++x)
-	//	{
-	//		MatrixTranslation(&world, x, 0.0f, y);
-	//		int32 index = Index2D(x, y, 3);
-	//		_animation[index].UpdateAnimation(deltaTime, world);
-	//	}
-	//}
-
 	//Update Camera
 	_transformSystem.UpdateTransform(_camera.GetTransform());
 	_camera.UpdateMatrix();
@@ -119,29 +85,18 @@ bool32 BaseScene::Update(float deltaTime)
 
 bool32 BaseScene::Render()
 {
-	//_renderSystem.Render(*_mainRenderView, _camera);
-	//VIDEO->Render(*_mainRenderView);
+	_renderSystem.Render(*_mainRenderView);
 
-	gpDevice->Clear(0, nullptr, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER | D3DCLEAR_STENCIL, 0xff208020, 1.0f, 0);
-	gpDevice->BeginScene();
 
-	const video::Effect *staticEffect = VIDEO->GetEffect(_staticEffect);
+	_mainRenderView->PreRender();
+	_mainRenderView->ExecCommands();
+	_mainRenderView->PostRender();
 
-	Matrix model;
-	MatrixIdentity(&model);
-	staticEffect->SetMatrix("matWorld", model);
-	staticEffect->SetMatrix("matViewProjection", _camera.GetViewProjectionMatrix());
-
-	staticEffect->DrawStaticMesh(*VIDEO->GetStaticXMesh(_staticMeshHandle));
-
-	gpDevice->EndScene();
-	gpDevice->Present(nullptr, nullptr, NULL, nullptr);
 	return true;
 }
 
 void BaseScene::Release()
 {
-	_terrain.Destroy();
 }
 
 const char * BaseScene::GetSceneName()

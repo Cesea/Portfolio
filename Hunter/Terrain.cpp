@@ -111,20 +111,15 @@ void Terrain::Destroy()
 	SAFE_DELETE(_pQuadTree);
 }
 
-void Terrain::Render(const video::Effect &effect, const Camera &camera)
+void Terrain::Render(video::RenderView &renderView)
 {
 	////월드행렬 셋팅
 	Matrix matWorld;
 	MatrixIdentity(&matWorld);
-	effect.SetMatrix("matWorld", matWorld);
+	//effect.SetMatrix("matWorld", matWorld);
 	//뷰 행렬
-	effect.SetMatrix("matViewProjection", camera.GetViewProjectionMatrix());
+	//effect.SetMatrix("matViewProjection", camera.GetViewProjectionMatrix());
 	////Texture 
-	//m_pTerrainEffect->SetTexture("Terrain0_Tex", m_pTexTile_0);
-	//m_pTerrainEffect->SetTexture("Terrain1_Tex", m_pTexTile_1);
-	//m_pTerrainEffect->SetTexture("Terrain2_Tex", m_pTexTile_2);
-	//m_pTerrainEffect->SetTexture("Terrain3_Tex", m_pTexTile_3);
-	//m_pTerrainEffect->SetTexture("TerrainControl_Tex", m_pTexSlat);
 
 	//광원 셋팅
 	//Vector3 dirLight = pDirectionLight->pTransform->GetForward();
@@ -136,10 +131,10 @@ void Terrain::Render(const video::Effect &effect, const Camera &camera)
 	for (int32 i = 0; i < _numSectionX * _numSectionZ; ++i)
 	{
 		Terrain::TerrainSection &refSection = _pSections[i];
-		if (camera.GetFrustum().IsSphereInFrustum(Vector3(refSection._centerX, 0.0f, refSection._centerZ), refSection._radius))
-		{
-			effect.DrawPrimitiveIndex(refSection._vHandle, refSection._iHandle, _mHandle);
-		}
+		//if (camera.GetFrustum().IsSphereInFrustum(Vector3(refSection._centerX, 0.0f, refSection._centerZ), refSection._radius))
+		//{
+			//effect.DrawPrimitiveIndex(refSection._vHandle, refSection._iHandle, _mHandle);
+		//}
 	}
 
 }

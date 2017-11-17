@@ -9,14 +9,12 @@ RenderSystem::~RenderSystem()
 {
 }
 
-void RenderSystem::Render(video::RenderView &renderView, const Camera &camera)
+void RenderSystem::Render(video::RenderView &renderView)
 {
 	auto &entities = GetEntities();
 	//renderView.SetViewProjection(camera.GetViewMatrix(), camera.GetProjectionMatrix());
 
 	renderView.PreRender();
-	renderView.Begin();
-
 	for (int32 i = 0; i < entities.size(); ++i)
 	{
 		TransformComponent &transformComponent = entities[i].GetComponent<TransformComponent>();
@@ -30,8 +28,6 @@ void RenderSystem::Render(video::RenderView &renderView, const Camera &camera)
 
 		}
 	}
-
-	renderView.End();
 	renderView.PostRender();
 }
 
@@ -47,8 +43,3 @@ void RenderSystem::OnEntityAdded(Entity & entity)
 void RenderSystem::OnEntityRemoved(Entity & entity)
 {
 }
-
-//void RenderSystem::SubmitMesh(Mesh & mesh)
-//{
-//
-//}

@@ -50,16 +50,17 @@ namespace video
 		LPDIRECT3DDEVICE9 GetDevice() { return _pDevice; }
 		EventChannel GetChannel() { return _channel; }
 
-		RenderView *GetRenderView(RenderViewHandle handle);
 
 		//버텍스 버퍼 생성
 		VertexBufferHandle CreateVertexBuffer(Memory *memory, VertexDeclHandle declHandle, const std::string &name = "");
+		VertexBufferHandle GetVertexBufferFromXMesh(ID3DXMesh *pMesh);
 		VertexBufferHandle GetVertexBuffer(const std::string &name);
 		VertexBuffer *GetVertexBuffer(VertexBufferHandle handle);
 		void DestroyVertexBuffer(VertexBufferHandle handle);
 
 		//인덱스 버퍼 생성
 		IndexBufferHandle CreateIndexBuffer(Memory *memory, uint32 stride, const std::string &name = "");
+		IndexBufferHandle GetIndexBufferFromXMesh(ID3DXMesh *pMesh);
 		IndexBufferHandle GetIndexBuffer(const std::string &name);
 		IndexBuffer *GetIndexBuffer(IndexBufferHandle handle);
 		void DestroyIndexBuffer(IndexBufferHandle handle);
@@ -85,11 +86,12 @@ namespace video
 		//렌더 뷰 생성
 		RenderViewHandle CreateRenderView(const std::string &name = "");
 		RenderViewHandle GetRenderView(const std::string &name);
+		RenderView *GetRenderView(RenderViewHandle handle);
 		void DestroyRenderView(RenderViewHandle handle);
 		
 		MaterialHandle CreateMaterial(const std::string &name = "");
 		MaterialHandle GetMaterial(const std::string &name);
-		const Material *GetMaterial(MaterialHandle handle);
+		Material *GetMaterial(MaterialHandle handle);
 		void DestroyMaterial(MaterialHandle handle);
 		void MaterialAddTexture(MaterialHandle material, uint32 textureSlot, TextureHandle texture);
 
@@ -119,11 +121,8 @@ namespace video
 
 		bool InitDefaultRenderState();
 
-		void DrawWithEffect(const video::RenderState &renderState, Matrix *matrices);
-		void DrawWithoutEffect(const video::RenderState &renderState, Matrix *matrices);
-
-		//void DrawPrimitive(const video::RenderState &renderState, Matrix *matrices);
-		//void DrawIndexPrimitive(const video::RenderState &renderState, Matrix *matrices);
+		//void DrawWithEffect(const video::RenderState &renderState, Matrix *matrices);
+		//void DrawWithoutEffect(const video::RenderState &renderState, Matrix *matrices);
 
 		void LoadDefaultTextures();
 		void MakeDefaultVertexDecls();
@@ -142,8 +141,6 @@ namespace video
 		RenderWindow _renderWindow;
 
 		EventChannel _channel;
-
-		RenderState _activeState;
 
 		VertexBuffer _vertexBuffers[VIDEO_CONFIG_VERTEXBUFFER_MAX_NUM];
 		IndexBuffer _indexBuffers[VIDEO_CONFIG_INDEXBUFFER_MAX_NUM];

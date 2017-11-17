@@ -10,7 +10,7 @@ public:
 	RenderSystem();
 	virtual ~RenderSystem() override;
 
-	void Render(video::RenderView &renderView, const Camera &camera);
+	void Render(video::RenderView &renderView);
 
 	virtual void Initialize();
 

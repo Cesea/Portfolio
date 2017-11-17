@@ -41,23 +41,7 @@ protected :
 
 protected :
 	bool32 _active;
-
-	bool32 _itemCheck{ false };
-	bool _collapse{ false };
-
-	float _sliderValue{ 0 };
-
-	char _strings1[MAX_PATH] = {0, };
-	char _strings2[MAX_PATH] = {0, };
-
-	im::WindowPos _firstWindowPos;
-	im::WindowPos _secondWindowPos;
-
-	int32 _scroll{ 0 };
-
-	bool _checked{ false };
-
-	video::RenderView *_mainRenderView;
+	video::RenderView *_mainRenderView{};
 
 	World _world;
 

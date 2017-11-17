@@ -223,40 +223,6 @@ namespace video
 		MaterialRange _materialRange;
 	};
 
-	//struct Skeleton
-	//{
-	//	bool Create();
-	//	void Destroy();
-	//	struct SkeletonName
-	//	{
-	//		char _name[64];
-	//	};
-
-	//	uint16 *_hierachy{};
-	//	Matrix *_localPoses{};
-	//	Matrix *_globalPoses{};
-	//	Matrix *_offsetMatrices{};
-	//	RenderGroupHandle *_renderGroups{};
-	//	SkeletonName *_names;
-
-	//	uint32 _numhierachy{};
-	//};
-
-	//struct Model
-	//{
-	//	//XFile을 먼저 로드 하고 정보를 추출하여 내가 원하는 포멧으로 변환한다.
-	//	bool CreateFromXStatic(const std::string &filePath, const Matrix *pMatCorrection = nullptr);
-	//	bool CreateFromXAnimated(const std::string &filePath, const Matrix *pMatCorrection = nullptr);
-	//	void Destroy();
-	//	std::vector<video::RenderGroupHandle> _groups;
-	//	Skeleton _skeleton;
-	//	video::EffectHandle _effect;
-	//	std::string _name;
-	//	//Sphere _sphere;
-	//	//AABB _aabb;
-	//};
-
-
 	struct PredefinedUniform
 	{
 		enum Enum
@@ -315,11 +281,10 @@ namespace video
 		void SetValue(LPCSTR name, void *value, size_t size);
 		void CommitChanges() const;
 
-		void DrawPrimitive(video::VertexBufferHandle vHandle, video::MaterialHandle mHandle) const;
-		void DrawPrimitiveIndex(video::VertexBufferHandle vHandle, video::IndexBufferHandle iHandle, 
-			video::MaterialHandle mHandle) const;
-		void DrawStaticMesh(const StaticXMesh &mesh, LPCSTR technique = nullptr) const;
-		void DrawSkinnedMesh(const SkinnedXMesh &mesh, animation::AnimationComponent &animation, LPCSTR technique = nullptr) const;
+		//void DrawPrimitive(const video::VertexBuffer &vBuffer, const video::Material &mHandle) const;
+		//void DrawPrimitiveIndex(const video::VertexBuffer &vBuffer, const video::IndexBuffer &iBuffer, const video::Material &mHandle) const;
+		//void DrawStaticMesh(const StaticXMesh &mesh, LPCSTR technique = nullptr) const;
+		//void DrawSkinnedMesh(const SkinnedXMesh &mesh, animation::AnimationComponent &animation, LPCSTR technique = nullptr) const;
 
 		ID3DXEffect *_ptr{};
 	};
@@ -352,6 +317,13 @@ namespace video
 	//TODO : Matrix Cache에서 여러개의 행렬을 넣을 수 있게끔 지원하라
 	struct MatrixCache
 	{
+		//NOTE : end가 -1이면 하나만 쓰는거...
+		struct CacheRange
+		{
+			int32 _start{};
+			int32 _end{-1};
+		};
+
 		MatrixCache() 
 			: _num(0)
 		{
@@ -362,27 +334,30 @@ namespace video
 			_num = 0;
 		}
 
-		uint32 Add(const Matrix *matrix)
+		uint32 Add(const Matrix *matrix, int32 numMatrix = 1)
 		{
 			if (nullptr != matrix)
 			{
-				//Assert(_num + _num < VIDEO_CONFIG_MAX_MATRIX_CACHE); /*"Matrix cache overflow. %d (max: %d)", m_num + _num, BGFX_CONFIG_MAX_MATRIX_CACHE);*/
-				//uint32 num = Uint32Min(VIDEO_CONFIG_MAX_MATRIX_CACHE - _num, num);
+				Assert(_num + numMatrix < VIDEO_CONFIG_MAX_MATRIX_CACHE); 
 				uint32 first = _num;
-				memcpy(&_cache[_num], matrix, sizeof(Matrix));
-				_num += 1;
+				memcpy(&_cache[_num], matrix, sizeof(Matrix) * numMatrix);
+				_num += numMatrix;
 				return first;
 			}
-			return 0;
+			else
+			{
+				return 0;
+			}
 		}
 
 		Matrix _cache[VIDEO_CONFIG_MAX_MATRIX_CACHE];
 		uint32 _num;
 	};
 
-	//TODO : 아래의 RenderState의 정보들을 DrawData로 교체하자..
-	struct DrawData
+	struct RenderCommand
 	{
+		VertexBufferHandle vHandle;
+		IndexBufferHandle iHandle;
 
 		//버텍스 버퍼로만 그릴때 사용된다
 		uint32 _startVertex{};
@@ -392,73 +367,42 @@ namespace video
 		uint32 _numVertices{};
 		uint32 _numPrim{};
 
-		D3DPRIMITIVETYPE _primitiveType{D3DPRIMITIVETYPE::D3DPT_TRIANGLELIST};
-	};
-
-	//NOTE : 만약 deffered rendering을 하게된다면  RenderView의 FrameBuffer에 이미지들을 렌더 한 후에 여러 RenderView의 
-	// FrameBuffer를 합성하여 그린다??
-	//Context와 같은 역할
-	struct RenderState
-	{
-		enum FillMode
+		enum PrimType
 		{
-			eFillPoint = 0,
-			eFillWireFrame,
-			eFillSolid,
-			Count
+			eTriangleList,
+			eLineList
 		};
+		PrimType _primType;
 
-		//리소스 핸들
-		VertexBufferHandle _vertexBuffer{};
-		VertexDeclHandle _vertexDecl{};
-		IndexBufferHandle _indexBuffer{};
-		MaterialHandle _material{};
-		EffectHandle _effect{};
+		EffectHandle _effectHandle;
+		MaterialHandle _materialHandle;
 
-		//device state
-		FillMode _fillMode{FillMode::eFillSolid};
-
-		DrawData _drawData;
-
-		void ResetDefault();
+		MatrixCache::CacheRange _matrixIndex{};
 	};
 
 	struct RenderView
 	{
 		bool Create();
-
-		void Begin();
-		void End();
-
-		void SetCamera(const Camera *pCamera);
-		//void SetViewProjection(const Matrix &viewMatrix, const Matrix &projectionMatrix);
-		void SetTransform(const Matrix &matrix);
-
-		void SetEffect(EffectHandle handle);
-
-		void SetMaterial(MaterialHandle handle);
-
-		void SetFillMode(RenderState::FillMode mode);
-
-		void Submit(VertexBufferHandle handle, uint32 startVertex = 0, uint32 primCount = 0);
-		void Submit(IndexBufferHandle handle, uint32 startIndex = 0, uint32 numVertices = 0, uint32 primCount = 0);
-		void SubmitGroup(RenderGroupHandle handle);
-
-		void Draw();
-
-		void PreRender();
-		void PostRender();
-
 		void Destroy();
 
-		const Camera *_pCamera{};
-		//Matrix _viewMatrix;
-		//Matrix _projectionMatrix;
+		RenderCommand &GetCommand() { return _renderCommands[_commandCount++]; }
+		void PreRender();
+		void ExecCommands();
+		void PostRender();
+
+		//void Sort();
 
 		uint32 _clearColor{};
 
+		Camera *_pCamera{};
+
+		RenderCommand _renderCommands[1024];
+		uint32 _commandCount{};
+
 		MatrixCache _matrixCache;
-		CommandBuffer _commandBuffer;
+
+		FrameBufferHandle _colorFBHandle;
+		FrameBufferHandle _depthFBHandle;;
 	};
 }
 

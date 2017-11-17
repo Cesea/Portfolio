@@ -59,155 +59,76 @@ void VideoDevice::Update(float deltaTime)
 //NOTE : Render 함수는 RenderView를 그리는 역할을 한다
 // 만약 RenderView의 RenderState에 Effect가 설정 되어있다면 Effect를 사용하여 렌더 할 것이고 아니라면 
 // 현제 Device에 설정된 값으로 렌더 될 것이다...
-void video::VideoDevice::Render(RenderView & renderView)
+void video::VideoDevice::Render(RenderView & renderView) 
 {
 	static uint32 count = 0;
 
 	uint32 drawCount = 0;
 
-	renderView.PreRender();
-
 	_pDevice->Clear(0, nullptr, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER | D3DCLEAR_STENCIL, renderView._clearColor, 1.0f, 0);
 	_pDevice->BeginScene();
 
-	CommandBuffer::Enum command;
-	renderView._commandBuffer.Read<CommandBuffer::Enum>(command);
-
-	RenderState sendingState{};
 	Matrix sendingMatrix[3];
 	MatrixIdentity(&sendingMatrix[0]);
-	sendingMatrix[1] = renderView._pCamera->GetViewMatrix();
-	sendingMatrix[2] = renderView._pCamera->GetViewProjectionMatrix();
+	//sendingMatrix[1] = renderView._pCamera->GetViewMatrix();
+	//sendingMatrix[2] = renderView._pCamera->GetViewProjectionMatrix();
 
 	gpDevice->SetTransform(D3DTS_VIEW, &sendingMatrix[1]);
 	gpDevice->SetTransform(D3DTS_PROJECTION, &sendingMatrix[2]);
 
-	if (command == CommandBuffer::Enum::eRendererInit)
+	for (uint32 i = 0; i < renderView._commandCount; ++i)
 	{
-		while (command != CommandBuffer::Enum::eEnd)
+		const RenderCommand &command = renderView._renderCommands[i];
+		VertexBuffer &vBuffer = *GetVertexBuffer(command.vHandle);
+		const Effect &effect = *GetEffect(command._effectHandle);
+		const Material &material = *GetMaterial(command._materialHandle);
+
+		const VertexDecl &decl = *VIDEO->GetVertexDecl(vBuffer._decl);
+
+		if (!command.iHandle.IsValid())
 		{
-			renderView._commandBuffer.Read<CommandBuffer::Enum>(command);
+			effect.SetMaterial(material);
 
-			switch (command)
+			gpDevice->SetVertexDeclaration(decl._ptr);
+			gpDevice->SetStreamSource(0, vBuffer._ptr, 0, decl._stride);
+
+			uint32 numPass = effect.BeginEffect();
+			for (uint32 j = 0; j < numPass; ++j)
 			{
-			case video::CommandBuffer::eSetTransform:
-			{
-				uint32 cacheIndex{};
-				renderView._commandBuffer.Read<uint32>(cacheIndex);
-				sendingMatrix[0] = renderView._matrixCache._cache[cacheIndex];
-
-			} break;
-			case video::CommandBuffer::eSetEffect:
-			{
-				EffectHandle handle;
-				renderView._commandBuffer.Read<EffectHandle>(handle);
-
-				sendingState._effect= handle;
-			} break;
-
-			case video::CommandBuffer::eSetVertexBuffer:
-			{
-				VertexBufferHandle handle;
-				renderView._commandBuffer.Read<VertexBufferHandle>(handle);
-				sendingState._vertexBuffer= handle;
-
-				renderView._commandBuffer.Read<uint32>(sendingState._drawData._startVertex);
-				renderView._commandBuffer.Read<uint32>(sendingState._drawData._numPrim);
-			} break;
-
-			case video::CommandBuffer::eSetIndexBuffer:
-			{
-				IndexBufferHandle handle;
-				renderView._commandBuffer.Read<IndexBufferHandle>(handle);
-				sendingState._indexBuffer= handle;
-
-				renderView._commandBuffer.Read<uint32>(sendingState._drawData._startIndex);
-				renderView._commandBuffer.Read<uint32>(sendingState._drawData._numVertices);
-				renderView._commandBuffer.Read<uint32>(sendingState._drawData._numPrim);
-			} break;
-
-			case video::CommandBuffer::eSetRenderGroup :
-			{
-				RenderGroupHandle handle;
-				renderView._commandBuffer.Read<RenderGroupHandle>(handle);
-
-				const RenderGroup &refRenderGroup = _renderGroups[handle.index];
-
-				sendingState._vertexBuffer = refRenderGroup._vertexBuffer;
-				sendingState._indexBuffer = refRenderGroup._indexBuffer;
-
-				sendingState._material = refRenderGroup._materialRange._material;
-				
-				sendingState._drawData._startIndex = refRenderGroup._materialRange._startIndex;
-				sendingState._drawData._numVertices = refRenderGroup._materialRange._numVertices;
-				sendingState._drawData._numPrim = refRenderGroup._materialRange._numPrim;
-			}break;
-
-			case video::CommandBuffer::eSetMaterial:
-			{
-				MaterialHandle handle;
-				renderView._commandBuffer.Read<MaterialHandle>(handle);
-				sendingState._material= handle;
-
-			}break;
-
-			case video::CommandBuffer::eChangeFillMode :
-			{
-				RenderState::FillMode fillMode;
-				renderView._commandBuffer.Read<RenderState::FillMode>(fillMode);
-				
-				sendingState._fillMode = fillMode;
-			}break;
-
-			case video::CommandBuffer::eChangePrimitiveType :
-			{
-				D3DPRIMITIVETYPE type;
-				renderView._commandBuffer.Read<D3DPRIMITIVETYPE>(type);
-				
-				sendingState._drawData._primitiveType = type;
-			}break;
-
-			case video::CommandBuffer::eDraw:
-			{
-				drawCount++;
-
-				if (sendingState._vertexBuffer.IsValid())
-				{
-					//NOTE : FillMode 처리해준다 Solid가 default 값
-					//if (sendingState._fillMode != RenderState::FillMode::eFillSolid)
-					//{
-					//	if (sendingState._fillMode == RenderState::FillMode::eFillPoint)
-					//	{
-					//		gpDevice->SetRenderState(D3DRS_FILLMODE, D3DFILL_POINT);
-					//	}
-					//	else if (sendingState._fillMode == RenderState::FillMode::eFillWireFrame)
-					//	{
-					//		gpDevice->SetRenderState(D3DRS_FILLMODE, D3DFILL_WIREFRAME);
-					//	}
-					//}
-					if (sendingState._effect.IsValid())
-					{
-						DrawWithEffect(sendingState, sendingMatrix);
-					}
-					else
-					{
-						DrawWithoutEffect(sendingState, sendingMatrix);
-					}
-				}
-				//한번의 렌더를 끝내면 RenderState를 Default 값으로 되돌린다.
-				sendingState.ResetDefault();
-				MatrixIdentity(&sendingMatrix[0]);
-			} break;
-			default:
-			{
-			} break;
+				effect.BeginPass(i);
+				_pDevice->DrawPrimitive((command._primType == RenderCommand::PrimType::eTriangleList) ? (D3DPT_TRIANGLELIST) : (D3DPT_LINELIST),
+					command._startVertex, 
+					(command._numPrim == 0) ? (vBuffer._size / decl._stride) : (command._numPrim));
+				effect.EndPass();
 			}
+			effect.EndEffect();
+		}
+		else
+		{
+			const IndexBuffer &iBuffer = *GetIndexBuffer(command.iHandle);
+
+			effect.SetMaterial(material);
+
+			gpDevice->SetVertexDeclaration(decl._ptr);
+			gpDevice->SetStreamSource(0, vBuffer._ptr, 0, decl._stride);
+			gpDevice->SetIndices(iBuffer._ptr);
+
+			uint32 numPass = effect.BeginEffect();
+			for (uint32 j = 0; j < numPass; ++j)
+			{
+				effect.BeginPass(i);
+				_pDevice->DrawIndexedPrimitive((command._primType == RenderCommand::PrimType::eTriangleList) ? (D3DPT_TRIANGLELIST) : (D3DPT_LINELIST),
+					0, 0, 
+					(command._numVertices == 0) ? (vBuffer._size / decl._stride) : (command._numVertices),
+					(command._startIndex == 0) ? (0) : (command._startIndex),
+					(command._numPrim == 0) ? (vBuffer._size / decl._stride) : (command._numPrim));
+				effect.EndPass();
+			}
+			effect.EndEffect();
+
 		}
 	}
-	renderView.PostRender();
-	
-	_pDevice->EndScene();
-	_pDevice->Present(nullptr, nullptr, NULL, nullptr);
+
 
 #if defined (DEBUG) || defined (_DEBUG) 
 	count++;
@@ -294,244 +215,243 @@ bool VideoDevice::InitDefaultRenderState()
 }
 
 //NOTE : 만약 이펙트로 렌더 한다면 항상 D3DPT_TRIANGLELIST라고 가정한다....
-void video::VideoDevice::DrawWithEffect(const video::RenderState & renderState, Matrix * matrices)
-{
-	Effect *effectPtr{};
-	VertexBuffer *vertexPtr{};
-	IndexBuffer *indexPtr{};
-	Material *materialPtr{};
-	VertexDecl *declPtr{};
-
-	DWORD fvf{};
-	_pDevice->GetFVF(&fvf);
-
-	//머테리얼 설정 여부 확인
-	if (renderState._material != _activeState._material)
-	{
-		_activeState._material = renderState._material;
-	}
-
-	if (_activeState._material.IsValid())
-	{
-		materialPtr = &_materials[_activeState._material.index];
-	}
-
-	if (renderState._vertexBuffer != _activeState._vertexBuffer)
-	{
-		_activeState._vertexBuffer = renderState._vertexBuffer;
-		vertexPtr = &_vertexBuffers[_activeState._vertexBuffer.index];
-		//Vertex Decl설정여부 확인
-		if (_activeState._vertexDecl != vertexPtr->_decl)
-		{
-			_activeState._vertexDecl = vertexPtr->_decl;
-			declPtr = &_vertexDecls[_activeState._vertexDecl.index];
-			_pDevice->SetVertexDeclaration(declPtr->_ptr);
-		}
-		else
-		{
-			declPtr = &_vertexDecls[_activeState._vertexDecl.index];
-		}
-		_pDevice->SetStreamSource(0, vertexPtr->_ptr, 0, declPtr->_stride);
-	}
-	else
-	{
-		vertexPtr = &_vertexBuffers[_activeState._vertexBuffer.index];
-		declPtr = &_vertexDecls[_activeState._vertexDecl.index];
-	}
-
-	if (renderState._effect != _activeState._effect)
-	{
-		_activeState._effect = renderState._effect;
-	}
-	effectPtr = &_effects[_activeState._effect.index];
-
-	effectPtr->SetMatrix("gWorld", matrices[0]);
-	effectPtr->SetMatrix("gView", matrices[1]);
-	effectPtr->SetMatrix("gProjection", matrices[2]);
-
-	if (materialPtr)
-	{
-		for (uint32 i = 0; i < VIDEO_CONFIG_MATERIAL_TEXTURE_MAX_NUM; ++i)
-		{
-			if (materialPtr->_textureHandles[i].IsValid())
-			{
-				effectPtr->SetTexture(PredefinedUniform::ParamName[PredefinedUniform::Enum::eTexture0 + i],
-					_textures[materialPtr->_textureHandles[i].index]);
-			}
-		}
-	}
-	//머테리얼까지 설정이 끝났다면 여기서 인덱스 버퍼가 있는지 없는지를 판별하여 분기를 나눈다.
-	//인덱스 버퍼가 있다..
-	if (renderState._indexBuffer.IsValid())
-	{
-		_activeState._indexBuffer = renderState._indexBuffer;
-		indexPtr = &_indexBuffers[renderState._indexBuffer.index];
-		_pDevice->SetIndices(indexPtr->_ptr);
-		uint32 numVertices{};
-		uint32 numPrim{};
-		uint32 startIndex{};
-
-
-		numVertices = (0 != renderState._drawData._numVertices) ? 
-			(renderState._drawData._numVertices) : (vertexPtr->_size / declPtr->_stride);
-		numPrim = (0 != renderState._drawData._numPrim) ? 
-			(renderState._drawData._numPrim) : ((indexPtr->_size / 2) / 3);
-		startIndex = (0 != renderState._drawData._startIndex) ? (renderState._drawData._startIndex) : 0;
-
-		uint32 numPass = effectPtr->BeginEffect();
-		for (uint32 i = 0; i < numPass; ++i)
-		{
-			effectPtr->BeginPass(i);
-			_pDevice->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, 0, numVertices, startIndex, numPrim);
-			effectPtr->EndPass();
-		}
-		effectPtr->EndEffect();
-
-	}
-	//인덱스 버퍼가 없다..
-	else
-	{
-		_pDevice->SetIndices(nullptr);
-		uint32 numPrim{};
-		uint32 startVertex{};
-
-		numPrim = (0 != renderState._drawData._numVertices) ? 
-			(renderState._drawData._numPrim) : (vertexPtr->_size / declPtr->_stride);
-		startVertex = (0 != renderState._drawData._startVertex) ? 
-			(renderState._drawData._startVertex) : (0);
-
-		uint32 numPass = effectPtr->BeginEffect();
-		for (uint32 i = 0; i < numPass; ++i)
-		{
-			effectPtr->BeginPass(i);
-			_pDevice->DrawPrimitive(D3DPT_TRIANGLELIST, startVertex, numPrim);
-
-			effectPtr->EndPass();
-		}
-		effectPtr->EndEffect();
-	}
-}
-
-//NOTE : 만약 이펙트로 렌더 한다면 항상 D3DPT_TRIANGLELIST라고 가정한다....
-void video::VideoDevice::DrawWithoutEffect(const video::RenderState & renderState, Matrix * matrices)
-{
-	VertexBuffer *vertexPtr{};
-	IndexBuffer *indexPtr{};
-	Material *materialPtr{};
-	VertexDecl *declPtr{};
-
-	//머테리얼 설정 여부 확인
-	if (renderState._material != _activeState._material)
-	{
-		_activeState._material = renderState._material;
-	}
-
-	if (_activeState._material.IsValid())
-	{
-		materialPtr = &_materials[_activeState._material.index];
-	}
-
-	if (renderState._vertexBuffer != _activeState._vertexBuffer)
-	{
-		_activeState._vertexBuffer = renderState._vertexBuffer;
-		vertexPtr = &_vertexBuffers[_activeState._vertexBuffer.index];
-		//Vertex Decl설정여부 확인
-		//effect를 사용하지 않기때문에 device의 fvf를 설정 해 주어야 한다.
-		if (_activeState._vertexDecl != vertexPtr->_decl)
-		{
-			_activeState._vertexDecl = vertexPtr->_decl;
-			declPtr = &_vertexDecls[_activeState._vertexDecl.index];
-		}
-		else
-		{
-			declPtr = &_vertexDecls[_activeState._vertexDecl.index];
-		}
-		//NOTE : 기본적으로 렌더러는 이펙트를 사용하여 렌더하도록 하기때문에 항상 
-		// FVF를 설정 해 주고 reset부분에서 꺼 주도록 하자...
-		_pDevice->SetStreamSource(0, vertexPtr->_ptr, 0, declPtr->_stride);
-	}
-	else
-	{
-		vertexPtr = &_vertexBuffers[_activeState._vertexBuffer.index];
-		declPtr = &_vertexDecls[_activeState._vertexDecl.index];
-	}
-	_pDevice->SetFVF(declPtr->_fvf);
-
-	_pDevice->SetTransform(D3DTS_WORLD, &matrices[0]);
-
-	if (materialPtr)
-	{
-		for (uint32 i = 0; i < VIDEO_CONFIG_MATERIAL_TEXTURE_MAX_NUM; ++i)
-		{
-			if (materialPtr->_textureHandles[i].IsValid())
-			{
-				//NOTE : SetTexture의 첫번째 인자에 어떤 값이 들어가야 맞는걸까?
-				_pDevice->SetTexture(i, _textures[materialPtr->_textureHandles[i].index]._ptr);
-			}
-		}
-	}
-
-	//머테리얼까지 설정이 끝났다면 여기서 인덱스 버퍼가 있는지 없는지를 판별하여 분기를 나눈다.
-	//인덱스 버퍼가 있다..
-	if (renderState._indexBuffer.IsValid())
-	{
-		indexPtr = &_indexBuffers[renderState._indexBuffer.index];
-		_pDevice->SetIndices(indexPtr->_ptr);
-
-		uint32 numVertices{};
-		uint32 numPrim{};
-		uint32 startIndex{};
-
-		//TriangleList일때...
-		if ( D3DPT_TRIANGLELIST == renderState._drawData._primitiveType)
-		{
-			numVertices = (0 != renderState._drawData._numVertices) ?
-				(renderState._drawData._numVertices) : (vertexPtr->_size / declPtr->_stride);
-			numPrim = (0 != renderState._drawData._numPrim) ?
-				(renderState._drawData._numPrim) : ((indexPtr->_size / 2) / 3);
-			startIndex = (0 != renderState._drawData._startIndex) ? (renderState._drawData._startIndex) : 0;
-
-			_pDevice->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, 0, numVertices, startIndex, numPrim);
-		}
-		//LineList일때
-		else if(D3DPT_LINELIST == renderState._drawData._primitiveType)
-		{
-			numVertices = (0 != renderState._drawData._numVertices) ?
-				(renderState._drawData._numVertices) : (vertexPtr->_size / declPtr->_stride);
-			numPrim = (0 != renderState._drawData._numPrim) ?
-				(renderState._drawData._numPrim) : ((indexPtr->_size / 2) / 2);
-			startIndex = (0 != renderState._drawData._startIndex) ? (renderState._drawData._startIndex) : 0;
-			_pDevice->DrawIndexedPrimitive(D3DPT_LINELIST, 0, 0, numVertices, startIndex, numPrim);
-		}
-
-	}
-	//인덱스 버퍼가 없다..
-	else
-	{
-		uint32 numPrim{};
-		uint32 startVertex{};
-
-		if ( D3DPT_TRIANGLELIST == renderState._drawData._primitiveType)
-		{
-			numPrim = (0 != renderState._drawData._numVertices) ?
-				(renderState._drawData._numPrim) : (vertexPtr->_size / declPtr->_stride);
-			startVertex = (0 != renderState._drawData._startVertex) ?
-				(renderState._drawData._startVertex) : (0);
-			_pDevice->DrawPrimitive(D3DPT_TRIANGLELIST, startVertex, numPrim);
-		}
-		//LineList일때
-		else if (D3DPT_LINELIST == renderState._drawData._primitiveType)
-		{
-			numPrim = (0 != renderState._drawData._numVertices) ?
-				(renderState._drawData._numPrim) : (vertexPtr->_size / declPtr->_stride);
-			startVertex = (0 != renderState._drawData._startVertex) ?
-				(renderState._drawData._startVertex) : (0);
-			_pDevice->DrawPrimitive(D3DPT_LINELIST, startVertex, numPrim);
-		}
-	}
-
-}
-
+//void video::VideoDevice::DrawWithEffect(const video::RenderState & renderState, Matrix * matrices)
+//{
+//	Effect *effectPtr{};
+//	VertexBuffer *vertexPtr{};
+//	IndexBuffer *indexPtr{};
+//	Material *materialPtr{};
+//	VertexDecl *declPtr{};
+//
+//	DWORD fvf{};
+//	_pDevice->GetFVF(&fvf);
+//
+//	//머테리얼 설정 여부 확인
+//	if (renderState._material != _activeState._material)
+//	{
+//		_activeState._material = renderState._material;
+//	}
+//
+//	if (_activeState._material.IsValid())
+//	{
+//		materialPtr = &_materials[_activeState._material.index];
+//	}
+//
+//	if (renderState._vertexBuffer != _activeState._vertexBuffer)
+//	{
+//		_activeState._vertexBuffer = renderState._vertexBuffer;
+//		vertexPtr = &_vertexBuffers[_activeState._vertexBuffer.index];
+//		//Vertex Decl설정여부 확인
+//		if (_activeState._vertexDecl != vertexPtr->_decl)
+//		{
+//			_activeState._vertexDecl = vertexPtr->_decl;
+//			declPtr = &_vertexDecls[_activeState._vertexDecl.index];
+//			_pDevice->SetVertexDeclaration(declPtr->_ptr);
+//		}
+//		else
+//		{
+//			declPtr = &_vertexDecls[_activeState._vertexDecl.index];
+//		}
+//		_pDevice->SetStreamSource(0, vertexPtr->_ptr, 0, declPtr->_stride);
+//	}
+//	else
+//	{
+//		vertexPtr = &_vertexBuffers[_activeState._vertexBuffer.index];
+//		declPtr = &_vertexDecls[_activeState._vertexDecl.index];
+//	}
+//
+//	if (renderState._effect != _activeState._effect)
+//	{
+//		_activeState._effect = renderState._effect;
+//	}
+//	effectPtr = &_effects[_activeState._effect.index];
+//
+//	effectPtr->SetMatrix("gWorld", matrices[0]);
+//	effectPtr->SetMatrix("gView", matrices[1]);
+//	effectPtr->SetMatrix("gProjection", matrices[2]);
+//
+//	if (materialPtr)
+//	{
+//		for (uint32 i = 0; i < VIDEO_CONFIG_MATERIAL_TEXTURE_MAX_NUM; ++i)
+//		{
+//			if (materialPtr->_textureHandles[i].IsValid())
+//			{
+//				effectPtr->SetTexture(PredefinedUniform::ParamName[PredefinedUniform::Enum::eTexture0 + i],
+//					_textures[materialPtr->_textureHandles[i].index]);
+//			}
+//		}
+//	}
+//	//머테리얼까지 설정이 끝났다면 여기서 인덱스 버퍼가 있는지 없는지를 판별하여 분기를 나눈다.
+//	//인덱스 버퍼가 있다..
+//	if (renderState._indexBuffer.IsValid())
+//	{
+//		_activeState._indexBuffer = renderState._indexBuffer;
+//		indexPtr = &_indexBuffers[renderState._indexBuffer.index];
+//		_pDevice->SetIndices(indexPtr->_ptr);
+//		uint32 numVertices{};
+//		uint32 numPrim{};
+//		uint32 startIndex{};
+//
+//
+//		numVertices = (0 != renderState._drawData._numVertices) ? 
+//			(renderState._drawData._numVertices) : (vertexPtr->_size / declPtr->_stride);
+//		numPrim = (0 != renderState._drawData._numPrim) ? 
+//			(renderState._drawData._numPrim) : ((indexPtr->_size / 2) / 3);
+//		startIndex = (0 != renderState._drawData._startIndex) ? (renderState._drawData._startIndex) : 0;
+//
+//		uint32 numPass = effectPtr->BeginEffect();
+//		for (uint32 i = 0; i < numPass; ++i)
+//		{
+//			effectPtr->BeginPass(i);
+//			_pDevice->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, 0, numVertices, startIndex, numPrim);
+//			effectPtr->EndPass();
+//		}
+//		effectPtr->EndEffect();
+//
+//	}
+//	//인덱스 버퍼가 없다..
+//	else
+//	{
+//		_pDevice->SetIndices(nullptr);
+//		uint32 numPrim{};
+//		uint32 startVertex{};
+//
+//		numPrim = (0 != renderState._drawData._numVertices) ? 
+//			(renderState._drawData._numPrim) : (vertexPtr->_size / declPtr->_stride);
+//		startVertex = (0 != renderState._drawData._startVertex) ? 
+//			(renderState._drawData._startVertex) : (0);
+//
+//		uint32 numPass = effectPtr->BeginEffect();
+//		for (uint32 i = 0; i < numPass; ++i)
+//		{
+//			effectPtr->BeginPass(i);
+//			_pDevice->DrawPrimitive(D3DPT_TRIANGLELIST, startVertex, numPrim);
+//
+//			effectPtr->EndPass();
+//		}
+//		effectPtr->EndEffect();
+//	}
+//}
+//
+////NOTE : 만약 이펙트로 렌더 한다면 항상 D3DPT_TRIANGLELIST라고 가정한다....
+//void video::VideoDevice::DrawWithoutEffect(const video::RenderState & renderState, Matrix * matrices)
+//{
+//	VertexBuffer *vertexPtr{};
+//	IndexBuffer *indexPtr{};
+//	Material *materialPtr{};
+//	VertexDecl *declPtr{};
+//
+//	//머테리얼 설정 여부 확인
+//	if (renderState._material != _activeState._material)
+//	{
+//		_activeState._material = renderState._material;
+//	}
+//
+//	if (_activeState._material.IsValid())
+//	{
+//		materialPtr = &_materials[_activeState._material.index];
+//	}
+//
+//	if (renderState._vertexBuffer != _activeState._vertexBuffer)
+//	{
+//		_activeState._vertexBuffer = renderState._vertexBuffer;
+//		vertexPtr = &_vertexBuffers[_activeState._vertexBuffer.index];
+//		//Vertex Decl설정여부 확인
+//		//effect를 사용하지 않기때문에 device의 fvf를 설정 해 주어야 한다.
+//		if (_activeState._vertexDecl != vertexPtr->_decl)
+//		{
+//			_activeState._vertexDecl = vertexPtr->_decl;
+//			declPtr = &_vertexDecls[_activeState._vertexDecl.index];
+//		}
+//		else
+//		{
+//			declPtr = &_vertexDecls[_activeState._vertexDecl.index];
+//		}
+//		//NOTE : 기본적으로 렌더러는 이펙트를 사용하여 렌더하도록 하기때문에 항상 
+//		// FVF를 설정 해 주고 reset부분에서 꺼 주도록 하자...
+//		_pDevice->SetStreamSource(0, vertexPtr->_ptr, 0, declPtr->_stride);
+//	}
+//	else
+//	{
+//		vertexPtr = &_vertexBuffers[_activeState._vertexBuffer.index];
+//		declPtr = &_vertexDecls[_activeState._vertexDecl.index];
+//	}
+//	_pDevice->SetFVF(declPtr->_fvf);
+//
+//	_pDevice->SetTransform(D3DTS_WORLD, &matrices[0]);
+//
+//	if (materialPtr)
+//	{
+//		for (uint32 i = 0; i < VIDEO_CONFIG_MATERIAL_TEXTURE_MAX_NUM; ++i)
+//		{
+//			if (materialPtr->_textureHandles[i].IsValid())
+//			{
+//				//NOTE : SetTexture의 첫번째 인자에 어떤 값이 들어가야 맞는걸까?
+//				_pDevice->SetTexture(i, _textures[materialPtr->_textureHandles[i].index]._ptr);
+//			}
+//		}
+//	}
+//
+//	//머테리얼까지 설정이 끝났다면 여기서 인덱스 버퍼가 있는지 없는지를 판별하여 분기를 나눈다.
+//	//인덱스 버퍼가 있다..
+//	if (renderState._indexBuffer.IsValid())
+//	{
+//		indexPtr = &_indexBuffers[renderState._indexBuffer.index];
+//		_pDevice->SetIndices(indexPtr->_ptr);
+//
+//		uint32 numVertices{};
+//		uint32 numPrim{};
+//		uint32 startIndex{};
+//
+//		//TriangleList일때...
+//		if ( D3DPT_TRIANGLELIST == renderState._drawData._primitiveType)
+//		{
+//			numVertices = (0 != renderState._drawData._numVertices) ?
+//				(renderState._drawData._numVertices) : (vertexPtr->_size / declPtr->_stride);
+//			numPrim = (0 != renderState._drawData._numPrim) ?
+//				(renderState._drawData._numPrim) : ((indexPtr->_size / 2) / 3);
+//			startIndex = (0 != renderState._drawData._startIndex) ? (renderState._drawData._startIndex) : 0;
+//
+//			_pDevice->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, 0, numVertices, startIndex, numPrim);
+//		}
+//		//LineList일때
+//		else if(D3DPT_LINELIST == renderState._drawData._primitiveType)
+//		{
+//			numVertices = (0 != renderState._drawData._numVertices) ?
+//				(renderState._drawData._numVertices) : (vertexPtr->_size / declPtr->_stride);
+//			numPrim = (0 != renderState._drawData._numPrim) ?
+//				(renderState._drawData._numPrim) : ((indexPtr->_size / 2) / 2);
+//			startIndex = (0 != renderState._drawData._startIndex) ? (renderState._drawData._startIndex) : 0;
+//			_pDevice->DrawIndexedPrimitive(D3DPT_LINELIST, 0, 0, numVertices, startIndex, numPrim);
+//		}
+//
+//	}
+//	//인덱스 버퍼가 없다..
+//	else
+//	{
+//		uint32 numPrim{};
+//		uint32 startVertex{};
+//
+//		if ( D3DPT_TRIANGLELIST == renderState._drawData._primitiveType)
+//		{
+//			numPrim = (0 != renderState._drawData._numVertices) ?
+//				(renderState._drawData._numPrim) : (vertexPtr->_size / declPtr->_stride);
+//			startVertex = (0 != renderState._drawData._startVertex) ?
+//				(renderState._drawData._startVertex) : (0);
+//			_pDevice->DrawPrimitive(D3DPT_TRIANGLELIST, startVertex, numPrim);
+//		}
+//		//LineList일때
+//		else if (D3DPT_LINELIST == renderState._drawData._primitiveType)
+//		{
+//			numPrim = (0 != renderState._drawData._numVertices) ?
+//				(renderState._drawData._numPrim) : (vertexPtr->_size / declPtr->_stride);
+//			startVertex = (0 != renderState._drawData._startVertex) ?
+//				(renderState._drawData._startVertex) : (0);
+//			_pDevice->DrawPrimitive(D3DPT_LINELIST, startVertex, numPrim);
+//		}
+//	}
+//
+//}
 
 //void video::VideoDevice::DrawPrimitive(const video::RenderState & renderState, Matrix *matrices)
 //{
@@ -779,6 +699,11 @@ VertexBufferHandle video::VideoDevice::CreateVertexBuffer(Memory * memory, Verte
 	return result;
 }
 
+VertexBufferHandle video::VideoDevice::GetVertexBufferFromXMesh(ID3DXMesh * pMesh)
+{
+	return VertexBufferHandle();
+}
+
 VertexBufferHandle video::VideoDevice::GetVertexBuffer(const std::string & name)
 {
 	return _vertexBufferPool.Get(name);
@@ -807,6 +732,11 @@ IndexBufferHandle video::VideoDevice::CreateIndexBuffer(Memory * memory, uint32 
 		Assert(false);//Creation failed
 	}
 	return result;
+}
+
+IndexBufferHandle video::VideoDevice::GetIndexBufferFromXMesh(ID3DXMesh * pMesh)
+{
+	return IndexBufferHandle();
 }
 
 IndexBufferHandle video::VideoDevice::GetIndexBuffer(const std::string & name)
@@ -945,7 +875,7 @@ MaterialHandle video::VideoDevice::GetMaterial(const std::string & name)
 	return _materialHandlePool.Get(name);
 }
 
-const Material * video::VideoDevice::GetMaterial(MaterialHandle handle)
+Material * video::VideoDevice::GetMaterial(MaterialHandle handle)
 {
 	if (handle.IsValid())
 	{

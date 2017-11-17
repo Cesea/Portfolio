@@ -240,79 +240,6 @@ namespace video
 		_ptr->CommitChanges();
 	}
 
-	void Effect::DrawPrimitive(video::VertexBufferHandle vHandle, video::MaterialHandle mHandle) const
-	{
-		video::VertexBuffer *vertexBuffer = VIDEO->GetVertexBuffer(vHandle);
-		video::VertexDecl *decl = VIDEO->GetVertexDecl(vertexBuffer->_decl);
-
-		const Material *mat = VIDEO->GetMaterial(mHandle);
-		this->SetMaterial(*mat);
-
-		gpDevice->SetVertexDeclaration(decl->_ptr);
-		gpDevice->SetStreamSource(0, vertexBuffer->_ptr, 0, decl->_stride);
-
-		uint32 numPass = this->BeginEffect();
-		for (uint32 j = 0; j < numPass; ++j)
-		{
-			this->BeginPass(j);
-			gpDevice->DrawPrimitive(D3DPT_TRIANGLELIST, 0, vertexBuffer->_size / decl->_stride);
-			this->EndPass();
-		}
-		this->EndEffect();
-	}
-
-	void Effect::DrawPrimitiveIndex(video::VertexBufferHandle vHandle, video::IndexBufferHandle iHandle,
-		video::MaterialHandle mHandle) const
-	{
-		video::VertexBuffer *vertexBuffer = VIDEO->GetVertexBuffer(vHandle);
-		video::VertexDecl *decl = VIDEO->GetVertexDecl(vertexBuffer->_decl);
-		video::IndexBuffer *indexBuffer = VIDEO->GetIndexBuffer(iHandle);
-
-		const Material *mat = VIDEO->GetMaterial(mHandle);
-		this->SetMaterial(*mat);
-
-		gpDevice->SetVertexDeclaration(decl->_ptr);
-		gpDevice->SetStreamSource(0, vertexBuffer->_ptr, 0, decl->_stride);
-		gpDevice->SetIndices(indexBuffer->_ptr);
-
-		uint32 numPass = this->BeginEffect();
-		for (uint32 j = 0; j < numPass; ++j)
-		{
-			this->BeginPass(j);
-			uint32 primCount = (indexBuffer->_stride == 2) ? (indexBuffer->_size / 2) / 3 : (indexBuffer->_size / 4) / 3;
-
-			gpDevice->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, 0, 
-				vertexBuffer->_size / decl->_stride, 0, 
-				primCount);
-			this->EndPass();
-		}
-		this->EndEffect();
-
-	}
-
-	void Effect::DrawStaticMesh(const StaticXMesh &mesh, LPCSTR technique) const
-	{
-		for (uint32 i = 0; i < mesh._numMaterial; ++i)
-		{
-			uint32 numPass = this->BeginEffect();
-			const Material *mat = VIDEO->GetMaterial(mesh._materialHandles[i]);
-			this->SetMaterial(*mat);
-
-			for (uint32 j = 0; j < numPass; ++j)
-			{
-				this->BeginPass(j);
-				mesh._pMesh->DrawSubset(i);
-				this->EndPass();
-			}
-			this->EndEffect();
-		}
-	}
-
-	void Effect::DrawSkinnedMesh(const SkinnedXMesh &mesh, animation::AnimationComponent &animation, LPCSTR technique) const
-	{
-		animation.UpdateMesh();
-		mesh.RenderBone(*this, mesh._pRootBone, animation);
-	}
 
 	bool IndexBuffer::Create(uint32 size, void * data, uint32 stride)
 	{
@@ -442,79 +369,24 @@ namespace video
 		return true;
 	}
 
-	void RenderView::Begin()
+	void RenderView::PreRender() 
 	{
-		_commandBuffer.Write<CommandBuffer::Enum>(CommandBuffer::Enum::eRendererInit);
-	}
-	void RenderView::End()
-	{
-		_commandBuffer.Finish();
+		gpDevice->Clear(0, nullptr, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER | D3DCLEAR_STENCIL, _clearColor, 1.0f, 0);
+
+		gpDevice->BeginScene();
 	}
 
-	void RenderView::SetCamera(const Camera * pCamera)
+	void RenderView::ExecCommands() 
 	{
-		_pCamera = pCamera;	
+		VIDEO->Render(*this);
 	}
 
-	void RenderView::SetTransform(const Matrix &matrix)
+	void RenderView::PostRender() 
 	{
-		uint32 matrixIndex = _matrixCache.Add(&matrix);
-		_commandBuffer.Write<CommandBuffer::Enum>(CommandBuffer::Enum::eSetTransform);
-		_commandBuffer.Write<uint32>(matrixIndex);
-	}
+		gpDevice->EndScene();
+		gpDevice->Present(nullptr, nullptr, NULL, nullptr);
 
-	void RenderView::SetEffect(EffectHandle handle)
-	{
-		_commandBuffer.Write<CommandBuffer::Enum>(CommandBuffer::Enum::eSetEffect);
-		_commandBuffer.Write<EffectHandle>(handle);
-	}
-
-	void RenderView::SetMaterial(MaterialHandle handle)
-	{
-		_commandBuffer.Write<CommandBuffer::Enum>(CommandBuffer::Enum::eSetMaterial);
-		_commandBuffer.Write<MaterialHandle>(handle);
-	}
-
-	void RenderView::SetFillMode(RenderState::FillMode mode)
-	{
-		_commandBuffer.Write<CommandBuffer::Enum>(CommandBuffer::Enum::eChangeFillMode);
-		_commandBuffer.Write<RenderState::FillMode>(mode);
-	}
-
-	//void RenderView::Submit(VertexBufferHandle handle, uint32 startVertex, uint32 primCount)
-	//{
-	//	_commandBuffer.Write<CommandBuffer::Enum>(CommandBuffer::eSetVertexBuffer);
-	//	_commandBuffer.Write<VertexBufferHandle>(handle);
-	//	_commandBuffer.Write<uint32>(startVertex);
-	//	_commandBuffer.Write<uint32>(primCount);
-	//}
-	//void RenderView::Submit(IndexBufferHandle handle, uint32 startIndex, uint32 numVertices, uint32 primCount)
-	//{
-	//	_commandBuffer.Write<CommandBuffer::Enum>(CommandBuffer::eSetIndexBuffer);
-	//	_commandBuffer.Write<IndexBufferHandle>(handle);
-	//	_commandBuffer.Write<uint32>(startIndex);
-	//	_commandBuffer.Write<uint32>(numVertices);
-	//	_commandBuffer.Write<uint32>(primCount);
-	//}
-	////SubmitGroup은 effect를 셋팅하지는 않는다
-	//void RenderView::SubmitGroup(RenderGroupHandle handle)
-	//{
-	//	_commandBuffer.Write<CommandBuffer::Enum>(CommandBuffer::eSetRenderGroup);
-	//	_commandBuffer.Write<RenderGroupHandle>(handle);
-	//}
-
-	void RenderView::Draw()
-	{
-		_commandBuffer.Write<CommandBuffer::Enum>(CommandBuffer::eDraw);
-	}
-
-	void RenderView::PreRender()
-	{
-	}
-
-	void RenderView::PostRender()
-	{
-		_commandBuffer.Reset();
+		_commandCount = 0;
 		_matrixCache.Reset();
 	}
 
@@ -655,22 +527,4 @@ namespace video
 	{
 		return;
 	}
-
-	void RenderState::ResetDefault()
-	{
-		_indexBuffer.MakeInvalid();
-
-		//NOTE : 전에 렌더를 했을때 이펙트를 사용하여 렌더 하지 않않다
-		// fvf나 다른 device와 관련된 셋팅을 변경했을 가능성이 있으므로 상태를 리셋해준다
-		if (!_effect.IsValid())
-		{
-			_fillMode = FillMode::eFillSolid;
-			gpDevice->SetRenderState(D3DRS_FILLMODE, D3DFILL_SOLID);
-			gpDevice->SetFVF(0);
-		}
-		_drawData._primitiveType = D3DPRIMITIVETYPE::D3DPT_TRIANGLELIST;
-	}
-
-	
-
 }
