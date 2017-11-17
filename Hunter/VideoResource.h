@@ -11,6 +11,15 @@
 
 //TODO : Dynamic buffer 만들어라
 
+namespace animation
+{
+	struct AnimationComponent;
+	struct AnimationComponentHandle;
+}
+
+class Camera;
+
+
 struct Memory
 {
 	void *_data;
@@ -214,40 +223,38 @@ namespace video
 		MaterialRange _materialRange;
 	};
 
-	struct Skeleton
-	{
-		bool Create();
-		void Destroy();
-		struct SkeletonName
-		{
-			char _name[64];
-		};
+	//struct Skeleton
+	//{
+	//	bool Create();
+	//	void Destroy();
+	//	struct SkeletonName
+	//	{
+	//		char _name[64];
+	//	};
 
-		uint16 *_hierachy{};
-		Matrix *_localPoses{};
-		Matrix *_globalPoses{};
-		Matrix *_offsetMatrices{};
-		RenderGroupHandle *_renderGroups{};
-		SkeletonName *_names;
+	//	uint16 *_hierachy{};
+	//	Matrix *_localPoses{};
+	//	Matrix *_globalPoses{};
+	//	Matrix *_offsetMatrices{};
+	//	RenderGroupHandle *_renderGroups{};
+	//	SkeletonName *_names;
 
-		uint32 _numhierachy{};
-	};
+	//	uint32 _numhierachy{};
+	//};
 
-	struct Model
-	{
-		//XFile을 먼저 로드 하고 정보를 추출하여 내가 원하는 포멧으로 변환한다.
-		bool CreateFromXStatic(const std::string &filePath, const Matrix *pMatCorrection = nullptr);
-		bool CreateFromXAnimated(const std::string &filePath, const Matrix *pMatCorrection = nullptr);
-		void Destroy();
-
-		std::vector<video::RenderGroupHandle> _groups;
-		Skeleton _skeleton;
-
-		video::EffectHandle _effect;
-		std::string _name;
-		//Sphere _sphere;
-		//AABB _aabb;
-	};
+	//struct Model
+	//{
+	//	//XFile을 먼저 로드 하고 정보를 추출하여 내가 원하는 포멧으로 변환한다.
+	//	bool CreateFromXStatic(const std::string &filePath, const Matrix *pMatCorrection = nullptr);
+	//	bool CreateFromXAnimated(const std::string &filePath, const Matrix *pMatCorrection = nullptr);
+	//	void Destroy();
+	//	std::vector<video::RenderGroupHandle> _groups;
+	//	Skeleton _skeleton;
+	//	video::EffectHandle _effect;
+	//	std::string _name;
+	//	//Sphere _sphere;
+	//	//AABB _aabb;
+	//};
 
 
 	struct PredefinedUniform
@@ -312,7 +319,7 @@ namespace video
 		void DrawPrimitiveIndex(video::VertexBufferHandle vHandle, video::IndexBufferHandle iHandle, 
 			video::MaterialHandle mHandle) const;
 		void DrawStaticMesh(const StaticXMesh &mesh, LPCSTR technique = nullptr) const;
-		void DrawSkinnedMesh(const SkinnedXMesh &mesh, SkinnedAnimation &animation, LPCSTR technique = nullptr) const;
+		void DrawSkinnedMesh(const SkinnedXMesh &mesh, animation::AnimationComponent &animation, LPCSTR technique = nullptr) const;
 
 		ID3DXEffect *_ptr{};
 	};
@@ -423,7 +430,8 @@ namespace video
 		void Begin();
 		void End();
 
-		void SetViewProjection(const Matrix &viewMatrix, const Matrix &projectionMatrix);
+		void SetCamera(const Camera *pCamera);
+		//void SetViewProjection(const Matrix &viewMatrix, const Matrix &projectionMatrix);
 		void SetTransform(const Matrix &matrix);
 
 		void SetEffect(EffectHandle handle);
@@ -443,207 +451,207 @@ namespace video
 
 		void Destroy();
 
-		Matrix _viewMatrix;
-		Matrix _projectionMatrix;
+		const Camera *_pCamera{};
+		//Matrix _viewMatrix;
+		//Matrix _projectionMatrix;
 
 		uint32 _clearColor{};
 
 		MatrixCache _matrixCache;
 		CommandBuffer _commandBuffer;
 	};
+}
+
+template <typename HandleType>
+class ResourceHandlePool
+{
+	typedef std::map<uint16, std::string> HandleTable;
+	typedef std::map<std::string, HandleType> NameTable;
+public:
+	explicit ResourceHandlePool(uint32 poolSize);
+
+	ResourceHandlePool(const ResourceHandlePool&) = delete;
+	ResourceHandlePool(ResourceHandlePool&&) = delete;
+	ResourceHandlePool& operator=(const ResourceHandlePool&) = delete;
+	ResourceHandlePool& operator=(ResourceHandlePool&&) = delete;
+
+	HandleType Create(const std::string &name = "");
+	void Remove(HandleType handle);
+
+	void SetName(HandleType id, const std::string &name);
+
+	HandleType Get(uint32 index) const;
+	const std::string &GetName(HandleType id) const;
+	HandleType Get(const std::string &name) const;
+
+	bool32 IsValid(HandleType id) const;
+	uint32 GetSize() const;
+	void Resize(uint32 amount);
+	void Clear();
+
+	const HandleType BuildHandle(uint16 index, uint16 count) const;
+
+private:
+	uint32 _defaultPoolSize;
+	uint32 _nextID;
+
+	std::vector<HandleType> _freeList;
+	std::vector<uint32> _counts;
+	HandleTable _handleTable;
+	NameTable _nameTable;
+};
 
 
-	template <typename HandleType>
-	class ResourceHandlePool
+//ResourceHandlePool
+template<typename HandleType>
+inline ResourceHandlePool<HandleType>::ResourceHandlePool(uint32 poolSize)
+	:_defaultPoolSize(poolSize), _counts(poolSize), _nextID(1)
+{
+}
+
+template<typename HandleType>
+inline HandleType ResourceHandlePool<HandleType>::Create(const std::string &name)
+{
+	HandleType result;
+	if (!_freeList.empty())
 	{
-		typedef std::map<uint16, std::string> HandleTable;
-		typedef std::map<std::string, HandleType> NameTable;
-	public:
-		explicit ResourceHandlePool(uint32 poolSize);
-
-		ResourceHandlePool(const ResourceHandlePool&) = delete;
-		ResourceHandlePool(ResourceHandlePool&&) = delete;
-		ResourceHandlePool& operator=(const ResourceHandlePool&) = delete;
-		ResourceHandlePool& operator=(ResourceHandlePool&&) = delete;
-
-		HandleType Create(const std::string &name = "");
-		void Remove(HandleType handle);
-
-		void SetName(HandleType id, const std::string &name);
-
-		HandleType Get(uint32 index) const;
-		const std::string &GetName(HandleType id) const;
-		HandleType Get(const std::string &name) const;
-
-		bool32 IsValid(HandleType id) const;
-		uint32 GetSize() const;
-		void Resize(uint32 amount);
-		void Clear();
-
-		const HandleType BuildHandle(uint16 index, uint16 count) const;
-
-	private:
-		uint32 _defaultPoolSize;
-		uint32 _nextID;
-
-		std::vector<HandleType> _freeList;
-		std::vector<uint32> _counts;
-		HandleTable _handleTable;
-		NameTable _nameTable;
-	};
-
-
-	//ResourceHandlePool
-	template<typename HandleType>
-	inline ResourceHandlePool<HandleType>::ResourceHandlePool(uint32 poolSize)
-		:_defaultPoolSize(poolSize), _counts(poolSize), _nextID(1)
+		result = _freeList.back();
+		_freeList.pop_back();
+	}
+	else
 	{
+		result.index = _nextID++;
+		_counts[result.index] = 1;
 	}
 
-	template<typename HandleType>
-	inline HandleType ResourceHandlePool<HandleType>::Create(const std::string &name)
+	//이름을 지정 해 주었다면 이름 추가한다
+	if (name.length() > 0)
 	{
-		HandleType result;
-		if (!_freeList.empty())
+		auto &handleIter = _handleTable.find(result.index);
+		if (handleIter == _handleTable.end())
 		{
-			result = _freeList.back();
-			_freeList.pop_back();
+			_handleTable[result.index] = name;
 		}
-		else
+		auto &nameIter = _nameTable.find(name);
+		if (nameIter == _nameTable.end())
 		{
-			result.index = _nextID++;
-			_counts[result.index] = 1;
-		}
-
-		//이름을 지정 해 주었다면 이름 추가한다
-		if (name.length() > 0)
-		{
-			auto &handleIter = _handleTable.find(result.index);
-			if (handleIter == _handleTable.end())
-			{
-				_handleTable[result.index] = name;
-			}
-			auto &nameIter = _nameTable.find(name);
-			if (nameIter == _nameTable.end())
-			{
-				_nameTable[name] = result;
-			}
-		}
-		return result;
-	}
-
-	template<typename HandleType>
-	inline void ResourceHandlePool<HandleType>::Remove(HandleType handle)
-	{
-		auto &counter = _counts[handle.index];
-		++counter; // increment the counter in the cache
-		_freeList.push_back(BuildHandle(handle.index, handle.count)); // add the ID to the freeList
-
-		auto handleFound = _handleTable.find(handle.index);
-		if (handleFound != _handleTable.end())
-		{
-			auto nameFound = _nameTable.find(handleFound->second);
-			if (nameFound != _nameTable.end())
-			{
-				_nameTable.erase(nameFound);
-			}
-			_handleTable.erase(handleFound);
+			_nameTable[name] = result;
 		}
 	}
+	return result;
+}
 
-	template<typename HandleType>
-	inline void ResourceHandlePool<HandleType>::SetName(HandleType handle, const std::string & name)
+template<typename HandleType>
+inline void ResourceHandlePool<HandleType>::Remove(HandleType handle)
+{
+	auto &counter = _counts[handle.index];
+	++counter; // increment the counter in the cache
+	_freeList.push_back(BuildHandle(handle.index, handle.count)); // add the ID to the freeList
+
+	auto handleFound = _handleTable.find(handle.index);
+	if (handleFound != _handleTable.end())
 	{
-		auto handleFound = _handleTable.find(handle.index);
-		_handleTable[handle.index] = name;
-
-		auto nameFound = _nameTable.find(name);
-		_nameTable[name] = handle;
-	}
-
-	template<typename HandleType>
-	inline HandleType ResourceHandlePool<HandleType>::Get(uint32 index) const
-	{
-		if (index < _counts.size())
+		auto nameFound = _nameTable.find(handleFound->second);
+		if (nameFound != _nameTable.end())
 		{
-			return BuildHandle(index);
+			_nameTable.erase(nameFound);
 		}
-		else
-		{
-			return BuildHandle(0, 0);
-		}
+		_handleTable.erase(handleFound);
 	}
+}
 
-	template<typename HandleType>
-	inline const std::string & ResourceHandlePool<HandleType>::GetName(HandleType handle) const
+template<typename HandleType>
+inline void ResourceHandlePool<HandleType>::SetName(HandleType handle, const std::string & name)
+{
+	auto handleFound = _handleTable.find(handle.index);
+	_handleTable[handle.index] = name;
+
+	auto nameFound = _nameTable.find(name);
+	_nameTable[name] = handle;
+}
+
+template<typename HandleType>
+inline HandleType ResourceHandlePool<HandleType>::Get(uint32 index) const
+{
+	if (index < _counts.size())
 	{
-		auto &find = _handleTable.find(handle.index);
-		if (find != _handleTable.end())
-		{
-			return find->second;
-		}
-		else
-		{
-			return std::string();
-		}
+		return BuildHandle(index);
 	}
-
-	template<typename HandleType>
-	inline HandleType ResourceHandlePool<HandleType>::Get(const std::string & name) const
+	else
 	{
-		auto &find = _nameTable.find(name);
-		if (find != _nameTable.end())
-		{
-			return find->second;
-		}
-		else
-		{
-			return BuildHandle(0, 0);
-		}
+		return BuildHandle(0, 0);
 	}
+}
 
-	template<typename HandleType>
-	inline bool32 ResourceHandlePool<HandleType>::IsValid(HandleType id) const
+template<typename HandleType>
+inline const std::string & ResourceHandlePool<HandleType>::GetName(HandleType handle) const
+{
+	auto &find = _handleTable.find(handle.index);
+	if (find != _handleTable.end())
 	{
-		if (id.index > _counts.size())
-		{
-			return false;
-		}
-		else
-		{
-			return (id.counter == _counts[id.index]) && (id.counter > 0);
-		}
+		return find->second;
 	}
-
-	template<typename HandleType>
-	inline uint32 ResourceHandlePool<HandleType>::GetSize() const
+	else
 	{
-		return _counts.size();
+		return std::string();
 	}
+}
 
-	template<typename HandleType>
-	inline void ResourceHandlePool<HandleType>::Resize(uint32 amount)
+template<typename HandleType>
+inline HandleType ResourceHandlePool<HandleType>::Get(const std::string & name) const
+{
+	auto &find = _nameTable.find(name);
+	if (find != _nameTable.end())
 	{
-		_counts.resize(amount);
+		return find->second;
 	}
-
-	template<typename HandleType>
-	inline void ResourceHandlePool<HandleType>::Clear()
+	else
 	{
-		_counts.clear();
-		_freeList.clear();
-
-		_handleTable.clear();
-		_nameTable.clear();
-		_nextID = 0;
+		return BuildHandle(0, 0);
 	}
+}
 
-	template<typename HandleType>
-	inline const HandleType ResourceHandlePool<HandleType>::BuildHandle(uint16 index, uint16 count) const
+template<typename HandleType>
+inline bool32 ResourceHandlePool<HandleType>::IsValid(HandleType id) const
+{
+	if (id.index > _counts.size())
 	{
-		HandleType result(index, count);
-		return result;
+		return false;
 	}
+	else
+	{
+		return (id.counter == _counts[id.index]) && (id.counter > 0);
+	}
+}
+
+template<typename HandleType>
+inline uint32 ResourceHandlePool<HandleType>::GetSize() const
+{
+	return _counts.size();
+}
+
+template<typename HandleType>
+inline void ResourceHandlePool<HandleType>::Resize(uint32 amount)
+{
+	_counts.resize(amount);
+}
+
+template<typename HandleType>
+inline void ResourceHandlePool<HandleType>::Clear()
+{
+	_counts.clear();
+	_freeList.clear();
+
+	_handleTable.clear();
+	_nameTable.clear();
+	_nextID = 0;
+}
+
+template<typename HandleType>
+inline const HandleType ResourceHandlePool<HandleType>::BuildHandle(uint16 index, uint16 count) const
+{
+	HandleType result(index, count);
+	return result;
 }
 
 #include "VideoResource_Mesh.h"

@@ -5,53 +5,55 @@
 
 #include "Typedefs.h"
 
+struct ResourceHandle
+{
+	uint16 index;
+	uint16 count;
+
+	ResourceHandle()
+	{
+		this->index = 0;
+		this->count = 0;
+	}
+	ResourceHandle(uint16 index, uint16 count)
+	{
+		this->index = index;
+		this->count = count;
+	}
+	uint32 Value() const
+	{
+		return (count << VIDEO_CONFIG_RESOURCE_COUNT_BIT) | index;
+	}
+	bool32 IsValid() const
+	{
+		return (Value() != 0);
+	}
+	void MakeInvalid()
+	{
+		this->index = 0;
+		this->count = 0;
+	}
+
+	bool operator== (const ResourceHandle &other) const
+	{
+		if (this->Value() == other.Value())
+		{
+			return true;
+		}
+		return false;
+	}
+
+	bool operator!= (const ResourceHandle &other) const
+	{
+		return !(*this == other);
+	}
+};
+
+
 namespace video
 {
-	struct VideoResourceHandle
-	{
-		uint16 index;
-		uint16 count;
 
-		VideoResourceHandle()
-		{
-			this->index = 0;
-			this->count = 0;
-		}
-		VideoResourceHandle(uint16 index, uint16 count)
-		{
-			this->index = index;
-			this->count = count;
-		}
-		uint32 Value() const
-		{
-			return (count << VIDEO_CONFIG_RESOURCE_COUNT_BIT) | index;
-		}
-		bool32 IsValid() const
-		{
-			return (Value() != 0);
-		}
-		void MakeInvalid()
-		{
-			this->index = 0;
-			this->count = 0;
-		}
-
-		bool operator== (const VideoResourceHandle &other) const
-		{
-			if (this->Value() == other.Value())
-			{
-				return true;
-			}
-			return false;
-		}
-
-		bool operator!= (const VideoResourceHandle &other) const
-		{
-			return !(*this == other);
-		}
-	};
-
-	struct VertexBufferHandle : public VideoResourceHandle
+	struct VertexBufferHandle : public ResourceHandle
 	{
 		VertexBufferHandle()
 		{
@@ -65,7 +67,7 @@ namespace video
 		}
 	};
 
-	struct IndexBufferHandle : public VideoResourceHandle
+	struct IndexBufferHandle : public ResourceHandle
 	{
 		IndexBufferHandle()
 		{
@@ -80,7 +82,7 @@ namespace video
 	};
 
 
-	struct VertexDeclHandle : public VideoResourceHandle
+	struct VertexDeclHandle : public ResourceHandle
 	{
 		VertexDeclHandle()
 		{
@@ -93,7 +95,7 @@ namespace video
 			this->count = count;
 		}
 	};
-	struct EffectHandle : public VideoResourceHandle
+	struct EffectHandle : public ResourceHandle
 	{
 		EffectHandle()
 		{
@@ -107,7 +109,7 @@ namespace video
 		}
 	};
 
-	struct TextureHandle : public VideoResourceHandle
+	struct TextureHandle : public ResourceHandle
 	{
 		TextureHandle()
 		{
@@ -121,7 +123,7 @@ namespace video
 		}
 	};
 
-	struct MaterialHandle : public VideoResourceHandle
+	struct MaterialHandle : public ResourceHandle
 	{
 		MaterialHandle()
 		{
@@ -135,7 +137,7 @@ namespace video
 		}
 	};
 
-	struct RenderViewHandle : public VideoResourceHandle
+	struct RenderViewHandle : public ResourceHandle
 	{
 		RenderViewHandle()
 		{
@@ -149,7 +151,7 @@ namespace video
 		}
 	};
 
-	struct RenderGroupHandle : public VideoResourceHandle
+	struct RenderGroupHandle : public ResourceHandle
 	{
 		RenderGroupHandle()
 		{
@@ -163,7 +165,7 @@ namespace video
 		}
 	};
 
-	struct FrameBufferHandle : public VideoResourceHandle
+	struct FrameBufferHandle : public ResourceHandle
 	{
 		FrameBufferHandle()
 		{
@@ -177,7 +179,7 @@ namespace video
 		}
 	};
 
-	struct StaticXMeshHandle : public VideoResourceHandle
+	struct StaticXMeshHandle : public ResourceHandle
 	{
 		StaticXMeshHandle()
 		{
@@ -192,7 +194,7 @@ namespace video
 		}
 	};
 
-	struct SkinnedXMeshHandle : public VideoResourceHandle
+	struct SkinnedXMeshHandle : public ResourceHandle
 	{
 		SkinnedXMeshHandle()
 		{

@@ -57,28 +57,26 @@ protected :
 
 	bool _checked{ false };
 
-	video::RenderView *_renderView;
+	video::RenderView *_mainRenderView;
 
 	World _world;
 
 	TransformSystem _transformSystem;
+	animation::AnimationSystem _animationSystem;
 	RenderSystem _renderSystem;
 
 	std::vector<Entity> _entities;
 	Camera _camera;
 
-	video::SkinnedXMeshHandle _skinnedMeshHandle;
 	video::StaticXMeshHandle _staticMeshHandle;
+
 	video::EffectHandle _staticEffect;
 	video::EffectHandle _skinnedEffect;
 	video::EffectHandle _terrainEffect;
 
-	video::SkinnedXMesh *_pMesh;
+	animation::AnimationComponent _animation[9];
 
-	video::SkinnedAnimation _animation[9];
-
-	Terrain _terrain;
+	std::vector<Vector3> _points;
 };
-
 
 #endif

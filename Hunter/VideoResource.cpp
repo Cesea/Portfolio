@@ -203,7 +203,8 @@ namespace video
 
 	void Effect::SetMatrix(LPCSTR name, const Matrix &matrix) const
 	{
-		_ptr->SetMatrix(name, &matrix);
+		HRESULT re = _ptr->SetMatrix(name, &matrix);
+		int a = 0;
 	}
 
 	void Effect::SetMatrices(LPCSTR name, const Matrix *matrices, uint32 numMatrices) const
@@ -296,19 +297,18 @@ namespace video
 			uint32 numPass = this->BeginEffect();
 			const Material *mat = VIDEO->GetMaterial(mesh._materialHandles[i]);
 			this->SetMaterial(*mat);
-			this->CommitChanges();
 
 			for (uint32 j = 0; j < numPass; ++j)
 			{
 				this->BeginPass(j);
-				mesh._pMesh->DrawSubset(j);
+				mesh._pMesh->DrawSubset(i);
 				this->EndPass();
 			}
 			this->EndEffect();
 		}
 	}
 
-	void Effect::DrawSkinnedMesh(const SkinnedXMesh &mesh, SkinnedAnimation &animation, LPCSTR technique) const
+	void Effect::DrawSkinnedMesh(const SkinnedXMesh &mesh, animation::AnimationComponent &animation, LPCSTR technique) const
 	{
 		animation.UpdateMesh();
 		mesh.RenderBone(*this, mesh._pRootBone, animation);
@@ -451,12 +451,10 @@ namespace video
 		_commandBuffer.Finish();
 	}
 
-	void RenderView::SetViewProjection(const Matrix & viewMatrix, const Matrix & projectionMatrix)
+	void RenderView::SetCamera(const Camera * pCamera)
 	{
-		_viewMatrix = viewMatrix;
-		_projectionMatrix = projectionMatrix;
+		_pCamera = pCamera;	
 	}
-
 
 	void RenderView::SetTransform(const Matrix &matrix)
 	{
@@ -483,30 +481,27 @@ namespace video
 		_commandBuffer.Write<RenderState::FillMode>(mode);
 	}
 
-	void RenderView::Submit(VertexBufferHandle handle, uint32 startVertex, uint32 primCount)
-	{
-		_commandBuffer.Write<CommandBuffer::Enum>(CommandBuffer::eSetVertexBuffer);
-		_commandBuffer.Write<VertexBufferHandle>(handle);
-		_commandBuffer.Write<uint32>(startVertex);
-		_commandBuffer.Write<uint32>(primCount);
-	}
-
-	void RenderView::Submit(IndexBufferHandle handle, uint32 startIndex, uint32 numVertices, uint32 primCount)
-	{
-		_commandBuffer.Write<CommandBuffer::Enum>(CommandBuffer::eSetIndexBuffer);
-		_commandBuffer.Write<IndexBufferHandle>(handle);
-
-		_commandBuffer.Write<uint32>(startIndex);
-		_commandBuffer.Write<uint32>(numVertices);
-		_commandBuffer.Write<uint32>(primCount);
-	}
-
-	//SubmitGroup은 effect를 셋팅하지는 않는다
-	void RenderView::SubmitGroup(RenderGroupHandle handle)
-	{
-		_commandBuffer.Write<CommandBuffer::Enum>(CommandBuffer::eSetRenderGroup);
-		_commandBuffer.Write<RenderGroupHandle>(handle);
-	}
+	//void RenderView::Submit(VertexBufferHandle handle, uint32 startVertex, uint32 primCount)
+	//{
+	//	_commandBuffer.Write<CommandBuffer::Enum>(CommandBuffer::eSetVertexBuffer);
+	//	_commandBuffer.Write<VertexBufferHandle>(handle);
+	//	_commandBuffer.Write<uint32>(startVertex);
+	//	_commandBuffer.Write<uint32>(primCount);
+	//}
+	//void RenderView::Submit(IndexBufferHandle handle, uint32 startIndex, uint32 numVertices, uint32 primCount)
+	//{
+	//	_commandBuffer.Write<CommandBuffer::Enum>(CommandBuffer::eSetIndexBuffer);
+	//	_commandBuffer.Write<IndexBufferHandle>(handle);
+	//	_commandBuffer.Write<uint32>(startIndex);
+	//	_commandBuffer.Write<uint32>(numVertices);
+	//	_commandBuffer.Write<uint32>(primCount);
+	//}
+	////SubmitGroup은 effect를 셋팅하지는 않는다
+	//void RenderView::SubmitGroup(RenderGroupHandle handle)
+	//{
+	//	_commandBuffer.Write<CommandBuffer::Enum>(CommandBuffer::eSetRenderGroup);
+	//	_commandBuffer.Write<RenderGroupHandle>(handle);
+	//}
 
 	void RenderView::Draw()
 	{
@@ -552,14 +547,14 @@ namespace video
 
 
 	//NOTE : Implement this
-	bool Skeleton::Create()
-	{
-		return false;
-	}
+	//bool Skeleton::Create()
+	//{
+	//	return false;
+	//}
 
-	void Skeleton::Destroy()
-	{
-	}
+	//void Skeleton::Destroy()
+	//{
+	//}
 
 	//bool Model::CreateFromXStatic(const std::string & filePath, const Matrix *pMatCorrection)
 	//{

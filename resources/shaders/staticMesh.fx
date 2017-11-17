@@ -1,9 +1,3 @@
-//#include "ModelPixel.fx"
-
-//
-// 전역변수
-//
-
 uniform extern float4x4 matWorld : World;
 uniform extern float4x4 matViewProjection : ViewProjection;
 uniform extern float4 vEyePos : ViewPosition;
@@ -38,51 +32,54 @@ sampler2D Specular = sampler_state
 //---------------------------------------------------------------
 // Base 관련
 //---------------------------------------------------------------
-struct VS_INPUT 
+struct vs_input 
 {
-   float4 Position : POSITION0;
-   float3 Normal : NORMAL0;
-   float3 Tangent : TANGENT0;
-   float3 Binormal : BINORMAL0;
-   float2 Texcoord : TEXCOORD0;
+   float3 position : POSITION0;
+   float3 normal : NORMAL0;
+   float3 tangent : TANGENT0;
+   float3 binormal : BINORMAL0;
+   float2 texcoord : TEXCOORD0;
 };
 
-struct VS_OUTPUT 
+struct vs_output 
 {
-   float4 Position : POSITION0;
-   float2 Texcoord : TEXCOORD0;
-   float3 Normal : TEXCOORD1;
-   float3 Binormal : TEXCOORD2;
-   float3 Tangent : TEXCOORD3;
+   float4 position : POSITION0;
+   float2 texcoord : TEXCOORD0;
+   float3 normal : TEXCOORD1;
+   float3 binormal : TEXCOORD2;
+   float3 tangent : TEXCOORD3;
    float3 viewDir : TEXCOORD4;
    float3 worldPos : TEXCOORD5;
-   float4 FinalPos : TEXCOORD6;
+   float4 finalPos : TEXCOORD6;
 };
 
-VS_OUTPUT vs_main( VS_INPUT Input )
+vs_output vs_main( vs_input input )
 {
-   VS_OUTPUT Output = (VS_OUTPUT)0;
+   vs_output output = (vs_output)0;
 
-   float4 worldPos = mul( Input.Position, matWorld );
-   Output.Position = mul( worldPos, matViewProjection );
+   float4 worldPos = mul( float4(input.position, 1.0f), matWorld );
+   output.position = mul( worldPos, matViewProjection );
    
-   Output.Texcoord = Input.Texcoord;
+   output.texcoord = input.texcoord;
    
-   Output.Normal = mul( Input.Normal, (float3x3)matWorld );
-   Output.Binormal = mul( Input.Binormal, (float3x3)matWorld );  
-   Output.Tangent = mul( Input.Tangent, (float3x3)matWorld ); 
-   
-   Output.viewDir = vEyePos.xyz - worldPos.xyz;
-   Output.worldPos = worldPos;
+   output.normal = mul( input.normal, (float3x3)matWorld );
+   //output.binormal = mul( input.binormal, (float3x3)matWorld );  
+   //output.tangent = mul( input.tangent, (float3x3)matWorld ); 
 
-   Output.FinalPos = Output.Position;
+   output.binormal = float3(0.0f, 0.0f, 0.0f);
+   output.tangent = float3(0.0f, 0.0f, 0.0f);
+   
+   output.viewDir = vEyePos.xyz - worldPos.xyz;
+   output.worldPos = (float3)worldPos;
 
-   return( Output );
+   output.finalPos = output.position;
+
+   return( output );
 }
 
-float4 ps_main(VS_OUTPUT input) : COLOR
+float4 ps_main(vs_output input) : COLOR
 {
-	return tex2D(Diffuse, input.Texcoord);
+	return tex2D(Diffuse, input.texcoord);
 }
 
 //--------------------------------------------------------------//
@@ -94,6 +91,8 @@ technique Base
    {
       VertexShader = compile vs_3_0 vs_main();
       PixelShader = compile ps_3_0 ps_main();
+
+	  CullMode = None;
    }
 }
 

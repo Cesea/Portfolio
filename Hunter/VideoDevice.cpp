@@ -76,8 +76,8 @@ void video::VideoDevice::Render(RenderView & renderView)
 	RenderState sendingState{};
 	Matrix sendingMatrix[3];
 	MatrixIdentity(&sendingMatrix[0]);
-	sendingMatrix[1] = renderView._viewMatrix;
-	sendingMatrix[2] = renderView._projectionMatrix;
+	sendingMatrix[1] = renderView._pCamera->GetViewMatrix();
+	sendingMatrix[2] = renderView._pCamera->GetViewProjectionMatrix();
 
 	gpDevice->SetTransform(D3DTS_VIEW, &sendingMatrix[1]);
 	gpDevice->SetTransform(D3DTS_PROJECTION, &sendingMatrix[2]);
@@ -968,20 +968,6 @@ void video::VideoDevice::MaterialAddTexture(MaterialHandle material, uint32 text
 void video::VideoDevice::SetCurrentRenderView(RenderViewHandle handle)
 {
 	_pCurrentView = &_renderViews[handle.index];
-}
-
-void video::VideoDevice::SetRenderViewProjectionMatrix(RenderViewHandle handle, const Matrix & view, const Matrix & projection)
-{
-	RenderView *pRenderView = &_renderViews[handle.index];
-	pRenderView->_viewMatrix = view;
-	pRenderView->_projectionMatrix = projection;
-}
-
-void video::VideoDevice::SetCurrentRenderViewProjectionMatrix(const Matrix & view, const Matrix & projection)
-{
-	Assert(_pCurrentView);
-	_pCurrentView->_viewMatrix = view;
-	_pCurrentView->_projectionMatrix = projection;
 }
 
 RenderGroupHandle video::VideoDevice::CreateRenderGroup(video::VertexBufferHandle vHandle, video::IndexBufferHandle iHandle,

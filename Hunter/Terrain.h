@@ -1,9 +1,11 @@
 #ifndef TERRAIN_H
 #define TERRAIN_H
 
+#include "SingletonBase.h"
+
 class QuadTree;
 
-class Terrain
+class Terrain : public SingletonBase<Terrain>
 {
 public:
 	struct TerrainConfig
@@ -72,11 +74,15 @@ private:
 
 	void SmoothTerrain(int32 passed);
 
-private:
+
 	video::VertexDeclHandle _declHandle{};
 	video::MaterialHandle _mHandle{};
 	video::VertexBufferHandle _vHandle{};
 	video::IndexBufferHandle _iHandle{};
+
+	video::EffectHandle _effect{};
+
+private:
 
 	//높이스케일(픽셀컬러가 255 일때 높이) 높이맵 y축 사이 간격 크기
 	float _heightScale{};
@@ -115,12 +121,12 @@ private:
 	video::TextureHandle _tile3Handle{};
 	video::TextureHandle _tileSplatHandle{};
 
-	video::EffectHandle _effect{};
-
 	video::TerrainVertex *_terrainVertices{};
 	QuadTree* _pQuadTree{};  //쿼드 트리
 
 	TerrainSection *_pSections{};
 };
+
+#define TERRAIN Terrain::GetInstance()
 
 #endif

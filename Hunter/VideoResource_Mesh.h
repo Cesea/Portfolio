@@ -103,8 +103,6 @@ namespace video
 	};
 
 	//에니메이션을 위한 typedef
-	typedef std::vector<LPD3DXANIMATIONSET> AnimationSetVector;
-	typedef std::map<std::string, LPD3DXANIMATIONSET> AnimationTable;
 
 
 	typedef std::map<std::string, BoneMesh *> BoneMeshTable;
@@ -121,7 +119,7 @@ namespace video
 		void UpdateMatrices(Bone *pBone, Matrix *pParentMatrix) const;
 
 		//NOTE : 직접 사용하지 않고 밖에서 쓴다
-		void RenderBone(const video::Effect &effect, Bone *pBone, SkinnedAnimation &animation) const;
+		void RenderBone(const video::Effect &effect, Bone *pBone, animation::AnimationComponent &animation) const;
 
 		Matrix _matCorrection;
 
@@ -135,53 +133,6 @@ namespace video
 		BoneTable _boneTable;
 	};
 
-	//SkinnedMesh는 한번만 불러오고, SkinnedAnimation은 여러개를 만들어서 사용하라....
-	struct SkinnedAnimation
-	{
-		bool Create(video::SkinnedXMeshHandle handle);
-		void Destroy();
-		void UpdateAnimation(float deltaTime, const Matrix &world);
-		void UpdateMesh();
-		void UpdateMatrixPalettesInternal(Bone *pBone );
-
-		//void	RenderBoneName(cCamera* pCam, cTransform* pTransform);
-
-		void Play(const std::string &animName, float crossFadeTime = 0.0);
-		void Play(int32 animIndex, float crossFadeTime = 0.0);
-		void PlayOneShot(const std::string &animName, float inCrossFadeTime = 0.0, float outCrossFadeTime = 0.0f);
-		void PlayOneShotAfterHold(const std::string &animName, float crossFadeTime = 0.0);
-		void Stop() { _playing = false; }
-		void SetPlaySpeed(float speed);
-
-		void SetAnimation(LPD3DXANIMATIONSET animation);
-
-		SkinnedXMesh *_pSkinnedMesh{};
-
-		Matrix _world;
-
-		ID3DXAnimationController *_pAnimationController{};
-		uint32 _numAnimation;
-
-		Matrix *_workingPalettes{};
-		uint32 _numPalette{};
-
-		AnimationSetVector _animations;
-		AnimationTable _animationTable;
-
-		LPD3DXANIMATIONSET _pPlayingAnimationSet{};
-		D3DXTRACK_DESC _playingTrackDesc{};
-
-		bool32 _playing{};
-		bool32 _looping{};
-		LPD3DXANIMATIONSET _pPrevPlayAnimationSet{};
-
-		float _crossFadeTime{};
-		float _leftCrossFadeTime{};
-		float _outCrossFadeTime{};
-		double _animationPlayFactor{};
-
-		float _animDelta{};
-	};
 }
 
 #endif

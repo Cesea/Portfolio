@@ -4,12 +4,29 @@
 #include "AnimationComponent.h"
 #include "RenderComponent.h"
 
-class AnimationSystem : public System<Requires<RenderComponent, AnimationComponent>>
+#define ANIMATION_CONFIG_MAX_COMPONENT_NUM (1024)
+
+namespace animation
 {
-public :
-	AnimationSystem();
+	class AnimationSystem : public System<Requires<RenderComponent, AnimationComponent>>
+	{
+	public:
+		AnimationSystem()
+			:_animationComponentPool(ANIMATION_CONFIG_MAX_COMPONENT_NUM)
+		{}
 
+	private:
+		void UpdateAnimation(AnimationComponent &component, float deltaTime, const Matrix &world);
+		//void UpdateMesh(AnimationComponent &compoent);
 
-};
+		//void SkinnedAnimation::UpdateAnimation(float deltaTime, const Matrix &world)
+		//{
+
+		//}
+
+		ResourceHandlePool<AnimationComponentHandle> _animationComponentPool;
+		AnimationComponent _animationComponents[ANIMATION_CONFIG_MAX_COMPONENT_NUM];
+	};
+}
 
 #endif

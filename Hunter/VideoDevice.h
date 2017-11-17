@@ -94,8 +94,6 @@ namespace video
 		void MaterialAddTexture(MaterialHandle material, uint32 textureSlot, TextureHandle texture);
 
 		void SetCurrentRenderView(RenderViewHandle handle);
-		void SetRenderViewProjectionMatrix(RenderViewHandle handle, const Matrix &view, const Matrix &projection);
-		void SetCurrentRenderViewProjectionMatrix(const Matrix &view, const Matrix &projection);
 
 		//CreateModelFromX 함수는 불러온 파일 경로에서 이름을 추출하여 HandlePool에 자동으로 이름을 등록한다
 		RenderGroupHandle CreateRenderGroup(video::VertexBufferHandle vHandle, video::IndexBufferHandle iHandle, 
