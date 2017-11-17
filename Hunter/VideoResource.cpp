@@ -280,7 +280,7 @@ namespace video
 			this->BeginPass(j);
 			gpDevice->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, 0, 
 				vertexBuffer->_size / decl->_stride, 0, 
-				(indexBuffer->_stride == 2) ? (indexBuffer->_size / 2) : (indexBuffer->_size / 4));
+				(indexBuffer->_stride == 2) ? (indexBuffer->_size / 2) / 3 : (indexBuffer->_size / 4) / 3);
 			this->EndPass();
 		}
 		this->EndEffect();
@@ -319,6 +319,7 @@ namespace video
 			_dynamic = true;
 		}
 		_size = size;
+		_stride = stride;
 
 		DWORD usage = D3DUSAGE_WRITEONLY;
 

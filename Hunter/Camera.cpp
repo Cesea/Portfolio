@@ -7,7 +7,7 @@ Camera::Camera()
 	_fov = 60.f * ONE_RAD;
 
 	//기본 Near
-	_camNear = 0.001f;
+	_camNear = 0.01f;
 
 	//기본 Far
 	_camFar = 4000.f;

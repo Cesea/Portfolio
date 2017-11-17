@@ -101,7 +101,7 @@ sampler2D TerrainControl = sampler_state
    MIPFILTER = ANISOTROPIC;
 };
 
-ps_output ps_main( ps_input input )
+ps_output ps_main( ps_input input ) : COLOR
 {   
 	ps_output output = (ps_output)0;
 
@@ -139,5 +139,6 @@ technique Base
    {
       VertexShader = compile vs_3_0 vs_main();
       PixelShader = compile ps_3_0 ps_main();
+
    }
 }

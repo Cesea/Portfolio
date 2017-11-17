@@ -42,7 +42,9 @@ public:
 	void Handle(const InputManager::MousePressedEvent &event);
 	void Handle(const InputManager::MouseReleasedEvent &event);
 	void Handle(const InputManager::MouseMoveEvent &event);
+
 protected:
+
 	float _fov;
 	float _camNear;
 	float _camFar;	

@@ -284,19 +284,12 @@ bool VideoDevice::InitDefaultRenderState()
 
 	gpDevice->SetRenderState(D3DRS_LIGHTING, FALSE);
 	
-	gpDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);
-	gpDevice->SetRenderState(D3DRS_SHADEMODE, D3DSHADE_GOURAUD);
 	gpDevice->SetRenderState(D3DRS_DITHERENABLE, TRUE );
 
 	gpDevice->SetRenderState(D3DRS_ZENABLE, TRUE );
 	gpDevice->SetRenderState(D3DRS_ZWRITEENABLE, TRUE );
 	gpDevice->SetRenderState(D3DRS_ZFUNC, D3DCMP_LESS);
 
- 	gpDevice->SetRenderState(D3DRS_ALPHABLENDENABLE, FALSE );
- 	gpDevice->SetRenderState(D3DRS_SPECULARENABLE, FALSE );
-
-	gpDevice->SetRenderState( D3DRS_COLORVERTEX ,   FALSE );
-	
 	return result;
 }
 

@@ -68,10 +68,11 @@ bool32 BaseScene::Init()
 	config._splatFileName = "../resources/Textures/Splat.png";
 
 	config._cellScale = 1.0f;
-	config._heightScale = 5.0f;
-	config._textureMult = 100;
+	config._heightScale = 30.0f;
+	config._textureMult = 50;
+	config._sectionResolution;
 
-	_terrain.Create(config, 0);
+	_terrain.Create(config, 1);
 
 	_active = true;
 	return result;

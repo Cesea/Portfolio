@@ -60,7 +60,7 @@ public:
 
 	void Destroy();
 	void Render(const video::Effect &effect, const Camera &camera);
-	bool IsIntersectRay(Ray *pRay, Vector3 pOut);
+	bool IsIntersectRay(const Ray &ray, Vector3 *pOut);
 
 	float GetHeight(float x, float z);
 

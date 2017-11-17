@@ -86,9 +86,6 @@ bool Terrain::Create(const Terrain::TerrainConfig &config, int32 smoothLevel)
 	VIDEO->MaterialAddTexture(_mHandle, VIDEO_TEXTURE3, _tile3Handle);
 	VIDEO->MaterialAddTexture(_mHandle, VIDEO_TEXTURE4, _tileSplatHandle);
 
-
-	////Terrain Effect 로딩
-	//m_pTerrainEffect = RESOURCE_FX->GetResource("../Resources/Shaders/TerrainBase.fx");
 }
 
 void Terrain::Destroy()
@@ -132,44 +129,47 @@ void Terrain::Render(const video::Effect &effect, const Camera &camera)
 	//광원 셋팅
 	//Vector3 dirLight = pDirectionLight->pTransform->GetForward();
 	//m_pTerrainEffect->SetVector("worldLightDir", &D3DXVECTOR4(dirLight, 1));
+
 	for (int32 i = 0; i < _numSectionX * _numSectionZ; ++i)
 	{
 		Terrain::TerrainSection &refSection = _pSections[i];
-		if(camera.GetFrustum().IsSphereInFrustum(Vector3(refSection._centerX, 0.0f, refSection._centerZ), refSection._radius))
-		effect.DrawPrimitiveIndex(refSection._vHandle, refSection._iHandle, _mHandle);
+		if (camera.GetFrustum().IsSphereInFrustum(Vector3(refSection._centerX, 0.0f, refSection._centerZ), refSection._radius))
+		{
+			effect.DrawPrimitiveIndex(refSection._vHandle, refSection._iHandle, _mHandle);
+		}
 	}
 
 }
 
 
 //TODO : Implement this
-bool Terrain::IsIntersectRay(Ray * pRay, Vector3 pOut)
+bool Terrain::IsIntersectRay(const Ray &ray, Vector3 *pOutHit)
 {
-	std::vector<D3DXVECTOR3> hits;
+	std::vector<Vector3> hits;
 
 	//최상단 쿼드 트리 부터 Ray Check 들어간다.
-	_pQuadTree->GetRayHits(&hits, pRay);
+	_pQuadTree->GetRayHits(ray, &hits);
 
 	if (hits.size() == 0)
+	{
 		return false;
+	}
 	//먼저 처음 위치화 처음 위치에 대한 거리 대입
-	D3DXVECTOR3 hitPos = hits[0];
-	D3DXVECTOR3 dir = hitPos - pRay->origin;
-	float distSq = D3DXVec3LengthSq(&dir);
+	Vector3 hitPos = hits[0];
+	Vector3 dir = hitPos - ray.origin;
+	float distSq = Vec3LengthSq(&dir);
 
 	for (int i = 1; i < hits.size(); i++)
 	{
-		dir = hits[i] - pRay->origin;
-		float newDist = D3DXVec3LengthSq(&dir);
+		dir = hits[i] - ray.origin;
+		float newDist = Vec3LengthSq(&dir);
 		if (newDist < distSq)
 		{
 			distSq = newDist;
 			hitPos = hits[i];
 		}
 	}
-	//
-	*pOut = hitPos;
-
+	*pOutHit = hitPos;
 	return true;
 }
 
@@ -564,7 +564,7 @@ bool Terrain::CreateTerrainSection(int32 x, int32 z, const video::TerrainVertex 
 
 	refSection._centerX = (refSection._startX + refSection._endX) * 0.5f;
 	refSection._centerZ = (refSection._startZ + refSection._endZ) * 0.5f;
-	refSection._radius = (refSection._centerX - refSection._startX) * 1.3f;
+	refSection._radius = (refSection._centerX - refSection._startX) * 1.4f;
 
 	return true;
 }

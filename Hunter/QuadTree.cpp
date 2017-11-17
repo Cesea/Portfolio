@@ -87,14 +87,16 @@ QuadTree::~QuadTree()
 	SAFE_DELETE(_pChilds[3]);
 }
 
+
+
 bool QuadTree::Init(video::TerrainVertex *pVertices, uint32 verNumEdge)
 {
 	_pTerrainVertices = pVertices;
 
-	_corners[eCornerLT] = 0;
-	_corners[eCornerRT] = verNumEdge - 1;
-	_corners[eCornerLB] = (verNumEdge - 1) * verNumEdge;
-	_corners[eCornerRB] = verNumEdge * verNumEdge - 1;
+	_corners[eCornerLT] = (verNumEdge - 1) * verNumEdge;
+	_corners[eCornerRT] = verNumEdge * verNumEdge - 1;
+	_corners[eCornerLB] = 0;
+	_corners[eCornerRB] = verNumEdge - 1;
 
 	CreateChildTree();
 	return true;
@@ -162,7 +164,7 @@ void QuadTree::CreateChildTree()
 	}
 }
 
-void QuadTree::GetRayHits(const Ray &ray, std::vector<Vector3>* pOutHit)
+void QuadTree::GetRayHits(const Ray &ray, std::vector<Vector3> *pOutHit)
 {
 	if (IsRayHitBoundSphere(ray, _centerPos, _radius, NULL, NULL))
 	{
@@ -172,7 +174,7 @@ void QuadTree::GetRayHits(const Ray &ray, std::vector<Vector3>* pOutHit)
 			//자식 재귀
 			for (int32 i = 0; i < 4; i++)
 			{
-				_pChilds[i]->GetRayHits(pRay, pOutHit);
+				_pChilds[i]->GetRayHits(ray, pOutHit);
 			}
 		}
 		//자식이 없는 마지막 노드일떄
@@ -207,7 +209,7 @@ void QuadTree::GetRayHits(const Ray &ray, std::vector<Vector3>* pOutHit)
 				nullptr, nullptr, &dist))			
 			{
 				//히트 지점
-				Vector3 hitPos = pRay->origin + pRay->direction * dist;
+				Vector3 hitPos = ray.origin + ray.direction * dist;
 				//푸쉬
 				pOutHit->push_back(hitPos);
 				return;
