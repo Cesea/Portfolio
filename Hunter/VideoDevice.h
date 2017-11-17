@@ -53,14 +53,14 @@ namespace video
 
 		//버텍스 버퍼 생성
 		VertexBufferHandle CreateVertexBuffer(Memory *memory, VertexDeclHandle declHandle, const std::string &name = "");
-		VertexBufferHandle GetVertexBufferFromXMesh(ID3DXMesh *pMesh);
+		VertexBufferHandle GetVertexBufferFromXMesh(ID3DXMesh *pMesh, const std::string &name = "");
 		VertexBufferHandle GetVertexBuffer(const std::string &name);
 		VertexBuffer *GetVertexBuffer(VertexBufferHandle handle);
 		void DestroyVertexBuffer(VertexBufferHandle handle);
 
 		//인덱스 버퍼 생성
 		IndexBufferHandle CreateIndexBuffer(Memory *memory, uint32 stride, const std::string &name = "");
-		IndexBufferHandle GetIndexBufferFromXMesh(ID3DXMesh *pMesh);
+		IndexBufferHandle GetIndexBufferFromXMesh(ID3DXMesh *pMesh, const std::string &name = "");
 		IndexBufferHandle GetIndexBuffer(const std::string &name);
 		IndexBuffer *GetIndexBuffer(IndexBufferHandle handle);
 		void DestroyIndexBuffer(IndexBufferHandle handle);

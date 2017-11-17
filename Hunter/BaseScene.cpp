@@ -33,7 +33,7 @@ bool32 BaseScene::Init()
 	Matrix correctionMat;
 	MatrixScaling(&correctionMat, 0.1f, 0.1f, 0.1f);
 
-	_staticMeshHandle = VIDEO->CreateStaticXMesh("../resources/models/Knight/Knight.X", &correctionMat, "Knight");
+	_staticMeshHandle = VIDEO->CreateStaticXMesh("../resources/models/knight/Knight.X", &correctionMat, "aa");
 
 	_world.AddSystem<RenderSystem>(_renderSystem);
 	_world.AddSystem<TransformSystem>(_transformSystem);
@@ -58,7 +58,7 @@ bool32 BaseScene::Init()
 	config._textureMult = 50;
 	config._sectionResolution;
 
-	TERRAIN->Create(config, 1);
+	//TERRAIN->Create(config, 1);
 	//_terrain.Create(config, 1);
 
 	_active = true;
@@ -85,8 +85,8 @@ bool32 BaseScene::Update(float deltaTime)
 
 bool32 BaseScene::Render()
 {
-	_renderSystem.Render(*_mainRenderView);
-
+	video::StaticXMesh *pMesh = VIDEO->GetStaticXMesh(_staticMeshHandle);
+	pMesh->FillRenderCommand(*_mainRenderView, _staticEffect);
 
 	_mainRenderView->PreRender();
 	_mainRenderView->ExecCommands();
@@ -112,48 +112,4 @@ bool32 BaseScene::IsActive()
 void BaseScene::RegisterEvents()
 {
 	EventChannel channel;
-	channel.Add<InputManager::KeyPressedEvent, BaseScene>(*this);
-}
-
-void BaseScene::Handle(const InputManager::KeyPressedEvent & event)
-{
-	//switch (event.code)
-	//{
-	//case '1':
-	//{
-	//	_pMesh->Play(1, 1.0f);
-	//}break;
-	//case '2':
-	//{
-	//	_pMesh->Play(2, 1.0f);
-	//}break;
-	//case '3':
-	//{
-	//	_pMesh->Play(3, 1.0f);
-	//}break;
-	//case '4':
-	//{
-	//	_pMesh->Play(4, 1.0f);
-	//}break;
-	//case '5':
-	//{
-	//	_pMesh->Play(5, 1.0f);
-	//}break;
-	//case '6':
-	//{
-	//	_pMesh->Play(6, 1.0f);
-	//}break;
-	//case '7':
-	//{
-	//	_pMesh->Play(7, 1.0f);
-	//}break;
-	//case '8':
-	//{
-	//	_pMesh->Play(8, 1.0f);
-	//}break;
-	//case '9':
-	//{
-	//	_pMesh->Play(9, 1.0f);
-	//}break;
-	//}
 }

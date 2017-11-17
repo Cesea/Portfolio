@@ -70,15 +70,13 @@ void video::VideoDevice::Render(RenderView & renderView)
 
 	Matrix sendingMatrix[3];
 	MatrixIdentity(&sendingMatrix[0]);
-	//sendingMatrix[1] = renderView._pCamera->GetViewMatrix();
-	//sendingMatrix[2] = renderView._pCamera->GetViewProjectionMatrix();
-
-	gpDevice->SetTransform(D3DTS_VIEW, &sendingMatrix[1]);
-	gpDevice->SetTransform(D3DTS_PROJECTION, &sendingMatrix[2]);
+	sendingMatrix[1] = renderView._pCamera->GetViewMatrix();
+	sendingMatrix[2] = renderView._pCamera->GetViewProjectionMatrix();
 
 	for (uint32 i = 0; i < renderView._commandCount; ++i)
 	{
 		const RenderCommand &command = renderView._renderCommands[i];
+
 		VertexBuffer &vBuffer = *GetVertexBuffer(command.vHandle);
 		const Effect &effect = *GetEffect(command._effectHandle);
 		const Material &material = *GetMaterial(command._materialHandle);
@@ -87,15 +85,17 @@ void video::VideoDevice::Render(RenderView & renderView)
 
 		if (!command.iHandle.IsValid())
 		{
-			effect.SetMaterial(material);
-
 			gpDevice->SetVertexDeclaration(decl._ptr);
 			gpDevice->SetStreamSource(0, vBuffer._ptr, 0, decl._stride);
 
 			uint32 numPass = effect.BeginEffect();
+			effect.SetMaterial(material);
+			effect.SetMatrix("matWorld", sendingMatrix[0]);
+			effect.SetMatrix("matViewProjection", sendingMatrix[2]);
+
 			for (uint32 j = 0; j < numPass; ++j)
 			{
-				effect.BeginPass(i);
+				effect.BeginPass(j);
 				_pDevice->DrawPrimitive((command._primType == RenderCommand::PrimType::eTriangleList) ? (D3DPT_TRIANGLELIST) : (D3DPT_LINELIST),
 					command._startVertex, 
 					(command._numPrim == 0) ? (vBuffer._size / decl._stride) : (command._numPrim));
@@ -107,16 +107,18 @@ void video::VideoDevice::Render(RenderView & renderView)
 		{
 			const IndexBuffer &iBuffer = *GetIndexBuffer(command.iHandle);
 
-			effect.SetMaterial(material);
-
 			gpDevice->SetVertexDeclaration(decl._ptr);
 			gpDevice->SetStreamSource(0, vBuffer._ptr, 0, decl._stride);
 			gpDevice->SetIndices(iBuffer._ptr);
 
 			uint32 numPass = effect.BeginEffect();
+
+			effect.SetMaterial(material);
+			effect.SetMatrix("matWorld", sendingMatrix[0]);
+			effect.SetMatrix("matViewProjection", sendingMatrix[2]);
 			for (uint32 j = 0; j < numPass; ++j)
 			{
-				effect.BeginPass(i);
+				effect.BeginPass(j);
 				_pDevice->DrawIndexedPrimitive((command._primType == RenderCommand::PrimType::eTriangleList) ? (D3DPT_TRIANGLELIST) : (D3DPT_LINELIST),
 					0, 0, 
 					(command._numVertices == 0) ? (vBuffer._size / decl._stride) : (command._numVertices),
@@ -125,7 +127,6 @@ void video::VideoDevice::Render(RenderView & renderView)
 				effect.EndPass();
 			}
 			effect.EndEffect();
-
 		}
 	}
 
@@ -699,9 +700,43 @@ VertexBufferHandle video::VideoDevice::CreateVertexBuffer(Memory * memory, Verte
 	return result;
 }
 
-VertexBufferHandle video::VideoDevice::GetVertexBufferFromXMesh(ID3DXMesh * pMesh)
+VertexBufferHandle video::VideoDevice::GetVertexBufferFromXMesh(ID3DXMesh *pMesh, const std::string &name)
 {
-	return VertexBufferHandle();
+	Assert(pMesh);
+
+	VertexBufferHandle result = _vertexBufferPool.Create(name);
+
+	IDirect3DVertexBuffer9 *meshVBuffer;
+	D3DVERTEXBUFFER_DESC bufferDesc{};
+	HRESULT_CHECK(pMesh->GetVertexBuffer(&meshVBuffer));
+	meshVBuffer->GetDesc(&bufferDesc);
+
+	D3DVERTEXELEMENT9 elements[MAX_FVF_DECL_SIZE];
+	pMesh->GetDeclaration(elements);
+
+	uint32 vertexStride = D3DXGetDeclVertexSize(elements, 0);
+
+	VertexDecl decl;
+	decl.Begin();
+	for (int32 i = 0; i < MAX_FVF_DECL_SIZE; ++i)
+	{
+		if (elements[i].Stream == 255)
+		{
+			break;
+		}
+		decl.Add(elements[i]);
+	}
+	decl.End(vertexStride);
+
+	VertexDeclHandle declHandle = VIDEO->CreateVertexDecl(&decl);
+
+	VertexBuffer &refBuffer = _vertexBuffers[result.index];
+	refBuffer._ptr = meshVBuffer;
+	refBuffer._size = bufferDesc.Size;
+	refBuffer._dynamic = false;
+	refBuffer._decl = declHandle;
+
+	return result;
 }
 
 VertexBufferHandle video::VideoDevice::GetVertexBuffer(const std::string & name)
@@ -734,9 +769,24 @@ IndexBufferHandle video::VideoDevice::CreateIndexBuffer(Memory * memory, uint32 
 	return result;
 }
 
-IndexBufferHandle video::VideoDevice::GetIndexBufferFromXMesh(ID3DXMesh * pMesh)
+IndexBufferHandle video::VideoDevice::GetIndexBufferFromXMesh(ID3DXMesh * pMesh, const std::string &name)
 {
-	return IndexBufferHandle();
+	Assert(pMesh);
+
+	IndexBufferHandle result = _indexBufferPool.Create(name);
+
+	IDirect3DIndexBuffer9 *meshIBuffer;
+	D3DINDEXBUFFER_DESC bufferDesc{};
+	HRESULT_CHECK(pMesh->GetIndexBuffer(&meshIBuffer));
+	meshIBuffer->GetDesc(&bufferDesc);
+
+	IndexBuffer &refBuffer = _indexBuffers[result.index];
+	refBuffer._ptr = meshIBuffer;
+	refBuffer._size = bufferDesc.Size;
+	refBuffer._dynamic = false;
+	refBuffer._stride = (bufferDesc.Type == D3DFMT_INDEX16) ? (2) : (4);
+
+	return result;
 }
 
 IndexBufferHandle video::VideoDevice::GetIndexBuffer(const std::string & name)

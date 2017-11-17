@@ -88,6 +88,8 @@ namespace video
 		void Destroy();
 		void BuidSubMeshBoundInfo();
 
+		void FillRenderCommand(RenderView &renderView, video::EffectHandle effect);
+
 		bool32 _visible{ true };
 		ID3DXMesh *_pMesh{};
 		uint32 _numMaterial{};
@@ -96,10 +98,12 @@ namespace video
 		MeshBoundInfo _meshBoundInfo{};
 		std::vector<MeshBoundInfo> _submeshBoundInfos;
 
-		std::vector<D3DXATTRIBUTERANGE> _attributeRanges;
 		D3DXATTRIBUTERANGE *_attributeRange{};
 
 		MeshVertInfo _meshVertInfo{};
+
+		VertexBufferHandle _vHandle;
+		IndexBufferHandle _iHandle;
 	};
 
 	//에니메이션을 위한 typedef

@@ -58,8 +58,6 @@ protected :
 	video::EffectHandle _skinnedEffect;
 	video::EffectHandle _terrainEffect;
 
-	animation::AnimationComponent _animation[9];
-
 	std::vector<Vector3> _points;
 };
 

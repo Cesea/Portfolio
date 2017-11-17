@@ -11,31 +11,6 @@ public:
 	RenderComponent() {}
 	virtual ~RenderComponent() {}
 
-	//enum MeshType
-	//{
-	//	eBuffer,
-	//	eStatic,
-	//	eSkinned
-	//};
-
-	//union Handles
-	//{
-	//	struct 
-	//	{
-	//		video::VertexBufferHandle _vb;
-	//		video::IndexBufferHandle _ib;
-	//	};
-	//	struct 
-	//	{
-	//		video::SkinnedXMeshHandle _skinned;
-	//		animation::AnimationComponentHandle _animation;
-	//	};
-	//	video::StaticXMeshHandle _static;
-	//	Handles() {}
-	//	~Handles() {}
-	//};
-	//MeshType _type;
-	//Handles _handles;
 
 	float radius{};
 

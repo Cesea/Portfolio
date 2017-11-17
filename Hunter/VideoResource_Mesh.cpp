@@ -243,9 +243,6 @@ namespace video
 		_materialHandles.reserve(_numMaterial + 1);
 		_submeshBoundInfos.reserve(_numMaterial + 1);
 
-		D3DVERTEXELEMENT9 vertexElement[MAX_FVF_DECL_SIZE];
-		_pMesh->GetDeclaration(vertexElement);
-
 
 
 		std::string stringCopy = fileName;
@@ -315,6 +312,9 @@ namespace video
 			ResizeMeshAndGetInfos(_pMesh, matIden, &_meshVertInfo, &_meshBoundInfo);
 		}
 
+		_vHandle = VIDEO->GetVertexBufferFromXMesh(_pMesh);
+		_iHandle = VIDEO->GetIndexBufferFromXMesh(_pMesh);
+
 		BuidSubMeshBoundInfo();
 	}
 
@@ -322,6 +322,9 @@ namespace video
 	{
 		COM_RELEASE(_pMesh);
 		SAFE_DELETE_ARRAY(_attributeRange);
+
+		VIDEO->DestroyVertexBuffer(_vHandle);
+		VIDEO->DestroyIndexBuffer(_iHandle);
 	}
 
 	//TODO : Implement this
@@ -334,6 +337,24 @@ namespace video
 		//	CalculateBoundingInfo(_vertices, &_submeshBoundInfos[i],
 		//		pAttributeRange.VertexStart, pAttributeRange.VertexStart + pAttributeRange.VertexCount);
 		//}
+	}
+
+	void StaticXMesh::FillRenderCommand(RenderView &renderView, video::EffectHandle effect)
+	{
+		for (uint32 i = 0; i < _numMaterial; ++i)
+		{
+			RenderCommand &command = renderView.GetCommand();
+			command.vHandle = _vHandle;
+			command.iHandle = _iHandle;
+
+			command._startIndex = _attributeRange[i].FaceStart * 3;
+			command._numVertices = _attributeRange[i].VertexCount;
+			command._numPrim = _attributeRange[i].FaceCount;
+
+			command._primType = RenderCommand::PrimType::eTriangleList;
+			command._materialHandle = _materialHandles[i];
+			command._effectHandle = effect;
+		}
 	}
 
 
