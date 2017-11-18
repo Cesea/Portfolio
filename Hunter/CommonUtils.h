@@ -18,6 +18,7 @@
 constexpr float EPSILON = 0.001f;
 constexpr float ONE_RAD = 0.017453f;
 
+
 inline int32 Index2D(int32 x, int32 y, int32 xMax)
 {
 	return x + (xMax * y);

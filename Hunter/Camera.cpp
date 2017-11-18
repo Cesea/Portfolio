@@ -1,6 +1,9 @@
 #include "stdafx.h"
 #include "Camera.h"
 
+constexpr float MAX_VERT_ANGLE = 85.0f;
+constexpr float MIN_VERT_ANGLE = -85.0f;
+
 Camera::Camera()
 {
 	//기본 화각 설정
@@ -10,7 +13,7 @@ Camera::Camera()
 	_camNear = 0.01f;
 
 	//기본 Far
-	_camFar = 4000.f;
+	_camFar = 1200.f;
 
 	_moveSpeed = 1.0f;
 	_rotationSpeed = 1.0f;
@@ -26,7 +29,7 @@ Camera::~Camera()
 {
 }
 
-void Camera::UpdateMatrix()
+void Camera::PreUpdateMatrix()
 {
 	//이동값이 남아있다면 움직여라
 	if (!_toMove.IsZero())
@@ -34,6 +37,10 @@ void Camera::UpdateMatrix()
 		_transform.MovePositionSelf(_toMove);
 		_toMove = Vector3(0.0f, 0.0f, 0.0f);
 	}
+}
+
+void Camera::UpdateMatrix()
+{
 	//화각에 의한 Projection 행렬 업데이트
 	MatrixPerspectiveFovLH(
 		&_matProjection,
@@ -48,14 +55,6 @@ void Camera::UpdateMatrix()
 	_matViewProjection = _matView * _matProjection;
 
 	_frustum.UpdateFrustum(_matViewProjection);
-}
-
-void Camera::UpdateCamToDevice(LPDIRECT3DDEVICE9 pDevice)
-{	//행렬 업데이트 해주고 
-	this->UpdateMatrix();
-	//셋팅
-	pDevice->SetTransform(D3DTS_VIEW, &_matView);
-	pDevice->SetTransform(D3DTS_PROJECTION, &_matProjection);
 }
 
 void Camera::ComputeRay(const Vector2 & screenPos, Ray * pOutRay)
@@ -185,20 +184,22 @@ void Camera::Handle(const InputManager::MouseMoveEvent & event)
 	if (_rotating)
 	{
 		float deltaTime = APPTIMER->GetTargetTime();
-		Vector3 rot{};
+
 		int32 deltaX = event.current.x - event.old.x;
 		int32 deltaY = event.current.y - event.old.y;
 
 		if (deltaX != 0)
 		{
-			rot.y = _rotationSpeed * deltaTime * (float)deltaX;
+			_horizontalAngle += _rotationSpeed * deltaTime * (float)deltaX;
 		}
 
 		if (deltaY != 0)
 		{
-			rot.x = _rotationSpeed * deltaTime * (float)deltaY;
+			_verticalAngle += _rotationSpeed * deltaTime * (float)deltaY;
 		}
 
-		_transform.RotateSelf(rot);
+		ClampFloat(_verticalAngle, MIN_VERT_ANGLE, MAX_VERT_ANGLE);
+
+		_transform.SetRotateWorld(_verticalAngle * ONE_RAD, _horizontalAngle * ONE_RAD, 0.0f);
 	}
 }

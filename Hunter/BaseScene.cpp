@@ -26,7 +26,7 @@ bool32 BaseScene::Init()
 	_mainRenderView = VIDEO->GetRenderView(renderViewHandle);
 	_mainRenderView->_clearColor = 0xff55330;
 
-	_camera.SetRotationSpeed(0.1f);
+	_camera.SetRotationSpeed(10.0f);
 	_camera.SetMoveSpeed(10.0f);
 
 	_mainRenderView->_pCamera = &_camera;
@@ -71,8 +71,7 @@ bool32 BaseScene::Init()
 	config._textureMult = 50;
 	config._sectionResolution;
 
-	//TERRAIN->Create(config, 1);
-	//_terrain.Create(config, 1);
+	TERRAIN->Create(config, 1);
 
 	_active = true;
 	return result;
@@ -97,11 +96,9 @@ bool32 BaseScene::Update(float deltaTime)
 	}
 
 	//Update Camera
+	_camera.PreUpdateMatrix();
 	_transformSystem.UpdateTransform(_camera.GetTransform());
 	_camera.UpdateMatrix();
-
-	gpDevice->SetTransform(D3DTS_VIEW, &_camera.GetViewMatrix());
-	gpDevice->SetTransform(D3DTS_PROJECTION, &_camera.GetProjectionMatrix());
 
 	return result;
 }
@@ -110,12 +107,16 @@ bool32 BaseScene::Render()
 {
 	//video::StaticXMesh *pMesh = VIDEO->GetStaticXMesh(_staticMeshHandle);
 
-	for (auto &animHandle : _animations)
+	for (uint32 i = 0; i < _animations.size(); ++i)
 	{
-		video::SkinnedAnimation *pAnimation = VIDEO->GetSkinnedAnimation(animHandle);
+		video::SkinnedAnimation *pAnimation = VIDEO->GetSkinnedAnimation(_animations[i]);
 		pAnimation->UpdateMesh();
 		pAnimation->FillRenderCommand(*_mainRenderView, _skinnedEffect, _staticEffect);
 	}
+
+	TERRAIN->FillRenderCommand(*_mainRenderView);
+
+	
 
 	//Matrix matrix;
 	//for (int32 y = 0; y < 8; ++y)

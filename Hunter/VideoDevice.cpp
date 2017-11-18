@@ -62,12 +62,9 @@ void VideoDevice::Update(float deltaTime)
 // 현제 Device에 설정된 값으로 렌더 될 것이다...
 void video::VideoDevice::Render(RenderView & renderView) 
 {
-	static uint32 count = 0;
+	static int32 count = 0;
 
 	uint32 drawCount = 0;
-
-	_pDevice->Clear(0, nullptr, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER | D3DCLEAR_STENCIL, renderView._clearColor, 1.0f, 0);
-	_pDevice->BeginScene();
 
 	Matrix sendingMatrix[3];
 	MatrixIdentity(&sendingMatrix[0]);
@@ -143,21 +140,21 @@ void video::VideoDevice::Render(RenderView & renderView)
 					0, 0, 
 					(command._numVertices == 0) ? (vBuffer._size / decl._stride) : (command._numVertices),
 					(command._startIndex == 0) ? (0) : (command._startIndex),
-					(command._numPrim == 0) ? (vBuffer._size / decl._stride) : (command._numPrim));
+					(command._numPrim == 0) ? (iBuffer._size / iBuffer._stride / 3) : (command._numPrim));
 				effect.EndPass();
 			}
 			effect.EndEffect();
 		}
+
+	//#if defined (DEBUG) || defined (_DEBUG) 
+	//	count++;
+	//	if (count % 60 == 0)
+	//	{
+	//		Console::Log("Draw Count : % d\n", drawCount);
+	//	}
+	//#endif
 	}
 
-
-#if defined (DEBUG) || defined (_DEBUG) 
-	count++;
-	if (count % 60 == 0)
-	{
-		Console::Log("Draw Count : % d\n", drawCount);
-	}
-#endif
 
 }
 

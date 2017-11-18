@@ -137,7 +137,6 @@ technique Base
       VertexShader = compile vs_3_0 vs_main();
       PixelShader = compile ps_3_0 ps_main();
 
-	  //FillMode  = WireFrame;
 	  //CullMode  = None;
    }
 }

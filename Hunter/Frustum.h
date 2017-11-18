@@ -16,6 +16,7 @@ public:
 	//프러스텀 정보 업데이트(View * projection 행렬 필요)
 	void UpdateFrustum(const Matrix &matViewProj);
 
+	bool IsPointIntFrustum(const Vector3 &point);
 	//구가 절두체 안에 있는지 판별한다
 	bool IsSphereInFrustum(const Vector3 &center, float radius) const;
 

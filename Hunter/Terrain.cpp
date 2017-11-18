@@ -72,7 +72,8 @@ bool Terrain::Create(const Terrain::TerrainConfig &config, int32 smoothLevel)
 	_pQuadTree->Init(_terrainVertices, _numVertexX);
 
 	//터레인 Texture 로딩
-	_mHandle = VIDEO->CreateMaterial("TerrainMaterial");
+	_effect = VIDEO->GetEffect("TerrainBase.fx");
+	_materialHandle = VIDEO->CreateMaterial("TerrainMaterial");
 
 	_tile0Handle = VIDEO->CreateTexture(config._tile0FileName, config._tile0FileName);
 	_tile1Handle = VIDEO->CreateTexture(config._tile1FileName, config._tile1FileName);
@@ -80,11 +81,11 @@ bool Terrain::Create(const Terrain::TerrainConfig &config, int32 smoothLevel)
 	_tile3Handle = VIDEO->CreateTexture(config._tile3FileName, config._tile3FileName);
 	_tileSplatHandle = VIDEO->CreateTexture(config._splatFileName);
 
-	VIDEO->MaterialAddTexture(_mHandle, VIDEO_TEXTURE0, _tile0Handle);
-	VIDEO->MaterialAddTexture(_mHandle, VIDEO_TEXTURE1, _tile1Handle);
-	VIDEO->MaterialAddTexture(_mHandle, VIDEO_TEXTURE2, _tile2Handle);
-	VIDEO->MaterialAddTexture(_mHandle, VIDEO_TEXTURE3, _tile3Handle);
-	VIDEO->MaterialAddTexture(_mHandle, VIDEO_TEXTURE4, _tileSplatHandle);
+	VIDEO->MaterialAddTexture(_materialHandle, VIDEO_TEXTURE0, _tile0Handle);
+	VIDEO->MaterialAddTexture(_materialHandle, VIDEO_TEXTURE1, _tile1Handle);
+	VIDEO->MaterialAddTexture(_materialHandle, VIDEO_TEXTURE2, _tile2Handle);
+	VIDEO->MaterialAddTexture(_materialHandle, VIDEO_TEXTURE3, _tile3Handle);
+	VIDEO->MaterialAddTexture(_materialHandle, VIDEO_TEXTURE4, _tileSplatHandle);
 
 }
 
@@ -105,40 +106,32 @@ void Terrain::Destroy()
 	VIDEO->DestroyTexture(_tile3Handle);
 	VIDEO->DestroyTexture(_tileSplatHandle);
 
-	VIDEO->DestroyMaterial(_mHandle);
+	VIDEO->DestroyMaterial(_materialHandle);
 
 	SAFE_DELETE_ARRAY(_terrainVertices);
 	SAFE_DELETE(_pQuadTree);
 }
 
-void Terrain::Render(video::RenderView &renderView)
+void Terrain::FillRenderCommand(video::RenderView & renderView)
 {
-	////월드행렬 셋팅
-	Matrix matWorld;
-	MatrixIdentity(&matWorld);
-	//effect.SetMatrix("matWorld", matWorld);
-	//뷰 행렬
-	//effect.SetMatrix("matViewProjection", camera.GetViewProjectionMatrix());
-	////Texture 
-
-	//광원 셋팅
-	//Vector3 dirLight = pDirectionLight->pTransform->GetForward();
-	//m_pTerrainEffect->SetVector("worldLightDir", &D3DXVECTOR4(dirLight, 1));
-
-
-	//effect.DrawPrimitiveIndex(_vHandle, _iHandle, _mHandle);
-
 	for (int32 i = 0; i < _numSectionX * _numSectionZ; ++i)
 	{
 		Terrain::TerrainSection &refSection = _pSections[i];
-		//if (camera.GetFrustum().IsSphereInFrustum(Vector3(refSection._centerX, 0.0f, refSection._centerZ), refSection._radius))
-		//{
-			//effect.DrawPrimitiveIndex(refSection._vHandle, refSection._iHandle, _mHandle);
-		//}
+		if (renderView._pCamera->GetFrustum().IsSphereInFrustum(Vector3(refSection._centerX, 0.0f, refSection._centerZ), refSection._radius))
+		{
+			video::RenderCommand &command = renderView.GetCommand();
+
+			command._drawType = video::RenderCommand::DrawType::eStatic;
+			command._primType = video::RenderCommand::PrimType::eTriangleList;
+
+			command._vHandle = refSection._vHandle;
+			command._iHandle = refSection._iHandle;
+
+			command._effectHandle = _effect;
+			command._materialHandle = _materialHandle;
+		}
 	}
-
 }
-
 
 //TODO : Implement this
 bool Terrain::IsIntersectRay(const Ray &ray, Vector3 *pOutHit)
@@ -560,9 +553,7 @@ bool Terrain::CreateTerrainSection(int32 x, int32 z, const video::TerrainVertex 
 	Assert(refSection._vHandle.IsValid());
 
 	mem._data = &indices[0];
-	mem._size = sizeof(uint16) * _sectionResolution * _sectionResolution * 3 * 2;
-
-	size = sizeof(uint16) * indices.size();
+	mem._size = sizeof(uint16) * _sectionResolution * _sectionResolution * 2 * 3;
 
 	//refSection._iHandle = VIDEO->GetIndexBuffer("TerrainSectionIndex");
 	//if (!refSection._iHandle.IsValid())
@@ -574,7 +565,7 @@ bool Terrain::CreateTerrainSection(int32 x, int32 z, const video::TerrainVertex 
 
 	refSection._centerX = (refSection._startX + refSection._endX) * 0.5f;
 	refSection._centerZ = (refSection._startZ + refSection._endZ) * 0.5f;
-	refSection._radius = (refSection._centerX - refSection._startX) * 1.4f;
+	refSection._radius = (refSection._centerX - refSection._startX) * 1.2f;
 
 	return true;
 }

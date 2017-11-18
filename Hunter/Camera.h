@@ -12,9 +12,8 @@ public:
 	Camera();
 	~Camera();
 
+	void PreUpdateMatrix();
 	void UpdateMatrix();
-
-	void UpdateCamToDevice(LPDIRECT3DDEVICE9 pDevice);
 
 	void SetMoveSpeed(float speed) { _moveSpeed = speed; }
 	void SetRotationSpeed(float speed) { _rotationSpeed = speed; }
@@ -28,9 +27,7 @@ public:
 
 	void OrthoToggle() { _ortho = !_ortho; }
 
-	//화면의 위치를 가지고 카메라의 투영 레이를 얻는다
 	void ComputeRay(const Vector2 &screenPos, Ray *pOutRay);
-	//월드 위치로  화면의 위치를 얻는다.
 	bool GetWorldPosToScreenPos(const Vector3 &worldPos, Vector2* pOutScreenPos);
 
 	const Frustum &GetFrustum() const { return _frustum; }
@@ -58,7 +55,10 @@ protected:
 	bool32 _rotating{false};
 
 	float _moveSpeed{1.0f};
-	float _rotationSpeed{0.4f};
+	float _rotationSpeed{0.1f};
+
+	float _verticalAngle{};
+	float _horizontalAngle{};
 
 	Vector3 _toMove;
 

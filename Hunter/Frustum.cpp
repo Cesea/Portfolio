@@ -43,6 +43,11 @@ void Frustum::UpdateFrustum(const Matrix & matViewProj)
 	_plane[5].Create(_pos[2], _pos[3], _pos[6]);
 }
 
+bool Frustum::IsPointIntFrustum(const Vector3 & point)
+{
+	return false;
+}
+
 bool Frustum::IsSphereInFrustum(const Vector3 &center, float radius) const
 {
 	Vector3 normal;

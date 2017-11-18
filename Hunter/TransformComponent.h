@@ -12,7 +12,6 @@
 
 struct TransformComponent : public Component
 {
-
 	DECLARE_META(TransformComponent);
 
 	TransformComponent();

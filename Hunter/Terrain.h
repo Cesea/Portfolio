@@ -3,6 +3,7 @@
 
 #include "SingletonBase.h"
 
+class IScene;
 class QuadTree;
 
 class Terrain : public SingletonBase<Terrain>
@@ -58,10 +59,12 @@ public:
 	Terrain() {}
 	~Terrain();
 
+	void SetScene(IScene *pScene) { _pScene = pScene; }
 	bool Create(const Terrain::TerrainConfig &config, int32 smoothLevel);
 
 	void Destroy();
-	void Render(video::RenderView &renderView);
+
+	void FillRenderCommand(video::RenderView &renderView);
 	bool IsIntersectRay(const Ray &ray, Vector3 *pOut);
 
 	float GetHeight(float x, float z);
@@ -74,12 +77,8 @@ private:
 
 	void SmoothTerrain(int32 passed);
 
-
 	video::VertexDeclHandle _declHandle{};
-	video::MaterialHandle _mHandle{};
-	video::VertexBufferHandle _vHandle{};
-	video::IndexBufferHandle _iHandle{};
-
+	video::MaterialHandle _materialHandle{};
 	video::EffectHandle _effect{};
 
 private:
