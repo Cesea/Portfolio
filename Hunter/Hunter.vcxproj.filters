@@ -24,9 +24,6 @@
     <ClCompile Include="RefVariant.cpp">
       <Filter>Sub\Reflection\Variant</Filter>
     </ClCompile>
-    <ClCompile Include="BaseScene.cpp">
-      <Filter>Game\GameScene</Filter>
-    </ClCompile>
     <ClCompile Include="tinyxml2.cpp">
       <Filter>Sub\tinyxml</Filter>
     </ClCompile>
@@ -156,6 +153,9 @@
     <ClCompile Include="Terrain.cpp">
       <Filter>Game\GameUtils\Terrain</Filter>
     </ClCompile>
+    <ClCompile Include="BaseScene.cpp">
+      <Filter>Game\GameScene</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -209,9 +209,6 @@
     </ClInclude>
     <ClInclude Include="RefVariant.h">
       <Filter>Sub\Reflection\Variant</Filter>
-    </ClInclude>
-    <ClInclude Include="BaseScene.h">
-      <Filter>Game\GameScene</Filter>
     </ClInclude>
     <ClInclude Include="imguiRenderer.h">
       <Filter>GUI</Filter>
@@ -395,6 +392,9 @@
     </ClInclude>
     <ClInclude Include="QuadTree.h">
       <Filter>Game\GameUtils\Terrain</Filter>
+    </ClInclude>
+    <ClInclude Include="BaseScene.h">
+      <Filter>Game\GameScene</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

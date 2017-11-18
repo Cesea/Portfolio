@@ -18,6 +18,18 @@
 constexpr float EPSILON = 0.001f;
 constexpr float ONE_RAD = 0.017453f;
 
+struct IntRect
+{
+	IntRect();
+	IntRect(int32 left, int32 top, int32 right, int32 bottom);
+	IntRect(const IntRect &other);
+
+	IntRect &operator= (const IntRect &other);
+	int32 _left;
+	int32 _top;
+	int32 _right;
+	int32 _bottom;
+};
 
 inline int32 Index2D(int32 x, int32 y, int32 xMax)
 {

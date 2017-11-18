@@ -71,11 +71,8 @@ void Camera::ComputeRay(const Vector2 & screenPos, Ray * pOutRay)
 	factorX = factorX * 2.0f - 1.0f;
 	factorY = factorY * 2.0f - 1.0f;
 
-	//투영행렬을 얻는다.
-	Matrix matProj = GetProjectionMatrix();
-
 	//동차로 위치에 화각 스케일량을 나눈다.
-	Vector3 direction( factorX / matProj._11, factorY / matProj._22, 1.0f);
+	Vector3 direction( factorX / _matProjection._11, factorY / _matProjection._22, 1.0f);
 
 	//카메라 월드 행렬
 	Matrix matCamWorld = _transform.GetFinalMatrix();

@@ -10,6 +10,7 @@ public:
 	RenderSystem();
 	virtual ~RenderSystem() override;
 
+	void UpdateAnimations(float deltaTime);
 	void Render(video::RenderView &renderView);
 
 	virtual void Initialize();
@@ -18,7 +19,8 @@ public:
 
 	virtual void OnEntityRemoved(Entity& entity);
 
-	//void SubmitMesh(Mesh &mesh);
+private :
+	void FillRenderView(const RenderComponent &component, video::RenderView &renderView);
 
 };
 

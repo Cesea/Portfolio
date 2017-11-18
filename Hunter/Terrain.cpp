@@ -3,12 +3,15 @@
 
 #include "QuadTree.h"
 
+#include "BaseScene.h"
+
 Terrain::~Terrain()
 {
 }
 
 bool Terrain::Create(const Terrain::TerrainConfig &config, int32 smoothLevel)
 {
+	RegisterEvents();
 	//스케일값 대입
 	_heightScale = config._heightScale;
 	_cellScale = config._cellScale;
@@ -69,7 +72,7 @@ bool Terrain::Create(const Terrain::TerrainConfig &config, int32 smoothLevel)
 
 	//쿼드트리를 만든다.
 	_pQuadTree = new QuadTree;
-	_pQuadTree->Init(_terrainVertices, _numVertexX);
+	_pQuadTree->Init(_terrainVertices, _numVertexX, _sectionResolution);
 
 	//터레인 Texture 로딩
 	_effect = VIDEO->GetEffect("TerrainBase.fx");
@@ -89,8 +92,28 @@ bool Terrain::Create(const Terrain::TerrainConfig &config, int32 smoothLevel)
 
 }
 
+void Terrain::RegisterEvents()
+{
+	EventChannel channel;
+	channel.Add<InputManager::MouseReleasedEvent, Terrain>(*this);
+}
+
+void Terrain::Handle(const InputManager::MouseReleasedEvent & event)
+{
+	EventChannel channel;
+
+	Ray ray;
+	_pScene->_camera.ComputeRay(Vector2(event.coord.x, event.coord.y), &ray);
+	Vector3 hitPos;
+	if (this->IsIntersectRay(ray, &hitPos))
+	{
+		channel.Queue<BaseScene::SpawnEvent>(new BaseScene::SpawnEvent(hitPos));
+	}
+}
+
 void Terrain::Destroy()
 {
+	_pScene = nullptr;
 	for (int32 i = 0; i < _numSectionX * _numSectionZ; ++i)
 	{
 		VIDEO->DestroyVertexBuffer(_pSections[i]._vHandle);
@@ -114,6 +137,13 @@ void Terrain::Destroy()
 
 void Terrain::FillRenderCommand(video::RenderView & renderView)
 {
+
+	IntRect drawRange = _pQuadTree->CalculateDrawRange(renderView._pCamera->GetFrustum());
+
+	//for (int32 y = drawRange._bottom; y < drawRange._top; ++y)
+	//{
+	//	for (int32 x = drawRange._left; x < drawRange._right; ++x)
+	//	{
 	for (int32 i = 0; i < _numSectionX * _numSectionZ; ++i)
 	{
 		Terrain::TerrainSection &refSection = _pSections[i];
@@ -124,6 +154,8 @@ void Terrain::FillRenderCommand(video::RenderView & renderView)
 			command._drawType = video::RenderCommand::DrawType::eStatic;
 			command._primType = video::RenderCommand::PrimType::eTriangleList;
 
+			Assert(refSection._vHandle.IsValid());
+			Assert(refSection._iHandle.IsValid());
 			command._vHandle = refSection._vHandle;
 			command._iHandle = refSection._iHandle;
 

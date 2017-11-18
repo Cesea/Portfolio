@@ -109,6 +109,8 @@ namespace video
 
 		VertexBufferHandle _vHandle;
 		IndexBufferHandle _iHandle;
+
+		static video::EffectHandle sDefaultEffectHandle;
 	};
 
 	//에니메이션을 위한 typedef
@@ -152,8 +154,8 @@ namespace video
 	{
 		bool Create(video::SkinnedXMeshHandle handle);
 		void Destroy();
-		void UpdateAnimation(float deltaTime, const Matrix &world);
-		void UpdateMesh();
+		void UpdateAnimation(float deltaTime);
+		void UpdateMesh(const Matrix &matrix);
 
 		void FillRenderCommand(RenderView &renderView, 
 			video::EffectHandle skinnedEffect, video::EffectHandle staticEffect);
@@ -197,8 +199,9 @@ namespace video
 		double _animationPlayFactor{};
 
 		float _animDelta{};
-	};
 
+		static video::EffectHandle sDefaultEffectHandle;
+	};
 }
 
 #endif

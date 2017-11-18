@@ -3,7 +3,7 @@
 
 #include "SingletonBase.h"
 
-class IScene;
+class BaseScene;
 class QuadTree;
 
 class Terrain : public SingletonBase<Terrain>
@@ -59,8 +59,11 @@ public:
 	Terrain() {}
 	~Terrain();
 
-	void SetScene(IScene *pScene) { _pScene = pScene; }
+	void SetScene(BaseScene *pScene) { _pScene = pScene; }
 	bool Create(const Terrain::TerrainConfig &config, int32 smoothLevel);
+
+	void RegisterEvents();
+	void Handle(const InputManager::MouseReleasedEvent &event);
 
 	void Destroy();
 
@@ -122,6 +125,7 @@ private:
 
 	video::TerrainVertex *_terrainVertices{};
 	QuadTree* _pQuadTree{};  //Äõµå Æ®¸®
+	BaseScene *_pScene;
 
 	TerrainSection *_pSections{};
 };

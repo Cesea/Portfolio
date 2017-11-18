@@ -19,8 +19,7 @@ bool32 BaseScene::Unload()
 bool32 BaseScene::Init()
 {
 	bool32 result = true;
-	RegisterEvents();
-
+	//RegisterEvents();
 
 	video::RenderViewHandle renderViewHandle= VIDEO->CreateRenderView("Main");
 	_mainRenderView = VIDEO->GetRenderView(renderViewHandle);
@@ -33,29 +32,57 @@ bool32 BaseScene::Init()
 
 	Matrix correctionMat;
 	MatrixScaling(&correctionMat, 0.1f, 0.1f, 0.1f);
-
-	//_staticMeshHandle = VIDEO->CreateStaticXMesh("../resources/models/knight/Knight.X", &correctionMat, "aa");
 	_skinnedMeshHandle = VIDEO->CreateSkinnedXMesh("../resources/models/knight/Knight.X", &correctionMat, "Knight");
 
-	_animations.reserve(16);
-	for (int32 i = 0; i < 16; ++i)
-	{
-		_animations.push_back(VIDEO->CreateSkinnedAnimation(_skinnedMeshHandle, "Anim" + std::to_string(i)));
-	}
-	for (int32 i = 0; i < 16; ++i)
-	{
-		video::SkinnedAnimation *pAnimation = VIDEO->GetSkinnedAnimation(_animations[i]);
-		pAnimation->Play(i);
-	}
+	MatrixScaling(&correctionMat, 1.0f, 1.0f, 1.0f);
+	video::StaticXMeshHandle staticMeshHandle = VIDEO->CreateStaticXMesh("../resources/models/environment/Rock/Rock1_A.X", &correctionMat, "Rock");
 
+	video::StaticXMesh::sDefaultEffectHandle = VIDEO->GetEffect("StaticMesh.fx");
+	video::SkinnedAnimation::sDefaultEffectHandle = VIDEO->GetEffect("SkinnedMesh.fx");
+	_terrainEffect = VIDEO->GetEffect("TerrainBase.fx");
 
 	_world.AddSystem<RenderSystem>(_renderSystem);
 	_world.AddSystem<TransformSystem>(_transformSystem);
 
-	_staticEffect = VIDEO->GetEffect("StaticMesh.fx");
-	_skinnedEffect = VIDEO->GetEffect("SkinnedMesh.fx");
-	_terrainEffect = VIDEO->GetEffect("TerrainBase.fx");
+	for (uint32 z = 0; z < 4; ++z)
+	{
+		for (uint32 x = 0; x < 4; ++x)
+		{
+			int32 index = Index2D(x, z, 4);
+			_entities.push_back(_world.CreateEntity());
+			Entity &entity = _entities.back();
 
+			TransformComponent &transComp = entity.AddComponent<TransformComponent>();
+			transComp.MovePositionWorld(x * 5, 0, z * 5);
+			RenderComponent &renderComp = entity.AddComponent<RenderComponent>();
+			renderComp._type = RenderComponent::Type::eSkinned;
+			renderComp._skinned = VIDEO->CreateSkinnedAnimation(_skinnedMeshHandle, "Anim" + std::to_string(index));
+
+			entity.Activate();
+		}
+	}
+
+	_entities.push_back(_world.CreateEntity());
+	Entity &entity = _entities.back();
+
+	TransformComponent &transComp = entity.AddComponent<TransformComponent>();
+	transComp.MovePositionWorld(-5.0f, -0.0f, -5.0f);
+	RenderComponent &renderComp = entity.AddComponent<RenderComponent>();
+	renderComp._type = RenderComponent::Type::eStatic;
+	renderComp._static = staticMeshHandle;
+
+	entity.Activate();
+
+	//_animations.reserve(16);
+	////for (int32 i = 0; i < 16; ++i)
+	//{
+	//	_animations.push_back(VIDEO->CreateSkinnedAnimation(_skinnedMeshHandle, "Anim" + std::to_string(0)));
+	//}
+	////for (int32 i = 0; i < 16; ++i)
+	//{
+	//	video::SkinnedAnimation *pAnimation = VIDEO->GetSkinnedAnimation(_animations[0]);
+	//	pAnimation->Play(0);
+	//}
 	_camera.GetTransform().MovePositionSelf(0.0f, 0.0f, -30.0f);
 
 	Terrain::TerrainConfig config;
@@ -71,7 +98,8 @@ bool32 BaseScene::Init()
 	config._textureMult = 50;
 	config._sectionResolution;
 
-	TERRAIN->Create(config, 1);
+	//TERRAIN->SetScene(this);
+	//TERRAIN->Create(config, 1);
 
 	_active = true;
 	return result;
@@ -85,48 +113,25 @@ bool32 BaseScene::Update(float deltaTime)
 
 	_transformSystem.PreUpdate(deltaTime);
 
-	int32 count = 0;
-	Matrix world;
-	for (auto &animHandle : _animations)
-	{
-		video::SkinnedAnimation *pAnimation = VIDEO->GetSkinnedAnimation(animHandle);
-		MatrixTranslation(&world, count * 5, 0, 0);
-		pAnimation->UpdateAnimation(deltaTime, world);
-		count++;
-	}
-
+	//Collision Check
+	_transformSystem.PostUpdate(deltaTime);
+	_renderSystem.UpdateAnimations(deltaTime);
 	//Update Camera
 	_camera.PreUpdateMatrix();
 	_transformSystem.UpdateTransform(_camera.GetTransform());
 	_camera.UpdateMatrix();
+
+	_channel.Update<BaseScene::SpawnEvent>(deltaTime);
 
 	return result;
 }
 
 bool32 BaseScene::Render()
 {
-	//video::StaticXMesh *pMesh = VIDEO->GetStaticXMesh(_staticMeshHandle);
 
-	for (uint32 i = 0; i < _animations.size(); ++i)
-	{
-		video::SkinnedAnimation *pAnimation = VIDEO->GetSkinnedAnimation(_animations[i]);
-		pAnimation->UpdateMesh();
-		pAnimation->FillRenderCommand(*_mainRenderView, _skinnedEffect, _staticEffect);
-	}
+	_renderSystem.Render(*_mainRenderView);
 
-	TERRAIN->FillRenderCommand(*_mainRenderView);
-
-	
-
-	//Matrix matrix;
-	//for (int32 y = 0; y < 8; ++y)
-	//{
-	//	for (int32 x = 0; x < 8; ++x)
-	//	{
-	//		MatrixTranslation(&matrix, x * 5, 0, y * 5);
-	//		pMesh->FillRenderCommand(*_mainRenderView, _staticEffect, &matrix);
-	//	}
-	//}
+	//TERRAIN->FillRenderCommand(*_mainRenderView);
 
 	_mainRenderView->PreRender();
 	_mainRenderView->ExecCommands();
@@ -152,4 +157,14 @@ bool32 BaseScene::IsActive()
 void BaseScene::RegisterEvents()
 {
 	EventChannel channel;
+	channel.Add<BaseScene::SpawnEvent, BaseScene>(*this);
+}
+
+void BaseScene::Handle(const SpawnEvent &event)
+{
+	static int a = 0;
+	_animations.push_back(VIDEO->CreateSkinnedAnimation(_skinnedMeshHandle, "aat"));
+	video::SkinnedAnimation *pAnimation = VIDEO->GetSkinnedAnimation(_animations.back());
+	pAnimation->Play(a++);
+
 }

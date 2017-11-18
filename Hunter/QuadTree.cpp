@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "QuadTree.h"
 
+int32 QuadTree::SectionResolution;
 
 bool32 IsRayHitBoundSphere(const Ray &ray, const Vector3 &center, float radius,
 	Vector3 *pOutHitPos, Vector3 *pOutHitNormal)
@@ -13,23 +14,7 @@ bool32 IsRayHitBoundSphere(const Ray &ray, const Vector3 &center, float radius,
 
 	//반지름의 제곱
 	float r2 = radius * radius;
-
-	//만약 광선이 구안에 있다면..
-	if (r2 > lengthSq)
-	{
-		//광선이 안에서 나가는 것은 체크 안된다.
-		return false;
-	}
-
-	//여기까지오면 오리진은 구밖에 있다는예기
-	//구센터까지의 방향벡터와 레이의 방향벡터가 직각을 포함한 
-	//둔각이라면 죽었다깨어나도 충돌될일없다
-	float dot = Vec3Dot(&dirToCenter, &ray.direction);
-	if (dot <= 0.0f)
-	{
-		return false;
-	}
-
+	float dot = Vec3Dot( &dirToCenter, &ray.direction );
 	// 피타고라스의 정리를 하기위해 직각 삼각형 공식유도
 	// d2 = x2 + y2;
 	// d = sqrt( x2 + y2 );
@@ -89,14 +74,16 @@ QuadTree::~QuadTree()
 
 
 
-bool QuadTree::Init(video::TerrainVertex *pVertices, uint32 verNumEdge)
+bool QuadTree::Init(video::TerrainVertex *pVertices, uint32 verNumEdge, int32 sectionRes)
 {
 	_pTerrainVertices = pVertices;
 
-	_corners[eCornerLT] = (verNumEdge - 1) * verNumEdge;
-	_corners[eCornerRT] = verNumEdge * verNumEdge - 1;
 	_corners[eCornerLB] = 0;
 	_corners[eCornerRB] = verNumEdge - 1;
+	_corners[eCornerLT] = (verNumEdge - 1) * verNumEdge;
+	_corners[eCornerRT] = verNumEdge * verNumEdge - 1;
+
+	SectionResolution = sectionRes;
 
 	CreateChildTree();
 	return true;
@@ -126,24 +113,6 @@ void QuadTree::CreateChildTree()
 		uint32 rightCenter = (_corners[eCornerRT] + _corners[eCornerRB]) / 2; //우 중앙
 		uint32 bottomCenter = (_corners[eCornerRB] + _corners[eCornerLB]) / 2; //하단 중앙
 
-																				//좌상단 자식
-		_pChilds[eCornerLT] = new QuadTree;
-		_pChilds[eCornerLT]->_corners[eCornerLT] = _corners[eCornerLT];
-		_pChilds[eCornerLT]->_corners[eCornerRT] = topCenter;
-		_pChilds[eCornerLT]->_corners[eCornerLB] = leftCenter;
-		_pChilds[eCornerLT]->_corners[eCornerRB] = _center;
-		_pChilds[eCornerLT]->_pTerrainVertices = _pTerrainVertices;
-		_pChilds[eCornerLT]->CreateChildTree();
-
-		//우상단 자식
-		_pChilds[eCornerRT] = new QuadTree;
-		_pChilds[eCornerRT]->_corners[eCornerLT] = topCenter;
-		_pChilds[eCornerRT]->_corners[eCornerRT] = _corners[eCornerRT];
-		_pChilds[eCornerRT]->_corners[eCornerLB] = _center;
-		_pChilds[eCornerRT]->_corners[eCornerRB] = rightCenter;
-		_pChilds[eCornerRT]->_pTerrainVertices = _pTerrainVertices;
-		_pChilds[eCornerRT]->CreateChildTree();
-
 		//좌하단 자식
 		_pChilds[eCornerLB] = new QuadTree;
 		_pChilds[eCornerLB]->_corners[eCornerLT] = leftCenter;
@@ -161,6 +130,24 @@ void QuadTree::CreateChildTree()
 		_pChilds[eCornerRB]->_corners[eCornerRB] = _corners[eCornerRB];
 		_pChilds[eCornerRB]->_pTerrainVertices = _pTerrainVertices;
 		_pChilds[eCornerRB]->CreateChildTree();
+																				//좌상단 자식
+		//좌상단
+		_pChilds[eCornerLT] = new QuadTree;
+		_pChilds[eCornerLT]->_corners[eCornerLT] = _corners[eCornerLT];
+		_pChilds[eCornerLT]->_corners[eCornerRT] = topCenter;
+		_pChilds[eCornerLT]->_corners[eCornerLB] = leftCenter;
+		_pChilds[eCornerLT]->_corners[eCornerRB] = _center;
+		_pChilds[eCornerLT]->_pTerrainVertices = _pTerrainVertices;
+		_pChilds[eCornerLT]->CreateChildTree();
+
+		//우상단 자식
+		_pChilds[eCornerRT] = new QuadTree;
+		_pChilds[eCornerRT]->_corners[eCornerLT] = topCenter;
+		_pChilds[eCornerRT]->_corners[eCornerRT] = _corners[eCornerRT];
+		_pChilds[eCornerRT]->_corners[eCornerLB] = _center;
+		_pChilds[eCornerRT]->_corners[eCornerRB] = rightCenter;
+		_pChilds[eCornerRT]->_pTerrainVertices = _pTerrainVertices;
+		_pChilds[eCornerRT]->CreateChildTree();
 	}
 }
 
@@ -216,4 +203,63 @@ void QuadTree::GetRayHits(const Ray &ray, std::vector<Vector3> *pOutHit)
 			}
 		}
 	}
+}
+
+int32 QuadTree::IsInFrustum(const Frustum & frustum)
+{
+	bool32 cornerIn[4];
+
+	Vector3 currentPoint = Vector3((_pTerrainVertices + _center)->_pos.x, 0.0f, (_pTerrainVertices + _center)->_pos.z);
+	if (frustum.IsSphereInFrustum(currentPoint, _radius))
+	{
+		cornerIn[0] = frustum.IsPointIntFrustum(*(Vector3 *)(_pTerrainVertices + _corners[0]));
+		cornerIn[1] = frustum.IsPointIntFrustum(*(Vector3 *)(_pTerrainVertices + _corners[1]));;
+		cornerIn[2] = frustum.IsPointIntFrustum(*(Vector3 *)(_pTerrainVertices + _corners[2]));;
+		cornerIn[3] = frustum.IsPointIntFrustum(*(Vector3 *)(_pTerrainVertices + _corners[3]));;
+
+		if (cornerIn[0] + cornerIn[1] + cornerIn[2] + cornerIn[3] == 4)
+		{
+			return FRUSTUM_COMPLETLY_IN;
+		}
+		else
+		{
+			return FRUSTUM_PARTIALLY_IN;
+		}
+	}
+	else
+	{
+		return FRUSTUM_OUT;
+	}
+}
+
+
+//TODO Implement this
+IntRect QuadTree::CalculateDrawRange(const Frustum & frustum)
+{
+	IntRect result;
+
+	//int32 lb = this->_pChilds[Corner::eCornerLB]->IsInFrustum(frustum);
+	//int32 rb = this->_pChilds[Corner::eCornerRB]->IsInFrustum(frustum);
+	//int32 lt = this->_pChilds[Corner::eCornerLT]->IsInFrustum(frustum);
+	//int32 rt = this->_pChilds[Corner::eCornerRT]->IsInFrustum(frustum);
+
+	//if (lb == FRUSTUM_COMPLETLY_IN || lb == FRUSTUM_PARTIALLY_IN)
+	//{
+	//	result._left = 0;
+	//}
+
+	result._left = 0;
+	result._top = 16;
+	result._right = 16;
+	result._bottom = 0;
+
+	return result;
+}
+
+
+int32 QuadTree::MapQuadIndexTo2DIndex(int32 level, QuadTree::Corner corner)
+{
+	int32 grid = pow(2, level);
+
+	return int32();
 }

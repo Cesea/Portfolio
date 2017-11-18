@@ -31,8 +31,8 @@ private :
 
 			while (iter != _eventQueue.end())
 			{
-				(*iter)->timeStamp -= deltaTime;
-				if ((*iter)->timeStamp < 0.0f)
+				(*iter)->_timeStamp -= deltaTime;
+				if ((*iter)->_timeStamp < 0.0f)
 				{
 					result.push_back(*iter);
 

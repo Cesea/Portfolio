@@ -3,6 +3,9 @@
 
 namespace video
 {
+	EffectHandle StaticXMesh::sDefaultEffectHandle;
+	EffectHandle SkinnedAnimation::sDefaultEffectHandle;
+
 	////Free Function
 	TextureHandle LoadTextureWithStrings(const std::string &filePath, const std::string &fileName, const std::string &fileExtension, const std::string &userStr)
 	{
@@ -543,7 +546,7 @@ namespace video
 		COM_RELEASE(_pAnimationController);
 	}
 
-	void SkinnedAnimation::UpdateAnimation(float deltaTime, const Matrix &world)
+	void SkinnedAnimation::UpdateAnimation(float deltaTime)
 	{
 		_pAnimationController->GetTrackDesc(0, &_playingTrackDesc);
 		//현재 얼마나 왔는지..
@@ -598,13 +601,12 @@ namespace video
 				_pAnimationController->SetTrackWeight(1, w1);
 			}
 		}
-		_world = world;
 	}
 
-	void SkinnedAnimation::UpdateMesh()
+	void SkinnedAnimation::UpdateMesh(const Matrix &world)
 	{
 		//로컬 행렬을 업데이트 한 후에...
-		_pSkinnedMesh->Update(&_world);
+		_pSkinnedMesh->Update(&world);
 		_pAnimationController->AdvanceTime(_animDelta, nullptr);
 		_animDelta = 0.0f;
 	}
@@ -650,6 +652,8 @@ namespace video
 					}
 
 					MatrixCache::CacheRange range = renderView._matrixCache.Add(_workingPalettes, _numPalette);
+
+					Assert(pBoneMesh->_vHandle.IsValid());
 
 					RenderCommand &command = renderView.GetCommand();
 					command._drawType = RenderCommand::DrawType::eAnimated;

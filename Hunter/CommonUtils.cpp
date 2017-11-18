@@ -68,3 +68,27 @@ int32 RandInt(int32 min, int32 max)
 {
 	return rand() % (max - min); +min;
 }
+
+IntRect::IntRect()
+	:_left(), _top(), _right(), _bottom()
+{
+}
+
+IntRect::IntRect(int32 left, int32 top, int32 right, int32 bottom)
+	:_left(left), _top(top), _right(right), _bottom(bottom)
+{
+}
+
+IntRect::IntRect(const IntRect & other)
+	:_left(other._left), _top(other._top), _right(other._right), _bottom(other._bottom)
+{
+}
+
+IntRect & IntRect::operator=(const IntRect & other)
+{
+	_left = other._left;
+	_right = other._right;
+	_top = other._top;
+	_bottom = other._bottom;
+	return *this;
+}

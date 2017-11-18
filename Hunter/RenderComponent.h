@@ -10,14 +10,27 @@ public:
 	RenderComponent() {}
 	virtual ~RenderComponent() {}
 
+	enum Type
+	{
+		eBuffer,
+		eStatic,
+		eSkinned
+	};
 
-	float radius{};
+	Type _type;
+	union
+	{
+		struct
+		{
+			video::VertexBufferHandle _vHandle;
+			video::IndexBufferHandle _iHandle;
+		};
+		video::StaticXMeshHandle _static;
+		video::SkinnedAnimationHandle _skinned;
+	};
 
-	uint32 _startVertex{};
-
-	uint32 _startIndex{};
-	uint32 _numVertices{};
-	uint32 _numPrim{};
+	video::MaterialHandle _material;
+	video::EffectHandle _effect;
 };
 
 #endif

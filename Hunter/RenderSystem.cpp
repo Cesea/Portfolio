@@ -9,26 +9,62 @@ RenderSystem::~RenderSystem()
 {
 }
 
-void RenderSystem::Render(video::RenderView &renderView)
+void RenderSystem::UpdateAnimations(float deltaTime)
 {
+	video::SkinnedAnimation *pFirstPointer = VIDEO->GetSkinnedAnimation(video::SkinnedAnimationHandle());
+
 	auto &entities = GetEntities();
-	//renderView.SetViewProjection(camera.GetViewMatrix(), camera.GetProjectionMatrix());
-
-	renderView.PreRender();
-	for (int32 i = 0; i < entities.size(); ++i)
+	for (uint32 i = 0; i < entities.size(); ++i)
 	{
-		TransformComponent &transformComponent = entities[i].GetComponent<TransformComponent>();
 		RenderComponent &refRenderComponent = entities[i].GetComponent<RenderComponent>();
-
-		//if (camera.GetFrustum().IsSphereInFrustum(transformComponent.GetWorldPosition(), 50.0f))
+		if (refRenderComponent._type == RenderComponent::Type::eSkinned)
 		{
-
-			//renderView.SetFillMode(video::RenderState::FillMode::eFillPoint);
-			//변환 행렬을 설정한다
-
+			video::SkinnedAnimation *pAnimation = VIDEO->GetSkinnedAnimation(refRenderComponent._skinned);
+			pAnimation->UpdateAnimation(deltaTime);
 		}
 	}
-	renderView.PostRender();
+}
+
+void RenderSystem::Render(video::RenderView &renderView)
+{
+	video::StaticXMesh *pFirstStatic = VIDEO->GetStaticXMesh(video::StaticXMeshHandle());
+	video::SkinnedAnimation *pFirstAnimation = VIDEO->GetSkinnedAnimation(video::SkinnedAnimationHandle());
+
+	auto &entities = GetEntities();
+	//renderView.SetViewProjection(camera.GetViewMatrix(), camera.GetProjectionMatrix());
+	Matrix worldMatrix;
+
+	for (uint32 i = 0; i < entities.size(); ++i)
+	{
+		TransformComponent &refTransformComponent = entities[i].GetComponent<TransformComponent>();
+		RenderComponent &refRenderComponent = entities[i].GetComponent<RenderComponent>();
+
+		if (refRenderComponent._type == RenderComponent::Type::eBuffer)
+		{
+			video::RenderCommand &refCommand = renderView.GetCommand();
+			refCommand._vHandle = refRenderComponent._vHandle;
+			refCommand._iHandle = refRenderComponent._iHandle;
+			refCommand._materialHandle = refRenderComponent._material;
+			refCommand._effectHandle = refRenderComponent._effect;
+
+			worldMatrix = refTransformComponent.GetFinalMatrix();
+			video::MatrixCache::CacheRange range = renderView._matrixCache.Add(&refTransformComponent.GetFinalMatrix());
+
+			refCommand._cacheRange = range;
+		}
+		else if (refRenderComponent._type == RenderComponent::Type::eStatic)
+		{
+			video::StaticXMesh *pMesh = VIDEO->GetStaticXMesh(refRenderComponent._static);
+			pMesh->FillRenderCommand(renderView, video::StaticXMesh::sDefaultEffectHandle, &refTransformComponent.GetFinalMatrix());
+		}
+		else if (refRenderComponent._type == RenderComponent::Type::eSkinned)
+		{
+			video::SkinnedAnimation *pAnimation = VIDEO->GetSkinnedAnimation(refRenderComponent._skinned);
+			pAnimation->UpdateMesh(refTransformComponent.GetFinalMatrix());
+			pAnimation->FillRenderCommand(renderView, 
+				video::SkinnedAnimation::sDefaultEffectHandle, video::StaticXMesh::sDefaultEffectHandle);
+		}
+	}
 }
 
 void RenderSystem::Initialize()
@@ -42,4 +78,9 @@ void RenderSystem::OnEntityAdded(Entity & entity)
 
 void RenderSystem::OnEntityRemoved(Entity & entity)
 {
+}
+
+void RenderSystem::FillRenderView(const RenderComponent & component, video::RenderView & renderView)
+{
+
 }

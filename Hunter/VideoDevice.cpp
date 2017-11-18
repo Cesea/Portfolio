@@ -64,7 +64,7 @@ void video::VideoDevice::Render(RenderView & renderView)
 {
 	static int32 count = 0;
 
-	uint32 drawCount = 0;
+	int32 drawCount = 0;
 
 	Matrix sendingMatrix[3];
 	MatrixIdentity(&sendingMatrix[0]);
@@ -106,7 +106,6 @@ void video::VideoDevice::Render(RenderView & renderView)
 			}
 		}
 
-
 		if (!command._iHandle.IsValid())
 		{
 			gpDevice->SetVertexDeclaration(decl._ptr);
@@ -147,15 +146,14 @@ void video::VideoDevice::Render(RenderView & renderView)
 		}
 
 	//#if defined (DEBUG) || defined (_DEBUG) 
-	//	count++;
+	//	drawCount++;
 	//	if (count % 60 == 0)
 	//	{
 	//		Console::Log("Draw Count : % d\n", drawCount);
 	//	}
 	//#endif
 	}
-
-
+	//count++;
 }
 
 bool VideoDevice::InitD3D(HWND windowHandle)
@@ -556,31 +554,6 @@ void video::VideoDevice::MaterialAddTexture(MaterialHandle material, uint32 text
 {
 	_materials[material.index].AddTexture(textureSlot, texture);
 }
-
-void video::VideoDevice::SetCurrentRenderView(RenderViewHandle handle)
-{
-	_pCurrentView = &_renderViews[handle.index];
-}
-
-//RenderGroupHandle video::VideoDevice::CreateRenderGroup(video::VertexBufferHandle vHandle, video::IndexBufferHandle iHandle,
-//	const RenderGroup::MaterialRange &materialRange, const std::string &name)
-//{
-//	RenderGroupHandle result = _renderGroupHandlePool.Create(name);
-//	_renderGroups[result.index].Create(vHandle, iHandle, materialRange);
-//	return result;
-//}
-//RenderGroupHandle video::VideoDevice::GetRenderGroup(const std::string & name)
-//{
-//	return _renderGroupHandlePool.Get(name);
-//}
-//void video::VideoDevice::DestroyRenderGroup(RenderGroupHandle handle)
-//{
-//	_renderGroups[handle.index].Destroy();
-//	_renderGroupHandlePool.Remove(handle);
-//}
-//void video::VideoDevice::RenderGroupSetEffect(RenderGroupHandle group, EffectHandle effect)
-//{
-//}
 
 StaticXMeshHandle video::VideoDevice::CreateStaticXMesh(const std::string fileName, const Matrix * pCorrection, const std::string &name)
 {

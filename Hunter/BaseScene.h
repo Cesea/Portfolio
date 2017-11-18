@@ -15,6 +15,7 @@
 
 class BaseScene : public IScene
 {
+	friend class Terrain;
 public :
 	BaseScene() 
 		:_world(4096)
@@ -47,8 +48,8 @@ protected :
 
 	TransformSystem _transformSystem;
 	RenderSystem _renderSystem;
-
 	std::vector<Entity> _entities;
+
 	Camera _camera;
 
 	video::StaticXMeshHandle _staticMeshHandle;
@@ -61,6 +62,18 @@ protected :
 	video::EffectHandle _terrainEffect;
 
 	std::vector<Vector3> _points;
+
+	EventChannel _channel;
+
+public :
+
+	struct SpawnEvent
+	{
+		SpawnEvent(const Vector3 &position) : _position(position) {}
+		Vector3 _position;
+		float _timeStamp;
+	};
+	void Handle(const SpawnEvent &event);
 };
 
 #endif

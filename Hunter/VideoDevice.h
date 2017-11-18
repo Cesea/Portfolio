@@ -95,15 +95,6 @@ namespace video
 		void DestroyMaterial(MaterialHandle handle);
 		void MaterialAddTexture(MaterialHandle material, uint32 textureSlot, TextureHandle texture);
 
-		void SetCurrentRenderView(RenderViewHandle handle);
-
-		//CreateModelFromX 함수는 불러온 파일 경로에서 이름을 추출하여 HandlePool에 자동으로 이름을 등록한다
-		//RenderGroupHandle CreateRenderGroup(video::VertexBufferHandle vHandle, video::IndexBufferHandle iHandle, 
-		//	const RenderGroup::MaterialRange &materialRange, const std::string &name = "");
-		//RenderGroupHandle GetRenderGroup(const std::string &name);
-		//void DestroyRenderGroup(RenderGroupHandle handle);
-		//void RenderGroupSetEffect(RenderGroupHandle group, EffectHandle effect);
-
 		StaticXMeshHandle CreateStaticXMesh(const std::string fileName, const Matrix *pCorrection, const std::string &name);
 		StaticXMeshHandle GetStaticXMesh(const std::string &name);
 		StaticXMesh *GetStaticXMesh(StaticXMeshHandle handle);

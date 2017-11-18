@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "Frustum.h"
 
+#define PLANE_EPSILON 5.0f
+
 Frustum::Frustum()
 {
 	_rHWPos[0] = Vector3(-1, 1, 0);
@@ -43,9 +45,25 @@ void Frustum::UpdateFrustum(const Matrix & matViewProj)
 	_plane[5].Create(_pos[2], _pos[3], _pos[6]);
 }
 
-bool Frustum::IsPointIntFrustum(const Vector3 & point)
+bool Frustum::IsPointIntFrustum(const Vector3 & point) const
 {
-	return false;
+	float fDist{};
+	fDist = D3DXPlaneDotCoord(&_plane[3], &point);
+	if (fDist > PLANE_EPSILON)
+	{
+		return false;
+	}
+	fDist = D3DXPlaneDotCoord(&_plane[2], &point);
+	if (fDist > PLANE_EPSILON)
+	{
+		return false;
+	}
+	fDist = D3DXPlaneDotCoord(&_plane[3], &point);
+	if (fDist > PLANE_EPSILON)
+	{
+		return false;
+	}
+	return true;
 }
 
 bool Frustum::IsSphereInFrustum(const Vector3 &center, float radius) const

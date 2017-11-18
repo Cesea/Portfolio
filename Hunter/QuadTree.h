@@ -5,14 +5,31 @@
 
 class QuadTree
 {
-private:
 	enum Corner 
 	{
-		eCornerLT = 0,
-		eCornerRT,
-		eCornerLB,
+		eCornerLB = 0,
 		eCornerRB,
+		eCornerLT,
+		eCornerRT,
 	};
+public:
+	QuadTree();
+	~QuadTree();
+
+	//쿼드 트리 초기화
+	bool Init(video::TerrainVertex *pVertices, uint32 verNumEdge, int32 sectionRes); 
+
+	void CreateChildTree();
+
+	void GetRayHits(const Ray &ray, std::vector<Vector3>* pOutHit);
+	int32 IsInFrustum(const Frustum &frustum);
+	int32 FrustumCull(const Frustum &frustum, int32 &checkLevel);
+
+	IntRect CalculateDrawRange(const Frustum &frustum);
+	int32 CalculateDrawRangeInternal(IntRect &range, const Frustum &frustum, QuadTree *pQuad);
+
+//private:
+	int32 MapQuadIndexTo2DIndex(int32 level, QuadTree::Corner corner);
 
 	video::TerrainVertex *_pTerrainVertices;
 
@@ -24,16 +41,8 @@ private:
 
 	Vector3 _centerPos; //자신의 쿼드트리 중심 위치
 	float _radius; //자신의 쿼드트리 영역 반지름
-public:
-	QuadTree();
-	~QuadTree();
 
-	//쿼드 트리 초기화
-	bool Init(video::TerrainVertex *pVertices, uint32 verNumEdge); 
-
-	void CreateChildTree();
-
-	void GetRayHits(const Ray &ray, std::vector<Vector3>* pOutHit);
+	static int32 SectionResolution;
 
 };
 #endif
