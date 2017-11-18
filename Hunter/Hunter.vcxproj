@@ -141,6 +141,7 @@
     <ClCompile Include="Filter.cpp" />
     <ClCompile Include="Frustum.cpp" />
     <ClCompile Include="Hash.cpp" />
+    <ClCompile Include="imgui.cpp" />
     <ClCompile Include="imguiRenderer.cpp" />
     <ClCompile Include="MathUtils.cpp" />
     <ClCompile Include="Matrix.cpp" />
@@ -179,6 +180,7 @@
     <ClCompile Include="VideoResource_Mesh.cpp" />
     <ClCompile Include="VideoVertexFormat.cpp" />
     <ClCompile Include="World.cpp" />
+    <ClCompile Include="WorldEditor.cpp" />
     <ClCompile Include="XMLManager.cpp" />
     <ClCompile Include="XmlSerializer.cpp" />
   </ItemGroup>
@@ -207,8 +209,9 @@
     <ClInclude Include="GameSystems.h" />
     <ClInclude Include="GameUtils.h" />
     <ClInclude Include="Hash.h" />
-    <ClInclude Include="imguiRenderer.h" />
+    <ClInclude Include="imgui.h" />
     <ClInclude Include="Allocators.h" />
+    <ClInclude Include="imguiRenderer.h" />
     <ClInclude Include="Math.h" />
     <ClInclude Include="MathUtils.h" />
     <ClInclude Include="Matrix.h" />

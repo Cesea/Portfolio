@@ -6,7 +6,6 @@
 
 IDirect3DDevice9 *gpDevice;
 
-using namespace im;
 using namespace video;
 
 VideoDevice::VideoDevice()
@@ -35,7 +34,7 @@ bool VideoDevice::Init()
 		return false;
 	}
 
-	im::GuiRenderer::GetInstance()->Init(gpDevice, "consolas", WINSIZEX, WINSIZEY);
+	//im::GuiRenderer::GetInstance()->Init(gpDevice, "consolas", WINSIZEX, WINSIZEY);
 
 	LoadDefaultTextures();
 	LoadDefaultEffects();
@@ -46,7 +45,7 @@ bool VideoDevice::Init()
 
 void VideoDevice::ShutDown()
 {
-	COM_RELEASE(_pDevice, 0);
+	COM_RELEASE(gpDevice, 0);
 	COM_RELEASE(_pD3D, 0);
 
 }
@@ -115,7 +114,7 @@ void video::VideoDevice::Render(RenderView & renderView)
 			for (uint32 j = 0; j < numPass; ++j)
 			{
 				effect.BeginPass(j);
-				_pDevice->DrawPrimitive((command._primType == RenderCommand::PrimType::eTriangleList) ? (D3DPT_TRIANGLELIST) : (D3DPT_LINELIST),
+				gpDevice->DrawPrimitive((command._primType == RenderCommand::PrimType::eTriangleList) ? (D3DPT_TRIANGLELIST) : (D3DPT_LINELIST),
 					command._startVertex, 
 					(command._numPrim == 0) ? (vBuffer._size / decl._stride) : (command._numPrim));
 				effect.EndPass();
@@ -135,7 +134,7 @@ void video::VideoDevice::Render(RenderView & renderView)
 			for (uint32 j = 0; j < numPass; ++j)
 			{
 				effect.BeginPass(j);
-				_pDevice->DrawIndexedPrimitive((command._primType == RenderCommand::PrimType::eTriangleList) ? (D3DPT_TRIANGLELIST) : (D3DPT_LINELIST),
+				gpDevice->DrawIndexedPrimitive((command._primType == RenderCommand::PrimType::eTriangleList) ? (D3DPT_TRIANGLELIST) : (D3DPT_LINELIST),
 					0, 0, 
 					(command._numVertices == 0) ? (vBuffer._size / decl._stride) : (command._numVertices),
 					(command._startIndex == 0) ? (0) : (command._startIndex),
@@ -219,13 +218,13 @@ bool VideoDevice::InitDefaultRenderState()
 {
 	bool result = true;
 
-	gpDevice->SetRenderState(D3DRS_LIGHTING, FALSE);
+	_pDevice->SetRenderState(D3DRS_LIGHTING, FALSE);
 	
-	gpDevice->SetRenderState(D3DRS_DITHERENABLE, TRUE );
+	_pDevice->SetRenderState(D3DRS_DITHERENABLE, TRUE );
 
-	gpDevice->SetRenderState(D3DRS_ZENABLE, TRUE );
-	gpDevice->SetRenderState(D3DRS_ZWRITEENABLE, TRUE );
-	gpDevice->SetRenderState(D3DRS_ZFUNC, D3DCMP_LESS);
+	_pDevice->SetRenderState(D3DRS_ZENABLE, TRUE );
+	_pDevice->SetRenderState(D3DRS_ZWRITEENABLE, TRUE );
+	_pDevice->SetRenderState(D3DRS_ZFUNC, D3DCMP_LESS);
 
 	return result;
 }
@@ -233,10 +232,10 @@ bool VideoDevice::InitDefaultRenderState()
 //TODO : Default texture들을 로드 하자
 void video::VideoDevice::LoadDefaultTextures()
 {
-	TextureHandle diffuse = VIDEO->CreateTexture("../resources/textures/diffuseDefault.png", "diffuseDefault.png");
-	TextureHandle normal = VIDEO->CreateTexture("../resources/textures/normalDefault.png", "normalDefault.png");
-	TextureHandle specular = VIDEO->CreateTexture("../resources/textures/specularDefault.png", "specularDefault.png");
-	TextureHandle emission = VIDEO->CreateTexture("../resources/textures/emissionDefault.png", "emissionDefault.png");
+	TextureHandle diffuse = VIDEO->CreateTexture("../resources/Textures/diffuseDefault.png", "diffuseDefault.png");
+	TextureHandle normal = VIDEO->CreateTexture("../resources/Textures/normalDefault.png", "normalDefault.png");
+	TextureHandle specular = VIDEO->CreateTexture("../resources/Textures/specularDefault.png", "specularDefault.png");
+	TextureHandle emission = VIDEO->CreateTexture("../resources/Textures/emissionDefault.png", "emissionDefault.png");
 
 	MaterialHandle material = VIDEO->CreateMaterial("default");
 	VIDEO->MaterialAddTexture(material, VIDEO_TEXTURE0, diffuse);

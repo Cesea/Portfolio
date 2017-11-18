@@ -107,7 +107,7 @@ void Terrain::Handle(const InputManager::MouseReleasedEvent & event)
 	Vector3 hitPos;
 	if (this->IsIntersectRay(ray, &hitPos))
 	{
-		channel.Queue<BaseScene::SpawnEvent>(new BaseScene::SpawnEvent(hitPos));
+		//channel.Queue<BaseScene::SpawnEvent>(new BaseScene::SpawnEvent(hitPos));
 	}
 }
 
@@ -200,14 +200,14 @@ float Terrain::GetHeight(float x, float z)
 {
 	//터레인 범위을 넘어가면 0.0 값을 리턴한다
 	if (x < _terrainStartX || x > _terrainEndX ||
-		z > _terrainStartZ || z < _terrainEndZ) 
+		z < _terrainStartZ || z > _terrainEndZ) 
 	{
 		return 0.0f;
 	}
 
-	//Terrain 의 좌상단 0 을 기준으로 월드 Terrain 의 상태적 위치를 찾자
+	//Terrain 의 우하단 0 을 기준으로 월드 Terrain 의 상태적 위치를 찾자
 	float pX = x - _terrainStartX;
-	float pZ = -(z + _terrainEndZ);
+	float pZ = z - _terrainStartZ;
 
 	//해당 위치가 어느 셀에 포함되는지 파악
 	float invCell = 1.0f / _cellScale;
@@ -227,10 +227,10 @@ float Terrain::GetHeight(float x, float z)
 	//  |/    |
 	// lb-----rb
 
-	Vector3 lt = _terrainVertices[idxZ * _numVertexX + idxX]._pos;
-	Vector3 rt = _terrainVertices[idxZ * _numVertexX + idxX + 1]._pos;
-	Vector3 lb = _terrainVertices[(idxZ + 1) * _numVertexX + idxX]._pos;
-	Vector3 rb = _terrainVertices[(idxZ + 1) * _numVertexX + idxX + 1]._pos;
+	Vector3 lb = _terrainVertices[idxZ * _numVertexX + idxX]._pos;
+	Vector3 rb = _terrainVertices[idxZ * _numVertexX + idxX + 1]._pos;
+	Vector3 lt = _terrainVertices[(idxZ + 1) * _numVertexX + idxX]._pos;
+	Vector3 rt = _terrainVertices[(idxZ + 1) * _numVertexX + idxX + 1]._pos;
 
 	//해당 셸에서의 delta 량을 구한다.
 	float dX = pX - static_cast<float>(idxX);
@@ -246,7 +246,6 @@ float Terrain::GetHeight(float x, float z)
 
 		fHeight = lt.y + (deltaU * dX) + (deltaV * dZ);
 	}
-
 	//해당 점이 우하단이 있니?
 	else
 	{

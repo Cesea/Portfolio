@@ -30,9 +30,6 @@
     <ClCompile Include="TextSerializer.cpp">
       <Filter>Sub\Reflection\Serializer</Filter>
     </ClCompile>
-    <ClCompile Include="imguiRenderer.cpp">
-      <Filter>GUI</Filter>
-    </ClCompile>
     <ClCompile Include="XMLManager.cpp">
       <Filter>Managers</Filter>
     </ClCompile>
@@ -156,6 +153,15 @@
     <ClCompile Include="BaseScene.cpp">
       <Filter>Game\GameScene</Filter>
     </ClCompile>
+    <ClCompile Include="imgui.cpp">
+      <Filter>GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="imguiRenderer.cpp">
+      <Filter>GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="WorldEditor.cpp">
+      <Filter>Game\WorldEditor</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -209,9 +215,6 @@
     </ClInclude>
     <ClInclude Include="RefVariant.h">
       <Filter>Sub\Reflection\Variant</Filter>
-    </ClInclude>
-    <ClInclude Include="imguiRenderer.h">
-      <Filter>GUI</Filter>
     </ClInclude>
     <ClInclude Include="tinyxml2.h">
       <Filter>Sub\tinyxml</Filter>
@@ -268,7 +271,7 @@
       <Filter>Game\GameUtils\Terrain</Filter>
     </ClInclude>
     <ClInclude Include="WorldEditor.h">
-      <Filter>Sub\WorldEditor</Filter>
+      <Filter>Game\WorldEditor</Filter>
     </ClInclude>
     <ClInclude Include="SceneManager.h">
       <Filter>Core\SubSystem\SceneeManager</Filter>
@@ -396,6 +399,12 @@
     <ClInclude Include="BaseScene.h">
       <Filter>Game\GameScene</Filter>
     </ClInclude>
+    <ClInclude Include="imgui.h">
+      <Filter>GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="imguiRenderer.h">
+      <Filter>GUI</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Core">
@@ -406,9 +415,6 @@
     </Filter>
     <Filter Include="Managers">
       <UniqueIdentifier>{dd9be55d-6b15-4a92-868d-f0f884e2091e}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="GUI\Retained">
-      <UniqueIdentifier>{2a13886c-38b1-4b75-8384-e30c2d02c998}</UniqueIdentifier>
     </Filter>
     <Filter Include="Sub">
       <UniqueIdentifier>{f0b23895-3d21-4c5e-b58d-d8cf44373094}</UniqueIdentifier>
@@ -439,9 +445,6 @@
     </Filter>
     <Filter Include="Core\SubSystem\VideoDevice">
       <UniqueIdentifier>{05262f6f-8893-4a0a-b28e-843ce048c3cb}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Sub\WorldEditor">
-      <UniqueIdentifier>{35c933a0-76c2-436d-aefd-0f91891567df}</UniqueIdentifier>
     </Filter>
     <Filter Include="Core\Memory">
       <UniqueIdentifier>{98c93bb1-bc13-429c-8171-1e95e47a1893}</UniqueIdentifier>
@@ -517,6 +520,9 @@
     </Filter>
     <Filter Include="Game\GameComponent\TransfromComponent">
       <UniqueIdentifier>{2fb70df9-3f23-48a0-9663-092d7ddb399f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\WorldEditor">
+      <UniqueIdentifier>{35c933a0-76c2-436d-aefd-0f91891567df}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

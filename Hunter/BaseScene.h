@@ -13,6 +13,8 @@
 
 #include "Camera.h"
 
+#include "WorldEditor.h"
+
 class BaseScene : public IScene
 {
 	friend class Terrain;
@@ -65,6 +67,7 @@ protected :
 
 	EventChannel _channel;
 
+	Editor *_editor{};
 public :
 
 	struct SpawnEvent
