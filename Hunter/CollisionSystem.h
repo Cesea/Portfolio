@@ -12,7 +12,7 @@ public :
 	CollisionSystem();
 	virtual ~CollisionSystem();
 
-	void Update(float deltaTime);
+	void Update(float deltaTime, float checkRange);
 
 
 	virtual void Initialize();
