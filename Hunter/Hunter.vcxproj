@@ -130,6 +130,7 @@
     <ClCompile Include="BaseScene.cpp" />
     <ClCompile Include="BaseSystem.cpp" />
     <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="cEnemy.cpp" />
     <ClCompile Include="CollisionComponent.cpp" />
     <ClCompile Include="CollisionUtils.cpp" />
     <ClCompile Include="CommonUtils.cpp" />
@@ -192,6 +193,7 @@
     <ClInclude Include="BaseScene.h" />
     <ClInclude Include="BaseSystem.h" />
     <ClInclude Include="Camera.h" />
+    <ClInclude Include="cEnemy.h" />
     <ClInclude Include="ClassTypeID.h" />
     <ClInclude Include="CollisionUtils.h" />
     <ClInclude Include="Color4F.h" />

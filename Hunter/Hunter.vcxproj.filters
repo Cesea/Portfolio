@@ -168,6 +168,9 @@
     <ClCompile Include="ScriptSystem.cpp">
       <Filter>Game\GameSystem\ScriptSystem</Filter>
     </ClCompile>
+    <ClCompile Include="cEnemy.cpp">
+      <Filter>Game\Enemy</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -420,6 +423,9 @@
     <ClInclude Include="Delegate.h">
       <Filter>Sub</Filter>
     </ClInclude>
+    <ClInclude Include="cEnemy.h">
+      <Filter>Game\Enemy</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Core">
@@ -544,6 +550,15 @@
     </Filter>
     <Filter Include="Game\GameSystem\ScriptSystem">
       <UniqueIdentifier>{00b94380-2d5a-414d-ae33-03169cba4084}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\Enemy">
+      <UniqueIdentifier>{893eb939-e5e3-4135-b266-7b9d5a97aac7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\Enemy\spawn">
+      <UniqueIdentifier>{48ab3ce0-5cc8-4bd6-83a9-2a6af2b100d3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\Enemy\script">
+      <UniqueIdentifier>{d0e7f8a4-65cc-4621-9885-04735fb50bb4}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>
