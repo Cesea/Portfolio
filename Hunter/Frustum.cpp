@@ -48,7 +48,7 @@ void Frustum::UpdateFrustum(const Matrix & matViewProj)
 bool Frustum::IsPointIntFrustum(const Vector3 & point) const
 {
 	float fDist{};
-	fDist = D3DXPlaneDotCoord(&_plane[3], &point);
+	fDist = D3DXPlaneDotCoord(&_plane[1], &point);
 	if (fDist > PLANE_EPSILON)
 	{
 		return false;
@@ -69,7 +69,8 @@ bool Frustum::IsPointIntFrustum(const Vector3 & point) const
 bool Frustum::IsSphereInFrustum(const Vector3 &center, float radius) const
 {
 	Vector3 normal;
-	for (int i = 0; i < 6; i++)
+
+	for (int i = 1; i < 4; i++)
 	{
 		normal.x = _plane[i].a;
 		normal.y = _plane[i].b;
@@ -78,7 +79,7 @@ bool Frustum::IsSphereInFrustum(const Vector3 &center, float radius) const
 		//면과 거리 
 		float distance = Vec3Dot(&normal, &center) + _plane[i].d;
 		//반지름 이상 벗어나면 정두체 안에 없음
-		if (distance > radius)
+		if (distance > radius + PLANE_EPSILON)
 		{
 			return false;
 		}

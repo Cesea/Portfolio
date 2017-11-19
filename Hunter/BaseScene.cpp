@@ -45,9 +45,9 @@ bool32 BaseScene::Init()
 	config._textureMult = 50;
 	config._sectionResolution = 64;
 
-	//TERRAIN->SetScene(this);
-	//TERRAIN->Create(config, 1);
-	//_terrainEffect = VIDEO->GetEffect("TerrainBase.fx");
+	TERRAIN->SetScene(this);
+	TERRAIN->Create(config, 1);
+	_terrainEffect = VIDEO->GetEffect("TerrainBase.fx");
 
 	//메쉬 불러오기..
 	Matrix correctionMat;
@@ -65,23 +65,6 @@ bool32 BaseScene::Init()
 	_world.AddSystem<RenderSystem>(_renderSystem);
 	_world.AddSystem<TransformSystem>(_transformSystem);
 	_world.AddSystem<ScriptSystem>(_scriptSystem);
-	for (int32 i = 0; i < 2; ++i)
-	{
-		_entities.push_back(_world.CreateEntity());
-		Entity &entity = _entities.back();
-
-		ScriptComponent &refScript = entity.AddComponent<ScriptComponent>();
-		if (i == 0)
-		{
-			refScript.SetScript(MAKE_SCRIPT_DELEGATE(Player, Update, _player));
-		}
-		else
-		{
-			refScript.SetScript(MAKE_SCRIPT_DELEGATE(Monster, Update, _monster));
-		}
-		entity.Activate();
-	}
-
 
 	for (uint32 z = 0; z < 2; ++z)
 	{
@@ -134,7 +117,7 @@ bool32 BaseScene::Update(float deltaTime)
 
 	//Collision Check
 	_transformSystem.PostUpdate(deltaTime);
-	_renderSystem.UpdateAnimations(deltaTime);
+	//_renderSystem.UpdateAnimations(deltaTime);
 	//Update Camera
 	_camera.PreUpdateMatrix();
 	_transformSystem.UpdateTransform(_camera.GetTransform());
@@ -158,8 +141,8 @@ bool32 BaseScene::Render()
 	////DEBUG_DRAWER->DrawBox();
 	//DEBUG_DRAWER->FillRenderCommand(*_mainRenderView);
 
-	_renderSystem.Render(*_mainRenderView);
-	//TERRAIN->FillRenderCommand(*_mainRenderView);
+	//_renderSystem.Render(*_mainRenderView);
+	TERRAIN->FillRenderCommand(*_mainRenderView);
 
 
 	_mainRenderView->PreRender();

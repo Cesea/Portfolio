@@ -1,4 +1,4 @@
-#include "stdafx.h"
+ï»¿#include "stdafx.h"
 #include "QuadTree.h"
 
 int32 QuadTree::SectionResolution;
@@ -6,16 +6,16 @@ int32 QuadTree::SectionResolution;
 bool32 IsRayHitBoundSphere(const Ray &ray, const Vector3 &center, float radius,
 	Vector3 *pOutHitPos, Vector3 *pOutHitNormal)
 {
-	//·¹ÀÌÀÇ ¿À¸®Áø¿¡¼­ ºÎÅÍ ±¸ÀÇ ¼¾ÅÍ±îÁöÀÇ ¹æÇâº¤ÅÍ
+	//ë ˆì´ì˜ ì˜¤ë¦¬ì§„ì—ì„œ ë¶€í„° êµ¬ì˜ ì„¼í„°ê¹Œì§€ì˜ ë°©í–¥ë²¡í„°
 	Vector3 dirToCenter = center - ray.origin;
 
-	//±æÀÌÀÇ Á¦°ö
+	//ê¸¸ì´ì˜ ì œê³±
 	float lengthSq = Vec3LengthSq(&dirToCenter);
 
-	//¹İÁö¸§ÀÇ Á¦°ö
+	//ë°˜ì§€ë¦„ì˜ ì œê³±
 	float r2 = radius * radius;
 	float dot = Vec3Dot( &dirToCenter, &ray.direction );
-	// ÇÇÅ¸°í¶ó½ºÀÇ Á¤¸®¸¦ ÇÏ±âÀ§ÇØ Á÷°¢ »ï°¢Çü °ø½ÄÀ¯µµ
+	// í”¼íƒ€ê³ ë¼ìŠ¤ì˜ ì •ë¦¬ë¥¼ í•˜ê¸°ìœ„í•´ ì§ê° ì‚¼ê°í˜• ê³µì‹ìœ ë„
 	// d2 = x2 + y2;
 	// d = sqrt( x2 + y2 );
 
@@ -24,17 +24,17 @@ bool32 IsRayHitBoundSphere(const Ray &ray, const Vector3 &center, float radius,
 	//d2 - x2 = y2;
 	float y2 = d2 - x2;
 
-	//±¤¼±ÀÌ ¿ø¹ÛÀ» ¹ş¾î³µ´Ù.
+	//ê´‘ì„ ì´ ì›ë°–ì„ ë²—ì–´ë‚¬ë‹¤.
 	if (y2 > r2)
 	{
 		return false;
 	}
 
-	//¿©±â±îÁö¿Â´Ù¸é ÀÏ´ÜÀº È÷Æ®
-	//¸¸¾à ¾ò¾Æ°¡¾ß¾Ë HitPoint °¡ÀÖ´Ù¸é..
+	//ì—¬ê¸°ê¹Œì§€ì˜¨ë‹¤ë©´ ì¼ë‹¨ì€ íˆíŠ¸
+	//ë§Œì•½ ì–»ì•„ê°€ì•¼ì•Œ HitPoint ê°€ìˆë‹¤ë©´..
 	if (nullptr != pOutHitPos)
 	{
-		//d¸¦ raius Á¦°ö
+		//dë¥¼ raius ì œê³±
 		d2 = r2;
 		//d2 = y2 + x2
 		//float x2 = d2 - y2;
@@ -43,7 +43,7 @@ bool32 IsRayHitBoundSphere(const Ray &ray, const Vector3 &center, float radius,
 		//
 		*pOutHitPos = ray.origin + (ray.direction * (dot - x));
 
-		//Hit µÈ À§Ä¡ÀÇ ³ë¸»À» ¾ò°Ú´Ù¸é..
+		//Hit ëœ ìœ„ì¹˜ì˜ ë…¸ë§ì„ ì–»ê² ë‹¤ë©´..
 		if (nullptr != pOutHitNormal)
 		{
 			*pOutHitNormal = *pOutHitPos - center;
@@ -56,16 +56,16 @@ bool32 IsRayHitBoundSphere(const Ray &ray, const Vector3 &center, float radius,
 
 QuadTree::QuadTree()
 {
-	//Â÷ÀÏµå Æ÷ÀÎÅÍ NULL Ã³¸®
+	//ì°¨ì¼ë“œ í¬ì¸í„° NULL ì²˜ë¦¬
 	ZeroMemory(_pChilds, sizeof(QuadTree*) * 4);
 
-	//¼¾ÅÍ ÀÎµ¦½º´Â -1
+	//ì„¼í„° ì¸ë±ìŠ¤ëŠ” -1
 	_center = -1;
 }
 
 QuadTree::~QuadTree()
 {
-	//ÀÚ½Ä ¾ÈÀü Áö¿ì±â
+	//ìì‹ ì•ˆì „ ì§€ìš°ê¸°
 	SAFE_DELETE(_pChilds[0]);
 	SAFE_DELETE(_pChilds[1]);
 	SAFE_DELETE(_pChilds[2]);
@@ -91,62 +91,66 @@ bool QuadTree::Init(video::TerrainVertex *pVertices, uint32 verNumEdge, int32 se
 
 void QuadTree::CreateChildTree()
 {
-	//Áß½ÉÀ§Ä¡
+	//ì¤‘ì‹¬ìœ„ì¹˜
 	_centerPos = (_pTerrainVertices[_corners[0]]._pos +
 		_pTerrainVertices[_corners[1]]._pos +
 		_pTerrainVertices[_corners[2]]._pos +
 		_pTerrainVertices[_corners[3]]._pos) * 0.25f;
 
-	//°¢ÄÚ³Ê Á¡ Áß¿¡¼­ÀÇ °Å¸®°¡ ¹İÁö¸§ ÀÌ´Ù
+	//ê°ì½”ë„ˆ ì  ì¤‘ì—ì„œì˜ ê±°ë¦¬ê°€ ë°˜ì§€ë¦„ ì´ë‹¤
 	Vector3 dir = _pTerrainVertices[_corners[0]]._pos - _centerPos;
 	float prevLength = Vec3LengthSq(&dir);
 	_radius = sqrt(prevLength);
 
-	//ÀÚ½ÄÀÌ ÀÖ´Ù.
+	//ìì‹ì´ ìˆë‹¤.
 	if ((_corners[eCornerRT] - _corners[eCornerLT]) > 1)
 	{
-		//¼¾ÅÍ ÀÎµ¦½º °è»ê
+		//ì„¼í„° ì¸ë±ìŠ¤ ê³„ì‚°
 		_center = (_corners[0] + _corners[1] + _corners[2] + _corners[3]) / 4;
 
-		uint32 topCenter = (_corners[eCornerRT] + _corners[eCornerLT]) / 2; //»ó´Ü Áß¾Ó
-		uint32 leftCenter = (_corners[eCornerLT] + _corners[eCornerLB]) / 2; //ÁÂ Áß¾Ó
-		uint32 rightCenter = (_corners[eCornerRT] + _corners[eCornerRB]) / 2; //¿ì Áß¾Ó
-		uint32 bottomCenter = (_corners[eCornerRB] + _corners[eCornerLB]) / 2; //ÇÏ´Ü Áß¾Ó
+		uint32 topCenter = (_corners[eCornerRT] + _corners[eCornerLT]) / 2; //ìƒë‹¨ ì¤‘ì•™
+		uint32 leftCenter = (_corners[eCornerLT] + _corners[eCornerLB]) / 2; //ì¢Œ ì¤‘ì•™
+		uint32 rightCenter = (_corners[eCornerRT] + _corners[eCornerRB]) / 2; //ìš° ì¤‘ì•™
+		uint32 bottomCenter = (_corners[eCornerRB] + _corners[eCornerLB]) / 2; //í•˜ë‹¨ ì¤‘ì•™
 
-		//ÁÂÇÏ´Ü ÀÚ½Ä
+		//ì¢Œí•˜ë‹¨ ìì‹
 		_pChilds[eCornerLB] = new QuadTree;
 		_pChilds[eCornerLB]->_corners[eCornerLT] = leftCenter;
 		_pChilds[eCornerLB]->_corners[eCornerRT] = _center;
 		_pChilds[eCornerLB]->_corners[eCornerLB] = _corners[eCornerLB];
 		_pChilds[eCornerLB]->_corners[eCornerRB] = bottomCenter;
 		_pChilds[eCornerLB]->_pTerrainVertices = _pTerrainVertices;
+		_pChilds[eCornerLB]->_culled = false;
 		_pChilds[eCornerLB]->CreateChildTree();
 
-		//¿ìÇÏ´Ü ÀÚ½Ä
+		//ìš°í•˜ë‹¨ ìì‹
 		_pChilds[eCornerRB] = new QuadTree;
 		_pChilds[eCornerRB]->_corners[eCornerLT] = _center;
 		_pChilds[eCornerRB]->_corners[eCornerRT] = rightCenter;
 		_pChilds[eCornerRB]->_corners[eCornerLB] = bottomCenter;
 		_pChilds[eCornerRB]->_corners[eCornerRB] = _corners[eCornerRB];
 		_pChilds[eCornerRB]->_pTerrainVertices = _pTerrainVertices;
+		_pChilds[eCornerRB]->_culled = false;
 		_pChilds[eCornerRB]->CreateChildTree();
-																				//ÁÂ»ó´Ü ÀÚ½Ä
-		//ÁÂ»ó´Ü
+																				//ì¢Œìƒë‹¨ ìì‹
+		//ì¢Œìƒë‹¨
 		_pChilds[eCornerLT] = new QuadTree;
 		_pChilds[eCornerLT]->_corners[eCornerLT] = _corners[eCornerLT];
 		_pChilds[eCornerLT]->_corners[eCornerRT] = topCenter;
 		_pChilds[eCornerLT]->_corners[eCornerLB] = leftCenter;
 		_pChilds[eCornerLT]->_corners[eCornerRB] = _center;
 		_pChilds[eCornerLT]->_pTerrainVertices = _pTerrainVertices;
+		_pChilds[eCornerLT]->_culled = false;
 		_pChilds[eCornerLT]->CreateChildTree();
 
-		//¿ì»ó´Ü ÀÚ½Ä
+		//ìš°ìƒë‹¨ ìì‹
 		_pChilds[eCornerRT] = new QuadTree;
 		_pChilds[eCornerRT]->_corners[eCornerLT] = topCenter;
 		_pChilds[eCornerRT]->_corners[eCornerRT] = _corners[eCornerRT];
 		_pChilds[eCornerRT]->_corners[eCornerLB] = _center;
 		_pChilds[eCornerRT]->_corners[eCornerRB] = rightCenter;
 		_pChilds[eCornerRT]->_pTerrainVertices = _pTerrainVertices;
+		_pChilds[eCornerRT]->_culled = false;
 		_pChilds[eCornerRT]->CreateChildTree();
 	}
 }
@@ -155,16 +159,16 @@ void QuadTree::GetRayHits(const Ray &ray, std::vector<Vector3> *pOutHit)
 {
 	if (IsRayHitBoundSphere(ray, _centerPos, _radius, NULL, NULL))
 	{
-		//ÀÚ½ÄÀÌ ÀÖ³Ä?
+		//ìì‹ì´ ìˆëƒ?
 		if ((_corners[eCornerRT] - _corners[eCornerLT]) > 1)
 		{
-			//ÀÚ½Ä Àç±Í
+			//ìì‹ ì¬ê·€
 			for (int32 i = 0; i < 4; i++)
 			{
 				_pChilds[i]->GetRayHits(ray, pOutHit);
 			}
 		}
-		//ÀÚ½ÄÀÌ ¾ø´Â ¸¶Áö¸· ³ëµåÀÏ‹š
+		//ìì‹ì´ ì—†ëŠ” ë§ˆì§€ë§‰ ë…¸ë“œì¼ë–„
 		else
 		{
 			//lt--rt
@@ -174,30 +178,30 @@ void QuadTree::GetRayHits(const Ray &ray, std::vector<Vector3> *pOutHit)
 			//|/   |
 			//lb--rb
 
-			//³ª(Å¸ÀÏ)ÀÇ Æú¸®°ï°ú RayÀÇ hitÁöÁ¡À» ¾òÀÚ
+			//ë‚˜(íƒ€ì¼)ì˜ í´ë¦¬ê³¤ê³¼ Rayì˜ hitì§€ì ì„ ì–»ì
 			float dist = 0.0f;
 			Vector3 lt = this->_pTerrainVertices[_corners[eCornerLT]]._pos;
 			Vector3 rt = this->_pTerrainVertices[_corners[eCornerRT]]._pos;
 			Vector3 lb = this->_pTerrainVertices[_corners[eCornerLB]]._pos;
 			Vector3 rb = this->_pTerrainVertices[_corners[eCornerRB]]._pos;
 
-			//ÁÂ»ó´Ü Æú¸®°ï Ã¼Å©
+			//ì¢Œìƒë‹¨ í´ë¦¬ê³¤ ì²´í¬
 			if (D3DXIntersectTri( &lt, &rt, &lb, &ray.origin, &ray.direction,
 				nullptr, nullptr, &dist))
 			{
 				Vector3 hitPos = ray.origin + ray.direction * dist;
 
-				//Çª½¬
+				//í‘¸ì‰¬
 				pOutHit->push_back(hitPos);
 				return;
 			}
-			//¿ìÇÏ´Ü Æú¸®°ï Ã¼Å©
+			//ìš°í•˜ë‹¨ í´ë¦¬ê³¤ ì²´í¬
 			if (D3DXIntersectTri( &rt, &rb, &lb, &ray.origin, &ray.direction,
 				nullptr, nullptr, &dist))			
 			{
-				//È÷Æ® ÁöÁ¡
+				//íˆíŠ¸ ì§€ì 
 				Vector3 hitPos = ray.origin + ray.direction * dist;
-				//Çª½¬
+				//í‘¸ì‰¬
 				pOutHit->push_back(hitPos);
 				return;
 			}
@@ -205,60 +209,23 @@ void QuadTree::GetRayHits(const Ray &ray, std::vector<Vector3> *pOutHit)
 	}
 }
 
-int32 QuadTree::GenerateIndex(uint8 * pData)
+int32 QuadTree::GenerateIndex(uint8 * pIndexData, const Frustum & frustum)
 {
-	return GenerateIndexInternal(0, pData);
-}
-
-int32 QuadTree::GenerateIndexInternal(int32 triangles, uint8 * pData)
-{
-	if (IsVisible())
-	{
-		uint32 *p = ((uint32 *)pData) + triangles * 3;
-		// ÁÂÃø»ó´Ü »ï°¢Çü
-		*p++ = _corners[eCornerLB];
-		*p++ = _corners[eCornerLT];
-		*p++ = _corners[eCornerRT];
-		triangles++;
-		// ¿ìÃøÇÏ´Ü »ï°¢Çü
-		*p++ = _corners[eCornerLB];
-		*p++ = _corners[eCornerRT];
-		*p++ = _corners[eCornerRB];
-		triangles++;
-
-		return triangles;
-	}
-
-	if (_pChilds[eCornerLB])
-	{
-		triangles = _pChilds[eCornerLB]->GenerateIndexInternal(triangles, pData);
-	}
-	if (_pChilds[eCornerRB])
-	{
-		triangles = _pChilds[eCornerLT]->GenerateIndexInternal(triangles, pData);
-	}
-	if (_pChilds[eCornerLT])
-	{
-		triangles = _pChilds[eCornerRB]->GenerateIndexInternal(triangles, pData);
-	}
-	if (_pChilds[eCornerRT])
-	{
-		triangles = _pChilds[eCornerRT]->GenerateIndexInternal(triangles, pData);
-	}
-	return triangles;
+	FrustumCull(frustum);
+	return GenerateTriIndex(0, pIndexData);
 }
 
 int32 QuadTree::IsInFrustum(const Frustum & frustum)
 {
 	bool32 cornerIn[4];
 
-	Vector3 currentPoint = Vector3((_pTerrainVertices + _center)->_pos.x, 0.0f, (_pTerrainVertices + _center)->_pos.z);
+	Vector3 currentPoint = (_pTerrainVertices + _center)->_pos;
 	if (frustum.IsSphereInFrustum(currentPoint, _radius))
 	{
-		cornerIn[0] = frustum.IsPointIntFrustum(*(Vector3 *)(_pTerrainVertices + _corners[0]));
-		cornerIn[1] = frustum.IsPointIntFrustum(*(Vector3 *)(_pTerrainVertices + _corners[1]));;
-		cornerIn[2] = frustum.IsPointIntFrustum(*(Vector3 *)(_pTerrainVertices + _corners[2]));;
-		cornerIn[3] = frustum.IsPointIntFrustum(*(Vector3 *)(_pTerrainVertices + _corners[3]));;
+		cornerIn[0] = frustum.IsPointIntFrustum((_pTerrainVertices + _corners[0])->_pos);
+		cornerIn[1] = frustum.IsPointIntFrustum((_pTerrainVertices + _corners[1])->_pos);;
+		cornerIn[2] = frustum.IsPointIntFrustum((_pTerrainVertices + _corners[2])->_pos);;
+		cornerIn[3] = frustum.IsPointIntFrustum((_pTerrainVertices + _corners[3])->_pos);;
 
 		if (cornerIn[0] + cornerIn[1] + cornerIn[2] + cornerIn[3] == 4)
 		{
@@ -275,30 +242,92 @@ int32 QuadTree::IsInFrustum(const Frustum & frustum)
 	}
 }
 
-
-//TODO Implement this
-IntRect QuadTree::CalculateDrawRange(const Frustum & frustum)
+void QuadTree::FrustumCull(const Frustum & frustum)
 {
-	IntRect result;
+	int32 result;
+	result = IsInFrustum(frustum);
+	switch (result)
+	{
+		//ì ˆë‘ì²´Âˆì— ì™„ì „íˆ í¬í•¨ ë¨, í•˜ìœ„ ë…¸ë“œ ê²€ìƒ‰ í•„ìš” ì—†ìŒ
+	case FRUSTUM_COMPLETLY_IN :
+	{
+		_culled = false;
+		return;
+	}break;
+	//ì ˆë‘ì²´ì— ë¶€ë¶„ì ìœ¼ë¡œ í¬í•¨ ë˜ì–´ì„œ, í•˜ìœ„ ë…¸ë“œ ê²€ìƒ‰ í•„ìš”
+	case FRUSTUM_PARTIALLY_IN :
+	{
+		_culled = false;
+	}break;
+	//ì ˆë‘ì²´Âˆì— ì™„ì „íˆ ë²—ì–´ë‚¨, í•˜ìœ„ ë…¸ë“œ ê²€ìƒ‰ í•„ìš” ì—†ìŒ
+	case FRUSTUM_OUT : 
+	{
+		_culled = true;
+		return;
+	}break;
+	}
 
-	//int32 lb = this->_pChilds[Corner::eCornerLB]->IsInFrustum(frustum);
-	//int32 rb = this->_pChilds[Corner::eCornerRB]->IsInFrustum(frustum);
-	//int32 lt = this->_pChilds[Corner::eCornerLT]->IsInFrustum(frustum);
-	//int32 rt = this->_pChilds[Corner::eCornerRT]->IsInFrustum(frustum);
-
-	//if (lb == FRUSTUM_COMPLETLY_IN || lb == FRUSTUM_PARTIALLY_IN)
-	//{
-	//	result._left = 0;
-	//}
-
-	result._left = 0;
-	result._top = 16;
-	result._right = 16;
-	result._bottom = 0;
-
-	return result;
+	if (_pChilds[0])
+	{
+		_pChilds[0]->FrustumCull(frustum);
+	}
+	if (_pChilds[1])
+	{
+		_pChilds[1]->FrustumCull(frustum);
+	}
+	if (_pChilds[2])
+	{
+		_pChilds[2]->FrustumCull(frustum);
+	}
+	if (_pChilds[3])
+	{
+		_pChilds[3]->FrustumCull(frustum);
+	}
 }
 
+int32 QuadTree::GenerateTriIndex(int32 numTri, uint8 * pIndexData)
+{
+	if (_culled)
+	{
+		_culled = false;
+		return numTri;
+	}
+
+	if (IsVisible())
+	{
+		uint32 *p = ((uint32 *)pIndexData) + numTri * 3;
+		// ì¢Œì¸¡ìƒë‹¨ ì‚¼ê°í˜•
+		*p++ = _corners[eCornerLB];
+		*p++ = _corners[eCornerLT];
+		*p++ = _corners[eCornerRT];
+		numTri++;
+		// ìš°ì¸¡í•˜ë‹¨ ì‚¼ê°í˜•
+		*p++ = _corners[eCornerLB];
+		*p++ = _corners[eCornerRT];
+		*p++ = _corners[eCornerRB];
+		numTri++;
+
+		return numTri;
+	}
+
+	if (_pChilds[eCornerLB])
+	{
+		numTri = _pChilds[eCornerLB]->GenerateTriIndex(numTri, pIndexData);
+	}
+	if (_pChilds[eCornerRB])
+	{
+		numTri = _pChilds[eCornerRB]->GenerateTriIndex(numTri, pIndexData);
+	}
+	if (_pChilds[eCornerLT])
+	{
+		numTri = _pChilds[eCornerLT]->GenerateTriIndex(numTri, pIndexData);
+	}
+	if (_pChilds[eCornerRT])
+	{
+		numTri = _pChilds[eCornerRT]->GenerateTriIndex(numTri, pIndexData);
+	}
+	return numTri;
+}
 
 int32 QuadTree::MapQuadIndexTo2DIndex(int32 level, QuadTree::Corner corner)
 {

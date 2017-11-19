@@ -13,7 +13,7 @@ Camera::Camera()
 	_camNear = 0.01f;
 
 	//±âº» Far
-	_camFar = 1200.f;
+	_camFar = 100.0f;
 
 	_moveSpeed = 1.0f;
 	_rotationSpeed = 1.0f;

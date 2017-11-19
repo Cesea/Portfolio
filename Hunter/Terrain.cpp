@@ -145,7 +145,7 @@ void Terrain::FillRenderCommand(video::RenderView & renderView)
 	video::IndexBuffer *pIndexBuffer = VIDEO->GetIndexBuffer(_iHandle);
 	uint8 *pData = nullptr;
 	pIndexBuffer->_ptr->Lock(0, sizeof(uint32) * _numCellX * _numCellZ * 3 * 2, (void **)&pData, D3DLOCK_DISCARD);
-	_numTriangleToDraw = _pQuadTree->GenerateIndex(pData);
+	_numTriangleToDraw = _pQuadTree->GenerateIndex(pData, renderView._pCamera->GetFrustum());
 	pIndexBuffer->_ptr->Unlock();
 
 	video::RenderCommand &command = renderView.GetCommand();
@@ -157,6 +157,7 @@ void Terrain::FillRenderCommand(video::RenderView & renderView)
 	command._iHandle = _iHandle;
 	command._effectHandle = _effect;
 	command._materialHandle = _materialHandle;
+	command._numPrim = _numTriangleToDraw;
 
 	//for (int32 i = 0; i < _numSectionX * _numSectionZ; ++i)
 	//{
