@@ -60,9 +60,6 @@
     <ClCompile Include="TestScene.cpp">
       <Filter>Game\GameScene\TestScene</Filter>
     </ClCompile>
-    <ClCompile Include="DebugDraw.cpp">
-      <Filter>Debug</Filter>
-    </ClCompile>
     <ClCompile Include="Ray.cpp">
       <Filter>Math</Filter>
     </ClCompile>
@@ -162,6 +159,9 @@
     <ClCompile Include="WorldEditor.cpp">
       <Filter>Game\WorldEditor</Filter>
     </ClCompile>
+    <ClCompile Include="DebugDrawer.cpp">
+      <Filter>Core\SubSystem\VideoDevice</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -254,9 +254,6 @@
     </ClInclude>
     <ClInclude Include="TestScene.h">
       <Filter>Game\GameScene\TestScene</Filter>
-    </ClInclude>
-    <ClInclude Include="DebugDraw.h">
-      <Filter>Debug</Filter>
     </ClInclude>
     <ClInclude Include="Ray.h">
       <Filter>Math</Filter>
@@ -405,6 +402,9 @@
     <ClInclude Include="imguiRenderer.h">
       <Filter>GUI</Filter>
     </ClInclude>
+    <ClInclude Include="DebugDrawer.h">
+      <Filter>Core\SubSystem\VideoDevice</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Core">
@@ -430,9 +430,6 @@
     </Filter>
     <Filter Include="Sub\tinyxml">
       <UniqueIdentifier>{291f8bb9-9ec3-41d4-a4a9-846cb98317e4}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Math">
-      <UniqueIdentifier>{a3fc95b4-5fb1-4f8f-8f65-d94a2c21622d}</UniqueIdentifier>
     </Filter>
     <Filter Include="Core\Timers">
       <UniqueIdentifier>{1a498917-4bd0-45a4-8cdb-28af30c3deb7}</UniqueIdentifier>
@@ -523,6 +520,9 @@
     </Filter>
     <Filter Include="Game\WorldEditor">
       <UniqueIdentifier>{35c933a0-76c2-436d-aefd-0f91891567df}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Math">
+      <UniqueIdentifier>{a3fc95b4-5fb1-4f8f-8f65-d94a2c21622d}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

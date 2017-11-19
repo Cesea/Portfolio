@@ -134,7 +134,7 @@
     <ClCompile Include="CollisionUtils.cpp" />
     <ClCompile Include="CommonUtils.cpp" />
     <ClCompile Include="Console.cpp" />
-    <ClCompile Include="DebugDraw.cpp" />
+    <ClCompile Include="DebugDrawer.cpp" />
     <ClCompile Include="Entity.cpp" />
     <ClCompile Include="EntityComponentStorage.cpp" />
     <ClCompile Include="EntityIDPool.cpp" />
@@ -198,7 +198,7 @@
     <ClInclude Include="Console.h" />
     <ClInclude Include="ContainerCheck.h" />
     <ClInclude Include="DataBase.h" />
-    <ClInclude Include="DebugDraw.h" />
+    <ClInclude Include="DebugDrawer.h" />
     <ClInclude Include="Entity.h" />
     <ClInclude Include="EntityComponentStorage.h" />
     <ClInclude Include="EntityComponentSystem.h" />

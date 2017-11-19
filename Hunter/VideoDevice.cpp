@@ -41,14 +41,18 @@ bool VideoDevice::Init()
 	LoadDefaultEffects();
 	MakeDefaultVertexDecls();
 
+	DEBUG_DRAWER->Init();
+
 	return true;
 }
 
 void VideoDevice::ShutDown()
 {
-	COM_RELEASE(gpDevice, 0);
-	COM_RELEASE(_pD3D, 0);
+	DEBUG_DRAWER->Shutdown();
+	DEBUG_DRAWER->ReleaseInstance();
 
+	COM_RELEASE(gpDevice);
+	COM_RELEASE(_pD3D);
 }
 
 void VideoDevice::Update(float deltaTime)

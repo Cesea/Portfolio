@@ -6,19 +6,16 @@
 #include "VideoResource_Mesh.h"
 
 #include "imguiRenderer.h"
-#include "DebugDraw.h"
-
+#include "DebugDrawer.h"
 
 #ifdef CreateFont
 	#undef CreateFont
 #endif
 
-
 //TODOs
-//1. DynamicVertexBuffer, DynamicIndexBuffer를 만들자... Update
-//2. Texture Update를 만들자 Lock, Unlock, UpdateContents
-//3. Texture CreateFromMemory를 만들자
-//4. PredefinedUniforms를 만들자
+//1. Texture Update를 만들자 Lock, Unlock, UpdateContents
+//2. Texture CreateFromMemory를 만들자
+//3. PredefinedUniforms를 만들자
 
 //defines 
 #define VIDEO (gEngine->GetVideo())
@@ -44,7 +41,6 @@ namespace video
 		~VideoDevice();
 
 		//VideoDevice(const VideoDevice &other) = delete;
-
 		bool Init();
 		void ShutDown();
 

@@ -64,7 +64,6 @@ protected :
 
 	std::vector<Vector3> _points;
 
-	video::DebugBuffer *_debugBuffer;
 
 	EventChannel _channel;
 

@@ -102,13 +102,6 @@ bool32 BaseScene::Init()
 	_editor = new Editor;
 	_editor->Init();
 
-
-	_debugBuffer = new DebugBuffer;
-	Memory mem;
-	mem._data = nullptr;
-	mem._size = sizeof(video::DebugVertex) * 1024;
-	_debugBuffer->_vHandle = VIDEO->CreateVertexBuffer(&mem, VIDEO->GetVertexDecl(video::DebugVertex::_name));
-
 	_active = true;
 	return result;
 }
@@ -133,14 +126,6 @@ bool32 BaseScene::Update(float deltaTime)
 
 	//_channel.Update<BaseScene::SpawnEvent>(deltaTime);
 
-	for (int i = 0; i < 10; ++i)
-	{
-		_debugBuffer->Add(video::DebugVertex(Vector3(-50.0f, 0.0f, i), 0xffffffff));
-		_debugBuffer->Add(video::DebugVertex(Vector3(50.0f, 0.0f, i), 0xffffffff));
-	}
-	//_debugBuffer->Add(video::DebugVertex(Vector3(10.0f, 0.0f, -5.0f), 0xff000000));
-	_debugBuffer->Update();
-
 	return result;
 }
 
@@ -149,20 +134,14 @@ bool32 BaseScene::Render()
 	Matrix model;
 	MatrixIdentity(&model);
 
+	DEBUG_DRAWER->DrawWorldGrid(5, 20);
+	DEBUG_DRAWER->DrawAABB(Vector3(0.0f, 5.0f, 0.0f), Vector3(12.0f, 10.0f, 10.0f), 0xff00ffff);
+	//DEBUG_DRAWER->DrawBox();
+	DEBUG_DRAWER->FillRenderCommand(*_mainRenderView);
+
 	_renderSystem.Render(*_mainRenderView);
-
-	video::RenderCommand &command =  _mainRenderView->GetCommand();
-	command._vHandle = _debugBuffer->_vHandle;
-	command._drawType = video::RenderCommand::DrawType::eStatic;
-	command._effectHandle = video::DebugBuffer::sDefaultEffectHandle;
-	command._primType = video::RenderCommand::eLineList;
-	command._numPrim = _debugBuffer->_count / 2;
-	command._materialHandle = VIDEO->GetMaterial("Default");
-	command._cacheRange = _mainRenderView->_matrixCache.Add(&model);
-
-	_debugBuffer->Reset();
-
 	//TERRAIN->FillRenderCommand(*_mainRenderView);
+
 
 	_mainRenderView->PreRender();
 	_mainRenderView->ExecCommands();

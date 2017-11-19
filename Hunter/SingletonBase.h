@@ -43,7 +43,7 @@ void SingletonBase<T>::ReleaseInstance(void)
 {
 	if (_pInstance) {
 		delete _pInstance;
-		s_pInstance = NULL;
+		_pInstance = NULL;
 	}
 }
 #endif
