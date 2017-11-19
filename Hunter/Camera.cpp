@@ -13,7 +13,11 @@ Camera::Camera()
 	_camNear = 0.01f;
 
 	//±âº» Far
+#if defined (DEBUG) || defined (_DEBUG)
 	_camFar = 100.0f;
+#else 
+	_camFar = 200.0f;
+#endif
 
 	_moveSpeed = 1.0f;
 	_rotationSpeed = 1.0f;
@@ -54,7 +58,7 @@ void Camera::UpdateMatrix()
 
 	_matViewProjection = _matView * _matProjection;
 
-	_frustum.UpdateFrustum(_matViewProjection);
+	_frustum.UpdateFrustum(*this);
 }
 
 void Camera::ComputeRay(const Vector2 & screenPos, Ray * pOutRay)

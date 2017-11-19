@@ -33,7 +33,7 @@ bool32 BaseScene::Init()
 
 	//터레인 로드
 	Terrain::TerrainConfig config;
-	config._heightFileName = "../resources/Textures/Height_map1024.jpg";
+	config._heightFileName = "../resources/Textures/02-australia-gray.jpg";
 	config._tile0FileName = "../resources/Textures/terrain1.jpg";
 	config._tile1FileName = "../resources/Textures/terrain2.png";
 	config._tile2FileName = "../resources/Textures/terrain3.png";
@@ -41,8 +41,9 @@ bool32 BaseScene::Init()
 	config._splatFileName = "../resources/Textures/Splat.png";
 
 	config._cellScale = 1.0f;
-	config._heightScale = 80.0f;
+	config._heightScale = 20.0f;
 	config._textureMult = 50;
+	config._lodRatio = 0.1f;
 	config._sectionResolution = 64;
 
 	TERRAIN->SetScene(this);
@@ -135,8 +136,8 @@ bool32 BaseScene::Render()
 	Matrix model;
 	MatrixIdentity(&model);
 
-	DEBUG_DRAWER->DrawWorldGrid(5, 40);
-	DEBUG_DRAWER->FillRenderCommand(*_mainRenderView);
+	//DEBUG_DRAWER->DrawWorldGrid(5, 40);
+	//DEBUG_DRAWER->FillRenderCommand(*_mainRenderView);
 	//DEBUG_DRAWER->DrawAABB(Vector3(0.0f, 5.0f, 0.0f), Vector3(12.0f, 10.0f, 10.0f), 0xff00ffff);
 	////DEBUG_DRAWER->DrawBox();
 	//DEBUG_DRAWER->FillRenderCommand(*_mainRenderView);
@@ -147,7 +148,7 @@ bool32 BaseScene::Render()
 
 	_mainRenderView->PreRender();
 	_mainRenderView->ExecCommands();
-	imguiRenderDraw();
+	//imguiRenderDraw();
 	_mainRenderView->PostRender();
 
 	return true;

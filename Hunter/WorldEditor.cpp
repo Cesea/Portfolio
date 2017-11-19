@@ -38,11 +38,8 @@ void Editor::Shutdown()
 void Editor::Edit(RefVariant &object)
 {
 	ImguiBeginFrame(_mx, _my, _mb, _scroll, _key);
-
 	//Console::Log("%d, %d, %d \n", _mx, _my, _mb);
-
 	ImguiBeginScrollArea(_name, 30, 30, 400, 800, &_scroll);
-
 
 	for (int32 i = 0; i < 10; ++i)
 	{

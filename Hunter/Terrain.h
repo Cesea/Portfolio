@@ -23,6 +23,8 @@ public:
 		//uv가 얼마나 반복 될 것인지...
 		float _textureMult;
 
+		float _lodRatio{};
+
 		//TerrainSection의 해상도를 결정한다...	
 		//Cell의 갯수이다
 		//기본 값이 64...
@@ -120,6 +122,9 @@ private:
 	float   _terrainStartZ{};
 	float	_terrainEndX{};
 	float	_terrainEndZ{};
+
+	//LOD비율
+	float _lodRatio{};
 
 	video::TextureHandle _heightMapHandle{};
 	video::TextureHandle _tile0Handle{};

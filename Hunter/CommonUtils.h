@@ -360,6 +360,36 @@ inline int absInt(int num)
 	}
 }
 
+inline float FMax(float f1, float f2)
+{
+	if (f1 > f2)
+	{
+		return f1;
+	}
+	else
+	{
+		return f2;
+	}
+}
+
+inline float FMin(float f1, float f2)
+{
+	if (f1 < f2)
+	{
+		return f1;
+	}
+	else
+	{
+		return f2;
+	}
+}
+
+//bottom값이 더 작다...
+inline bool IsInRect(const RECT *pRect, POINT p)
+{
+	return (p.x >= pRect->left) && (p.x <= pRect->right) && (p.y <= pRect->top) && (p.y >= pRect->bottom);
+}
+
 
 
 #endif

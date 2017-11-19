@@ -22,6 +22,8 @@ public :
 		eFrustumUnkown = -1, 	
 	};
 
+	enum {EDGE_UP = 0, EDGE_DOWN, EDGE_LEFT, EDGE_RIGHT};
+
 public:
 	QuadTree();
 	~QuadTree();
@@ -31,25 +33,33 @@ public:
 
 	void CreateChildTree();
 
+
 	void GetRayHits(const Ray &ray, std::vector<Vector3>* pOutHit);
 
-	int32 GenerateIndex(uint8 *pIndexData, const Frustum &frustum);
-	//int32 GenerateIndexInternal(int32 triangles, uint8 *pData);
-
+	int32 GenerateIndex(uint8 *pIndexData, const Frustum &frustum, const Vector3 &camPos, float LODRatio);
 	int32 IsInFrustum(const Frustum &frustum);
 	void FrustumCull(const Frustum &frustum);
 
-private :
+	float GetDistance(const Vector3 &v1, const Vector3 &v2);
+	int32 GetLODLevel(const Vector3 &cameraPos, float LODRatio);
 
 private :
 
-	int32 GenerateTriIndex(int32 numTri, uint8 *pIndexData);
+private :
 
-	bool32 IsVisible() { return (float)_corners[eCornerRT] - (float)_corners[eCornerLT] <= 1.0f; }
+	void BuildNeighborNode(QuadTree *pRoot, int32 cx);
+	QuadTree *FindNode(int32 i0, int32 i1, int32 i2, int32 i3);;
+	int32 GetNodeIndex(int32 edge, int32 cs, int32 &i0, int32 &i1, int32 &i2, int32 &i3);
+	void AllInFrustum();
 
-	int32 MapQuadIndexTo2DIndex(int32 level, QuadTree::Corner corner);
+	int32 GenerateTriIndex(int32 numTri, uint8 *pIndexData, const Vector3 &camPos, float LODRatio);
+
+	bool32 IsVisible(const Vector3 &camPos, float LODRatio);
 
 	video::TerrainVertex *_pTerrainVertices;
+
+	QuadTree *_pParent;
+	QuadTree *_pNeighbors[4];
 
 	uint32 _corners[4]; //자신의 쿼드 트리의 각 코너 정점 인덱스
 	uint32 _center;     //자신의 쿼드 트리의 주앙 정점 인덱스

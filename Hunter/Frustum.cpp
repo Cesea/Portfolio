@@ -5,60 +5,53 @@
 
 Frustum::Frustum()
 {
-	_rHWPos[0] = Vector3(-1, 1, 0);
-	_rHWPos[1] = Vector3(1, 1, 0);
-	_rHWPos[2] = Vector3(-1, -1, 0);
-	_rHWPos[3] = Vector3(1, -1, 0);
+	_rHWPos[0] = Vector3(-1, -1, 0);
+	_rHWPos[1] = Vector3(1, -1, 0);
+	_rHWPos[2] = Vector3(1, -1, 1);
+	_rHWPos[3] = Vector3(-1, -1, 1);
 
-	_rHWPos[4] = Vector3(-1, 1, 1);
-	_rHWPos[5] = Vector3(1, 1, 1);
-	_rHWPos[6] = Vector3(-1, -1, 1);
-	_rHWPos[7] = Vector3(1, -1, 1);
+	_rHWPos[4] = Vector3(-1, 1, 0);
+	_rHWPos[5] = Vector3(1, 1, 0);
+	_rHWPos[6] = Vector3(1, 1, 1);
+	_rHWPos[7] = Vector3(-1, 1, 1);
+
+	_zFar = 100;
 }
+
 
 Frustum::~Frustum()
 {
 }
 
-void Frustum::UpdateFrustum(const Matrix & matViewProj)
+void Frustum::UpdateFrustum(const Camera &camera)
 {
-	//viewPojection 역행렬
 	Matrix inverse;
-	MatrixInverse(&inverse, NULL, &matViewProj);
+	MatrixInverse(&inverse, NULL, &camera.GetViewProjectionMatrix());
 
 	for (int i = 0; i < 8; i++)
 	{
 		Vec3TransformCoord(_pos + i, _rHWPos + i, &inverse);
 	}
 
-	//정면플랜
-	_plane[0].Create(_pos[0], _pos[1], _pos[2]);
-	//후면
-	_plane[1].Create(_pos[5], _pos[4], _pos[7]);
-	//우측
-	_plane[2].Create(_pos[1], _pos[5], _pos[3]);
-	//좌측
-	_plane[3].Create(_pos[4], _pos[0], _pos[6]);
-	//상단
-	_plane[4].Create(_pos[4], _pos[5], _pos[0]);
-	//하단
-	_plane[5].Create(_pos[2], _pos[3], _pos[6]);
+	_plane[3].Create(*(_rHWPos + 2), *(_rHWPos + 6), *(_rHWPos + 7));
+	_plane[4].Create(*(_rHWPos), *(_rHWPos + 3), *(_rHWPos + 7));
+	_plane[5].Create(*(_rHWPos + 1), *(_rHWPos + 5), *(_rHWPos + 6));
 }
 
 bool Frustum::IsPointIntFrustum(const Vector3 & point) const
 {
 	float fDist{};
-	fDist = D3DXPlaneDotCoord(&_plane[1], &point);
-	if (fDist > PLANE_EPSILON)
-	{
-		return false;
-	}
-	fDist = D3DXPlaneDotCoord(&_plane[2], &point);
-	if (fDist > PLANE_EPSILON)
-	{
-		return false;
-	}
 	fDist = D3DXPlaneDotCoord(&_plane[3], &point);
+	if (fDist > PLANE_EPSILON)
+	{
+		return false;
+	}
+	fDist = D3DXPlaneDotCoord(&_plane[4], &point);
+	if (fDist > PLANE_EPSILON)
+	{
+		return false;
+	}
+	fDist = D3DXPlaneDotCoord(&_plane[5], &point);
 	if (fDist > PLANE_EPSILON)
 	{
 		return false;
@@ -70,7 +63,7 @@ bool Frustum::IsSphereInFrustum(const Vector3 &center, float radius) const
 {
 	Vector3 normal;
 
-	for (int i = 1; i < 4; i++)
+	for (int i = 3; i < 6; ++i)
 	{
 		normal.x = _plane[i].a;
 		normal.y = _plane[i].b;

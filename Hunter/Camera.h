@@ -23,7 +23,7 @@ public:
 	const Matrix &GetViewProjectionMatrix() const { return _matViewProjection; }
 
 	void SetFov(float fov) { _fov = fov; }
-	float GetFov() { return _fov; }
+	float GetFov() const { return _fov; }
 
 	void OrthoToggle() { _ortho = !_ortho; }
 

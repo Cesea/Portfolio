@@ -16,6 +16,8 @@ bool Terrain::Create(const Terrain::TerrainConfig &config, int32 smoothLevel)
 	_heightScale = config._heightScale;
 	_cellScale = config._cellScale;
 
+	_lodRatio = config._lodRatio;
+
 	//높이맵 불러온다
 	_heightMapHandle = VIDEO->CreateTexture(config._heightFileName, config._heightFileName);
 	video::Texture *heightMap = VIDEO->GetTexture(_heightMapHandle);
@@ -145,7 +147,8 @@ void Terrain::FillRenderCommand(video::RenderView & renderView)
 	video::IndexBuffer *pIndexBuffer = VIDEO->GetIndexBuffer(_iHandle);
 	uint8 *pData = nullptr;
 	pIndexBuffer->_ptr->Lock(0, sizeof(uint32) * _numCellX * _numCellZ * 3 * 2, (void **)&pData, D3DLOCK_DISCARD);
-	_numTriangleToDraw = _pQuadTree->GenerateIndex(pData, renderView._pCamera->GetFrustum());
+	_numTriangleToDraw = _pQuadTree->GenerateIndex(pData, renderView._pCamera->GetFrustum(), 
+		renderView._pCamera->GetTransform()._position, _lodRatio);
 	pIndexBuffer->_ptr->Unlock();
 
 	video::RenderCommand &command = renderView.GetCommand();
