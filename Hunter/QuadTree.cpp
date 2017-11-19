@@ -205,6 +205,49 @@ void QuadTree::GetRayHits(const Ray &ray, std::vector<Vector3> *pOutHit)
 	}
 }
 
+int32 QuadTree::GenerateIndex(uint8 * pData)
+{
+	return GenerateIndexInternal(0, pData);
+}
+
+int32 QuadTree::GenerateIndexInternal(int32 triangles, uint8 * pData)
+{
+	if (IsVisible())
+	{
+		uint32 *p = ((uint32 *)pData) + triangles * 3;
+		// ÁÂÃø»ó´Ü »ï°¢Çü
+		*p++ = _corners[eCornerLB];
+		*p++ = _corners[eCornerLT];
+		*p++ = _corners[eCornerRT];
+		triangles++;
+		// ¿ìÃøÇÏ´Ü »ï°¢Çü
+		*p++ = _corners[eCornerLB];
+		*p++ = _corners[eCornerRT];
+		*p++ = _corners[eCornerRB];
+		triangles++;
+
+		return triangles;
+	}
+
+	if (_pChilds[eCornerLB])
+	{
+		triangles = _pChilds[eCornerLB]->GenerateIndexInternal(triangles, pData);
+	}
+	if (_pChilds[eCornerRB])
+	{
+		triangles = _pChilds[eCornerLT]->GenerateIndexInternal(triangles, pData);
+	}
+	if (_pChilds[eCornerLT])
+	{
+		triangles = _pChilds[eCornerRB]->GenerateIndexInternal(triangles, pData);
+	}
+	if (_pChilds[eCornerRT])
+	{
+		triangles = _pChilds[eCornerRT]->GenerateIndexInternal(triangles, pData);
+	}
+	return triangles;
+}
+
 int32 QuadTree::IsInFrustum(const Frustum & frustum)
 {
 	bool32 cornerIn[4];

@@ -114,11 +114,14 @@ void Terrain::Handle(const InputManager::MouseReleasedEvent & event)
 void Terrain::Destroy()
 {
 	_pScene = nullptr;
-	for (int32 i = 0; i < _numSectionX * _numSectionZ; ++i)
-	{
-		VIDEO->DestroyVertexBuffer(_pSections[i]._vHandle);
-		VIDEO->DestroyIndexBuffer(_pSections[i]._iHandle);
-	}
+
+	VIDEO->DestroyVertexBuffer(_vHandle);
+	VIDEO->DestroyIndexBuffer(_iHandle);
+	//for (int32 i = 0; i < _numSectionX * _numSectionZ; ++i)
+	//{
+	//	VIDEO->DestroyVertexBuffer(_pSections[i]._vHandle);
+	//	VIDEO->DestroyIndexBuffer(_pSections[i]._iHandle);
+	//}
 	SAFE_DELETE_ARRAY(_pSections);
 
 	VIDEO->DestroyVertexDecl(_declHandle);
@@ -137,32 +140,40 @@ void Terrain::Destroy()
 
 void Terrain::FillRenderCommand(video::RenderView & renderView)
 {
+	//IntRect drawRange = _pQuadTree->CalculateDrawRange(renderView._pCamera->GetFrustum());
 
-	IntRect drawRange = _pQuadTree->CalculateDrawRange(renderView._pCamera->GetFrustum());
+	video::IndexBuffer *pIndexBuffer = VIDEO->GetIndexBuffer(_iHandle);
+	uint8 *pData = nullptr;
+	pIndexBuffer->_ptr->Lock(0, sizeof(uint32) * _numCellX * _numCellZ * 3 * 2, (void **)&pData, D3DLOCK_DISCARD);
+	_numTriangleToDraw = _pQuadTree->GenerateIndex(pData);
+	pIndexBuffer->_ptr->Unlock();
 
-	//for (int32 y = drawRange._bottom; y < drawRange._top; ++y)
+	video::RenderCommand &command = renderView.GetCommand();
+	command._drawType = video::RenderCommand::DrawType::eStatic;
+	command._primType = video::RenderCommand::PrimType::eTriangleList;
+	Assert(_vHandle.IsValid());
+	Assert(_iHandle.IsValid());
+	command._vHandle = _vHandle;
+	command._iHandle = _iHandle;
+	command._effectHandle = _effect;
+	command._materialHandle = _materialHandle;
+
+	//for (int32 i = 0; i < _numSectionX * _numSectionZ; ++i)
 	//{
-	//	for (int32 x = drawRange._left; x < drawRange._right; ++x)
+	//	Terrain::TerrainSection &refSection = _pSections[i];
+	//	if (renderView._pCamera->GetFrustum().IsSphereInFrustum(Vector3(refSection._centerX, 0.0f, refSection._centerZ), refSection._radius))
 	//	{
-	for (int32 i = 0; i < _numSectionX * _numSectionZ; ++i)
-	{
-		Terrain::TerrainSection &refSection = _pSections[i];
-		if (renderView._pCamera->GetFrustum().IsSphereInFrustum(Vector3(refSection._centerX, 0.0f, refSection._centerZ), refSection._radius))
-		{
-			video::RenderCommand &command = renderView.GetCommand();
-
-			command._drawType = video::RenderCommand::DrawType::eStatic;
-			command._primType = video::RenderCommand::PrimType::eTriangleList;
-
-			Assert(refSection._vHandle.IsValid());
-			Assert(refSection._iHandle.IsValid());
-			command._vHandle = refSection._vHandle;
-			command._iHandle = refSection._iHandle;
-
-			command._effectHandle = _effect;
-			command._materialHandle = _materialHandle;
-		}
-	}
+	//		video::RenderCommand &command = renderView.GetCommand();
+	//		command._drawType = video::RenderCommand::DrawType::eStatic;
+	//		command._primType = video::RenderCommand::PrimType::eTriangleList;
+	//		Assert(refSection._vHandle.IsValid());
+	//		Assert(refSection._iHandle.IsValid());
+	//		command._vHandle = refSection._vHandle;
+	//		command._iHandle = refSection._iHandle;
+	//		command._effectHandle = _effect;
+	//		command._materialHandle = _materialHandle;
+	//	}
+	//}
 }
 
 //TODO : Implement this
@@ -351,7 +362,7 @@ bool Terrain::CreateTerrain(int32 smooth, int32 tileNum)
 
 	D3DLOCKED_RECT lockRect;
 	video::Texture *heightMap = VIDEO->GetTexture(_heightMapHandle);
-	heightMap->_ptr->LockRect(0, &lockRect, 0, 0);
+	heightMap->_ptr->LockRect(0, &lockRect, 0, D3DLOCK_READONLY);
 
 	for (int32 z = 0; z < _numVertexZ; z++) 
 	{
@@ -493,16 +504,30 @@ bool Terrain::CreateTerrain(int32 smooth, int32 tileNum)
 
 	_declHandle = VIDEO->CreateVertexDecl(&decl, "TerrainDecl");
 
-	_pSections = new Terrain::TerrainSection[_numSectionX * _numSectionZ];
-	Assert(_pSections);
+	Memory mem;
+	mem._data = &_terrainVertices[0];
+	mem._size = sizeof(video::TerrainVertex) * _numVertexX * _numVertexZ;
 
-	for (uint32 z = 0; z < _numSectionZ; ++z)
-	{
-		for (uint32 x = 0; x < _numSectionX; ++x)
-		{
-			CreateTerrainSection(x, z, _terrainVertices);
-		}
-	}
+	_vHandle = VIDEO->CreateVertexBuffer(&mem, _declHandle);
+	Assert(_vHandle.IsValid());
+
+	mem._data = nullptr;
+	mem._size = sizeof(uint32) * _numCellX * _numCellZ * 2 * 3;
+
+	_iHandle = VIDEO->CreateIndexBuffer(&mem, sizeof(uint32));
+
+	//refSection._iHandle = VIDEO->GetIndexBuffer("TerrainSectionIndex");
+	//if (!refSection._iHandle.IsValid())
+	//_pSections = new Terrain::TerrainSection[_numSectionX * _numSectionZ];
+	//Assert(_pSections);
+
+	//for (uint32 z = 0; z < _numSectionZ; ++z)
+	//{
+	//	for (uint32 x = 0; x < _numSectionX; ++x)
+	//	{
+	//		CreateTerrainSection(x, z, _terrainVertices);
+	//	}
+	//}
 
 	SAFE_DELETE_ARRAY(poses);
 	SAFE_DELETE_ARRAY(normals);
@@ -580,19 +605,19 @@ bool Terrain::CreateTerrainSection(int32 x, int32 z, const video::TerrainVertex 
 
 	int32 size = sizeof(video::TerrainVertex) * vertices.size();
 
-	refSection._vHandle = VIDEO->CreateVertexBuffer(&mem, _declHandle);
-	Assert(refSection._vHandle.IsValid());
+	//refSection._vHandle = VIDEO->CreateVertexBuffer(&mem, _declHandle);
+	//Assert(refSection._vHandle.IsValid());
 
-	mem._data = &indices[0];
-	mem._size = sizeof(uint16) * _sectionResolution * _sectionResolution * 2 * 3;
+	//mem._data = &indices[0];
+	//mem._size = sizeof(uint16) * _sectionResolution * _sectionResolution * 2 * 3;
 
-	//refSection._iHandle = VIDEO->GetIndexBuffer("TerrainSectionIndex");
-	//if (!refSection._iHandle.IsValid())
-	{
-		refSection._iHandle = VIDEO->CreateIndexBuffer(&mem, sizeof(uint16));
-	}
+	////refSection._iHandle = VIDEO->GetIndexBuffer("TerrainSectionIndex");
+	////if (!refSection._iHandle.IsValid())
+	//{
+	//	refSection._iHandle = VIDEO->CreateIndexBuffer(&mem, sizeof(uint16));
+	//}
 
-	Assert(refSection._iHandle.IsValid());
+	//Assert(refSection._iHandle.IsValid());
 
 	refSection._centerX = (refSection._startX + refSection._endX) * 0.5f;
 	refSection._centerZ = (refSection._startZ + refSection._endZ) * 0.5f;

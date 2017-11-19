@@ -66,7 +66,7 @@ void VideoDevice::Update(float deltaTime)
 // 현제 Device에 설정된 값으로 렌더 될 것이다...
 void video::VideoDevice::Render(RenderView & renderView) 
 {
-	static int32 count = 0;
+	static int32 counter = 0;
 
 	int32 drawCount = 0;
 
@@ -160,16 +160,15 @@ void video::VideoDevice::Render(RenderView & renderView)
 			}
 			effect.EndEffect();
 		}
-
-	//#if defined (DEBUG) || defined (_DEBUG) 
-	//	drawCount++;
-	//	if (count % 60 == 0)
-	//	{
-	//		Console::Log("Draw Count : % d\n", drawCount);
-	//	}
-	//#endif
+		drawCount++;
 	}
-	//count++;
+	#if defined (DEBUG) || defined (_DEBUG) 
+	if (counter % 60 == 0)
+	{
+		Console::Log("Draw Count : % d\n", drawCount);
+	}
+	#endif
+	counter++;
 }
 
 bool VideoDevice::InitD3D(HWND windowHandle)

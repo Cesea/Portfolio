@@ -17,7 +17,6 @@ public:
 	//만약에 이동이 환정이 된다면 더미의 위치를 현재의 위치에 적용시킨다
 	void PostUpdate(float deltaTime);
 
-
 	virtual void Initialize();
 
 	virtual void OnEntityAdded(Entity& entity);
@@ -26,7 +25,6 @@ public:
 
 	void UpdateTransform(TransformComponent &component);
 private :
-
 };
 
 

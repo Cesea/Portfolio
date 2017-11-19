@@ -44,12 +44,11 @@ bool32 BaseScene::Init()
 	config._cellScale = 1.0f;
 	config._heightScale = 80.0f;
 	config._textureMult = 50;
-	config._sectionResolution;
+	config._sectionResolution = 64;
 
-	//TERRAIN->SetScene(this);
-	//TERRAIN->Create(config, 1);
-	//_terrainEffect = VIDEO->GetEffect("TerrainBase.fx");
-
+	TERRAIN->SetScene(this);
+	TERRAIN->Create(config, 1);
+	_terrainEffect = VIDEO->GetEffect("TerrainBase.fx");
 
 	//메쉬 불러오기..
 	Matrix correctionMat;
@@ -64,26 +63,26 @@ bool32 BaseScene::Init()
 	video::DebugBuffer::sDefaultEffectHandle = VIDEO->GetEffect("DebugShader.fx");
 
 	//엔티티 생성
-	_world.AddSystem<RenderSystem>(_renderSystem);
-	_world.AddSystem<TransformSystem>(_transformSystem);
+	//_world.AddSystem<RenderSystem>(_renderSystem);
+	//_world.AddSystem<TransformSystem>(_transformSystem);
 
-	for (uint32 z = 0; z < 2; ++z)
-	{
-		for (uint32 x = 0; x < 2; ++x)
-		{
-			int32 index = Index2D(x, z, 2);
-			_entities.push_back(_world.CreateEntity());
-			Entity &entity = _entities.back();
+	//for (uint32 z = 0; z < 2; ++z)
+	//{
+	//	for (uint32 x = 0; x < 2; ++x)
+	//	{
+	//		int32 index = Index2D(x, z, 2);
+	//		_entities.push_back(_world.CreateEntity());
+	//		Entity &entity = _entities.back();
 
-			TransformComponent &transComp = entity.AddComponent<TransformComponent>();
-			transComp.MovePositionWorld(x * 10, /*TERRAIN->GetHeight(x * 10, z * 10)*/0 , z * 10);
-			RenderComponent &renderComp = entity.AddComponent<RenderComponent>();
-			renderComp._type = RenderComponent::Type::eSkinned;
-			renderComp._skinned = VIDEO->CreateSkinnedAnimation(_skinnedMeshHandle, "Anim" + std::to_string(index));
+	//		TransformComponent &transComp = entity.AddComponent<TransformComponent>();
+	//		transComp.MovePositionWorld(x * 10, /*TERRAIN->GetHeight(x * 10, z * 10)*/0 , z * 10);
+	//		RenderComponent &renderComp = entity.AddComponent<RenderComponent>();
+	//		renderComp._type = RenderComponent::Type::eSkinned;
+	//		renderComp._skinned = VIDEO->CreateSkinnedAnimation(_skinnedMeshHandle, "Anim" + std::to_string(index));
 
-			entity.Activate();
-		}
-	}
+	//		entity.Activate();
+	//	}
+	//}
 
 	/*_entities.push_back(_world.CreateEntity());
 	Entity &entity = _entities.back();*/
@@ -134,13 +133,14 @@ bool32 BaseScene::Render()
 	Matrix model;
 	MatrixIdentity(&model);
 
-	DEBUG_DRAWER->DrawWorldGrid(5, 20);
-	DEBUG_DRAWER->DrawAABB(Vector3(0.0f, 5.0f, 0.0f), Vector3(12.0f, 10.0f, 10.0f), 0xff00ffff);
-	//DEBUG_DRAWER->DrawBox();
+	DEBUG_DRAWER->DrawWorldGrid(5, 40);
 	DEBUG_DRAWER->FillRenderCommand(*_mainRenderView);
+	//DEBUG_DRAWER->DrawAABB(Vector3(0.0f, 5.0f, 0.0f), Vector3(12.0f, 10.0f, 10.0f), 0xff00ffff);
+	////DEBUG_DRAWER->DrawBox();
+	//DEBUG_DRAWER->FillRenderCommand(*_mainRenderView);
 
 	_renderSystem.Render(*_mainRenderView);
-	//TERRAIN->FillRenderCommand(*_mainRenderView);
+	TERRAIN->FillRenderCommand(*_mainRenderView);
 
 
 	_mainRenderView->PreRender();

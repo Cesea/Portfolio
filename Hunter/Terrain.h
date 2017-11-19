@@ -52,8 +52,8 @@ public:
 
 		float _radius{};
 
-		video::VertexBufferHandle _vHandle;
-		video::IndexBufferHandle _iHandle;
+		//video::VertexBufferHandle _vHandle;
+		//video::IndexBufferHandle _iHandle;
 	};
 
 	Terrain() {}
@@ -80,6 +80,9 @@ private:
 
 	void SmoothTerrain(int32 passed);
 
+	video::VertexBufferHandle _vHandle{};
+	video::IndexBufferHandle _iHandle{};
+
 	video::VertexDeclHandle _declHandle{};
 	video::MaterialHandle _materialHandle{};
 	video::EffectHandle _effect{};
@@ -89,6 +92,8 @@ private:
 	//높이스케일(픽셀컬러가 255 일때 높이) 높이맵 y축 사이 간격 크기
 	float _heightScale{};
 	float _cellScale{};	//셀간격
+
+	int32 _numTriangleToDraw{};
 
 	int32 _numVertexX{};	//가로 정점의수
 	int32 _numVertexZ{};	//깊이 정점의수
