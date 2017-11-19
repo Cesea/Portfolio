@@ -162,6 +162,12 @@
     <ClCompile Include="DebugDrawer.cpp">
       <Filter>Core\SubSystem\VideoDevice</Filter>
     </ClCompile>
+    <ClCompile Include="ScriptComponent.cpp">
+      <Filter>Game\GameComponent\ScriptComponent</Filter>
+    </ClCompile>
+    <ClCompile Include="ScriptSystem.cpp">
+      <Filter>Game\GameSystem\ScriptSystem</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -405,6 +411,15 @@
     <ClInclude Include="DebugDrawer.h">
       <Filter>Core\SubSystem\VideoDevice</Filter>
     </ClInclude>
+    <ClInclude Include="ScriptComponent.h">
+      <Filter>Game\GameComponent\ScriptComponent</Filter>
+    </ClInclude>
+    <ClInclude Include="ScriptSystem.h">
+      <Filter>Game\GameSystem\ScriptSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="Delegate.h">
+      <Filter>Sub</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Core">
@@ -523,6 +538,12 @@
     </Filter>
     <Filter Include="Math">
       <UniqueIdentifier>{a3fc95b4-5fb1-4f8f-8f65-d94a2c21622d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\GameComponent\ScriptComponent">
+      <UniqueIdentifier>{bd8ca497-b961-45e9-a015-381a2b6cb734}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\GameSystem\ScriptSystem">
+      <UniqueIdentifier>{00b94380-2d5a-414d-ae33-03169cba4084}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

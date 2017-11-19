@@ -6,6 +6,7 @@
 #include "World.h"
 #include "MoveSystem.h"
 #include "RenderSystem.h"
+#include "ScriptSystem.h"
 
 #include "TransformSystem.h"
 
@@ -14,6 +15,37 @@
 #include "Camera.h"
 
 #include "WorldEditor.h"
+
+class Player
+{
+public :
+	bool CreateFromWorld(World &world)
+	{
+		_entity = world.CreateEntity();
+	}
+
+	void Update(float deltaTime)
+	{
+		Console::Log("Updating Player\n");
+	}
+
+	Entity _entity;
+};
+
+class Monster
+{
+public:
+	bool CreateFromWorld(World &world)
+	{
+		_entity = world.CreateEntity();
+	}
+	void Update(float deltaTime)
+	{
+		Console::Log("Updating Monster\n");
+	}
+	Entity _entity;
+
+};
 
 class BaseScene : public IScene
 {
@@ -50,6 +82,7 @@ protected :
 
 	TransformSystem _transformSystem;
 	RenderSystem _renderSystem;
+	ScriptSystem _scriptSystem;
 	std::vector<Entity> _entities;
 
 	Camera _camera;
@@ -69,6 +102,10 @@ protected :
 
 	Editor *_editor{};
 	video::FontHandle _font;
+
+	Player _player;
+	Monster _monster;
+
 public :
 
 	struct SpawnEvent

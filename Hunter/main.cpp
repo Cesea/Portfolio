@@ -26,36 +26,6 @@ struct foo
 
 int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE phInstance, LPSTR cmdLine, int cmdShow)
 {
-	MemoryArena<LinearAllocator, SingleThreadPolicy> arena(1024 * 100);
-
-	//int32 *a = (int32 *)HUNTER_NEW(int32, arena);
-	//*a = 1;
-
-	//int32 *b = (int32 *)HUNTER_NEW(int32, arena);
-	//*b = 2;
-
-	//int32 *c = (int32 *)HUNTER_NEW(int32, arena);
-	//*c = 3;
-
-	//int32 *d = (int32 *)HUNTER_NEW(int32, arena);
-
-	//*d = *a * *c;
-
-	//for (int i = 0; i < 20000; ++i)
-	//{
-	//	int32 *d = (int32 *)HUNTER_NEW(int32, arena);
-	//	HUNTER_DELETE(d, arena);
-	//}
-
-	for (int i = 0; i < 20000; ++i)
-	{
-		int32 *d = new int32;
-		delete d;
-	}
-
-
-	arena.Reset();
-
 
 	gEngine = new Engine;
 	if (!gEngine->InitializePlatform(hInstance))

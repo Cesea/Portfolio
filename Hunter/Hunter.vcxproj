@@ -154,6 +154,8 @@
     <ClCompile Include="Ray.cpp" />
     <ClCompile Include="RenderComponent.cpp" />
     <ClCompile Include="RenderSystem.cpp" />
+    <ClCompile Include="ScriptComponent.cpp" />
+    <ClCompile Include="ScriptSystem.cpp" />
     <ClCompile Include="Terrain.cpp" />
     <ClCompile Include="TestScene.cpp" />
     <ClCompile Include="TextSerializer.cpp" />
@@ -199,6 +201,7 @@
     <ClInclude Include="ContainerCheck.h" />
     <ClInclude Include="DataBase.h" />
     <ClInclude Include="DebugDrawer.h" />
+    <ClInclude Include="Delegate.h" />
     <ClInclude Include="Entity.h" />
     <ClInclude Include="EntityComponentStorage.h" />
     <ClInclude Include="EntityComponentSystem.h" />
@@ -227,6 +230,8 @@
     <ClInclude Include="RenderComponent.h" />
     <ClInclude Include="RenderSystem.h" />
     <ClInclude Include="SceneChangeEffect.h" />
+    <ClInclude Include="ScriptComponent.h" />
+    <ClInclude Include="ScriptSystem.h" />
     <ClInclude Include="System.h" />
     <ClInclude Include="Terrain.h" />
     <ClInclude Include="TestScene.h" />

@@ -5,6 +5,7 @@
 
 class QuadTree
 {
+public :
 	enum Corner 
 	{
 		eCornerLB = 0,
@@ -12,6 +13,15 @@ class QuadTree
 		eCornerLT,
 		eCornerRT,
 	};
+
+	enum QuadLocation
+	{
+		eFrustumOut = 0,
+		eFrustumPartiallyIn = 1,
+		eFrustumCompletlyIn = 2,
+		eFrustumUnkown = -1, 	
+	};
+
 public:
 	QuadTree();
 	~QuadTree();

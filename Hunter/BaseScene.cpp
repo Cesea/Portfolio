@@ -3,7 +3,6 @@
 
 using namespace video;
 
-
 bool32 BaseScene::Load()
 {
 	bool32 result = true;
@@ -46,9 +45,9 @@ bool32 BaseScene::Init()
 	config._textureMult = 50;
 	config._sectionResolution = 64;
 
-	TERRAIN->SetScene(this);
-	TERRAIN->Create(config, 1);
-	_terrainEffect = VIDEO->GetEffect("TerrainBase.fx");
+	//TERRAIN->SetScene(this);
+	//TERRAIN->Create(config, 1);
+	//_terrainEffect = VIDEO->GetEffect("TerrainBase.fx");
 
 	//메쉬 불러오기..
 	Matrix correctionMat;
@@ -63,26 +62,44 @@ bool32 BaseScene::Init()
 	video::DebugBuffer::sDefaultEffectHandle = VIDEO->GetEffect("DebugShader.fx");
 
 	//엔티티 생성
-	//_world.AddSystem<RenderSystem>(_renderSystem);
-	//_world.AddSystem<TransformSystem>(_transformSystem);
+	_world.AddSystem<RenderSystem>(_renderSystem);
+	_world.AddSystem<TransformSystem>(_transformSystem);
+	_world.AddSystem<ScriptSystem>(_scriptSystem);
+	for (int32 i = 0; i < 2; ++i)
+	{
+		_entities.push_back(_world.CreateEntity());
+		Entity &entity = _entities.back();
 
-	//for (uint32 z = 0; z < 2; ++z)
-	//{
-	//	for (uint32 x = 0; x < 2; ++x)
-	//	{
-	//		int32 index = Index2D(x, z, 2);
-	//		_entities.push_back(_world.CreateEntity());
-	//		Entity &entity = _entities.back();
+		ScriptComponent &refScript = entity.AddComponent<ScriptComponent>();
+		if (i == 0)
+		{
+			refScript.SetScript(MAKE_SCRIPT_DELEGATE(Player, Update, _player));
+		}
+		else
+		{
+			refScript.SetScript(MAKE_SCRIPT_DELEGATE(Monster, Update, _monster));
+		}
+		entity.Activate();
+	}
 
-	//		TransformComponent &transComp = entity.AddComponent<TransformComponent>();
-	//		transComp.MovePositionWorld(x * 10, /*TERRAIN->GetHeight(x * 10, z * 10)*/0 , z * 10);
-	//		RenderComponent &renderComp = entity.AddComponent<RenderComponent>();
-	//		renderComp._type = RenderComponent::Type::eSkinned;
-	//		renderComp._skinned = VIDEO->CreateSkinnedAnimation(_skinnedMeshHandle, "Anim" + std::to_string(index));
 
-	//		entity.Activate();
-	//	}
-	//}
+	for (uint32 z = 0; z < 2; ++z)
+	{
+		for (uint32 x = 0; x < 2; ++x)
+		{
+			int32 index = Index2D(x, z, 2);
+			_entities.push_back(_world.CreateEntity());
+			Entity &entity = _entities.back();
+
+			TransformComponent &transComp = entity.AddComponent<TransformComponent>();
+			transComp.MovePositionWorld(x * 10, /*TERRAIN->GetHeight(x * 10, z * 10)*/0 , z * 10);
+			RenderComponent &renderComp = entity.AddComponent<RenderComponent>();
+			renderComp._type = RenderComponent::Type::eSkinned;
+			renderComp._skinned = VIDEO->CreateSkinnedAnimation(_skinnedMeshHandle, "Anim" + std::to_string(index));
+
+			entity.Activate();
+		}
+	}
 
 	/*_entities.push_back(_world.CreateEntity());
 	Entity &entity = _entities.back();*/
@@ -123,6 +140,8 @@ bool32 BaseScene::Update(float deltaTime)
 	_transformSystem.UpdateTransform(_camera.GetTransform());
 	_camera.UpdateMatrix();
 
+	_scriptSystem.Update(deltaTime);
+
 	//_channel.Update<BaseScene::SpawnEvent>(deltaTime);
 
 	return result;
@@ -140,7 +159,7 @@ bool32 BaseScene::Render()
 	//DEBUG_DRAWER->FillRenderCommand(*_mainRenderView);
 
 	_renderSystem.Render(*_mainRenderView);
-	TERRAIN->FillRenderCommand(*_mainRenderView);
+	//TERRAIN->FillRenderCommand(*_mainRenderView);
 
 
 	_mainRenderView->PreRender();
