@@ -3,6 +3,7 @@
 
 
 #define EPSILON 0.001f
+#define FLOATEQUAL(a,b) ((abs((a)-(b)) )< EPSILON)
 
 Vector3 getSphereClosetVector(Vector3 SpherePos, Vector3 point, float radius)
 {
@@ -663,4 +664,325 @@ bool Time_RayToOBB(Vector3 rayPos, Vector3 rayDir, Vector3 OBBPos, Vector3 xVec,
 		return FinalMax;
 
 	return FinalMin;
+}
+
+bool IsBlocking(TransformComponent * pTransA, CollisionComponent::BoundingBox * pBoundA, TransformComponent * pTransB, CollisionComponent::BoundingBox * pBoundB, float moveFactor)
+{
+	//둘이 충돌되지 않았으면 할필요없다
+	if (Collision_AABBToAABB(pBoundA->localMinPos, pBoundA->localMaxPos,pBoundB->localMinPos,pBoundB->localMaxPos) == false)
+		return false;
+
+	moveFactor = Clamp01(moveFactor);
+
+
+
+	//둘이 부디쳤스니 밀어내야한다...
+
+	//A의 Min Max
+	D3DXVECTOR3 minA = pBoundA->localMinPos;
+	D3DXVECTOR3 maxA = pBoundA->localMaxPos;
+
+	//B의 Min Max
+	D3DXVECTOR3 minB = pBoundB->localMinPos;
+	D3DXVECTOR3 maxB = pBoundB->localMaxPos;
+
+	//B 의 로컬 사각 8 점
+
+	//       5-------6 Max
+	//      /|      /|
+	//     1-------2 |
+	//     | 4-----|-7
+	//     |/      |/
+	// Min 0-------3
+
+	D3DXVECTOR3 pos[8];
+	pos[0] = D3DXVECTOR3(minB.x, minB.y, minB.z);
+	pos[1] = D3DXVECTOR3(minB.x, maxB.y, minB.z);
+	pos[2] = D3DXVECTOR3(maxB.x, maxB.y, minB.z);
+	pos[3] = D3DXVECTOR3(maxB.x, minB.y, minB.z);
+	pos[4] = D3DXVECTOR3(minB.x, minB.y, maxB.z);
+	pos[5] = D3DXVECTOR3(minB.x, maxB.y, maxB.z);
+	pos[6] = D3DXVECTOR3(maxB.x, maxB.y, maxB.z);
+	pos[7] = D3DXVECTOR3(maxB.x, minB.y, maxB.z);
+
+
+	//A 의 월드 역행렬
+	D3DXMATRIXA16 matWorldAInv;
+	D3DXMatrixInverse(&matWorldAInv, NULL, &pTransA->GetFinalMatrix());
+
+	//B 의 월드 행렬
+	D3DXMATRIXA16 matWorldB = pTransB->GetFinalMatrix();
+
+	//B 월드 만큼 가고 A 의 역으로 다시 움직인 행렬
+	D3DXMATRIXA16 mat = matWorldB * matWorldAInv;
+
+	//B pos 에 적용
+	for (int i = 0; i < 8; i++)
+		D3DXVec3TransformCoord(&pos[i], &pos[i], &mat);
+
+	//이이후 Pos 들은 A 대한 B 의 상대적인 위치값들이된다.
+
+
+	//최종적으로 적용된 B pos 를 가지고 min max 를 갱신 하자
+	minB = pos[0];
+	maxB = pos[0];
+	for (int i = 1; i < 8; i++) {
+		if (pos[i].x < minB.x) minB.x = pos[i].x;
+		if (pos[i].y < minB.y) minB.y = pos[i].y;
+		if (pos[i].z < minB.z) minB.z = pos[i].z;
+		if (pos[i].x > maxB.x) maxB.x = pos[i].x;
+		if (pos[i].y > maxB.y) maxB.y = pos[i].y;
+		if (pos[i].z > maxB.z) maxB.z = pos[i].z;
+	}
+
+	//사각 형 구조체
+	struct fRect {
+		float left;
+		float right;
+		float bottom;
+		float top;
+		float back;
+		float front;
+	};
+
+	fRect rcA = { minA.x, maxA.x, minA.y, maxA.y, minA.z, maxA.z };
+	fRect rcB = { minB.x, maxB.x, minB.y, maxB.y, minB.z, maxB.z };
+
+	//겹칩량의 사각형
+	fRect rcInter;
+	rcInter.left = max(rcA.left, rcB.left);
+	rcInter.right = min(rcA.right, rcB.right);
+	rcInter.bottom = max(rcA.bottom, rcB.bottom);
+	rcInter.top = min(rcA.top, rcB.top);
+	rcInter.back = max(rcA.back, rcB.back);
+	rcInter.front = min(rcA.front, rcB.front);
+
+
+	//각축의 겹칩량을 구하고 그중 가장 작은 축으로 B 이동시킨다.
+	float interX = rcInter.right - rcInter.left;
+	float interY = rcInter.top - rcInter.bottom;
+	float interZ = rcInter.front - rcInter.back;
+	float minInter = (interX < interY) ? ((interX < interZ) ? interX : interZ) : ((interY < interZ) ? interY : interZ);
+
+	//미는 방향
+	D3DXVECTOR3 moveDirA(0, 0, 0);
+
+	//밀량
+	float moveLengthA = minInter;
+
+	//X 축의 겹칩량이 제일 작다면..
+	if (minInter == interX)
+	{
+		//A 의 왼쪽으로 밀어야 한다면....
+		if (FLOATEQUAL(rcInter.left, rcA.left))
+			moveDirA = -pTransA->GetRight();
+
+		//A 의 오른쪽으로 밀어야 한다면....
+		else if (FLOATEQUAL(rcInter.right, rcA.right))
+			moveDirA = pTransA->GetRight();
+	}
+	//Y 축의 겹칩량이 제일 작다면..
+	else if (minInter == interY)
+	{
+		//A 의 위으로 밀어야 한다면....
+		if (FLOATEQUAL(rcInter.top, rcA.top))
+			moveDirA = pTransA->GetUp();
+
+		//A 의 아래으로 밀어야 한다면....
+		else if (FLOATEQUAL(rcInter.bottom, rcA.bottom))
+			moveDirA = -pTransA->GetUp();
+
+	}
+
+	//Z 축의 겹침량이 제일 작다면..
+	else if (minInter == interZ)
+	{
+		//A 의 정면으로 밀어야 한다면....
+		if (FLOATEQUAL(rcInter.front, rcA.front))
+			moveDirA = pTransA->GetForward();
+
+		//A 의 뒤으로 밀어야 한다면....
+		else if (FLOATEQUAL(rcInter.back, rcA.back))
+			moveDirA = -pTransA->GetForward();
+	}
+
+	//여기까지온다면 밀량과 미는 방향이 계산된다.
+	//moveDirA
+	//moveLengthA
+	//위의 두값은 A 를 가만히 두고 B 를 A 역으로 계산한 값이된다.
+
+	//
+	// 아래의 연산은 B 를 가만히 두고 A 를 B 역으로 계산한 값이된다.
+	//
+	D3DXVECTOR3 moveDirB(0, 0, 0);
+	float moveLengthB = 0.0f;
+
+	//A의 Min Max
+	minA = pBoundA->localMinPos;
+	maxA = pBoundA->localMaxPos;
+
+	//B의 Min Max
+	minB = pBoundB->localMinPos;
+	maxB = pBoundB->localMaxPos;
+
+	//B 의 로컬 사각 8 점
+
+	//       5-------6 Max
+	//      /|      /|
+	//     1-------2 |
+	//     | 4-----|-7
+	//     |/      |/
+	// Min 0-------3
+
+	pos[0] = D3DXVECTOR3(minA.x, minA.y, minA.z);
+	pos[1] = D3DXVECTOR3(minA.x, maxA.y, minA.z);
+	pos[2] = D3DXVECTOR3(maxA.x, maxA.y, minA.z);
+	pos[3] = D3DXVECTOR3(maxA.x, minA.y, minA.z);
+	pos[4] = D3DXVECTOR3(minA.x, minA.y, maxA.z);
+	pos[5] = D3DXVECTOR3(minA.x, maxA.y, maxA.z);
+	pos[6] = D3DXVECTOR3(maxA.x, maxA.y, maxA.z);
+	pos[7] = D3DXVECTOR3(maxA.x, minA.y, maxA.z);
+
+	//B 의 월드 역행렬
+	D3DXMATRIXA16 matWorldBInv;
+	D3DXMatrixInverse(&matWorldBInv, NULL, &pTransB->GetFinalMatrix());
+
+	//A 의 월드 행렬
+	D3DXMATRIXA16 matWorldA = pTransA->GetFinalMatrix();
+
+	//A 월드 만큼 가고 B 의 역으로 다시 움직인 행렬
+	mat = matWorldA * matWorldBInv;
+
+	//A pos 에 적용
+	for (int i = 0; i < 8; i++)
+		D3DXVec3TransformCoord(&pos[i], &pos[i], &mat);
+
+	//최종적으로 적용된 A pos 를 가지고 min max 를 갱신 하자
+	minA = pos[0];
+	maxA = pos[0];
+	for (int i = 1; i < 8; i++) {
+		if (pos[i].x < minA.x) minA.x = pos[i].x;
+		if (pos[i].y < minA.y) minA.y = pos[i].y;
+		if (pos[i].z < minA.z) minA.z = pos[i].z;
+		if (pos[i].x > maxA.x) maxA.x = pos[i].x;
+		if (pos[i].y > maxA.y) maxA.y = pos[i].y;
+		if (pos[i].z > maxA.z) maxA.z = pos[i].z;
+	}
+	//rcA = { minA.x, maxA.x, minA.y, maxA.y, minA.z, maxA.z };
+	//rcB = { minB.x, maxB.x, minB.y, maxB.y, minB.z, maxB.z };
+	rcA.left = minA.x;		rcA.right = maxA.x;			rcA.bottom = minA.y;			rcA.top = maxA.y;			rcA.back = minA.z;			rcA.front = maxA.z;
+	rcB.left = minB.x;		rcB.right = maxB.x;			rcB.bottom = minB.y;			rcB.top = maxB.y;			rcB.back = minB.z;			rcB.front = maxB.z;
+
+	//겹칩량의 사각형
+	rcInter.left = max(rcA.left, rcB.left);
+	rcInter.right = min(rcA.right, rcB.right);
+	rcInter.bottom = max(rcA.bottom, rcB.bottom);
+	rcInter.top = min(rcA.top, rcB.top);
+	rcInter.back = max(rcA.back, rcB.back);
+	rcInter.front = min(rcA.front, rcB.front);
+
+	//각축의 겹칩량을 구하고 그중 가장 작은 축으로 B 이동시킨다.
+	interX = rcInter.right - rcInter.left;
+	interY = rcInter.top - rcInter.bottom;
+	interZ = rcInter.front - rcInter.back;
+	minInter = (interX < interY) ? ((interX < interZ) ? interX : interZ) : ((interY < interZ) ? interY : interZ);
+
+	moveLengthB = minInter;
+
+	//X 축의 겹칩량이 제일 작다면..
+	if (minInter == interX)
+	{
+		//B 의 왼쪽으로 밀어야 한다면....
+		if (FLOATEQUAL(rcInter.left, rcB.left))
+			moveDirB = -pTransB->GetRight();
+
+		//B 의 오른쪽으로 밀어야 한다면....
+		else if (FLOATEQUAL(rcInter.right, rcB.right))
+			moveDirB = pTransB->GetRight();
+	}
+	//Y 축의 겹칩량이 제일 작다면..
+	else if (minInter == interY)
+	{
+		//B 의 위으로 밀어야 한다면....
+		if (FLOATEQUAL(rcInter.top, rcB.top))
+			moveDirB = pTransB->GetUp();
+
+		//B 의 아래으로 밀어야 한다면....
+		else if (FLOATEQUAL(rcInter.bottom, rcB.bottom))
+			moveDirB = -pTransB->GetUp();
+
+	}
+
+	//Z 축의 겹침량이 제일 작다면..
+	else if (minInter == interZ)
+	{
+		//B 의 정면으로 밀어야 한다면....
+		if (FLOATEQUAL(rcInter.front, rcB.front))
+			moveDirB = pTransB->GetForward();
+
+		//B 의 뒤으로 밀어야 한다면....
+		else if (FLOATEQUAL(rcInter.back, rcB.back))
+			moveDirB = -pTransB->GetForward();
+	}
+
+
+	//여기까지온다면 아래의 4 개의 변수가 계산된 것이다....
+	//D3DXVECTOR3 moveDirA( 0, 0, 0 );
+	//float moveLengthA = minInter;
+	//D3DXVECTOR3 moveDirB( 0, 0, 0 );
+	//float moveLengthB = 0.0f;
+
+
+	//밀량이 작은쪽으로...
+	if (moveLengthB > moveLengthA)
+	{
+		//A 와 B 의 스케일 적용
+		//여긴 A 를 가만히 두고 B 를 건들인거다
+		//따라서 A 의 스케일이 2 였고 B 의 스케일 이 1 이였다고 가정하였을 때
+		//A 의 역행렬로 계산되어 A 의 스케일이 1 B 의 스케일이 0.5 로 계산된 길이이다
+		//그러므로 각 축의 길이는
+		//Ascale 값을 곱하여 계산하는 것이 올바르다.
+		D3DXVECTOR3 scaleA = pTransA->GetScale();
+		D3DXVECTOR3 scaleB = pTransB->GetScale();
+
+		pTransB->MovePositionWorld(
+			moveDirA.x * moveLengthA * (1.0 - moveFactor) * scaleA.x,
+			moveDirA.y * moveLengthA * (1.0 - moveFactor) * scaleA.y,
+			moveDirA.z * moveLengthA * (1.0 - moveFactor) * scaleA.z);
+
+
+		pTransA->MovePositionWorld(
+			-moveDirA.x * moveLengthA * moveFactor * scaleA.x,
+			-moveDirA.y * moveLengthA * moveFactor * scaleA.y,
+			-moveDirA.z * moveLengthA * moveFactor * scaleA.z);
+
+
+	}
+
+
+	else
+	{
+		//A 와 B 의 스케일 적용
+		//여긴 B 를 가만히 두고 A 를 건들인거다 
+		//따라서 A 의 스케일이 2 였고 B 의 스케일 이 1 이였다고 가정하였을때
+		//B 의 역행렬로 계산되어 A 의 스케일이 2 B 의 스케일이 1 로 계산된 길이이다
+		//그러므로 각 축의 길이는 BScale 값을 곱하여 계산하는 것이 올바르다.
+
+		D3DXVECTOR3 scaleA = pTransA->GetScale();
+		D3DXVECTOR3 scaleB = pTransB->GetScale();
+
+		pTransA->MovePositionWorld(
+			moveDirB.x * moveLengthB * moveFactor  * scaleB.x,
+			moveDirB.y * moveLengthB * moveFactor  * scaleB.y,
+			moveDirB.z * moveLengthB * moveFactor  * scaleB.z);
+
+		pTransB->MovePositionWorld(
+			-moveDirB.x * moveLengthB * (1.0 - moveFactor) *scaleB.x,
+			-moveDirB.y * moveLengthB * (1.0 - moveFactor) *scaleB.y,
+			-moveDirB.z * moveLengthB * (1.0 - moveFactor) *scaleB.z);
+	}
+
+
+	return true;
+
 }

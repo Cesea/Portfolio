@@ -86,5 +86,5 @@ bool Collision_RayToOBB(Vector3 rayPos, Vector3 rayDir, Vector3 OBBPos, Vector3 
 //광선과 OBB박스와의 충돌에서 광선이 OBB박스까지 도달하는 거리를 리턴한다. 시간이 음수값이면 충돌하지 않음.
 bool Time_RayToOBB(Vector3 rayPos, Vector3 rayDir, Vector3 OBBPos, Vector3 xVec, Vector3 yVec, Vector3 zVec,
 	float xVecSize, float yVecSize, float zVecSize);
-
+bool IsBlocking(TransformComponent * pTransA, CollisionComponent::BoundingBox * pBoundA, TransformComponent * pTransB, CollisionComponent::BoundingBox * pBoundB, float moveFactor);
 #endif
