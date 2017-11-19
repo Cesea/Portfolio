@@ -335,6 +335,29 @@ int32 RandInt();
 int32 RandInt(int32 max);
 int32 RandInt(int32 min, int32 max);
 
+inline float absFloat(float num)
+{
+	if (num < 0)
+	{
+		return num*-1;
+	}
+	else
+	{
+		return num;
+	}
+}
+inline int absInt(int num)
+{
+	if (num < 0)
+	{
+		return num*-1;
+	}
+	else
+	{
+		return num;
+	}
+}
+
 
 
 #endif

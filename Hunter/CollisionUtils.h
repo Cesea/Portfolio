@@ -4,70 +4,87 @@
 #include "CollisionComponent.h"
 #include "TransformComponent.h"
 
-////Shpere BoundingVolume에 대한 함수들...
-//void GetWorldCenterRadiusShere(const BoundingSphere &sphere, 
-//	TransformComponent *pOutTransform, Vector3 *pOutCenter, float *pOutRadius);
-//void SetBoundVolume(BoundingSphere *pOutSphere, const Vector3 &center, const Vector3 &halfSize); 
-//
-////Box BoundingVolume에 대한 함수들
-//void GetWorldBox(const BoundingBox &box, TransformComponent* pOutTransform, Vector3 *pOutBoxPos);
-//void GetWorldAABBMinMax(const BoundingBox &box, TransformComponent *pOutTransform, 
-//	Vector3 *pOutMin, Vector3 *pOutMax);
-//void SetBoundBox(const Vector3 &center, const Vector3 &halfSize, BoundingBox *pOutBoundingBox);
-//
-//
-////struct CollisionResult
-////{
-////};
-//
-////레이 바운드에 충돌했는지 확인
-//bool32 IsRayHitBoundSphere(
-//	const Ray &ray,
-//	const CollisionComponent &collision,
-//	const TransformComponent &transform,	
-//	Vector3 *pOutHitPos, 
-//	Vector3 *pOutHitNormal);
-//
-//
-////레이 바운드에 충돌했는지 확인
-//bool32 IsRayHitBoundBox( const Ray &ray, const CollisionComponent &pBound, const TransformComponent &transform,	Vector3 *pOutHitPos, Vector3 *pOutHitNormal); 
-//
-////bool32 IsRayHitStaticMeshObject( const Ray &ray, const CollisionComponent &pObject, Vector3 *pOutHitPos, Vector3 *pOutHitNormal);
-//
-//bool32 IsRayHitSphere(
-//	const Ray &ray,
-//	const Vector3 &center,
-//	float radius,
-//	Vector3 *pOutHitPos,
-//	Vector3 *pOutHitNormal);
-//
-////2개의 바운드에 대한 충돌
-//bool32 IsOverlap(cBaseObject* pObjA, cBaseObject* pObjB);
-//
-//bool32 IsOverlapTwoSphere(const TransformComponent &transformA, const CollisionComponent &collisionA,
-//	const TransformComponent &transformB, const CollisionComponent &collisionB);
-//
-//bool32 IsOverlapTwoBox(const TransformComponent &transformA, const CollisionComponent &collisionA,
-//	const TransformComponent &transformB, const CollisionComponent &collisionB);
-//
-//bool32 IsOverlapSphereBox(const TransformComponent &transformA, const CollisionComponent &collisionA,
-//	const TransformComponent &transformB, const CollisionComponent &collisionB);
-//
-//bool32 IsOverlapBoxSphere(const TransformComponent &transformA, const CollisionComponent &collisionA,
-//	const TransformComponent &transformB, const CollisionComponent &collisionB);
-//
-////bool32 IsBlocking(cBaseObject* pObjA, cBaseObject* pObjB, float moveFactor = 0.0f);
-//
-////2개의 바운드에 대해 충돌하고 겹치지 않게 한다
-////moveFactor가 0일수록 겹칩에 대해 b가 움직인다.
-////moveFactor가 0.5이면 겹칩에 대해 A 와 b가 같이량으로 움직인다.
-////moveFactor가 1일수록 겹칩에 대해 A가 움직인다.
-//
-//
-//bool32 IsBlockingTwoSphere(const TransformComponent &pTransA, const CollisionComponent &collisionA,
-//	const TransformComponent &pTransB, const CollisionComponent &collisionB, float moveFactor = 0.0f);
-//
-//bool32 IsBlockingTwoBox(const TransformComponent &transformA, const CollisionComponent &collisionA,
-//	const TransformComponent &pTransB, const CollisionComponent &collisionB, float moveFactor = 0.0f);
+
+struct AABB
+{
+	D3DXVECTOR3 min;
+	D3DXVECTOR3 max;
+	D3DXVECTOR3 center;
+	float xSize;
+	float ySize;
+	float zSize;
+	void setAABB(D3DXVECTOR3 _min, D3DXVECTOR3 _max)
+	{
+		min = _min;
+		max = _max;
+		center = (min + max) / 2;
+		xSize = (max.x - min.x);
+		ySize = (max.y - min.y);
+		zSize = (max.z - min.z);
+
+	}
+};
+struct Sphere
+{
+	D3DXVECTOR3 center;
+	float radius;
+};
+
+#include "stdafx.h"
+#include "CollisionUtils.h"
+
+
+#define EPSILON 0.001f
+
+//구에서 포인트까지의 제일가까운 좌표를 리턴해준다.
+Vector3 getSphereClosetVector(Vector3 SpherePos, Vector3 point, float radius);
+//aabb박스에서 포인트까지의 제일가까운 좌표를 리턴해준다.
+Vector3 getAABBClosetVector(Vector3 MinPoint, Vector3 MaxPoint, Vector3 point);
+//OBB박스에서 포인트까지의 제일가까운 좌표를 리턴해준다.
+Vector3 getOBBClosetVector(Vector3 OBBPos, Vector3 xVec, Vector3 yVec, Vector3 zVec, float xVecSize, float yVecSize, float zVecSize, Vector3 point);
+//평면에서 포인트까지의 제일 가까운 좌표를 리턴해준다.
+Vector3 getPlaneClosetVector(Vector3 planeNormal, float planeDistance, Vector3 point);
+//선에서 포인트까지의 제일 가까운 좌표를 리턴해준다.
+Vector3 getLineClosetVector(Vector3 startPoint, Vector3 endPoint, Vector3 point);
+//광선에서 포인트까지의 제일 가까운 좌표를 리턴해준다.
+Vector3 getRayClosetVector(Vector3 rayOrigin, Vector3 rayDirection, Vector3 point);
+//구와 구간의 충돌체크
+bool Collision_SphereToSphere(Vector3 spherePos1, Vector3 spherePos2, float radius1, float radius2);
+//구와 AABB박스의 충돌체크
+bool Collision_SphereToAABB(Vector3 MinPoint, Vector3 MaxPoint, Vector3 spherePos, float radius);
+//구와 OBB박스의 충돌체크
+bool Collision_SphereToOBB(Vector3 OBBPos, Vector3 xVec, Vector3 yVec, Vector3 zVec, float xVecSize, float yVecSize, float zVecSize,
+	Vector3 spherePos, float radius);
+//구와 평면의 충돌체크
+bool Collision_SphereToPlane(Vector3 planeNormal, float planeDistance, Vector3 spherePos, float radius);
+//AABB박스와 AABB박스의 충돌체크
+bool Collision_AABBToAABB(Vector3 minPoint1, Vector3 maxPoint1, Vector3 minPoint2, Vector3 maxPoint2);
+//AABB박스와 OBB박스의 충돌체크
+bool Collision_AABBToOBB(Vector3 minPoint, Vector3 maxPoint, Vector3 OBBPos,
+	Vector3 xVec, Vector3 yVec, Vector3 zVec, float xVecSize, float yVecSize, float zVecSize);
+//AABB박스와 평면의 충돌체크
+bool Collision_AABBtoPlane(Vector3 minPoint, Vector3 maxPoint, Vector3 planeNormal, float planeDistance);
+//OBB박스와 OBB박스의 충돌체크
+bool Collision_OBBToOBB(Vector3 OBBPos1, Vector3 xVec1, Vector3 yVec1, Vector3 zVec1, float xVecSize1, float yVecSize1, float zVecSize1
+	, Vector3 OBBPos2, Vector3 xVec2, Vector3 yVec2, Vector3 zVec2, float xVecSize2, float yVecSize2, float zVecSize2);
+//OBB박스와 평면의 충돌체크
+bool Collision_OBBToPlane(Vector3 OBBPos, Vector3 xVec, Vector3 yVec, Vector3 zVec, float xVecSize, float yVecSize, float zVecSize
+	, Vector3 planeNormal, float planeDistance);
+//평면과 평면의 충돌체크
+bool Collision_PlaneToPlane(Vector3 planeNormal1, float planeDistance1, Vector3 planeNormal2, float planeDistance2);
+//광선과 구와의 충돌체크
+bool Collision_RayToSphere(Vector3 rayPos, Vector3 rayDir, Vector3 spherePos, float radius);
+//광선과 구와의 충돌에서 광선이 구까지 도달하는 거리를 리턴한다. 시간이 음수값이면 충돌하지않음
+float Time_RayToSphere(Vector3 rayPos, Vector3 rayDir, Vector3 spherePos, float radius);
+//광선과 AABB와의 충돌체크
+bool Collision_RayToAABB(Vector3 rayPos, Vector3 rayDir, Vector3 minPos, Vector3 maxPos);
+//광선과 AABB와의 충돌에서 광선이 AABB까지 도달하는 거리를 리턴한다. 시간이 음수값이면 충돌하지 않음
+float Time_RayToAABB(Vector3 rayPos, Vector3 rayDir, Vector3 minPos, Vector3 maxPos);
+//광선과 OBB와의 충돌체크
+bool Collision_RayToOBB(Vector3 rayPos, Vector3 rayDir, Vector3 OBBPos, Vector3 xVec, Vector3 yVec, Vector3 zVec,
+	float xVecSize, float yVecSize, float zVecSize);
+//광선과 OBB박스와의 충돌에서 광선이 OBB박스까지 도달하는 거리를 리턴한다. 시간이 음수값이면 충돌하지 않음.
+bool Time_RayToOBB(Vector3 rayPos, Vector3 rayDir, Vector3 OBBPos, Vector3 xVec, Vector3 yVec, Vector3 zVec,
+	float xVecSize, float yVecSize, float zVecSize);
 
 #endif
