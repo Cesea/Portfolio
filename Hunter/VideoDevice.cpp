@@ -261,13 +261,13 @@ void video::VideoDevice::MakeDefaultVertexDecls()
 	staticVertex.End(sizeof(StaticMeshVertex));
 	VIDEO->CreateVertexDecl(&staticVertex, StaticMeshVertex::_name);
 
-	//LineVertex Decl
-	VertexDecl lineVertex;
-	lineVertex.Begin();
-	lineVertex.Add(VertexElement(0, 0, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0));
-	lineVertex.Add(VertexElement(0, sizeof(Vector3), D3DDECLTYPE_D3DCOLOR, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_COLOR, 0));
-	lineVertex.End(sizeof(LineVertex));
-	VIDEO->CreateVertexDecl(&lineVertex, LineVertex::_name);
+	//DebugVertex Decl
+	VertexDecl debugVertex;
+	debugVertex.Begin();
+	debugVertex.Add(VertexElement(0, 0, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0));
+	debugVertex.Add(VertexElement(0, sizeof(Vector3), D3DDECLTYPE_D3DCOLOR, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_COLOR, 0));
+	debugVertex.End(sizeof(debugVertex));
+	VIDEO->CreateVertexDecl(&debugVertex, DebugVertex::_name);
 
 	//StaticTestVertex Decl
 	VertexDecl staticTestVertex;
@@ -288,6 +288,8 @@ void video::VideoDevice::LoadDefaultEffects()
 	VIDEO->CreateEffect("../resources/Shaders/StaticTestMesh.fx", "StaticTestMesh.fx");
 	VIDEO->CreateEffect("../resources/Shaders/SkinnedMesh.fx", "SkinnedMesh.fx");
 	VIDEO->CreateEffect("../resources/Shaders/TerrainBase.fx", "TerrainBase.fx");
+
+	VIDEO->CreateEffect("../resources/Shaders/DebugShader.fx", "DebugShader.fx");
 }
 
 RenderView *video::VideoDevice::GetRenderView(RenderViewHandle handle)

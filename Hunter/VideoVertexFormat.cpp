@@ -6,7 +6,7 @@ namespace video
 	std::string TerrainVertex::_name = "TerrainVertex";
 	std::string StaticTestVertex::_name = "StaticTestVertex";
 	std::string StaticMeshVertex::_name = "StaticMeshVertex";
-	std::string LineVertex::_name = "LineVertex";
+	std::string DebugVertex::_name = "DebugVertex";
 
 	StaticTestVertex::StaticTestVertex()
 		:_position(), _normal(), _uv()
@@ -30,14 +30,13 @@ namespace video
 	{
 	}
 	
-	LineVertex::LineVertex()
+	DebugVertex::DebugVertex()
 		:_position(), _color(0xff00ff00)
 	{
 	}
 
-	LineVertex::LineVertex(const Vector3 & position, const uint32 color)
+	DebugVertex::DebugVertex(const Vector3 & position, const uint32 color)
 		: _position(position), _color(color)
 	{
 	}
-
 }

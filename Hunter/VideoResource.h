@@ -432,7 +432,20 @@ namespace video
 		void PrintTextShadow(const std::string &str, int32 x, int32 y, uint32 color, uint32 shadow = 0xFF000000);
 
 		ID3DXFont *_ptr{};
+	};
 
+	//디버그 용도로 사용한다....
+	struct DebugBuffer
+	{
+		VertexBufferHandle _vHandle;
+		void Add(const DebugVertex &vertex);
+		void Reset();
+		void Update();
+
+		DebugVertex _vertices[1024];
+		uint32 _count{};
+
+		static video::EffectHandle sDefaultEffectHandle;
 	};
 
 

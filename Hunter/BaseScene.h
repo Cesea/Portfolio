@@ -53,7 +53,6 @@ protected :
 	std::vector<Entity> _entities;
 
 	Camera _camera;
-
 	video::StaticXMeshHandle _staticMeshHandle;
 	video::SkinnedXMeshHandle _skinnedMeshHandle;
 
@@ -64,6 +63,8 @@ protected :
 	video::EffectHandle _terrainEffect;
 
 	std::vector<Vector3> _points;
+
+	video::DebugBuffer *_debugBuffer;
 
 	EventChannel _channel;
 

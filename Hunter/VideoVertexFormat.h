@@ -43,10 +43,10 @@ namespace video
 		static std::string _name;
 	};
 
-	struct LineVertex
+	struct DebugVertex
 	{
-		LineVertex();
-		LineVertex(const Vector3 &position, const uint32 color);
+		DebugVertex();
+		DebugVertex(const Vector3 &position, const uint32 color);
 
 		Vector3 _position;
 		uint32 _color;

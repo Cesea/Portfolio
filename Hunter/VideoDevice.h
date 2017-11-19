@@ -62,6 +62,7 @@ namespace video
 		VertexBufferHandle GetVertexBuffer(const std::string &name);
 		VertexBuffer *GetVertexBuffer(VertexBufferHandle handle);
 		void DestroyVertexBuffer(VertexBufferHandle handle);
+		void UpdateVertexBuffer(VertexBufferHandle handle, Memory *memory);
 
 		//인덱스 버퍼 생성
 		IndexBufferHandle CreateIndexBuffer(Memory *memory, uint32 stride, const std::string &name = "");
@@ -69,6 +70,7 @@ namespace video
 		IndexBufferHandle GetIndexBuffer(const std::string &name);
 		IndexBuffer *GetIndexBuffer(IndexBufferHandle handle);
 		void DestroyIndexBuffer(IndexBufferHandle handle);
+		void UpdateIndexBuffer(IndexBufferHandle handle, Memory *memory);
 
 		//버텍스 데클 생성
 		VertexDeclHandle CreateVertexDecl(const VertexDecl *decl, const std::string &name = "");

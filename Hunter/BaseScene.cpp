@@ -101,8 +101,12 @@ bool32 BaseScene::Init()
 	_editor = new Editor;
 	_editor->Init();
 
-	//D3DXFONT_DESC fontDesc;
-	//_font = VIDEO->CreateFont();
+
+	_debugBuffer = new DebugBuffer;
+	Memory mem;
+	mem._data = nullptr;
+	mem._size = sizeof(video::DebugVertex) * 1024;
+	_debugBuffer->_vHandle = VIDEO->CreateVertexBuffer(&mem, VIDEO->GetVertexDecl(video::DebugVertex::_name));
 
 	_active = true;
 	return result;
@@ -127,6 +131,10 @@ bool32 BaseScene::Update(float deltaTime)
 	_camera.UpdateMatrix();
 
 	//_channel.Update<BaseScene::SpawnEvent>(deltaTime);
+
+	_debugBuffer->Add(video::DebugVertex(Vector3(0.0f, 0.0f, 0.0f), 0xff000000));
+	_debugBuffer->Add(video::DebugVertex(Vector3(10.0f, 0.0f, 0.0f), 0xff000000));
+	_debugBuffer->Update();
 
 	return result;
 }

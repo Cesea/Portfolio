@@ -423,11 +423,9 @@ namespace video
 	//{
 	//	return false;
 	//}
-
 	//void Skeleton::Destroy()
 	//{
 	//}
-
 	//bool Model::CreateFromXStatic(const std::string & filePath, const Matrix *pMatCorrection)
 	//{
 	//	XMeshStatic xMesh;
@@ -440,18 +438,14 @@ namespace video
 	//	ExtractMeshFromXStatic(xMesh, this, filePath);
 	//	xMesh.Release();
 	//}
-
 	//bool Model::CreateFromXAnimated(const std::string & filePath, const Matrix * pMatCorrection)
 	//{
 	//	std::string nameCopy = filePath;
 	//	std::string path;
 	//	std::string extension;
-
 	//	SplitFilePathToNamePathExtension(nameCopy, _name, path, extension);
-
 	//	VertexBufferHandle vertexHandle;
 	//	IndexBufferHandle indexHandle;
-
 	//	XMeshAnimated xMesh;
 	//	HRESULT hresult = xMesh.Load(filePath, pMatCorrection);
 	//	if (FAILED(hresult))
@@ -459,11 +453,9 @@ namespace video
 	//		Assert(false);// xmesh load failed
 	//		return false;
 	//	}
-
 	//	uint32 numBone;
 	//	xMesh.GetTotalNumFrame(&numBone);
 	//	Assert(numBone > 0);
-
 	//	_skeleton._hierachy = new uint16[numBone];
 	//	_skeleton._globalPoses = new Matrix[numBone];
 	//	_skeleton._localPoses = new Matrix[numBone];
@@ -471,18 +463,14 @@ namespace video
 	//	_skeleton._names = new Skeleton::SkeletonName[numBone];
 	//	_skeleton._renderGroups = new video::RenderGroupHandle[numBone];
 	//	_skeleton._numhierachy = numBone;
-
 	//	_skeleton._hierachy[0] = 0;
 	//	MatrixIdentity(&_skeleton._globalPoses[0]);
 	//	MatrixIdentity(&_skeleton._localPoses[0]);
-
-
 	//	std::vector<std::string> texturePaths;
 	//	for (uint32 i = 0; i < numBone; ++i)
 	//	{
 	//		_skeleton._hierachy[i] = xMesh._frameIndex[i];
 	//		_skeleton._localPoses[i] = xMesh._linearFrames[i]->TransformationMatrix;
-
 	//		if (nullptr != xMesh._linearFrames[i]->Name)
 	//		{
 	//			strncpy(_skeleton._names[i]._name, xMesh._linearFrames[i]->Name, 64);
@@ -493,7 +481,6 @@ namespace video
 	//			sprintf(buffer, "Bone %d", i);
 	//			strncpy(_skeleton._names[i]._name, buffer, 64);
 	//		}
-
 	//		if (nullptr != xMesh._linearFrames[i]->pMeshContainer)
 	//		{
 	//			ContainerEX *pContainerMesh = (ContainerEX *)xMesh._linearFrames[i]->pMeshContainer;
@@ -504,16 +491,12 @@ namespace video
 	//			}
 	//		}
 	//	}
-
 	//	animation::UpdateSkeleton(&_skeleton, nullptr);
-
 	//	xMesh.Release();
 	//}
-
 	//void Model::Destroy()
 	//{
 	//}
-
 	//bool RenderGroup::Create(video::VertexBufferHandle vHandle, video::IndexBufferHandle iHandle, const RenderGroup::MaterialRange & materialRange)
 	//{
 	//	_vertexBuffer = vHandle;
@@ -522,7 +505,6 @@ namespace video
 	//	_materialRange = materialRange;
 	//	return true;
 	//}
-
 	//void RenderGroup::Destroy()
 	//{
 	//	return;
@@ -556,5 +538,27 @@ namespace video
 	{
 		PrintText(str, x + 1, y + 1, shadow);
 		PrintText(str, x, y, color);
+
+	}
+	void DebugBuffer::Update()
+	{
+		Assert(_vHandle.IsValid());
+		VertexBuffer *buffer = VIDEO->GetVertexBuffer(_vHandle);
+		Assert(buffer->_dynamic);
+		uint8 *pData = nullptr;
+		buffer->_ptr->Lock(0, 0, (void **)&pData, D3DLOCK_DISCARD);
+
+		memcpy(pData, _vertices, sizeof(DebugVertex) *_count);
+		buffer->_ptr->Unlock();
+	}
+
+	void DebugBuffer::Add(const DebugVertex & vertex)
+	{
+		_vertices[_count++] = vertex;
+	}
+
+	void DebugBuffer::Reset()
+	{
+		_count = 0;
 	}
 }
