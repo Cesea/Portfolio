@@ -20,24 +20,3 @@ public:
 	Enemy();
 	virtual ~Enemy();
 };
-
-class Dragon : Enemy
-{
-public :
-	virtual bool CreateFromWorld(World &world)
-	{
-		_entity = world.CreateEntity();
-
-		_entity.AddComponent<TransformComponent>();
-	}
-
-	void update(float deltaTime)override
-	{
-	}
-	Dragon() {}
-	virtual ~Dragon() {}
-
-private :
-	Entity _entity;
-};
-

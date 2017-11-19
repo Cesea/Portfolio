@@ -168,8 +168,14 @@
     <ClCompile Include="ScriptSystem.cpp">
       <Filter>Game\GameSystem\ScriptSystem</Filter>
     </ClCompile>
-    <ClCompile Include="cEnemy.cpp">
+    <ClCompile Include="Enemy.cpp">
       <Filter>Game\Enemy</Filter>
+    </ClCompile>
+    <ClCompile Include="Dragon.cpp">
+      <Filter>Game\Enemy\script</Filter>
+    </ClCompile>
+    <ClCompile Include="spawnManager.cpp">
+      <Filter>Game\Enemy\spawn</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -423,8 +429,15 @@
     <ClInclude Include="Delegate.h">
       <Filter>Sub</Filter>
     </ClInclude>
-    <ClInclude Include="cEnemy.h">
+    <ClInclude Include="Enemy.h">
       <Filter>Game\Enemy</Filter>
+    </ClInclude>
+    <ClInclude Include="resource.h" />
+    <ClInclude Include="Dragon.h">
+      <Filter>Game\Enemy\script</Filter>
+    </ClInclude>
+    <ClInclude Include="spawnManager.h">
+      <Filter>Game\Enemy\spawn</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -560,5 +573,8 @@
     <Filter Include="Game\Enemy\script">
       <UniqueIdentifier>{d0e7f8a4-65cc-4621-9885-04735fb50bb4}</UniqueIdentifier>
     </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Hunter.rc" />
   </ItemGroup>
 </Project>

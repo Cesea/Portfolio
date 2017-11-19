@@ -130,12 +130,13 @@
     <ClCompile Include="BaseScene.cpp" />
     <ClCompile Include="BaseSystem.cpp" />
     <ClCompile Include="Camera.cpp" />
-    <ClCompile Include="cEnemy.cpp" />
     <ClCompile Include="CollisionComponent.cpp" />
     <ClCompile Include="CollisionUtils.cpp" />
     <ClCompile Include="CommonUtils.cpp" />
     <ClCompile Include="Console.cpp" />
     <ClCompile Include="DebugDrawer.cpp" />
+    <ClCompile Include="Dragon.cpp" />
+    <ClCompile Include="Enemy.cpp" />
     <ClCompile Include="Entity.cpp" />
     <ClCompile Include="EntityComponentStorage.cpp" />
     <ClCompile Include="EntityIDPool.cpp" />
@@ -157,6 +158,7 @@
     <ClCompile Include="RenderSystem.cpp" />
     <ClCompile Include="ScriptComponent.cpp" />
     <ClCompile Include="ScriptSystem.cpp" />
+    <ClCompile Include="spawnManager.cpp" />
     <ClCompile Include="Terrain.cpp" />
     <ClCompile Include="TestScene.cpp" />
     <ClCompile Include="TextSerializer.cpp" />
@@ -193,7 +195,6 @@
     <ClInclude Include="BaseScene.h" />
     <ClInclude Include="BaseSystem.h" />
     <ClInclude Include="Camera.h" />
-    <ClInclude Include="cEnemy.h" />
     <ClInclude Include="ClassTypeID.h" />
     <ClInclude Include="CollisionUtils.h" />
     <ClInclude Include="Color4F.h" />
@@ -204,6 +205,8 @@
     <ClInclude Include="DataBase.h" />
     <ClInclude Include="DebugDrawer.h" />
     <ClInclude Include="Delegate.h" />
+    <ClInclude Include="Dragon.h" />
+    <ClInclude Include="Enemy.h" />
     <ClInclude Include="Entity.h" />
     <ClInclude Include="EntityComponentStorage.h" />
     <ClInclude Include="EntityComponentSystem.h" />
@@ -231,9 +234,11 @@
     <ClInclude Include="Ray.h" />
     <ClInclude Include="RenderComponent.h" />
     <ClInclude Include="RenderSystem.h" />
+    <ClInclude Include="resource.h" />
     <ClInclude Include="SceneChangeEffect.h" />
     <ClInclude Include="ScriptComponent.h" />
     <ClInclude Include="ScriptSystem.h" />
+    <ClInclude Include="spawnManager.h" />
     <ClInclude Include="System.h" />
     <ClInclude Include="Terrain.h" />
     <ClInclude Include="TestScene.h" />
@@ -273,6 +278,9 @@
     <ClInclude Include="WorldEditor.h" />
     <ClInclude Include="XMLManager.h" />
     <ClInclude Include="XmlSerializer.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Hunter.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
