@@ -47,14 +47,17 @@ struct CollisionComponent : public Component
 {
 	CollisionComponent();
 	virtual ~CollisionComponent();
+	enum CollisionType
+	{
+		Type_Box,
+		Type_Sphere
+	};
+	CollisionType _type;
+	BoundingSphere _sphere;
+	BoundingBox _boundingBox;
 
-	Vector3 _localCenter;
-	float _radius;
-
-	Vector3 _hafSize;
-
-	Vector3 _locaMinPos;
-	Vector3 _locaMaxPos;
+	bool isTrigger;
+	bool locked;
 };
 
 
