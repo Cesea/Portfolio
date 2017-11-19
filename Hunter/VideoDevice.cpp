@@ -111,13 +111,25 @@ void video::VideoDevice::Render(RenderView & renderView)
 			gpDevice->SetVertexDeclaration(decl._ptr);
 			gpDevice->SetStreamSource(0, vBuffer._ptr, 0, decl._stride);
 
+			D3DPRIMITIVETYPE primType = (command._primType == RenderCommand::PrimType::eTriangleList) ?
+				(D3DPT_TRIANGLELIST) : (D3DPT_LINELIST);
+
+			uint32 primCount = 0;
+			if (primType == D3DPT_TRIANGLELIST)
+			{
+				primCount = (command._numPrim == 0) ? (vBuffer._size / decl._stride) / 3 : (command._numPrim);
+			}
+			else if(primType == D3DPT_LINELIST)
+			{
+				primCount = (command._numPrim == 0) ? (vBuffer._size / decl._stride) / 2 : (command._numPrim);
+			}
+
 			uint32 numPass = effect.BeginEffect();
 			for (uint32 j = 0; j < numPass; ++j)
 			{
 				effect.BeginPass(j);
-				gpDevice->DrawPrimitive((command._primType == RenderCommand::PrimType::eTriangleList) ? (D3DPT_TRIANGLELIST) : (D3DPT_LINELIST),
-					command._startVertex, 
-					(command._numPrim == 0) ? (vBuffer._size / decl._stride) : (command._numPrim));
+				gpDevice->DrawPrimitive(primType,
+					command._startVertex, primCount);
 				effect.EndPass();
 			}
 			effect.EndEffect();
@@ -238,7 +250,7 @@ void video::VideoDevice::LoadDefaultTextures()
 	TextureHandle specular = VIDEO->CreateTexture("../resources/Textures/specularDefault.png", "specularDefault.png");
 	TextureHandle emission = VIDEO->CreateTexture("../resources/Textures/emissionDefault.png", "emissionDefault.png");
 
-	MaterialHandle material = VIDEO->CreateMaterial("default");
+	MaterialHandle material = VIDEO->CreateMaterial("Default");
 	VIDEO->MaterialAddTexture(material, VIDEO_TEXTURE0, diffuse);
 	VIDEO->MaterialAddTexture(material, VIDEO_TEXTURE1, normal);
 	VIDEO->MaterialAddTexture(material, VIDEO_TEXTURE2, specular);
@@ -266,7 +278,7 @@ void video::VideoDevice::MakeDefaultVertexDecls()
 	debugVertex.Begin();
 	debugVertex.Add(VertexElement(0, 0, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0));
 	debugVertex.Add(VertexElement(0, sizeof(Vector3), D3DDECLTYPE_D3DCOLOR, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_COLOR, 0));
-	debugVertex.End(sizeof(debugVertex));
+	debugVertex.End(sizeof(DebugVertex));
 	VIDEO->CreateVertexDecl(&debugVertex, DebugVertex::_name);
 
 	//StaticTestVertex Decl

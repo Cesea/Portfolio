@@ -378,7 +378,7 @@ namespace video
 		VertexBufferHandle _vHandle;
 		IndexBufferHandle _iHandle;
 
-		int16 _vertInfluence;
+		int16 _vertInfluence{};
 
 		//버텍스 버퍼로만 그릴때 사용된다
 		uint32 _startVertex{};
@@ -447,8 +447,6 @@ namespace video
 
 		static video::EffectHandle sDefaultEffectHandle;
 	};
-
-
 }
 
 template <typename HandleType>

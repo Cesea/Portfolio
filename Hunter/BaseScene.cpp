@@ -56,11 +56,12 @@ bool32 BaseScene::Init()
 	MatrixScaling(&correctionMat, 0.1f, 0.1f, 0.1f);
 	_skinnedMeshHandle = VIDEO->CreateSkinnedXMesh("../resources/Models/knight/Knight.X", &correctionMat, "Knight");
 
-	MatrixScaling(&correctionMat, 1.0f, 1.0f, 1.0f);
-	video::StaticXMeshHandle staticMeshHandle = VIDEO->CreateStaticXMesh("../resources/Models/environment/Rock/Rock1_A.X", &correctionMat, "Rock");
+	//MatrixScaling(&correctionMat, 1.0f, 1.0f, 1.0f);
+	//video::StaticXMeshHandle staticMeshHandle = VIDEO->CreateStaticXMesh("../resources/Models/environment/Rock/Rock1_A.X", &correctionMat, "Rock");
 
 	video::StaticXMesh::sDefaultEffectHandle = VIDEO->GetEffect("StaticMesh.fx");
 	video::SkinnedAnimation::sDefaultEffectHandle = VIDEO->GetEffect("SkinnedMesh.fx");
+	video::DebugBuffer::sDefaultEffectHandle = VIDEO->GetEffect("DebugShader.fx");
 
 	//엔티티 생성
 	_world.AddSystem<RenderSystem>(_renderSystem);
@@ -84,16 +85,16 @@ bool32 BaseScene::Init()
 		}
 	}
 
-	_entities.push_back(_world.CreateEntity());
-	Entity &entity = _entities.back();
+	/*_entities.push_back(_world.CreateEntity());
+	Entity &entity = _entities.back();*/
 
-	TransformComponent &transComp = entity.AddComponent<TransformComponent>();
-	transComp.MovePositionWorld(-5.0f, -0.0f, -5.0f);
-	RenderComponent &renderComp = entity.AddComponent<RenderComponent>();
-	renderComp._type = RenderComponent::Type::eStatic;
-	renderComp._static = staticMeshHandle;
+	//TransformComponent &transComp = entity.AddComponent<TransformComponent>();
+	//transComp.MovePositionWorld(-5.0f, -0.0f, -5.0f);
+	//RenderComponent &renderComp = entity.AddComponent<RenderComponent>();
+	//renderComp._type = RenderComponent::Type::eStatic;
+	//renderComp._static = staticMeshHandle;
 
-	entity.Activate();
+	//entity.Activate();
 
 	//에디터 생성
 
@@ -132,8 +133,12 @@ bool32 BaseScene::Update(float deltaTime)
 
 	//_channel.Update<BaseScene::SpawnEvent>(deltaTime);
 
-	_debugBuffer->Add(video::DebugVertex(Vector3(0.0f, 0.0f, 0.0f), 0xff000000));
-	_debugBuffer->Add(video::DebugVertex(Vector3(10.0f, 0.0f, 0.0f), 0xff000000));
+	for (int i = 0; i < 10; ++i)
+	{
+		_debugBuffer->Add(video::DebugVertex(Vector3(-50.0f, 0.0f, i), 0xffffffff));
+		_debugBuffer->Add(video::DebugVertex(Vector3(50.0f, 0.0f, i), 0xffffffff));
+	}
+	//_debugBuffer->Add(video::DebugVertex(Vector3(10.0f, 0.0f, -5.0f), 0xff000000));
 	_debugBuffer->Update();
 
 	return result;
@@ -141,7 +146,22 @@ bool32 BaseScene::Update(float deltaTime)
 
 bool32 BaseScene::Render()
 {
+	Matrix model;
+	MatrixIdentity(&model);
+
 	_renderSystem.Render(*_mainRenderView);
+
+	video::RenderCommand &command =  _mainRenderView->GetCommand();
+	command._vHandle = _debugBuffer->_vHandle;
+	command._drawType = video::RenderCommand::DrawType::eStatic;
+	command._effectHandle = video::DebugBuffer::sDefaultEffectHandle;
+	command._primType = video::RenderCommand::eLineList;
+	command._numPrim = _debugBuffer->_count / 2;
+	command._materialHandle = VIDEO->GetMaterial("Default");
+	command._cacheRange = _mainRenderView->_matrixCache.Add(&model);
+
+	_debugBuffer->Reset();
+
 	//TERRAIN->FillRenderCommand(*_mainRenderView);
 
 	_mainRenderView->PreRender();

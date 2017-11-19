@@ -3,6 +3,7 @@
 
 namespace video
 {
+	EffectHandle DebugBuffer::sDefaultEffectHandle;
 	
 	LPCSTR PredefinedUniform::ParamName[Enum::Count] = 
 	{
@@ -547,7 +548,6 @@ namespace video
 		Assert(buffer->_dynamic);
 		uint8 *pData = nullptr;
 		buffer->_ptr->Lock(0, 0, (void **)&pData, D3DLOCK_DISCARD);
-
 		memcpy(pData, _vertices, sizeof(DebugVertex) *_count);
 		buffer->_ptr->Unlock();
 	}

@@ -31,12 +31,24 @@ namespace video
 	}
 	
 	DebugVertex::DebugVertex()
-		:_position(), _color(0xff00ff00)
+		:_position(), _color(0xffffffff)
 	{
 	}
 
-	DebugVertex::DebugVertex(const Vector3 & position, const uint32 color)
+	DebugVertex::DebugVertex(const Vector3 & position, uint32 color)
 		: _position(position), _color(color)
 	{
+	}
+
+	DebugVertex::DebugVertex(const DebugVertex & other)
+		: _position(other._position), _color(other._color)
+	{
+	}
+
+	DebugVertex & DebugVertex::operator=(const DebugVertex & other)
+	{
+		_position = other._position;
+		_color = other._color;
+		return *this;
 	}
 }

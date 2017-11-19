@@ -47,6 +47,9 @@ namespace video
 	{
 		DebugVertex();
 		DebugVertex(const Vector3 &position, const uint32 color);
+		DebugVertex(const DebugVertex &other);
+
+		DebugVertex &operator= (const DebugVertex &other);
 
 		Vector3 _position;
 		uint32 _color;
