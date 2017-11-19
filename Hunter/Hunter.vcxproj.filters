@@ -168,6 +168,15 @@
     <ClCompile Include="ScriptSystem.cpp">
       <Filter>Game\GameSystem\ScriptSystem</Filter>
     </ClCompile>
+    <ClCompile Include="Enemy.cpp">
+      <Filter>Game\Enemy</Filter>
+    </ClCompile>
+    <ClCompile Include="Dragon.cpp">
+      <Filter>Game\Enemy\script</Filter>
+    </ClCompile>
+    <ClCompile Include="spawnManager.cpp">
+      <Filter>Game\Enemy\spawn</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -420,6 +429,16 @@
     <ClInclude Include="Delegate.h">
       <Filter>Sub</Filter>
     </ClInclude>
+    <ClInclude Include="Enemy.h">
+      <Filter>Game\Enemy</Filter>
+    </ClInclude>
+    <ClInclude Include="resource.h" />
+    <ClInclude Include="Dragon.h">
+      <Filter>Game\Enemy\script</Filter>
+    </ClInclude>
+    <ClInclude Include="spawnManager.h">
+      <Filter>Game\Enemy\spawn</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Core">
@@ -545,5 +564,17 @@
     <Filter Include="Game\GameSystem\ScriptSystem">
       <UniqueIdentifier>{00b94380-2d5a-414d-ae33-03169cba4084}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Game\Enemy">
+      <UniqueIdentifier>{893eb939-e5e3-4135-b266-7b9d5a97aac7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\Enemy\spawn">
+      <UniqueIdentifier>{48ab3ce0-5cc8-4bd6-83a9-2a6af2b100d3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\Enemy\script">
+      <UniqueIdentifier>{d0e7f8a4-65cc-4621-9885-04735fb50bb4}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Hunter.rc" />
   </ItemGroup>
 </Project>
