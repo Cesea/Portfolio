@@ -15,12 +15,15 @@ void Editor::RegisterEvents()
 	channel.Add<InputManager::MouseMoveEvent, Editor>(*this);
 	channel.Add<InputManager::MouseReleasedEvent, Editor>(*this);
 	channel.Add<InputManager::MousePressedEvent, Editor>(*this);
-	//channel.Add<InputManager::MouseWheelEvent, Editor>(*this);
+	channel.Add<InputManager::MouseWheelEvent, Editor>(*this);
 	channel.Add<InputManager::KeyPressedEvent, Editor>(*this);
 }
 
 void Editor::Init()
 {
+	strcpy(_button, "Button");
+	strcpy(_collapse, "Collapse");
+	
 	this->RegisterEvents();
 }
 
@@ -32,20 +35,32 @@ void Editor::Shutdown()
 	}
 }
 
-void Editor::Edit(void * object)
+void Editor::Edit(RefVariant &object)
 {
-	ImguiBeginFrame(_mx, _my, _mb, _scroll);
-	Console::Log("%d, %d, %d \n", _mx, _my, _mb);
+	ImguiBeginFrame(_mx, _my, _mb, _scroll, _key);
 
-	ImguiBeginScrollArea(_name, 100, 100, 400, 500, &_scroll);
+	//Console::Log("%d, %d, %d \n", _mx, _my, _mb);
 
-	ImguiButton("asdasfd");
-	ImguiCollapse("asdasfd", nullptr, false);
+	ImguiBeginScrollArea(_name, 30, 30, 400, 800, &_scroll);
+
+
+	for (int32 i = 0; i < 10; ++i)
+	{
+		ImguiButton(_button);
+	}
+	ImguiCollapse(_collapse, nullptr, false);
+
+	ImguiSlider(_slider, &_val, -10, 10, 1.0f);
+	imguiEdit(_edit, 90);
 
 	ImguiEndScrollArea();
 
 	ImguiEndFrame();
+
+	_scroll = 0;
+	_key = 0;
 }
+
 
 void Editor::Handle(const InputManager::MousePressedEvent & event)
 {
@@ -65,6 +80,8 @@ void Editor::Handle(const InputManager::MouseMoveEvent & event)
 
 void Editor::Handle(const InputManager::MouseWheelEvent & event)
 {
+	_scroll = event.delta / 120;
+	Console::Log("%d\n", event.delta);
 }
 
 void Editor::Handle(const InputManager::MouseReleasedEvent & event)
@@ -79,5 +96,5 @@ void Editor::Handle(const InputManager::MouseReleasedEvent & event)
 
 void Editor::Handle(const InputManager::KeyPressedEvent & event)
 {
-	
+	_key = event.code;
 }

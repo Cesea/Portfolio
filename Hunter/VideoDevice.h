@@ -9,6 +9,11 @@
 #include "DebugDraw.h"
 
 
+#ifdef CreateFont
+	#undef CreateFont
+#endif
+
+
 //TODOs
 //1. DynamicVertexBuffer, DynamicIndexBuffer를 만들자... Update
 //2. Texture Update를 만들자 Lock, Unlock, UpdateContents
@@ -111,6 +116,14 @@ namespace video
 		void DestroySkinnedAnimation(SkinnedAnimationHandle handle);
 
 
+		//Font Functions
+		FontHandle CreateFont(const D3DXFONT_DESC &fontDesc, const std::string &name);
+		FontHandle GetFont(const std::string &name);
+		Font *GetFont(FontHandle handle);
+		void DestroyFont(FontHandle handle);
+		void DrawFont(FontHandle handle, const std::string &str, int32 x, int32 y, uint32 color);
+		void DrawFontShadow(FontHandle handle, const std::string &str, int32 x, int32 y, uint32 color, uint32 shadow = 0xff000000);
+		void GetBoundingRect(FontHandle handle, const std::string &str, int32 x, int32 y, RECT *pOutRect);
 
 	private:
 		//Private Functions
@@ -155,6 +168,8 @@ namespace video
 
 		SkinnedAnimation _skinnedAnimations[VIDEO_CONFIG_ANIMATION_MAX_NUM];
 
+		Font _fonts[VIDEO_CONFIG_FONT_MAX_NUM];
+
 		ResourceHandlePool<VertexBufferHandle> _vertexBufferPool;
 		ResourceHandlePool<IndexBufferHandle> _indexBufferPool;
 		ResourceHandlePool<TextureHandle> _textureHandlePool;
@@ -169,6 +184,7 @@ namespace video
 		ResourceHandlePool<SkinnedXMeshHandle> _skinnedXMeshHandlePool;
 
 		ResourceHandlePool<SkinnedAnimationHandle> _skinnedAnimationHandlePool;
+		ResourceHandlePool<FontHandle> _fontHandlePool;
 	};
 }
 #endif

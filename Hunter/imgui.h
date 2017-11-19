@@ -20,7 +20,7 @@ inline uint32 ImguiRGBA(uint8 r, uint8 g, uint8 b, uint8 a = 255)
 	return (a << 24) | (r << 16) | (g << 8) | (b);
 }
 
-void ImguiBeginFrame(int32 mx, int32 my, uint8 mbut, int32 scroll);
+void ImguiBeginFrame(int32 mx, int32 my, uint8 mbut, int32 scroll, uint32 keyCode);
 void ImguiEndFrame();
 
 bool ImguiBeginScrollArea(const char* name, int32 x, int32 y, int32 w, int32 h, int32 *pOutScroll);
@@ -38,6 +38,8 @@ bool ImguiCollapse(const char* text, const char* subtext, bool checked, bool ena
 void ImguiLabel(const char* text);
 void ImguiValue(const char* text);
 bool ImguiSlider(const char* text, float* val, float vmin, float vmax, float vinc, bool enabled = true);
+
+bool imguiEdit(char *text, int32 width, bool enable = true);
 
 void ImguiDrawText(int32 x, int32 y, int32 align, const char* text, uint32 color);
 

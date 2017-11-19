@@ -7,6 +7,8 @@ class Terrain;
 
 #define EDITOR_MAX_NAME 64
 
+#define EDITOR_MAX_NAME_VAR 32
+
 class Gizmo
 {
 public :
@@ -37,7 +39,7 @@ public :
 	virtual void Init();
 	virtual void Shutdown();
 
-	virtual void Edit(void *pObject);
+	virtual void Edit(RefVariant &pObject);
 
 public:
 	void RegisterEvents();
@@ -59,6 +61,16 @@ public :
 	void *_pEdittingObject{};
 
 	char _name[EDITOR_MAX_NAME] = {0, };
+
+
+	char _button[EDITOR_MAX_NAME] = {0, };
+	char _collapse[EDITOR_MAX_NAME] = {0, };
+	char _slider[EDITOR_MAX_NAME] = {0, };
+	char _edit[EDITOR_MAX_NAME] = { 0, };
+
+	float _val{};
+
+	video::FontHandle _fHandle;
 };
 
 class WorldEditor

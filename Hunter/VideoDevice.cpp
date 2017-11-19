@@ -18,7 +18,8 @@ VideoDevice::VideoDevice()
 	_materialHandlePool(VIDEO_CONFIG_MATERIAL_MAX_NUM),
 	_staticXMeshHandlePool(VIDEO_CONFIG_STATIC_XMESH_MAX_NUM),
 	_skinnedXMeshHandlePool(VIDEO_CONFIG_SKINNED_XMESH_MAX_NUM),
-	_skinnedAnimationHandlePool(VIDEO_CONFIG_ANIMATION_MAX_NUM)
+	_skinnedAnimationHandlePool(VIDEO_CONFIG_ANIMATION_MAX_NUM),
+	_fontHandlePool(VIDEO_CONFIG_FONT_MAX_NUM)
 
 {
 }
@@ -651,4 +652,53 @@ void video::VideoDevice::DestroySkinnedAnimation(SkinnedAnimationHandle handle)
 		_skinnedAnimations[handle.index].Destroy();
 	}
 	_skinnedAnimationHandlePool.Remove(handle);
+}
+
+FontHandle video::VideoDevice::CreateFont(const D3DXFONT_DESC & fontDesc, const std::string & name)
+{
+	FontHandle result = _fontHandlePool.Create(name);
+	if (!_fonts[result.index].Create(fontDesc))
+	{
+		Console::Log("Skinned Animation create failed\n");
+		return FontHandle();
+	}
+	return result;
+}
+
+FontHandle video::VideoDevice::GetFont(const std::string & name)
+{
+	return _fontHandlePool.Get(name);
+}
+
+Font * video::VideoDevice::GetFont(FontHandle handle)
+{
+	if (handle.IsValid())
+	{
+		return &_fonts[handle.index];
+	}
+	return nullptr;
+}
+
+void video::VideoDevice::DestroyFont(FontHandle handle)
+{
+	if (handle.IsValid())
+	{
+		_fonts[handle.index].Destroy();
+	}
+	_fontHandlePool.Remove(handle);
+}
+
+void video::VideoDevice::DrawFont(FontHandle handle, const std::string & str, int32 x, int32 y, uint32 color)
+{
+	_fonts[handle.index].PrintText(str, x, y, color);
+}
+
+void video::VideoDevice::DrawFontShadow(FontHandle handle, const std::string & str, int32 x, int32 y, uint32 color, uint32 shadow)
+{
+	_fonts[handle.index].PrintTextShadow(str, x, y, color);
+}
+
+void video::VideoDevice::GetBoundingRect(FontHandle handle, const std::string & str, int32 x, int32 y, RECT * pOutRect)
+{
+	_fonts[handle.index].GetBoundingRect(str, x, y, pOutRect);
 }

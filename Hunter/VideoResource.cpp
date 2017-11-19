@@ -514,17 +514,47 @@ namespace video
 	//{
 	//}
 
-	bool RenderGroup::Create(video::VertexBufferHandle vHandle, video::IndexBufferHandle iHandle, const RenderGroup::MaterialRange & materialRange)
+	//bool RenderGroup::Create(video::VertexBufferHandle vHandle, video::IndexBufferHandle iHandle, const RenderGroup::MaterialRange & materialRange)
+	//{
+	//	_vertexBuffer = vHandle;
+	//	_indexBuffer = iHandle;
+	//	
+	//	_materialRange = materialRange;
+	//	return true;
+	//}
+
+	//void RenderGroup::Destroy()
+	//{
+	//	return;
+	//}
+
+	bool Font::Create(const D3DXFONT_DESC & fontDesc)
 	{
-		_vertexBuffer = vHandle;
-		_indexBuffer = iHandle;
-		
-		_materialRange = materialRange;
+		D3DXCreateFontIndirect(gpDevice, &fontDesc, &_ptr);
+		Assert(_ptr);
 		return true;
 	}
 
-	void RenderGroup::Destroy()
+	void Font::Destroy()
 	{
-		return;
+		COM_RELEASE(_ptr);
+	}
+
+	void Font::GetBoundingRect(const std::string & str, int32 x, int32 y, RECT *pOutRect)
+	{
+		_ptr->DrawTextA( NULL, str.c_str(), -1, pOutRect, DT_LEFT | DT_NOCLIP | DT_CALCRECT, 0xffffffff );
+	}
+
+	void Font::PrintText(const std::string & str, int32 x, int32 y, uint32 color)
+	{
+		RECT rc = { x , y , 0 , 0 };
+
+		_ptr->DrawTextA( NULL, str.c_str(), -1, &rc, DT_LEFT | DT_NOCLIP, color );
+	}
+
+	void Font::PrintTextShadow(const std::string & str, int32 x, int32 y, uint32 color, uint32 shadow)
+	{
+		PrintText(str, x + 1, y + 1, shadow);
+		PrintText(str, x, y, color);
 	}
 }

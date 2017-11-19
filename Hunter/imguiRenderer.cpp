@@ -8,6 +8,8 @@ static IDirect3DStateBlock9 *gStateBlock = nullptr;
 static Matrix gIMViewMatrix;
 static Matrix gIMProjectionMatrix;
 
+static video::FontHandle gFontHandle;
+
 struct UIVertex
 {
 	Vector3 _position;
@@ -72,9 +74,10 @@ void DrawLine(int32 x0, int32 y0, int32 x1, int32 y1, D3DCOLOR color)
 	gpDevice->DrawPrimitiveUP(D3DPT_LINELIST, 1, vertices, sizeof(UIVertex));
 }
 
-void DrawFont(int32 id, int32 x, int32 y, D3DCOLOR color, const char *str, DWORD format)
+void DrawFont(int32 id, int32 x, int32 y, uint32 color, const char *str, DWORD format)
 {
 	RECT rect = { x, y, 0, 0 };
+	VIDEO->DrawFont(gFontHandle, str, x, y, color);
 	//_fonts[id]->DrawTextA(nullptr, str, -1, &rect, format | DT_CALCRECT, 0);
 	//_fonts[id]->DrawTextA(nullptr, str, -1, &rect, format, color);
 }
@@ -128,11 +131,28 @@ bool imguiRenderInit()
 	gIMViewMatrix._42 = ty;
 	gIMViewMatrix._43 = -tz;
 
-	return false;
+	D3DXFONT_DESC fontDesc{};
+
+	fontDesc.Height = 10;
+	fontDesc.Width = 6;
+	fontDesc.Weight = 10;
+	fontDesc.MipLevels = 0;
+	fontDesc.Italic = false;
+	fontDesc.CharSet = DEFAULT_CHARSET;
+	fontDesc.OutputPrecision = OUT_DEFAULT_PRECIS;
+	fontDesc.Quality = DEFAULT_QUALITY;
+	fontDesc.PitchAndFamily = DEFAULT_PITCH | FF_DONTCARE;
+
+	strncpy(fontDesc.FaceName, "Consolas", strlen("Consolas"));
+
+	gFontHandle = VIDEO->CreateFont(fontDesc, "guiDefaultFont");
+
+	return true;
 }
 
 void imguiRenderDestroy()
 {
+	VIDEO->DestroyFont(gFontHandle);
 	COM_RELEASE(gStateBlock);
 }
 

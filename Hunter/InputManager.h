@@ -157,10 +157,10 @@ public :
 	};
 	struct MouseWheelEvent
 	{
-		MouseWheelEvent(uint32 code, uint32 syskey, POINT coord)
-			:code(code), coord(coord)
+		MouseWheelEvent(int32 delta, POINT coord)
+			:delta(delta), coord(coord)
 		{}
-		uint32 code;
+		int32 delta;
 		POINT coord;
 	};
 

@@ -116,7 +116,8 @@ struct GuiState
 		_mx(-1), _my(-1), _scroll(0),
 		_active(0), _hot(0), _hotToBe(0), IsHot(false), IsActive(false), _wentActive(false),
 		_dragX(0), _dragY(0), _dragOrig(0), _widgetX(0), _widgetY(0), _widgetW(100),
-		_insideCurrentScroll(false), _areaID(0), _widgetID(0) {
+		_insideCurrentScroll(false), _areaID(0), _widgetID(0), _keyboardFocus(0), _vkCode(0)
+	{
 	}
 
 	bool _left;
@@ -126,6 +127,7 @@ struct GuiState
 	uint32 _active;
 	uint32 _hot;
 	uint32 _hotToBe;
+	uint32 _keyboardFocus;
 	bool IsHot;
 	bool IsActive;
 	bool _wentActive;
@@ -136,6 +138,8 @@ struct GuiState
 
 	uint32 _areaID;
 	uint32 _widgetID;
+
+	uint32 _vkCode;
 };
 
 static GuiState gState;
@@ -168,6 +172,7 @@ inline void ClearInput()
 	gState._leftPressed = false;
 	gState._leftReleased = false;
 	gState._scroll = 0;
+	gState._vkCode = 0;
 }
 
 inline void ClearActive() {
@@ -227,7 +232,14 @@ static bool ButtonLogic(uint32 id, bool over)
 	return result;
 }
 
-static void UpdateInput(int32 mx, int32 my, unsigned char mbut, int32 scroll) 
+static bool KeyLogic(uint32 id)
+{
+	bool result = false;
+	result = (gState._keyboardFocus == id);
+	return result;
+}
+
+static void UpdateInput(int32 mx, int32 my, unsigned char mbut, int32 scroll, uint32 keyCode) 
 {
 	bool left = (mbut & ImguiMouseButton::eImguiMButtonLeft) != 0;
 
@@ -238,12 +250,13 @@ static void UpdateInput(int32 mx, int32 my, unsigned char mbut, int32 scroll)
 	gState._left = left;
 
 	gState._scroll = scroll;
+	gState._vkCode = keyCode;
 }
 
 
-void ImguiBeginFrame(int32 mx, int32 my, uint8 mbut, int32 scroll)
+void ImguiBeginFrame(int32 mx, int32 my, uint8 mbut, int32 scroll, uint32 keyCode)
 {
-	UpdateInput(mx, my, mbut, scroll);
+	UpdateInput(mx, my, mbut, scroll, keyCode);
 
 	gState._hot = gState._hotToBe;
 	gState._hotToBe = 0;
@@ -298,8 +311,8 @@ bool ImguiBeginScrollArea(const char * name, int32 x, int32 y, int32 w, int32 h,
 	gState._widgetX = x + SCROLL_AREA_PADDING;
 	gState._widgetY = y + AREA_HEADER + (*pOutScroll);
 	gState._widgetW = w - SCROLL_AREA_PADDING * 4;
-	g_scrollTop = y - AREA_HEADER + h;
-	g_scrollBottom = y + SCROLL_AREA_PADDING;
+	g_scrollTop = y + AREA_HEADER;
+	g_scrollBottom = y + SCROLL_AREA_PADDING + h;
 	g_scrollRight = x + w - SCROLL_AREA_PADDING * 3;
 	g_scrollVal = pOutScroll;
 
@@ -311,11 +324,11 @@ bool ImguiBeginScrollArea(const char * name, int32 x, int32 y, int32 w, int32 h,
 	g_insideScrollArea = InRect(x, y, w, h, false);
 	gState._insideCurrentScroll = g_insideScrollArea;
 
-	AddCommandRect((float)x, (float)y, (float)w, (float)h, ImguiRGBA(20, 20, 20, 50));
+	AddCommandRect((float)x, (float)y, (float)w, (float)h, ImguiRGBA(20, 20, 20, 100));
 
-	//AddCommandText(x + AREA_HEADER / 2, y + h - AREA_HEADER / 2 - TEXT_HEIGHT / 2, ImguiTextAlign::eImguiAlignLeft, name, ImguiRGBA(255, 255, 255, 128));
+	AddCommandText(x + AREA_HEADER / 2, y + h - AREA_HEADER / 2 - TEXT_HEIGHT / 2, ImguiTextAlign::eImguiAlignLeft, name, ImguiRGBA(255, 255, 255, 128));
 
-	//AddCommandScissor(x + SCROLL_AREA_PADDING, y + SCROLL_AREA_PADDING, w - SCROLL_AREA_PADDING * 4, h - AREA_HEADER - SCROLL_AREA_PADDING);
+	AddCommandScissor(x + SCROLL_AREA_PADDING, y + SCROLL_AREA_PADDING, w - SCROLL_AREA_PADDING * 4, h - AREA_HEADER - SCROLL_AREA_PADDING);
 
 	return g_insideScrollArea;
 }
@@ -323,78 +336,84 @@ bool ImguiBeginScrollArea(const char * name, int32 x, int32 y, int32 w, int32 h,
 void ImguiEndScrollArea()
 {
 	// Disable scissoring.
-	//AddCommandScissor(-1, -1, -1, -1);
+	AddCommandScissor(-1, -1, -1, -1);
 
 	// Draw _scroll bar
-	int x = g_scrollRight + SCROLL_AREA_PADDING / 2;
-	int y = g_scrollBottom;
-	int w = SCROLL_AREA_PADDING * 2;
-	int h = g_scrollTop - g_scrollBottom;
+	//int x = g_scrollRight + SCROLL_AREA_PADDING / 2;
+	//int y = g_scrollTop;
+	//int w = SCROLL_AREA_PADDING * 2;
+	//int h = g_scrollBottom - g_scrollTop - SCROLL_AREA_PADDING * 3;
 
-	int stop = g_scrollAreaTop;
-	int sbot = gState._widgetY;
-	int sh = stop - sbot; // The scrollable area height.
+	//int stop = g_scrollAreaTop;
+	//int sbot = gState._widgetY;
+	//int sh = sbot - stop; // The scrollable area height.
 
-	float barHeight = (float)h / (float)sh;
+	//float barHeight = (float)sh / (float)h;
 
-	if (barHeight < 1) {
-		float barY = (float)(y - sbot) / (float)sh;
-		if (barY < 0) barY = 0;
-		if (barY > 1) barY = 1;
+	//if (barHeight > 1.0) 
+	//{
+	//	float barY = (float)(y - stop) / (float)sh;
+	//	if (barY < 0) barY = 0;
+	//	if (barY > 1) barY = 1;
 
-		// Handle _scroll bar logic.
-		unsigned int hid = g_scrollId;
-		int hx = x;
-		int hy = y + (int)(barY*h);
-		int hw = w;
-		int hh = (int)(barHeight*h);
+	//	// Handle _scroll bar logic.
+	//	unsigned int hid = g_scrollId;
+	//	int hx = x;
+	//	int hy = y + (int)(barY*h);
+	//	int hw = w;
+	//	int hh = (int)(barHeight*h);
 
-		const int range = h - (hh - 1);
-		bool over = InRect(hx, hy, hw, hh);
-		ButtonLogic(hid, over);
-		if (IsActive(hid)) 
-		{
-			float u = (float)(hy - y) / (float)range;
-			if (gState._wentActive) 
-			{
-				gState._dragY = gState._my;
-				gState._dragOrig = u;
-			}
-			if (gState._dragY != gState._my) 
-			{
-				u = gState._dragOrig + (gState._my - gState._dragY) / (float)range;
-				if (u < 0) u = 0;
-				if (u > 1) u = 1;
-				*g_scrollVal = (int)((1 - u) * (sh - h));
-			}
-		}
+	//	const int range = h - (hh - 1);
+	//	bool over = InRect(hx, hy, hw, hh);
+	//	ButtonLogic(hid, over);
+	//	if (IsActive(hid)) 
+	//	{
+	//		float u = (float)(hy - y) / (float)range;
+	//		if (gState._wentActive) 
+	//		{
+	//			gState._dragY = gState._my;
+	//			gState._dragOrig = u;
+	//		}
+	//		if (gState._dragY != gState._my) 
+	//		{
+	//			u = gState._dragOrig + (gState._my - gState._dragY) / (float)range;
+	//			if (u < 0) u = 0;
+	//			if (u > 1) u = 1;
+	//			*g_scrollVal = (int)((1 - u) * (h - sh));
+	//		}
+	//	}
 
-		// BG
-		//AddCommandRect((float)x, (float)y, (float)w, (float)h, ImguiRGBA(0, 200, 200, 196));
-		// Bar
-		//if (IsActive(hid))
-		//{
-		//	AddCommandRect((float)hx, (float)hy, (float)hw, (float)hh, ImguiRGBA(255, 196, 0, 196));
-		//}
-		//else
-		//{
-		//	AddCommandRect((float)hx, (float)hy, (float)hw, (float)hh, 
-		//		IsHot(hid) ? ImguiRGBA(255, 196, 0, 96) : ImguiRGBA(255, 255, 255, 64));
-		//}
-		
+	//	// BG
+	//	AddCommandRect((float)x, (float)y, (float)w, (float)h, ImguiRGBA(0, 200, 200, 196));
+	//	// Bar
+	//	if (IsActive(hid))
+	//	{
+	//		AddCommandRect((float)hx, (float)hy, (float)hw, (float)hh, ImguiRGBA(255, 196, 0, 196));
+	//	}
+	//	else
+	//	{
+	//		AddCommandRect((float)hx, (float)hy, (float)hw, (float)hh, 
+	//			IsHot(hid) ? ImguiRGBA(255, 196, 0, 96) : ImguiRGBA(255, 255, 255, 64));
+	//	}
 
-		// Handle mouse scrolling.
-		if (g_insideScrollArea) 
-		{ // && !anyActive())
-			if (gState._scroll) 
-			{
-				*g_scrollVal += 20 * gState._scroll;
+	//	// Handle mouse scrolling.
+	//	if (g_insideScrollArea) 
+	//	{ // && !anyActive())
+	//		if (gState._scroll != 0) 
+	//		{
+	//			*g_scrollVal += gState._scroll;
 
-				if (*g_scrollVal < 0) { *g_scrollVal = 0; }
-				if (*g_scrollVal > (sh - h)) { *g_scrollVal = (sh - h); }
-			}
-		}
-	}
+	//			if (*g_scrollVal < 0)
+	//			{
+	//				*g_scrollVal = 0;
+	//			}
+	//			if (*g_scrollVal > (h - sh))
+	//			{
+	//				*g_scrollVal = (h - sh);
+	//			}
+	//		}
+	//	}
+	//}
 	gState._insideCurrentScroll = false;
 }
 
@@ -582,7 +601,7 @@ bool ImguiCollapse(const char * text, const char * subtext, bool checked, bool e
 void ImguiLabel(const char * text)
 {
 	int x = gState._widgetX;
-	int y = gState._widgetY - BUTTON_HEIGHT;
+	int y = gState._widgetY;
 	gState._widgetY += BUTTON_HEIGHT;
 	AddCommandText(x, y + BUTTON_HEIGHT / 2 - TEXT_HEIGHT / 2, ImguiTextAlign::eImguiAlignLeft, text, ImguiRGBA(255, 255, 255, 255));
 }
@@ -590,7 +609,7 @@ void ImguiLabel(const char * text)
 void ImguiValue(const char * text)
 {
 	const int x = gState._widgetX;
-	const int y = gState._widgetY - BUTTON_HEIGHT;
+	const int y = gState._widgetY;
 	const int w = gState._widgetW;
 	gState._widgetY += BUTTON_HEIGHT;
 
@@ -604,7 +623,7 @@ bool ImguiSlider(const char * text, float * val, float vmin, float vmax, float v
 	unsigned int id = (gState._areaID << 16) | gState._widgetID;
 
 	int x = gState._widgetX;
-	int y = gState._widgetY - BUTTON_HEIGHT;
+	int y = gState._widgetY;
 	int w = gState._widgetW;
 	int h = SLIDER_HEIGHT;
 	gState._widgetY += SLIDER_HEIGHT + DEFAULT_SPACING;
@@ -675,6 +694,69 @@ bool ImguiSlider(const char * text, float * val, float vmin, float vmax, float v
 	}
 
 	return res || valChanged;
+}
+
+bool imguiEdit(char * text, int32 width, bool enable)
+{
+	gState._widgetID++;
+	unsigned int id = (gState._areaID << 16) | gState._widgetID;
+
+	int x = gState._widgetX;
+	int y = gState._widgetY;
+	int w = gState._widgetW;
+	int h = BUTTON_HEIGHT;
+	gState._widgetY += BUTTON_HEIGHT; // + DEFAULT_SPACING;
+
+	bool over = enable && InRect(x, y, w, h);
+	bool mouseResult = ButtonLogic(id, over);
+	bool keyResult = KeyLogic(id);
+
+	if (mouseResult)
+	{
+		gState._keyboardFocus = id;
+	}
+
+	if (gState._vkCode && keyResult)
+	{
+		int32 index = strlen(text);
+		if (gState._vkCode == VK_BACK)
+		{
+			if (index > 0)
+			{
+				text[index - 1] = '\0';
+			}
+		}
+		else
+		{
+			char mappedChar = MapVirtualKey(gState._vkCode, MAPVK_VK_TO_CHAR);
+			if (IsLetter(mappedChar))
+			{
+				//if (!gState.shiftDown)
+				//{
+				//	mappedChar += 32;
+				//}
+			}
+			text[index] = mappedChar;
+		}
+	}
+
+	AddCommandRect((float)x, (float)y, (float)w, (float)h,
+		IsActive(id) ? ImguiRGBA(255, 196, 0, 255) : ImguiRGBA(255, 255, 255, 200));
+
+	if (enable)
+	{
+		AddCommandText(x + 5, y + 2,
+			ImguiTextAlign::eImguiAlignLeft, text,
+			IsHot(id) ? ImguiRGBA(0, 0, 0, 255) : ImguiRGBA(0, 0, 0, 200));
+	}
+	else
+	{
+		AddCommandText(x + 5, y + 2,
+			ImguiTextAlign::eImguiAlignLeft, text,
+			ImguiRGBA(60, 60, 60, 60));
+	}
+
+	return mouseResult;
 }
 
 void ImguiDrawText(int32 x, int32 y, int32 align, const char * text, uint32 color)

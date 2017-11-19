@@ -133,7 +133,19 @@ void Mouse::UpdateWithMessage(WPARAM wParam, LPARAM lParam)
 		_pParent->_channel.Broadcast<InputManager::MouseMoveEvent>(
 			InputManager::MouseMoveEvent(PointMake(_currentPoint.x, _currentPoint.y),PointMake(_oldPoint.x, _oldPoint.y)));
 	}
+}
 
+void Mouse::UpdateWheelWithMessage(WPARAM wParam, LPARAM lParam)
+{
+	_wheelDelta = GET_WHEEL_DELTA_WPARAM(wParam);
+	_currentPoint.x = LOWORD(lParam);
+	_currentPoint.y = HIWORD(lParam);
+
+
+}
+
+void Mouse::Update()
+{
 	//constexpr로 버튼이 정의 되어있다
 	for (int32 i = 0; i < 3; ++i)
 	{
@@ -149,23 +161,21 @@ void Mouse::UpdateWithMessage(WPARAM wParam, LPARAM lParam)
 		}
 		if (IsPressed(i))
 		{
-			_pParent->_channel.Broadcast<InputManager::MousePressedEvent>(InputManager::MousePressedEvent(i, 
+			_pParent->_channel.Broadcast<InputManager::MousePressedEvent>(InputManager::MousePressedEvent(i,
 				PointMake(_currentPoint.x, _currentPoint.y)));
 		}
 	}
-}
 
-void Mouse::UpdateWheelWithMessage(WPARAM wParam, LPARAM lParam)
-{
-	_wheelDelta = GET_WHEEL_DELTA_WPARAM(wParam);
-	_currentPoint.x = LOWORD(lParam);
-	_currentPoint.y = HIWORD(lParam);
-}
+	if (_wheelDelta != 0)
+	{
+		_pParent->_channel.Broadcast<InputManager::MouseWheelEvent>(InputManager::MouseWheelEvent(_wheelDelta,
+			PointMake(_currentPoint.x, _currentPoint.y)));
+	}
 
-void Mouse::Update()
-{
 	memcpy(_oldState, _currentState, sizeof(bool32) * 3);
 
 	_oldPoint.x = _currentPoint.x;
 	_oldPoint.y = _currentPoint.y;
+
+	_wheelDelta = 0;
 }

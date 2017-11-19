@@ -46,9 +46,9 @@ bool32 BaseScene::Init()
 	config._textureMult = 50;
 	config._sectionResolution;
 
-	TERRAIN->SetScene(this);
-	TERRAIN->Create(config, 1);
-	_terrainEffect = VIDEO->GetEffect("TerrainBase.fx");
+	//TERRAIN->SetScene(this);
+	//TERRAIN->Create(config, 1);
+	//_terrainEffect = VIDEO->GetEffect("TerrainBase.fx");
 
 
 	//메쉬 불러오기..
@@ -75,7 +75,7 @@ bool32 BaseScene::Init()
 			Entity &entity = _entities.back();
 
 			TransformComponent &transComp = entity.AddComponent<TransformComponent>();
-			transComp.MovePositionWorld(x * 10, TERRAIN->GetHeight(x * 10, z * 10), z * 10);
+			transComp.MovePositionWorld(x * 10, /*TERRAIN->GetHeight(x * 10, z * 10)*/0 , z * 10);
 			RenderComponent &renderComp = entity.AddComponent<RenderComponent>();
 			renderComp._type = RenderComponent::Type::eSkinned;
 			renderComp._skinned = VIDEO->CreateSkinnedAnimation(_skinnedMeshHandle, "Anim" + std::to_string(index));
@@ -95,23 +95,14 @@ bool32 BaseScene::Init()
 
 	entity.Activate();
 
-	//에디서 생성
+	//에디터 생성
 
 	imguiRenderInit();
 	_editor = new Editor;
 	_editor->Init();
 
-	_animations.reserve(16);
-	//for (int32 i = 0; i < 16; ++i)
-	{
-		_animations.push_back(VIDEO->CreateSkinnedAnimation(_skinnedMeshHandle, "Anim" + std::to_string(0)));
-	}
-	//for (int32 i = 0; i < 16; ++i)
-	{
-		video::SkinnedAnimation *pAnimation = VIDEO->GetSkinnedAnimation(_animations[0]);
-		pAnimation->Play(0);
-	}
-
+	//D3DXFONT_DESC fontDesc;
+	//_font = VIDEO->CreateFont();
 
 	_active = true;
 	return result;
@@ -121,7 +112,7 @@ bool32 BaseScene::Update(float deltaTime)
 {
 	bool32 result = true;
 
-	_editor->Edit(nullptr);
+	_editor->Edit(RefVariant());
 
 	_world.Refresh();
 
@@ -143,7 +134,7 @@ bool32 BaseScene::Update(float deltaTime)
 bool32 BaseScene::Render()
 {
 	_renderSystem.Render(*_mainRenderView);
-	TERRAIN->FillRenderCommand(*_mainRenderView);
+	//TERRAIN->FillRenderCommand(*_mainRenderView);
 
 	_mainRenderView->PreRender();
 	_mainRenderView->ExecCommands();

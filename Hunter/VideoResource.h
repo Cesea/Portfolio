@@ -193,35 +193,33 @@ namespace video
 	};
 
 	//디바이스에 실질적으로 저장되는 것은 model이 아니라 이거다
-	struct RenderGroup
-	{
-		//머테리얼의 범위...
-		struct MaterialRange
-		{
-			MaterialHandle _material;
-			uint32 _startIndex;
-			uint32 _numPrim;
-			uint32 _startVertex;
-			uint32 _numVertices;
-
-			MaterialRange &operator== (const MaterialRange &other)
-			{
-				_material = other._material;
-				_startIndex = other._startIndex;
-				_numPrim = other._numPrim;
-				_startVertex = other._startVertex;
-				_numVertices = other._numVertices;
-			}
-		};
-		bool Create(video::VertexBufferHandle vHandle, video::IndexBufferHandle iHandle, const RenderGroup::MaterialRange &materialRange);
-		void Destroy();
-
-		video::VertexBufferHandle _vertexBuffer;
-		video::IndexBufferHandle _indexBuffer;
-		//Sphere _sphere;
-		//AABB _aabb;
-		MaterialRange _materialRange;
-	};
+	//struct RenderGroup
+	//{
+	//	//머테리얼의 범위...
+	//	struct MaterialRange
+	//	{
+	//		MaterialHandle _material;
+	//		uint32 _startIndex;
+	//		uint32 _numPrim;
+	//		uint32 _startVertex;
+	//		uint32 _numVertices;
+	//		MaterialRange &operator== (const MaterialRange &other)
+	//		{
+	//			_material = other._material;
+	//			_startIndex = other._startIndex;
+	//			_numPrim = other._numPrim;
+	//			_startVertex = other._startVertex;
+	//			_numVertices = other._numVertices;
+	//		}
+	//	};
+	//	bool Create(video::VertexBufferHandle vHandle, video::IndexBufferHandle iHandle, const RenderGroup::MaterialRange &materialRange);
+	//	void Destroy();
+	//	video::VertexBufferHandle _vertexBuffer;
+	//	video::IndexBufferHandle _indexBuffer;
+	//	//Sphere _sphere;
+	//	//AABB _aabb;
+	//	MaterialRange _materialRange;
+	//};
 
 	struct PredefinedUniform
 	{
@@ -423,6 +421,21 @@ namespace video
 		FrameBufferHandle _colorFBHandle;
 		FrameBufferHandle _depthFBHandle;;
 	};
+	
+	struct Font
+	{
+		bool Create(const D3DXFONT_DESC &fontDesc);
+		void Destroy();
+
+		void GetBoundingRect(const std::string &str, int32 x, int32 y, RECT *pOutRect);
+		void PrintText(const std::string &str, int32 x, int32 y, uint32 color);
+		void PrintTextShadow(const std::string &str, int32 x, int32 y, uint32 color, uint32 shadow = 0xFF000000);
+
+		ID3DXFont *_ptr{};
+
+	};
+
+
 }
 
 template <typename HandleType>

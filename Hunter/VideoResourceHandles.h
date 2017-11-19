@@ -223,5 +223,20 @@ namespace video
 			this->count = count;
 		}
 	};
+	
+	struct FontHandle : public ResourceHandle
+	{
+		FontHandle()
+		{
+			this->index = 0;
+			this->count = 0;
+		}
+
+		FontHandle(uint16 index, uint16 count)
+		{
+			this->index = index;
+			this->count = count;
+		}
+	};
 }
 #endif

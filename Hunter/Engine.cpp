@@ -50,6 +50,22 @@ void Engine::Run()
 					_pInput->keyboard.UpdateWithMessage(msg.message, msg.wParam, msg.lParam);
 				}break;
 
+				case WM_MOUSEWHEEL:
+				{
+					_pInput->mouse.UpdateWheelWithMessage(msg.wParam, msg.lParam);
+				}break;
+
+				case WM_LBUTTONDOWN:
+				case WM_LBUTTONUP:
+				case WM_MBUTTONUP:
+				case WM_MBUTTONDOWN:
+				case WM_RBUTTONDOWN:
+				case WM_RBUTTONUP:
+				case WM_MOUSEMOVE:
+				{
+					_pInput->mouse.UpdateWithMessage(msg.wParam, msg.lParam);
+				}break;
+
 				default :
 				{
 					TranslateMessage(&msg);
@@ -107,25 +123,6 @@ LRESULT Engine::EngineWindowCallback(HWND windowHandle, UINT msg, WPARAM wParam,
 		_valid = false;
 	}break;
 
-	//case WM_SYSKEYDOWN:
-	//case WM_KEYDOWN :
-	//case WM_SYSKEYUP :
-	//case WM_KEYUP :
-	//case WM_CHAR :
-	//{
-	//	_pInput->keyboard.UpdateWithMessage(msg, wParam, lParam);
-	//}break;
-
-	case WM_LBUTTONDOWN:
-	case WM_LBUTTONUP:
-	case WM_MBUTTONUP:
-	case WM_MBUTTONDOWN:
-	case WM_RBUTTONDOWN:
-	case WM_RBUTTONUP:
-	case WM_MOUSEMOVE:
-	{
-		_pInput->mouse.UpdateWithMessage(wParam, lParam);
-	}break;
 
 	default :
 	{

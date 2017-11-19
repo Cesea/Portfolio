@@ -68,6 +68,7 @@ protected :
 	EventChannel _channel;
 
 	Editor *_editor{};
+	video::FontHandle _font;
 public :
 
 	struct SpawnEvent
