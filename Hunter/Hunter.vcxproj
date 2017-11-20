@@ -152,6 +152,8 @@
     <ClCompile Include="Matrix.cpp" />
     <ClCompile Include="MoveComponent.cpp" />
     <ClCompile Include="ColiisionSystem.cpp" />
+    <ClCompile Include="Particle.cpp" />
+    <ClCompile Include="ParticleComponent.cpp" />
     <ClCompile Include="Plane.cpp" />
     <ClCompile Include="MoveSystem.cpp" />
     <ClCompile Include="QuadTree.cpp" />
@@ -231,6 +233,8 @@
     <ClInclude Include="MoveComponent.h" />
     <ClInclude Include="CollisionComponent.h" />
     <ClInclude Include="CollisionSystem.h" />
+    <ClInclude Include="Particle.h" />
+    <ClInclude Include="ParticleComponent.h" />
     <ClInclude Include="Plane.h" />
     <ClInclude Include="MoveSystem.h" />
     <ClInclude Include="QuadTree.h" />

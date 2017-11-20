@@ -180,6 +180,12 @@
     <ClCompile Include="spawn.cpp">
       <Filter>Game\Enemy\spawn</Filter>
     </ClCompile>
+    <ClCompile Include="ParticleComponent.cpp">
+      <Filter>Game\GameComponent\ParticleComponent</Filter>
+    </ClCompile>
+    <ClCompile Include="Particle.cpp">
+      <Filter>Game\GameComponent\ParticleComponent\Particle</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -445,6 +451,12 @@
     <ClInclude Include="spawn.h">
       <Filter>Game\Enemy\spawn</Filter>
     </ClInclude>
+    <ClInclude Include="ParticleComponent.h">
+      <Filter>Game\GameComponent\ParticleComponent</Filter>
+    </ClInclude>
+    <ClInclude Include="Particle.h">
+      <Filter>Game\GameComponent\ParticleComponent\Particle</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Core">
@@ -578,6 +590,12 @@
     </Filter>
     <Filter Include="Game\Enemy\script">
       <UniqueIdentifier>{d0e7f8a4-65cc-4621-9885-04735fb50bb4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\GameComponent\ParticleComponent">
+      <UniqueIdentifier>{1dedc840-fcf1-483c-8e8c-36ac841f068e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\GameComponent\ParticleComponent\Particle">
+      <UniqueIdentifier>{d4f76645-adba-4afb-8942-c2c3d2761ffc}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
