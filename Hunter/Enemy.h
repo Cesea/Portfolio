@@ -1,5 +1,7 @@
 #pragma once
+
 class TransformComponent;
+
 class Enemy
 {
 	enum stateTag
@@ -10,6 +12,7 @@ class Enemy
 		HURT,
 		DIE
 	};
+
 protected:
 	float _hp;
 	float _speed;

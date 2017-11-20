@@ -11,24 +11,24 @@ RenderSystem::~RenderSystem()
 
 void RenderSystem::UpdateAnimations(float deltaTime)
 {
-	video::SkinnedAnimation *pFirstPointer = VIDEO->GetSkinnedAnimation(video::SkinnedAnimationHandle());
+	//video::SkinnedAnimation *pFirstPointer = VIDEO->GetSkinnedAnimation(video::SkinnedAnimationHandle());
 
-	auto &entities = GetEntities();
-	for (uint32 i = 0; i < entities.size(); ++i)
-	{
-		RenderComponent &refRenderComponent = entities[i].GetComponent<RenderComponent>();
-		if (refRenderComponent._type == RenderComponent::Type::eSkinned)
-		{
-			video::SkinnedAnimation *pAnimation = VIDEO->GetSkinnedAnimation(refRenderComponent._skinned);
-			pAnimation->UpdateAnimation(deltaTime);
-		}
-	}
+	//auto &entities = GetEntities();
+	//for (uint32 i = 0; i < entities.size(); ++i)
+	//{
+	//	RenderComponent &refRenderComponent = entities[i].GetComponent<RenderComponent>();
+	//	if (refRenderComponent._type == RenderComponent::Type::eSkinned)
+	//	{
+	//		video::SkinnedAnimation *pAnimation = VIDEO->GetSkinnedAnimation(refRenderComponent._skinned);
+	//		pAnimation->UpdateAnimation(deltaTime);
+	//	}
+	//}
 }
 
 void RenderSystem::Render(video::RenderView &renderView)
 {
-	video::StaticXMesh *pFirstStatic = VIDEO->GetStaticXMesh(video::StaticXMeshHandle());
-	video::SkinnedAnimation *pFirstAnimation = VIDEO->GetSkinnedAnimation(video::SkinnedAnimationHandle());
+	//video::StaticXMesh *pFirstStatic = VIDEO->GetStaticXMesh(video::StaticXMeshHandle());
+	//video::SkinnedAnimation *pFirstAnimation = VIDEO->GetSkinnedAnimation(video::SkinnedAnimationHandle());
 
 	auto &entities = GetEntities();
 	//renderView.SetViewProjection(camera.GetViewMatrix(), camera.GetProjectionMatrix());
@@ -60,7 +60,9 @@ void RenderSystem::Render(video::RenderView &renderView)
 		else if (refRenderComponent._type == RenderComponent::Type::eSkinned)
 		{
 			video::SkinnedAnimation *pAnimation = VIDEO->GetSkinnedAnimation(refRenderComponent._skinned);
-			pAnimation->UpdateMesh(refTransformComponent.GetFinalMatrix());
+			ActionComponent &actionComp = entities[i].GetComponent<ActionComponent>();
+			pAnimation->_pSkinnedMesh->Update(&refTransformComponent.GetFinalMatrix());
+			actionComp._pAnimationController->AdvanceTime(actionComp._animDelta, nullptr);
 			pAnimation->FillRenderCommand(renderView, 
 				video::SkinnedAnimation::sDefaultEffectHandle, video::StaticXMesh::sDefaultEffectHandle);
 		}

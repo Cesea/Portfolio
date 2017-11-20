@@ -20,7 +20,6 @@ VideoDevice::VideoDevice()
 	_skinnedXMeshHandlePool(VIDEO_CONFIG_SKINNED_XMESH_MAX_NUM),
 	_skinnedAnimationHandlePool(VIDEO_CONFIG_ANIMATION_MAX_NUM),
 	_fontHandlePool(VIDEO_CONFIG_FONT_MAX_NUM)
-
 {
 }
 

@@ -163,7 +163,6 @@ namespace video
 
 		StaticXMesh _staticMeshes[VIDEO_CONFIG_STATIC_XMESH_MAX_NUM];
 		SkinnedXMesh _skinnedMeshes[VIDEO_CONFIG_SKINNED_XMESH_MAX_NUM];
-
 		SkinnedAnimation _skinnedAnimations[VIDEO_CONFIG_ANIMATION_MAX_NUM];
 
 		Font _fonts[VIDEO_CONFIG_FONT_MAX_NUM];

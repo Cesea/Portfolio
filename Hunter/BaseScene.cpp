@@ -68,25 +68,24 @@ bool32 BaseScene::Init()
 	_world.AddSystem<ActionSystem>(_actionSystem);
 	_world.AddSystem<ScriptSystem>(_scriptSystem);
 
-	for (uint32 z = 0; z < 2; ++z)
-	{
-		for (uint32 x = 0; x < 2; ++x)
-		{
-			int32 index = Index2D(x, z, 2);
-			_entities.push_back(_world.CreateEntity());
-			Entity &entity = _entities.back();
-
-			TransformComponent &transComp = entity.AddComponent<TransformComponent>();
-			transComp.MovePositionWorld(x * 10, /*TERRAIN->GetHeight(x * 10, z * 10)*/0 , z * 10);
-			RenderComponent &renderComp = entity.AddComponent<RenderComponent>();
-			renderComp._type = RenderComponent::Type::eSkinned;
-			renderComp._skinned = VIDEO->CreateSkinnedAnimation(_skinnedMeshHandle, "Anim" + std::to_string(index));
-			ActionComponent &actionComp = entity.AddComponent<ActionComponent>();
-			actionComp._state = 1;
-
-			entity.Activate();
-		}
-	}
+	//for (uint32 z = 0; z < 2; ++z)
+	//{
+	//	for (uint32 x = 0; x < 2; ++x)
+	//	{
+	//		int32 index = Index2D(x, z, 2);
+	//		_entities.push_back(_world.CreateEntity());
+	//		Entity &entity = _entities.back();
+	//		TransformComponent &transComp = entity.AddComponent<TransformComponent>();
+	//		transComp.MovePositionWorld(x * 10, /*TERRAIN->GetHeight(x * 10, z * 10)*/0 , z * 10);
+	//		RenderComponent &renderComp = entity.AddComponent<RenderComponent>();
+	//		renderComp._type = RenderComponent::Type::eSkinned;
+	//		renderComp._skinned = VIDEO->CreateSkinnedAnimation(_skinnedMeshHandle, "Anim" + std::to_string(index));
+	//		ActionComponent &actionComp = entity.AddComponent<ActionComponent>();
+	//		actionComp.CreateFrom(renderComp._skinned);
+	//		entity.Activate();
+	//	}
+	//}
+	_player.CreateFromWorld(_world);
 
 	/*_entities.push_back(_world.CreateEntity());
 	Entity &entity = _entities.back();*/
@@ -123,13 +122,11 @@ bool32 BaseScene::Update(float deltaTime)
 	//Collision Check
 	_transformSystem.PostUpdate(deltaTime);
 	_actionSystem.Update(deltaTime);
-	_renderSystem.UpdateAnimations(deltaTime);
 
 	//Update Camera
 	_camera.PreUpdateMatrix();
 	_transformSystem.UpdateTransform(_camera.GetTransform());
 	_camera.UpdateMatrix();
-
 
 	//_channel.Update<BaseScene::SpawnEvent>(deltaTime);
 
@@ -138,9 +135,6 @@ bool32 BaseScene::Update(float deltaTime)
 
 bool32 BaseScene::Render()
 {
-	Matrix model;
-	MatrixIdentity(&model);
-
 	DEBUG_DRAWER->DrawWorldGrid(5, 40);
 	DEBUG_DRAWER->FillRenderCommand(*_mainRenderView);
 
@@ -175,15 +169,5 @@ bool32 BaseScene::IsActive()
 
 void BaseScene::RegisterEvents()
 {
-	EventChannel channel;
-	channel.Add<BaseScene::SpawnEvent, BaseScene>(*this);
 }
 
-void BaseScene::Handle(const SpawnEvent &event)
-{
-	static int a = 0;
-	_animations.push_back(VIDEO->CreateSkinnedAnimation(_skinnedMeshHandle, "aat"));
-	video::SkinnedAnimation *pAnimation = VIDEO->GetSkinnedAnimation(_animations.back());
-	pAnimation->Play(a++);
-
-}

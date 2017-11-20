@@ -17,6 +17,9 @@
 
 #include "WorldEditor.h"
 
+#include "Player.h"
+
+
 class BaseScene : public IScene
 {
 	friend class Terrain;
@@ -68,22 +71,14 @@ protected :
 
 	std::vector<Vector3> _points;
 
-
 	EventChannel _channel;
 
 	Editor *_editor{};
 	video::FontHandle _font;
 
+	Player _player;
 
 public :
-
-	struct SpawnEvent
-	{
-		SpawnEvent(const Vector3 &position) : _position(position) {}
-		Vector3 _position;
-		float _timeStamp;
-	};
-	void Handle(const SpawnEvent &event);
 };
 
 #endif

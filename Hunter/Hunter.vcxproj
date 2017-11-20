@@ -126,6 +126,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="ActionComponent.cpp" />
     <ClCompile Include="ActionSystem.cpp" />
     <ClCompile Include="Allocators.cpp" />
     <ClCompile Include="ApplicationTimer.cpp" />
@@ -153,6 +154,7 @@
     <ClCompile Include="ColiisionSystem.cpp" />
     <ClCompile Include="Plane.cpp" />
     <ClCompile Include="MoveSystem.cpp" />
+    <ClCompile Include="Player.cpp" />
     <ClCompile Include="QuadTree.cpp" />
     <ClCompile Include="Quaternion.cpp" />
     <ClCompile Include="Ray.cpp" />
@@ -233,6 +235,7 @@
     <ClInclude Include="CollisionSystem.h" />
     <ClInclude Include="Plane.h" />
     <ClInclude Include="MoveSystem.h" />
+    <ClInclude Include="Player.h" />
     <ClInclude Include="QuadTree.h" />
     <ClInclude Include="Quaternion.h" />
     <ClInclude Include="Ray.h" />

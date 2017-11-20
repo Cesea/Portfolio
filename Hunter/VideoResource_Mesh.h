@@ -113,10 +113,6 @@ namespace video
 		static video::EffectHandle sDefaultEffectHandle;
 	};
 
-	//에니메이션을 위한 typedef
-
-	typedef std::vector<LPD3DXANIMATIONSET> AnimationSetVector;
-	typedef std::map<std::string, LPD3DXANIMATIONSET> AnimationTable;
 
 	typedef std::map<std::string, BoneMesh *> BoneMeshTable;
 	typedef std::map<std::string, Bone *> BoneTable;
@@ -128,11 +124,10 @@ namespace video
 
 		void InitBoneMatrixPointer(Bone *pBone);
 
-		void Update(const Matrix *pWorld);
+		void Update(const Matrix *pMatrix);
 		void UpdateMatrices(Bone *pBone, Matrix *pParentMatrix) const;
 
 		//NOTE : 직접 사용하지 않고 밖에서 쓴다
-
 		//void FillRenderCommand(RenderView &renderView, AnimationHandle animHandle, video::EffectHandle effect);
 		//void RenderBone(RenderView &renderView, Bone *pBone, AnimationHandle animHandle, video::EffectHandle effect) const;
 
@@ -143,9 +138,8 @@ namespace video
 		ID3DXAnimationController *_pAnimationController{};
 
 		uint32 _numSubset{};
-
-		BoneMeshTable _meshTable;
-		BoneTable _boneTable;
+		//BoneMeshTable _meshTable;
+		//BoneTable _boneTable;
 	};
 
 
@@ -154,8 +148,6 @@ namespace video
 	{
 		bool Create(video::SkinnedXMeshHandle handle);
 		void Destroy();
-		void UpdateAnimation(float deltaTime);
-		void UpdateMesh(const Matrix &matrix);
 
 		void FillRenderCommand(RenderView &renderView, 
 			video::EffectHandle skinnedEffect, video::EffectHandle staticEffect);
@@ -163,42 +155,11 @@ namespace video
 			video::EffectHandle skinnedEffect, video::EffectHandle staticEffect, Bone *pBone);
 
 		//void	RenderBoneName(cCamera* pCam, cTransform* pTransform);
-
-		void Play(const std::string &animName, float crossFadeTime = 0.0);
-		void Play(int32 animIndex, float crossFadeTime = 0.0);
-		void PlayOneShot(const std::string &animName, float inCrossFadeTime = 0.0, float outCrossFadeTime = 0.0f);
-		void PlayOneShotAfterHold(const std::string &animName, float crossFadeTime = 0.0);
-		void Stop() { _playing = false; }
-		void SetPlaySpeed(float speed);
-
-		void SetAnimation(LPD3DXANIMATIONSET animation);
-
 		SkinnedXMesh *_pSkinnedMesh{};
 
-		Matrix _world;
-
 		ID3DXAnimationController *_pAnimationController{};
-		uint32 _numAnimation;
-
+		int32 _numPalette{};
 		Matrix *_workingPalettes{};
-		uint32 _numPalette{};
-
-		AnimationSetVector _animations;
-		AnimationTable _animationTable;
-
-		LPD3DXANIMATIONSET _pPlayingAnimationSet{};
-		D3DXTRACK_DESC _playingTrackDesc{};
-
-		bool32 _playing{};
-		bool32 _looping{};
-		LPD3DXANIMATIONSET _pPrevPlayAnimationSet{};
-
-		float _crossFadeTime{};
-		float _leftCrossFadeTime{};
-		float _outCrossFadeTime{};
-		double _animationPlayFactor{};
-
-		float _animDelta{};
 
 		static video::EffectHandle sDefaultEffectHandle;
 	};

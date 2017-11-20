@@ -23,7 +23,7 @@ bool Dragon::CreateFromWorld(World & world)
 	transComp.MovePositionWorld(0, 0, 0);
 	RenderComponent &renderComp = _entity.AddComponent<RenderComponent>();
 	renderComp._type = RenderComponent::Type::eSkinned;
-	renderComp._skinned = VIDEO->CreateSkinnedAnimation(_skinnedMeshHandle, "Anim0");
+	//renderComp._skinned = VIDEO->CreateSkinnedAnimation(_skinnedMeshHandle, "Anim0");
 
 	_entity.Activate();
 	return true;

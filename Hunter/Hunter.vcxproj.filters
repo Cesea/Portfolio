@@ -169,16 +169,22 @@
       <Filter>Game\GameSystem\ScriptSystem</Filter>
     </ClCompile>
     <ClCompile Include="Enemy.cpp">
-      <Filter>Game\Enemy</Filter>
+      <Filter>Game\GameObject\Enemy</Filter>
     </ClCompile>
     <ClCompile Include="Dragon.cpp">
-      <Filter>Game\Enemy\script</Filter>
+      <Filter>Game\GameObject\Enemy\script</Filter>
     </ClCompile>
     <ClCompile Include="spawnManager.cpp">
-      <Filter>Game\Enemy\spawn</Filter>
+      <Filter>Game\GameObject\Enemy\spawn</Filter>
     </ClCompile>
     <ClCompile Include="ActionSystem.cpp">
       <Filter>Game\GameSystem\ActionSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="Player.cpp">
+      <Filter>Game\GameObject</Filter>
+    </ClCompile>
+    <ClCompile Include="ActionComponent.cpp">
+      <Filter>Game\GameComponent\ActionComponent</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -433,14 +439,14 @@
       <Filter>Sub</Filter>
     </ClInclude>
     <ClInclude Include="Enemy.h">
-      <Filter>Game\Enemy</Filter>
+      <Filter>Game\GameObject\Enemy</Filter>
     </ClInclude>
     <ClInclude Include="resource.h" />
     <ClInclude Include="Dragon.h">
-      <Filter>Game\Enemy\script</Filter>
+      <Filter>Game\GameObject\Enemy\script</Filter>
     </ClInclude>
     <ClInclude Include="spawnManager.h">
-      <Filter>Game\Enemy\spawn</Filter>
+      <Filter>Game\GameObject\Enemy\spawn</Filter>
     </ClInclude>
     <ClInclude Include="TerrainSystem.h">
       <Filter>Game\GameUtils\Terrain</Filter>
@@ -450,6 +456,9 @@
     </ClInclude>
     <ClInclude Include="ActionSystem.h">
       <Filter>Game\GameSystem\ActionSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="Player.h">
+      <Filter>Game\GameObject</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -558,9 +567,6 @@
     <Filter Include="Game\GameComponent\MoveComponent">
       <UniqueIdentifier>{4fee0c64-cec2-4c14-b81f-933a66b3a09c}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Game\GameComponent\RenderComponent">
-      <UniqueIdentifier>{41f7ad9e-814b-41a9-9d48-8945cea0acbc}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Game\GameComponent\TransfromComponent">
       <UniqueIdentifier>{2fb70df9-3f23-48a0-9663-092d7ddb399f}</UniqueIdentifier>
     </Filter>
@@ -576,20 +582,26 @@
     <Filter Include="Game\GameSystem\ScriptSystem">
       <UniqueIdentifier>{00b94380-2d5a-414d-ae33-03169cba4084}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Game\Enemy">
-      <UniqueIdentifier>{893eb939-e5e3-4135-b266-7b9d5a97aac7}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Game\Enemy\spawn">
-      <UniqueIdentifier>{48ab3ce0-5cc8-4bd6-83a9-2a6af2b100d3}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Game\Enemy\script">
-      <UniqueIdentifier>{d0e7f8a4-65cc-4621-9885-04735fb50bb4}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Game\GameComponent\ActionComponent">
       <UniqueIdentifier>{39f5f783-17f8-4853-99f2-cd47d44969cd}</UniqueIdentifier>
     </Filter>
     <Filter Include="Game\GameSystem\ActionSystem">
       <UniqueIdentifier>{dd3e75b1-7032-4010-9484-d20e8c7db150}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\GameObject">
+      <UniqueIdentifier>{1522c39a-8489-4679-b87b-978e2a93d64b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\GameObject\Enemy">
+      <UniqueIdentifier>{893eb939-e5e3-4135-b266-7b9d5a97aac7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\GameObject\Enemy\spawn">
+      <UniqueIdentifier>{48ab3ce0-5cc8-4bd6-83a9-2a6af2b100d3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\GameObject\Enemy\script">
+      <UniqueIdentifier>{d0e7f8a4-65cc-4621-9885-04735fb50bb4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\GameComponent\RenderComponent">
+      <UniqueIdentifier>{41f7ad9e-814b-41a9-9d48-8945cea0acbc}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

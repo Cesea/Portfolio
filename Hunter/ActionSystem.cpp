@@ -20,15 +20,8 @@ void ActionSystem::Update(float deltaTime)
 		if (refRenderComp._type == RenderComponent::Type::eSkinned)
 		{
 			ActionComponent &refActionComp = entities[i].GetComponent<ActionComponent>();
-
-			video::SkinnedAnimation *pAnimation = VIDEO->GetSkinnedAnimation(refRenderComp._skinned);
-
-			if (count % 60 == 0)
-			{
-				pAnimation->Play(refActionComp._state++, 0.2f);
-			}
+			refActionComp.UpdateAnimation(deltaTime);
 		}
-
 	}
 	count++;
 }
