@@ -11,6 +11,7 @@ struct Command
 	};
 };
 
+
 class Player 
 {
 public :
@@ -23,11 +24,8 @@ public :
 	void Handle(const InputManager::KeyPressedEvent &event);
 protected :
 	void InterpretCommand();
-
 	Entity entity;
-
 	int32 _animationIndex{-1};
-
 };
 
 #endif

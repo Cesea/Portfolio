@@ -62,7 +62,7 @@ void RenderSystem::Render(video::RenderView &renderView)
 			video::SkinnedAnimation *pAnimation = VIDEO->GetSkinnedAnimation(refRenderComponent._skinned);
 			ActionComponent &actionComp = entities[i].GetComponent<ActionComponent>();
 			pAnimation->_pSkinnedMesh->Update(&refTransformComponent.GetFinalMatrix());
-			actionComp._pAnimationController->AdvanceTime(actionComp._animDelta, nullptr);
+			actionComp._pAnimationController->AdvanceTime(actionComp._animDelta, actionComp._pCallbackHandler);
 			pAnimation->FillRenderCommand(renderView, 
 				video::SkinnedAnimation::sDefaultEffectHandle, video::StaticXMesh::sDefaultEffectHandle);
 		}

@@ -24,6 +24,8 @@ void Player::CreateFromWorld(World & world)
 	scriptComponent.SetScript(MAKE_SCRIPT_DELEGATE(Player, Update, *this));
 	ActionComponent &actionComp = entity.AddComponent<ActionComponent>();
 	actionComp.CreateFrom(renderComp._skinned);
+	actionComp._pCallbackHandler = new PlayerCallBackHandler;
+
 
 	entity.Activate();
 }
@@ -33,10 +35,15 @@ void Player::Update(float deltaTime)
 	if (_animationIndex != -1)
 	{
 		ActionComponent &refAction = entity.GetComponent<ActionComponent>();
-		refAction.Play(_animationIndex);
+
+		Action action;
+		action._animationIndex = _animationIndex;
+		action._blocking = true;
+		action._crossFadeTime = 0.2f;
+
+		refAction._actionQueue.PushAction(action);
 		_animationIndex = -1;
 	}
-
 }
 
 void Player::InterpretCommand()

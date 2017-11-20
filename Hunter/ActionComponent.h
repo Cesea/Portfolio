@@ -9,23 +9,49 @@
 typedef std::vector<LPD3DXANIMATIONSET> AnimationSetVector;
 typedef std::map<std::string, LPD3DXANIMATIONSET> AnimationTable;
 
-struct Action
+class PlayerCallBackHandler : public ID3DXAnimationCallbackHandler
 {
-	int32 _animationIndex{};
-	//만약 뒤에 에니메이션이 온다면 이 에니메이션이 끝나고 실행되게 할거냐 아니면 바로 블랜딩이 되게끔 할 거냐??
-	bool32 _blocking{};
-	float _playSpeed{};
+public :
+	HRESULT CALLBACK HandleCallback(THIS_ UINT Track, LPVOID pCallbackData)
+	{
+		Console::Log("Hi\n");
+		return S_OK;
+	}
 
-	float _crossFadeTime{};
-	float _outCrossFadeTime{};
-
-	char extraInfo[16];
 };
 
-struct ActionQueue
+
+struct Action
 {
-	Action _actions[ACTION_MAX_NUM];
-	uint32 _count{};
+	Action();
+	Action(const Action &other);
+	Action &operator= (const Action &other);
+
+	//만약 animationIndex 가 -1이라면 오류이다...생성자에서 -1로 초기화하니 항상 올바른 값을 주도록 하자
+	int32 _animationIndex;
+	//만약 뒤에 에니메이션이 온다면 이 에니메이션이 끝나고 실행되게 할거냐 아니면 바로 블랜딩이 되게끔 할 거냐??
+	bool32 _blocking;
+	float _playSpeed;
+
+	float _crossFadeTime;
+	float _outCrossFadeTime;
+
+	char _extraInfo[16];
+};
+
+class ActionQueue
+{
+public :
+	void PushAction(const Action &action);
+	const Action &Front();
+	void PopAction();
+
+	bool HasAction() { return (_head != _tail); }
+
+private :
+	Action _actions[ACTION_MAX_NUM]{};
+	uint32 _head{};
+	uint32 _tail{};
 
 };
 
@@ -45,9 +71,9 @@ public :
 	void PlayOneShotAfterHold(int32 animIndex, float crossFadeTime = 0.0);
 
 	//문자열로 찾기
-	void Play(const std::string &animName, float crossFadeTime = 0.0);
-	void PlayOneShot(const std::string &animName, float inCrossFadeTime = 0.0, float outCrossFadeTime = 0.0f);
-	void PlayOneShotAfterHold(const std::string &animName, float crossFadeTime = 0.0);
+	//void Play(const std::string &animName, float crossFadeTime = 0.0);
+	//void PlayOneShot(const std::string &animName, float inCrossFadeTime = 0.0, float outCrossFadeTime = 0.0f);
+	//void PlayOneShotAfterHold(const std::string &animName, float crossFadeTime = 0.0);
 
 	void Stop() { _playing = false; }
 	void SetPlaySpeed(float speed);
@@ -62,11 +88,13 @@ public :
 	uint32 _numAnimation{};
 
 	ID3DXAnimationSet *_pPlayingAnimationSet{};
+	uint32 _playingAnimationIndex{};
 	D3DXTRACK_DESC _playingTrackDesc{};
 
 	bool32 _playing{};
 	bool32 _looping{};
 	ID3DXAnimationSet *_pPrevPlayingAnimationSet{};
+	uint32 _prevAnimationIndex{};
 
 	float _crossFadeTime{};
 	float _leftCrossFadeTime{};
@@ -74,6 +102,8 @@ public :
 	double _animationPlayFactor{};
 
 	float _animDelta{};
+
+	ID3DXAnimationCallbackHandler *_pCallbackHandler{};
 
 	AnimationSetVector _animations;
 	AnimationTable _animationTable;
