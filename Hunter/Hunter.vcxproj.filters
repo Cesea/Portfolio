@@ -177,6 +177,9 @@
     <ClCompile Include="spawnManager.cpp">
       <Filter>Game\Enemy\spawn</Filter>
     </ClCompile>
+    <ClCompile Include="spawn.cpp">
+      <Filter>Game\Enemy\spawn</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -437,6 +440,9 @@
       <Filter>Game\Enemy\script</Filter>
     </ClInclude>
     <ClInclude Include="spawnManager.h">
+      <Filter>Game\Enemy\spawn</Filter>
+    </ClInclude>
+    <ClInclude Include="spawn.h">
       <Filter>Game\Enemy\spawn</Filter>
     </ClInclude>
   </ItemGroup>
