@@ -126,6 +126,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="ActionSystem.cpp" />
     <ClCompile Include="Allocators.cpp" />
     <ClCompile Include="ApplicationTimer.cpp" />
     <ClCompile Include="BaseScene.cpp" />
@@ -191,6 +192,8 @@
     <ClCompile Include="XmlSerializer.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="ActionComponent.h" />
+    <ClInclude Include="ActionSystem.h" />
     <ClInclude Include="ApplicationTimer.h" />
     <ClInclude Include="Assert.h" />
     <ClInclude Include="BaseScene.h" />
@@ -242,6 +245,7 @@
     <ClInclude Include="spawnManager.h" />
     <ClInclude Include="System.h" />
     <ClInclude Include="Terrain.h" />
+    <ClInclude Include="TerrainSystem.h" />
     <ClInclude Include="TestScene.h" />
     <ClInclude Include="TextSerializer.h" />
     <ClInclude Include="tinyxml2.h" />

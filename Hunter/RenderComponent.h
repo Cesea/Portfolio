@@ -16,7 +16,6 @@ public:
 		eStatic,
 		eSkinned
 	};
-
 	Type _type;
 	union
 	{

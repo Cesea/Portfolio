@@ -447,6 +447,12 @@ namespace video
 
 		static video::EffectHandle sDefaultEffectHandle;
 	};
+
+	struct ImguiBuffer
+	{
+
+
+	};
 }
 
 template <typename HandleType>

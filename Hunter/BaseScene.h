@@ -6,6 +6,7 @@
 #include "World.h"
 #include "MoveSystem.h"
 #include "RenderSystem.h"
+#include "ActionSystem.h"
 #include "ScriptSystem.h"
 
 #include "TransformSystem.h"
@@ -52,6 +53,7 @@ protected :
 	TransformSystem _transformSystem;
 	RenderSystem _renderSystem;
 	ScriptSystem _scriptSystem;
+	ActionSystem _actionSystem;
 	std::vector<Entity> _entities;
 
 	Camera _camera;

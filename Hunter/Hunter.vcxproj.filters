@@ -177,6 +177,9 @@
     <ClCompile Include="spawnManager.cpp">
       <Filter>Game\Enemy\spawn</Filter>
     </ClCompile>
+    <ClCompile Include="ActionSystem.cpp">
+      <Filter>Game\GameSystem\ActionSystem</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -439,6 +442,15 @@
     <ClInclude Include="spawnManager.h">
       <Filter>Game\Enemy\spawn</Filter>
     </ClInclude>
+    <ClInclude Include="TerrainSystem.h">
+      <Filter>Game\GameUtils\Terrain</Filter>
+    </ClInclude>
+    <ClInclude Include="ActionComponent.h">
+      <Filter>Game\GameComponent\ActionComponent</Filter>
+    </ClInclude>
+    <ClInclude Include="ActionSystem.h">
+      <Filter>Game\GameSystem\ActionSystem</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Core">
@@ -572,6 +584,12 @@
     </Filter>
     <Filter Include="Game\Enemy\script">
       <UniqueIdentifier>{d0e7f8a4-65cc-4621-9885-04735fb50bb4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\GameComponent\ActionComponent">
+      <UniqueIdentifier>{39f5f783-17f8-4853-99f2-cd47d44969cd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\GameSystem\ActionSystem">
+      <UniqueIdentifier>{dd3e75b1-7032-4010-9484-d20e8c7db150}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

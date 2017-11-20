@@ -46,9 +46,9 @@ bool32 BaseScene::Init()
 	config._lodRatio = 0.1f;
 	config._sectionResolution = 64;
 
-	TERRAIN->SetScene(this);
-	TERRAIN->Create(config, 1);
-	_terrainEffect = VIDEO->GetEffect("TerrainBase.fx");
+	//TERRAIN->SetScene(this);
+	//TERRAIN->Create(config, 1);
+	//_terrainEffect = VIDEO->GetEffect("TerrainBase.fx");
 
 	//메쉬 불러오기..
 	Matrix correctionMat;
@@ -65,6 +65,7 @@ bool32 BaseScene::Init()
 	//엔티티 생성
 	_world.AddSystem<RenderSystem>(_renderSystem);
 	_world.AddSystem<TransformSystem>(_transformSystem);
+	_world.AddSystem<ActionSystem>(_actionSystem);
 	_world.AddSystem<ScriptSystem>(_scriptSystem);
 
 	for (uint32 z = 0; z < 2; ++z)
@@ -80,6 +81,8 @@ bool32 BaseScene::Init()
 			RenderComponent &renderComp = entity.AddComponent<RenderComponent>();
 			renderComp._type = RenderComponent::Type::eSkinned;
 			renderComp._skinned = VIDEO->CreateSkinnedAnimation(_skinnedMeshHandle, "Anim" + std::to_string(index));
+			ActionComponent &actionComp = entity.AddComponent<ActionComponent>();
+			actionComp._state = 1;
 
 			entity.Activate();
 		}
@@ -114,17 +117,19 @@ bool32 BaseScene::Update(float deltaTime)
 
 	_world.Refresh();
 
+	_scriptSystem.Update(deltaTime);
 	_transformSystem.PreUpdate(deltaTime);
 
 	//Collision Check
 	_transformSystem.PostUpdate(deltaTime);
-	//_renderSystem.UpdateAnimations(deltaTime);
+	_actionSystem.Update(deltaTime);
+	_renderSystem.UpdateAnimations(deltaTime);
+
 	//Update Camera
 	_camera.PreUpdateMatrix();
 	_transformSystem.UpdateTransform(_camera.GetTransform());
 	_camera.UpdateMatrix();
 
-	_scriptSystem.Update(deltaTime);
 
 	//_channel.Update<BaseScene::SpawnEvent>(deltaTime);
 
@@ -136,19 +141,15 @@ bool32 BaseScene::Render()
 	Matrix model;
 	MatrixIdentity(&model);
 
-	//DEBUG_DRAWER->DrawWorldGrid(5, 40);
-	//DEBUG_DRAWER->FillRenderCommand(*_mainRenderView);
-	//DEBUG_DRAWER->DrawAABB(Vector3(0.0f, 5.0f, 0.0f), Vector3(12.0f, 10.0f, 10.0f), 0xff00ffff);
-	////DEBUG_DRAWER->DrawBox();
-	//DEBUG_DRAWER->FillRenderCommand(*_mainRenderView);
+	DEBUG_DRAWER->DrawWorldGrid(5, 40);
+	DEBUG_DRAWER->FillRenderCommand(*_mainRenderView);
 
-	//_renderSystem.Render(*_mainRenderView);
-	TERRAIN->FillRenderCommand(*_mainRenderView);
-
+	_renderSystem.Render(*_mainRenderView);
+	//TERRAIN->FillRenderCommand(*_mainRenderView);
 
 	_mainRenderView->PreRender();
 	_mainRenderView->ExecCommands();
-	//imguiRenderDraw();
+	imguiRenderDraw();
 	_mainRenderView->PostRender();
 
 	return true;

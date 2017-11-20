@@ -5,6 +5,8 @@
 #include "RenderComponent.h"
 #include "MoveComponent.h"
 #include "CollisionComponent.h"
+#include "ScriptComponent.h"
+#include "ActionComponent.h"
 
 
 #endif
