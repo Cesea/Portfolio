@@ -186,6 +186,9 @@
     <ClCompile Include="GameCommand.cpp">
       <Filter>Game\GameUtils\GameCommand</Filter>
     </ClCompile>
+    <ClCompile Include="PlayerAnimationString.cpp">
+      <Filter>Game\GameObject\Player</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />

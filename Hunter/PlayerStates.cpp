@@ -26,15 +26,46 @@ void PlayerNormalState::OnEnter()
 	_pActor->_pActionComp->SetFirstAction(firstAction);
 
 
+	_idleRandomTimer.Restart(2.0f);
 
 }
-
 
 PlayerState * PlayerNormalState::Update(float deltaTime, const GameCommand &command)
 {
 	PlayerState *newState = nullptr;
+	//인풋이 없었다.
+	if (true == command._interpreted)
+	{
+		if (_lastCommand._type == GameCommand::Type::eMove)
+		{
+			_pActor->_pActionComp->_actionQueue.PushAction(PLAYER_ANIM(PlayerAnimationEnum::eStandingFree));
+		}
+	}
+	else if (false == command._interpreted)
+	{
+		if (command._type == GameCommand::Type::eMove)
+		{
+			if (command._movement._vertical == Movement::Vertical::eUp)
+			{
+				_pActor->_pActionComp->_actionQueue.PushAction(PLAYER_ANIM(PlayerAnimationEnum::eWalk));
+			}
+			else if (command._movement._vertical == Movement::Vertical::eDown)
+			{
+				_pActor->_pActionComp->_actionQueue.PushAction(PLAYER_ANIM(PlayerAnimationEnum::eWalkingBack));
+			}
+		}
+		else if (command._type == GameCommand::Type::eJump)
+		{
+			_pActor->_pActionComp->_actionQueue.PushAction(PLAYER_ANIM(PlayerAnimationEnum::eJumpRunning));
+		}
+	}
 
+	//if (_idleRandomTimer.Tick(deltaTime))
+	//{
+	//	_pActor->_pActionComp->_actionQueue.PushAction(PLAYER_ANIM(PlayerAnimationEnum::eSitDown));
+	//}
 
+	_lastCommand = command;
 	return newState;
 }
 
@@ -48,7 +79,11 @@ void PlayerWarState::OnEnter()
 
 PlayerState * PlayerWarState::Update(float deltaTime, const GameCommand &command)
 {
-	return nullptr;
+	PlayerState *newState = nullptr;
+
+
+	_lastCommand = command;
+	return newState;
 }
 
 void PlayerWarState::OnExit()
@@ -61,7 +96,11 @@ void PlayerDeadState::OnEnter()
 
 PlayerState * PlayerDeadState::Update(float deltaTime, const GameCommand &command)
 {
-	return nullptr;
+	PlayerState *newState = nullptr;
+
+
+	_lastCommand = command;
+	return newState;
 }
 
 void PlayerDeadState::OnExit()

@@ -154,6 +154,7 @@
     <ClCompile Include="ColiisionSystem.cpp" />
     <ClCompile Include="Plane.cpp" />
     <ClCompile Include="Player.cpp" />
+    <ClCompile Include="PlayerAnimationString.cpp" />
     <ClCompile Include="PlayerStates.cpp" />
     <ClCompile Include="QuadTree.cpp" />
     <ClCompile Include="Quaternion.cpp" />

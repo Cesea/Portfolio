@@ -26,6 +26,9 @@ public :
 	virtual void OnEnter() = 0;
 	virtual PlayerState *Update(float deltaTime, const GameCommand &command) = 0;
 	virtual void OnExit() = 0;
+
+protected : 
+	GameCommand _lastCommand;
 };
 
 class PlayerNormalState : public PlayerState
@@ -37,6 +40,10 @@ public :
 
 protected :
 	StopWatch _idleRandomTimer;
+
+	bool32 _sitting{ false };
+	bool32 _walking{ false };
+	bool32 _running{ false };
 
 };
 

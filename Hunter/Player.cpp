@@ -14,7 +14,9 @@ void Player::CreateFromWorld(World & world)
 {
 	EventChannel channel;
 	channel.Add<InputManager::KeyPressedEvent, Player>(*this);
+	channel.Add<InputManager::KeyDownEvent, Player>(*this);
 	channel.Add<InputManager::MousePressedEvent, Player>(*this);
+	SetInputConfig();
 	_entity = world.CreateEntity();
 
 	TransformComponent &transComp = _entity.AddComponent<TransformComponent>();
@@ -39,12 +41,13 @@ void Player::CreateFromWorld(World & world)
 	_stateMachine.Init(this);
 	_stateMachine.ChangeState(new PlayerNormalState);
 
-	_lastCommand._interpreted = true;
+	_currentCommand._interpreted = true;
 }
 
 void Player::Update(float deltaTime)
 {
-	_stateMachine.Update(deltaTime, _lastCommand);
+	_stateMachine.Update(deltaTime, _currentCommand);
+	_currentCommand._interpreted = true;
 
 	//if (_lastCommand._interpreted == false)
 	//{
@@ -115,46 +118,6 @@ void Player::Handle(const InputManager::KeyPressedEvent & event)
 {
 	uint32 inputCode = event.code;
 
-	if (_inputConfig._left == inputCode)
-	{
-		_lastCommand._type = GameCommand::Type::eMove;
-		_lastCommand._movement._horizontal = Movement::Horizontal::eLeft;
-		_lastCommand._behavior._type = Behavior::Type::eWalk;
-		_lastCommand._interpreted = false;
-	}
-	else if(_inputConfig._right == inputCode)
-	{
-		_lastCommand._type = GameCommand::Type::eMove;
-		_lastCommand._movement._horizontal = Movement::Horizontal::eRight;
-		_lastCommand._behavior._type = Behavior::Type::eWalk;
-		_lastCommand._interpreted = false;
-	}
-	else if(_inputConfig._up == inputCode)
-	{
-		_lastCommand._type = GameCommand::Type::eMove;
-		_lastCommand._movement._vertical = Movement::Vertical::eUp;
-		_lastCommand._behavior._type = Behavior::Type::eWalk;
-		_lastCommand._interpreted = false;
-	}
-	else if (_inputConfig._down == inputCode)
-	{
-		_lastCommand._type = GameCommand::Type::eMove;
-		_lastCommand._movement._vertical = Movement::Vertical::eDown;
-		_lastCommand._behavior._type = Behavior::Type::eWalk;
-		_lastCommand._interpreted = false;
-	}
-	//else if (_keyConfig._jump == inputCode)
-	//{
-	//	_lastCommand._type = GameCommand::Type::eJump;
-	//	_lastCommand._behavior._type = Behavior::Type::eJump;
-	//	//_lastCommand._movement._vertical = Movement::Vertical::eDown;
-	//	_lastCommand._interpreted = false;
-	//}
-	else if(_inputConfig._special == inputCode)
-	{
-		_lastCommand._type = GameCommand::Type::eAction;
-		_lastCommand._interpreted = false;
-	}
 }
 
 void Player::Handle(const InputManager::MousePressedEvent & event)
@@ -163,17 +126,60 @@ void Player::Handle(const InputManager::MousePressedEvent & event)
 
 	if (inputCode == _inputConfig._attack)
 	{
-		_lastCommand._type = GameCommand::Type::eAction;
-		_lastCommand._behavior._type = Behavior::Type::eAttack;
-		_lastCommand._interpreted = false;
+		_currentCommand._type = GameCommand::Type::eAction;
+		_currentCommand._behavior._type = Behavior::Type::eAttack;
+		_currentCommand._interpreted = false;
 	}
 	else if (inputCode == _inputConfig._block)
 	{
-		_lastCommand._type = GameCommand::Type::eAction;
-		_lastCommand._behavior._type = Behavior::Type::eBlock;
-		_lastCommand._interpreted = false;
+		_currentCommand._type = GameCommand::Type::eAction;
+		_currentCommand._behavior._type = Behavior::Type::eBlock;
+		_currentCommand._interpreted = false;
 	}
 }
+
+void Player::Handle(const InputManager::KeyDownEvent & event)
+{
+	uint32 inputCode = event.code;
+
+	if (_inputConfig._left == inputCode)
+	{
+		_currentCommand._type = GameCommand::Type::eMove;
+		_currentCommand._movement._horizontal = Movement::Horizontal::eLeft;
+		_currentCommand._behavior._type = Behavior::Type::eWalk;
+		_currentCommand._interpreted = false;
+	}
+	else if(_inputConfig._right == inputCode)
+	{
+		_currentCommand._type = GameCommand::Type::eMove;
+		_currentCommand._movement._horizontal = Movement::Horizontal::eRight;
+		_currentCommand._behavior._type = Behavior::Type::eWalk;
+		_currentCommand._interpreted = false;
+	}
+	else if(_inputConfig._up == inputCode)
+	{
+		_currentCommand._type = GameCommand::Type::eMove;
+		_currentCommand._movement._vertical = Movement::Vertical::eUp;
+		_currentCommand._behavior._type = Behavior::Type::eWalk;
+		_currentCommand._interpreted = false;
+	}
+	else if (_inputConfig._down == inputCode)
+	{
+		_currentCommand._type = GameCommand::Type::eMove;
+		_currentCommand._movement._vertical = Movement::Vertical::eDown;
+		_currentCommand._behavior._type = Behavior::Type::eWalk;
+		_currentCommand._interpreted = false;
+	}
+	else if (_inputConfig._jump == inputCode)
+	{
+		_currentCommand._type = GameCommand::Type::eJump;
+		_currentCommand._behavior._type = Behavior::Type::eJump;
+		_currentCommand._movement._vertical = Movement::Vertical::eDown;
+		_currentCommand._interpreted = false;
+	}
+
+}
+
 
 void Player::SetInputConfig()
 {

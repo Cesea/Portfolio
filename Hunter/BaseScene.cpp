@@ -20,6 +20,8 @@ bool32 BaseScene::Init()
 	bool32 result = true;
 	//RegisterEvents();
 
+	InitPlayerAnimation();
+
 	//렌더 타켓 설정
 	video::RenderViewHandle renderViewHandle= VIDEO->CreateRenderView("Main");
 	_mainRenderView = VIDEO->GetRenderView(renderViewHandle);

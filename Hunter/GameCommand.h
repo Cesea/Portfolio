@@ -56,6 +56,10 @@ struct GameCommand
 	bool32 _interpreted{false};
 
 	void Reset();
+
+	GameCommand();
+	GameCommand(const GameCommand &other);
+	GameCommand &operator= (const GameCommand &other);
 };
 
 

@@ -116,6 +116,11 @@ void ActionComponent::UpdateAnimation(float deltaTime)
 
 bool ActionComponent::Play(const Action & action)
 {
+	if (strcmp(action._name, _playingAction._name) == 0)
+	{
+		return true;
+	}
+
 	//현제 플레이 중인 엑션이 블로킹인지 아닌지 판단한다....
 	if (_playingAction._blocking)
 	{

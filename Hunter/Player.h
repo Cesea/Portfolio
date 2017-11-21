@@ -75,6 +75,7 @@ public :
 
 	void Handle(const InputManager::KeyPressedEvent &event);
 	void Handle(const InputManager::MousePressedEvent &event);
+	void Handle(const InputManager::KeyDownEvent &event);
 protected :
 
 	void SetupCallbackAndCompression();
@@ -85,7 +86,7 @@ protected :
 
 	PlayerStateMachine _stateMachine;
 
-	GameCommand _lastCommand;
+	GameCommand _currentCommand;
 
 	ActionComponent *_pActionComp{};
 

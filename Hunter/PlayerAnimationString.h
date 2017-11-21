@@ -1,6 +1,30 @@
 #ifndef PLAYER_ANIMATION_STRING_H
 #define PLAYER_ANIMATION_STRING_H
 
+
+#define PLAYER_ANIM_DECLARE(Name) \
+	template <> \
+	struct PlayerAnimationAction<Name> \
+	{ \
+		static Action _action; \
+	}; \
+
+#define PLAYER_ANIM_LINK(Name) \
+	Action PlayerAnimationAction<Name>::_action;
+
+#define PLAYER_ANIM_DEFINE(Name, Blocking, PlayOnce, PlaySpeed, CrossFadeTime, OutCrossFadeTime)  \
+	PlayerAnimationAction<Name>::_action._blocking = Blocking; \
+	PlayerAnimationAction<Name>::_action._playOnce = PlayOnce; \
+	PlayerAnimationAction<Name>::_action._playSpeed = PlaySpeed; \
+	PlayerAnimationAction<Name>::_action._crossFadeTime = CrossFadeTime; \
+	PlayerAnimationAction<Name>::_action._outCrossFadeTime = OutCrossFadeTime; \
+	strncpy(PlayerAnimationAction<Name>::_action._name, PlayerAnimationString[PlayerAnimationEnum::Name], strlen(PlayerAnimationString[PlayerAnimationEnum::Name])); \
+	PlayerAnimationAction<Name>::_action._name; 
+
+#define PLAYER_ANIM( Name ) PlayerAnimationAction<Name>::_action
+
+void InitPlayerAnimation();
+
 enum PlayerAnimationEnum
 {
 	eWarRetreat = 0,
@@ -50,7 +74,14 @@ enum PlayerAnimationEnum
 	eSalute,
 	eSitDown,
 	eSitting,
-	eHeroWalk
+	eWalk,
+	COUNT
+};
+
+template <int32 Anim>
+struct PlayerAnimationAction
+{
+	//static const Action _action;
 };
 
 static const char *PlayerAnimationString[] = 
@@ -62,7 +93,7 @@ static const char *PlayerAnimationString[] =
 	{ "hero_Drinking"},
 	{ "hero_Eating"},
 	{ "hero_Explanation"},
-	{ "hero_Jump_running"},
+	{ "hero_Jump_runing"},
 	{ "hero_Run"},
 	{"hero_Say_No"},
 	{"hero_Sneaking"},
@@ -104,5 +135,54 @@ static const char *PlayerAnimationString[] =
 	{"hero_sitting"},
 	{"hero_walk"}
 };
+
+PLAYER_ANIM_DECLARE(eWarRetreat);
+PLAYER_ANIM_DECLARE(eWalkingBack);
+PLAYER_ANIM_DECLARE(eClimbingLadder);
+PLAYER_ANIM_DECLARE(eCrouching);
+PLAYER_ANIM_DECLARE(eDrinking);
+PLAYER_ANIM_DECLARE(eEating);
+PLAYER_ANIM_DECLARE(eExplanation);
+PLAYER_ANIM_DECLARE(eJumpRunning);
+PLAYER_ANIM_DECLARE(eRun);
+PLAYER_ANIM_DECLARE(eSayNo);
+PLAYER_ANIM_DECLARE(eSneaking);
+PLAYER_ANIM_DECLARE(eStandingFree);
+PLAYER_ANIM_DECLARE(eSwimming);
+PLAYER_ANIM_DECLARE(eTalking);
+PLAYER_ANIM_DECLARE(eWarThrowingAxe);
+PLAYER_ANIM_DECLARE(eWarThrowingSpear);
+PLAYER_ANIM_DECLARE(eWarCombatMode);
+PLAYER_ANIM_DECLARE(eWarDying);
+PLAYER_ANIM_DECLARE(eWarBackwards);
+PLAYER_ANIM_DECLARE(eWarBelowHighSwing);
+PLAYER_ANIM_DECLARE(eWarCharging);
+PLAYER_ANIM_DECLARE(eWarDodgeToLeft);
+PLAYER_ANIM_DECLARE(eWarDodgeToRight);
+PLAYER_ANIM_DECLARE(eWarMovingLeft);
+PLAYER_ANIM_DECLARE(eWarMovingRight);
+PLAYER_ANIM_DECLARE(eWarParryFromStraightDown);
+PLAYER_ANIM_DECLARE(eWarParryFront);
+PLAYER_ANIM_DECLARE(eWarRunSwingLeft);
+PLAYER_ANIM_DECLARE(eWarRunSwingRight);
+PLAYER_ANIM_DECLARE(eWarRunSwingUpDown);
+PLAYER_ANIM_DECLARE(eWarShieldBlock);
+PLAYER_ANIM_DECLARE(eWarShieldBlow);
+PLAYER_ANIM_DECLARE(eWarSpecialAttackA);
+PLAYER_ANIM_DECLARE(eWarSpecialAttackB);
+PLAYER_ANIM_DECLARE(eWarSwingHighStraigtDown);
+PLAYER_ANIM_DECLARE(eWarSwingLeft);
+PLAYER_ANIM_DECLARE(eWarSwingRight);
+PLAYER_ANIM_DECLARE(eWarTakingHit);
+PLAYER_ANIM_DECLARE(eWarThrustMid);
+PLAYER_ANIM_DECLARE(eBoring);
+PLAYER_ANIM_DECLARE(eCameUp);
+PLAYER_ANIM_DECLARE(eLookingAround);
+PLAYER_ANIM_DECLARE(eMakingItem);
+PLAYER_ANIM_DECLARE(ePickObject);
+PLAYER_ANIM_DECLARE(eSalute);
+PLAYER_ANIM_DECLARE(eSitDown);
+PLAYER_ANIM_DECLARE(eSitting);
+PLAYER_ANIM_DECLARE(eWalk);
 
 #endif
