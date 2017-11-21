@@ -29,5 +29,7 @@ public:
 
 	void createParticle(float maxTime, const Vector3 pos, const Vector3 accel, const Vector3 vel, float scale);
 	void updateParticle(float timeDelta);
+
+	void GetParticleVertex(	LPPARTICLE_VERTEX pOut,const VEC_COLOR& colors,	const VEC_SCALE& scales);
 };
 
