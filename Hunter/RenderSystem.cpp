@@ -59,12 +59,12 @@ void RenderSystem::Render(video::RenderView &renderView)
 		}
 		else if (refRenderComponent._type == RenderComponent::Type::eSkinned)
 		{
-			video::SkinnedAnimation *pAnimation = VIDEO->GetSkinnedAnimation(refRenderComponent._skinned);
+			video::AnimationInstance *pAnimation = VIDEO->GetAnimationInstance(refRenderComponent._skinned);
 			ActionComponent &actionComp = entities[i].GetComponent<ActionComponent>();
-			pAnimation->_pSkinnedMesh->Update(&refTransformComponent.GetFinalMatrix());
 			actionComp._pAnimationController->AdvanceTime(actionComp._animDelta, actionComp._pCallbackHandler);
+			pAnimation->_pSkinnedMesh->Update(&refTransformComponent.GetFinalMatrix());
 			pAnimation->FillRenderCommand(renderView, 
-				video::SkinnedAnimation::sDefaultEffectHandle, video::StaticXMesh::sDefaultEffectHandle);
+				video::AnimationInstance::sDefaultEffectHandle, video::StaticXMesh::sDefaultEffectHandle);
 		}
 	}
 }

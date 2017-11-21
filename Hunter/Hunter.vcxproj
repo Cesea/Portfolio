@@ -246,6 +246,8 @@
     <ClInclude Include="ScriptComponent.h" />
     <ClInclude Include="ScriptSystem.h" />
     <ClInclude Include="spawnManager.h" />
+    <ClInclude Include="State.h" />
+    <ClInclude Include="StateMachine.h" />
     <ClInclude Include="System.h" />
     <ClInclude Include="Terrain.h" />
     <ClInclude Include="TerrainSystem.h" />

@@ -4,7 +4,7 @@
 namespace video
 {
 	EffectHandle StaticXMesh::sDefaultEffectHandle;
-	EffectHandle SkinnedAnimation::sDefaultEffectHandle;
+	EffectHandle AnimationInstance::sDefaultEffectHandle;
 
 	////Free Function
 	TextureHandle LoadTextureWithStrings(const std::string &filePath, const std::string &fileName, const std::string &fileExtension, const std::string &userStr)
@@ -503,7 +503,7 @@ namespace video
 	}
 
 	//Skinned Animation ////////////////////////////////////////////////////////
-	bool SkinnedAnimation::Create(video::SkinnedXMeshHandle handle)
+	bool AnimationInstance::Create(video::SkinnedXMeshHandle handle)
 	{
 		if (!handle.IsValid())
 		{
@@ -527,18 +527,18 @@ namespace video
 		return true;
 	}
 
-	void SkinnedAnimation::Destroy()
+	void AnimationInstance::Destroy()
 	{
 		COM_RELEASE(_pAnimationController);
 	}
 
-	void SkinnedAnimation::FillRenderCommand(RenderView & renderView, 
+	void AnimationInstance::FillRenderCommand(RenderView & renderView, 
 		video::EffectHandle skinnedEffect, video::EffectHandle staticEffect)
 	{
 		FillRenderCommandInternal(renderView, skinnedEffect, staticEffect, _pSkinnedMesh->_pRootBone);
 	}
 
-	void SkinnedAnimation::FillRenderCommandInternal(RenderView & renderView, 
+	void AnimationInstance::FillRenderCommandInternal(RenderView & renderView, 
 		video::EffectHandle skinnedEffect, video::EffectHandle staticEffect, Bone *pBone)
 	{
 		if (nullptr == pBone)

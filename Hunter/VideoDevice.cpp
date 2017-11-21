@@ -18,7 +18,7 @@ VideoDevice::VideoDevice()
 	_materialHandlePool(VIDEO_CONFIG_MATERIAL_MAX_NUM),
 	_staticXMeshHandlePool(VIDEO_CONFIG_STATIC_XMESH_MAX_NUM),
 	_skinnedXMeshHandlePool(VIDEO_CONFIG_SKINNED_XMESH_MAX_NUM),
-	_skinnedAnimationHandlePool(VIDEO_CONFIG_ANIMATION_MAX_NUM),
+	_animationInstanceHandlePool(VIDEO_CONFIG_ANIMATION_MAX_NUM),
 	_fontHandlePool(VIDEO_CONFIG_FONT_MAX_NUM)
 {
 }
@@ -636,38 +636,38 @@ void video::VideoDevice::DestroySkinnedMesh(SkinnedXMeshHandle handle)
 	_skinnedXMeshHandlePool.Remove(handle);
 }
 
-SkinnedAnimationHandle video::VideoDevice::CreateSkinnedAnimation(SkinnedXMeshHandle xMesh, const std::string & name)
+AnimationInstanceHandle video::VideoDevice::CreateAnimationInstance(SkinnedXMeshHandle xMesh, const std::string & name)
 {
-	SkinnedAnimationHandle result = _skinnedAnimationHandlePool.Create(name);
-	if (!_skinnedAnimations[result.index].Create(xMesh))
+	AnimationInstanceHandle result = _animationInstanceHandlePool.Create(name);
+	if (!_animationInstances[result.index].Create(xMesh))
 	{
 		Console::Log("Skinned Animation create failed\n");
-		return SkinnedAnimationHandle();
+		return AnimationInstanceHandle();
 	}
 	return result;
 }
 
-SkinnedAnimationHandle video::VideoDevice::GetSkinnedAnimation(const std::string & name)
+AnimationInstanceHandle video::VideoDevice::GetAnimationInstance(const std::string & name)
 {
-	return _skinnedAnimationHandlePool.Get(name);
+	return _animationInstanceHandlePool.Get(name);
 }
 
-SkinnedAnimation * video::VideoDevice::GetSkinnedAnimation(SkinnedAnimationHandle handle)
+AnimationInstance * video::VideoDevice::GetAnimationInstance(AnimationInstanceHandle handle)
 {
 	if (handle.IsValid())
 	{
-		return &_skinnedAnimations[handle.index];
+		return &_animationInstances[handle.index];
 	}
 	return nullptr;
 }
 
-void video::VideoDevice::DestroySkinnedAnimation(SkinnedAnimationHandle handle)
+void video::VideoDevice::DestroyAnimationInstance(AnimationInstanceHandle handle)
 {
 	if (handle.IsValid())
 	{
-		_skinnedAnimations[handle.index].Destroy();
+		_animationInstances[handle.index].Destroy();
 	}
-	_skinnedAnimationHandlePool.Remove(handle);
+	_animationInstanceHandlePool.Remove(handle);
 }
 
 FontHandle video::VideoDevice::CreateFont(const D3DXFONT_DESC & fontDesc, const std::string & name)

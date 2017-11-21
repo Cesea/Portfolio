@@ -460,6 +460,12 @@
     <ClInclude Include="Player.h">
       <Filter>Game\GameObject</Filter>
     </ClInclude>
+    <ClInclude Include="State.h">
+      <Filter>Sub\StateMachine</Filter>
+    </ClInclude>
+    <ClInclude Include="StateMachine.h">
+      <Filter>Sub\StateMachine</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Core">
@@ -602,6 +608,9 @@
     </Filter>
     <Filter Include="Game\GameComponent\RenderComponent">
       <UniqueIdentifier>{41f7ad9e-814b-41a9-9d48-8945cea0acbc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sub\StateMachine">
+      <UniqueIdentifier>{03a31a36-575e-41fb-83b9-1e21b39eca4a}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

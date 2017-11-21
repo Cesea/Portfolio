@@ -14,9 +14,9 @@ Camera::Camera()
 
 	//±âº» Far
 #if defined (DEBUG) || defined (_DEBUG)
-	_camFar = 100.0f;
+	_camFar = 500.0f;
 #else 
-	_camFar = 200.0f;
+	_camFar = 600.0f;
 #endif
 
 	_moveSpeed = 1.0f;

@@ -63,7 +63,7 @@ protected :
 	video::StaticXMeshHandle _staticMeshHandle;
 	video::SkinnedXMeshHandle _skinnedMeshHandle;
 
-	std::vector<video::SkinnedAnimationHandle> _animations;
+	std::vector<video::AnimationInstanceHandle> _animations;
 
 	video::EffectHandle _staticEffect;
 	video::EffectHandle _skinnedEffect;

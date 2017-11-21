@@ -209,15 +209,15 @@ namespace video
 		}
 	};
 
-	struct SkinnedAnimationHandle : public ResourceHandle
+	struct AnimationInstanceHandle : public ResourceHandle
 	{
-		SkinnedAnimationHandle()
+		AnimationInstanceHandle()
 		{
 			this->index = 0;
 			this->count = 0;
 		}
 
-		SkinnedAnimationHandle(uint16 index, uint16 count)
+		AnimationInstanceHandle(uint16 index, uint16 count)
 		{
 			this->index = index;
 			this->count = count;

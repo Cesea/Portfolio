@@ -108,10 +108,10 @@ namespace video
 		SkinnedXMesh *GetSkinnedXMesh(SkinnedXMeshHandle handle);
 		void DestroySkinnedMesh(SkinnedXMeshHandle handle);
 
-		SkinnedAnimationHandle CreateSkinnedAnimation(SkinnedXMeshHandle xMesh, const std::string &name);
-		SkinnedAnimationHandle GetSkinnedAnimation(const std::string &name);
-		SkinnedAnimation *GetSkinnedAnimation(SkinnedAnimationHandle handle);
-		void DestroySkinnedAnimation(SkinnedAnimationHandle handle);
+		AnimationInstanceHandle CreateAnimationInstance(SkinnedXMeshHandle xMesh, const std::string &name);
+		AnimationInstanceHandle GetAnimationInstance(const std::string &name);
+		AnimationInstance *GetAnimationInstance(AnimationInstanceHandle handle);
+		void DestroyAnimationInstance(AnimationInstanceHandle handle);
 
 
 		//Font Functions
@@ -163,7 +163,7 @@ namespace video
 
 		StaticXMesh _staticMeshes[VIDEO_CONFIG_STATIC_XMESH_MAX_NUM];
 		SkinnedXMesh _skinnedMeshes[VIDEO_CONFIG_SKINNED_XMESH_MAX_NUM];
-		SkinnedAnimation _skinnedAnimations[VIDEO_CONFIG_ANIMATION_MAX_NUM];
+		AnimationInstance _animationInstances[VIDEO_CONFIG_ANIMATION_MAX_NUM];
 
 		Font _fonts[VIDEO_CONFIG_FONT_MAX_NUM];
 
@@ -180,7 +180,7 @@ namespace video
 		ResourceHandlePool<StaticXMeshHandle> _staticXMeshHandlePool;
 		ResourceHandlePool<SkinnedXMeshHandle> _skinnedXMeshHandlePool;
 
-		ResourceHandlePool<SkinnedAnimationHandle> _skinnedAnimationHandlePool;
+		ResourceHandlePool<AnimationInstanceHandle> _animationInstanceHandlePool;
 		ResourceHandlePool<FontHandle> _fontHandlePool;
 	};
 }

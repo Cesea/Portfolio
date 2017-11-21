@@ -59,7 +59,7 @@ bool32 BaseScene::Init()
 	//video::StaticXMeshHandle staticMeshHandle = VIDEO->CreateStaticXMesh("../resources/Models/environment/Rock/Rock1_A.X", &correctionMat, "Rock");
 
 	video::StaticXMesh::sDefaultEffectHandle = VIDEO->GetEffect("StaticMesh.fx");
-	video::SkinnedAnimation::sDefaultEffectHandle = VIDEO->GetEffect("SkinnedMesh.fx");
+	video::AnimationInstance::sDefaultEffectHandle = VIDEO->GetEffect("SkinnedMesh.fx");
 	video::DebugBuffer::sDefaultEffectHandle = VIDEO->GetEffect("DebugShader.fx");
 
 	//엔티티 생성

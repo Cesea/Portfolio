@@ -25,7 +25,7 @@ public:
 			video::IndexBufferHandle _iHandle;
 		};
 		video::StaticXMeshHandle _static;
-		video::SkinnedAnimationHandle _skinned;
+		video::AnimationInstanceHandle _skinned;
 	};
 
 	video::MaterialHandle _material;

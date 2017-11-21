@@ -1,9 +1,9 @@
 #include "stdafx.h"
 
-bool ActionComponent::CreateFrom(video::SkinnedAnimationHandle skinnedAnimation)
+bool ActionComponent::CreateFrom(video::AnimationInstanceHandle skinnedAnimation)
 {
 	Assert(skinnedAnimation.IsValid());
-	video::SkinnedAnimation *pSkinnedAnimation = VIDEO->GetSkinnedAnimation(skinnedAnimation);
+	video::AnimationInstance *pSkinnedAnimation = VIDEO->GetAnimationInstance(skinnedAnimation);
 
 	pSkinnedAnimation->_pAnimationController->CloneAnimationController(
 		pSkinnedAnimation->_pAnimationController->GetMaxNumAnimationOutputs(),
@@ -12,17 +12,31 @@ bool ActionComponent::CreateFrom(video::SkinnedAnimationHandle skinnedAnimation)
 		pSkinnedAnimation->_pAnimationController->GetMaxNumEvents(), &_pAnimationController);
 
 	_numAnimation = _pAnimationController->GetNumAnimationSets();
+
+	return true;
+}
+
+void ActionComponent::MakeAnimationList()
+{
 	for (uint32 i = 0; i < _numAnimation; i++)
 	{
 		LPD3DXANIMATIONSET animSet;
 		_pAnimationController->GetAnimationSet(i, &animSet);
 		this->_animations.push_back(animSet);
-		this->_animationTable.insert(std::make_pair(animSet->GetName(), animSet));
+		this->_animationTable.insert(std::make_pair(animSet->GetName(), i));
 	}
+}
 
-	this->Play(0);
-
-	return true;
+void ActionComponent::SetFirstAction(const Action &action)
+{
+	auto found = _animationTable.find(action._name);
+	if (found != _animationTable.end())
+	{
+		_playing = true;
+		_looping = true;
+		_playingAction = action;
+		SetAnimation(found->second);
+	}
 }
 
 void ActionComponent::Destroy()
@@ -33,45 +47,49 @@ void ActionComponent::Destroy()
 
 void ActionComponent::UpdateAnimation(float deltaTime)
 {
-	//엑션 큐에 실행해야할 아이템이 있다.....
-	if (_actionQueue.HasAction())
-	{
-		const Action &head = _actionQueue.Front();
-
-		if (head._animationIndex != _playingAnimationIndex)
-		{
-			this->Play(head._animationIndex, head._crossFadeTime);
-			_playingAnimationIndex = head._animationIndex;
-			_actionQueue.PopAction();
-		}
-	}
-
 	_pAnimationController->GetTrackDesc(0, &_playingTrackDesc);
-	//현재 얼마나 왔는지..
 	_animationPlayFactor = _playingTrackDesc.Position / _pPlayingAnimationSet->GetPeriod();
 
-	//마지막에 도달했다면...
-	if (_animationPlayFactor >= 1.0)
+	if (_actionQueue.HasAction())
 	{
-		if (false == _looping)
+		const Action &front = _actionQueue.Front();
+		if (Play(front))
 		{
-			//돌아갈 Animation 이 있다면..
-			if (nullptr != _pPrevPlayingAnimationSet)
+			_actionQueue.PopAction();
+		}
+		else
+		{
+			int a = 0;
+		}
+	}
+	else 
+	{
+		if (_animationPlayFactor >= 0.95)
+		{
+			if (false == _looping)
 			{
-				_crossFadeTime = _outCrossFadeTime;
-				_leftCrossFadeTime = _outCrossFadeTime;
-				_looping = true;
-				SetAnimation(_pPrevPlayingAnimationSet);
-				_pPrevPlayingAnimationSet = nullptr;
+				//돌아갈 Animation 이 있다면..
+				if (nullptr != _pPrevPlayingAnimationSet)
+				{
+					_crossFadeTime = _outCrossFadeTime;
+					_leftCrossFadeTime = _outCrossFadeTime;
+					_looping = true;
+					_playingAction = _prevAction;
+					SetAnimation(_pPrevPlayingAnimationSet);
+					_pPrevPlayingAnimationSet = nullptr;
+				}
+				else
+				{
+					this->Stop();
+				}
 			}
-			else
-			{
-				this->Stop();
-			}
+
+			_animationPlayFactor = _animationPlayFactor - (int32)_animationPlayFactor;
+
 		}
 	}
 
-	_animationPlayFactor = _animationPlayFactor - (int32)_animationPlayFactor;
+
 
 	if (_playing)
 	{
@@ -101,55 +119,145 @@ void ActionComponent::UpdateAnimation(float deltaTime)
 	}
 }
 
-
-void ActionComponent::Play(int32 animIndex, float crossFadeTime)
+bool ActionComponent::Play(const Action & action)
 {
-	_playing = true;
-	_looping = true;
-
-	if (animIndex < _numAnimation)
+	//현제 플레이 중인 엑션이 블로킹인지 아닌지 판단한다....
+	if (_playingAction._blocking)
 	{
-		_crossFadeTime = crossFadeTime;
-		_leftCrossFadeTime = crossFadeTime;
+		if (_animationPlayFactor > 0.95)
+		{
+			if (action._playOnce)
+			{
+				auto found = _animationTable.find(action._name);
+				if (found != _animationTable.end())
+				{
+					_playing = true;
+					_looping = false;
+					_crossFadeTime = action._crossFadeTime;
+					_leftCrossFadeTime = action._crossFadeTime;
 
-		this->SetAnimation(_animations[animIndex]);
+					_outCrossFadeTime = action._outCrossFadeTime;
+
+					if (this->_prevAction._playOnce)
+					{
+						_pPrevPlayingAnimationSet = _pPlayingAnimationSet;
+
+						this->_prevAction = _playingAction;
+						this->_playingAction = action;
+					}
+
+					this->SetAnimation(found->second);
+					return true;
+				}
+			}
+			else
+			{
+				auto found = _animationTable.find(action._name);
+				if (found != _animationTable.end())
+				{
+					_playing = true;
+					_looping = true;
+					_crossFadeTime = action._crossFadeTime;
+					_leftCrossFadeTime = action._crossFadeTime;
+
+					this->_playingAction = action;
+					this->SetAnimation(found->second);
+					return true;
+				}
+			}
+		}
+		_animationPlayFactor = _animationPlayFactor - (int32)_animationPlayFactor;
 	}
+	else
+	{
+		if (action._playOnce)
+		{
+			_playing = true;
+			_looping = false;
+
+			auto found = _animationTable.find(action._name);
+			if (found != _animationTable.end())
+			{
+				_pPrevPlayingAnimationSet = _pPlayingAnimationSet;
+
+				this->_prevAction = _playingAction;
+				this->_playingAction = action;
+
+				_crossFadeTime = action._crossFadeTime;
+				_leftCrossFadeTime = action._crossFadeTime;
+
+				_outCrossFadeTime = action._outCrossFadeTime;
+
+				this->SetAnimation(found->second);
+				return true;
+			}
+		}
+		else
+		{
+			_playing = true;
+			_looping = true;
+
+			auto found = _animationTable.find(action._name);
+			if (found != _animationTable.end())
+			{
+				_crossFadeTime = action._crossFadeTime;
+				_leftCrossFadeTime = action._crossFadeTime;
+
+				this->_playingAction = action;
+				this->SetAnimation(found->second);
+				return true;
+			}
+		}
+	}
+	return false;
 }
 
-void ActionComponent::PlayOneShot(int32 animIndex, float inCrossFadeTime, float outCrossFadeTime)
-{
-	_playing = true;
-	_looping = true;
-
-	if (animIndex < _numAnimation)
-	{
-		_pPrevPlayingAnimationSet = _pPlayingAnimationSet;
-
-		_crossFadeTime = inCrossFadeTime;
-		_leftCrossFadeTime = inCrossFadeTime;
-
-		_outCrossFadeTime = outCrossFadeTime;
-
-		this->SetAnimation(_animations[animIndex]);
-	}
-}
-
-void ActionComponent::PlayOneShotAfterHold(int32 animIndex, float crossFadeTime)
-{
-	_playing = true;
-	_looping = true;
-
-	if (animIndex < _numAnimation)
-	{
-		_pPrevPlayingAnimationSet = nullptr;
-
-		_crossFadeTime = crossFadeTime;
-		_leftCrossFadeTime = crossFadeTime;
-
-		this->SetAnimation(_animations[animIndex]);
-	}
-}
-
+//
+//void ActionComponent::Play(int32 animIndex, float crossFadeTime)
+//{
+//	_playing = true;
+//	_looping = true;
+//
+//	if (animIndex < _numAnimation)
+//	{
+//		_crossFadeTime = crossFadeTime;
+//		_leftCrossFadeTime = crossFadeTime;
+//
+//		this->SetAnimation(_animations[animIndex]);
+//	}
+//}
+//void ActionComponent::PlayOneShot(int32 animIndex, float inCrossFadeTime, float outCrossFadeTime)
+//{
+//	_playing = true;
+//	_looping = true;
+//
+//	if (animIndex < _numAnimation)
+//	{
+//		_pPrevPlayingAnimationSet = _pPlayingAnimationSet;
+//
+//		_crossFadeTime = inCrossFadeTime;
+//		_leftCrossFadeTime = inCrossFadeTime;
+//
+//		_outCrossFadeTime = outCrossFadeTime;
+//
+//		this->SetAnimation(_animations[animIndex]);
+//	}
+//}
+//void ActionComponent::PlayOneShotAfterHold(int32 animIndex, float crossFadeTime)
+//{
+//	_playing = true;
+//	_looping = true;
+//
+//	if (animIndex < _numAnimation)
+//	{
+//		_pPrevPlayingAnimationSet = nullptr;
+//
+//		_crossFadeTime = crossFadeTime;
+//		_leftCrossFadeTime = crossFadeTime;
+//
+//		this->SetAnimation(_animations[animIndex]);
+//	}
+//}
 //void ActionComponent::Play(const std::string & animName, float crossFadeTime)
 //{
 //	_playing = true;
@@ -162,10 +270,9 @@ void ActionComponent::PlayOneShotAfterHold(int32 animIndex, float crossFadeTime)
 //		_crossFadeTime = crossFadeTime;
 //		_leftCrossFadeTime = crossFadeTime;
 //
-//		this->SetAnimation(find->second);
+//		this->Play(find->second);
 //	}
 //}
-//
 //void ActionComponent::PlayOneShot(const std::string & animName, float inCrossFadeTime, float outCrossFadeTime)
 //{
 //	_playing = true;
@@ -181,10 +288,9 @@ void ActionComponent::PlayOneShotAfterHold(int32 animIndex, float crossFadeTime)
 //
 //		_outCrossFadeTime = outCrossFadeTime;
 //
-//		this->SetAnimation(find->second);
+//		this->Play(find->second);
 //	}
 //}
-//
 //void ActionComponent::PlayOneShotAfterHold(const std::string & animName, float crossFadeTime)
 //{
 //	_playing = true;
@@ -196,7 +302,7 @@ void ActionComponent::PlayOneShotAfterHold(int32 animIndex, float crossFadeTime)
 //		_pPrevPlayingAnimationSet = nullptr;
 //		_crossFadeTime = crossFadeTime;
 //		_leftCrossFadeTime = crossFadeTime;
-//		this->SetAnimation(find->second);
+//		this->Play(find->second);
 //	}
 //}
 
@@ -238,14 +344,12 @@ void ActionComponent::SetAnimation(ID3DXAnimationSet *animationSet)
 
 void ActionQueue::PushAction(const Action & action)
 {
-	if (_tail == (ACTION_MAX_NUM - 1))
+	_actions[_tail++] = action;
+	if (_tail == (ACTION_MAX_NUM))
 	{
 		_tail = 0;
 		Assert(_head != _tail);
 	}
-
-	_actions[_tail++] = action;
-
 }
 
 const Action & ActionQueue::Front()
@@ -260,37 +364,40 @@ void ActionQueue::PopAction()
 		Console::Log("Error there is no Action in ActionQueue");
 		//Assert(false);
 	}
-	if (_head == (ACTION_MAX_NUM - 1))
+	_head += 1;
+	if (_head == (ACTION_MAX_NUM))
 	{
 		_head = 0;
 	}
-	_head += 1;
 }
 
 Action::Action()
 {
-	_animationIndex = -1;
+	ZeroMemory(_name, sizeof(char) * ACTION_MAX_NAME);
 	_blocking = true;
 	_playSpeed = 1.0f;
 	_crossFadeTime = 0.0f;
 	_outCrossFadeTime = 0.0f;
+	_playOnce = false;
 	ZeroMemory(_extraInfo, sizeof(char) * 16);
 }
 
 Action::Action(const Action & other)
-	:_animationIndex(other._animationIndex), _blocking(other._blocking), _playSpeed(other._playSpeed),
-	_crossFadeTime(other._crossFadeTime), _outCrossFadeTime(other._outCrossFadeTime)
+	: _blocking(other._blocking), _playSpeed(other._playSpeed),
+	_crossFadeTime(other._crossFadeTime), _outCrossFadeTime(other._outCrossFadeTime), _playOnce(other._playOnce)
 {
+	strncpy(_name, other._name, sizeof(char) * ACTION_MAX_NAME);
 	memcpy(_extraInfo, other._extraInfo, sizeof(char) * 16);
 }
 
 Action & Action::operator=(const Action & other)
 {
-	_animationIndex = other._animationIndex;
+	strncpy(_name, other._name, sizeof(char) * ACTION_MAX_NAME);
 	_blocking = other._blocking;
 	_playSpeed = other._playSpeed;
 	_crossFadeTime = other._crossFadeTime;
 	_outCrossFadeTime = other._outCrossFadeTime;
+	_playOnce = other._playOnce;
 	memcpy(_extraInfo, other._extraInfo, sizeof(char) * 16);
 
 	return *this;

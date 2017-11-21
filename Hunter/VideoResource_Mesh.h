@@ -6,7 +6,7 @@
 namespace video
 {
 	struct SkinnedXMesh;
-	struct SkinnedAnimation;
+	struct AnimationInstance;
 }
 
 struct Bone : public D3DXFRAME
@@ -114,8 +114,8 @@ namespace video
 	};
 
 
-	typedef std::map<std::string, BoneMesh *> BoneMeshTable;
-	typedef std::map<std::string, Bone *> BoneTable;
+	//typedef std::map<std::string, BoneMesh *> BoneMeshTable;
+	//typedef std::map<std::string, Bone *> BoneTable;
 
 	struct SkinnedXMesh
 	{
@@ -138,13 +138,15 @@ namespace video
 		ID3DXAnimationController *_pAnimationController{};
 
 		uint32 _numSubset{};
+		MeshBoundInfo _boundInfo{};
+
 		//BoneMeshTable _meshTable;
 		//BoneTable _boneTable;
 	};
 
 
 	//SkinnedMesh는 한번만 불러오고, SkinnedAnimation은 여러개를 만들어서 사용하라....
-	struct SkinnedAnimation
+	struct AnimationInstance
 	{
 		bool Create(video::SkinnedXMeshHandle handle);
 		void Destroy();

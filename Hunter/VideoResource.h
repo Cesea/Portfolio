@@ -30,7 +30,7 @@ namespace video
 {
 	struct StaticXMesh;
 	struct SkinnedXMesh;
-	struct SkinnedAnimation;
+	struct AnimationInstance;
 
 	struct CommandBuffer
 	{
