@@ -3,12 +3,20 @@
 
 #include "Component.h"
 
-#define ACTION_MAX_NUM 10
+#define ACTION_MAX_NUM 16
 #define ACTION_MAX_NAME 36
 
 //에니메이션을 위한 typedef
 typedef std::vector<LPD3DXANIMATIONSET> AnimationSetVector;
 typedef std::map<std::string, int32> AnimationTable;
+
+//기존의 에니메이션 셋을 삭제, 콜벡데이터를 넣었다면 새로 만들어서 Controller에 추가시킨다
+bool AddCallbackKeysAndCompress(LPD3DXANIMATIONCONTROLLER pAnimationController,
+	LPD3DXKEYFRAMEDANIMATIONSET pAnimationSet,
+	DWORD numCallbackKeys,
+	D3DXKEY_CALLBACK *pKeys,
+	DWORD compressionFlags,
+	float compression);
 
 struct Action
 {

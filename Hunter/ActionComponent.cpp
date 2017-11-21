@@ -5,12 +5,7 @@ bool ActionComponent::CreateFrom(video::AnimationInstanceHandle skinnedAnimation
 	Assert(skinnedAnimation.IsValid());
 	video::AnimationInstance *pSkinnedAnimation = VIDEO->GetAnimationInstance(skinnedAnimation);
 
-	pSkinnedAnimation->_pAnimationController->CloneAnimationController(
-		pSkinnedAnimation->_pAnimationController->GetMaxNumAnimationOutputs(),
-		pSkinnedAnimation->_pAnimationController->GetMaxNumAnimationSets(),
-		pSkinnedAnimation->_pAnimationController->GetMaxNumTracks(),
-		pSkinnedAnimation->_pAnimationController->GetMaxNumEvents(), &_pAnimationController);
-
+	_pAnimationController = pSkinnedAnimation->_pAnimationController;
 	_numAnimation = _pAnimationController->GetNumAnimationSets();
 
 	return true;
@@ -138,7 +133,7 @@ bool ActionComponent::Play(const Action & action)
 
 					_outCrossFadeTime = action._outCrossFadeTime;
 
-					if (this->_prevAction._playOnce)
+					if ( this->_prevAction._playOnce)
 					{
 						_pPrevPlayingAnimationSet = _pPlayingAnimationSet;
 
@@ -401,4 +396,46 @@ Action & Action::operator=(const Action & other)
 	memcpy(_extraInfo, other._extraInfo, sizeof(char) * 16);
 
 	return *this;
+}
+
+bool AddCallbackKeysAndCompress(LPD3DXANIMATIONCONTROLLER pAnimationController, LPD3DXKEYFRAMEDANIMATIONSET pAnimationSet, 
+	DWORD numCallbackKeys, D3DXKEY_CALLBACK * pKeys, DWORD compressionFlags, float compression)
+{
+	HRESULT hr;
+	LPD3DXCOMPRESSEDANIMATIONSET pASNew = NULL;
+	LPD3DXBUFFER pBufCompressed = NULL;
+
+	hr = pAnimationSet->Compress(compressionFlags, compression, NULL, &pBufCompressed);
+	if (FAILED(hr))
+	{
+		return false;
+	}
+
+	hr = D3DXCreateCompressedAnimationSet(pAnimationSet->GetName(),
+		pAnimationSet->GetSourceTicksPerSecond(),
+		pAnimationSet->GetPlaybackType(),
+		pBufCompressed,
+		numCallbackKeys,
+		pKeys,
+		&pASNew);
+	pBufCompressed->Release();
+
+	if (FAILED(hr))
+	{
+		return false;
+	}
+
+	pAnimationController->UnregisterAnimationSet(pAnimationSet);
+	pAnimationSet->Release();
+
+	hr = pAnimationController->RegisterAnimationSet(pASNew);
+	if (FAILED(hr))
+	{
+		return false;
+	}
+
+	pASNew->Release();
+	pASNew = NULL;
+
+	return hr;
 }

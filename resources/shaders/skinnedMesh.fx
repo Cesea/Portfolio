@@ -139,6 +139,8 @@ technique Skinning
     {
         VertexShader = compile vs_3_0 vs_skinning();
 		PixelShader = compile ps_3_0 ps_main();
+
+		CullMode = None;
     }
 }
 

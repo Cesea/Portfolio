@@ -14,6 +14,7 @@ void Player::CreateFromWorld(World & world)
 {
 	EventChannel channel;
 	channel.Add<InputManager::KeyPressedEvent, Player>(*this);
+	channel.Add<InputManager::MousePressedEvent, Player>(*this);
 	_entity = world.CreateEntity();
 
 	TransformComponent &transComp = _entity.AddComponent<TransformComponent>();
@@ -25,210 +26,168 @@ void Player::CreateFromWorld(World & world)
 	ScriptComponent &scriptComponent = _entity.AddComponent<ScriptComponent>();
 	scriptComponent.SetScript(MAKE_SCRIPT_DELEGATE(Player, Update, *this));
 
-	ActionComponent &actionComp = _entity.AddComponent<ActionComponent>();
-	actionComp.CreateFrom(renderComp._skinned);
-	actionComp._pCallbackHandler = new PlayerCallbackHandler;
+	_pActionComp = &_entity.AddComponent<ActionComponent>();
+	_pActionComp->CreateFrom(renderComp._skinned);
+	_pActionComp->_pCallbackHandler = new PlayerCallbackHandler;
 
 	SetupCallbackAndCompression();
-	actionComp.MakeAnimationList();
-
-	Action firstAction;
-	firstAction._blocking = false;
-	strncpy(firstAction._name, 
-		PlayerAnimationString[PlayerAnimationEnum::eStandingFree], strlen(PlayerAnimationString[PlayerAnimationEnum::eStandingFree]));
-	actionComp.SetFirstAction(firstAction);
+	_pActionComp->MakeAnimationList();
 
 
 	_entity.Activate();
 
-	_keyConfig._up = 'I';
-	_keyConfig._down = 'K';
-	_keyConfig._left = 'J';
-	_keyConfig._right = 'L';
-	_keyConfig._jump = VK_SPACE;
-	_keyConfig._special = 'Q';
+	_stateMachine.Init(this);
+	_stateMachine.ChangeState(new PlayerNormalState);
 
 	_lastCommand._interpreted = true;
 }
 
 void Player::Update(float deltaTime)
 {
-	if (_lastCommand._interpreted == false)
-	{
-		ActionComponent &refAction = _entity.GetComponent<ActionComponent>();
-		refAction._actionQueue.PushAction(std::move(InterpretCommand(_lastCommand)));
+	_stateMachine.Update(deltaTime, _lastCommand);
 
-
-		Action test;
-		test._blocking = true;
-		test._crossFadeTime = 0.2f;
-		test._outCrossFadeTime = 0.2f;
-		test._playOnce = true;
-		strncpy(test._name, PlayerAnimationString[PlayerAnimationEnum::eWarSwingRight], strlen(PlayerAnimationString[PlayerAnimationEnum::eWarSwingRight]));
-
-		refAction._actionQueue.PushAction(test);
-
-		test._blocking = true;
-		test._crossFadeTime = 0.2f;
-		test._outCrossFadeTime = 0.2f;
-		test._playOnce = true;
-		strncpy(test._name, PlayerAnimationString[PlayerAnimationEnum::eWarDodgeToLeft], strlen(PlayerAnimationString[PlayerAnimationEnum::eWarDodgeToLeft]));
-
-		refAction._actionQueue.PushAction(test);
-
-		_lastCommand._interpreted = true;
-	}
-}
-
-Action Player::InterpretCommand(const Command &command)
-{
-	Action result;
-
-	if (command._type == Command::Type::eAction)
-	{
-		result._blocking = true;
-		result._crossFadeTime = 0.2f;
-		result._outCrossFadeTime = 0.2f;
-		result._playOnce = true;
-		strncpy(result._name, PlayerAnimationString[PlayerAnimationEnum::eWarSwingLeft], strlen(PlayerAnimationString[PlayerAnimationEnum::eWarSwingLeft]));
-	}
-
-	return result;
+	//if (_lastCommand._interpreted == false)
+	//{
+	//	ActionComponent &refAction = _entity.GetComponent<ActionComponent>();
+	//	//refAction._actionQueue.PushAction(std::move(InterpretCommand(_lastCommand)));
+	//	Action test;
+	//	test._blocking = true;
+	//	test._crossFadeTime = 0.2f;
+	//	test._outCrossFadeTime = 0.2f;
+	//	test._playOnce = true;
+	//	strncpy(test._name, PlayerAnimationString[PlayerAnimationEnum::eWarSwingRight], strlen(PlayerAnimationString[PlayerAnimationEnum::eWarSwingRight]));
+	//	refAction._actionQueue.PushAction(test);
+	//	test._blocking = true;
+	//	test._crossFadeTime = 0.2f;
+	//	test._outCrossFadeTime = 0.2f;
+	//	test._playOnce = true;
+	//	memset(test._name, 0, sizeof(char) * ACTION_MAX_NAME);
+	//	strncpy(test._name, PlayerAnimationString[PlayerAnimationEnum::eWarDodgeToLeft], strlen(PlayerAnimationString[PlayerAnimationEnum::eWarDodgeToLeft]));
+	//	refAction._actionQueue.PushAction(test);
+	//	test._blocking = false;
+	//	test._crossFadeTime = 0.2f;
+	//	test._outCrossFadeTime = 0.2f;
+	//	test._playOnce = false;
+	//	memset(test._name, 0, sizeof(char) * ACTION_MAX_NAME);
+	//	strncpy(test._name, PlayerAnimationString[PlayerAnimationEnum::eWarCombatMode], strlen(PlayerAnimationString[PlayerAnimationEnum::eWarCombatMode]));
+	//	refAction._actionQueue.PushAction(test);
+	//	_lastCommand._interpreted = true;
+	//}
 }
 
 void Player::SetupCallbackAndCompression()
 {
-	ActionComponent &refActionComp = _entity.GetComponent<ActionComponent>();
-	TransformComponent &refTransform = _entity.GetComponent<TransformComponent>();
+	//ActionComponent &refActionComp = _entity.GetComponent<ActionComponent>();
+	//TransformComponent &refTransform = _entity.GetComponent<TransformComponent>();
 
-	ID3DXAnimationController *pController = refActionComp._pAnimationController;
-	uint32 numAnimationSet = pController->GetNumAnimationSets();
-	ID3DXKeyframedAnimationSet *anim0;
-	ID3DXKeyframedAnimationSet *anim1;
-	ID3DXKeyframedAnimationSet *anim2;
-	ID3DXKeyframedAnimationSet *anim3;
-	ID3DXKeyframedAnimationSet *anim4;
+	//ID3DXAnimationController *pController = refActionComp._pAnimationController;
+	//uint32 numAnimationSet = pController->GetNumAnimationSets();
+	//ID3DXKeyframedAnimationSet *anim0;
+	//ID3DXKeyframedAnimationSet *anim1;
+	//ID3DXKeyframedAnimationSet *anim2;
+	//ID3DXKeyframedAnimationSet *anim3;
+	//ID3DXKeyframedAnimationSet *anim4;
 
-	pController->GetAnimationSet(0, (ID3DXAnimationSet **)&anim0);
-	pController->GetAnimationSet(1, (ID3DXAnimationSet **)&anim1);
-	pController->GetAnimationSet(2, (ID3DXAnimationSet **)&anim2);
-	pController->GetAnimationSet(3, (ID3DXAnimationSet **)&anim3);
-	pController->GetAnimationSet(4, (ID3DXAnimationSet **)&anim4);
+	//pController->GetAnimationSet(0, (ID3DXAnimationSet **)&anim0);
+	//pController->GetAnimationSet(1, (ID3DXAnimationSet **)&anim1);
+	//pController->GetAnimationSet(2, (ID3DXAnimationSet **)&anim2);
+	//pController->GetAnimationSet(3, (ID3DXAnimationSet **)&anim3);
+	//pController->GetAnimationSet(4, (ID3DXAnimationSet **)&anim4);
 
-	_callbackData._pPlayerPosition = &refTransform._position;
+	//_callbackData._pPlayerPosition = &refTransform._position;
 
-	D3DXKEY_CALLBACK anim0Keys[2];
-	anim0Keys[0].Time = 0;
-	anim0Keys[0].pCallbackData = (void *)&_callbackData;
-	anim0Keys[1].Time = anim0->GetPeriod() / 2.0f * anim0->GetSourceTicksPerSecond();
-	anim0Keys[1].pCallbackData = (void *)&_callbackData;
+	//D3DXKEY_CALLBACK anim0Keys[2];
+	//anim0Keys[0].Time = 0;
+	//anim0Keys[0].pCallbackData = (void *)&_callbackData;
+	//anim0Keys[1].Time = anim0->GetPeriod() / 2.0f * anim0->GetSourceTicksPerSecond();
+	//anim0Keys[1].pCallbackData = (void *)&_callbackData;
 
-	AddCallbackKeysAndCompress(pController, anim0, 2, anim0Keys, D3DXCOMPRESS_DEFAULT, 0.1f);
-	AddCallbackKeysAndCompress(pController, anim1, 2, anim0Keys, D3DXCOMPRESS_DEFAULT, 0.1f);
-	AddCallbackKeysAndCompress(pController, anim2, 2, anim0Keys, D3DXCOMPRESS_DEFAULT, 0.1f);
-	AddCallbackKeysAndCompress(pController, anim3, 2, anim0Keys, D3DXCOMPRESS_DEFAULT, 0.1f);
-	AddCallbackKeysAndCompress(pController, anim4, 2, anim0Keys, D3DXCOMPRESS_DEFAULT, 0.1f);
-
+	//AddCallbackKeysAndCompress(pController, anim0, 2, anim0Keys, D3DXCOMPRESS_DEFAULT, 0.1f);
+	//AddCallbackKeysAndCompress(pController, anim1, 2, anim0Keys, D3DXCOMPRESS_DEFAULT, 0.1f);
+	//AddCallbackKeysAndCompress(pController, anim2, 2, anim0Keys, D3DXCOMPRESS_DEFAULT, 0.1f);
+	//AddCallbackKeysAndCompress(pController, anim3, 2, anim0Keys, D3DXCOMPRESS_DEFAULT, 0.1f);
+	//AddCallbackKeysAndCompress(pController, anim4, 2, anim0Keys, D3DXCOMPRESS_DEFAULT, 0.1f);
 }
 
-bool Player::AddCallbackKeysAndCompress(LPD3DXANIMATIONCONTROLLER pAnimationController, LPD3DXKEYFRAMEDANIMATIONSET pAnimationSet, 
-	DWORD numCallbackKeys, D3DXKEY_CALLBACK * pKeys, DWORD compressionFlags, float compression)
-{
-	HRESULT hr;
-	LPD3DXCOMPRESSEDANIMATIONSET pASNew = NULL;
-	LPD3DXBUFFER pBufCompressed = NULL;
 
-	hr = pAnimationSet->Compress(compressionFlags, compression, NULL, &pBufCompressed);
-	if (FAILED(hr))
-	{
-		return false;
-	}
-
-	hr = D3DXCreateCompressedAnimationSet(pAnimationSet->GetName(),
-		pAnimationSet->GetSourceTicksPerSecond(),
-		pAnimationSet->GetPlaybackType(),
-		pBufCompressed,
-		numCallbackKeys,
-		pKeys,
-		&pASNew);
-	pBufCompressed->Release();
-
-	if (FAILED(hr))
-	{
-		return false;
-	}
-
-	pAnimationController->UnregisterAnimationSet(pAnimationSet);
-	pAnimationSet->Release();
-
-	hr = pAnimationController->RegisterAnimationSet(pASNew);
-	if (FAILED(hr))
-	{
-		return false;
-	}
-
-	pASNew->Release();
-	pASNew = NULL;
-
-
-
-	return hr;
-}
 
 void Player::Handle(const InputManager::KeyPressedEvent & event)
 {
 	uint32 inputCode = event.code;
 
-	if (_keyConfig._left == inputCode)
+	if (_inputConfig._left == inputCode)
 	{
-		_lastCommand._type = Command::Type::eMove;
-		_lastCommand._detail = Command::MoveDirection::eLeft;
+		_lastCommand._type = GameCommand::Type::eMove;
+		_lastCommand._movement._horizontal = Movement::Horizontal::eLeft;
+		_lastCommand._behavior._type = Behavior::Type::eWalk;
 		_lastCommand._interpreted = false;
 	}
-	else if(_keyConfig._right == inputCode)
+	else if(_inputConfig._right == inputCode)
 	{
-		_lastCommand._type = Command::Type::eMove;
-		_lastCommand._detail = Command::MoveDirection::eRight;
+		_lastCommand._type = GameCommand::Type::eMove;
+		_lastCommand._movement._horizontal = Movement::Horizontal::eRight;
+		_lastCommand._behavior._type = Behavior::Type::eWalk;
 		_lastCommand._interpreted = false;
 	}
-	else if(_keyConfig._up == inputCode)
+	else if(_inputConfig._up == inputCode)
 	{
-		_lastCommand._type = Command::Type::eMove;
-		_lastCommand._detail = Command::MoveDirection::eUp;
+		_lastCommand._type = GameCommand::Type::eMove;
+		_lastCommand._movement._vertical = Movement::Vertical::eUp;
+		_lastCommand._behavior._type = Behavior::Type::eWalk;
 		_lastCommand._interpreted = false;
 	}
-	else if (_keyConfig._down == inputCode)
+	else if (_inputConfig._down == inputCode)
 	{
-		_lastCommand._type = Command::Type::eMove;
-		_lastCommand._detail = Command::MoveDirection::eDown;
+		_lastCommand._type = GameCommand::Type::eMove;
+		_lastCommand._movement._vertical = Movement::Vertical::eDown;
+		_lastCommand._behavior._type = Behavior::Type::eWalk;
 		_lastCommand._interpreted = false;
 	}
-	else if (_keyConfig._jump == inputCode)
+	//else if (_keyConfig._jump == inputCode)
+	//{
+	//	_lastCommand._type = GameCommand::Type::eJump;
+	//	_lastCommand._behavior._type = Behavior::Type::eJump;
+	//	//_lastCommand._movement._vertical = Movement::Vertical::eDown;
+	//	_lastCommand._interpreted = false;
+	//}
+	else if(_inputConfig._special == inputCode)
 	{
-	}
-	else if(_keyConfig._special == inputCode)
-	{
-		_lastCommand._type = Command::Type::eAction;
-		_lastCommand._detail = Command::ActionType::eAttack;
+		_lastCommand._type = GameCommand::Type::eAction;
 		_lastCommand._interpreted = false;
 	}
 }
 
-bool LocalTimer::Tick(float deltaTime)
+void Player::Handle(const InputManager::MousePressedEvent & event)
 {
-	_currentTime += deltaTime;
-	if (_targetTime > 0.0f)
+	uint32 inputCode = event.code;
+
+	if (inputCode == _inputConfig._attack)
 	{
-		if (_currentTime > _targetTime)
-		{
-			return true;
-		}
+		_lastCommand._type = GameCommand::Type::eAction;
+		_lastCommand._behavior._type = Behavior::Type::eAttack;
+		_lastCommand._interpreted = false;
 	}
-	return false;
+	else if (inputCode == _inputConfig._block)
+	{
+		_lastCommand._type = GameCommand::Type::eAction;
+		_lastCommand._behavior._type = Behavior::Type::eBlock;
+		_lastCommand._interpreted = false;
+	}
 }
 
-void LocalTimer::Restart(float targetTime)
+void Player::SetInputConfig()
 {
-	_currentTime = 0.0f;
-	_targetTime = targetTime;
+
+	_inputConfig._up = 'I';
+	_inputConfig._down = 'K';
+	_inputConfig._left = 'J';
+	_inputConfig._right = 'L';
+	_inputConfig._jump = VK_SPACE;
+	_inputConfig._sneak = VK_CONTROL;
+
+	_inputConfig._attack = MOUSE_BUTTON_LEFT;
+	_inputConfig._block = MOUSE_BUTTON_RIGHT;
+
+	_inputConfig._special = 'U';
 }
+

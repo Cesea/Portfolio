@@ -90,9 +90,6 @@
     <ClCompile Include="Allocators.cpp">
       <Filter>Core\Memory</Filter>
     </ClCompile>
-    <ClCompile Include="MoveSystem.cpp">
-      <Filter>Game\GameSystem\MovementSystem</Filter>
-    </ClCompile>
     <ClCompile Include="ColiisionSystem.cpp">
       <Filter>Game\GameSystem\CollisionSystem</Filter>
     </ClCompile>
@@ -128,9 +125,6 @@
     </ClCompile>
     <ClCompile Include="CollisionComponent.cpp">
       <Filter>Game\GameComponent\CollisionComponent</Filter>
-    </ClCompile>
-    <ClCompile Include="MoveComponent.cpp">
-      <Filter>Game\GameComponent\MoveComponent</Filter>
     </ClCompile>
     <ClCompile Include="RenderComponent.cpp">
       <Filter>Game\GameComponent\RenderComponent</Filter>
@@ -180,11 +174,17 @@
     <ClCompile Include="ActionSystem.cpp">
       <Filter>Game\GameSystem\ActionSystem</Filter>
     </ClCompile>
-    <ClCompile Include="Player.cpp">
-      <Filter>Game\GameObject</Filter>
-    </ClCompile>
     <ClCompile Include="ActionComponent.cpp">
       <Filter>Game\GameComponent\ActionComponent</Filter>
+    </ClCompile>
+    <ClCompile Include="Player.cpp">
+      <Filter>Game\GameObject\Player</Filter>
+    </ClCompile>
+    <ClCompile Include="PlayerStates.cpp">
+      <Filter>Game\GameObject\Player</Filter>
+    </ClCompile>
+    <ClCompile Include="GameCommand.cpp">
+      <Filter>Game\GameUtils\GameCommand</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -348,9 +348,6 @@
     <ClInclude Include="DataBase.h">
       <Filter>Core\SubSystem\DataBase</Filter>
     </ClInclude>
-    <ClInclude Include="MoveSystem.h">
-      <Filter>Game\GameSystem\MovementSystem</Filter>
-    </ClInclude>
     <ClInclude Include="CollisionSystem.h">
       <Filter>Game\GameSystem\CollisionSystem</Filter>
     </ClInclude>
@@ -401,9 +398,6 @@
     </ClInclude>
     <ClInclude Include="CollisionComponent.h">
       <Filter>Game\GameComponent\CollisionComponent</Filter>
-    </ClInclude>
-    <ClInclude Include="MoveComponent.h">
-      <Filter>Game\GameComponent\MoveComponent</Filter>
     </ClInclude>
     <ClInclude Include="RenderComponent.h">
       <Filter>Game\GameComponent\RenderComponent</Filter>
@@ -457,14 +451,23 @@
     <ClInclude Include="ActionSystem.h">
       <Filter>Game\GameSystem\ActionSystem</Filter>
     </ClInclude>
-    <ClInclude Include="Player.h">
-      <Filter>Game\GameObject</Filter>
-    </ClInclude>
     <ClInclude Include="State.h">
       <Filter>Sub\StateMachine</Filter>
     </ClInclude>
     <ClInclude Include="StateMachine.h">
       <Filter>Sub\StateMachine</Filter>
+    </ClInclude>
+    <ClInclude Include="Player.h">
+      <Filter>Game\GameObject\Player</Filter>
+    </ClInclude>
+    <ClInclude Include="PlayerAnimationString.h">
+      <Filter>Game\GameObject\Player</Filter>
+    </ClInclude>
+    <ClInclude Include="GameCommand.h">
+      <Filter>Game\GameUtils\GameCommand</Filter>
+    </ClInclude>
+    <ClInclude Include="PlayerStates.h">
+      <Filter>Game\GameObject\Player</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -540,9 +543,6 @@
     <Filter Include="Game\GameSystem">
       <UniqueIdentifier>{d7142de2-c937-4586-a206-5c7d6e472e49}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Game\GameSystem\MovementSystem">
-      <UniqueIdentifier>{b0f7ecfb-8121-4aa0-88ba-91bf94352179}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Game\GameSystem\CollisionSystem">
       <UniqueIdentifier>{3c44ec6d-ab6d-4798-af60-0326aa391024}</UniqueIdentifier>
     </Filter>
@@ -569,9 +569,6 @@
     </Filter>
     <Filter Include="Game\GameComponent\CollisionComponent">
       <UniqueIdentifier>{1f11db7f-2aa1-4a9a-81ab-03b8b476aca2}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Game\GameComponent\MoveComponent">
-      <UniqueIdentifier>{4fee0c64-cec2-4c14-b81f-933a66b3a09c}</UniqueIdentifier>
     </Filter>
     <Filter Include="Game\GameComponent\TransfromComponent">
       <UniqueIdentifier>{2fb70df9-3f23-48a0-9663-092d7ddb399f}</UniqueIdentifier>
@@ -611,6 +608,12 @@
     </Filter>
     <Filter Include="Sub\StateMachine">
       <UniqueIdentifier>{03a31a36-575e-41fb-83b9-1e21b39eca4a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\GameObject\Player">
+      <UniqueIdentifier>{8ae39ce4-3eee-409c-9264-da8bd4e7ac36}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\GameUtils\GameCommand">
+      <UniqueIdentifier>{c610a143-4bbe-4f78-94fe-cc759e7141e2}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

@@ -1,15 +1,17 @@
 #ifndef STATE_H
 #define STATE_H
 
+#include "GameCommand.h"
 
 template <typename T>
-class StateFoo
+class State
 {
 public:
-	virtual void OnEnter(T *actor) = 0;
-	virtual State *Update(T *actor, float deltaTime, int32 command) = 0;
-	virtual void OnExit(T *actor) = 0;
-
+	virtual bool Init(T *pActor) = 0;
+	virtual void Release() = 0;
+	virtual void OnEnter() = 0;
+	virtual State<T> *Update(float deltaTime, const GameCommand &command) = 0;
+	virtual void OnExit() = 0;
 protected :
 	T *_pActor{};
 };

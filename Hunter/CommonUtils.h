@@ -33,6 +33,15 @@ struct IntRect
 	int32 _bottom;
 };
 
+struct StopWatch
+{
+	bool Tick(float deltaTime);
+	void Restart(float targetTime);
+	float _currentTime{};
+	float _targetTime{};
+
+};
+
 inline int32 Index2D(int32 x, int32 y, int32 xMax)
 {
 	return x + (xMax * y);

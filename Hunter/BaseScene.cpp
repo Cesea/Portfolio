@@ -53,7 +53,8 @@ bool32 BaseScene::Init()
 	//메쉬 불러오기..
 	Matrix correctionMat;
 	MatrixScaling(&correctionMat, 0.1f, 0.1f, 0.1f);
-	_skinnedMeshHandle = VIDEO->CreateSkinnedXMesh("../resources/Models/knight/Knight.X", &correctionMat, "Knight");
+	//_skinnedMeshHandle = VIDEO->CreateSkinnedXMesh("../resources/Castanic_F_L18A/Castanic_F_L18A.X", &correctionMat, "Castanic");
+	_skinnedMeshHandle = VIDEO->CreateSkinnedXMesh("../resources/Models/Knight/Knight.X", &correctionMat, "Knight");
 
 	//MatrixScaling(&correctionMat, 1.0f, 1.0f, 1.0f);
 	//video::StaticXMeshHandle staticMeshHandle = VIDEO->CreateStaticXMesh("../resources/Models/environment/Rock/Rock1_A.X", &correctionMat, "Rock");
@@ -112,6 +113,9 @@ bool32 BaseScene::Update(float deltaTime)
 {
 	bool32 result = true;
 
+	//gpDevice->SetRenderState(D3DRS_ALPHABLENDENABLE, true);
+	//gpDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
+	//gpDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
 	_editor->Edit(RefVariant());
 
 	_world.Refresh();

@@ -4,7 +4,6 @@
 #include "IScene.h"
 
 #include "World.h"
-#include "MoveSystem.h"
 #include "RenderSystem.h"
 #include "ActionSystem.h"
 #include "ScriptSystem.h"

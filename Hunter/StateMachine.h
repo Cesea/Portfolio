@@ -1,20 +1,20 @@
-#ifndef STATE_MANAGER_H
-#define STATE_MANAGER_H
+#ifndef STATE_MACHINE_H
+#define STATE_MACHINE_H
 
 #include "State.h"
+#include "GameCommand.h"
 
 template <typename T>
-class StateManagerFoo
+class StateMachine
 {
 public:
-	StateManager() {}
-	virtual ~StateManager() {}
+	StateMachine() {}
+	virtual ~StateMachine() {}
 
-	bool Init(T *actor, State<T> *firstState)
+	bool Init(T *actor)
 	{
 		_pActor = actor;
 
-		_currentState = firstState;
 		return S_OK;
 	}
 
@@ -25,9 +25,9 @@ public:
 		SAFE_DELETE(_prevState)
 	}
 
-	void Update(float deltaTime, int32 command)
+	void Update(float deltaTime, const GameCommand &command)
 	{
-		State<T> *newState = _currentState->Update(_pActor, deltaTime, command);
+		State<T> *newState = _currentState->Update(deltaTime, command);
 		if (nullptr != newState)
 		{
 			ChangeState(newState);
@@ -38,12 +38,14 @@ public:
 	{
 		if (_currentState)
 		{
-			_currentState->OnExit(_pActor);
+			_currentState->OnExit();
+			_currentState->Release();
 			SAFE_DELETE(_currentState);
 			_currentState = nullptr;
 		}
 		_currentState = state;
-		_currentState->OnEnter(_pActor);
+		_currentState->Init(_pActor);
+		_currentState->OnEnter();
 	}
 private:
 	State<T> *_currentState{};
