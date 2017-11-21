@@ -84,8 +84,6 @@ void ActionComponent::UpdateAnimation(float deltaTime)
 		}
 	}
 
-
-
 	if (_playing)
 	{
 		_animDelta = deltaTime;
@@ -375,30 +373,29 @@ Action::Action()
 {
 	ZeroMemory(_name, sizeof(char) * ACTION_MAX_NAME);
 	_blocking = true;
+	_stop = false;
 	_playSpeed = 1.0f;
 	_crossFadeTime = 0.0f;
 	_outCrossFadeTime = 0.0f;
 	_playOnce = false;
-	ZeroMemory(_extraInfo, sizeof(char) * 16);
 }
 
 Action::Action(const Action & other)
-	: _blocking(other._blocking), _playSpeed(other._playSpeed),
+	: _blocking(other._blocking), _playSpeed(other._playSpeed), _stop(false),
 	_crossFadeTime(other._crossFadeTime), _outCrossFadeTime(other._outCrossFadeTime), _playOnce(other._playOnce)
 {
 	strncpy(_name, other._name, sizeof(char) * ACTION_MAX_NAME);
-	memcpy(_extraInfo, other._extraInfo, sizeof(char) * 16);
 }
 
 Action & Action::operator=(const Action & other)
 {
 	strncpy(_name, other._name, sizeof(char) * ACTION_MAX_NAME);
+	_stop = false;
 	_blocking = other._blocking;
 	_playSpeed = other._playSpeed;
 	_crossFadeTime = other._crossFadeTime;
 	_outCrossFadeTime = other._outCrossFadeTime;
 	_playOnce = other._playOnce;
-	memcpy(_extraInfo, other._extraInfo, sizeof(char) * 16);
 
 	return *this;
 }

@@ -44,17 +44,17 @@ bool32 BaseScene::Init()
 
 	config._cellScale = 1.0f;
 	config._heightScale = 20.0f;
-	config._textureMult = 50;
+	config._textureMult = 100;
 	config._lodRatio = 0.1f;
 	config._sectionResolution = 64;
 
-	//TERRAIN->SetScene(this);
-	//TERRAIN->Create(config, 1);
-	//_terrainEffect = VIDEO->GetEffect("TerrainBase.fx");
+	TERRAIN->SetScene(this);
+	TERRAIN->Create(config, 1);
+	_terrainEffect = VIDEO->GetEffect("TerrainBase.fx");
 
 	//메쉬 불러오기..
 	Matrix correctionMat;
-	MatrixScaling(&correctionMat, 0.1f, 0.1f, 0.1f);
+	MatrixScaling(&correctionMat, 0.01f, 0.01f, 0.01f);
 	//_skinnedMeshHandle = VIDEO->CreateSkinnedXMesh("../resources/Castanic_F_L18A/Castanic_F_L18A.X", &correctionMat, "Castanic");
 	_skinnedMeshHandle = VIDEO->CreateSkinnedXMesh("../resources/Models/Knight/Knight.X", &correctionMat, "Knight");
 
@@ -115,9 +115,6 @@ bool32 BaseScene::Update(float deltaTime)
 {
 	bool32 result = true;
 
-	//gpDevice->SetRenderState(D3DRS_ALPHABLENDENABLE, true);
-	//gpDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
-	//gpDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
 	_editor->Edit(RefVariant());
 
 	_world.Refresh();
@@ -145,7 +142,7 @@ bool32 BaseScene::Render()
 	DEBUG_DRAWER->FillRenderCommand(*_mainRenderView);
 
 	_renderSystem.Render(*_mainRenderView);
-	//TERRAIN->FillRenderCommand(*_mainRenderView);
+	TERRAIN->FillRenderCommand(*_mainRenderView);
 
 	_mainRenderView->PreRender();
 	_mainRenderView->ExecCommands();

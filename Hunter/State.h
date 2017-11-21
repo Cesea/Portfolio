@@ -10,7 +10,7 @@ public:
 	virtual bool Init(T *pActor) = 0;
 	virtual void Release() = 0;
 	virtual void OnEnter() = 0;
-	virtual State<T> *Update(float deltaTime, const GameCommand &command) = 0;
+	virtual void Update(float deltaTime, const GameCommand &command) = 0;
 	virtual void OnExit() = 0;
 protected :
 	T *_pActor{};

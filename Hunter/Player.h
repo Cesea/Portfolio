@@ -2,9 +2,10 @@
 #define PLAYER_H
 
 #include "PlayerAnimationString.h"
-#include "PlayerStates.h"
 
 #define TRANSITION_TIME 0.125f
+
+class PlayerStateMachine;
 
 struct PlayerCallbackData
 {
@@ -47,24 +48,43 @@ struct InputConfig
 	//uint32 _block;
 };
 
-//class BaseObject
-//{
-//public :
-//	BaseObject();
-//	virtual ~BaseObject();
-//
-//	virtual void CreateFromWorld(World &world);
-//	virtual void Update(float deltaTime);
-//
-//protected :
-//};
+
 
 class Player 
 {
-	friend class PlayerState;
-	friend class PlayerNormalState;
-	friend class PlayerWarState;
-	friend class PlayerDeadState;
+public :
+	struct AttackEvent
+	{
+		int32 _a;
+	};
+
+	struct MoveEvent
+	{
+		int32 _a;
+	};
+	struct InteractEvent
+	{
+		int32 _a;
+	};
+	struct JumpEvent
+	{
+		int32 _a;
+	};
+
+	struct PositionEvent
+	{
+		int32 _a;
+	};
+
+	struct QueueActionEvent
+	{
+		QueueActionEvent(const Action &action)
+			:_action(action)
+		{}
+		const Action &_action;
+	};
+
+	friend class PlayerStanceState;
 public :
 	Player();
 	virtual ~Player();
@@ -76,6 +96,8 @@ public :
 	void Handle(const InputManager::KeyPressedEvent &event);
 	void Handle(const InputManager::MousePressedEvent &event);
 	void Handle(const InputManager::KeyDownEvent &event);
+
+	void Handle(const QueueActionEvent &event);
 protected :
 
 	void SetupCallbackAndCompression();
@@ -84,7 +106,7 @@ protected :
 
 	PlayerCallbackData _callbackData;
 
-	PlayerStateMachine _stateMachine;
+	PlayerStateMachine *_stateMachine;
 
 	GameCommand _currentCommand;
 
@@ -93,6 +115,7 @@ protected :
 private :
 	void SetInputConfig();
 	InputConfig _inputConfig;
+
 
 };
 

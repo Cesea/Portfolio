@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "Player.h"
 
+#include "PlayerStates.h"
+
 
 Player::Player()
 {
@@ -16,6 +18,7 @@ void Player::CreateFromWorld(World & world)
 	channel.Add<InputManager::KeyPressedEvent, Player>(*this);
 	channel.Add<InputManager::KeyDownEvent, Player>(*this);
 	channel.Add<InputManager::MousePressedEvent, Player>(*this);
+	channel.Add<QueueActionEvent, Player>(*this);
 	SetInputConfig();
 	_entity = world.CreateEntity();
 
@@ -35,18 +38,23 @@ void Player::CreateFromWorld(World & world)
 	SetupCallbackAndCompression();
 	_pActionComp->MakeAnimationList();
 
-
 	_entity.Activate();
 
-	_stateMachine.Init(this);
-	_stateMachine.ChangeState(new PlayerNormalState);
+	_stateMachine = new PlayerStateMachine;
+	_stateMachine->Init(this);
+	_stateMachine->RegisterState(META_TYPE(PlayerStanceState)->Name(), new PlayerStanceState());
+	_stateMachine->RegisterState(META_TYPE(PlayerMoveState)->Name(), new PlayerMoveState());
+	_stateMachine->RegisterState(META_TYPE(PlayerAttackState)->Name(), new PlayerAttackState());
+	_stateMachine->RegisterState(META_TYPE(PlayerCombatState)->Name(), new PlayerCombatState());
+	_stateMachine->RegisterState(META_TYPE(PlayerDeadState)->Name(), new PlayerDeadState());
+	_stateMachine->ChangeState(META_TYPE(PlayerStanceState)->Name());
 
 	_currentCommand._interpreted = true;
 }
 
 void Player::Update(float deltaTime)
 {
-	_stateMachine.Update(deltaTime, _currentCommand);
+	_stateMachine->Update(deltaTime, _currentCommand);
 	_currentCommand._interpreted = true;
 
 	//if (_lastCommand._interpreted == false)
@@ -178,6 +186,11 @@ void Player::Handle(const InputManager::KeyDownEvent & event)
 		_currentCommand._interpreted = false;
 	}
 
+}
+
+void Player::Handle(const QueueActionEvent & event)
+{
+	_pActionComp->_actionQueue.PushAction(event._action);
 }
 
 

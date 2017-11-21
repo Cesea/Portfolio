@@ -5,17 +5,15 @@
 #include "State.h"
 #include "StateMachine.h"
 
-class Player;
+#include "Player.h"
+
 class PlayerState;
 class PlayerStateMachine;
 
 class PlayerStateMachine : public StateMachine<Player>
 {
 public :
-
-
 protected :
-
 };
 
 class PlayerState : public State<Player>
@@ -24,49 +22,98 @@ public :
 	virtual bool Init(Player *pPlayer);
 	virtual void Release();
 	virtual void OnEnter() = 0;
-	virtual PlayerState *Update(float deltaTime, const GameCommand &command) = 0;
+	virtual void Update(float deltaTime, const GameCommand &command) = 0;
 	virtual void OnExit() = 0;
 
 protected : 
+	EventChannel _channel;
 	GameCommand _lastCommand;
 };
 
-class PlayerNormalState : public PlayerState
+class PlayerAttackState : public PlayerState
 {
-public :
+public:
+	DECLARE_META(PlayerAttackState);
+
 	void OnEnter() override;
-	PlayerState *Update(float deltaTime, const GameCommand &command) override;
+	void Update(float deltaTime, const GameCommand &command) override;
 	void OnExit() override;
 
-protected :
-	StopWatch _idleRandomTimer;
+	//void Handle(const Player::AttackEvent &event);
+};
 
-	bool32 _sitting{ false };
-	bool32 _walking{ false };
-	bool32 _running{ false };
+class PlayerCombatState : public PlayerState
+{
+public :
+	DECLARE_META(PlayerCombatState);
+
+	void OnEnter() override;
+	void Update(float deltaTime, const GameCommand &command) override;
+	void OnExit() override;
+
+	//void Handle(const Player::AttackEvent &event);
+	//void Handle(const CombatEndEvent &event);
+	//void Handle(const Player::MoveEvent &event);
+	//void Handle(const DamageEvent &event);
 
 };
 
-class PlayerWarState : public PlayerState
+class PlayerStanceState : public PlayerState
 {
-public :
+public:
+	DECLARE_META(PlayerStanceState);
+
 	void OnEnter() override;
-	PlayerState *Update(float deltaTime, const GameCommand &command) override;
+	void Update(float deltaTime, const GameCommand &command) override;
 	void OnExit() override;
+
+	void Handle(const Player::MoveEvent &event);
+	//void Handle(const CombatBeginEvent &event);
+	//void Handle(const Player::InteractEvent &event);
 
 protected :
 
+	StopWatch _randomTimer;
+};
+
+class PlayerMoveState : public PlayerState
+{
+public :
+	DECLARE_META(PlayerMoveState);
+
+	void OnEnter() override;
+	void Update(float deltaTime, const GameCommand &command) override;
+	void OnExit() override;
+
+	//void Handle(const Player::JumpEvent &event);
+	//void Handle(const CombatBeginEvent &event);
 };
 
 class PlayerDeadState : public PlayerState
 {
 public :
+	DECLARE_META(PlayerDeadState);
+
 	void OnEnter() override;
-	PlayerState *Update(float deltaTime, const GameCommand &command) override;
+	void Update(float deltaTime, const GameCommand &command) override;
 	void OnExit() override;
 
-protected :
-
 };
+
+//class PlayerNormalState : public PlayerState
+//{
+//public :
+//	void OnEnter() override;
+//	PlayerState *Update(float deltaTime, const GameCommand &command) override;
+//	void OnExit() override;
+//
+//protected :
+//	StopWatch _idleRandomTimer;
+//
+//	bool32 _sitting{ false };
+//	bool32 _walking{ false };
+//	bool32 _running{ false };
+//};
+
 
 #endif

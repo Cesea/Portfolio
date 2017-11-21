@@ -4,10 +4,15 @@
 #include "State.h"
 #include "GameCommand.h"
 
+#include <map>
+
+
 template <typename T>
 class StateMachine
 {
 public:
+	typedef std::map<std::string, State<T> *> StateTable;
+
 	StateMachine() {}
 	virtual ~StateMachine() {}
 
@@ -18,36 +23,57 @@ public:
 		return S_OK;
 	}
 
+	bool RegisterState(const std::string &name, State<T> *pNewState)
+	{
+		auto found = _stateTable.find(name);
+		if (found == _stateTable.end())
+		{
+			_stateTable.insert(std::make_pair(name, pNewState));
+			return true;
+		}
+		return false;
+	}
+
 	void Release()
 	{
 		_pActor = nullptr;
-		SAFE_DELETE(_currentState);
-		SAFE_DELETE(_prevState)
+		_currentState = nullptr;
+		_prevState = nullptr;
+		for (auto &state : _stateTable)
+		{
+			SAFE_DELETE(state.second);
+		}
+		_stateTable.clear();
 	}
 
 	void Update(float deltaTime, const GameCommand &command)
 	{
-		State<T> *newState = _currentState->Update(deltaTime, command);
-		if (nullptr != newState)
-		{
-			ChangeState(newState);
-		}
+		_currentState->Update(deltaTime, command);
 	}
 
-	void ChangeState(State<T> *state)
+	void ChangeState(const std::string &newStateName)
 	{
 		if (_currentState)
 		{
 			_currentState->OnExit();
 			_currentState->Release();
-			SAFE_DELETE(_currentState);
-			_currentState = nullptr;
+			_prevState = _currentState;
 		}
-		_currentState = state;
-		_currentState->Init(_pActor);
-		_currentState->OnEnter();
+		auto &found = _stateTable.find(newStateName);
+		if (found != _stateTable.end())
+		{
+			_currentState = found->second;
+			_currentState->Init(_pActor);
+			_currentState->OnEnter();
+		}
+
 	}
-private:
+
+	const StateTable &GetStateTable() { return _stateTable; }
+
+protected :
+	StateTable _stateTable;
+
 	State<T> *_currentState{};
 	State<T> *_prevState{};
 

@@ -24,17 +24,15 @@ struct Action
 	Action(const Action &other);
 	Action &operator= (const Action &other);
 
-	//만약 animationIndex 가 -1이라면 오류이다...생성자에서 -1로 초기화하니 항상 올바른 값을 주도록 하자
 	char _name[ACTION_MAX_NAME];
 	//만약 뒤에 에니메이션이 온다면 이 에니메이션이 끝나고 실행되게 할거냐 아니면 바로 블랜딩이 되게끔 할 거냐??
 	bool32 _blocking;
 	bool32 _playOnce{true};
+	bool32 _stop{ false };
 	float _playSpeed;
 
 	float _crossFadeTime;
 	float _outCrossFadeTime;
-
-	char _extraInfo[16];
 };
 
 class ActionQueue
