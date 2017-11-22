@@ -5,7 +5,7 @@
 #include "GameCommand.h"
 
 #include <map>
-
+struct Action;
 
 template <typename T>
 class StateMachine
@@ -28,6 +28,8 @@ public:
 		auto found = _stateTable.find(name);
 		if (found == _stateTable.end())
 		{
+
+			pNewState->Init(this);
 			_stateTable.insert(std::make_pair(name, pNewState));
 			return true;
 		}
@@ -56,22 +58,22 @@ public:
 		if (_currentState)
 		{
 			_currentState->OnExit();
-			_currentState->Release();
 			_prevState = _currentState;
 		}
 		auto &found = _stateTable.find(newStateName);
 		if (found != _stateTable.end())
 		{
 			_currentState = found->second;
-			_currentState->Init(_pActor);
 			_currentState->OnEnter();
 		}
-
 	}
 
 	const StateTable &GetStateTable() { return _stateTable; }
+	virtual void QueueAction(const Action &action) = 0;
 
 protected :
+	friend class State<T>;
+
 	StateTable _stateTable;
 
 	State<T> *_currentState{};

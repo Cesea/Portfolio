@@ -11,11 +11,9 @@
 
 #include "Delegate.h"
 
-//TODO :
-#define BX_ALIGN_MASK(_value, _mask) ( ( (_value)+(_mask) ) & ( (~0)&(~(_mask) ) ) )
-#define BX_ALIGN_16(_value) BX_ALIGN_MASK(_value, 0xf)
-#define BX_ALIGN_256(_value) BX_ALIGN_MASK(_value, 0xff)
-#define BX_ALIGN_4096(_value) BX_ALIGN_MASK(_value, 0xfff)
+#include "State.h"
+#include "StateMachine.h"
+
 
 constexpr float EPSILON = 0.001f;
 constexpr float ONE_RAD = 0.017453f;

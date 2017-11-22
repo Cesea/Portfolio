@@ -52,10 +52,6 @@ void ActionComponent::UpdateAnimation(float deltaTime)
 		{
 			_actionQueue.PopAction();
 		}
-		else
-		{
-			int a = 0;
-		}
 	}
 	else 
 	{
@@ -78,15 +74,17 @@ void ActionComponent::UpdateAnimation(float deltaTime)
 					this->Stop();
 				}
 			}
-
 			_animationPlayFactor = _animationPlayFactor - (int32)_animationPlayFactor;
-
 		}
 	}
 
 	if (_playing)
 	{
 		_animDelta = deltaTime;
+	}
+	else
+	{
+		_animDelta = 0;
 	}
 
 	//크로스 페이드가 진행중이라면..
@@ -100,6 +98,7 @@ void ActionComponent::UpdateAnimation(float deltaTime)
 		{
 			_pAnimationController->SetTrackWeight(0, 1);
 			_pAnimationController->SetTrackEnable(1, false);
+			Console::Log("ttt\n");
 		}
 		else
 		{
@@ -170,21 +169,30 @@ bool ActionComponent::Play(const Action & action)
 	{
 		if (action._playOnce)
 		{
-			_playing = true;
-			_looping = false;
-
+		
 			auto found = _animationTable.find(action._name);
 			if (found != _animationTable.end())
 			{
+
+				_playing = true;
+				_looping = false;
 				_pPrevPlayingAnimationSet = _pPlayingAnimationSet;
 
-				this->_prevAction = _playingAction;
-				this->_playingAction = action;
+				//this->_prevAction = _playingAction;
+				//this->_playingAction = action;
 
 				_crossFadeTime = action._crossFadeTime;
 				_leftCrossFadeTime = action._crossFadeTime;
 
 				_outCrossFadeTime = action._outCrossFadeTime;
+
+				if (this->_prevAction._playOnce)
+				{
+					_pPrevPlayingAnimationSet = _pPlayingAnimationSet;
+
+					this->_prevAction = _playingAction;
+					this->_playingAction = action;
+				}
 
 				this->SetAnimation(found->second);
 				return true;

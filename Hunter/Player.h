@@ -52,6 +52,7 @@ struct InputConfig
 
 class Player 
 {
+	friend class PlayerStateMachine;
 public :
 	struct AttackEvent
 	{
@@ -97,7 +98,6 @@ public :
 	void Handle(const InputManager::MousePressedEvent &event);
 	void Handle(const InputManager::KeyDownEvent &event);
 
-	void Handle(const QueueActionEvent &event);
 protected :
 
 	void SetupCallbackAndCompression();
@@ -106,15 +106,18 @@ protected :
 
 	PlayerCallbackData _callbackData;
 
-	PlayerStateMachine *_stateMachine;
+	PlayerStateMachine *_pStateMachine;
 
 	GameCommand _currentCommand;
 
 	ActionComponent *_pActionComp{};
 
+	void QueueAction(const Action &action);
+
 private :
 	void SetInputConfig();
 	InputConfig _inputConfig;
+	EventChannel _channel;
 
 
 };

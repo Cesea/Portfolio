@@ -18,7 +18,6 @@ void Player::CreateFromWorld(World & world)
 	channel.Add<InputManager::KeyPressedEvent, Player>(*this);
 	channel.Add<InputManager::KeyDownEvent, Player>(*this);
 	channel.Add<InputManager::MousePressedEvent, Player>(*this);
-	channel.Add<QueueActionEvent, Player>(*this);
 	SetInputConfig();
 	_entity = world.CreateEntity();
 
@@ -34,27 +33,28 @@ void Player::CreateFromWorld(World & world)
 	_pActionComp = &_entity.AddComponent<ActionComponent>();
 	_pActionComp->CreateFrom(renderComp._skinned);
 	_pActionComp->_pCallbackHandler = new PlayerCallbackHandler;
-
 	SetupCallbackAndCompression();
+
 	_pActionComp->MakeAnimationList();
+	_pActionComp->SetFirstAction(PLAYER_ANIM(PlayerAnimationEnum::eStandingFree));
 
 	_entity.Activate();
 
-	_stateMachine = new PlayerStateMachine;
-	_stateMachine->Init(this);
-	_stateMachine->RegisterState(META_TYPE(PlayerStanceState)->Name(), new PlayerStanceState());
-	_stateMachine->RegisterState(META_TYPE(PlayerMoveState)->Name(), new PlayerMoveState());
-	_stateMachine->RegisterState(META_TYPE(PlayerAttackState)->Name(), new PlayerAttackState());
-	_stateMachine->RegisterState(META_TYPE(PlayerCombatState)->Name(), new PlayerCombatState());
-	_stateMachine->RegisterState(META_TYPE(PlayerDeadState)->Name(), new PlayerDeadState());
-	_stateMachine->ChangeState(META_TYPE(PlayerStanceState)->Name());
+	_pStateMachine = new PlayerStateMachine;
+	_pStateMachine->Init(this);
+	_pStateMachine->RegisterState(META_TYPE(PlayerStanceState)->Name(), new PlayerStanceState());
+	_pStateMachine->RegisterState(META_TYPE(PlayerMoveState)->Name(), new PlayerMoveState());
+	_pStateMachine->RegisterState(META_TYPE(PlayerAttackState)->Name(), new PlayerAttackState());
+	_pStateMachine->RegisterState(META_TYPE(PlayerCombatState)->Name(), new PlayerCombatState());
+	_pStateMachine->RegisterState(META_TYPE(PlayerDeadState)->Name(), new PlayerDeadState());
+	_pStateMachine->ChangeState(META_TYPE(PlayerStanceState)->Name());
 
 	_currentCommand._interpreted = true;
 }
 
 void Player::Update(float deltaTime)
 {
-	_stateMachine->Update(deltaTime, _currentCommand);
+	_pStateMachine->Update(deltaTime, _currentCommand);
 	_currentCommand._interpreted = true;
 
 	//if (_lastCommand._interpreted == false)
@@ -134,15 +134,16 @@ void Player::Handle(const InputManager::MousePressedEvent & event)
 
 	if (inputCode == _inputConfig._attack)
 	{
-		_currentCommand._type = GameCommand::Type::eAction;
+	/*	_currentCommand._type = GameCommand::Type::eAction;
 		_currentCommand._behavior._type = Behavior::Type::eAttack;
-		_currentCommand._interpreted = false;
+		_currentCommand._interpreted = false;*/
+		_channel.Broadcast<Player::AttackEvent>(AttackEvent());
 	}
 	else if (inputCode == _inputConfig._block)
 	{
-		_currentCommand._type = GameCommand::Type::eAction;
-		_currentCommand._behavior._type = Behavior::Type::eBlock;
-		_currentCommand._interpreted = false;
+		//_currentCommand._type = GameCommand::Type::eAction;
+		//_currentCommand._behavior._type = Behavior::Type::eBlock;
+		//_currentCommand._interpreted = false;
 	}
 }
 
@@ -156,6 +157,7 @@ void Player::Handle(const InputManager::KeyDownEvent & event)
 		_currentCommand._movement._horizontal = Movement::Horizontal::eLeft;
 		_currentCommand._behavior._type = Behavior::Type::eWalk;
 		_currentCommand._interpreted = false;
+		_channel.Broadcast<Player::MoveEvent>(Player::MoveEvent());
 	}
 	else if(_inputConfig._right == inputCode)
 	{
@@ -163,6 +165,7 @@ void Player::Handle(const InputManager::KeyDownEvent & event)
 		_currentCommand._movement._horizontal = Movement::Horizontal::eRight;
 		_currentCommand._behavior._type = Behavior::Type::eWalk;
 		_currentCommand._interpreted = false;
+		_channel.Broadcast<Player::MoveEvent>(Player::MoveEvent());
 	}
 	else if(_inputConfig._up == inputCode)
 	{
@@ -170,6 +173,7 @@ void Player::Handle(const InputManager::KeyDownEvent & event)
 		_currentCommand._movement._vertical = Movement::Vertical::eUp;
 		_currentCommand._behavior._type = Behavior::Type::eWalk;
 		_currentCommand._interpreted = false;
+		_channel.Broadcast<Player::MoveEvent>(Player::MoveEvent());
 	}
 	else if (_inputConfig._down == inputCode)
 	{
@@ -177,6 +181,7 @@ void Player::Handle(const InputManager::KeyDownEvent & event)
 		_currentCommand._movement._vertical = Movement::Vertical::eDown;
 		_currentCommand._behavior._type = Behavior::Type::eWalk;
 		_currentCommand._interpreted = false;
+		_channel.Broadcast<Player::MoveEvent>(Player::MoveEvent());
 	}
 	else if (_inputConfig._jump == inputCode)
 	{
@@ -188,11 +193,10 @@ void Player::Handle(const InputManager::KeyDownEvent & event)
 
 }
 
-void Player::Handle(const QueueActionEvent & event)
+void Player::QueueAction(const Action & action)
 {
-	_pActionComp->_actionQueue.PushAction(event._action);
+	_pActionComp->_actionQueue.PushAction(action);
 }
-
 
 void Player::SetInputConfig()
 {

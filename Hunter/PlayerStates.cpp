@@ -5,75 +5,130 @@
 
 DEFINE_META(PlayerAttackState)
 {
-	ADD_MEMBER(_pActor);
+	//ADD_MEMBER(_pActor);
 }
 
 DEFINE_META(PlayerStanceState)
 {
-	ADD_MEMBER(_pActor);
+	//ADD_MEMBER(_pActor);
 }
 
 DEFINE_META(PlayerCombatState)
 {
-	ADD_MEMBER(_pActor);
+	//ADD_MEMBER(_pActor);
 }
 
 DEFINE_META(PlayerMoveState)
 {
-	ADD_MEMBER(_pActor);
+	//ADD_MEMBER(_pActor);
 }
 
 DEFINE_META(PlayerDeadState)
 {
-	ADD_MEMBER(_pActor);
+	//ADD_MEMBER(_pActor);
 }
 
 //Player State /////////////////////////////////////////
-bool PlayerState::Init(Player * pPlayer)
+bool PlayerState::Init(StateMachine<Player> * pParent)
 {
-	_pActor = pPlayer;
+	_pParent = pParent;
 	return true;
 }
 
 void PlayerState::Release()
 {
-	_pActor = nullptr;
+	_pParent = nullptr;
 }
+
+//PlayerAttackState///////////////////////////////////////////////////////////
 void PlayerAttackState::OnEnter()
-{}
+{
+	_toCombatTimer.Restart(1.0f);
+	_pParent->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWarSwingLeft));
+}
+
 void PlayerAttackState::Update(float deltaTime, const GameCommand &command)
-{}
+{
+	if (_toCombatTimer.Tick(deltaTime))
+	{
+		_pParent->ChangeState(META_TYPE(PlayerCombatState)->Name());
+	}
+}
+
 void PlayerAttackState::OnExit()
-{}
+{
+}
 
+//PlayerCombatState///////////////////////////////////////////////////////////
 void PlayerCombatState::OnEnter()
-{}
+{
+	EventChannel channel;
+	channel.Add<Player::AttackEvent, PlayerCombatState>(*this);
+
+	_toStanceTimer.Restart(3.0f);
+	_pParent->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWarCombatMode));
+}
+
 void PlayerCombatState::Update(float deltaTime, const GameCommand &command)
-{}
+{
+	if (_toStanceTimer.Tick(deltaTime))
+	{
+		_pParent->ChangeState(META_TYPE(PlayerStanceState)->Name());
+	}
+}
+
 void PlayerCombatState::OnExit()
-{}
+{
+	EventChannel channel;
+	channel.Remove<Player::AttackEvent, PlayerCombatState>(*this);
+	_toStanceTimer.Restart(2.0f);
 
+}
+
+void PlayerCombatState::Handle(const Player::AttackEvent & event)
+{
+	//_pParent->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWarSwingLeft));
+	_pParent->ChangeState(META_TYPE(PlayerAttackState)->Name());
+}
+
+//Player Move State///////////////////////////////////////////////////////////
 void PlayerMoveState::OnEnter()
-{}
+{
+	EventChannel channel;
+	channel.Add<Player::MoveEvent, PlayerMoveState>(*this);
+
+	_toStanceTimer.Restart(1.0f);
+	_pParent->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWalk));
+}
+
 void PlayerMoveState::Update(float deltaTime, const GameCommand &command)
-{}
+{
+	if (_toStanceTimer.Tick(deltaTime))
+	{
+		_pParent->ChangeState(META_TYPE(PlayerStanceState)->Name());
+	}
+}
+
 void PlayerMoveState::OnExit()
-{}
+{
+	EventChannel channel;
+	channel.Remove<Player::MoveEvent, PlayerMoveState>(*this);
+}
 
-void PlayerDeadState::OnEnter()
-{}
-void PlayerDeadState::Update(float deltaTime, const GameCommand &command)
-{}
-void PlayerDeadState::OnExit()
-{}
+void PlayerMoveState::Handle(const Player::MoveEvent & event)
+{
+	_toStanceTimer.Restart(1.0f);
+}
 
-
-
+//Player Stance State///////////////////////////////////////////////////////////
 void PlayerStanceState::OnEnter()
 {
+	EventChannel channel;
+	channel.Add<Player::MoveEvent, PlayerStanceState>(*this);
+	channel.Add<Player::AttackEvent, PlayerStanceState>(*this);
+
 	_randomTimer.Restart(RandFloat(3.0f, 5.0f));
-	_pActor->_pActionComp->SetFirstAction(PLAYER_ANIM(PlayerAnimationEnum::eStandingFree));
-	//_channel.Broadcast<Player::QueueActionEvent>(Player::QueueActionEvent());
+	_pParent->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eStandingFree));
 }
 
 void PlayerStanceState::Update(float deltaTime, const GameCommand &command)
@@ -83,15 +138,15 @@ void PlayerStanceState::Update(float deltaTime, const GameCommand &command)
 		int32 randomNumber = RandInt(0, 30);
 		if (randomNumber >= 0 && randomNumber < 10)
 		{
-			_channel.Broadcast<Player::QueueActionEvent>(Player::QueueActionEvent(PLAYER_ANIM(PlayerAnimationEnum::eSalute)));
+			_pParent->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eSalute));
 		}
 		else if (randomNumber >= 10 && randomNumber < 20)
 		{
-			_channel.Broadcast<Player::QueueActionEvent>(Player::QueueActionEvent(PLAYER_ANIM(PlayerAnimationEnum::eBoring)));
+			_pParent->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eBoring));
 		}
 		else if (randomNumber >= 20 && randomNumber < 30)
 		{
-			_channel.Broadcast<Player::QueueActionEvent>(Player::QueueActionEvent(PLAYER_ANIM(PlayerAnimationEnum::eLookingAround)));
+			_pParent->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eLookingAround));
 		}
 		_randomTimer.Restart(RandFloat(3.0f, 5.0f));
 
@@ -100,9 +155,35 @@ void PlayerStanceState::Update(float deltaTime, const GameCommand &command)
 
 void PlayerStanceState::OnExit()
 {
+	EventChannel channel;
+	channel.Remove<Player::MoveEvent, PlayerStanceState>(*this);
+	channel.Remove<Player::AttackEvent, PlayerStanceState>(*this);
+}
+
+void PlayerStanceState::Handle(const Player::AttackEvent & event)
+{
+	Console::Log("Combat Begin\n");
+	_pParent->ChangeState(META_TYPE(PlayerCombatState)->Name());
 }
 
 void PlayerStanceState::Handle(const Player::MoveEvent & event)
+{
+	Console::Log("I'm moving\n");
+
+	_pParent->ChangeState(META_TYPE(PlayerMoveState)->Name());
+}
+
+
+//Player Dead State///////////////////////////////////////////////////////////
+void PlayerDeadState::OnEnter()
+{
+}
+
+void PlayerDeadState::Update(float deltaTime, const GameCommand &command)
+{
+}
+
+void PlayerDeadState::OnExit()
 {
 }
 

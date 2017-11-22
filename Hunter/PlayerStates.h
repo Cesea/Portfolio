@@ -10,16 +10,28 @@
 class PlayerState;
 class PlayerStateMachine;
 
+
 class PlayerStateMachine : public StateMachine<Player>
 {
+	friend class PlayerState;
+	friend class PlayerAttackState;
+	friend class PlayerCombatState;
+	friend class PlayerStanceState;
+	friend class PlayerMoveState;
+	friend class PlayerDeadState;
 public :
+	virtual void QueueAction(const Action &action)
+	{
+		_pActor->_pActionComp->_actionQueue.PushAction(action);
+	}
+
 protected :
 };
 
 class PlayerState : public State<Player>
 {
 public :
-	virtual bool Init(Player *pPlayer);
+	virtual bool Init(StateMachine<Player> *pParent);
 	virtual void Release();
 	virtual void OnEnter() = 0;
 	virtual void Update(float deltaTime, const GameCommand &command) = 0;
@@ -40,6 +52,8 @@ public:
 	void OnExit() override;
 
 	//void Handle(const Player::AttackEvent &event);
+protected:
+	StopWatch _toCombatTimer;
 };
 
 class PlayerCombatState : public PlayerState
@@ -51,11 +65,13 @@ public :
 	void Update(float deltaTime, const GameCommand &command) override;
 	void OnExit() override;
 
-	//void Handle(const Player::AttackEvent &event);
+	void Handle(const Player::AttackEvent &event);
 	//void Handle(const CombatEndEvent &event);
 	//void Handle(const Player::MoveEvent &event);
 	//void Handle(const DamageEvent &event);
 
+private :
+	StopWatch _toStanceTimer;
 };
 
 class PlayerStanceState : public PlayerState
@@ -67,6 +83,7 @@ public:
 	void Update(float deltaTime, const GameCommand &command) override;
 	void OnExit() override;
 
+	void Handle(const Player::AttackEvent &event);
 	void Handle(const Player::MoveEvent &event);
 	//void Handle(const CombatBeginEvent &event);
 	//void Handle(const Player::InteractEvent &event);
@@ -87,6 +104,10 @@ public :
 
 	//void Handle(const Player::JumpEvent &event);
 	//void Handle(const CombatBeginEvent &event);
+	void Handle(const Player::MoveEvent &event);
+
+protected :
+	StopWatch _toStanceTimer;
 };
 
 class PlayerDeadState : public PlayerState

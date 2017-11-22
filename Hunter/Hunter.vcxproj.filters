@@ -472,6 +472,9 @@
     <ClInclude Include="PlayerStates.h">
       <Filter>Game\GameObject\Player</Filter>
     </ClInclude>
+    <ClInclude Include="CombatManager.h">
+      <Filter>Game\GameManager</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Core">
@@ -617,6 +620,9 @@
     </Filter>
     <Filter Include="Game\GameUtils\GameCommand">
       <UniqueIdentifier>{c610a143-4bbe-4f78-94fe-cc759e7141e2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\GameManager">
+      <UniqueIdentifier>{270c9003-5fb1-488a-b4d6-faf623868371}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
