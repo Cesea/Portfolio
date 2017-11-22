@@ -27,9 +27,6 @@ public:
 		video::StaticXMeshHandle _static;
 		video::AnimationInstanceHandle _skinned;
 	};
-
-	video::MaterialHandle _material;
-	video::EffectHandle _effect;
 };
 
 #endif

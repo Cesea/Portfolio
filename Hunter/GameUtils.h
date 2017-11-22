@@ -6,6 +6,7 @@
 #include "GameComponent.h"
 #include "GameSystems.h"
 
+#include "Light.h"
 #include "Terrain.h"
 
 #endif

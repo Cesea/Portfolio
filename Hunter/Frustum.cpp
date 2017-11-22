@@ -5,17 +5,16 @@
 
 Frustum::Frustum()
 {
-	_rHWPos[0] = Vector3(-1, -1, 0);
-	_rHWPos[1] = Vector3(1, -1, 0);
-	_rHWPos[2] = Vector3(1, -1, 1);
-	_rHWPos[3] = Vector3(-1, -1, 1);
+	_rHWPos[0] = Vector3(-1, 1, 0);
+	_rHWPos[1] = Vector3( 1, 1, 0);
+	_rHWPos[2] = Vector3(-1, -1, 0);
+	_rHWPos[3] = Vector3( 1, -1, 0);
 
-	_rHWPos[4] = Vector3(-1, 1, 0);
-	_rHWPos[5] = Vector3(1, 1, 0);
-	_rHWPos[6] = Vector3(1, 1, 1);
-	_rHWPos[7] = Vector3(-1, 1, 1);
+	_rHWPos[4] = Vector3(-1, 1, 1);
+	_rHWPos[5] = Vector3( 1, 1, 1);
+	_rHWPos[6] = Vector3(-1,-1, 1);
+	_rHWPos[7] = Vector3( 1,-1, 1);
 
-	_zFar = 100;
 }
 
 
@@ -32,10 +31,12 @@ void Frustum::UpdateFrustum(const Camera &camera)
 	{
 		Vec3TransformCoord(_pos + i, _rHWPos + i, &inverse);
 	}
-
-	_plane[3].Create(*(_rHWPos + 2), *(_rHWPos + 6), *(_rHWPos + 7));
-	_plane[4].Create(*(_rHWPos), *(_rHWPos + 3), *(_rHWPos + 7));
-	_plane[5].Create(*(_rHWPos + 1), *(_rHWPos + 5), *(_rHWPos + 6));
+	_plane[0].Create(_pos[0], _pos[1], _pos[2]);
+	_plane[1].Create(_pos[5], _pos[4], _pos[7]);
+	_plane[2].Create(_pos[1], _pos[5], _pos[3]);
+	_plane[3].Create(_pos[4], _pos[0], _pos[6]);
+	_plane[4].Create(_pos[4], _pos[5], _pos[0]);
+	_plane[5].Create(_pos[2], _pos[3], _pos[6]);
 }
 
 bool Frustum::IsPointIntFrustum(const Vector3 & point) const

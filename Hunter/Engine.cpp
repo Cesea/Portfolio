@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "Engine.h"
 
+#include "BaseScene.h"
+
 #define HUNTER_DEBUG 1
 
 Engine *gEngine;
@@ -18,6 +20,11 @@ Engine::Engine()
 
 Engine::~Engine()
 {
+	GIZMOMANAGER->Release();
+	GIZMOMANAGER->ReleaseInstance();
+
+	SPRITEMANAGER->Release();
+	SPRITEMANAGER->ReleaseInstance();
 }
 
 void Engine::Run()
@@ -77,6 +84,7 @@ void Engine::Run()
 		float deltaTime = APPTIMER->GetTargetTime();
 
 		_pScene->Update(deltaTime);
+		_pScene->Render();
 
 		APPTIMER->Tick();
 
@@ -187,6 +195,12 @@ bool Engine::InitializeSystems()
 	{
 		return false;
 	}
+
+	GIZMOMANAGER->Init(gpDevice);
+	SPRITEMANAGER->Init(gpDevice);
+
+	_pScene->AddScene("BaseScene", new BaseScene());
+	_pScene->ChangeScene("BaseScene", 0);
 
 	return true;
 }

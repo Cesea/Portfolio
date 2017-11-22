@@ -3,6 +3,10 @@
 
 #include "VideoResourceHandles.h"
 
+struct TransformComponent;
+class Light;
+class DirectionalLight;
+
 namespace video
 {
 	struct SkinnedXMesh;
@@ -18,7 +22,12 @@ struct BoneMesh : public D3DXMESHCONTAINER
 {
 	bool32 _visible{ true };
 	ID3DXMesh *WorkingMesh;			
-	std::vector<video::MaterialHandle> _materialHandles;
+
+	std::vector<video::TextureHandle> _diffuseTextures;
+	std::vector<video::TextureHandle> _normalTextures;
+	std::vector<video::TextureHandle> _specularTextures;
+	std::vector<video::TextureHandle> _emissionTexture;
+	std::vector<D3DMATERIAL9> _materials;
 
 	Matrix** ppBoneMatrixPtrs{};		//본들의 행렬 [ 포인터 배열 ]
 	Matrix* pBoneOffsetMatices{};		//자신의 기본 행렬 배열
@@ -30,8 +39,6 @@ struct BoneMesh : public D3DXMESHCONTAINER
 	DWORD NumAttributesGroup{};		//메시의 속성 그룹수 ( 해당 메시에 메터리얼정보가 몇개있니? )
 	LPD3DXBUFFER BufBoneCombos{};			//본컴비네이션 ( 메시에 적용되는 본 ID 정보와 메터리얼 정보 )
 
-	video::VertexBufferHandle _vHandle;
-	video::IndexBufferHandle _iHandle;
 };
 
 class BoneHierachy : public ID3DXAllocateHierarchy
@@ -76,11 +83,6 @@ namespace video
 		std::vector<uint16> _indices;
 	};
 
-	//struct MeshContainer
-	//{
-	//};
-	//NOTE : 지금 mesh가 staticMesh, skinnedmesh 두개로 나누어져 있다... 이것을 하나로 합할 수 있을까
-
 	void ResizeMeshAndGetInfos(ID3DXMesh *pMesh, const Matrix &correction, 
 		MeshVertInfo *pOutVertInfo, MeshBoundInfo *pOutBoundInfo);
 
@@ -89,28 +91,35 @@ namespace video
 	
 	struct StaticXMesh
 	{
+		static video::EffectHandle _sEffectHandle;
+		static void SetCamera(const Camera &camera);
+		static void SetBaseLight(DirectionalLight *pDirectional);
+
 		bool Create(const std::string &fileName, const Matrix* matCorrection = nullptr);
 		void Destroy();
 		void BuidSubMeshBoundInfo();
 
-		void FillRenderCommand(RenderView &renderView, video::EffectHandle effect, const Matrix *pMatrix = nullptr);
+
+		void Render(const TransformComponent &transform);
+		//void Render(video::Effect);
+		//void FillRenderCommand(RenderView &renderView, video::EffectHandle effect, const Matrix *pMatrix = nullptr);
 
 		bool32 _visible{ true };
 		ID3DXMesh *_pMesh{};
 		uint32 _numMaterial{};
-		std::vector<video::MaterialHandle> _materialHandles;
+		std::vector<video::TextureHandle> _diffuseTextures;
+		std::vector<video::TextureHandle> _normalTextures;
+		std::vector<video::TextureHandle> _specularTextures;
+		std::vector<video::TextureHandle> _emissionTexture;
+		std::vector<D3DMATERIAL9> _materials;
+
+		//std::vector<video::MaterialHandle> _materialHandles;
 
 		MeshBoundInfo _meshBoundInfo{};
 		std::vector<MeshBoundInfo> _submeshBoundInfos;
 
 		D3DXATTRIBUTERANGE *_attributeRange{};
-
 		MeshVertInfo _meshVertInfo{};
-
-		VertexBufferHandle _vHandle;
-		IndexBufferHandle _iHandle;
-
-		static video::EffectHandle sDefaultEffectHandle;
 	};
 
 
@@ -119,6 +128,12 @@ namespace video
 
 	struct SkinnedXMesh
 	{
+		static video::EffectHandle _sSkinnedEffectHandle;
+		static video::EffectHandle _sStaticEffectHandle;
+		static void SetCamera(const Camera &Camera);
+		static void SetBaseLight(DirectionalLight *pDirectionalLight);
+		static void SetTechniqueName(const std::string &name);
+
 		bool Create(const std::string &fileName, const Matrix* matCorrection = nullptr);
 		void Destroy();
 
@@ -127,21 +142,20 @@ namespace video
 		void Update(const Matrix *pMatrix);
 		void UpdateMatrices(Bone *pBone, Matrix *pParentMatrix) const;
 
-		//NOTE : 직접 사용하지 않고 밖에서 쓴다
-		//void FillRenderCommand(RenderView &renderView, AnimationHandle animHandle, video::EffectHandle effect);
-		//void RenderBone(RenderView &renderView, Bone *pBone, AnimationHandle animHandle, video::EffectHandle effect) const;
+		virtual void Render(const TransformComponent &transform);
+
+		void RenderBone(Bone* pBone);
 
 		Matrix _matCorrection;
 
 		Bone *_pRootBone{};
 		uint32 _numWorkingPalette;
+		Matrix *_workingPalettes{};
 		ID3DXAnimationController *_pAnimationController{};
 
 		uint32 _numSubset{};
 		MeshBoundInfo _boundInfo{};
 
-		//BoneMeshTable _meshTable;
-		//BoneTable _boneTable;
 	};
 
 
@@ -151,19 +165,9 @@ namespace video
 		bool Create(video::SkinnedXMeshHandle handle);
 		void Destroy();
 
-		void FillRenderCommand(RenderView &renderView, 
-			video::EffectHandle skinnedEffect, video::EffectHandle staticEffect);
-		void FillRenderCommandInternal(RenderView &renderView, 
-			video::EffectHandle skinnedEffect, video::EffectHandle staticEffect, Bone *pBone);
-
-		//void	RenderBoneName(cCamera* pCam, cTransform* pTransform);
 		SkinnedXMesh *_pSkinnedMesh{};
 
 		ID3DXAnimationController *_pAnimationController{};
-		int32 _numPalette{};
-		Matrix *_workingPalettes{};
-
-		static video::EffectHandle sDefaultEffectHandle;
 	};
 }
 

@@ -40,15 +40,11 @@ bool VideoDevice::Init()
 	LoadDefaultEffects();
 	MakeDefaultVertexDecls();
 
-	DEBUG_DRAWER->Init();
-
 	return true;
 }
 
 void VideoDevice::ShutDown()
 {
-	DEBUG_DRAWER->Shutdown();
-	DEBUG_DRAWER->ReleaseInstance();
 
 	COM_RELEASE(gpDevice);
 	COM_RELEASE(_pD3D);
@@ -299,11 +295,10 @@ void video::VideoDevice::MakeDefaultVertexDecls()
 void video::VideoDevice::LoadDefaultEffects()
 {
 	VIDEO->CreateEffect("../resources/Shaders/StaticMesh.fx", "StaticMesh.fx");
-	VIDEO->CreateEffect("../resources/Shaders/StaticTestMesh.fx", "StaticTestMesh.fx");
 	VIDEO->CreateEffect("../resources/Shaders/SkinnedMesh.fx", "SkinnedMesh.fx");
 	VIDEO->CreateEffect("../resources/Shaders/TerrainBase.fx", "TerrainBase.fx");
-
-	VIDEO->CreateEffect("../resources/Shaders/DebugShader.fx", "DebugShader.fx");
+	VIDEO->CreateEffect("../Resources/Shaders/EvironmentCUBE.fx", "Environment.fx");
+	VIDEO->CreateEffect("../Resources/Shaders/PostEffect.fx", "PostEffect.fx");
 }
 
 RenderView *video::VideoDevice::GetRenderView(RenderViewHandle handle)
@@ -326,44 +321,44 @@ VertexBufferHandle video::VideoDevice::CreateVertexBuffer(Memory * memory, Verte
 	return result;
 }
 
-VertexBufferHandle video::VideoDevice::GetVertexBufferFromXMesh(ID3DXMesh *pMesh, const std::string &name)
-{
-	Assert(pMesh);
-
-	VertexBufferHandle result = _vertexBufferPool.Create(name);
-
-	IDirect3DVertexBuffer9 *meshVBuffer;
-	D3DVERTEXBUFFER_DESC bufferDesc{};
-	HRESULT_CHECK(pMesh->GetVertexBuffer(&meshVBuffer));
-	meshVBuffer->GetDesc(&bufferDesc);
-
-	D3DVERTEXELEMENT9 elements[MAX_FVF_DECL_SIZE];
-	pMesh->GetDeclaration(elements);
-
-	uint32 vertexStride = D3DXGetDeclVertexSize(elements, 0);
-
-	VertexDecl decl;
-	decl.Begin();
-	for (int32 i = 0; i < MAX_FVF_DECL_SIZE; ++i)
-	{
-		if (elements[i].Stream == 255)
-		{
-			break;
-		}
-		decl.Add(elements[i]);
-	}
-	decl.End(vertexStride);
-
-	VertexDeclHandle declHandle = VIDEO->CreateVertexDecl(&decl);
-
-	VertexBuffer &refBuffer = _vertexBuffers[result.index];
-	refBuffer._ptr = meshVBuffer;
-	refBuffer._size = bufferDesc.Size;
-	refBuffer._dynamic = false;
-	refBuffer._decl = declHandle;
-
-	return result;
-}
+//VertexBufferHandle video::VideoDevice::GetVertexBufferFromXMesh(ID3DXMesh *pMesh, const std::string &name)
+//{
+//	Assert(pMesh);
+//
+//	VertexBufferHandle result = _vertexBufferPool.Create(name);
+//
+//	IDirect3DVertexBuffer9 *meshVBuffer;
+//	D3DVERTEXBUFFER_DESC bufferDesc{};
+//	HRESULT_CHECK(pMesh->GetVertexBuffer(&meshVBuffer));
+//	meshVBuffer->GetDesc(&bufferDesc);
+//
+//	D3DVERTEXELEMENT9 elements[MAX_FVF_DECL_SIZE];
+//	pMesh->GetDeclaration(elements);
+//
+//	uint32 vertexStride = D3DXGetDeclVertexSize(elements, 0);
+//
+//	VertexDecl decl;
+//	decl.Begin();
+//	for (int32 i = 0; i < MAX_FVF_DECL_SIZE; ++i)
+//	{
+//		if (elements[i].Stream == 255)
+//		{
+//			break;
+//		}
+//		decl.Add(elements[i]);
+//	}
+//	decl.End(vertexStride);
+//
+//	VertexDeclHandle declHandle = VIDEO->CreateVertexDecl(&decl);
+//
+//	VertexBuffer &refBuffer = _vertexBuffers[result.index];
+//	refBuffer._ptr = meshVBuffer;
+//	refBuffer._size = bufferDesc.Size;
+//	refBuffer._dynamic = false;
+//	refBuffer._decl = declHandle;
+//
+//	return result;
+//}
 
 VertexBufferHandle video::VideoDevice::GetVertexBuffer(const std::string & name)
 {
@@ -395,25 +390,25 @@ IndexBufferHandle video::VideoDevice::CreateIndexBuffer(Memory * memory, uint32 
 	return result;
 }
 
-IndexBufferHandle video::VideoDevice::GetIndexBufferFromXMesh(ID3DXMesh * pMesh, const std::string &name)
-{
-	Assert(pMesh);
-
-	IndexBufferHandle result = _indexBufferPool.Create(name);
-
-	IDirect3DIndexBuffer9 *meshIBuffer;
-	D3DINDEXBUFFER_DESC bufferDesc{};
-	HRESULT_CHECK(pMesh->GetIndexBuffer(&meshIBuffer));
-	meshIBuffer->GetDesc(&bufferDesc);
-
-	IndexBuffer &refBuffer = _indexBuffers[result.index];
-	refBuffer._ptr = meshIBuffer;
-	refBuffer._size = bufferDesc.Size;
-	refBuffer._dynamic = false;
-	refBuffer._stride = (bufferDesc.Type == D3DFMT_INDEX16) ? (2) : (4);
-
-	return result;
-}
+//IndexBufferHandle video::VideoDevice::GetIndexBufferFromXMesh(ID3DXMesh * pMesh, const std::string &name)
+//{
+//	Assert(pMesh);
+//
+//	IndexBufferHandle result = _indexBufferPool.Create(name);
+//
+//	IDirect3DIndexBuffer9 *meshIBuffer;
+//	D3DINDEXBUFFER_DESC bufferDesc{};
+//	HRESULT_CHECK(pMesh->GetIndexBuffer(&meshIBuffer));
+//	meshIBuffer->GetDesc(&bufferDesc);
+//
+//	IndexBuffer &refBuffer = _indexBuffers[result.index];
+//	refBuffer._ptr = meshIBuffer;
+//	refBuffer._size = bufferDesc.Size;
+//	refBuffer._dynamic = false;
+//	refBuffer._stride = (bufferDesc.Type == D3DFMT_INDEX16) ? (2) : (4);
+//
+//	return result;
+//}
 
 IndexBufferHandle video::VideoDevice::GetIndexBuffer(const std::string & name)
 {

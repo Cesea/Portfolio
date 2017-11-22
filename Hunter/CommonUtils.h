@@ -7,8 +7,6 @@
 
 #include "TypeTraits.h"
 
-#include "Hash.h"
-
 #include "Delegate.h"
 
 #include "State.h"

@@ -2,14 +2,17 @@
 #define SCENE_MANAGER_H
 
 #include "IScene.h"
-//#include "SceneChangeEffect.h"
+#include "SceneChangeEffect.h"
 
 #include <map>
 
 class SceneManager
 {
-	typedef std::map<std::string, IScene *> SceneMap;
-	typedef std::map<std::string, IScene *>::iterator SceneMapIter;
+	friend class SceneChangeEffect;
+	friend DWORD CALLBACK LoadingTread(LPVOID lpParam);
+
+	typedef std::map<std::string, IScene *> SceneTable;
+	typedef std::map<std::string, IScene *>::iterator SceneTableIter;
 
 public :
 	struct SceneChangeEvent
@@ -19,44 +22,49 @@ public :
 	};
 
 public :
-
 	SceneManager();
 	virtual ~SceneManager();
 
 	bool Init();
 	void ShutDown();
 
-	virtual void Update(float deltaTime);
+	void Update(float deltaTime);
+	void Render();
 	EventChannel GetChannel() { return _channel; }
-private :
-	bool ChangeScene(const std::string &key);
+public :
+	bool ChangeScene(const std::string &key, uint32 effectNum);
 	bool ChangeSceneWithEffect(const std::string &key, int32 numEffect);
 	bool ChangeSceneWithLoadingEffect(const std::string &key, int32 startEffectNum, int32 endEffectNum);
 
 	void AddScene(const std::string &sceneName, IScene *pScene);
 	void AddLoadingScene(const std::string &sceneName, IScene *pScene);
-	void RemoveScene(const std::string &key);
-	void RemoveLoadingScene(const std::string &key);
+
 
 	void RemoveAllScenes();
 
 private :
-	SceneMap _scenes;
-	SceneMap _loadingScene;
+	SceneTable _scenes;
+	SceneTable _loadingScene;
 
-	IScene *_pCurrentScene;
+	IScene *_pCurrentScene{};
+	IScene *_pReleaseScene{};
 
-	//SceneChaneEffect *_
+	std::vector<SceneChangeEffect*> _sceneChangeEffects;	
+	SceneChangeEffect *_pCurrentChangeEffect{};	
+
+	int32 _nOutEffect;	
+public :
+	float _loadingProgress{ 0 };
+	std::string _loadingString;
 
 	EventChannel _channel;
 
-	//Event handle
 public :
 
 	void Handle(const SceneChangeEvent &event)
 	{
 		Console::Log("Scene Changed %s\n", event.newSceneName);
-		ChangeScene(event.newSceneName);
+		ChangeScene(event.newSceneName, 0);
 	}
 };
 

@@ -3,41 +3,37 @@
 float camNear;			//카메라 근거리 평면
 float camFar;			//카메라 원거리 평면
 
-//Diffuse Map
-texture gTexture0;
+texture Diffuse_Tex;
 sampler2D Diffuse = sampler_state
 {
-	Texture = (gTexture0);
+	Texture = (Diffuse_Tex);
 	MAGFILTER = LINEAR;
 	MIPFILTER = LINEAR;
 	MINFILTER = LINEAR;
 };
-
-//Normal Map
-texture gTexture1;
+texture Normal_Tex;
 sampler2D Normal = sampler_state
 {
-	Texture = (gTexture1);
+	Texture = (Normal_Tex);
 	MAGFILTER = LINEAR;
 	MINFILTER = LINEAR;
 	MIPFILTER = LINEAR;
 };
 
-//Specular Map
-texture gTexture2;
+texture Specular_Tex;
 sampler2D Specular = sampler_state
 {
-	Texture = (gTexture2);
+	Texture = (Specular_Tex);
 	MAGFILTER = LINEAR;
 	MINFILTER = LINEAR;
 	MIPFILTER = LINEAR;
 };
 
-//Emission Map
-texture gTexture3;
+
+texture Emission_Tex;
 sampler2D Emission = sampler_state
 {
-	Texture = (gTexture3);
+	Texture = (Emission_Tex);
 	MAGFILTER = LINEAR;
 	MIPFILTER = LINEAR;
 	MINFILTER = LINEAR;
@@ -71,12 +67,17 @@ struct PS_OUTPUT
 // Render Base 관련
 //---------------------------------------------------------------
 
+float4 ps_default(PS_INPUT input) : COLOR
+{
+	return tex2D(Diffuse, input.Texcoord);
+}
+
 PS_OUTPUT ps_main(PS_INPUT Input)
 {
 	PS_OUTPUT Output = (PS_OUTPUT)0;
 
 	float4 diffTex = tex2D(Diffuse, Input.Texcoord);
-	clip(diffTex.a - 0.1f);
+		clip(diffTex.a - 0.1f);
 
 	//TBN Matrix
 	float3x3 TBN = float3x3(
