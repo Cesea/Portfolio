@@ -165,7 +165,6 @@
     <ClCompile Include="ScriptSystem.cpp" />
     <ClCompile Include="spawnManager.cpp" />
     <ClCompile Include="Terrain.cpp" />
-    <ClCompile Include="TerrainEditorScene.cpp" />
     <ClCompile Include="TestScene.cpp" />
     <ClCompile Include="TextSerializer.cpp" />
     <ClCompile Include="tinyxml2.cpp" />
@@ -254,7 +253,7 @@
     <ClInclude Include="StateMachine.h" />
     <ClInclude Include="System.h" />
     <ClInclude Include="Terrain.h" />
-    <ClInclude Include="TerrainEditorScene.h" />
+    <ClInclude Include="TerrainSystem.h" />
     <ClInclude Include="TestScene.h" />
     <ClInclude Include="TextSerializer.h" />
     <ClInclude Include="tinyxml2.h" />

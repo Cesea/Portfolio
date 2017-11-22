@@ -92,8 +92,8 @@ void InitPlayerAnimation()
 	PLAYER_ANIM_DEFINE(eWarSpecialAttackA, true, true, 1.0f, 0.2f, 0.2f);
 	PLAYER_ANIM_DEFINE(eWarSpecialAttackB, true, true, 1.0f, 0.2f, 0.2f);
 	PLAYER_ANIM_DEFINE(eWarSwingHighStraigtDown, true, true, 1.0f, 0.2f, 0.2f);
-	PLAYER_ANIM_DEFINE(eWarSwingLeft, true, true, 1.0f, 0.2f, 0.15f);
-	PLAYER_ANIM_DEFINE(eWarSwingRight, true, true, 1.0f, 0.2f, 0.15f);
+	PLAYER_ANIM_DEFINE(eWarSwingLeft, true, true, 1.0f, 0.2f, 0.2f);
+	PLAYER_ANIM_DEFINE(eWarSwingRight, true, true, 1.0f, 0.2f, 0.2f);
 	PLAYER_ANIM_DEFINE(eWarTakingHit, true, true, 1.0f, 0.2f, 0.2f);
 	PLAYER_ANIM_DEFINE(eWarThrustMid, true, true, 1.0f, 0.2f, 0.2f);
 	PLAYER_ANIM_DEFINE(eBoring, true, true, 1.0f, 0.2f, 0.2f);

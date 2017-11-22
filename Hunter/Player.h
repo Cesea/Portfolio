@@ -119,7 +119,6 @@ private :
 	InputConfig _inputConfig;
 	EventChannel _channel;
 
-	float _speed{2.0f};
 
 };
 

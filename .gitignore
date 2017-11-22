@@ -72,7 +72,6 @@ artifacts/
 *.x
 *.swp
 *.zip
-*.jpg
 
 # Chutzpah Test files
 _Chutzpah*

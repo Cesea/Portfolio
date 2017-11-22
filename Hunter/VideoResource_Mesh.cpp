@@ -286,7 +286,7 @@ namespace video
 			}
 			else
 			{
-				MaterialHandle material = VIDEO->GetMaterial("Default");
+				MaterialHandle material = VIDEO->GetMaterial("default");
 				_materialHandles.push_back(material);
 			}
 		}

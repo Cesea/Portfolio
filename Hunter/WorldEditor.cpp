@@ -1,8 +1,6 @@
 #include "stdafx.h"
 #include "WorldEditor.h"
 
-bool32 gEditorOn = false;
-
 Editor::Editor()
 {
 }
@@ -23,8 +21,7 @@ void Editor::RegisterEvents()
 
 void Editor::Init()
 {
-	//strcpy(_name, "TerrainEditor");
-	//strcpy(_button, "Button");
+	strcpy(_button, "Button");
 	strcpy(_collapse, "Collapse");
 	
 	this->RegisterEvents();
@@ -42,54 +39,23 @@ void Editor::Edit(RefVariant &object)
 {
 	ImguiBeginFrame(_mx, _my, _mb, _scroll, _key);
 	//Console::Log("%d, %d, %d \n", _mx, _my, _mb);
+	ImguiBeginScrollArea(_name, 30, 30, 400, 800, &_scroll);
 
-	if (_editing == false)
+	for (int32 i = 0; i < 10; ++i)
 	{
-		if (ImguiCollapse("TerrainEditor", nullptr, _editing))
-		{
-			_editing = true;
-			gEditorOn = true;
-		}
+		ImguiButton(_button);
 	}
-	else
-	{
-		ImguiBeginScrollArea("TerrainEditor", EDITORX, EDITORY, EDITORSIZEX, EDITORSIZEY, &_scroll);
-		if (ImguiCollapse("TerrainEditor", nullptr, _editing))
-		{
-			_editing = false;
-			gEditorOn = false;
-		}
+	ImguiCollapse(_collapse, nullptr, false);
 
-		if (!_pickingObject)
-		{
-			if (ImguiButton("PickObject"))
-			{
-				_pickingObject = !_pickingObject;
-			}
-		}
-		else
-		{
-			if (ImguiButton("PickObject"))
-			{
-				_pickingObject = !_pickingObject;
-			}
-		}
-		ImguiCollapse(_collapse, nullptr, false);
+	ImguiSlider(_slider, &_val, -10, 10, 1.0f);
+	imguiEdit(_edit, 90);
 
-		ImguiSlider(_slider, &_val, -10, 10, 1.0f);
-		imguiEdit(_edit, 90);
+	ImguiEndScrollArea();
 
-		ImguiEndScrollArea();
+	ImguiEndFrame();
 
-		ImguiEndFrame();
-
-		_scroll = 0;
-		_key = 0;
-	}
-}
-
-void Editor::Render(video::RenderView * renderView)
-{
+	_scroll = 0;
+	_key = 0;
 }
 
 
@@ -128,12 +94,4 @@ void Editor::Handle(const InputManager::MouseReleasedEvent & event)
 void Editor::Handle(const InputManager::KeyPressedEvent & event)
 {
 	_key = event.code;
-}
-
-void Gizmo::Init()
-{
-}
-
-void Brush::Init()
-{
 }

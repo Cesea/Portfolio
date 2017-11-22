@@ -20,8 +20,6 @@ bool32 BaseScene::Init()
 	bool32 result = true;
 	//RegisterEvents();
 
-	_channel.Add<BaseScene::SpawnEvent, BaseScene>(*this);
-
 	InitPlayerAnimation();
 
 	//렌더 타켓 설정
@@ -37,34 +35,31 @@ bool32 BaseScene::Init()
 
 	//터레인 로드
 	Terrain::TerrainConfig config;
-	config._heightFileName = "../resources/Textures/Height_map1024.jpg";
-	config._tile0FileName = "../resources/Textures/TerrainTexture01.jpg";
-	config._tile1FileName = "../resources/Textures/TerrainTexture02.jpg";
-	config._tile2FileName = "../resources/Textures/TerrainTexture03.png";
-	config._tile3FileName = "../resources/Textures/TerrainTexture04.png";
+	config._heightFileName = "../resources/Textures/02-australia-gray.jpg";
+	config._tile0FileName = "../resources/Textures/terrain1.jpg";
+	config._tile1FileName = "../resources/Textures/terrain2.png";
+	config._tile2FileName = "../resources/Textures/terrain3.png";
+	config._tile3FileName = "../resources/Textures/terrain4.png";
 	config._splatFileName = "../resources/Textures/Splat.png";
 
 	config._cellScale = 1.0f;
 	config._heightScale = 20.0f;
-	config._textureMult = 300;
+	config._textureMult = 100;
 	config._lodRatio = 0.1f;
 	config._sectionResolution = 64;
 
 	TERRAIN->SetScene(this);
-	TERRAIN->Create(config, 1, false);
+	TERRAIN->Create(config, 1);
 	_terrainEffect = VIDEO->GetEffect("TerrainBase.fx");
 
 	//메쉬 불러오기..
 	Matrix correctionMat;
-	MatrixScaling(&correctionMat, 0.012f, 0.012f, 0.012f);
+	MatrixScaling(&correctionMat, 0.01f, 0.01f, 0.01f);
+	//_skinnedMeshHandle = VIDEO->CreateSkinnedXMesh("../resources/Castanic_F_L18A/Castanic_F_L18A.X", &correctionMat, "Castanic");
 	_skinnedMeshHandle = VIDEO->CreateSkinnedXMesh("../resources/Models/Knight/Knight.X", &correctionMat, "Knight");
 
-	MatrixScaling(&correctionMat, 1.0f, 1.0f, 1.0f);
-	video::StaticXMeshHandle staticMeshHandle = VIDEO->CreateStaticXMesh("../resources/Models/Environment/Rock/Rock1_A.X", &correctionMat, "Rock1_A");
-
-	video::StaticXMeshHandle gizmoTranslation = VIDEO->CreateStaticXMesh("../resources/GizmoTranslation.X", &correctionMat, "GizmoTranslation");
-	video::StaticXMeshHandle gizmoScaling = VIDEO->CreateStaticXMesh("../resources/GizmoScale.X", &correctionMat, "GizmoScaling");
-	video::StaticXMeshHandle gizmoRotation = VIDEO->CreateStaticXMesh("../resources/GizmoRotation.X", &correctionMat, "GizmoRotation");
+	//MatrixScaling(&correctionMat, 1.0f, 1.0f, 1.0f);
+	//video::StaticXMeshHandle staticMeshHandle = VIDEO->CreateStaticXMesh("../resources/Models/environment/Rock/Rock1_A.X", &correctionMat, "Rock");
 
 	video::StaticXMesh::sDefaultEffectHandle = VIDEO->GetEffect("StaticMesh.fx");
 	video::AnimationInstance::sDefaultEffectHandle = VIDEO->GetEffect("SkinnedMesh.fx");
@@ -75,8 +70,6 @@ bool32 BaseScene::Init()
 	_world.AddSystem<TransformSystem>(_transformSystem);
 	_world.AddSystem<ActionSystem>(_actionSystem);
 	_world.AddSystem<ScriptSystem>(_scriptSystem);
-
-
 
 	//for (uint32 z = 0; z < 2; ++z)
 	//{
@@ -95,52 +88,21 @@ bool32 BaseScene::Init()
 	//		entity.Activate();
 	//	}
 	//}
-
 	_player.CreateFromWorld(_world);
 
-	{
-		_entities.push_back(_world.CreateEntity());
-		Entity &entity = _entities.back();
+	/*_entities.push_back(_world.CreateEntity());
+	Entity &entity = _entities.back();*/
 
-		TransformComponent &transComp = entity.AddComponent<TransformComponent>();
-		transComp.MovePositionWorld(0.0f, -0.0f, 0.0f);
-		RenderComponent &renderComp = entity.AddComponent<RenderComponent>();
-		renderComp._type = RenderComponent::Type::eStatic;
-		renderComp._static = gizmoTranslation;
-		renderComp._effect = _staticEffect;
+	//TransformComponent &transComp = entity.AddComponent<TransformComponent>();
+	//transComp.MovePositionWorld(-5.0f, -0.0f, -5.0f);
+	//RenderComponent &renderComp = entity.AddComponent<RenderComponent>();
+	//renderComp._type = RenderComponent::Type::eStatic;
+	//renderComp._static = staticMeshHandle;
 
-		entity.Activate();
-	}
-
-	{
-		_entities.push_back(_world.CreateEntity());
-		Entity &entity = _entities.back();
-
-		TransformComponent &transComp = entity.AddComponent<TransformComponent>();
-		transComp.MovePositionWorld(0.0f, -0.0f, 0.0f);
-		RenderComponent &renderComp = entity.AddComponent<RenderComponent>();
-		renderComp._type = RenderComponent::Type::eStatic;
-		renderComp._static = gizmoRotation;
-		renderComp._effect = _staticEffect;
-
-		entity.Activate();
-	}
-
-	{
-		_entities.push_back(_world.CreateEntity());
-		Entity &entity = _entities.back();
-
-		TransformComponent &transComp = entity.AddComponent<TransformComponent>();
-		transComp.MovePositionWorld(0.0f, -0.0f, 0.0f);
-		RenderComponent &renderComp = entity.AddComponent<RenderComponent>();
-		renderComp._type = RenderComponent::Type::eStatic;
-		renderComp._static = gizmoScaling;
-		renderComp._effect = _staticEffect;
-
-		entity.Activate();
-	}
+	//entity.Activate();
 
 	//에디터 생성
+
 	imguiRenderInit();
 	_editor = new Editor;
 	_editor->Init();
@@ -176,7 +138,7 @@ bool32 BaseScene::Update(float deltaTime)
 
 bool32 BaseScene::Render()
 {
-	DEBUG_DRAWER->DrawWorldGrid(1, 80);
+	DEBUG_DRAWER->DrawWorldGrid(5, 40);
 	DEBUG_DRAWER->FillRenderCommand(*_mainRenderView);
 
 	_renderSystem.Render(*_mainRenderView);
@@ -210,19 +172,5 @@ bool32 BaseScene::IsActive()
 
 void BaseScene::RegisterEvents()
 {
-}
-
-void BaseScene::Handle(const BaseScene::SpawnEvent & event)
-{
-	_entities.push_back(_world.CreateEntity());
-	Entity &entity = _entities.back();
-	TransformComponent &refTransform = entity.AddComponent<TransformComponent>();
-	refTransform.MovePositionWorld(event._position);
-
-	RenderComponent &refRender = entity.AddComponent<RenderComponent>();
-	refRender._type = RenderComponent::Type::eStatic;
-	refRender._static = VIDEO->GetStaticXMesh("Rock1_A");
-
-	entity.Activate();
 }
 

@@ -3,8 +3,6 @@
 
 #include "imgui.h"
 
-bool imguiWindowProc(UINT msg, WPARAM wParam, LPARAM lParam);
-
 bool imguiRenderInit();
 
 void imguiRenderDestroy();

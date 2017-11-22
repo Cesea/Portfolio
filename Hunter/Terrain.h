@@ -6,31 +6,11 @@
 class BaseScene;
 class QuadTree;
 
-#define TERRAIN_CHUNK_RES (128)
-
-struct TerrainChunkPos
-{
-	int32 _x{};
-	int32 _z{};
-
-	float _relX{};
-	float _relZ{};
-};
-
 class Terrain : public SingletonBase<Terrain>
 {
-	friend class Editor;
 public:
 	struct TerrainConfig
 	{
-		bool32 _createFromHeightMap;
-		bool32 _createFromBuffer;
-
-		int32 _xResolution;
-		int32 _zResolution;
-
-		//만약 CreateFromHeightMap이 true라면 heightmap을 읽어서 로드한다...
-		//CreateFromBuffer가 true라면 버텍스 버퍼와 인덱스 버퍼를 읽어서 로드 한다.
 		std::string _heightFileName;
 		std::string _tile0FileName;
 		std::string _tile1FileName;
@@ -58,36 +38,31 @@ public:
 		uint32 i2;
 	};
 
-	struct TerrainChunk
+	struct TerrainSection
 	{
-		TerrainChunkPos _chunkPos;
+		int32 _indexX;
+		int32 _indexZ;
 
-		int32 _chunkX{};
-		int32 _chunkZ{};
+		float _startX;
+		float _startZ;
 
-		float _relStartX{};
-		float _relStartZ{};
+		float _endX;
+		float _endZ;
 
-		float _relEndX{};
-		float _relEndZ{};
-
-		float _relCenterX{};
-		float _relCenterZ{};
+		float _centerX;
+		float _centerZ;
 
 		float _radius{};
 
-		video::VertexBufferHandle _vHandle{};
-		video::IndexBufferHandle _iHandle{};
-
-		QuadTree* _pQuadTree{};  //쿼드 트리
-		video::TerrainVertex *_pVertices;
+		//video::VertexBufferHandle _vHandle;
+		//video::IndexBufferHandle _iHandle;
 	};
 
 	Terrain() {}
 	~Terrain();
 
 	void SetScene(BaseScene *pScene) { _pScene = pScene; }
-	bool Create(const Terrain::TerrainConfig &config, int32 smoothLevel, bool32 inEditMode);
+	bool Create(const Terrain::TerrainConfig &config, int32 smoothLevel);
 
 	void RegisterEvents();
 	void Handle(const InputManager::MouseReleasedEvent &event);
@@ -98,10 +73,8 @@ public:
 	bool IsIntersectRay(const Ray &ray, Vector3 *pOut);
 
 	float GetHeight(float x, float z);
+
 	float GetSlant(Vector3* pOut, float gravityPower, float x, float z);
-
-	//void ElevateVertex();
-
 private:
 	bool CreateTerrain(int32 smooth, int32 tileNum);
 
@@ -118,13 +91,11 @@ private:
 
 private:
 
-	////높이스케일(픽셀컬러가 255 일때 높이) 높이맵 y축 사이 간격 크기
+	//높이스케일(픽셀컬러가 255 일때 높이) 높이맵 y축 사이 간격 크기
 	float _heightScale{};
 	float _cellScale{};	//셀간격
 
 	int32 _numTriangleToDraw{};
-
-	bool32 _inEditMode{ false };
 
 	int32 _numVertexX{};	//가로 정점의수
 	int32 _numVertexZ{};	//깊이 정점의수
@@ -163,12 +134,12 @@ private:
 	video::TextureHandle _tileSplatHandle{};
 
 	video::TerrainVertex *_terrainVertices{};
-	TerrainFace *_terrainFaces{};
-
 	QuadTree* _pQuadTree{};  //쿼드 트리
 	BaseScene *_pScene;
 
-	TerrainChunk *_pSections{};
+	TerrainSection *_pSections{};
 };
+
+#define TERRAIN Terrain::GetInstance()
 
 #endif

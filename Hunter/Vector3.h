@@ -4,46 +4,6 @@
 class Vector4;
 class Matrix;
 
-constexpr float EPSILON = 0.001f;
-constexpr float ONE_RAD = 0.017453f;
-
-
-inline float FAbs(float f)
-{
-	if (f < 0.0f)
-	{
-		return -f;
-	}
-	else
-	{
-		return f;
-	}
-}
-
-inline bool FloatEqual(float f1, float f2)
-{
-	if (FAbs(f1 - f2) < EPSILON)
-	{
-		return true;
-	}
-	else
-	{
-		return false;
-	}
-}
-
-inline bool FloatZero(float f)
-{
-	if (FAbs(f) < EPSILON)
-	{
-		return true;
-	}
-	else
-	{
-		return false;
-	}
-}
-
 class Vector3 : public D3DXVECTOR3
 {
 public :
@@ -54,8 +14,6 @@ public :
 	~Vector3();
 	Vector3(const Vector3 &other);
 	const Vector3 &operator= (const Vector3 &other);
-
-	bool IsZero() { return FloatZero(x) && FloatZero(y) && FloatZero(z); }
 
 	// assignment operators
 	Vector3& operator += (const Vector3& other);

@@ -189,9 +189,6 @@
     <ClCompile Include="PlayerAnimationString.cpp">
       <Filter>Game\GameObject\Player</Filter>
     </ClCompile>
-    <ClCompile Include="TerrainEditorScene.cpp">
-      <Filter>Game\GameScene\TerrainEidtorScene</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -448,6 +445,9 @@
     <ClInclude Include="spawnManager.h">
       <Filter>Game\GameObject\Enemy\spawn</Filter>
     </ClInclude>
+    <ClInclude Include="TerrainSystem.h">
+      <Filter>Game\GameUtils\Terrain</Filter>
+    </ClInclude>
     <ClInclude Include="ActionComponent.h">
       <Filter>Game\GameComponent\ActionComponent</Filter>
     </ClInclude>
@@ -474,9 +474,6 @@
     </ClInclude>
     <ClInclude Include="CombatManager.h">
       <Filter>Game\GameManager</Filter>
-    </ClInclude>
-    <ClInclude Include="TerrainEditorScene.h">
-      <Filter>Game\GameScene\TerrainEidtorScene</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -626,9 +623,6 @@
     </Filter>
     <Filter Include="Game\GameManager">
       <UniqueIdentifier>{270c9003-5fb1-488a-b4d6-faf623868371}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Game\GameScene\TerrainEidtorScene">
-      <UniqueIdentifier>{58f67160-6e81-4862-8dc6-41ab9d92edf6}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

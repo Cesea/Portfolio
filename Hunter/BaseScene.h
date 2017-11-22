@@ -48,11 +48,9 @@ protected :
 
 protected :
 	bool32 _active;
-private :
 	video::RenderView *_mainRenderView{};
 
 	World _world;
-	Camera _camera;
 
 	TransformSystem _transformSystem;
 	RenderSystem _renderSystem;
@@ -60,6 +58,7 @@ private :
 	ActionSystem _actionSystem;
 	std::vector<Entity> _entities;
 
+	Camera _camera;
 	video::StaticXMeshHandle _staticMeshHandle;
 	video::SkinnedXMeshHandle _skinnedMeshHandle;
 
@@ -78,16 +77,7 @@ private :
 
 	Player _player;
 
-
 public :
-	struct SpawnEvent
-	{
-		SpawnEvent(const Vector3 &position)
-			:_position(position)
-		{}
-		Vector3 _position;
-	};
-	void Handle(const BaseScene::SpawnEvent &event);
 };
 
 #endif

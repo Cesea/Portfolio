@@ -115,7 +115,7 @@ struct GuiState
 		_left(false), _leftPressed(false), _leftReleased(false),
 		_mx(-1), _my(-1), _scroll(0),
 		_active(0), _hot(0), _hotToBe(0), IsHot(false), IsActive(false), _wentActive(false),
-		_dragX(0), _dragY(0), _dragOrig(0), _widgetX(0), _widgetY(0), _widgetW(200),
+		_dragX(0), _dragY(0), _dragOrig(0), _widgetX(0), _widgetY(0), _widgetW(100),
 		_insideCurrentScroll(false), _areaID(0), _widgetID(0), _keyboardFocus(0), _vkCode(0)
 	{
 	}
@@ -267,7 +267,7 @@ void ImguiBeginFrame(int32 mx, int32 my, uint8 mbut, int32 scroll, uint32 keyCod
 
 	gState._widgetX = 0;
 	gState._widgetY = 0;
-	gState._widgetW = 120;
+	gState._widgetW = 0;
 
 	gState._areaID = 1;
 	gState._widgetID = 1;
@@ -309,7 +309,7 @@ bool ImguiBeginScrollArea(const char * name, int32 x, int32 y, int32 w, int32 h,
 	g_scrollId = (gState._areaID << 16) | gState._widgetID;
 
 	gState._widgetX = x + SCROLL_AREA_PADDING;
-	gState._widgetY = y;
+	gState._widgetY = y + AREA_HEADER + (*pOutScroll);
 	gState._widgetW = w - SCROLL_AREA_PADDING * 4;
 	g_scrollTop = y + AREA_HEADER;
 	g_scrollBottom = y + SCROLL_AREA_PADDING + h;
@@ -326,7 +326,7 @@ bool ImguiBeginScrollArea(const char * name, int32 x, int32 y, int32 w, int32 h,
 
 	AddCommandRect((float)x, (float)y, (float)w, (float)h, ImguiRGBA(20, 20, 20, 100));
 
-	//AddCommandText(x + AREA_HEADER / 2, y + h - AREA_HEADER / 2 - TEXT_HEIGHT / 2, ImguiTextAlign::eImguiAlignLeft, name, ImguiRGBA(255, 255, 255, 128));
+	AddCommandText(x + AREA_HEADER / 2, y + h - AREA_HEADER / 2 - TEXT_HEIGHT / 2, ImguiTextAlign::eImguiAlignLeft, name, ImguiRGBA(255, 255, 255, 128));
 
 	AddCommandScissor(x + SCROLL_AREA_PADDING, y + SCROLL_AREA_PADDING, w - SCROLL_AREA_PADDING * 4, h - AREA_HEADER - SCROLL_AREA_PADDING);
 
@@ -452,7 +452,7 @@ bool ImguiButton(const char * text, bool enabled)
 
 	int x = gState._widgetX;
 	int y = gState._widgetY;
-	int w = 120;
+	int w = 80;
 	int h = BUTTON_HEIGHT;
 	gState._widgetY += BUTTON_HEIGHT + DEFAULT_SPACING;
 
