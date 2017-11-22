@@ -11,9 +11,6 @@
 
 #include "VideoDevice.h"
 
-#include "GizmoManager.h"
-#include "SpriteManager.h"
-
 #include <memory>
 
 class Engine

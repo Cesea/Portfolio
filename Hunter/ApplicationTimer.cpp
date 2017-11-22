@@ -39,13 +39,3 @@ void ApplicationTimer::Tick()
 	_prevCounter = _currentCounter;
 }
 
-float ApplicationTimer::GetCurrentRealTimeSecond()
-{
-	__int64 nowTime;
-
-	//현제 시간을 얻는다.
-	QueryPerformanceCounter((LARGE_INTEGER*)&nowTime);
-
-	return nowTime * _timeScale;
-}
-

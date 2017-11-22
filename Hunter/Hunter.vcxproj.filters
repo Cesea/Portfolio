@@ -102,6 +102,9 @@
     <ClCompile Include="CollisionUtils.cpp">
       <Filter>Game\GameSystem\CollisionSystem</Filter>
     </ClCompile>
+    <ClCompile Include="Hash.cpp">
+      <Filter>Sub</Filter>
+    </ClCompile>
     <ClCompile Include="VideoDevice.cpp">
       <Filter>Core\SubSystem\VideoDevice</Filter>
     </ClCompile>
@@ -150,6 +153,9 @@
     <ClCompile Include="WorldEditor.cpp">
       <Filter>Game\WorldEditor</Filter>
     </ClCompile>
+    <ClCompile Include="DebugDrawer.cpp">
+      <Filter>Core\SubSystem\VideoDevice</Filter>
+    </ClCompile>
     <ClCompile Include="ScriptComponent.cpp">
       <Filter>Game\GameComponent\ScriptComponent</Filter>
     </ClCompile>
@@ -183,26 +189,8 @@
     <ClCompile Include="PlayerAnimationString.cpp">
       <Filter>Game\GameObject\Player</Filter>
     </ClCompile>
-    <ClCompile Include="GizmoManager.cpp">
-      <Filter>Managers</Filter>
-    </ClCompile>
-    <ClCompile Include="DirectionalLight.cpp">
-      <Filter>Game\GameUtils\Light</Filter>
-    </ClCompile>
-    <ClCompile Include="PointLight.cpp">
-      <Filter>Game\GameUtils\Light</Filter>
-    </ClCompile>
-    <ClCompile Include="BaseLight.cpp">
-      <Filter>Game\GameUtils\Light</Filter>
-    </ClCompile>
-    <ClCompile Include="IScene.cpp">
-      <Filter>Game\GameScene</Filter>
-    </ClCompile>
-    <ClCompile Include="SceneChangeEffect.cpp">
-      <Filter>Core\SubSystem\SceneeManager</Filter>
-    </ClCompile>
-    <ClCompile Include="SpriteManager.cpp">
-      <Filter>Managers</Filter>
+    <ClCompile Include="TerrainEditorScene.cpp">
+      <Filter>Game\GameScene\TerrainEidtorScene</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -354,6 +342,9 @@
     <ClInclude Include="TypeTraits.h">
       <Filter>Sub</Filter>
     </ClInclude>
+    <ClInclude Include="Assert.h">
+      <Filter>Debug</Filter>
+    </ClInclude>
     <ClInclude Include="Memory.h">
       <Filter>Core\Memory</Filter>
     </ClInclude>
@@ -374,6 +365,9 @@
     </ClInclude>
     <ClInclude Include="SceneChangeEffect.h">
       <Filter>Core\SubSystem\SceneeManager</Filter>
+    </ClInclude>
+    <ClInclude Include="Hash.h">
+      <Filter>Sub</Filter>
     </ClInclude>
     <ClInclude Include="VideoDevice.h">
       <Filter>Core\SubSystem\VideoDevice</Filter>
@@ -432,6 +426,9 @@
     <ClInclude Include="imguiRenderer.h">
       <Filter>GUI</Filter>
     </ClInclude>
+    <ClInclude Include="DebugDrawer.h">
+      <Filter>Core\SubSystem\VideoDevice</Filter>
+    </ClInclude>
     <ClInclude Include="ScriptComponent.h">
       <Filter>Game\GameComponent\ScriptComponent</Filter>
     </ClInclude>
@@ -478,26 +475,8 @@
     <ClInclude Include="CombatManager.h">
       <Filter>Game\GameManager</Filter>
     </ClInclude>
-    <ClInclude Include="GizmoManager.h">
-      <Filter>Managers</Filter>
-    </ClInclude>
-    <ClInclude Include="DirectionalLight.h">
-      <Filter>Game\GameUtils\Light</Filter>
-    </ClInclude>
-    <ClInclude Include="PointLight.h">
-      <Filter>Game\GameUtils\Light</Filter>
-    </ClInclude>
-    <ClInclude Include="BaseLight.h">
-      <Filter>Game\GameUtils\Light</Filter>
-    </ClInclude>
-    <ClInclude Include="Light.h">
-      <Filter>Game\GameUtils\Light</Filter>
-    </ClInclude>
-    <ClInclude Include="SceneChangeUpDown.h">
-      <Filter>Core\SubSystem\SceneeManager</Filter>
-    </ClInclude>
-    <ClInclude Include="SpriteManager.h">
-      <Filter>Managers</Filter>
+    <ClInclude Include="TerrainEditorScene.h">
+      <Filter>Game\GameScene\TerrainEidtorScene</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -527,6 +506,9 @@
     </Filter>
     <Filter Include="Core\Timers">
       <UniqueIdentifier>{1a498917-4bd0-45a4-8cdb-28af30c3deb7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Debug">
+      <UniqueIdentifier>{76a6963c-195a-47f4-bb35-80dc0a39ec35}</UniqueIdentifier>
     </Filter>
     <Filter Include="Core\SubSystem">
       <UniqueIdentifier>{e5f48745-5d7e-4565-bd8e-8884a513ad53}</UniqueIdentifier>
@@ -645,11 +627,8 @@
     <Filter Include="Game\GameManager">
       <UniqueIdentifier>{270c9003-5fb1-488a-b4d6-faf623868371}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Game\GameUtils\Light">
-      <UniqueIdentifier>{67c99fef-0974-44e8-8370-134b6c058383}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Game\GameScene\LoadingScenes">
-      <UniqueIdentifier>{a5c68106-705b-4ae1-9125-35d31cd31314}</UniqueIdentifier>
+    <Filter Include="Game\GameScene\TerrainEidtorScene">
+      <UniqueIdentifier>{58f67160-6e81-4862-8dc6-41ab9d92edf6}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

@@ -11,7 +11,7 @@ public:
 	virtual ~RenderSystem() override;
 
 	void UpdateAnimations(float deltaTime);
-	void Render(const Camera &camera);
+	void Render(video::RenderView &renderView);
 
 	virtual void Initialize();
 

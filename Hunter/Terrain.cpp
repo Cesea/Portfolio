@@ -103,16 +103,14 @@ void Terrain::RegisterEvents()
 
 void Terrain::Handle(const InputManager::MouseReleasedEvent & event)
 {
-	if (event.code == MOUSE_BUTTON_LEFT)
+	EventChannel channel;
+
+	Ray ray;
+	_pScene->_camera.ComputeRay(Vector2(event.coord.x, event.coord.y), &ray);
+	Vector3 hitPos;
+	if (this->IsIntersectRay(ray, &hitPos))
 	{
-		EventChannel channel;
-		Ray ray;
-		_pScene->_camera.ComputeRay(Vector2(event.coord.x, event.coord.y), &ray);
-		Vector3 hitPos;
-		if (this->IsIntersectRay(ray, &hitPos))
-		{
-			channel.Broadcast<BaseScene::SpawnEvent>(BaseScene::SpawnEvent(hitPos));
-		}
+		channel.Broadcast<BaseScene::SpawnEvent>(BaseScene::SpawnEvent(hitPos));
 	}
 }
 

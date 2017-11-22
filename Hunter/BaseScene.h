@@ -12,7 +12,10 @@
 
 #include "Terrain.h"
 
+#include "Camera.h"
+
 #include "WorldEditor.h"
+
 #include "Player.h"
 
 
@@ -25,17 +28,29 @@ public :
 	{};
 	virtual ~BaseScene() {}
 
-	virtual bool SceneInit();
-	virtual void SceneRelease();
-	virtual bool SceneUpdate(float timDelta);
-	virtual void SceneRender1();
-	virtual void SceneRenderSprite();
+	virtual bool32 Load();
+	virtual bool32 Unload();
+
+	virtual bool32 Init();
+	virtual bool32 Update(float deltaTime);
+	virtual bool32 Render();
+
+	virtual void Release();
+
+	virtual const char *GetSceneName();
+	virtual bool32 IsActive();
+
+	void RegisterEvents();
+
+	void Handle(const InputManager::KeyPressedEvent &event);
 
 protected :
 
 protected :
 	bool32 _active;
 private :
+	video::RenderView *_mainRenderView{};
+
 	World _world;
 	Camera _camera;
 
@@ -45,11 +60,24 @@ private :
 	ActionSystem _actionSystem;
 	std::vector<Entity> _entities;
 
+	video::StaticXMeshHandle _staticMeshHandle;
+	video::SkinnedXMeshHandle _skinnedMeshHandle;
+
+	std::vector<video::AnimationInstanceHandle> _animations;
+
+	video::EffectHandle _staticEffect;
+	video::EffectHandle _skinnedEffect;
+	video::EffectHandle _terrainEffect;
+
+	std::vector<Vector3> _points;
+
 	EventChannel _channel;
 
 	Editor *_editor{};
+	video::FontHandle _font;
 
 	Player _player;
+
 
 public :
 	struct SpawnEvent

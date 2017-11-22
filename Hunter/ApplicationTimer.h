@@ -17,7 +17,6 @@ public :
 	inline int32 GetDeltaMS() { return _currentDeltaMS; }
 
 	inline float GetTargetTime() { return _targetFramePerMS / 1000.0f; }
-	float GetCurrentRealTimeSecond();
 
 
 private :
