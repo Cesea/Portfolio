@@ -4,8 +4,8 @@
 //#include "InputComponent.h"
 
 constexpr int32 MOUSE_BUTTON_LEFT = 0;
-constexpr int32 MOUSE_BUTTON_MIDDLE = 1;
-constexpr int32 MOUSE_BUTTON_RIGHT = 2;
+constexpr int32 MOUSE_BUTTON_MIDDLE = 2;
+constexpr int32 MOUSE_BUTTON_RIGHT = 1;
 
 class InputManager;
 

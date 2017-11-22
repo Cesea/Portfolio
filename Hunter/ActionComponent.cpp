@@ -42,8 +42,6 @@ void ActionComponent::Destroy()
 
 void ActionComponent::UpdateAnimation(float deltaTime)
 {
-	_pAnimationController->GetTrackDesc(0, &_playingTrackDesc);
-	_animationPlayFactor = _playingTrackDesc.Position / _pPlayingAnimationSet->GetPeriod();
 
 	if (_actionQueue.HasAction())
 	{
@@ -53,29 +51,32 @@ void ActionComponent::UpdateAnimation(float deltaTime)
 			_actionQueue.PopAction();
 		}
 	}
-	else 
+
+	double per = _pPlayingAnimationSet->GetPeriod();
+
+	_pAnimationController->GetTrackDesc(0, &_playingTrackDesc);
+	_animationPlayFactor = _playingTrackDesc.Position / per;
+
+	if (_animationPlayFactor >= 0.95)
 	{
-		if (_animationPlayFactor >= 0.95)
+		if (false == _looping)
 		{
-			if (false == _looping)
+			//돌아갈 Animation 이 있다면..
+			if (nullptr != _pPrevPlayingAnimationSet)
 			{
-				//돌아갈 Animation 이 있다면..
-				if (nullptr != _pPrevPlayingAnimationSet)
-				{
-					_crossFadeTime = _outCrossFadeTime;
-					_leftCrossFadeTime = _outCrossFadeTime;
-					_looping = true;
-					_playingAction = _prevAction;
-					SetAnimation(_pPrevPlayingAnimationSet);
-					_pPrevPlayingAnimationSet = nullptr;
-				}
-				else
-				{
-					this->Stop();
-				}
+				_crossFadeTime = _outCrossFadeTime;
+				_leftCrossFadeTime = _outCrossFadeTime;
+				_looping = true;
+				_playingAction = _prevAction;
+				SetAnimation(_pPrevPlayingAnimationSet);
+				_pPrevPlayingAnimationSet = nullptr;
 			}
-			_animationPlayFactor = _animationPlayFactor - (int32)_animationPlayFactor;
+			else
+			{
+				this->Stop();
+			}
 		}
+		_animationPlayFactor = _animationPlayFactor - (int32)_animationPlayFactor;
 	}
 
 	if (_playing)
@@ -98,13 +99,14 @@ void ActionComponent::UpdateAnimation(float deltaTime)
 		{
 			_pAnimationController->SetTrackWeight(0, 1);
 			_pAnimationController->SetTrackEnable(1, false);
-			Console::Log("ttt\n");
+			//Console::Log("ttt\n");
 		}
 		else
 		{
-			float w1 = (_leftCrossFadeTime / _crossFadeTime);		//1번 Track 가중치
+			float w1 = (_leftCrossFadeTime / _crossFadeTime);			//1번 Track 가중치
 			float w0 = 1.0f - w1;										//0번 Track 가중치
 
+			//Console::Log("%f %f\n", w1, w0);
 			_pAnimationController->SetTrackWeight(0, w0);
 			_pAnimationController->SetTrackWeight(1, w1);
 		}
@@ -135,7 +137,7 @@ bool ActionComponent::Play(const Action & action)
 
 					_outCrossFadeTime = action._outCrossFadeTime;
 
-					if ( this->_prevAction._playOnce)
+					//if (!this->_playingAction._playOnce)
 					{
 						_pPrevPlayingAnimationSet = _pPlayingAnimationSet;
 
@@ -157,6 +159,7 @@ bool ActionComponent::Play(const Action & action)
 					_crossFadeTime = action._crossFadeTime;
 					_leftCrossFadeTime = action._crossFadeTime;
 
+					this->_prevAction = this->_playingAction;
 					this->_playingAction = action;
 					this->SetAnimation(found->second);
 					return true;
@@ -169,30 +172,20 @@ bool ActionComponent::Play(const Action & action)
 	{
 		if (action._playOnce)
 		{
-		
 			auto found = _animationTable.find(action._name);
 			if (found != _animationTable.end())
 			{
-
 				_playing = true;
 				_looping = false;
 				_pPrevPlayingAnimationSet = _pPlayingAnimationSet;
 
-				//this->_prevAction = _playingAction;
-				//this->_playingAction = action;
+				this->_prevAction = _playingAction;
+				this->_playingAction = action;
 
 				_crossFadeTime = action._crossFadeTime;
 				_leftCrossFadeTime = action._crossFadeTime;
 
 				_outCrossFadeTime = action._outCrossFadeTime;
-
-				if (this->_prevAction._playOnce)
-				{
-					_pPrevPlayingAnimationSet = _pPlayingAnimationSet;
-
-					this->_prevAction = _playingAction;
-					this->_playingAction = action;
-				}
 
 				this->SetAnimation(found->second);
 				return true;
@@ -209,6 +202,7 @@ bool ActionComponent::Play(const Action & action)
 				_crossFadeTime = action._crossFadeTime;
 				_leftCrossFadeTime = action._crossFadeTime;
 
+				this->_prevAction = this->_playingAction;
 				this->_playingAction = action;
 				this->SetAnimation(found->second);
 				return true;

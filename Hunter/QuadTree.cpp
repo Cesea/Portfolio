@@ -1,9 +1,6 @@
 ﻿#include "stdafx.h"
 #include "QuadTree.h"
 
-
-int32 QuadTree::SectionResolution;
-
 #define IS_IN_RANGE(value,r0,r1) (( ((r0) <= (value)) && ((value) <= (r1)) ) ? 1 : 0)
 
 bool32 IsRayHitBoundSphere(const Ray &ray, const Vector3 &center, float radius,
@@ -61,7 +58,7 @@ QuadTree::QuadTree()
 {
 	//차일드 포인터 NULL 처리
 	ZeroMemory(_pChilds, sizeof(QuadTree*) * 4);
-	ZeroMemory(_pNeighbors, sizeof(QuadTree *) * 4);
+	//ZeroMemory(_pNeighbors, sizeof(QuadTree *) * 4);
 
 	//센터 인덱스는 -1
 	_center = -1;
@@ -81,16 +78,15 @@ bool QuadTree::Init(video::TerrainVertex *pVertices, uint32 verNumEdge, int32 se
 {
 	_pTerrainVertices = pVertices;
 
-	_corners[eCornerLB] = 0;
-	_corners[eCornerRB] = verNumEdge - 1;
-	_corners[eCornerLT] = (verNumEdge - 1) * verNumEdge;
-	_corners[eCornerRT] = verNumEdge * verNumEdge - 1;
+	_corners[eCornerLT] = 0;
+	_corners[eCornerRT] = verNumEdge - 1;
+	_corners[eCornerLB] = (verNumEdge - 1) * verNumEdge;
+	_corners[eCornerRB] = verNumEdge * verNumEdge - 1;
 
-	SectionResolution = sectionRes;
 
 	CreateChildTree();
 
-	BuildNeighborNode(this, _corners[eCornerRB] + 1);
+	//BuildNeighborNode(this, _corners[eCornerRB] + 1);
 
 	return true;
 }
@@ -119,49 +115,41 @@ void QuadTree::CreateChildTree()
 		uint32 rightCenter = (_corners[eCornerRT] + _corners[eCornerRB]) / 2; //우 중앙
 		uint32 bottomCenter = (_corners[eCornerRB] + _corners[eCornerLB]) / 2; //하단 중앙
 
-		//좌하단 자식
-		_pChilds[eCornerLB] = new QuadTree;
-		_pChilds[eCornerLB]->_pParent = this;
-		_pChilds[eCornerLB]->_corners[eCornerLT] = leftCenter;
-		_pChilds[eCornerLB]->_corners[eCornerRT] = _center;
-		_pChilds[eCornerLB]->_corners[eCornerLB] = _corners[eCornerLB];
-		_pChilds[eCornerLB]->_corners[eCornerRB] = bottomCenter;
-		_pChilds[eCornerLB]->_pTerrainVertices = _pTerrainVertices;
-		_pChilds[eCornerLB]->_culled = false;
-		_pChilds[eCornerLB]->CreateChildTree();
-
-		//우하단 자식
-		_pChilds[eCornerRB] = new QuadTree;
-		_pChilds[eCornerRB]->_pParent = this;
-		_pChilds[eCornerRB]->_corners[eCornerLT] = _center;
-		_pChilds[eCornerRB]->_corners[eCornerRT] = rightCenter;
-		_pChilds[eCornerRB]->_corners[eCornerLB] = bottomCenter;
-		_pChilds[eCornerRB]->_corners[eCornerRB] = _corners[eCornerRB];
-		_pChilds[eCornerRB]->_pTerrainVertices = _pTerrainVertices;
-		_pChilds[eCornerRB]->_culled = false;
-		_pChilds[eCornerRB]->CreateChildTree();
-		//좌상단 자식
-//좌상단
+																			   //좌상단 자식
 		_pChilds[eCornerLT] = new QuadTree;
-		_pChilds[eCornerLT]->_pParent = this;
 		_pChilds[eCornerLT]->_corners[eCornerLT] = _corners[eCornerLT];
 		_pChilds[eCornerLT]->_corners[eCornerRT] = topCenter;
 		_pChilds[eCornerLT]->_corners[eCornerLB] = leftCenter;
 		_pChilds[eCornerLT]->_corners[eCornerRB] = _center;
 		_pChilds[eCornerLT]->_pTerrainVertices = _pTerrainVertices;
-		_pChilds[eCornerLT]->_culled = false;
 		_pChilds[eCornerLT]->CreateChildTree();
 
 		//우상단 자식
 		_pChilds[eCornerRT] = new QuadTree;
-		_pChilds[eCornerRT]->_pParent = this;
 		_pChilds[eCornerRT]->_corners[eCornerLT] = topCenter;
 		_pChilds[eCornerRT]->_corners[eCornerRT] = _corners[eCornerRT];
 		_pChilds[eCornerRT]->_corners[eCornerLB] = _center;
 		_pChilds[eCornerRT]->_corners[eCornerRB] = rightCenter;
 		_pChilds[eCornerRT]->_pTerrainVertices = _pTerrainVertices;
-		_pChilds[eCornerRT]->_culled = false;
 		_pChilds[eCornerRT]->CreateChildTree();
+
+		//좌하단 자식
+		_pChilds[eCornerLB] = new QuadTree;
+		_pChilds[eCornerLB]->_corners[eCornerLT] = leftCenter;
+		_pChilds[eCornerLB]->_corners[eCornerRT] = _center;
+		_pChilds[eCornerLB]->_corners[eCornerLB] = _corners[eCornerLB];
+		_pChilds[eCornerLB]->_corners[eCornerRB] = bottomCenter;
+		_pChilds[eCornerLB]->_pTerrainVertices = _pTerrainVertices;
+		_pChilds[eCornerLB]->CreateChildTree();
+
+		//우하단 자식
+		_pChilds[eCornerRB] = new QuadTree;
+		_pChilds[eCornerRB]->_corners[eCornerLT] = _center;
+		_pChilds[eCornerRB]->_corners[eCornerRT] = rightCenter;
+		_pChilds[eCornerRB]->_corners[eCornerLB] = bottomCenter;
+		_pChilds[eCornerRB]->_corners[eCornerRB] = _corners[eCornerRB];
+		_pChilds[eCornerRB]->_pTerrainVertices = _pTerrainVertices;
+		_pChilds[eCornerRB]->CreateChildTree();
 	}
 	else
 	{
@@ -224,408 +212,408 @@ void QuadTree::GetRayHits(const Ray &ray, std::vector<Vector3> *pOutHit)
 	}
 }
 
-int32 QuadTree::GenerateIndex(uint8 * pIndexData, const Frustum & frustum, const Vector3 &camPos, float LODRatio)
-{
-	FrustumCull(frustum);
-	return GenerateTriIndex(0, pIndexData, camPos, LODRatio);
-}
-
-int32 QuadTree::IsInFrustum(const Frustum & frustum)
-{
-	bool32 cornerIn[4];
-
-	Vector3 currentPoint = (_pTerrainVertices + _center)->_pos;
-	if (frustum.IsSphereInFrustum(currentPoint, _radius))
-	{
-		cornerIn[0] = frustum.IsPointIntFrustum((_pTerrainVertices + _corners[0])->_pos);
-		cornerIn[1] = frustum.IsPointIntFrustum((_pTerrainVertices + _corners[1])->_pos);
-		cornerIn[2] = frustum.IsPointIntFrustum((_pTerrainVertices + _corners[2])->_pos);
-		cornerIn[3] = frustum.IsPointIntFrustum((_pTerrainVertices + _corners[3])->_pos);
-
-		if (cornerIn[0] + cornerIn[1] + cornerIn[2] + cornerIn[3] == 4)
-		{
-			return FRUSTUM_COMPLETLY_IN;
-		}
-		else
-		{
-			return FRUSTUM_PARTIALLY_IN;
-		}
-	}
-	else
-	{
-		return FRUSTUM_OUT;
-	}
-}
-
-void QuadTree::FrustumCull(const Frustum & frustum)
-{
-	int32 result;
-	result = IsInFrustum(frustum);
-	switch (result)
-	{
-		//절두체에 완전히 포함 됨, 하위 노드 검색 필요 없음
-	case FRUSTUM_COMPLETLY_IN :
-	{
-		AllInFrustum();
-		return;
-	}break;
-	//절두체에 부분적으로 포함 되어서, 하위 노드 검색 필요
-	case FRUSTUM_PARTIALLY_IN :
-	{
-		_culled = false;
-	}break;
-	//절두체에 완전히 벗어남, 하위 노드 검색 필요 없음
-	case FRUSTUM_OUT : 
-	{
-		_culled = true;
-		return;
-	}break;
-	}
-
-	if (_pChilds[0])
-	{
-		_pChilds[0]->FrustumCull(frustum);
-	}
-	if (_pChilds[1])
-	{
-		_pChilds[1]->FrustumCull(frustum);
-	}
-	if (_pChilds[2])
-	{
-		_pChilds[2]->FrustumCull(frustum);
-	}
-	if (_pChilds[3])
-	{
-		_pChilds[3]->FrustumCull(frustum);
-	}
-}
-
-float QuadTree::GetDistance(const Vector3 & v1, const Vector3 & v2)
-{
-	return Vec3Length(&(v1 - v2));
-}
-
-int32 QuadTree::GetLODLevel(const Vector3 & cameraPos, float LODRatio)
-{
-	float d = GetDistance((_pTerrainVertices + _center)->_pos, cameraPos);
-	return FMax((int32)(d * LODRatio), 1);
-}
-
-int32 QuadTree::GenerateTriIndex(int32 numTri, uint8 * pIndexData, const Vector3 &camPos, float LODRatio)
-{
-	if (_culled)
-	{
-		if (nullptr != _pParent)
-		{
-			if (_pParent->_culled)
-			{
-				_culled = false;
-				return numTri;
-			}
-		}
-	}
-
-	uint32 *p = ((uint32 *)pIndexData) + numTri * 3;
-
-	if (IsVisible(camPos, LODRatio))
-	{
-		if (_corners[eCornerRT] - _corners[eCornerLT] <= 1.0f)
-		{
-			// 좌측상단 삼각형
-			*p++ = _corners[eCornerLB];
-			*p++ = _corners[eCornerLT];
-			*p++ = _corners[eCornerRT];
-			numTri++;
-			// 우측하단 삼각형
-			*p++ = _corners[eCornerLB];
-			*p++ = _corners[eCornerRT];
-			*p++ = _corners[eCornerRB];
-			numTri++;
-
-			return numTri;
-		}
-
-		bool32 neighborVisible[4] = { 0, 0, 0, 0 };
-
-		if (nullptr != _pNeighbors[EDGE_UP])
-		{
-			neighborVisible[EDGE_UP] = _pNeighbors[EDGE_UP]->IsVisible(camPos, LODRatio);
-		}
-		if (nullptr != _pNeighbors[EDGE_DOWN])
-		{
-			neighborVisible[EDGE_DOWN] = _pNeighbors[EDGE_DOWN]->IsVisible(camPos, LODRatio);
-		}
-		if (nullptr != _pNeighbors[EDGE_LEFT])
-		{
-			neighborVisible[EDGE_LEFT] = _pNeighbors[EDGE_LEFT]->IsVisible(camPos, LODRatio);
-		}
-		if (nullptr != _pNeighbors[EDGE_RIGHT])
-		{
-			neighborVisible[EDGE_RIGHT] = _pNeighbors[EDGE_RIGHT]->IsVisible(camPos, LODRatio);
-		}
-
-		if (neighborVisible[EDGE_UP] && neighborVisible[EDGE_DOWN] && 
-			neighborVisible[EDGE_LEFT] && neighborVisible[EDGE_RIGHT])
-		{
-			// 좌측상단 삼각형
-			*p++ = _corners[eCornerLB];
-			*p++ = _corners[eCornerLT];
-			*p++ = _corners[eCornerRT];
-			numTri++;
-			// 우측하단 삼각형
-			*p++ = _corners[eCornerLB];
-			*p++ = _corners[eCornerRT];
-			*p++ = _corners[eCornerRB];
-			numTri++;
-
-			return numTri;
-		}
-
-		int32 n;
-		//상단 부분 갭 채우기
-		if (!neighborVisible[EDGE_UP])
-		{
-			n = (_corners[eCornerLT] + _corners[eCornerRT]) / 2;
-			*p++ = _center; *p++ = _corners[eCornerLT]; *p++ = n;
-			numTri++;
-
-			*p++ = _center; *p++ = n; *p++ = _corners[eCornerRT];
-			numTri++;
-		}
-		else
-		{
-			*p++ = _center; *p++ = _corners[eCornerLT]; *p++ = _corners[eCornerRT];
-			numTri++;
-		}
-		//하단 갭 채우기
-		if (!neighborVisible[EDGE_DOWN])
-		{
-			n = (_corners[eCornerLB] + _corners[eCornerRB]) / 2;
-			*p++ = _center; *p++ = _corners[eCornerRB]; *p++ = n;
-			numTri++;
-
-			*p++ = _center; *p++ = n; *p++ = _corners[eCornerLB];
-			numTri++;
-		}
-		else
-		{
-			*p++ = _center; *p++ = _corners[eCornerRB]; *p++ = _corners[eCornerLB];
-			numTri++;
-		}
-		//좌측 갭 채우기
-		if (!neighborVisible[EDGE_LEFT])
-		{
-			n = (_corners[eCornerLT] + _corners[eCornerLB]) / 2;
-			*p++ = _center; *p++ = _corners[eCornerLB]; *p++ = n;
-			numTri++;
-
-			*p++ = _center; *p++ = n; *p++ = _corners[eCornerLT];
-			numTri++;
-		}
-		else
-		{
-			*p++ = _center; *p++ = _corners[eCornerLB]; *p++ = _corners[eCornerLT];
-			numTri++;
-		}
-		//우측 갭 채우기
-		if (!neighborVisible[EDGE_RIGHT])
-		{
-			n = (_corners[eCornerRT] + _corners[eCornerRB]) / 2;
-			*p++ = _center; *p++ = n; *p++ = _corners[eCornerRB];
-			numTri++;
-
-			*p++ = _center; *p++ = _corners[eCornerRT]; *p++ = n;
-			numTri++;
-		}
-		else
-		{
-			*p++ = _center; *p++ = _corners[eCornerRT]; *p++ = _corners[eCornerRB];
-			numTri++;
-		}
-		return numTri;
-	}
-
-	if (_pChilds[eCornerLB])
-	{
-		numTri = _pChilds[eCornerLB]->GenerateTriIndex(numTri, pIndexData, camPos, LODRatio);
-	}
-	if (_pChilds[eCornerRB])
-	{
-		numTri = _pChilds[eCornerRB]->GenerateTriIndex(numTri, pIndexData, camPos, LODRatio);
-	}
-	if (_pChilds[eCornerLT])
-	{
-		numTri = _pChilds[eCornerLT]->GenerateTriIndex(numTri, pIndexData, camPos, LODRatio);
-	}
-	if (_pChilds[eCornerRT])
-	{
-		numTri = _pChilds[eCornerRT]->GenerateTriIndex(numTri, pIndexData, camPos, LODRatio);
-	}
-	return numTri;
-}
-
-bool32 QuadTree::IsVisible(const Vector3 &camPos, float LODRatio)
-{
-	return (_corners[eCornerRT] - _corners[eCornerLT]) <= GetLODLevel(camPos, LODRatio);
-}
-
-
-void QuadTree::BuildNeighborNode(QuadTree *pRoot, int32 cx)
-{
-	int32 n;
-	int32 i0, i1, i2, i3;
-
-	for (int32 i = 0; i < 4; ++i)
-	{
-		i0 = _corners[0];
-		i1 = _corners[1];
-		i2 = _corners[2];
-		i3 = _corners[3];
-
-		n = GetNodeIndex(i, cx, i0, i1, i2, i3);
-		if (n >= 0)
-		{
-			_pNeighbors[i] = pRoot->FindNode(i0, i1, i2, i3);
-		}
-	}
-	if (nullptr != _pChilds[0])
-	{
-		_pChilds[0]->BuildNeighborNode(pRoot, cx);
-		_pChilds[1]->BuildNeighborNode(pRoot, cx);
-		_pChilds[2]->BuildNeighborNode(pRoot, cx);
-		_pChilds[3]->BuildNeighborNode(pRoot, cx);
-	}
-}
-
-QuadTree *QuadTree::FindNode(int32 i0, int32 i1, int32 i2, int32 i3)
-{
-	QuadTree *result = nullptr;
-	if (_corners[0] == i0 && _corners[1] == i1 && _corners[2] == i2 && _corners[3] == i3)
-	{
-		return this;
-	}
-	if (nullptr != _pChilds[0])
-	{
-		RECT rect;
-		POINT point;
-
-		int32 n = (i0 + i1 + i2 + i3) / 4;
-
-		point.x = (int32)_pTerrainVertices[n]._pos.x;
-		point.y = (int32)_pTerrainVertices[n]._pos.z;
-
-		SetRect(&rect,
-			(int32)_pTerrainVertices[_pChilds[0]->_corners[eCornerLT]]._pos.x,
-			(int32)_pTerrainVertices[_pChilds[0]->_corners[eCornerLT]]._pos.z,
-			(int32)_pTerrainVertices[_pChilds[0]->_corners[eCornerRB]]._pos.x,
-			(int32)_pTerrainVertices[_pChilds[0]->_corners[eCornerRB]]._pos.z);
-
-		if (IsInRect(&rect, point))
-		{
-			return _pChilds[0]->FindNode(i0, i1, i2, i3);
-		}
-
-		SetRect(&rect,
-			(int32)_pTerrainVertices[_pChilds[1]->_corners[eCornerLT]]._pos.x,
-			(int32)_pTerrainVertices[_pChilds[1]->_corners[eCornerLT]]._pos.z,
-			(int32)_pTerrainVertices[_pChilds[1]->_corners[eCornerRB]]._pos.x,
-			(int32)_pTerrainVertices[_pChilds[1]->_corners[eCornerRB]]._pos.z);
-
-		if (IsInRect(&rect, point))
-		{
-			return _pChilds[1]->FindNode(i0, i1, i2, i3);
-		}
-
-		SetRect(&rect,
-			(int32)_pTerrainVertices[_pChilds[2]->_corners[eCornerLT]]._pos.x,
-			(int32)_pTerrainVertices[_pChilds[2]->_corners[eCornerLT]]._pos.z,
-			(int32)_pTerrainVertices[_pChilds[2]->_corners[eCornerRB]]._pos.x,
-			(int32)_pTerrainVertices[_pChilds[2]->_corners[eCornerRB]]._pos.z);
-
-		if (IsInRect(&rect, point))
-		{
-			return _pChilds[2]->FindNode(i0, i1, i2, i3);
-		}
-
-		SetRect(&rect,
-			(int32)_pTerrainVertices[_pChilds[3]->_corners[eCornerLT]]._pos.x,
-			(int32)_pTerrainVertices[_pChilds[3]->_corners[eCornerLT]]._pos.z,
-			(int32)_pTerrainVertices[_pChilds[3]->_corners[eCornerRB]]._pos.x,
-			(int32)_pTerrainVertices[_pChilds[3]->_corners[eCornerRB]]._pos.z);
-
-		if (IsInRect(&rect, point))
-		{
-			return _pChilds[3]->FindNode(i0, i1, i2, i3);
-		}
-	}
-	return nullptr;
-}
-
-int32 QuadTree::GetNodeIndex(int32 edge, int32 cx, int32 &i0, int32 &i1, int32 &i2, int32 &i3)
-{
-	int32 n, a, b, c, d, gap;
-	a = i0;
-	b = i1;
-	c = i2;
-	d = i3;
-
-	gap = b - a;
-
-	switch (edge)
-	{
-	case EDGE_UP :
-	{
-		i0 = c;
-		i1 = d;
-		i2 = c + cx * gap;
-		i3 = d + cx * gap;
-	}break;
-	case EDGE_DOWN :
-	{
-		i0 = a - cx * gap;
-		i1 = b - cx * gap;
-		i2 = a;
-		i3 = b;
-	}break;
-	case EDGE_LEFT :
-	{
-		i0 = a - gap;
-		i1 = a;
-		i2 = c - gap;
-		i3 = c;
-	}break;
-	case EDGE_RIGHT :
-	{
-		i0 = b;
-		i1 = b + gap;
-		i2 = d;
-		i3 = d + gap;
-		if ((i0 / cx) != (a / cx)) return -1;
-		if ((i1 / cx) != (b / cx)) return -1;
-	}break;
-	}
-	
-	n = (i0 + i1 + i2 + i3) / 4;
-
-	if (!IS_IN_RANGE(n, 0, cx * cx - 1))
-	{
-		return -1;
-	}
-	return n;
-
-}
-
-void QuadTree::AllInFrustum()
-{
-	_culled = false;
-	if (nullptr == _pChilds[0])
-	{
-		return;
-	}
-
-	_pChilds[0]->AllInFrustum();
-	_pChilds[1]->AllInFrustum();
-	_pChilds[2]->AllInFrustum();
-	_pChilds[3]->AllInFrustum();
-
-}
+//int32 QuadTree::GenerateIndex(uint8 * pIndexData, const Frustum & frustum, const Vector3 &camPos, float LODRatio)
+//{
+//	FrustumCull(frustum);
+//	return GenerateTriIndex(0, pIndexData, camPos, LODRatio);
+//}
+//
+//int32 QuadTree::IsInFrustum(const Frustum & frustum)
+//{
+//	bool32 cornerIn[4];
+//
+//	Vector3 currentPoint = (_pTerrainVertices + _center)->_pos;
+//	if (frustum.IsSphereInFrustum(currentPoint, _radius))
+//	{
+//		cornerIn[0] = frustum.IsPointIntFrustum((_pTerrainVertices + _corners[0])->_pos);
+//		cornerIn[1] = frustum.IsPointIntFrustum((_pTerrainVertices + _corners[1])->_pos);
+//		cornerIn[2] = frustum.IsPointIntFrustum((_pTerrainVertices + _corners[2])->_pos);
+//		cornerIn[3] = frustum.IsPointIntFrustum((_pTerrainVertices + _corners[3])->_pos);
+//
+//		if (cornerIn[0] + cornerIn[1] + cornerIn[2] + cornerIn[3] == 4)
+//		{
+//			return FRUSTUM_COMPLETLY_IN;
+//		}
+//		else
+//		{
+//			return FRUSTUM_PARTIALLY_IN;
+//		}
+//	}
+//	else
+//	{
+//		return FRUSTUM_OUT;
+//	}
+//}
+//
+//void QuadTree::FrustumCull(const Frustum & frustum)
+//{
+//	int32 result;
+//	result = IsInFrustum(frustum);
+//	switch (result)
+//	{
+//		//절두체에 완전히 포함 됨, 하위 노드 검색 필요 없음
+//	case FRUSTUM_COMPLETLY_IN :
+//	{
+//		AllInFrustum();
+//		return;
+//	}break;
+//	//절두체에 부분적으로 포함 되어서, 하위 노드 검색 필요
+//	case FRUSTUM_PARTIALLY_IN :
+//	{
+//		_culled = false;
+//	}break;
+//	//절두체에 완전히 벗어남, 하위 노드 검색 필요 없음
+//	case FRUSTUM_OUT : 
+//	{
+//		_culled = true;
+//		return;
+//	}break;
+//	}
+//
+//	if (_pChilds[0])
+//	{
+//		_pChilds[0]->FrustumCull(frustum);
+//	}
+//	if (_pChilds[1])
+//	{
+//		_pChilds[1]->FrustumCull(frustum);
+//	}
+//	if (_pChilds[2])
+//	{
+//		_pChilds[2]->FrustumCull(frustum);
+//	}
+//	if (_pChilds[3])
+//	{
+//		_pChilds[3]->FrustumCull(frustum);
+//	}
+//}
+//
+//float QuadTree::GetDistance(const Vector3 & v1, const Vector3 & v2)
+//{
+//	return Vec3Length(&(v1 - v2));
+//}
+//
+//int32 QuadTree::GetLODLevel(const Vector3 & cameraPos, float LODRatio)
+//{
+//	float d = GetDistance((_pTerrainVertices + _center)->_pos, cameraPos);
+//	return FMax((int32)(d * LODRatio), 1);
+//}
+//
+//int32 QuadTree::GenerateTriIndex(int32 numTri, uint8 * pIndexData, const Vector3 &camPos, float LODRatio)
+//{
+//	if (_culled)
+//	{
+//		if (nullptr != _pParent)
+//		{
+//			if (_pParent->_culled)
+//			{
+//				_culled = false;
+//				return numTri;
+//			}
+//		}
+//	}
+//
+//	uint32 *p = ((uint32 *)pIndexData) + numTri * 3;
+//
+//	if (IsVisible(camPos, LODRatio))
+//	{
+//		if (_corners[eCornerRT] - _corners[eCornerLT] <= 1.0f)
+//		{
+//			// 좌측상단 삼각형
+//			*p++ = _corners[eCornerLB];
+//			*p++ = _corners[eCornerLT];
+//			*p++ = _corners[eCornerRT];
+//			numTri++;
+//			// 우측하단 삼각형
+//			*p++ = _corners[eCornerLB];
+//			*p++ = _corners[eCornerRT];
+//			*p++ = _corners[eCornerRB];
+//			numTri++;
+//
+//			return numTri;
+//		}
+//
+//		bool32 neighborVisible[4] = { 0, 0, 0, 0 };
+//
+//		if (nullptr != _pNeighbors[EDGE_UP])
+//		{
+//			neighborVisible[EDGE_UP] = _pNeighbors[EDGE_UP]->IsVisible(camPos, LODRatio);
+//		}
+//		if (nullptr != _pNeighbors[EDGE_DOWN])
+//		{
+//			neighborVisible[EDGE_DOWN] = _pNeighbors[EDGE_DOWN]->IsVisible(camPos, LODRatio);
+//		}
+//		if (nullptr != _pNeighbors[EDGE_LEFT])
+//		{
+//			neighborVisible[EDGE_LEFT] = _pNeighbors[EDGE_LEFT]->IsVisible(camPos, LODRatio);
+//		}
+//		if (nullptr != _pNeighbors[EDGE_RIGHT])
+//		{
+//			neighborVisible[EDGE_RIGHT] = _pNeighbors[EDGE_RIGHT]->IsVisible(camPos, LODRatio);
+//		}
+//
+//		if (neighborVisible[EDGE_UP] && neighborVisible[EDGE_DOWN] && 
+//			neighborVisible[EDGE_LEFT] && neighborVisible[EDGE_RIGHT])
+//		{
+//			// 좌측상단 삼각형
+//			*p++ = _corners[eCornerLB];
+//			*p++ = _corners[eCornerLT];
+//			*p++ = _corners[eCornerRT];
+//			numTri++;
+//			// 우측하단 삼각형
+//			*p++ = _corners[eCornerLB];
+//			*p++ = _corners[eCornerRT];
+//			*p++ = _corners[eCornerRB];
+//			numTri++;
+//
+//			return numTri;
+//		}
+//
+//		int32 n;
+//		//상단 부분 갭 채우기
+//		if (!neighborVisible[EDGE_UP])
+//		{
+//			n = (_corners[eCornerLT] + _corners[eCornerRT]) / 2;
+//			*p++ = _center; *p++ = _corners[eCornerLT]; *p++ = n;
+//			numTri++;
+//
+//			*p++ = _center; *p++ = n; *p++ = _corners[eCornerRT];
+//			numTri++;
+//		}
+//		else
+//		{
+//			*p++ = _center; *p++ = _corners[eCornerLT]; *p++ = _corners[eCornerRT];
+//			numTri++;
+//		}
+//		//하단 갭 채우기
+//		if (!neighborVisible[EDGE_DOWN])
+//		{
+//			n = (_corners[eCornerLB] + _corners[eCornerRB]) / 2;
+//			*p++ = _center; *p++ = _corners[eCornerRB]; *p++ = n;
+//			numTri++;
+//
+//			*p++ = _center; *p++ = n; *p++ = _corners[eCornerLB];
+//			numTri++;
+//		}
+//		else
+//		{
+//			*p++ = _center; *p++ = _corners[eCornerRB]; *p++ = _corners[eCornerLB];
+//			numTri++;
+//		}
+//		//좌측 갭 채우기
+//		if (!neighborVisible[EDGE_LEFT])
+//		{
+//			n = (_corners[eCornerLT] + _corners[eCornerLB]) / 2;
+//			*p++ = _center; *p++ = _corners[eCornerLB]; *p++ = n;
+//			numTri++;
+//
+//			*p++ = _center; *p++ = n; *p++ = _corners[eCornerLT];
+//			numTri++;
+//		}
+//		else
+//		{
+//			*p++ = _center; *p++ = _corners[eCornerLB]; *p++ = _corners[eCornerLT];
+//			numTri++;
+//		}
+//		//우측 갭 채우기
+//		if (!neighborVisible[EDGE_RIGHT])
+//		{
+//			n = (_corners[eCornerRT] + _corners[eCornerRB]) / 2;
+//			*p++ = _center; *p++ = n; *p++ = _corners[eCornerRB];
+//			numTri++;
+//
+//			*p++ = _center; *p++ = _corners[eCornerRT]; *p++ = n;
+//			numTri++;
+//		}
+//		else
+//		{
+//			*p++ = _center; *p++ = _corners[eCornerRT]; *p++ = _corners[eCornerRB];
+//			numTri++;
+//		}
+//		return numTri;
+//	}
+//
+//	if (_pChilds[eCornerLB])
+//	{
+//		numTri = _pChilds[eCornerLB]->GenerateTriIndex(numTri, pIndexData, camPos, LODRatio);
+//	}
+//	if (_pChilds[eCornerRB])
+//	{
+//		numTri = _pChilds[eCornerRB]->GenerateTriIndex(numTri, pIndexData, camPos, LODRatio);
+//	}
+//	if (_pChilds[eCornerLT])
+//	{
+//		numTri = _pChilds[eCornerLT]->GenerateTriIndex(numTri, pIndexData, camPos, LODRatio);
+//	}
+//	if (_pChilds[eCornerRT])
+//	{
+//		numTri = _pChilds[eCornerRT]->GenerateTriIndex(numTri, pIndexData, camPos, LODRatio);
+//	}
+//	return numTri;
+//}
+//
+//bool32 QuadTree::IsVisible(const Vector3 &camPos, float LODRatio)
+//{
+//	return (_corners[eCornerRT] - _corners[eCornerLT]) <= GetLODLevel(camPos, LODRatio);
+//}
+//
+//
+//void QuadTree::BuildNeighborNode(QuadTree *pRoot, int32 cx)
+//{
+//	int32 n;
+//	int32 i0, i1, i2, i3;
+//
+//	for (int32 i = 0; i < 4; ++i)
+//	{
+//		i0 = _corners[0];
+//		i1 = _corners[1];
+//		i2 = _corners[2];
+//		i3 = _corners[3];
+//
+//		n = GetNodeIndex(i, cx, i0, i1, i2, i3);
+//		if (n >= 0)
+//		{
+//			_pNeighbors[i] = pRoot->FindNode(i0, i1, i2, i3);
+//		}
+//	}
+//	if (nullptr != _pChilds[0])
+//	{
+//		_pChilds[0]->BuildNeighborNode(pRoot, cx);
+//		_pChilds[1]->BuildNeighborNode(pRoot, cx);
+//		_pChilds[2]->BuildNeighborNode(pRoot, cx);
+//		_pChilds[3]->BuildNeighborNode(pRoot, cx);
+//	}
+//}
+//
+//QuadTree *QuadTree::FindNode(int32 i0, int32 i1, int32 i2, int32 i3)
+//{
+//	QuadTree *result = nullptr;
+//	if (_corners[0] == i0 && _corners[1] == i1 && _corners[2] == i2 && _corners[3] == i3)
+//	{
+//		return this;
+//	}
+//	if (nullptr != _pChilds[0])
+//	{
+//		RECT rect;
+//		POINT point;
+//
+//		int32 n = (i0 + i1 + i2 + i3) / 4;
+//
+//		point.x = (int32)_pTerrainVertices[n]._pos.x;
+//		point.y = (int32)_pTerrainVertices[n]._pos.z;
+//
+//		SetRect(&rect,
+//			(int32)_pTerrainVertices[_pChilds[0]->_corners[eCornerLT]]._pos.x,
+//			(int32)_pTerrainVertices[_pChilds[0]->_corners[eCornerLT]]._pos.z,
+//			(int32)_pTerrainVertices[_pChilds[0]->_corners[eCornerRB]]._pos.x,
+//			(int32)_pTerrainVertices[_pChilds[0]->_corners[eCornerRB]]._pos.z);
+//
+//		if (IsInRect(&rect, point))
+//		{
+//			return _pChilds[0]->FindNode(i0, i1, i2, i3);
+//		}
+//
+//		SetRect(&rect,
+//			(int32)_pTerrainVertices[_pChilds[1]->_corners[eCornerLT]]._pos.x,
+//			(int32)_pTerrainVertices[_pChilds[1]->_corners[eCornerLT]]._pos.z,
+//			(int32)_pTerrainVertices[_pChilds[1]->_corners[eCornerRB]]._pos.x,
+//			(int32)_pTerrainVertices[_pChilds[1]->_corners[eCornerRB]]._pos.z);
+//
+//		if (IsInRect(&rect, point))
+//		{
+//			return _pChilds[1]->FindNode(i0, i1, i2, i3);
+//		}
+//
+//		SetRect(&rect,
+//			(int32)_pTerrainVertices[_pChilds[2]->_corners[eCornerLT]]._pos.x,
+//			(int32)_pTerrainVertices[_pChilds[2]->_corners[eCornerLT]]._pos.z,
+//			(int32)_pTerrainVertices[_pChilds[2]->_corners[eCornerRB]]._pos.x,
+//			(int32)_pTerrainVertices[_pChilds[2]->_corners[eCornerRB]]._pos.z);
+//
+//		if (IsInRect(&rect, point))
+//		{
+//			return _pChilds[2]->FindNode(i0, i1, i2, i3);
+//		}
+//
+//		SetRect(&rect,
+//			(int32)_pTerrainVertices[_pChilds[3]->_corners[eCornerLT]]._pos.x,
+//			(int32)_pTerrainVertices[_pChilds[3]->_corners[eCornerLT]]._pos.z,
+//			(int32)_pTerrainVertices[_pChilds[3]->_corners[eCornerRB]]._pos.x,
+//			(int32)_pTerrainVertices[_pChilds[3]->_corners[eCornerRB]]._pos.z);
+//
+//		if (IsInRect(&rect, point))
+//		{
+//			return _pChilds[3]->FindNode(i0, i1, i2, i3);
+//		}
+//	}
+//	return nullptr;
+//}
+//
+//int32 QuadTree::GetNodeIndex(int32 edge, int32 cx, int32 &i0, int32 &i1, int32 &i2, int32 &i3)
+//{
+//	int32 n, a, b, c, d, gap;
+//	a = i0;
+//	b = i1;
+//	c = i2;
+//	d = i3;
+//
+//	gap = b - a;
+//
+//	switch (edge)
+//	{
+//	case EDGE_UP :
+//	{
+//		i0 = c;
+//		i1 = d;
+//		i2 = c + cx * gap;
+//		i3 = d + cx * gap;
+//	}break;
+//	case EDGE_DOWN :
+//	{
+//		i0 = a - cx * gap;
+//		i1 = b - cx * gap;
+//		i2 = a;
+//		i3 = b;
+//	}break;
+//	case EDGE_LEFT :
+//	{
+//		i0 = a - gap;
+//		i1 = a;
+//		i2 = c - gap;
+//		i3 = c;
+//	}break;
+//	case EDGE_RIGHT :
+//	{
+//		i0 = b;
+//		i1 = b + gap;
+//		i2 = d;
+//		i3 = d + gap;
+//		if ((i0 / cx) != (a / cx)) return -1;
+//		if ((i1 / cx) != (b / cx)) return -1;
+//	}break;
+//	}
+//	
+//	n = (i0 + i1 + i2 + i3) / 4;
+//
+//	if (!IS_IN_RANGE(n, 0, cx * cx - 1))
+//	{
+//		return -1;
+//	}
+//	return n;
+//
+//}
+//
+//void QuadTree::AllInFrustum()
+//{
+//	_culled = false;
+//	if (nullptr == _pChilds[0])
+//	{
+//		return;
+//	}
+//
+//	_pChilds[0]->AllInFrustum();
+//	_pChilds[1]->AllInFrustum();
+//	_pChilds[2]->AllInFrustum();
+//	_pChilds[3]->AllInFrustum();
+//
+//}

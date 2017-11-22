@@ -11,7 +11,6 @@ ActionSystem::~ActionSystem()
 
 void ActionSystem::Update(float deltaTime)
 {
-	static int32 count = 0;
 
 	auto &entities = GetEntities();
 	for (int32 i = 0; i < entities.size(); ++i)
@@ -23,7 +22,6 @@ void ActionSystem::Update(float deltaTime)
 			refActionComp.UpdateAnimation(deltaTime);
 		}
 	}
-	count++;
 }
 
 void ActionSystem::Initialize()

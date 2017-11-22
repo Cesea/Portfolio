@@ -36,7 +36,6 @@ void Engine::Run()
 	while (_valid && _running)
 	{
 		MSG msg{};
-		_pInput->Update(0.0f);
 		while (PeekMessage(&msg, 0, 0, 0, PM_REMOVE))
 		{
 			switch (msg.message)
@@ -73,6 +72,8 @@ void Engine::Run()
 				}break;
 			}
 		}
+
+		_pInput->Update(0.0f);
 		float deltaTime = APPTIMER->GetTargetTime();
 
 		_pScene->Update(deltaTime);

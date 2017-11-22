@@ -67,7 +67,7 @@ public :
 
 	void Handle(const Player::AttackEvent &event);
 	//void Handle(const CombatEndEvent &event);
-	//void Handle(const Player::MoveEvent &event);
+	void Handle(const Player::MoveEvent &event);
 	//void Handle(const DamageEvent &event);
 
 private :

@@ -12,12 +12,13 @@ class Terrain;
 class Gizmo
 {
 public :
-	enum EditMode
+	enum Type
 	{
-		Translation = 0,
-		Rotation,
-		Scaling,
+		eTranslation = 0,
+		eRotation,
+		eScaling,
 	};
+	void Init();
 
 //	void MakeTransformCenter(std::vector<EntityHandle> entities);
 //	void Edit(std::vector<EntityHandle> entities);
@@ -28,7 +29,25 @@ public :
 //	void ChangeScaling(std::vector<EntityHandle> entities);
 //
 //	TransformComponent transform;
+
+	void ChangeMode(Gizmo::Type type);
+
+	video::StaticXMeshHandle _x;
+	video::StaticXMeshHandle _t;
+	video::StaticXMeshHandle _z;
 };
+
+class Brush
+{
+public :
+	void Init();
+
+	Vector3 _position;
+
+	video::VertexBufferHandle _vHandle;
+	video::MaterialHandle _mHandle;
+};
+
 
 class Editor
 {
@@ -41,6 +60,7 @@ public :
 
 	virtual void Edit(RefVariant &pObject);
 
+	void Render(video::RenderView *renderView);
 public:
 	void RegisterEvents();
 
@@ -50,7 +70,12 @@ public:
 	void Handle(const InputManager::MouseWheelEvent &event);
 
 	void Handle(const InputManager::KeyPressedEvent &event);
+
 public :
+	Brush _brush;
+	Gizmo _gizmo;
+
+	bool32 _editing{ false };
 	
 	int32 _mx;
 	int32 _my;
@@ -60,10 +85,10 @@ public :
 
 	void *_pEdittingObject{};
 
-	char _name[EDITOR_MAX_NAME] = {0, };
+	char _nameStr[EDITOR_MAX_NAME] = {0, };
+	char _pickObjectStr[EDITOR_MAX_NAME] = {0, };
+	bool32 _pickingObject{false};
 
-
-	char _button[EDITOR_MAX_NAME] = {0, };
 	char _collapse[EDITOR_MAX_NAME] = {0, };
 	char _slider[EDITOR_MAX_NAME] = {0, };
 	char _edit[EDITOR_MAX_NAME] = { 0, };

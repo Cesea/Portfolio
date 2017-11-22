@@ -64,6 +64,7 @@ void PlayerCombatState::OnEnter()
 {
 	EventChannel channel;
 	channel.Add<Player::AttackEvent, PlayerCombatState>(*this);
+	channel.Add<Player::MoveEvent, PlayerCombatState>(*this);
 
 	_toStanceTimer.Restart(3.0f);
 	_pParent->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWarCombatMode));
@@ -81,6 +82,7 @@ void PlayerCombatState::OnExit()
 {
 	EventChannel channel;
 	channel.Remove<Player::AttackEvent, PlayerCombatState>(*this);
+	channel.Remove<Player::MoveEvent, PlayerCombatState>(*this);
 	_toStanceTimer.Restart(2.0f);
 
 }
@@ -89,6 +91,13 @@ void PlayerCombatState::Handle(const Player::AttackEvent & event)
 {
 	//_pParent->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWarSwingLeft));
 	_pParent->ChangeState(META_TYPE(PlayerAttackState)->Name());
+	_toStanceTimer.Restart(2.0f);
+}
+
+void PlayerCombatState::Handle(const Player::MoveEvent & event)
+{
+	_pParent->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWarMovingLeft));
+	_toStanceTimer.Restart(2.0f);
 }
 
 //Player Move State///////////////////////////////////////////////////////////
