@@ -15,8 +15,6 @@
 #include "StateMachine.h"
 
 
-constexpr float EPSILON = 0.001f;
-constexpr float ONE_RAD = 0.017453f;
 
 struct IntRect
 {
@@ -85,41 +83,6 @@ inline float Uint32ToFloat(uint32 ms)
 	return (float)ms * 0.001f;
 }
 
-inline float FAbs(float f)
-{
-	if (f < 0.0f)
-	{
-		return -f;
-	}
-	else
-	{
-		return f;
-	}
-}
-
-inline bool FloatEqual(float f1, float f2)
-{
-	if (FAbs(f1 - f2) < EPSILON)
-	{
-		return true;
-	}
-	else
-	{
-		return false;
-	}
-}
-
-inline bool FloatZero(float f)
-{
-	if (FAbs(f) < EPSILON)
-	{
-		return true;
-	}
-	else
-	{
-		return false;
-	}
-}
 
 inline int32 RectWidth(const RECT &rect)
 {

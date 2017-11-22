@@ -166,7 +166,7 @@ void Camera::Handle(const InputManager::KeyDownEvent & event)
 
 void Camera::Handle(const InputManager::MousePressedEvent & event)
 {
-	if (event.code == MOUSE_BUTTON_LEFT)
+	if (event.code == MOUSE_BUTTON_RIGHT)
 	{
 		_rotating = true;
 	}
@@ -174,7 +174,7 @@ void Camera::Handle(const InputManager::MousePressedEvent & event)
 
 void Camera::Handle(const InputManager::MouseReleasedEvent & event)
 {
-	if (event.code == MOUSE_BUTTON_LEFT)
+	if (event.code == MOUSE_BUTTON_RIGHT)
 	{
 		_rotating = false;
 	}

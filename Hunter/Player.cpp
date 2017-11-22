@@ -55,7 +55,44 @@ void Player::CreateFromWorld(World & world)
 void Player::Update(float deltaTime)
 {
 	_pStateMachine->Update(deltaTime, _currentCommand);
-	_currentCommand._interpreted = true;
+
+	if (false == _currentCommand._interpreted)
+	{
+		if (_currentCommand._type == GameCommand::Type::eMove)
+		{
+			Vector3 delta{};
+			if (_currentCommand._movement._vertical == Movement::Vertical::eUp)
+			{
+				delta.z += 1.0f;
+			}
+			else if(_currentCommand._movement._vertical == Movement::Vertical::eDown)
+			{
+				delta.z -= 1.0f;
+			}
+
+			if (_currentCommand._movement._horizontal == Movement::Horizontal::eLeft)
+			{
+				delta.x -= 1.0f;
+			}
+			else if(_currentCommand._movement._horizontal == Movement::Horizontal::eRight)
+			{
+				delta.x += 1.0f;
+			}
+			delta *= deltaTime;
+			if (!delta.IsZero())
+			{
+				Vec3Normalize(&delta, &delta);
+				TransformComponent &refTransform = _entity.GetComponent<TransformComponent>();
+				refTransform.MovePositionLocal(delta * deltaTime);
+				//아래의 줄을 TransformSystem에서 해야할까??
+				refTransform._position.y = TERRAIN->GetHeight(refTransform._position.x, refTransform._position.z);
+			}
+		}
+		_currentCommand._interpreted = true;
+
+		_currentCommand.Reset();
+	}
+
 
 	//if (_lastCommand._interpreted == false)
 	//{

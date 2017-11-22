@@ -48,7 +48,7 @@ namespace video
 			usage |= D3DUSAGE_DYNAMIC;
 		}
 
-		VIDEO_CHECK(gpDevice->CreateVertexBuffer(size, usage, 0,
+		VIDEO_CHECK(gpDevice->CreateVertexBuffer(size, usage, 0, 
 			D3DPOOL_DEFAULT, &_ptr, nullptr));
 
 		if (nullptr != data)
