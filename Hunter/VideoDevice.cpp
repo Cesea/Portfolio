@@ -299,11 +299,9 @@ void video::VideoDevice::MakeDefaultVertexDecls()
 void video::VideoDevice::LoadDefaultEffects()
 {
 	VIDEO->CreateEffect("../resources/Shaders/StaticMesh.fx", "StaticMesh.fx");
-	VIDEO->CreateEffect("../resources/Shaders/StaticTestMesh.fx", "StaticTestMesh.fx");
 	VIDEO->CreateEffect("../resources/Shaders/SkinnedMesh.fx", "SkinnedMesh.fx");
 	VIDEO->CreateEffect("../resources/Shaders/TerrainBase.fx", "TerrainBase.fx");
 
-	VIDEO->CreateEffect("../resources/Shaders/DebugShader.fx", "DebugShader.fx");
 }
 
 RenderView *video::VideoDevice::GetRenderView(RenderViewHandle handle)

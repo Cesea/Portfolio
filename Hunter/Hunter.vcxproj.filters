@@ -57,9 +57,6 @@
     <ClCompile Include="ApplicationTimer.cpp">
       <Filter>Core\Timers</Filter>
     </ClCompile>
-    <ClCompile Include="TestScene.cpp">
-      <Filter>Game\GameScene\TestScene</Filter>
-    </ClCompile>
     <ClCompile Include="Ray.cpp">
       <Filter>Math</Filter>
     </ClCompile>
@@ -192,6 +189,21 @@
     <ClCompile Include="TerrainEditorScene.cpp">
       <Filter>Game\GameScene\TerrainEidtorScene</Filter>
     </ClCompile>
+    <ClCompile Include="GizmoManager.cpp">
+      <Filter>Managers</Filter>
+    </ClCompile>
+    <ClCompile Include="SpriteManager.cpp">
+      <Filter>Managers</Filter>
+    </ClCompile>
+    <ClCompile Include="BaseLight.cpp">
+      <Filter>Game\GameUtils\Light</Filter>
+    </ClCompile>
+    <ClCompile Include="DirectionalLight.cpp">
+      <Filter>Game\GameUtils\Light</Filter>
+    </ClCompile>
+    <ClCompile Include="PointLight.cpp">
+      <Filter>Game\GameUtils\Light</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -281,9 +293,6 @@
     </ClInclude>
     <ClInclude Include="ApplicationTimer.h">
       <Filter>Core\Timers</Filter>
-    </ClInclude>
-    <ClInclude Include="TestScene.h">
-      <Filter>Game\GameScene\TestScene</Filter>
     </ClInclude>
     <ClInclude Include="Ray.h">
       <Filter>Math</Filter>
@@ -478,6 +487,24 @@
     <ClInclude Include="TerrainEditorScene.h">
       <Filter>Game\GameScene\TerrainEidtorScene</Filter>
     </ClInclude>
+    <ClInclude Include="GizmoManager.h">
+      <Filter>Managers</Filter>
+    </ClInclude>
+    <ClInclude Include="SpriteManager.h">
+      <Filter>Managers</Filter>
+    </ClInclude>
+    <ClInclude Include="BaseLight.h">
+      <Filter>Game\GameUtils\Light</Filter>
+    </ClInclude>
+    <ClInclude Include="DirectionalLight.h">
+      <Filter>Game\GameUtils\Light</Filter>
+    </ClInclude>
+    <ClInclude Include="PointLight.h">
+      <Filter>Game\GameUtils\Light</Filter>
+    </ClInclude>
+    <ClInclude Include="Light.h">
+      <Filter>Game\GameUtils\Light</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Core">
@@ -564,9 +591,6 @@
     <Filter Include="Game\GameScene">
       <UniqueIdentifier>{8c9cd546-7171-45e7-b49f-873d7745382f}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Game\GameScene\TestScene">
-      <UniqueIdentifier>{5a71353e-00bc-4729-92c9-598c2955957d}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Game\GameUtils">
       <UniqueIdentifier>{563f8004-6a59-40ad-a91c-8b90fd7fda6e}</UniqueIdentifier>
     </Filter>
@@ -629,6 +653,9 @@
     </Filter>
     <Filter Include="Game\GameScene\TerrainEidtorScene">
       <UniqueIdentifier>{58f67160-6e81-4862-8dc6-41ab9d92edf6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\GameUtils\Light">
+      <UniqueIdentifier>{24fd2b98-dcb3-488a-b8cf-2d5152558813}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

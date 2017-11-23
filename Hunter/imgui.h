@@ -20,7 +20,8 @@ inline uint32 ImguiRGBA(uint8 r, uint8 g, uint8 b, uint8 a = 255)
 	return (a << 24) | (r << 16) | (g << 8) | (b);
 }
 
-void ImguiBeginFrame(int32 mx, int32 my, uint8 mbut, int32 scroll, uint32 keyCode);
+void ImguiBeginFrame(int32 mx, int32 my, uint8 mbut, int32 scroll, uint32 keyCode, bool32 shiftDown);
+
 void ImguiEndFrame();
 
 bool ImguiBeginScrollArea(const char* name, int32 x, int32 y, int32 w, int32 h, int32 *pOutScroll);

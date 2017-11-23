@@ -18,6 +18,10 @@ Engine::Engine()
 
 Engine::~Engine()
 {
+	GIZMOMANAGER->Release();
+	GIZMOMANAGER->ReleaseInstance();
+	SPRITEMANAGER->Release();
+	SPRITEMANAGER->ReleaseInstance();
 }
 
 void Engine::Run()
@@ -40,43 +44,43 @@ void Engine::Run()
 		{
 			switch (msg.message)
 			{
-				case WM_SYSKEYDOWN:
-				case WM_KEYDOWN :
-				case WM_SYSKEYUP :
-				case WM_KEYUP :
-				case WM_CHAR :
-				{
-					_pInput->keyboard.UpdateWithMessage(msg.message, msg.wParam, msg.lParam);
-				}break;
+			case WM_SYSKEYDOWN:
+			case WM_KEYDOWN:
+			case WM_SYSKEYUP:
+			case WM_KEYUP:
+			case WM_CHAR:
+			{
+				_pInput->keyboard.UpdateWithMessage(msg.message, msg.wParam, msg.lParam);
+			}break;
 
-				case WM_MOUSEWHEEL:
-				{
-					_pInput->mouse.UpdateWheelWithMessage(msg.wParam, msg.lParam);
-				}break;
+			case WM_MOUSEWHEEL:
+			{
+				_pInput->mouse.UpdateWheelWithMessage(msg.wParam, msg.lParam);
+			}break;
 
-				case WM_LBUTTONDOWN:
-				case WM_LBUTTONUP:
-				case WM_MBUTTONUP:
-				case WM_MBUTTONDOWN:
-				case WM_RBUTTONDOWN:
-				case WM_RBUTTONUP:
-				case WM_MOUSEMOVE:
-				{
-					_pInput->mouse.UpdateWithMessage(msg.wParam, msg.lParam);
-				}break;
+			case WM_LBUTTONDOWN:
+			case WM_LBUTTONUP:
+			case WM_MBUTTONUP:
+			case WM_MBUTTONDOWN:
+			case WM_RBUTTONDOWN:
+			case WM_RBUTTONUP:
+			case WM_MOUSEMOVE:
+			{
+				_pInput->mouse.UpdateWithMessage(msg.wParam, msg.lParam);
+			}break;
 
-				default :
-				{
-					TranslateMessage(&msg);
-					DispatchMessage(&msg);
-				}break;
+			default:
+			{
+				TranslateMessage(&msg);
+				DispatchMessage(&msg);
+			}break;
 			}
 		}
 
 		_pInput->Update(0.0f);
 		float deltaTime = APPTIMER->GetTargetTime();
 
-		_pScene->Update(deltaTime);
+		_pScene->Update(deltaTime, *_pInput.get());
 
 		APPTIMER->Tick();
 
@@ -187,6 +191,9 @@ bool Engine::InitializeSystems()
 	{
 		return false;
 	}
+
+	GIZMOMANAGER->Init(gpDevice);
+	SPRITEMANAGER->Init(gpDevice);
 
 	return true;
 }

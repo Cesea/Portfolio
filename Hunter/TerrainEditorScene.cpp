@@ -10,31 +10,13 @@ TerrainEditorScene::~TerrainEditorScene()
 {
 }
 
-bool32 TerrainEditorScene::Load()
+bool TerrainEditorScene::Init()
 {
-	bool32 result = true;
-	return result;
-}
-
-bool32 TerrainEditorScene::Unload()
-{
-	bool32 result = true;
-	return result;
-}
-
-bool32 TerrainEditorScene::Init()
-{
-	bool32 result = true;
-
-	//렌더 타켓 설정
-	video::RenderViewHandle renderViewHandle = VIDEO->CreateRenderView("Main");
-	_mainRenderView = VIDEO->GetRenderView(renderViewHandle);
-	_mainRenderView->_clearColor = 0xff55330;
+	bool result = true;
 
 	_camera.SetRotationSpeed(10.0f);
 	_camera.SetMoveSpeed(20.0f);
 	_camera.GetTransform().MovePositionSelf(0.0f, 0.0f, -30.0f);
-	_mainRenderView->_pCamera = &_camera;
 
 	_world.AddSystem<RenderSystem>(_renderSystem);
 	_world.AddSystem<TransformSystem>(_transformSystem);
@@ -58,7 +40,6 @@ bool32 TerrainEditorScene::Init()
 
 	TERRAIN->SetScene(this);
 	TERRAIN->Create(config, 1, true);
-	_terrainEffect = VIDEO->GetEffect("TerrainBase.fx");
 
 	imguiRenderInit();
 	_editor = new Editor;
@@ -68,11 +49,11 @@ bool32 TerrainEditorScene::Init()
 	return result;
 }
 
-bool32 TerrainEditorScene::Update(float deltaTime)
+bool TerrainEditorScene::Update(float deltaTime, const InputManager &input)
 {
-	bool32 result = true;
+	bool result = true;
 
-	_editor->Edit(RefVariant());
+	_editor->Edit(RefVariant(), input);
 
 	_world.Refresh();
 
@@ -90,14 +71,13 @@ bool32 TerrainEditorScene::Update(float deltaTime)
 	return result;
 }
 
-bool32 TerrainEditorScene::Render()
+bool TerrainEditorScene::Render()
 {
-	bool32 result = true;
+	bool result = true;
 	//DEBUG_DRAWER->DrawWorldGrid(1, 80);
 	//DEBUG_DRAWER->FillRenderCommand(*_mainRenderView);
 
-	_renderSystem.Render(*_mainRenderView);
-	TERRAIN->FillRenderCommand(*_mainRenderView);
+	//TERRAIN->FillRenderCommand(*_mainRenderView);
 
 	_mainRenderView->PreRender();
 	_mainRenderView->ExecCommands();
@@ -117,11 +97,6 @@ void TerrainEditorScene::Release()
 const char * TerrainEditorScene::GetSceneName()
 {
 	return "TerrainEditorScene";
-}
-
-bool32 TerrainEditorScene::IsActive()
-{
-	return _active;
 }
 
 void TerrainEditorScene::RegisterEvents()

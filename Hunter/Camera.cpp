@@ -57,7 +57,16 @@ void Camera::UpdateMatrix()
 	MatrixInverse(&_matView, NULL, &_transform._matFinal);
 
 	_matViewProjection = _matView * _matProjection;
+}
 
+void Camera::UpdateCamToDevice()
+{
+	gpDevice->SetTransform(D3DTS_VIEW, &_matView);
+	gpDevice->SetTransform(D3DTS_PROJECTION, &_matProjection);
+}
+
+void Camera::UpdateFrustum()
+{
 	_frustum.UpdateFrustum(*this);
 }
 

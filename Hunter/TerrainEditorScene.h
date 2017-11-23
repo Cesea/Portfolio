@@ -9,17 +9,13 @@ public :
 	TerrainEditorScene();
 	virtual ~TerrainEditorScene();
 
-	virtual bool32 Load();
-	virtual bool32 Unload();
-
-	virtual bool32 Init();
-	virtual bool32 Update(float deltaTime);
-	virtual bool32 Render();
+	virtual bool Init();
+	virtual bool Update(float deltaTime, const InputManager &input);
+	virtual bool Render();
 
 	virtual void Release();
 
 	virtual const char *GetSceneName();
-	virtual bool32 IsActive();
 
 	void RegisterEvents();
 
@@ -37,13 +33,7 @@ private :
 	video::RenderView *_mainRenderView{};
 	Camera _camera;
 
-	video::EffectHandle _staticEffect;
-	video::EffectHandle _skinnedEffect;
-	video::EffectHandle _terrainEffect;
-
 	Editor *_editor{};
-	video::FontHandle _font;
-
 };
 
 

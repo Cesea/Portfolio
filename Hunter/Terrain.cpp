@@ -79,7 +79,7 @@ bool Terrain::Create(const Terrain::TerrainConfig &config, int32 smoothLevel, bo
 
 	//터레인 Texture 로딩
 	_effect = VIDEO->GetEffect("TerrainBase.fx");
-	_materialHandle = VIDEO->CreateMaterial("TerrainMaterial");
+	//_materialHandle = VIDEO->CreateMaterial("TerrainMaterial");
 
 	_tile0Handle = VIDEO->CreateTexture(config._tile0FileName, config._tile0FileName);
 	_tile1Handle = VIDEO->CreateTexture(config._tile1FileName, config._tile1FileName);
@@ -87,31 +87,17 @@ bool Terrain::Create(const Terrain::TerrainConfig &config, int32 smoothLevel, bo
 	_tile3Handle = VIDEO->CreateTexture(config._tile3FileName, config._tile3FileName);
 	_tileSplatHandle = VIDEO->CreateTexture(config._splatFileName);
 
-	VIDEO->MaterialAddTexture(_materialHandle, VIDEO_TEXTURE0, _tile0Handle);
-	VIDEO->MaterialAddTexture(_materialHandle, VIDEO_TEXTURE1, _tile1Handle);
-	VIDEO->MaterialAddTexture(_materialHandle, VIDEO_TEXTURE2, _tile2Handle);
-	VIDEO->MaterialAddTexture(_materialHandle, VIDEO_TEXTURE3, _tile3Handle);
-	VIDEO->MaterialAddTexture(_materialHandle, VIDEO_TEXTURE4, _tileSplatHandle);
-
+	//VIDEO->MaterialAddTexture(_materialHandle, VIDEO_TEXTURE0, _tile0Handle);
+	//VIDEO->MaterialAddTexture(_materialHandle, VIDEO_TEXTURE1, _tile1Handle);
+	//VIDEO->MaterialAddTexture(_materialHandle, VIDEO_TEXTURE2, _tile2Handle);
+	//VIDEO->MaterialAddTexture(_materialHandle, VIDEO_TEXTURE3, _tile3Handle);
+	//VIDEO->MaterialAddTexture(_materialHandle, VIDEO_TEXTURE4, _tileSplatHandle);
 }
 
 void Terrain::RegisterEvents()
 {
 	EventChannel channel;
 	channel.Add<InputManager::MouseReleasedEvent, Terrain>(*this);
-}
-
-void Terrain::Handle(const InputManager::MouseReleasedEvent & event)
-{
-	EventChannel channel;
-
-	Ray ray;
-	_pScene->_camera.ComputeRay(Vector2(event.coord.x, event.coord.y), &ray);
-	Vector3 hitPos;
-	if (this->IsIntersectRay(ray, &hitPos))
-	{
-		channel.Broadcast<BaseScene::SpawnEvent>(BaseScene::SpawnEvent(hitPos));
-	}
 }
 
 void Terrain::Destroy()
@@ -135,83 +121,85 @@ void Terrain::Destroy()
 	VIDEO->DestroyTexture(_tile3Handle);
 	VIDEO->DestroyTexture(_tileSplatHandle);
 
-	VIDEO->DestroyMaterial(_materialHandle);
+	//VIDEO->DestroyMaterial(_materialHandle);
 
 	SAFE_DELETE_ARRAY(_terrainVertices);
 	SAFE_DELETE(_pQuadTree);
 }
 
-void Terrain::FillRenderCommand(video::RenderView & renderView)
-{
+//void Terrain::FillRenderCommand(video::RenderView & renderView)
+//{
+//
+//	//video::IndexBuffer *pIndexBuffer = VIDEO->GetIndexBuffer(_iHandle);
+//	//uint8 *pData = nullptr;
+//	//pIndexBuffer->_ptr->Lock(0, 0, (void **)&pData, D3DLOCK_DISCARD);
+//	//_numTriangleToDraw = _pQuadTree->GenerateIndex(pData, renderView._pCamera->GetFrustum(), 
+//	//	renderView._pCamera->GetTransform()._position, _lodRatio);
+//	//pIndexBuffer->_ptr->Unlock();
+//
+//	if (_inEditMode)
+//	{
+//		video::RenderCommand &command = renderView.GetCommand();
+//		command._drawType = video::RenderCommand::DrawType::eStatic;
+//		command._primType = video::RenderCommand::PrimType::eTriangleList;
+//		Assert(_vHandle.IsValid());
+//		Assert(_iHandle.IsValid());
+//
+//		video::VertexBuffer *pVBuffer = VIDEO->GetVertexBuffer(_vHandle);
+//		void *pVertexData = nullptr;
+//		pVBuffer->_ptr->Lock(0, 0, (void **)&pVertexData, D3DLOCK_DISCARD);
+//		memcpy(pVertexData, _terrainVertices, sizeof(video::TerrainVertex) * _numTotalVertex);
+//		pVBuffer->_ptr->Unlock();
+//
+//		Assert(_terrainFaces);
+//		video::IndexBuffer *pIBuffer = VIDEO->GetIndexBuffer(_iHandle);
+//		void *pIndexData = nullptr;
+//		pIBuffer->_ptr->Lock(0, 0, (void **)&pIndexData, D3DLOCK_DISCARD);
+//		memcpy(pIndexData, _terrainFaces, sizeof(TerrainFace) * _numTotalFace);
+//		pIBuffer->_ptr->Unlock();
+//
+//		command._vHandle = _vHandle;
+//		command._iHandle = _iHandle;
+//		command._effectHandle = _effect;
+//		command._materialHandle = _materialHandle;
+//		command._numPrim = _numTriangleToDraw;
+//	}
+//	else
+//	{
+//		video::RenderCommand &command = renderView.GetCommand();
+//		command._drawType = video::RenderCommand::DrawType::eStatic;
+//		command._primType = video::RenderCommand::PrimType::eTriangleList;
+//		Assert(_vHandle.IsValid());
+//		Assert(_iHandle.IsValid());
+//		command._vHandle = _vHandle;
+//		command._iHandle = _iHandle;
+//		command._effectHandle = _effect;
+//		command._materialHandle = _materialHandle;
+//		command._numPrim = _numTriangleToDraw;
+//	}
+//
+//
+//	//for (int32 i = 0; i < _numSectionX * _numSectionZ; ++i)
+//	//{
+//	//	Terrain::TerrainSection &refSection = _pSections[i];
+//	//	if (renderView._pCamera->GetFrustum().IsSphereInFrustum(Vector3(refSection._centerX, 0.0f, refSection._centerZ), refSection._radius))
+//	//	{
+//	//		video::RenderCommand &command = renderView.GetCommand();
+//	//		command._drawType = video::RenderCommand::DrawType::eStatic;
+//	//		command._primType = video::RenderCommand::PrimType::eTriangleList;
+//	//		Assert(refSection._vHandle.IsValid());
+//	//		Assert(refSection._iHandle.IsValid());
+//	//		command._vHandle = refSection._vHandle;
+//	//		command._iHandle = refSection._iHandle;
+//	//		command._effectHandle = _effect;
+//	//		command._materialHandle = _materialHandle;
+//	//	}
+//	//}
+//}
 
-	//video::IndexBuffer *pIndexBuffer = VIDEO->GetIndexBuffer(_iHandle);
-	//uint8 *pData = nullptr;
-	//pIndexBuffer->_ptr->Lock(0, 0, (void **)&pData, D3DLOCK_DISCARD);
-	//_numTriangleToDraw = _pQuadTree->GenerateIndex(pData, renderView._pCamera->GetFrustum(), 
-	//	renderView._pCamera->GetTransform()._position, _lodRatio);
-	//pIndexBuffer->_ptr->Unlock();
-
-	if (_inEditMode)
-	{
-		video::RenderCommand &command = renderView.GetCommand();
-		command._drawType = video::RenderCommand::DrawType::eStatic;
-		command._primType = video::RenderCommand::PrimType::eTriangleList;
-		Assert(_vHandle.IsValid());
-		Assert(_iHandle.IsValid());
-
-		video::VertexBuffer *pVBuffer = VIDEO->GetVertexBuffer(_vHandle);
-		void *pVertexData = nullptr;
-		pVBuffer->_ptr->Lock(0, 0, (void **)&pVertexData, D3DLOCK_DISCARD);
-		memcpy(pVertexData, _terrainVertices, sizeof(video::TerrainVertex) * _numTotalVertex);
-		pVBuffer->_ptr->Unlock();
-
-		Assert(_terrainFaces);
-		video::IndexBuffer *pIBuffer = VIDEO->GetIndexBuffer(_iHandle);
-		void *pIndexData = nullptr;
-		pIBuffer->_ptr->Lock(0, 0, (void **)&pIndexData, D3DLOCK_DISCARD);
-		memcpy(pIndexData, _terrainFaces, sizeof(TerrainFace) * _numTotalFace);
-		pIBuffer->_ptr->Unlock();
-
-		command._vHandle = _vHandle;
-		command._iHandle = _iHandle;
-		command._effectHandle = _effect;
-		command._materialHandle = _materialHandle;
-		command._numPrim = _numTriangleToDraw;
-	}
-	else
-	{
-		video::RenderCommand &command = renderView.GetCommand();
-		command._drawType = video::RenderCommand::DrawType::eStatic;
-		command._primType = video::RenderCommand::PrimType::eTriangleList;
-		Assert(_vHandle.IsValid());
-		Assert(_iHandle.IsValid());
-		command._vHandle = _vHandle;
-		command._iHandle = _iHandle;
-		command._effectHandle = _effect;
-		command._materialHandle = _materialHandle;
-		command._numPrim = _numTriangleToDraw;
-	}
-
-
-	//for (int32 i = 0; i < _numSectionX * _numSectionZ; ++i)
-	//{
-	//	Terrain::TerrainSection &refSection = _pSections[i];
-	//	if (renderView._pCamera->GetFrustum().IsSphereInFrustum(Vector3(refSection._centerX, 0.0f, refSection._centerZ), refSection._radius))
-	//	{
-	//		video::RenderCommand &command = renderView.GetCommand();
-	//		command._drawType = video::RenderCommand::DrawType::eStatic;
-	//		command._primType = video::RenderCommand::PrimType::eTriangleList;
-	//		Assert(refSection._vHandle.IsValid());
-	//		Assert(refSection._iHandle.IsValid());
-	//		command._vHandle = refSection._vHandle;
-	//		command._iHandle = refSection._iHandle;
-	//		command._effectHandle = _effect;
-	//		command._materialHandle = _materialHandle;
-	//	}
-	//}
-}
 
 //TODO : Implement this
+
 bool Terrain::IsIntersectRay(const Ray &ray, Vector3 *pOutHit)
 {
 	std::vector<Vector3> hits;
@@ -382,6 +370,55 @@ float Terrain::GetSlant(Vector3 * pOut, float gravityPower, float x, float z)
 	Vec3Cross(pOut, &right, &normal);
 
 	return true;
+}
+
+void Terrain::Render(const Camera & camera)
+{
+	//월드 행렬셋팅
+	video::Effect *pEffect = VIDEO->GetEffect(_effect);
+	video::VertexBuffer *vBuffer = VIDEO->GetVertexBuffer(_vHandle);
+	video::IndexBuffer *iBuffer = VIDEO->GetIndexBuffer(_iHandle);
+	video::VertexDecl *decl = VIDEO->GetVertexDecl(vBuffer->_decl);
+
+	Matrix matInd;
+	MatrixIdentity(&matInd);
+	pEffect->SetMatrix("matWorld", matInd);
+
+
+	//뷰 행렬셋팅
+	pEffect->SetMatrix("matViewProjection", camera.GetViewProjectionMatrix());
+
+	//Texture 셋팅
+	pEffect->SetTexture("Terrain0_Tex", *VIDEO->GetTexture(_tile0Handle));
+	pEffect->SetTexture("Terrain1_Tex", *VIDEO->GetTexture(_tile1Handle));
+	pEffect->SetTexture("Terrain2_Tex", *VIDEO->GetTexture(_tile2Handle));
+	pEffect->SetTexture("Terrain3_Tex", *VIDEO->GetTexture(_tile3Handle));
+	pEffect->SetTexture("TerrainControl_Tex", *VIDEO->GetTexture(_tileSplatHandle));
+
+	//광원 셋팅
+	//D3DXVECTOR3 dirLight = pDirectionLight->pTransform->GetForward();
+	//pEffect->SetVector("worldLightDir", D3DXVECTOR4(dirLight, 1));
+
+	//광원 셋팅
+	//m_pTerrainEffect->SetVector( "worldLightDir", &D3DXVECTOR4( dirLight, 1 ) );
+
+
+	pEffect->SetTechnique("Base");
+
+	uint32 numPass = pEffect->BeginEffect();
+
+	for (uint32 i = 0; i < numPass; i++) 
+	{
+		pEffect->BeginPass(i);
+
+		gpDevice->SetStreamSource(0, vBuffer->_ptr, 0, sizeof(video::TerrainVertex));
+		gpDevice->SetVertexDeclaration(decl->_ptr);
+		gpDevice->SetIndices(iBuffer->_ptr);
+		gpDevice->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, 0, _numTotalVertex, 0, _numTotalFace);
+
+		pEffect->EndPass();
+	}
+	pEffect->EndEffect();
 }
 
 bool Terrain::CreateTerrain(int32 smooth, int32 tileNum)

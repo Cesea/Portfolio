@@ -90,15 +90,15 @@ public:
 	bool Create(const Terrain::TerrainConfig &config, int32 smoothLevel, bool32 inEditMode);
 
 	void RegisterEvents();
-	void Handle(const InputManager::MouseReleasedEvent &event);
 
 	void Destroy();
 
-	void FillRenderCommand(video::RenderView &renderView);
 	bool IsIntersectRay(const Ray &ray, Vector3 *pOut);
 
 	float GetHeight(float x, float z);
 	float GetSlant(Vector3* pOut, float gravityPower, float x, float z);
+
+	void Render(const Camera &camear);
 
 	//void ElevateVertex();
 
@@ -113,7 +113,7 @@ private:
 	video::IndexBufferHandle _iHandle{};
 
 	video::VertexDeclHandle _declHandle{};
-	video::MaterialHandle _materialHandle{};
+	//video::MaterialHandle _materialHandle{};
 	video::EffectHandle _effect{};
 
 private:

@@ -275,6 +275,8 @@ namespace video
 		void SetTexture(const std::string &name, const Texture &texture) const;
 		void SetMaterial(const Material &material) const;
 		void SetInt(LPCSTR name, const int32 value) const;
+		void SetFloat(LPCSTR name, const float value) const;
+		void SetVector(LPCSTR name, const Vector4 &value) const;
 
 		void SetValue(LPCSTR name, void *value, size_t size);
 		void CommitChanges() const;

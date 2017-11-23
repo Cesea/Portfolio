@@ -235,6 +235,15 @@ namespace video
 	{
 		_ptr->SetInt(name, value);
 	}
+	void Effect::SetFloat(LPCSTR name, const float value) const
+	{
+		_ptr->SetFloat(name, value);
+	}
+
+	void Effect::SetVector(LPCSTR name, const Vector4 &value) const
+	{
+		_ptr->SetVector(name, &value);
+	}
 
 	void Effect::CommitChanges() const
 	{

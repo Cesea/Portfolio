@@ -13,19 +13,47 @@ Editor::~Editor()
 
 void Editor::RegisterEvents()
 {
-	EventChannel channel;
-	channel.Add<InputManager::MouseMoveEvent, Editor>(*this);
-	channel.Add<InputManager::MouseReleasedEvent, Editor>(*this);
-	channel.Add<InputManager::MousePressedEvent, Editor>(*this);
-	channel.Add<InputManager::MouseWheelEvent, Editor>(*this);
-	channel.Add<InputManager::KeyPressedEvent, Editor>(*this);
+}
+
+void Editor::ChangeEditState(EditMode mode)
+{
+	switch (mode)
+	{
+	case Editor::eNone:
+	{
+		_editing = false;
+		gEditorOn = false;
+	} break;
+	case Editor::eTerrainEdit:
+	{
+		_editing = true;
+		gEditorOn = true;
+	} break;
+	case Editor::eObjectEdit:
+	{
+		_editing = true;
+		gEditorOn = true;
+	} break;
+	}
+	_currentMode = mode;
+}
+
+void Editor::UpdateInput(const InputManager & input)
+{
+	_mx = input.mouse.GetCurrentPoint().x;
+	_my = input.mouse.GetCurrentPoint().y;
+	_mb = input.mouse.IsDown(MOUSE_BUTTON_LEFT);
+
+	_shiftDown = input.keyboard.GetShiftDown();
+	//Console::Log("%d\n", input.keyboard.GetVKCode());
+	_key = MapVirtualKey(input.keyboard.GetVKCode(), MAPVK_VK_TO_CHAR);
 }
 
 void Editor::Init()
 {
 	//strcpy(_name, "TerrainEditor");
 	//strcpy(_button, "Button");
-	strcpy(_collapse, "Collapse");
+	//strcpy(_collapse, "Collapse");
 	
 	this->RegisterEvents();
 }
@@ -38,97 +66,159 @@ void Editor::Shutdown()
 	}
 }
 
-void Editor::Edit(RefVariant &object)
+void Editor::Edit(RefVariant &object, const InputManager &input)
 {
-	ImguiBeginFrame(_mx, _my, _mb, _scroll, _key);
-	//Console::Log("%d, %d, %d \n", _mx, _my, _mb);
+	UpdateInput(input);
+	ImguiBeginFrame(_mx, _my, _mb, _scroll, _key, _shiftDown);
 
-	if (_editing == false)
+	switch (_currentMode)
+	{
+	case Editor::eNone:
 	{
 		if (ImguiCollapse("TerrainEditor", nullptr, _editing))
 		{
+			ChangeEditState(EditMode::eTerrainEdit);
+			
+		}
+		if (ImguiCollapse("ObjectEditor", nullptr, _editing))
+		{
+			ChangeEditState(EditMode::eObjectEdit);
 			_editing = true;
 			gEditorOn = true;
 		}
-	}
-	else
+
+	} break;
+	case Editor::eTerrainEdit:
 	{
 		ImguiBeginScrollArea("TerrainEditor", EDITORX, EDITORY, EDITORSIZEX, EDITORSIZEY, &_scroll);
 		if (ImguiCollapse("TerrainEditor", nullptr, _editing))
 		{
-			_editing = false;
-			gEditorOn = false;
+			ChangeEditState(EditMode::eNone);
 		}
 
-		if (!_pickingObject)
+		ImguiIndent();
+
+		if (false == _terrainEditor._editingRock)
 		{
-			if (ImguiButton("PickObject"))
+			if (ImguiCollapse("Rocks", nullptr, _terrainEditor._editingRock))
 			{
-				_pickingObject = !_pickingObject;
+				_terrainEditor._editingRock = !_terrainEditor._editingRock;
 			}
 		}
 		else
 		{
-			if (ImguiButton("PickObject"))
+			if (ImguiCollapse("Rocks", nullptr, _terrainEditor._editingRock))
 			{
-				_pickingObject = !_pickingObject;
+				_terrainEditor._editingRock = !_terrainEditor._editingRock;
+			}
+
+			ImguiIndent();
+			if (ImguiButton("Rock01"))
+			{
+				_terrainEditor._currentStaticHandle = VIDEO->GetStaticXMesh("Rock01");
+				_channel.Broadcast<BaseScene::SpawnEvent>(SpawnEvent());
+			}
+			if (ImguiButton("Rock02"))
+			{
+				_terrainEditor._currentStaticHandle = VIDEO->GetStaticXMesh("Rock02");
+			}
+			ImguiUnindent();
+		}
+		if (false == _terrainEditor._editingTree)
+		{
+			if (ImguiCollapse("Trees", nullptr, _terrainEditor._editingTree))
+			{
+				_terrainEditor._editingTree = !_terrainEditor._editingTree;
 			}
 		}
-		ImguiCollapse(_collapse, nullptr, false);
+		else
+		{
+			if (ImguiCollapse("Trees", nullptr, _terrainEditor._editingTree))
+			{
+				_terrainEditor._editingTree = !_terrainEditor._editingTree;
+			}
+			ImguiIndent();
+			if (ImguiButton("Tree01"))
+			{
+				_terrainEditor._currentStaticHandle = VIDEO->GetStaticXMesh("Tree01");
+			}
+			if (ImguiButton("Tree01"))
+			{
+				_terrainEditor._currentStaticHandle = VIDEO->GetStaticXMesh("Tree02");
+			}
+			ImguiUnindent();
+		}
 
-		ImguiSlider(_slider, &_val, -10, 10, 1.0f);
-		imguiEdit(_edit, 90);
+		if (false == _terrainEditor._editingGrass)
+		{
+			if (ImguiCollapse("Grass", nullptr, _terrainEditor._editingGrass))
+			{
+				_terrainEditor._editingGrass = !_terrainEditor._editingGrass;
+			}
+		}
+		else
+		{
+			if (ImguiCollapse("Grass", nullptr, _terrainEditor._editingGrass))
+			{
+				_terrainEditor._editingGrass = !_terrainEditor._editingGrass;
+			}
+			ImguiIndent();
+			if (ImguiButton("Grass"))
+			{
+				_terrainEditor._currentStaticHandle = VIDEO->GetStaticXMesh("Grass01");
+			}
+			if (ImguiButton("Grass"))
+			{
+				_terrainEditor._currentStaticHandle = VIDEO->GetStaticXMesh("Grass02");
+			}
+			ImguiUnindent();
+		}
 
 		ImguiEndScrollArea();
 
-		ImguiEndFrame();
+	} break;
 
-		_scroll = 0;
-		_key = 0;
+	case Editor::eObjectEdit:
+	{
+		ImguiBeginScrollArea("ObjectEditor", EDITORX, EDITORY, EDITORSIZEX, EDITORSIZEY, &_scroll);
+		if (ImguiCollapse("ObjectEditor", nullptr, _editing))
+		{
+			ChangeEditState(EditMode::eNone);
+		}
+
+		if (nullptr == _selectedEntity)
+		{
+			ImguiLabel("No Object Selected");
+			if (ImguiButton("Pick Object!"))
+			{
+				//_pickingObject = !_pickingObject;
+			}
+		}
+		else
+		{
+			if (ImguiButton("Object Selected"))
+			{
+				//_pickingObject = !_pickingObject;
+			}
+		}
+		//ImguiCollapse(_collapse, nullptr, false);
+
+		//ImguiSlider(_slider, &_val, -10, 10, 1.0f);
+
+		imguiEdit("Editor", 90);
+
+		ImguiEndScrollArea();
+	} break;
 	}
+
+	ImguiEndFrame();
+
 }
 
 void Editor::Render(video::RenderView * renderView)
 {
 }
 
-
-void Editor::Handle(const InputManager::MousePressedEvent & event)
-{
-	if (event.code == MOUSE_BUTTON_LEFT)
-	{
-		_mb = true;
-	}
-	_mx = event.coord.x;
-	_my = event.coord.y;
-}
-
-void Editor::Handle(const InputManager::MouseMoveEvent & event)
-{
-	_mx = event.current.x;
-	_my = event.current.y;
-}
-
-void Editor::Handle(const InputManager::MouseWheelEvent & event)
-{
-	_scroll = event.delta / 120;
-	Console::Log("%d\n", event.delta);
-}
-
-void Editor::Handle(const InputManager::MouseReleasedEvent & event)
-{
-	if (event.code == MOUSE_BUTTON_LEFT)
-	{
-		_mb = false;
-	}
-	_mx = event.coord.x;
-	_my = event.coord.y;
-}
-
-void Editor::Handle(const InputManager::KeyPressedEvent & event)
-{
-	_key = event.code;
-}
 
 void Gizmo::Init()
 {
@@ -137,3 +227,4 @@ void Gizmo::Init()
 void Brush::Init()
 {
 }
+

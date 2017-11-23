@@ -8,12 +8,19 @@
 class Camera
 {
 
+
 public:
+	float _fov;
+	float _camNear;
+	float _camFar;
+
 	Camera();
 	~Camera();
 
 	void PreUpdateMatrix();
 	void UpdateMatrix();
+	void UpdateCamToDevice();
+	void UpdateFrustum();
 
 	void SetMoveSpeed(float speed) { _moveSpeed = speed; }
 	void SetRotationSpeed(float speed) { _rotationSpeed = speed; }
@@ -42,9 +49,6 @@ public:
 
 protected:
 
-	float _fov;
-	float _camNear;
-	float _camFar;	
 
 	Matrix _matView;
 	Matrix _matProjection;

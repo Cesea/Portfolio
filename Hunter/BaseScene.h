@@ -12,45 +12,31 @@
 
 #include "Terrain.h"
 
-#include "Camera.h"
-
 #include "WorldEditor.h"
-
 #include "Player.h"
 
 
 class BaseScene : public IScene
 {
 	friend class Terrain;
-public :
-	BaseScene() 
+public:
+	BaseScene()
 		:_world(4096)
 	{};
 	virtual ~BaseScene() {}
 
-	virtual bool32 Load();
-	virtual bool32 Unload();
-
-	virtual bool32 Init();
-	virtual bool32 Update(float deltaTime);
-	virtual bool32 Render();
+	virtual bool Init();
+	virtual bool Update(float deltaTime, const InputManager &input);
+	virtual bool Render();
 
 	virtual void Release();
+	virtual const char *GetSceneName() { return "BaseScene"; }
 
-	virtual const char *GetSceneName();
-	virtual bool32 IsActive();
+protected:
 
-	void RegisterEvents();
-
-	void Handle(const InputManager::KeyPressedEvent &event);
-
-protected :
-
-protected :
+protected:
 	bool32 _active;
-private :
-	video::RenderView *_mainRenderView{};
-
+private:
 	World _world;
 	Camera _camera;
 
@@ -60,32 +46,23 @@ private :
 	ActionSystem _actionSystem;
 	std::vector<Entity> _entities;
 
-	video::StaticXMeshHandle _staticMeshHandle;
-	video::SkinnedXMeshHandle _skinnedMeshHandle;
-
-	std::vector<video::AnimationInstanceHandle> _animations;
-
-	video::EffectHandle _staticEffect;
-	video::EffectHandle _skinnedEffect;
-	video::EffectHandle _terrainEffect;
-
-	std::vector<Vector3> _points;
-
 	EventChannel _channel;
 
 	Editor *_editor{};
-	video::FontHandle _font;
 
 	Player _player;
 
-
-public :
+public:
 	struct SpawnEvent
 	{
 		SpawnEvent(const Vector3 &position)
 			:_position(position)
 		{}
+
+		bool32 _isStatic;
+
 		Vector3 _position;
+		char _name[32];
 	};
 	void Handle(const BaseScene::SpawnEvent &event);
 };

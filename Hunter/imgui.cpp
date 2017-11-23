@@ -140,6 +140,7 @@ struct GuiState
 	uint32 _widgetID;
 
 	uint32 _vkCode;
+	bool32 _shiftDown{false};
 };
 
 static GuiState gState;
@@ -239,7 +240,7 @@ static bool KeyLogic(uint32 id)
 	return result;
 }
 
-static void UpdateInput(int32 mx, int32 my, unsigned char mbut, int32 scroll, uint32 keyCode) 
+static void UpdateInput(int32 mx, int32 my, unsigned char mbut, int32 scroll, uint32 keyCode, bool32 shiftDown) 
 {
 	bool left = (mbut & ImguiMouseButton::eImguiMButtonLeft) != 0;
 
@@ -251,12 +252,17 @@ static void UpdateInput(int32 mx, int32 my, unsigned char mbut, int32 scroll, ui
 
 	gState._scroll = scroll;
 	gState._vkCode = keyCode;
+	gState._shiftDown = shiftDown;
 }
 
 
-void ImguiBeginFrame(int32 mx, int32 my, uint8 mbut, int32 scroll, uint32 keyCode)
+void ImguiBeginFrame(int32 mx, int32 my, uint8 mbut, int32 scroll, uint32 keyCode, bool32 shiftDown)
 {
-	UpdateInput(mx, my, mbut, scroll, keyCode);
+	UpdateInput(mx, my, mbut, scroll, keyCode, shiftDown);
+	if (keyCode != 0)
+	{
+		int a = 0;
+	}
 
 	gState._hot = gState._hotToBe;
 	gState._hotToBe = 0;
@@ -731,10 +737,10 @@ bool imguiEdit(char * text, int32 width, bool enable)
 			char mappedChar = MapVirtualKey(gState._vkCode, MAPVK_VK_TO_CHAR);
 			if (IsLetter(mappedChar))
 			{
-				//if (!gState.shiftDown)
-				//{
-				//	mappedChar += 32;
-				//}
+				if (!gState._shiftDown)
+				{
+					mappedChar += 32;
+				}
 			}
 			text[index] = mappedChar;
 		}

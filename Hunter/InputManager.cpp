@@ -50,12 +50,6 @@ void Keyboard::UpdateOnKeyDown(WPARAM wParam, LPARAM lParam)
 {
 	_currentState[wParam] = true;
 	_vkCode = wParam;
-
-}
-
-void Keyboard::UpdateOnChar(WPARAM wParam, LPARAM lParam)
-{
-	_vkCode = wParam;
 }
 
 void Keyboard::UpdateWithMessage(UINT msg, WPARAM wParam, LPARAM lParam)
@@ -72,17 +66,13 @@ void Keyboard::UpdateWithMessage(UINT msg, WPARAM wParam, LPARAM lParam)
 	{
 		this->UpdateOnKeyUp(wParam, lParam);
 	}break;
-	case WM_CHAR :
-	{
-		this->UpdateOnChar(wParam, lParam);
-	}break;
 	}
 }
 
 void Keyboard::Update()
 {
 	_vkCode = 0;
-	_shiftDown = _currentState[VK_SHIFT] ? true : false;
+	//_shiftDown = _currentState[VK_SHIFT] ? true : false;
 	for (int32 i = 0; i < 256; ++i)
 	{
 		if (IsDown(i))
@@ -96,6 +86,7 @@ void Keyboard::Update()
 		if (IsPressed(i))
 		{
 			_pParent->GetChannel().Broadcast<InputManager::KeyPressedEvent>(InputManager::KeyPressedEvent(i));
+			_vkCode = i;
 		}
 	}
 	memcpy(_oldState, _currentState, sizeof(bool) * 256);
@@ -141,36 +132,71 @@ void Mouse::UpdateWheelWithMessage(WPARAM wParam, LPARAM lParam)
 	_currentPoint.x = LOWORD(lParam);
 	_currentPoint.y = HIWORD(lParam);
 
-
 }
 
 void Mouse::Update()
 {
-	//constexpr로 버튼이 정의 되어있다
-	for (int32 i = 0; i < 3; ++i)
+	if (gEditorOn)
 	{
-		if (IsDown(i))
+		if (_currentPoint.x < EDITORX || _currentPoint.x > EDITORX + EDITORSIZEX &&
+			_currentPoint.y < EDITORY || _currentPoint.y > EDITORY + EDITORSIZEY)
 		{
-			_pParent->_channel.Broadcast<InputManager::MouseDownEvent>(InputManager::MouseDownEvent(i,
-				PointMake(_currentPoint.x, _currentPoint.y)));
-		}
-		if (IsReleased(i))
-		{
-			_pParent->_channel.Broadcast<InputManager::MouseReleasedEvent>(InputManager::MouseReleasedEvent(i,
-				PointMake(_currentPoint.x, _currentPoint.y)));
-		}
-		if (IsPressed(i))
-		{
-			_pParent->_channel.Broadcast<InputManager::MousePressedEvent>(InputManager::MousePressedEvent(i,
-				PointMake(_currentPoint.x, _currentPoint.y)));
-		}
-	}
+			//constexpr로 버튼이 정의 되어있다
+			for (int32 i = 0; i < 3; ++i)
+			{
+				if (IsDown(i))
+				{
+					_pParent->_channel.Broadcast<InputManager::MouseDownEvent>(InputManager::MouseDownEvent(i,
+						PointMake(_currentPoint.x, _currentPoint.y)));
+				}
+				if (IsReleased(i))
+				{
+					_pParent->_channel.Broadcast<InputManager::MouseReleasedEvent>(InputManager::MouseReleasedEvent(i,
+						PointMake(_currentPoint.x, _currentPoint.y)));
+				}
+				if (IsPressed(i))
+				{
+					_pParent->_channel.Broadcast<InputManager::MousePressedEvent>(InputManager::MousePressedEvent(i,
+						PointMake(_currentPoint.x, _currentPoint.y)));
+				}
+			}
 
-	if (_wheelDelta != 0)
-	{
-		_pParent->_channel.Broadcast<InputManager::MouseWheelEvent>(InputManager::MouseWheelEvent(_wheelDelta,
-			PointMake(_currentPoint.x, _currentPoint.y)));
+			if (_wheelDelta != 0)
+			{
+				_pParent->_channel.Broadcast<InputManager::MouseWheelEvent>(InputManager::MouseWheelEvent(_wheelDelta,
+					PointMake(_currentPoint.x, _currentPoint.y)));
+			}
+		}
 	}
+	else
+	{
+		//constexpr로 버튼이 정의 되어있다
+		for (int32 i = 0; i < 3; ++i)
+		{
+			if (IsDown(i))
+			{
+				_pParent->_channel.Broadcast<InputManager::MouseDownEvent>(InputManager::MouseDownEvent(i,
+					PointMake(_currentPoint.x, _currentPoint.y)));
+			}
+			if (IsReleased(i))
+			{
+				_pParent->_channel.Broadcast<InputManager::MouseReleasedEvent>(InputManager::MouseReleasedEvent(i,
+					PointMake(_currentPoint.x, _currentPoint.y)));
+			}
+			if (IsPressed(i))
+			{
+				_pParent->_channel.Broadcast<InputManager::MousePressedEvent>(InputManager::MousePressedEvent(i,
+					PointMake(_currentPoint.x, _currentPoint.y)));
+			}
+		}
+
+		if (_wheelDelta != 0)
+		{
+			_pParent->_channel.Broadcast<InputManager::MouseWheelEvent>(InputManager::MouseWheelEvent(_wheelDelta,
+				PointMake(_currentPoint.x, _currentPoint.y)));
+		}
+	}
+	
 
 	memcpy(_oldState, _currentState, sizeof(bool32) * 3);
 

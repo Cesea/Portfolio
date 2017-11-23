@@ -3,44 +3,9 @@
 
 namespace video
 {
-	EffectHandle StaticXMesh::sDefaultEffectHandle;
-	EffectHandle AnimationInstance::sDefaultEffectHandle;
-
-	////Free Function
-	TextureHandle LoadTextureWithStrings(const std::string &filePath, const std::string &fileName, const std::string &fileExtension, const std::string &userStr)
-	{
-		TextureHandle resultHandle;
-		//텍스쳐를 로드하는데 텍스쳐가 이미 있다면 그것을 반환하고
-		resultHandle = VIDEO->GetTexture(fileName + userStr + fileExtension);
-		if (!resultHandle.IsValid())
-		{
-			//만약 없다면 새로 로드한다
-			resultHandle = VIDEO->CreateTexture(filePath + fileName + userStr + fileExtension,
-				fileName + userStr + fileExtension);
-			//새로 로드한 텍스쳐가 유효하지 않다면
-			if (!resultHandle.IsValid())
-			{
-				//기본 흰 텍스쳐를 불러온다
-				if (userStr == ".")
-				{
-					resultHandle = VIDEO->GetTexture("diffuseDefault.png");
-				}
-				else if (userStr == "_N.")
-				{
-					resultHandle = VIDEO->GetTexture("normalDefault.png");
-				}
-				else if (userStr == "_S.")
-				{
-					resultHandle = VIDEO->GetTexture("specularDefault.png");
-				}
-				else if (userStr == "_E.")
-				{
-					resultHandle = VIDEO->GetTexture("emissionDefault.png");
-				}
-			}
-		}
-		return resultHandle;
-	}
+	EffectHandle StaticXMesh::_sEffectHandle;
+	EffectHandle SkinnedXMesh::_sSkinnedEffectHandle;
+	EffectHandle SkinnedXMesh::_sStaticEffectHandle;
 
 	void ResizeMeshAndGetInfos(ID3DXMesh *pMesh, const Matrix &correction,
 		MeshVertInfo *pOutVertInfo, MeshBoundInfo *pOutBoundInfo)
@@ -228,6 +193,26 @@ namespace video
 		pOutBoundInfo->_radius = D3DXVec3Length(&(pOutBoundInfo->_center - pOutBoundInfo->_min));
 	}
 
+	void StaticXMesh::SetCamera(const Camera & camera)
+	{
+		Matrix matViewProj = camera.GetViewProjectionMatrix();
+		video::Effect *pEffect = VIDEO->GetEffect(_sEffectHandle);
+
+		pEffect->SetMatrix("matViewProjection", matViewProj);
+
+		Vector3 vEyePos = camera.GetTransform().GetWorldPosition();
+
+		pEffect->_ptr->SetVector("vEyePos", &D3DXVECTOR4(vEyePos, 1));
+		pEffect->_ptr->SetFloat("camFar", camera._camFar);
+		pEffect->_ptr->SetFloat("camNear", camera._camNear);
+	}
+
+	void StaticXMesh::SetBaseLight(DirectionalLight * pDirectional)
+	{
+		video::Effect *pEffect = VIDEO->GetEffect(_sEffectHandle);
+		pEffect->SetMatrix("baseDirectionalLight", pDirectional->GetLightMatrix());
+	}
+
 	bool StaticXMesh::Create(const std::string & fileName, const Matrix * matCorrection)
 	{
 		DWORD dwMatNum{};
@@ -243,51 +228,128 @@ namespace video
 			return false;
 		}
 		_numMaterial = dwMatNum;
-		_materialHandles.reserve(_numMaterial + 1);
-		_submeshBoundInfos.reserve(_numMaterial + 1);
+		//_materialHandles.reserve(_numMaterial + 1);
+		//_submeshBoundInfos.reserve(_numMaterial + 1);
 
-
-
-		std::string stringCopy = fileName;
-		std::string name;
+		//로딩 경로에서 파일명만 제거하고 경로만 받는다.
 		std::string path;
-		std::string extension;
+		int lastPathIndex = 0;		//마지막 \ 의 위치
 
-		SplitFilePathToNamePathExtension(stringCopy, name, path, extension);
+									//filePath.find_first_of( 'A' );		filePath 문자열에 'A' 가 들어있는 위치 리턴 ( 앞에서 부터 검색 )
+		lastPathIndex = fileName.find_last_of('/');		//뒤에서 부터 검색
+		if (lastPathIndex == -1) 
+		{			
+			lastPathIndex = fileName.find_last_of('\\');	
+		}
+		//경로 구분이 있다면...
+		if (lastPathIndex != -1) 
+		{
+			path = fileName.substr(0, lastPathIndex + 1);
+		}
 
-		std::string textureExtension;		//파일 확장자 명
-		std::string textureFileName;		//파일 명	
+		//Texture 로딩시 필요한 문자열들..
+		std::string texFilePath;	//최종 경로...
+		std::string texExp;			//파일 확장자 명
+		std::string texFile;		//파일 명	
 
 		LPD3DXMATERIAL pMaterials = (LPD3DXMATERIAL)pMaterial->GetBufferPointer();
 
 		for (uint32 i = 0; i < this->_numMaterial; i++)
 		{
+			//로드된 메터리얼
 			D3DMATERIAL9 mtrl = pMaterials[i].MatD3D;
 
+			//메쉬의 메터리얼에는 Ambient 정보가 없으니
+			//Diffuse 정보와 동일하게 하자..
+			mtrl.Ambient = mtrl.Diffuse;
+
+			//메터리얼 정보 푸쉬
+			_materials.push_back(mtrl);
+
 			//메터리얼의 Texture 정보가 있다면..
-			if (nullptr != pMaterials[i].pTextureFilename)
+			if (pMaterials[i].pTextureFilename != nullptr)
 			{
+
 				//tex 파일경로는 Mesh 파일경로 + texture 파일이름
-				std::string textureString = pMaterials[i].pTextureFilename;
-				SplitNameToNameExtension(textureString, textureFileName, textureExtension);
+				texFilePath = path + pMaterials[i].pTextureFilename;
+				//Texture 로딩하고 푸쉬
+				video::TextureHandle diffuseHandle = VIDEO->GetTexture(texFilePath);
+				if (!diffuseHandle.IsValid())
+				{
+					_diffuseTextures.push_back(VIDEO->CreateTexture(texFilePath, texFilePath));
+				}
 
-				TextureHandle diffuse = LoadTextureWithStrings(path, textureFileName, textureExtension, ".");
-				TextureHandle normal = LoadTextureWithStrings(path, textureFileName, textureExtension, "_N.");
-				TextureHandle specular = LoadTextureWithStrings(path, textureFileName, textureExtension, "_S.");
-				TextureHandle emission = LoadTextureWithStrings(path, textureFileName, textureExtension, "_E.");
+				//파일 이름과 확장자 위치
+				int dotIndex = texFilePath.find_last_of(".");
 
-				MaterialHandle material = VIDEO->CreateMaterial(textureFileName);
-				VIDEO->MaterialAddTexture(material, VIDEO_TEXTURE_DIFFUSE, diffuse);
-				VIDEO->MaterialAddTexture(material, VIDEO_TEXTURE_NORMAL, normal);
-				VIDEO->MaterialAddTexture(material, VIDEO_TEXTURE_SPECULAR, specular);
-				VIDEO->MaterialAddTexture(material, VIDEO_TEXTURE_EMISSIVE, emission);
+				//파일 명과 확장자를 나눈다.
+				texFile = texFilePath.substr(0, dotIndex);
+				texExp = texFilePath.substr(dotIndex + 1, fileName.length());
 
-				_materialHandles.push_back(material);
+				//
+				// 노말말 맵은 _N 이 붙는다.
+				//
+				texFilePath = texFile + "_N." + texExp;
+
+				video::TextureHandle normalHandle = VIDEO->GetTexture(texFilePath);
+				if (!normalHandle.IsValid())
+				{
+					video::TextureHandle loadedHandle = VIDEO->CreateTexture(texFilePath, texFilePath);
+					if (!loadedHandle.IsValid())
+					{
+						_normalTextures.push_back(VIDEO->GetTexture("normalDefault.png"));
+					}
+					else
+					{
+						_normalTextures.push_back(loadedHandle);
+					}
+				}
+
+
+				//
+				// 스펙큘러 맵은 _S 이 붙는다.
+				//
+				texFilePath = texFile + "_S." + texExp;
+				video::TextureHandle specularHandle = VIDEO->GetTexture(texFilePath);
+				if (!specularHandle.IsValid())
+				{
+					video::TextureHandle loadedHandle = VIDEO->CreateTexture(texFilePath, texFilePath);
+					if (!loadedHandle.IsValid())
+					{
+						_specularTextures.push_back(VIDEO->GetTexture("specularDefault.png"));
+					}
+					else
+					{
+						_specularTextures.push_back(loadedHandle);
+					}
+				}
+
+
+				//
+				// 이미션 맵은 _E 이 붙는다.
+				//
+				texFilePath = texFile + "_E." + texExp;
+				video::TextureHandle emissionHandle = VIDEO->GetTexture(texFilePath);
+				if (!emissionHandle.IsValid())
+				{
+					video::TextureHandle loadedHandle = VIDEO->CreateTexture(texFilePath, texFilePath);
+					if (!loadedHandle.IsValid())
+					{
+						_emissionTexture.push_back(VIDEO->GetTexture("emissionDefault.png"));
+					}
+					else
+					{
+						_emissionTexture.push_back(loadedHandle);
+					}
+				}
 			}
+
 			else
 			{
-				MaterialHandle material = VIDEO->GetMaterial("Default");
-				_materialHandles.push_back(material);
+				_diffuseTextures.push_back(VIDEO->GetTexture("diffuseDefault.png"));
+				_normalTextures.push_back(VIDEO->GetTexture("normalDefault.png"));
+				_specularTextures.push_back(VIDEO->GetTexture("specularDefault.png"));
+				_emissionTexture.push_back(VIDEO->GetTexture("emissionDefault.png"));
 			}
 		}
 
@@ -315,9 +377,6 @@ namespace video
 			ResizeMeshAndGetInfos(_pMesh, matIden, &_meshVertInfo, &_meshBoundInfo);
 		}
 
-		_vHandle = VIDEO->GetVertexBufferFromXMesh(_pMesh);
-		_iHandle = VIDEO->GetIndexBufferFromXMesh(_pMesh);
-
 		BuidSubMeshBoundInfo();
 	}
 
@@ -326,8 +385,6 @@ namespace video
 		COM_RELEASE(_pMesh);
 		SAFE_DELETE_ARRAY(_attributeRange);
 
-		VIDEO->DestroyVertexBuffer(_vHandle);
-		VIDEO->DestroyIndexBuffer(_iHandle);
 	}
 
 	//TODO : Implement this
@@ -342,32 +399,89 @@ namespace video
 		//}
 	}
 
-	void StaticXMesh::FillRenderCommand(RenderView &renderView, video::EffectHandle effect, const Matrix *pMatrix)
+	void StaticXMesh::Render(const TransformComponent & transform)
 	{
-		MatrixCache::CacheRange range;
-		if (nullptr != pMatrix)
+		//월드행렬 셋팅
+
+		video::Effect *pEffect = VIDEO->GetEffect(_sEffectHandle);
+
+		Matrix matWorld = transform.GetFinalMatrix();
+		pEffect->SetMatrix("matWorld", matWorld);
+
+		//광원 방향 일단...
+		Vector4 lightDir(1, -1, 1, 1);
+		pEffect->SetVector("vLightDir", lightDir);
+
+		//라이트 컬러 일단 흰색
+		Vector4 lightColor(1, 1, 1, 1);
+		pEffect->SetVector("vLightColor", lightColor);
+
+		//Effect 로 그리기 시작
+		pEffect->SetTechnique("Base");
+
+		uint32 passNum = pEffect->BeginEffect();
+
+		for (uint32 i = 0; i < passNum; i++)
 		{
-			range = renderView._matrixCache.Add(pMatrix);
+			pEffect->BeginPass(i);
 
+			for (uint32 m = 0; m < this->_numMaterial; m++) 
+			{
+				////텍스쳐 셋팅
+				pEffect->SetTexture("Diffuse_Tex", *VIDEO->GetTexture(_diffuseTextures[m]));
+				pEffect->SetTexture("Normal_Tex", *VIDEO->GetTexture(_normalTextures[m]));
+				pEffect->SetTexture("Specular_Tex", *VIDEO->GetTexture(_specularTextures[m]));
+				pEffect->SetTexture("Emission_Tex", *VIDEO->GetTexture(_emissionTexture[m]));
+				////스펙파워
+				pEffect->SetFloat("fSpecPower", this->_materials[m].Power);
+
+
+				//Begin 이 들어오고 난후 값이 바뀌면 다음과 같이 실행
+				pEffect->CommitChanges();
+
+				_pMesh->DrawSubset(m);
+			}
+			pEffect->EndPass();
 		}
+		pEffect->EndEffect();
+	}
 
-		for (uint32 i = 0; i < _numMaterial; ++i)
-		{
-			RenderCommand &command = renderView.GetCommand();
-			command._drawType = RenderCommand::DrawType::eStatic;
+	void SkinnedXMesh::SetCamera(const Camera & camera)
+	{
+		Matrix matViewProj = camera.GetViewProjectionMatrix();
+		video::Effect *pSkinned = VIDEO->GetEffect(_sSkinnedEffectHandle);
 
-			command._vHandle = _vHandle;
-			command._iHandle = _iHandle;
-			command._cacheRange = range;
+		pSkinned->SetMatrix("matViewProjection", matViewProj);
 
-			command._startIndex = _attributeRange[i].FaceStart * 3;
-			command._numVertices = _attributeRange[i].VertexCount;
-			command._numPrim = _attributeRange[i].FaceCount;
+		Vector3 vEyePos = camera.GetTransform().GetWorldPosition();
 
-			command._primType = RenderCommand::PrimType::eTriangleList;
-			command._materialHandle = _materialHandles[i];
-			command._effectHandle = effect;
-		}
+		pSkinned->_ptr->SetVector("vEyePos", &Vector4(vEyePos, 1));
+		pSkinned->_ptr->SetFloat("camFar", camera._camFar);
+		pSkinned->_ptr->SetFloat("camNear", camera._camNear);
+
+		video::Effect *pStatic = VIDEO->GetEffect(_sStaticEffectHandle);
+
+		pStatic->SetMatrix("matViewProjection", matViewProj);
+
+		vEyePos = camera.GetTransform().GetWorldPosition();
+
+		pStatic->_ptr->SetVector("vEyePos", &Vector4(vEyePos, 1));
+		pStatic->_ptr->SetFloat("camFar", camera._camFar);
+		pStatic->_ptr->SetFloat("camNear", camera._camNear);
+
+	}
+
+	void SkinnedXMesh::SetBaseLight(DirectionalLight * pDirectional)
+	{
+		video::Effect *pSkinned = VIDEO->GetEffect(_sSkinnedEffectHandle);
+		video::Effect *pStatic = VIDEO->GetEffect(_sStaticEffectHandle);
+
+		pSkinned->SetMatrix("baseDirectionalLight", pDirectional->GetLightMatrix());
+		pStatic->SetMatrix("baseDirectionalLight", pDirectional->GetLightMatrix());
+	}
+
+	void SkinnedXMesh::SetTechniqueName(const std::string & name)
+	{
 	}
 
 	//Skinned XMesh ////////////////////////////////////////////////////////
@@ -383,7 +497,21 @@ namespace video
 		}
 
 		BoneHierachy boneHierachy;
-		boneHierachy.SetFilePath(fileName);
+		std::string path;
+		int lastPathIndex = 0;		//마지막 \ 의 위치
+
+		lastPathIndex = fileName.find_last_of('/');		//뒤에서 부터 검색
+		if (lastPathIndex == -1)
+		{
+			lastPathIndex = fileName.find_last_of('\\');
+		}
+		//경로 구분이 있다면...
+		if (lastPathIndex != -1)
+		{
+			path = fileName.substr(0, lastPathIndex + 1);
+		}
+
+		boneHierachy.SetFilePath(path);
 		boneHierachy.SetSkinnedMesh(this);
 
 		if (FAILED(D3DXLoadMeshHierarchyFromX(fileName.c_str(), D3DXMESH_MANAGED, gpDevice,
@@ -456,6 +584,21 @@ namespace video
 		}
 	}
 
+	void SkinnedXMesh::Update(const Matrix * pWorld)
+	{
+		Matrix finalWorld;
+		if (nullptr != pWorld)
+		{
+			finalWorld = _matCorrection * (*pWorld);
+		}
+		else
+		{
+			finalWorld = _matCorrection;
+		}
+
+		UpdateMatrices(_pRootBone, &finalWorld);
+	}
+
 	void SkinnedXMesh::UpdateMatrices(Bone * pBone, Matrix *pParentMatrix) const
 	{
 		if (nullptr == pBone)
@@ -487,20 +630,143 @@ namespace video
 		}
 	}
 
-	void SkinnedXMesh::Update(const Matrix * pWorld)
+	void SkinnedXMesh::Render(const TransformComponent & transform)
 	{
-		Matrix finalWorld;
-		if (nullptr != pWorld)
+		Matrix matFinal;
+
+		//Transform 이 들어왔다면...
+		Matrix matWorld = transform.GetFinalMatrix();
+		matFinal = _matCorrection * matWorld;
+
+		video::Effect *pSkinnedEffect = VIDEO->GetEffect(_sSkinnedEffectHandle);
+		pSkinnedEffect->SetTechnique("SkinnedMesh");
+		pSkinnedEffect->SetMatrix("matWorld", matFinal);
+
+		//pStaticEffect->SetTechnique("SkinnedMesh");
+		//pStaticEffect->SetMatrix("matWorld", matFinal);
+
+		//행렬 업데이트 
+		Update(&transform.GetFinalMatrix());
+
+		//루트 본부터 타고 들어간다.
+		RenderBone((Bone*)_pRootBone);
+	}
+
+	void SkinnedXMesh::RenderBone(Bone * pBone)
+	{
+		if (nullptr == pBone)
 		{
-			finalWorld = _matCorrection * (*pWorld);
-		}
-		else
-		{
-			finalWorld = _matCorrection;
+			return;
 		}
 
-		UpdateMatrices(_pRootBone, &finalWorld);
+		//본에 메쉬 컨테이너가 존재한다면 그려야한다.
+		if (pBone->pMeshContainer)
+		{
+
+			//본에 있는 메쉬 컨테이너는 BONE_MESH 이다
+			BoneMesh* pBoneMesh = (BoneMesh*)pBone->pMeshContainer;
+
+			//본 컴비네이션 정보가  
+			if (nullptr != pBoneMesh->BufBoneCombos)
+			{
+				video::Effect *pSkinnedEffect = VIDEO->GetEffect(_sSkinnedEffectHandle);
+
+				//해당 본의 컴비네이션 정보를 얻는다.
+				LPD3DXBONECOMBINATION pBoneComb =
+					(LPD3DXBONECOMBINATION)(pBoneMesh->BufBoneCombos->GetBufferPointer());
+
+				//본에 물려있는 메쉬의 서브셋갯수을 속성그룹수와 같다
+				for (DWORD i = 0; i < pBoneMesh->NumAttributesGroup; i++)
+				{
+					//해당 속성의 팔래트 엔트리 수만큼 돌면서 작업용 팔래트 행렬 갱신
+					for (DWORD palEntry = 0; palEntry < pBoneMesh->NumPaletteEntries; palEntry++)
+					{
+						//적용되는 행렬 ID 를 얻는다
+						DWORD dwMatrixIndex = pBoneComb[i].BoneId[palEntry];
+
+						//행렬 인덱스가 유효하다면...
+						if (dwMatrixIndex != UINT_MAX)
+						{
+							//작업 앵렬을 만든다.
+							D3DXMatrixMultiply(&_workingPalettes[palEntry],
+								&(pBoneMesh->pBoneOffsetMatices[dwMatrixIndex]),
+								pBoneMesh->ppBoneMatrixPtrs[dwMatrixIndex]);
+						}
+					}
+
+					//위에서 셋팅됭 작업행렬을 Effect 팔래스에 적용한다.
+					pSkinnedEffect->SetMatrices( "amPalette", _workingPalettes, pBoneMesh->NumPaletteEntries);
+
+					//적용되는 정점의 본최대 영향수 를 대입 최대 영향수  -1 
+					pSkinnedEffect->SetInt("CurNumBones", pBoneMesh->MaxNumFaceInfls - 1);
+
+					//메터리얼 인덱스
+					DWORD materialIndex = pBoneComb[i].AttribId;
+
+					//텍스쳐 셋팅
+					pSkinnedEffect->SetTexture("Diffuse_Tex", *VIDEO->GetTexture(pBoneMesh->_diffuseTextures[materialIndex]));
+					pSkinnedEffect->SetTexture("Specular_Tex", *VIDEO->GetTexture(pBoneMesh->_specularTextures[materialIndex]));
+					pSkinnedEffect->SetTexture("Normal_Tex", *VIDEO->GetTexture(pBoneMesh->_normalTextures[materialIndex]));
+					pSkinnedEffect->SetTexture("Emission_Tex", *VIDEO->GetTexture(pBoneMesh->_emissionTexture[materialIndex]));
+					pSkinnedEffect->SetFloat("fSpecPower", pBoneMesh->_materials[materialIndex].Power);
+
+					pSkinnedEffect->CommitChanges();
+
+					uint32 numPass = pSkinnedEffect->BeginEffect();
+					for (uint32 p = 0; p < numPass; ++p)
+					{
+						pSkinnedEffect->BeginPass(p);
+						pBoneMesh->WorkingMesh->DrawSubset(i);
+						pSkinnedEffect->EndPass();
+					}
+					pSkinnedEffect->EndEffect();
+				}
+			}
+			else
+			{
+
+				video::Effect *pStaticEffect = VIDEO->GetEffect(_sStaticEffectHandle);
+				pStaticEffect->SetMatrix("matWorld", pBone->CombinedTransformationMatrix);
+				for (DWORD i = 0; i < pBoneMesh->NumAttributesGroup; i++)
+				{
+					//pBoneMesh->_attributeRange[i].AttribId;
+					pStaticEffect->SetTexture("Diffuse_Tex", *VIDEO->GetTexture(pBoneMesh->_diffuseTextures[i]));
+					pStaticEffect->SetTexture("Specular_Tex", *VIDEO->GetTexture(pBoneMesh->_specularTextures[i]));
+					pStaticEffect->SetTexture("Normal_Tex", *VIDEO->GetTexture(pBoneMesh->_normalTextures[i]));
+					pStaticEffect->SetTexture("Emission_Tex", *VIDEO->GetTexture(pBoneMesh->_emissionTexture[i]));
+					pStaticEffect->SetFloat("fSpecPower", pBoneMesh->_materials[i].Power);
+
+					pStaticEffect->CommitChanges();
+
+					uint32 numPass = pStaticEffect->BeginEffect();
+					for (uint32 p = 0; p < numPass; ++p)
+					{
+						pStaticEffect->BeginPass(p);
+						pBoneMesh->MeshData.pMesh->DrawSubset(i);
+						pStaticEffect->EndPass();
+					}
+					pStaticEffect->EndEffect();
+
+				}
+				
+			}
+		}
+
+
+		//이웃 본이 존재한다면...
+		if (pBone->pFrameSibling)
+		{
+			RenderBone((Bone*)pBone->pFrameSibling);
+		}
+
+		//자식 본이 존재한다면...
+		if (pBone->pFrameFirstChild)
+		{
+			RenderBone((Bone*)pBone->pFrameFirstChild);
+		}
 	}
+
+	
 
 	//Skinned Animation ////////////////////////////////////////////////////////
 	bool AnimationInstance::Create(video::SkinnedXMeshHandle handle)
@@ -512,10 +778,6 @@ namespace video
 
 		_pSkinnedMesh = VIDEO->GetSkinnedXMesh(handle);
 		Assert(_pSkinnedMesh);
-
-		_numPalette = _pSkinnedMesh->_numWorkingPalette;
-		Assert(_numPalette);
-		_workingPalettes = new Matrix[_numPalette];
 
 		//SKinned Mesh 에 Animation 를 복사한다.
 		_pSkinnedMesh->_pAnimationController->CloneAnimationController(
@@ -532,102 +794,6 @@ namespace video
 		COM_RELEASE(_pAnimationController);
 	}
 
-	void AnimationInstance::FillRenderCommand(RenderView & renderView, 
-		video::EffectHandle skinnedEffect, video::EffectHandle staticEffect)
-	{
-		FillRenderCommandInternal(renderView, skinnedEffect, staticEffect, _pSkinnedMesh->_pRootBone);
-	}
-
-	void AnimationInstance::FillRenderCommandInternal(RenderView & renderView, 
-		video::EffectHandle skinnedEffect, video::EffectHandle staticEffect, Bone *pBone)
-	{
-		if (nullptr == pBone)
-		{
-			return;
-		}
-
-		if (pBone->pMeshContainer)
-		{
-			BoneMesh* pBoneMesh = (BoneMesh*)pBone->pMeshContainer;
-
-			//만약 본이 있고 스킨 정보가 있다면
-			if (nullptr != pBoneMesh->BufBoneCombos)
-			{
-				LPD3DXBONECOMBINATION pBoneCombinations = (LPD3DXBONECOMBINATION)pBoneMesh->BufBoneCombos->GetBufferPointer();
-				for (uint32 i = 0; i < pBoneMesh->NumAttributesGroup; ++i)
-				{
-					//해당 속성의 팔래트 엔트리 수만큼 돌면서 작업용 팔래트 행렬 갱신
-					for (uint32 palEntry = 0; palEntry < pBoneMesh->NumPaletteEntries; palEntry++)
-					{
-						//적용되는 행렬 ID 를 얻는다
-						DWORD dwMatrixIndex = pBoneCombinations[i].BoneId[palEntry];
-
-						//행렬 인덱스가 유효하다면...
-						if (dwMatrixIndex != UINT_MAX)
-						{
-							//작업 앵렬을 만든다.
-							MatrixMultiply(&_workingPalettes[palEntry],
-								&(pBoneMesh->pBoneOffsetMatices[dwMatrixIndex]),
-								pBoneMesh->ppBoneMatrixPtrs[dwMatrixIndex]);
-						}
-					}
-
-					MatrixCache::CacheRange range = renderView._matrixCache.Add(_workingPalettes, _numPalette);
-
-					Assert(pBoneMesh->_vHandle.IsValid());
-
-					RenderCommand &command = renderView.GetCommand();
-					command._drawType = RenderCommand::DrawType::eAnimated;
-					command._vertInfluence = pBoneMesh->MaxNumFaceInfls;
-
-					command._vHandle = pBoneMesh->_vHandle;
-					command._iHandle = pBoneMesh->_iHandle;
-					command._cacheRange = range;
-
-					command._startIndex = pBoneCombinations[i].FaceStart * 3;
-					command._numVertices = pBoneCombinations[i].VertexCount;
-					command._numPrim = pBoneCombinations[i].FaceCount;
-
-					command._primType = RenderCommand::PrimType::eTriangleList;
-					command._materialHandle = pBoneMesh->_materialHandles[i];
-					command._effectHandle = skinnedEffect;
-				}
-			}
-			//스킨 정보가 없다면...
-			else
-			{
-				MatrixCache::CacheRange range = renderView._matrixCache.Add(&pBone->CombinedTransformationMatrix);
-				Assert(pBoneMesh->_attributeRange);
-				for (uint32 i = 0; i < pBoneMesh->NumMaterials; ++i)
-				{
-					RenderCommand &command = renderView.GetCommand();
-					command._drawType = RenderCommand::DrawType::eStatic;
-
-					command._vHandle = pBoneMesh->_vHandle;
-					command._iHandle = pBoneMesh->_iHandle;
-					command._cacheRange = range;
-
-					command._startIndex = pBoneMesh->_attributeRange[i].FaceStart * 3;
-					command._numVertices = pBoneMesh->_attributeRange[i].VertexCount;
-					command._numPrim = pBoneMesh->_attributeRange[i].FaceCount;
-
-					command._primType = RenderCommand::PrimType::eTriangleList;
-					command._materialHandle = pBoneMesh->_materialHandles[i];
-					command._effectHandle = staticEffect;
-				}
-
-			}
-		}
-
-		if (pBone->pFrameSibling)
-		{
-			FillRenderCommandInternal(renderView, skinnedEffect, staticEffect, (Bone*)pBone->pFrameSibling);
-		}
-		if (pBone->pFrameFirstChild)
-		{
-			FillRenderCommandInternal(renderView, skinnedEffect, staticEffect, (Bone*)pBone->pFrameFirstChild);
-		}
-	}
 }
 
 void BoneHierachy::SetSkinnedMesh(video::SkinnedXMesh *pSkinnedMesh)
@@ -707,47 +873,131 @@ STDMETHODIMP BoneHierachy::CreateMeshContainer(LPCSTR Name, CONST D3DXMESHDATA *
 	boneMesh->pAdjacency = new DWORD[numAdjacency];							//인접 정보의 수만큼 증가
 	memcpy(boneMesh->pAdjacency, pAdjacency, sizeof(DWORD) * numAdjacency);
 
-	std::string PathCopy = _filePath;
-	std::string name;
-	std::string path;
-	std::string extension;
 
-	SplitFilePathToNamePathExtension(PathCopy, name, path, extension);
 
-	std::string textureFileName;
-	std::string textureExtension;
 
-	std::string texPath = path;
+	std::string texFilePath;
+	std::string texExp;			//파일 확장자 명
+	std::string texFile;		//파일 명`
+
+	std::string texPath;
 
 	//여기서 Material정보 가져오자..
 	boneMesh->NumMaterials = NumMaterials;
 	boneMesh->pMaterials = new D3DXMATERIAL[NumMaterials];
 	for (uint32 i = 0; i < NumMaterials; i++)
 	{
+		//로드된 메터리얼
+		D3DMATERIAL9 mtrl = pMaterials[i].MatD3D;
+
+		//메쉬의 메터리얼에는 Ambient 정보가 없으니
+		//Diffuse 정보와 동일하게 하자..
+		mtrl.Ambient = mtrl.Diffuse;
+
+		//메터리얼 정보 푸쉬
+		boneMesh->_materials.push_back(mtrl);
+
 		//메터리얼의 Texture 정보가 있다면..
-		if (nullptr != pMaterials[i].pTextureFilename)
+		if (pMaterials[i].pTextureFilename != nullptr)
 		{
+			//이름 깊은 복사
+			int len = strlen(pMaterials[i].pTextureFilename);
+			boneMesh->pMaterials[i].pTextureFilename = new char[len + 1];
+			strcpy_s(boneMesh->pMaterials[i].pTextureFilename, len + 1, pMaterials[i].pTextureFilename);
+
 			//tex 파일경로는 Mesh 파일경로 + texture 파일이름
-			std::string textureString = pMaterials[i].pTextureFilename;
-			SplitNameToNameExtension(textureString, textureFileName, textureExtension);
+			texFilePath = this->_filePath+ pMaterials[i].pTextureFilename;
+			//Texture 로딩하고 푸쉬
+			video::TextureHandle diffuseHandle = VIDEO->GetTexture(texFilePath);
+			if (!diffuseHandle.IsValid())
+			{
+				video::TextureHandle loadedHandle = VIDEO->CreateTexture(texFilePath, texFilePath);
+				if (!loadedHandle.IsValid())
+				{
+					boneMesh->_diffuseTextures.push_back(VIDEO->GetTexture("diffuseDefault.png"));
+				}
+				else
+				{
+					boneMesh->_diffuseTextures.push_back(loadedHandle);
+				}
+			}
+			else
+			{
+				boneMesh->_diffuseTextures.push_back(diffuseHandle);
+			}
 
-			video::TextureHandle diffuse = video::LoadTextureWithStrings(path, textureFileName, textureExtension, ".");
-			video::TextureHandle normal = video::LoadTextureWithStrings(path, textureFileName, textureExtension, "_N.");
-			video::TextureHandle specular = video::LoadTextureWithStrings(path, textureFileName, textureExtension, "_S.");
-			video::TextureHandle emission = video::LoadTextureWithStrings(path, textureFileName, textureExtension, "_E.");
+			//파일 이름과 확장자 위치
+			int dotIndex = texFilePath.find_last_of(".");
 
-			video::MaterialHandle material = VIDEO->CreateMaterial(textureFileName);
-			VIDEO->MaterialAddTexture(material, VIDEO_TEXTURE_DIFFUSE, diffuse);
-			VIDEO->MaterialAddTexture(material, VIDEO_TEXTURE_NORMAL, normal);
-			VIDEO->MaterialAddTexture(material, VIDEO_TEXTURE_SPECULAR, specular);
-			VIDEO->MaterialAddTexture(material, VIDEO_TEXTURE_EMISSIVE, emission);
+			//파일 명과 확장자를 나눈다.
+			texFile = texFilePath.substr(0, dotIndex);
+			texExp = texFilePath.substr(dotIndex + 1, texPath.length());
 
-			boneMesh->_materialHandles.push_back(material);
+			texFilePath = texFile + "_N." + texExp;
+
+			video::TextureHandle normalHandle = VIDEO->GetTexture(texFilePath);
+			if (!normalHandle.IsValid())
+			{
+				video::TextureHandle loadedHandle = VIDEO->CreateTexture(texFilePath, texFilePath);
+				if (!loadedHandle.IsValid())
+				{
+					boneMesh->_normalTextures.push_back(VIDEO->GetTexture("normalDefault.png"));
+				}
+				else
+				{
+					boneMesh->_normalTextures.push_back(loadedHandle);
+				}
+			}
+			else
+			{
+				boneMesh->_normalTextures.push_back(normalHandle);
+			}
+
+			texFilePath = texFile + "_S." + texExp;
+			video::TextureHandle specularHandle = VIDEO->GetTexture(texFilePath);
+			if (!specularHandle.IsValid())
+			{
+				video::TextureHandle loadedHandle = VIDEO->CreateTexture(texFilePath, texFilePath);
+				if (!loadedHandle.IsValid())
+				{
+					boneMesh->_specularTextures.push_back(VIDEO->GetTexture("specularDefault.png"));
+				}
+				else
+				{
+					boneMesh->_specularTextures.push_back(loadedHandle);
+				}
+			}
+			else
+			{
+				boneMesh->_specularTextures.push_back(specularHandle);
+			}
+
+			texFilePath = texFile + "_E." + texExp;
+			video::TextureHandle emissionHandle = VIDEO->GetTexture(texFilePath);
+			if (!emissionHandle.IsValid())
+			{
+				video::TextureHandle loadedHandle = VIDEO->CreateTexture(texFilePath, texFilePath);
+				if (!loadedHandle.IsValid())
+				{
+					boneMesh->_emissionTexture.push_back(VIDEO->GetTexture("emissionDefault.png"));
+				}
+				else
+				{
+					boneMesh->_emissionTexture.push_back(loadedHandle);
+				}
+			}
+			else
+			{
+				boneMesh->_emissionTexture.push_back(emissionHandle);
+			}
+
 		}
 		else
 		{
-			video::MaterialHandle material = VIDEO->GetMaterial("default");
-			boneMesh->_materialHandles.push_back(material);
+			boneMesh->_diffuseTextures.push_back(VIDEO->GetTexture("diffuseDefault.png"));
+			boneMesh->_normalTextures.push_back(VIDEO->GetTexture("normalDefault.png"));
+			boneMesh->_specularTextures.push_back(VIDEO->GetTexture("specularDefault.png"));
+			boneMesh->_emissionTexture.push_back(VIDEO->GetTexture("emissionDefault.png"));
 		}
 	}
 
@@ -801,38 +1051,17 @@ STDMETHODIMP BoneHierachy::CreateMeshContainer(LPCSTR Name, CONST D3DXMESHDATA *
 
 		//본의 컴비네이션 은 메쉬의 Subset 별로 어떠한 본에 영향을 받는지에 대한 정보를 지니게 된다.
 		//본매트릭스 인덱스 = 본컴비네이션[Subset].BoneID[팔래트]
-		if (_pSkinnedMesh->_numWorkingPalette < boneMesh->NumPaletteEntries)
+		if ( _pSkinnedMesh->_numWorkingPalette < boneMesh->NumPaletteEntries )
 		{
+			if ( _pSkinnedMesh->_numWorkingPalette )
+				delete[] _pSkinnedMesh->_workingPalettes;
+
 			_pSkinnedMesh->_numWorkingPalette = boneMesh->NumPaletteEntries;
+			_pSkinnedMesh->_workingPalettes = new Matrix[boneMesh->NumPaletteEntries];
 		}
-		boneMesh->_vHandle = VIDEO->GetVertexBufferFromXMesh(boneMesh->WorkingMesh);
-		boneMesh->_iHandle = VIDEO->GetIndexBufferFromXMesh(boneMesh->WorkingMesh);
 	}
-	else
-	{
-		HRESULT re = boneMesh->MeshData.pMesh->OptimizeInplace(D3DXMESHOPT_ATTRSORT | D3DXMESHOPT_COMPACT | D3DXMESHOPT_VERTEXCACHE,
-			pAdjacency, nullptr, nullptr, nullptr);
-
-		boneMesh->_attributeRange = new D3DXATTRIBUTERANGE[boneMesh->NumAttributesGroup];
-		Assert(boneMesh->_attributeRange);
-
-		boneMesh->MeshData.pMesh->GetAttributeTable(boneMesh->_attributeRange, &boneMesh->NumAttributesGroup);
-
-		boneMesh->_vHandle = VIDEO->GetVertexBufferFromXMesh(boneMesh->MeshData.pMesh);
-		boneMesh->_iHandle = VIDEO->GetIndexBufferFromXMesh(boneMesh->MeshData.pMesh);
-	}
-
 	*ppNewMeshContainer = boneMesh;
 	
-	//auto found = this->_pSkinnedMesh->_meshTable.find(Name);
-	//if (found == this->_pSkinnedMesh->_meshTable.end())
-	//{
-	//	this->_pSkinnedMesh->_meshTable.insert(std::make_pair(std::string(Name), (BoneMesh *)*ppNewMeshContainer));
-	//}
-
-	//D3DVERTEXELEMENT9 elements[MAX_FVF_DECL_SIZE];
-	//boneMesh->WorkingMesh->GetDeclaration(elements);
-
 	SAFE_RELEASE(d3dDevice);
 	return S_OK;
 }
@@ -857,19 +1086,16 @@ STDMETHODIMP BoneHierachy::DestroyMeshContainer(LPD3DXMESHCONTAINER pMeshContain
 	//boneMesh 로 형변환
 	BoneMesh* boneMesh = (BoneMesh*)pMeshContainerToFree;
 
-	VIDEO->DestroyVertexBuffer(boneMesh->_vHandle);
-	VIDEO->DestroyIndexBuffer(boneMesh->_iHandle);
-
 	//텍스쳐 해제
 	//해제 코드도 작성하자...
-	UINT numTex = boneMesh->_materialHandles.size();
-	for (UINT i = 0; i < numTex; i++)
-	{
-		//if (boneMesh->pMaterials[i].pTextureFilename != NULL)
-		//{
-		//	SAFE_DELETE_ARRAY(boneMesh->pMaterials[i].pTextureFilename);
-		//}
-	}
+	//UINT numTex = boneMesh->_materialHandles.size();
+	//for (UINT i = 0; i < numTex; i++)
+	//{
+	//	//if (boneMesh->pMaterials[i].pTextureFilename != NULL)
+	//	//{
+	//	//	SAFE_DELETE_ARRAY(boneMesh->pMaterials[i].pTextureFilename);
+	//	//}
+	//}
 	SAFE_DELETE_ARRAY(boneMesh->Name);
 	SAFE_DELETE_ARRAY(boneMesh->pMaterials);
 	SAFE_DELETE_ARRAY(boneMesh->pAdjacency);

@@ -25,7 +25,7 @@ void RenderSystem::UpdateAnimations(float deltaTime)
 	//}
 }
 
-void RenderSystem::Render(video::RenderView &renderView)
+void RenderSystem::Render(const Camera &camera)
 {
 	//video::StaticXMesh *pFirstStatic = VIDEO->GetStaticXMesh(video::StaticXMeshHandle());
 	//video::SkinnedAnimation *pFirstAnimation = VIDEO->GetSkinnedAnimation(video::SkinnedAnimationHandle());
@@ -41,21 +41,21 @@ void RenderSystem::Render(video::RenderView &renderView)
 
 		if (refRenderComponent._type == RenderComponent::Type::eBuffer)
 		{
-			video::RenderCommand &refCommand = renderView.GetCommand();
-			refCommand._vHandle = refRenderComponent._vHandle;
-			refCommand._iHandle = refRenderComponent._iHandle;
-			refCommand._materialHandle = refRenderComponent._material;
-			refCommand._effectHandle = refRenderComponent._effect;
+			//video::RenderCommand &refCommand = renderView.GetCommand();
+			//refCommand._vHandle = refRenderComponent._vHandle;
+			//refCommand._iHandle = refRenderComponent._iHandle;
+			//refCommand._materialHandle = refRenderComponent._material;
+			//refCommand._effectHandle = refRenderComponent._effect;
 
-			worldMatrix = refTransformComponent.GetFinalMatrix();
-			video::MatrixCache::CacheRange range = renderView._matrixCache.Add(&refTransformComponent.GetFinalMatrix());
+			//worldMatrix = refTransformComponent.GetFinalMatrix();
+			//video::MatrixCache::CacheRange range = renderView._matrixCache.Add(&refTransformComponent.GetFinalMatrix());
 
-			refCommand._cacheRange = range;
+			//refCommand._cacheRange = range;
 		}
 		else if (refRenderComponent._type == RenderComponent::Type::eStatic)
 		{
 			video::StaticXMesh *pMesh = VIDEO->GetStaticXMesh(refRenderComponent._static);
-			pMesh->FillRenderCommand(renderView, video::StaticXMesh::sDefaultEffectHandle, &refTransformComponent.GetFinalMatrix());
+			pMesh->Render(refTransformComponent);
 		}
 		else if (refRenderComponent._type == RenderComponent::Type::eSkinned)
 		{
@@ -63,8 +63,7 @@ void RenderSystem::Render(video::RenderView &renderView)
 			ActionComponent &actionComp = entities[i].GetComponent<ActionComponent>();
 			actionComp._pAnimationController->AdvanceTime(actionComp._animDelta, actionComp._pCallbackHandler);
 			pAnimation->_pSkinnedMesh->Update(&refTransformComponent.GetFinalMatrix());
-			pAnimation->FillRenderCommand(renderView, 
-				video::AnimationInstance::sDefaultEffectHandle, video::StaticXMesh::sDefaultEffectHandle);
+			pAnimation->_pSkinnedMesh->Render(refTransformComponent);
 		}
 	}
 }

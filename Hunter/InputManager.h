@@ -30,16 +30,14 @@ public :
 	inline bool32 IsAltDown() { return _altDown; }
 	inline bool32 IsControlDown() { return _ctrlDown; }
 
-	inline uint8 GetCharInput() const { return _vkCode; }
-	inline bool32 GetShiftDown() const { return _shiftDown; }
+	inline uint8 GetVKCode() const { return _vkCode; }
+	inline bool32 GetShiftDown() const { return _currentState[VK_SHIFT]; }
 	inline void SetCharInput(uint8 ch) { _vkCode = ch; }
 
 private :
 
 	void UpdateOnKeyUp(WPARAM wParam, LPARAM lParam);
 	void UpdateOnKeyDown(WPARAM wParam, LPARAM lParam);
-	void UpdateOnChar(WPARAM wParam, LPARAM lParam);
-
 	//void ProcessWindowMessage(bool32 *button, bool32 isDown);
 private :
 	bool _currentState[256] = {0, };
@@ -50,7 +48,7 @@ private :
 	bool32 _ctrlDown{};
 
 	WPARAM _wParam{};
-	uint8 _vkCode{};
+	uint32 _vkCode{};
 
 	InputManager *_pParent;
 };

@@ -130,6 +130,7 @@
     <ClCompile Include="ActionSystem.cpp" />
     <ClCompile Include="Allocators.cpp" />
     <ClCompile Include="ApplicationTimer.cpp" />
+    <ClCompile Include="BaseLight.cpp" />
     <ClCompile Include="BaseScene.cpp" />
     <ClCompile Include="BaseSystem.cpp" />
     <ClCompile Include="Camera.cpp" />
@@ -138,6 +139,7 @@
     <ClCompile Include="CommonUtils.cpp" />
     <ClCompile Include="Console.cpp" />
     <ClCompile Include="DebugDrawer.cpp" />
+    <ClCompile Include="DirectionalLight.cpp" />
     <ClCompile Include="Dragon.cpp" />
     <ClCompile Include="Enemy.cpp" />
     <ClCompile Include="Entity.cpp" />
@@ -146,6 +148,7 @@
     <ClCompile Include="Filter.cpp" />
     <ClCompile Include="Frustum.cpp" />
     <ClCompile Include="GameCommand.cpp" />
+    <ClCompile Include="GizmoManager.cpp" />
     <ClCompile Include="Hash.cpp" />
     <ClCompile Include="imgui.cpp" />
     <ClCompile Include="imguiRenderer.cpp" />
@@ -156,6 +159,7 @@
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="PlayerAnimationString.cpp" />
     <ClCompile Include="PlayerStates.cpp" />
+    <ClCompile Include="PointLight.cpp" />
     <ClCompile Include="QuadTree.cpp" />
     <ClCompile Include="Quaternion.cpp" />
     <ClCompile Include="Ray.cpp" />
@@ -164,9 +168,9 @@
     <ClCompile Include="ScriptComponent.cpp" />
     <ClCompile Include="ScriptSystem.cpp" />
     <ClCompile Include="spawnManager.cpp" />
+    <ClCompile Include="SpriteManager.cpp" />
     <ClCompile Include="Terrain.cpp" />
     <ClCompile Include="TerrainEditorScene.cpp" />
-    <ClCompile Include="TestScene.cpp" />
     <ClCompile Include="TextSerializer.cpp" />
     <ClCompile Include="tinyxml2.cpp" />
     <ClCompile Include="TransformComponent.cpp" />
@@ -200,6 +204,7 @@
     <ClInclude Include="ActionSystem.h" />
     <ClInclude Include="ApplicationTimer.h" />
     <ClInclude Include="Assert.h" />
+    <ClInclude Include="BaseLight.h" />
     <ClInclude Include="BaseScene.h" />
     <ClInclude Include="BaseSystem.h" />
     <ClInclude Include="Camera.h" />
@@ -214,6 +219,7 @@
     <ClInclude Include="DataBase.h" />
     <ClInclude Include="DebugDrawer.h" />
     <ClInclude Include="Delegate.h" />
+    <ClInclude Include="DirectionalLight.h" />
     <ClInclude Include="Dragon.h" />
     <ClInclude Include="Enemy.h" />
     <ClInclude Include="Entity.h" />
@@ -226,10 +232,12 @@
     <ClInclude Include="GameComponent.h" />
     <ClInclude Include="GameSystems.h" />
     <ClInclude Include="GameUtils.h" />
+    <ClInclude Include="GizmoManager.h" />
     <ClInclude Include="Hash.h" />
     <ClInclude Include="imgui.h" />
     <ClInclude Include="Allocators.h" />
     <ClInclude Include="imguiRenderer.h" />
+    <ClInclude Include="Light.h" />
     <ClInclude Include="Math.h" />
     <ClInclude Include="MathUtils.h" />
     <ClInclude Include="Matrix.h" />
@@ -240,6 +248,7 @@
     <ClInclude Include="Player.h" />
     <ClInclude Include="PlayerAnimationString.h" />
     <ClInclude Include="PlayerStates.h" />
+    <ClInclude Include="PointLight.h" />
     <ClInclude Include="QuadTree.h" />
     <ClInclude Include="Quaternion.h" />
     <ClInclude Include="Ray.h" />
@@ -250,12 +259,12 @@
     <ClInclude Include="ScriptComponent.h" />
     <ClInclude Include="ScriptSystem.h" />
     <ClInclude Include="spawnManager.h" />
+    <ClInclude Include="SpriteManager.h" />
     <ClInclude Include="State.h" />
     <ClInclude Include="StateMachine.h" />
     <ClInclude Include="System.h" />
     <ClInclude Include="Terrain.h" />
     <ClInclude Include="TerrainEditorScene.h" />
-    <ClInclude Include="TestScene.h" />
     <ClInclude Include="TextSerializer.h" />
     <ClInclude Include="tinyxml2.h" />
     <ClInclude Include="TransformComponent.h" />
