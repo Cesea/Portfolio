@@ -8,7 +8,7 @@
 
 //에니메이션을 위한 typedef
 typedef std::vector<LPD3DXANIMATIONSET> AnimationSetVector;
-typedef std::map<std::string, int32> AnimationTable;
+typedef std::map<std::string, int32> AnimationSetTable;
 
 //기존의 에니메이션 셋을 삭제, 콜벡데이터를 넣었다면 새로 만들어서 Controller에 추가시킨다
 bool AddCallbackKeysAndCompress(LPD3DXANIMATIONCONTROLLER pAnimationController,
@@ -73,14 +73,18 @@ public :
 	//void PlayOneShot(const std::string &animName, float inCrossFadeTime = 0.0, float outCrossFadeTime = 0.0f);
 	//void PlayOneShotAfterHold(const std::string &animName, float crossFadeTime = 0.0);
 
+
+	void Play( const std::string &animName, float crossFadeTime = 0.0 );
+	void Play( int32 animIndex, float crossFadeTime = 0.0 );
+	void Play( LPD3DXANIMATIONSET animSet, float crossFadeTime = 0.0 );
+	void PlayOneShot( const std::string &animName, float inCrossFadeTime = 0.0, float outCrossFadeTime = 0.0f );
+	void PlayOneShotAfterHold( const std::string &animName, float crossFadeTime = 0.0 );
+
 	void Stop() { _playing = false; }
 	void SetPlaySpeed(float speed);
 
 	inline void SetAnimation(int32 index) { SetAnimation(_animations[index]); }
 	void SetAnimation(ID3DXAnimationSet *animationSet);
-
-
-	void UpdateMesh(const Matrix &world);
 
 	ActionQueue _actionQueue;
 
@@ -106,7 +110,7 @@ public :
 	ID3DXAnimationCallbackHandler *_pCallbackHandler{};
 
 	AnimationSetVector _animations;
-	AnimationTable _animationTable;
+	AnimationSetTable _animationTable;
 };
 
 

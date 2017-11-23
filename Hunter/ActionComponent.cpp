@@ -17,8 +17,8 @@ void ActionComponent::MakeAnimationList()
 	{
 		LPD3DXANIMATIONSET animSet;
 		_pAnimationController->GetAnimationSet(i, &animSet);
-		this->_animations.push_back(animSet);
-		this->_animationTable.insert(std::make_pair(animSet->GetName(), i));
+		_animations.push_back(animSet);
+		_animationTable.insert(std::make_pair(animSet->GetName(), i));
 	}
 }
 
@@ -42,7 +42,6 @@ void ActionComponent::Destroy()
 
 void ActionComponent::UpdateAnimation(float deltaTime)
 {
-
 	if (_actionQueue.HasAction())
 	{
 		const Action &front = _actionQueue.Front();
@@ -212,100 +211,82 @@ bool ActionComponent::Play(const Action & action)
 	return false;
 }
 
-//
-//void ActionComponent::Play(int32 animIndex, float crossFadeTime)
-//{
-//	_playing = true;
-//	_looping = true;
-//
-//	if (animIndex < _numAnimation)
-//	{
-//		_crossFadeTime = crossFadeTime;
-//		_leftCrossFadeTime = crossFadeTime;
-//
-//		this->SetAnimation(_animations[animIndex]);
-//	}
-//}
-//void ActionComponent::PlayOneShot(int32 animIndex, float inCrossFadeTime, float outCrossFadeTime)
-//{
-//	_playing = true;
-//	_looping = true;
-//
-//	if (animIndex < _numAnimation)
-//	{
-//		_pPrevPlayingAnimationSet = _pPlayingAnimationSet;
-//
-//		_crossFadeTime = inCrossFadeTime;
-//		_leftCrossFadeTime = inCrossFadeTime;
-//
-//		_outCrossFadeTime = outCrossFadeTime;
-//
-//		this->SetAnimation(_animations[animIndex]);
-//	}
-//}
-//void ActionComponent::PlayOneShotAfterHold(int32 animIndex, float crossFadeTime)
-//{
-//	_playing = true;
-//	_looping = true;
-//
-//	if (animIndex < _numAnimation)
-//	{
-//		_pPrevPlayingAnimationSet = nullptr;
-//
-//		_crossFadeTime = crossFadeTime;
-//		_leftCrossFadeTime = crossFadeTime;
-//
-//		this->SetAnimation(_animations[animIndex]);
-//	}
-//}
-//void ActionComponent::Play(const std::string & animName, float crossFadeTime)
-//{
-//	_playing = true;
-//	_looping = true;
-//
-//	AnimationTable::iterator find = _animationTable.find(animName);
-//	if (find != _animationTable.end())
-//	{
-//		//크로스 페이드 타임 기억
-//		_crossFadeTime = crossFadeTime;
-//		_leftCrossFadeTime = crossFadeTime;
-//
-//		this->Play(find->second);
-//	}
-//}
-//void ActionComponent::PlayOneShot(const std::string & animName, float inCrossFadeTime, float outCrossFadeTime)
-//{
-//	_playing = true;
-//	_looping = true;
-//
-//	AnimationTable::iterator find = _animationTable.find(animName);
-//	if (find != _animationTable.end())
-//	{
-//		_pPrevPlayingAnimationSet = _pPlayingAnimationSet;
-//
-//		_crossFadeTime = inCrossFadeTime;
-//		_leftCrossFadeTime = inCrossFadeTime;
-//
-//		_outCrossFadeTime = outCrossFadeTime;
-//
-//		this->Play(find->second);
-//	}
-//}
-//void ActionComponent::PlayOneShotAfterHold(const std::string & animName, float crossFadeTime)
-//{
-//	_playing = true;
-//	_looping = true;
-//
-//	AnimationTable::iterator find = _animationTable.find(animName);
-//	if (find != _animationTable.end())
-//	{
-//		_pPrevPlayingAnimationSet = nullptr;
-//		_crossFadeTime = crossFadeTime;
-//		_leftCrossFadeTime = crossFadeTime;
-//		this->Play(find->second);
-//	}
-//}
+//Play Functions ////////////////////////////////////////////////////////////
+void ActionComponent::Play(const std::string & animName, float crossFadeTime)
+{
+	_playing = true;
+	_looping = true;
 
+	AnimationSetTable::iterator find = _animationTable.find( animName );
+	if ( find != this->_animationTable.end() ) 
+	{
+		_crossFadeTime = crossFadeTime;
+		_leftCrossFadeTime = crossFadeTime;
+
+		this->SetAnimation( find->second );
+	}
+}
+
+void ActionComponent::Play(int32 animIndex, float crossFadeTime)
+{
+	_playing = true;
+	_looping = true;
+
+	if ( animIndex < _numAnimation ) 
+	{
+		_crossFadeTime = crossFadeTime;
+		_leftCrossFadeTime = crossFadeTime;
+
+		this->SetAnimation( _animations[animIndex] );
+	}
+}
+
+void ActionComponent::Play(LPD3DXANIMATIONSET animSet, float crossFadeTime)
+{
+	_playing = true;
+	_looping = true;
+
+	_crossFadeTime = crossFadeTime;
+	_leftCrossFadeTime = crossFadeTime;
+
+	this->SetAnimation(animSet);
+}
+
+void ActionComponent::PlayOneShot(const std::string &animName, float inCrossFadeTime, float outCrossFadeTime)
+{
+	_playing = true;
+	_looping = false;
+
+	AnimationSetTable::iterator find = _animationTable.find( animName );
+	if ( find != _animationTable.end() ) 
+	{
+		_pPrevPlayingAnimationSet = _pPlayingAnimationSet;
+
+		_crossFadeTime = inCrossFadeTime;
+		_leftCrossFadeTime = inCrossFadeTime;
+
+		_outCrossFadeTime = outCrossFadeTime;
+
+		this->SetAnimation( find->second );
+	}
+}
+
+void ActionComponent::PlayOneShotAfterHold(const std::string & animName, float crossFadeTime)
+{
+	_playing = true;
+	_looping = false;
+
+	AnimationSetTable::iterator find = _animationTable.find( animName );
+	if ( find != _animationTable.end() ) 
+	{
+		_pPrevPlayingAnimationSet = nullptr;
+
+		_crossFadeTime = crossFadeTime;
+		_leftCrossFadeTime = crossFadeTime;
+
+		this->SetAnimation( find->second );
+	}
+}
 
 void ActionComponent::SetPlaySpeed(float speed)
 {
@@ -402,7 +383,8 @@ Action & Action::operator=(const Action & other)
 	return *this;
 }
 
-bool AddCallbackKeysAndCompress(LPD3DXANIMATIONCONTROLLER pAnimationController, LPD3DXKEYFRAMEDANIMATIONSET pAnimationSet, 
+bool AddCallbackKeysAndCompress(LPD3DXANIMATIONCONTROLLER pAnimationController, 
+	LPD3DXKEYFRAMEDANIMATIONSET pAnimationSet, 
 	DWORD numCallbackKeys, D3DXKEY_CALLBACK * pKeys, DWORD compressionFlags, float compression)
 {
 	HRESULT hr;
