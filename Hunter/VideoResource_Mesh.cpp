@@ -286,9 +286,6 @@ namespace video
 				texFile = texFilePath.substr(0, dotIndex);
 				texExp = texFilePath.substr(dotIndex + 1, fileName.length());
 
-				//
-				// 노말말 맵은 _N 이 붙는다.
-				//
 				texFilePath = texFile + "_N." + texExp;
 
 				video::TextureHandle normalHandle = VIDEO->GetTexture(texFilePath);
@@ -305,10 +302,6 @@ namespace video
 					}
 				}
 
-
-				//
-				// 스펙큘러 맵은 _S 이 붙는다.
-				//
 				texFilePath = texFile + "_S." + texExp;
 				video::TextureHandle specularHandle = VIDEO->GetTexture(texFilePath);
 				if (!specularHandle.IsValid())
@@ -324,10 +317,6 @@ namespace video
 					}
 				}
 
-
-				//
-				// 이미션 맵은 _E 이 붙는다.
-				//
 				texFilePath = texFile + "_E." + texExp;
 				video::TextureHandle emissionHandle = VIDEO->GetTexture(texFilePath);
 				if (!emissionHandle.IsValid())
@@ -343,7 +332,6 @@ namespace video
 					}
 				}
 			}
-
 			else
 			{
 				_diffuseTextures.push_back(VIDEO->GetTexture("diffuseDefault.png"));

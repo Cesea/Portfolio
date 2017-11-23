@@ -204,6 +204,9 @@
     <ClCompile Include="PointLight.cpp">
       <Filter>Game\GameUtils\Light</Filter>
     </ClCompile>
+    <ClCompile Include="GameObjectFactory.cpp">
+      <Filter>Managers</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -504,6 +507,9 @@
     </ClInclude>
     <ClInclude Include="Light.h">
       <Filter>Game\GameUtils\Light</Filter>
+    </ClInclude>
+    <ClInclude Include="GameObjectFactory.h">
+      <Filter>Managers</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

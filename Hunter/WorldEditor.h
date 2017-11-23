@@ -56,18 +56,28 @@ struct TerrainEditor
 		_editingTree = false;
 		_editingGrass = false;
 		_currentStaticHandle.MakeInvalid();;
-
 	}
 	bool32 _editingRock{};
 	bool32 _editingTree{};
 	bool32 _editingGrass{};
 
 	video::StaticXMeshHandle _currentStaticHandle;
+
+	int32 _numObjectToPaint{};
+	float _spreadness{ 1.0f };
+
+	std::vector<std::string> _rockNames{};
+	std::vector<std::string> _treeNames{};
+	std::vector<std::string> _grassNames{};
 };
 
 struct ObjectEditor
 {
+	void Reset()
+	{
 
+	}
+	bool32 _editingTransform{};
 };
 
 
@@ -100,26 +110,24 @@ public :
 	void InObjectEditMode();
 
 	EditMode _currentMode;
-	EventChannel _channel;
 	
-
 	Brush _brush;
 	Gizmo _gizmo;
-
 	bool32 _editing{ false };
-	
+
 	int32 _mx;
 	int32 _my;
 	int8 _mb;
+	bool32 _leftButtonPressed{};
 	int32 _scroll;
 	bool32 _shiftDown;
 	uint32 _key;
 
-	void *_pEdittingObject{};
-
 	void UpdateInput(const InputManager &input);
 
 	TerrainEditor _terrainEditor;
+
+	EventChannel _channel;
 };
 
 #endif

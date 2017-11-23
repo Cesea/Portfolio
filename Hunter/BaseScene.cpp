@@ -9,19 +9,17 @@ bool BaseScene::Init()
 	bool result = true;
 	//RegisterEvents();
 
+	GAMEOBJECTFACTORY->SetCurrentScene(this);
 
 	video::StaticXMesh::_sEffectHandle = VIDEO->GetEffect("StaticMesh.fx");
 	video::SkinnedXMesh::_sStaticEffectHandle = VIDEO->GetEffect("StaticMesh.fx");
 	video::SkinnedXMesh::_sSkinnedEffectHandle = VIDEO->GetEffect("SkinnedMesh.fx");
-
-	_channel.Add<BaseScene::SpawnEvent, BaseScene>(*this);
 
 	InitPlayerAnimation();
 
 	_camera.SetRotationSpeed(10.0f);
 	_camera.SetMoveSpeed(20.0f);
 	_camera.GetTransform().MovePositionSelf(0.0f, 0.0f, -30.0f);
-
 
 	//터레인 로드
 	Terrain::TerrainConfig config;
@@ -38,8 +36,9 @@ bool BaseScene::Init()
 	config._lodRatio = 0.1f;
 	config._sectionResolution = 64;
 
-	TERRAIN->SetScene(this);
-	TERRAIN->Create(config, 1, false);
+	_pTerrain = new Terrain();
+	_pTerrain->SetScene(this);
+	_pTerrain->Create(config, 1, false);
 
 	//메쉬 불러오기..
 	Matrix correctionMat;
@@ -54,12 +53,14 @@ bool BaseScene::Init()
 	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Rock/Rock4_A.X", &correctionMat, "Rock04");
 	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Rock/Rock5_A.X", &correctionMat, "Rock05");
 
+	MatrixScaling(&correctionMat, 0.01f, 0.01f, 0.01f);
 	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Grass/Grass1.X", &correctionMat, "Grass01");
 	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Grass/Grass2.X", &correctionMat, "Grass02");
 	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Grass/Grass3.X", &correctionMat, "Grass03");
 	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Grass/Grass4.X", &correctionMat, "Grass04");
 	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Grass/Grass5.X", &correctionMat, "Grass05");
 
+	MatrixScaling(&correctionMat, 1.0f, 1.0f, 1.0f);
 	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Tree/Tree1.X", &correctionMat, "Tree01");
 	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Tree/Tree2.X", &correctionMat, "Tree02");
 	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Tree/Tree3.X", &correctionMat, "Tree03");
@@ -71,6 +72,7 @@ bool BaseScene::Init()
 	_world.AddSystem<TransformSystem>(_transformSystem);
 	_world.AddSystem<ActionSystem>(_actionSystem);
 	_world.AddSystem<ScriptSystem>(_scriptSystem);
+
 
 	_player.CreateFromWorld(_world);
 
@@ -88,7 +90,6 @@ bool BaseScene::Init()
 	_editor = new Editor;
 	_editor->Init();
 
-	_active = true;
 	return result;
 }
 
@@ -134,7 +135,7 @@ bool BaseScene::Render()
 	
 	GIZMOMANAGER->WorldGrid(1.0f, 20);
 
-	TERRAIN->Render(_camera);
+	_pTerrain->Render(_camera);
 	_renderSystem.Render(_camera);
 	//TERRAIN->FillRenderCommand(*_mainRenderView);
 
@@ -150,27 +151,29 @@ void BaseScene::Release()
 {
 }
 
-void BaseScene::Handle(const BaseScene::SpawnEvent & event)
-{
-	_entities.push_back(_world.CreateEntity());
-	Entity &entity = _entities.back();
-	TransformComponent &refTransform = entity.AddComponent<TransformComponent>();
-	refTransform.MovePositionWorld(event._position);
-
-	RenderComponent &refRender = entity.AddComponent<RenderComponent>();
-
-	if (event._isStatic)
-	{
-		refRender._type = RenderComponent::Type::eStatic;
-		refRender._static = VIDEO->GetStaticXMesh(event._name);
-		Assert(refRender._static.IsValid());
-	}
-	else
-	{
-		refRender._type = RenderComponent::Type::eSkinned;
-		video::SkinnedXMeshHandle meshHandle = VIDEO->GetSkinnedXMesh(event._name);
-		refRender._skinned = VIDEO->CreateAnimationInstance(meshHandle, event._name + std::to_string(entity.GetID().index));
-		Assert(refRender._skinned.IsValid());
-	}
-	entity.Activate();
-}
+//void BaseScene::Handle(const BaseScene::SpawnEvent & event)
+//{
+//	_entities.push_back(_world.CreateEntity());
+//	Entity &entity = _entities.back();
+//	TransformComponent &refTransform = entity.AddComponent<TransformComponent>();
+//
+//	float terrainHeight = _pTerrain->GetHeight(event._position.x, event._position.z);
+//	refTransform.MovePositionWorld(Vector3(event._position.x, terrainHeight, event._position.z));
+//
+//	RenderComponent &refRender = entity.AddComponent<RenderComponent>();
+//
+//	if (event._isStatic)
+//	{
+//		refRender._type = RenderComponent::Type::eStatic;
+//		refRender._static = VIDEO->GetStaticXMesh(event._name);
+//		Assert(refRender._static.IsValid());
+//	}
+//	else
+//	{
+//		refRender._type = RenderComponent::Type::eSkinned;
+//		video::SkinnedXMeshHandle meshHandle = VIDEO->GetSkinnedXMesh(event._name);
+//		refRender._skinned = VIDEO->CreateAnimationInstance(meshHandle, event._name + std::to_string(entity.GetID().index));
+//		Assert(refRender._skinned.IsValid());
+//	}
+//	entity.Activate();
+//}

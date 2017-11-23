@@ -1,10 +1,18 @@
 #ifndef I_SCENE_H
 #define I_SCENE_H
 
+#include "World.h"
+#include "Terrain.h"
+#include "Camera.h"
+
 class IScene
 {
 public :
-	IScene() {};
+	friend class GameObjectFactory;
+
+	IScene()
+		:_world(4096), _entities(4096)
+	{};
 	virtual ~IScene() {}
 
 	virtual bool Init() = 0;
@@ -14,6 +22,12 @@ public :
 	virtual void Release() = 0;
 
 	virtual const char *GetSceneName() = 0;
+
+protected :
+	World _world;
+	std::vector<Entity> _entities;
+	Camera _camera;
+	Terrain *_pTerrain{};
 };
 
 #endif

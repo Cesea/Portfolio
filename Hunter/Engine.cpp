@@ -18,6 +18,8 @@ Engine::Engine()
 
 Engine::~Engine()
 {
+	GAMEOBJECTFACTORY->Release();
+	GAMEOBJECTFACTORY->ReleaseInstance();
 	GIZMOMANAGER->Release();
 	GIZMOMANAGER->ReleaseInstance();
 	SPRITEMANAGER->Release();
@@ -77,10 +79,11 @@ void Engine::Run()
 			}
 		}
 
-		_pInput->Update(0.0f);
+		_pInput->Update();
 		float deltaTime = APPTIMER->GetTargetTime();
-
 		_pScene->Update(deltaTime, *_pInput.get());
+
+		_pInput->UpdatePrevInput();
 
 		APPTIMER->Tick();
 
@@ -157,7 +160,7 @@ bool Engine::InitializePlatform(HINSTANCE instanceHandle)
 	int32 clientHeight = clientRect.bottom - clientRect.top;
 
 	_windowHandle = CreateWindow(wc.lpszClassName, "Hunter", WS_OVERLAPPEDWINDOW,
-		CW_USEDEFAULT, CW_USEDEFAULT, clientWidth, clientHeight, nullptr, nullptr, _instanceHandle, nullptr);
+		WINSTARTX, WINSTARTY, clientWidth, clientHeight, nullptr, nullptr, _instanceHandle, nullptr);
 
 	if (!_windowHandle)
 	{
@@ -194,6 +197,8 @@ bool Engine::InitializeSystems()
 
 	GIZMOMANAGER->Init(gpDevice);
 	SPRITEMANAGER->Init(gpDevice);
+
+	GAMEOBJECTFACTORY->Init();
 
 	return true;
 }

@@ -21,7 +21,14 @@ void InputManager::ShutDown()
 {
 }
 
-void InputManager::Update(float deltaTime)
+void InputManager::UpdatePrevInput()
+{
+	keyboard.UpdatePrevInput();
+	mouse.UpdatePrevInput();
+
+}
+
+void InputManager::Update()
 {
 	keyboard.Update();
 	mouse.Update();
@@ -89,6 +96,11 @@ void Keyboard::Update()
 			_vkCode = i;
 		}
 	}
+
+}
+
+void Keyboard::UpdatePrevInput()
+{
 	memcpy(_oldState, _currentState, sizeof(bool) * 256);
 }
 
@@ -138,8 +150,8 @@ void Mouse::Update()
 {
 	if (gEditorOn)
 	{
-		if (_currentPoint.x < EDITORX || _currentPoint.x > EDITORX + EDITORSIZEX &&
-			_currentPoint.y < EDITORY || _currentPoint.y > EDITORY + EDITORSIZEY)
+		if (!(_currentPoint.x > EDITORX && _currentPoint.x < EDITORX + EDITORSIZEX &&
+			_currentPoint.y > EDITORY && _currentPoint.y < EDITORY + EDITORSIZEY))
 		{
 			//constexpr로 버튼이 정의 되어있다
 			for (int32 i = 0; i < 3; ++i)
@@ -196,8 +208,11 @@ void Mouse::Update()
 				PointMake(_currentPoint.x, _currentPoint.y)));
 		}
 	}
-	
 
+}
+
+void Mouse::UpdatePrevInput()
+{
 	memcpy(_oldState, _currentState, sizeof(bool32) * 3);
 
 	_oldPoint.x = _currentPoint.x;

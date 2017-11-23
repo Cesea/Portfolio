@@ -46,6 +46,9 @@
 
 #include <assert.h>
 
+#define WINSTARTX (100)
+#define WINSTARTY (100)
+
 #define WINSIZEX (1600)
 #define WINSIZEY (900)
 

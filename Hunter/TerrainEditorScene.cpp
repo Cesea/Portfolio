@@ -38,14 +38,13 @@ bool TerrainEditorScene::Init()
 	config._lodRatio = 0.1f;
 	config._sectionResolution = 64;
 
-	TERRAIN->SetScene(this);
-	TERRAIN->Create(config, 1, true);
+	//TERRAIN->SetScene(this);
+	//TERRAIN->Create(config, 1, true);
 
 	imguiRenderInit();
 	_editor = new Editor;
 	_editor->Init();
 
-	_active = true;
 	return result;
 }
 

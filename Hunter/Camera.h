@@ -7,8 +7,6 @@
 
 class Camera
 {
-
-
 public:
 	float _fov;
 	float _camNear;
@@ -16,6 +14,8 @@ public:
 
 	Camera();
 	~Camera();
+
+	void CreateFromWorld(World &world);
 
 	void PreUpdateMatrix();
 	void UpdateMatrix();
@@ -49,6 +49,7 @@ public:
 
 protected:
 
+	Entity _entity;
 
 	Matrix _matView;
 	Matrix _matProjection;

@@ -81,11 +81,11 @@ void Player::Update(float deltaTime)
 			delta *= deltaTime;
 			if (!delta.IsZero())
 			{
-				Vec3Normalize(&delta, &delta);
-				TransformComponent &refTransform = _entity.GetComponent<TransformComponent>();
-				refTransform.MovePositionLocal(delta * deltaTime);
-				//아래의 줄을 TransformSystem에서 해야할까??
-				refTransform._position.y = TERRAIN->GetHeight(refTransform._position.x, refTransform._position.z);
+				//Vec3Normalize(&delta, &delta);
+				//TransformComponent &refTransform = _entity.GetComponent<TransformComponent>();
+				//refTransform.MovePositionLocal(delta * deltaTime);
+				////아래의 줄을 TransformSystem에서 해야할까??
+				//refTransform._position.y = TERRAIN->GetHeight(refTransform._position.x, refTransform._position.z);
 			}
 		}
 		_currentCommand._interpreted = true;

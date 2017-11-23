@@ -7,6 +7,25 @@ struct TransformComponent;
 class Light;
 class DirectionalLight;
 
+struct MeshBoundInfo
+{
+	Vector3 _min;
+	Vector3 _max;
+	Vector3 _center;
+	Vector3 _size;
+	Vector3 _halfSize;
+	float _radius;
+};
+
+struct MeshVertInfo
+{
+	uint32 _numVertices;
+	uint32 _numFaces;
+	std::vector<Vector3> _positions;
+	std::vector<Vector3> _normals;
+	std::vector<uint16> _indices;
+};
+
 namespace video
 {
 	struct SkinnedXMesh;
@@ -39,6 +58,7 @@ struct BoneMesh : public D3DXMESHCONTAINER
 	DWORD NumAttributesGroup{};		//메시의 속성 그룹수 ( 해당 메시에 메터리얼정보가 몇개있니? )
 	LPD3DXBUFFER BufBoneCombos{};			//본컴비네이션 ( 메시에 적용되는 본 ID 정보와 메터리얼 정보 )
 
+	MeshBoundInfo _boundInfo;
 };
 
 class BoneHierachy : public ID3DXAllocateHierarchy
@@ -64,25 +84,6 @@ public:
 
 namespace video
 {
-	struct MeshBoundInfo
-	{
-		Vector3 _min;
-		Vector3 _max;
-		Vector3 _center;
-		Vector3 _size;
-		Vector3 _halfSize;
-		float _radius;
-	};
-
-	struct MeshVertInfo
-	{
-		uint32 _numVertices;
-		uint32 _numFaces;
-		std::vector<Vector3> _positions;
-		std::vector<Vector3> _normals;
-		std::vector<uint16> _indices;
-	};
-
 	void ResizeMeshAndGetInfos(ID3DXMesh *pMesh, const Matrix &correction, 
 		MeshVertInfo *pOutVertInfo, MeshBoundInfo *pOutBoundInfo);
 
@@ -99,10 +100,7 @@ namespace video
 		void Destroy();
 		void BuidSubMeshBoundInfo();
 
-
 		void Render(const TransformComponent &transform);
-		//void Render(video::Effect);
-		//void FillRenderCommand(RenderView &renderView, video::EffectHandle effect, const Matrix *pMatrix = nullptr);
 
 		bool32 _visible{ true };
 		ID3DXMesh *_pMesh{};
@@ -121,10 +119,6 @@ namespace video
 		D3DXATTRIBUTERANGE *_attributeRange{};
 		MeshVertInfo _meshVertInfo{};
 	};
-
-
-	//typedef std::map<std::string, BoneMesh *> BoneMeshTable;
-	//typedef std::map<std::string, Bone *> BoneTable;
 
 	struct SkinnedXMesh
 	{
@@ -155,7 +149,6 @@ namespace video
 
 		uint32 _numSubset{};
 		MeshBoundInfo _boundInfo{};
-
 	};
 
 

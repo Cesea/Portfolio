@@ -5,6 +5,7 @@
 
 struct CollisionComponent : public Component
 {
+	//BoudningSphere는 일괄적 스케일만을 지원한다
 	struct BoundingSphere
 	{
 		Vector3 localCenter;
@@ -47,17 +48,27 @@ struct CollisionComponent : public Component
 
 	CollisionComponent();
 	virtual ~CollisionComponent();
+
 	enum CollisionType
 	{
 		Type_Box,
 		Type_Sphere
 	};
+
 	CollisionType _type;
-	BoundingSphere _sphere;
+	BoundingSphere _boundingSphere;
 	BoundingBox _boundingBox;
 
 	bool isTrigger;
 	bool locked;
+
+	//디버그용 함수들...
+	void GetWorldCenterRadius(const TransformComponent &transform, Vector3 *pOutCenter, float *pOutRadius);
+	void GetWorldBox(const TransformComponent& transform, Vector3* pOutBoxPos);
+	void GetWorldAABBMinMax(const TransformComponent& transform, Vector3* pOutMin, Vector3* pOutMax);
+
+	void RenderSphereGizmo(const TransformComponent &transform);
+	void RenderBoxGizmo(const TransformComponent &transform);
 };
 
 

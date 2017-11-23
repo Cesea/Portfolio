@@ -12,7 +12,6 @@ Terrain::~Terrain()
 bool Terrain::Create(const Terrain::TerrainConfig &config, int32 smoothLevel, bool32 inEditMode)
 {
 	_inEditMode = inEditMode;
-	RegisterEvents();
 	//스케일값 대입
 	_heightScale = config._heightScale;
 	_cellScale = config._cellScale;
@@ -96,8 +95,6 @@ bool Terrain::Create(const Terrain::TerrainConfig &config, int32 smoothLevel, bo
 
 void Terrain::RegisterEvents()
 {
-	EventChannel channel;
-	channel.Add<InputManager::MouseReleasedEvent, Terrain>(*this);
 }
 
 void Terrain::Destroy()
@@ -197,8 +194,6 @@ void Terrain::Destroy()
 //	//}
 //}
 
-
-//TODO : Implement this
 
 bool Terrain::IsIntersectRay(const Ray &ray, Vector3 *pOutHit)
 {

@@ -1,12 +1,10 @@
 #ifndef TERRAIN_H
 #define TERRAIN_H
 
-#include "SingletonBase.h"
-
 class BaseScene;
 class QuadTree;
 
-#define TERRAIN_CHUNK_RES (128)
+//#define TERRAIN_CHUNK_RES (128)
 
 struct TerrainChunkPos
 {
@@ -17,9 +15,10 @@ struct TerrainChunkPos
 	float _relZ{};
 };
 
-class Terrain : public SingletonBase<Terrain>
+class Terrain 
 {
 	friend class Editor;
+
 public:
 	struct TerrainConfig
 	{

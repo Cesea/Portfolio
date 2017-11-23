@@ -103,7 +103,7 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <WholeProgramOptimization>true</WholeProgramOptimization>
-      <OmitFramePointers>true</OmitFramePointers>
+      <OmitFramePointers>false</OmitFramePointers>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -148,6 +148,7 @@
     <ClCompile Include="Filter.cpp" />
     <ClCompile Include="Frustum.cpp" />
     <ClCompile Include="GameCommand.cpp" />
+    <ClCompile Include="GameObjectFactory.cpp" />
     <ClCompile Include="GizmoManager.cpp" />
     <ClCompile Include="Hash.cpp" />
     <ClCompile Include="imgui.cpp" />
@@ -230,6 +231,7 @@
     <ClInclude Include="Frustum.h" />
     <ClInclude Include="GameCommand.h" />
     <ClInclude Include="GameComponent.h" />
+    <ClInclude Include="GameObjectFactory.h" />
     <ClInclude Include="GameSystems.h" />
     <ClInclude Include="GameUtils.h" />
     <ClInclude Include="GizmoManager.h" />

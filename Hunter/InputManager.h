@@ -20,6 +20,7 @@ public :
 
 	void UpdateWithMessage(UINT msg, WPARAM wParam, LPARAM lParam);
 	void Update();
+	void UpdatePrevInput();
 
 	inline bool32 IsDown(int32 keyCode) const { return _currentState[keyCode]; }
 	inline bool32 IsReleased(int32 keyCode) const { return (!_currentState[keyCode] && _oldState[keyCode]); }
@@ -66,6 +67,7 @@ public:
 	void UpdateWheelWithMessage(WPARAM wParam, LPARAM lParam);
 
 	void Update();
+	void UpdatePrevInput();
 
 	inline bool32 IsDown(int32 button) const { return _currentState[button]; }
 	inline bool32 IsReleased(int32 button) const { return (!_currentState[button] && _oldState[button]); }
@@ -168,16 +170,14 @@ public :
 	bool Init();
 	void ShutDown();
 
-	void Update(float deltaTime);
+	void Update();
+	void UpdatePrevInput();
 	EventChannel GetChannel() { return _channel; }
 
 	Keyboard keyboard;
 	Mouse mouse;
 private :
-
 	EventChannel _channel;
-
-
 };
 
 #endif
