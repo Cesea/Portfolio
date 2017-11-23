@@ -669,22 +669,20 @@ bool Time_RayToOBB(Vector3 rayPos, Vector3 rayDir, Vector3 OBBPos, Vector3 xVec,
 bool IsBlocking(TransformComponent * pTransA, CollisionComponent::BoundingBox * pBoundA, TransformComponent * pTransB, CollisionComponent::BoundingBox * pBoundB, float moveFactor)
 {
 	//둘이 충돌되지 않았으면 할필요없다
-	if (Collision_AABBToAABB(pBoundA->localMinPos, pBoundA->localMaxPos,pBoundB->localMinPos,pBoundB->localMaxPos) == false)
+	if (Collision_AABBToAABB(pBoundA->_localMinPos, pBoundA->_localMaxPos,pBoundB->_localMinPos,pBoundB->_localMaxPos) == false)
 		return false;
 
 	moveFactor = Clamp01(moveFactor);
 
-
-
 	//둘이 부디쳤스니 밀어내야한다...
 
 	//A의 Min Max
-	D3DXVECTOR3 minA = pBoundA->localMinPos;
-	D3DXVECTOR3 maxA = pBoundA->localMaxPos;
+	Vector3 minA = pBoundA->_localMinPos;
+	Vector3 maxA = pBoundA->_localMaxPos;
 
 	//B의 Min Max
-	D3DXVECTOR3 minB = pBoundB->localMinPos;
-	D3DXVECTOR3 maxB = pBoundB->localMaxPos;
+	Vector3 minB = pBoundB->_localMinPos;
+	Vector3 maxB = pBoundB->_localMaxPos;
 
 	//B 의 로컬 사각 8 점
 
@@ -695,26 +693,26 @@ bool IsBlocking(TransformComponent * pTransA, CollisionComponent::BoundingBox * 
 	//     |/      |/
 	// Min 0-------3
 
-	D3DXVECTOR3 pos[8];
-	pos[0] = D3DXVECTOR3(minB.x, minB.y, minB.z);
-	pos[1] = D3DXVECTOR3(minB.x, maxB.y, minB.z);
-	pos[2] = D3DXVECTOR3(maxB.x, maxB.y, minB.z);
-	pos[3] = D3DXVECTOR3(maxB.x, minB.y, minB.z);
-	pos[4] = D3DXVECTOR3(minB.x, minB.y, maxB.z);
-	pos[5] = D3DXVECTOR3(minB.x, maxB.y, maxB.z);
-	pos[6] = D3DXVECTOR3(maxB.x, maxB.y, maxB.z);
-	pos[7] = D3DXVECTOR3(maxB.x, minB.y, maxB.z);
+	Vector3 pos[8];
+	pos[0] = Vector3(minB.x, minB.y, minB.z);
+	pos[1] = Vector3(minB.x, maxB.y, minB.z);
+	pos[2] = Vector3(maxB.x, maxB.y, minB.z);
+	pos[3] = Vector3(maxB.x, minB.y, minB.z);
+	pos[4] = Vector3(minB.x, minB.y, maxB.z);
+	pos[5] = Vector3(minB.x, maxB.y, maxB.z);
+	pos[6] = Vector3(maxB.x, maxB.y, maxB.z);
+	pos[7] = Vector3(maxB.x, minB.y, maxB.z);
 
 
 	//A 의 월드 역행렬
-	D3DXMATRIXA16 matWorldAInv;
-	D3DXMatrixInverse(&matWorldAInv, NULL, &pTransA->GetFinalMatrix());
+	Matrix matWorldAInv;
+	MatrixInverse(&matWorldAInv, NULL, &pTransA->GetFinalMatrix());
 
 	//B 의 월드 행렬
-	D3DXMATRIXA16 matWorldB = pTransB->GetFinalMatrix();
+	Matrix matWorldB = pTransB->GetFinalMatrix();
 
 	//B 월드 만큼 가고 A 의 역으로 다시 움직인 행렬
-	D3DXMATRIXA16 mat = matWorldB * matWorldAInv;
+	Matrix mat = matWorldB * matWorldAInv;
 
 	//B pos 에 적용
 	for (int i = 0; i < 8; i++)
@@ -818,12 +816,12 @@ bool IsBlocking(TransformComponent * pTransA, CollisionComponent::BoundingBox * 
 	float moveLengthB = 0.0f;
 
 	//A의 Min Max
-	minA = pBoundA->localMinPos;
-	maxA = pBoundA->localMaxPos;
+	minA = pBoundA->_localMinPos;
+	maxA = pBoundA->_localMaxPos;
 
 	//B의 Min Max
-	minB = pBoundB->localMinPos;
-	maxB = pBoundB->localMaxPos;
+	minB = pBoundB->_localMinPos;
+	maxB = pBoundB->_localMaxPos;
 
 	//B 의 로컬 사각 8 점
 
@@ -834,17 +832,17 @@ bool IsBlocking(TransformComponent * pTransA, CollisionComponent::BoundingBox * 
 	//     |/      |/
 	// Min 0-------3
 
-	pos[0] = D3DXVECTOR3(minA.x, minA.y, minA.z);
-	pos[1] = D3DXVECTOR3(minA.x, maxA.y, minA.z);
-	pos[2] = D3DXVECTOR3(maxA.x, maxA.y, minA.z);
-	pos[3] = D3DXVECTOR3(maxA.x, minA.y, minA.z);
-	pos[4] = D3DXVECTOR3(minA.x, minA.y, maxA.z);
-	pos[5] = D3DXVECTOR3(minA.x, maxA.y, maxA.z);
-	pos[6] = D3DXVECTOR3(maxA.x, maxA.y, maxA.z);
-	pos[7] = D3DXVECTOR3(maxA.x, minA.y, maxA.z);
+	pos[0] = Vector3(minA.x, minA.y, minA.z);
+	pos[1] = Vector3(minA.x, maxA.y, minA.z);
+	pos[2] = Vector3(maxA.x, maxA.y, minA.z);
+	pos[3] = Vector3(maxA.x, minA.y, minA.z);
+	pos[4] = Vector3(minA.x, minA.y, maxA.z);
+	pos[5] = Vector3(minA.x, maxA.y, maxA.z);
+	pos[6] = Vector3(maxA.x, maxA.y, maxA.z);
+	pos[7] = Vector3(maxA.x, minA.y, maxA.z);
 
 	//B 의 월드 역행렬
-	D3DXMATRIXA16 matWorldBInv;
+	Matrix matWorldBInv;
 	D3DXMatrixInverse(&matWorldBInv, NULL, &pTransB->GetFinalMatrix());
 
 	//A 의 월드 행렬

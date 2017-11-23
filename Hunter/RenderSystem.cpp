@@ -56,6 +56,11 @@ void RenderSystem::Render(const Camera &camera)
 		{
 			video::StaticXMesh *pMesh = VIDEO->GetStaticXMesh(refRenderComponent._static);
 			pMesh->Render(refTransformComponent);
+			
+#if defined (DEBUG) || defined (_DEBUG)
+			CollisionComponent &refCollisionComp = entities[i].GetComponent<CollisionComponent>();
+			refCollisionComp.RenderBoxGizmo(refTransformComponent);
+#endif
 		}
 		else if (refRenderComponent._type == RenderComponent::Type::eSkinned)
 		{

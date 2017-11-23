@@ -79,18 +79,8 @@ bool BaseScene::Init()
 	_world.AddSystem<ActionSystem>(_actionSystem);
 	_world.AddSystem<ScriptSystem>(_scriptSystem);
 
-
 	//_player.CreateFromWorld(_world);
 	_snake.CreateFromWorld(_world);
-
-	//_entities.push_back(_world.CreateEntity());
-	//Entity &entity = _entities.back();
-	//TransformComponent &transComp = entity.AddComponent<TransformComponent>();
-	//transComp.MovePositionWorld(0.0f, -0.0f, 0.0f);
-	//RenderComponent &renderComp = entity.AddComponent<RenderComponent>();
-	//renderComp._type = RenderComponent::Type::eStatic;
-	//renderComp._static = staticMeshHandle;
-	//entity.Activate();
 
 	//에디터 생성
 	imguiRenderInit();

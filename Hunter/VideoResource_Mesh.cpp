@@ -456,7 +456,6 @@ namespace video
 		pStatic->_ptr->SetVector("vEyePos", &Vector4(vEyePos, 1));
 		pStatic->_ptr->SetFloat("camFar", camera._camFar);
 		pStatic->_ptr->SetFloat("camNear", camera._camNear);
-
 	}
 
 	void SkinnedXMesh::SetBaseLight(DirectionalLight * pDirectional)

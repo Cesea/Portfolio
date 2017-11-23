@@ -175,6 +175,10 @@ void Editor::InTerrainEditMode()
 
 void Editor::InObjectEditMode()
 {
+	if (ImguiCollapse("TerrainEditor", nullptr, _editing))
+	{
+		ChangeEditState(EditMode::eNone);
+	}
 }
 
 void Editor::UpdateInput(const InputManager & input)

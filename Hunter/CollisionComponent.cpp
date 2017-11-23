@@ -14,26 +14,26 @@ void CollisionComponent::GetWorldCenterRadius(const TransformComponent & transfo
 {
 	Matrix finalMatrix = transform.GetFinalMatrix();
 	//월드 센터
-	Vec3TransformCoord(pOutCenter, &_boundingSphere.localCenter, &finalMatrix);
+	Vec3TransformCoord(pOutCenter, &_boundingSphere._localCenter, &finalMatrix);
 
 	Vector3 scale = transform.GetScale();
 	//구의 길이
-	*pOutRadius = _boundingSphere.radius * scale.x;
+	*pOutRadius = _boundingSphere._radius * scale.x;
 }
 
 void CollisionComponent::GetWorldBox(const TransformComponent & transform, Vector3 * pOutBoxPos)
 {
 	//로컬 8개의 정점을 구한다.
 	Vector3 vertices[8];
-	vertices[0] = Vector3(_boundingBox.localMinPos.x, _boundingBox.localMinPos.y, _boundingBox.localMinPos.z);
-	vertices[0] = Vector3(_boundingBox.localMinPos.x, _boundingBox.localMaxPos.y, _boundingBox.localMinPos.z);
-	vertices[0] = Vector3(_boundingBox.localMaxPos.x, _boundingBox.localMaxPos.y, _boundingBox.localMinPos.z);
-	vertices[0] = Vector3(_boundingBox.localMaxPos.x, _boundingBox.localMinPos.y, _boundingBox.localMinPos.z);
+	vertices[0] = Vector3(_boundingBox._localMinPos.x, _boundingBox._localMinPos.y, _boundingBox._localMinPos.z);
+	vertices[1] = Vector3(_boundingBox._localMinPos.x, _boundingBox._localMaxPos.y, _boundingBox._localMinPos.z);
+	vertices[2] = Vector3(_boundingBox._localMaxPos.x, _boundingBox._localMaxPos.y, _boundingBox._localMinPos.z);
+	vertices[3] = Vector3(_boundingBox._localMaxPos.x, _boundingBox._localMinPos.y, _boundingBox._localMinPos.z);
 
-	vertices[0] = Vector3(_boundingBox.localMinPos.x, _boundingBox.localMinPos.y, _boundingBox.localMaxPos.z);
-	vertices[0] = Vector3(_boundingBox.localMinPos.x, _boundingBox.localMaxPos.y, _boundingBox.localMaxPos.z);
-	vertices[0] = Vector3(_boundingBox.localMaxPos.x, _boundingBox.localMaxPos.y, _boundingBox.localMaxPos.z);
-	vertices[0] = Vector3(_boundingBox.localMaxPos.x, _boundingBox.localMinPos.y, _boundingBox.localMaxPos.z);
+	vertices[4] = Vector3(_boundingBox._localMinPos.x, _boundingBox._localMinPos.y, _boundingBox._localMaxPos.z);
+	vertices[5] = Vector3(_boundingBox._localMinPos.x, _boundingBox._localMaxPos.y, _boundingBox._localMaxPos.z);
+	vertices[6] = Vector3(_boundingBox._localMaxPos.x, _boundingBox._localMaxPos.y, _boundingBox._localMaxPos.z);
+	vertices[7] = Vector3(_boundingBox._localMaxPos.x, _boundingBox._localMinPos.y, _boundingBox._localMaxPos.z);
 
 	Matrix finalMatrix = transform.GetFinalMatrix();
 	for (int i = 0; i < 8; i++)

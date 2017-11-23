@@ -8,59 +8,59 @@ struct CollisionComponent : public Component
 	//BoudningSphere는 일괄적 스케일만을 지원한다
 	struct BoundingSphere
 	{
-		Vector3 localCenter;
-		float radius;
+		Vector3 _localCenter;
+		float _radius;
 		BoundingSphere & operator=(const BoundingSphere & other)
 		{
-			this->localCenter = other.localCenter;
-			this->radius = other.radius;
+			this->_localCenter = other._localCenter;
+			this->_radius = other._radius;
 		}
 	};
 
 	struct BoundingBox
 	{
-		Vector3 localCenter;
-		float xSize;
-		float ySize;
-		float zSize;
-		Vector3 localMinPos;
-		Vector3 localMaxPos;
-		void initialBox(const Vector3 & min, const Vector3 & max)
+		Vector3 _localCenter;
+		float _xSize;
+		float _ySize;
+		float _zSize;
+		Vector3 _localMinPos;
+		Vector3 _localMaxPos;
+		void Init(const Vector3 & min, const Vector3 & max)
 		{
-			localMinPos = min;
-			localMaxPos = max;
-			xSize = (max.x - min.x) / 2;
-			ySize = (max.y - min.y) / 2;
-			zSize = (max.z - min.z) / 2;
-			localCenter = (min + max) / 2;
+			_localMinPos = min;
+			_localMaxPos = max;
+			_xSize = (max.x - min.x) / 2;
+			_ySize = (max.y - min.y) / 2;
+			_zSize = (max.z - min.z) / 2;
+			_localCenter = (min + max) / 2;
 		}
 
 		BoundingBox & operator=(const BoundingBox & other)
 		{
-			this->localCenter = other.localCenter;
-			this->xSize = other.xSize;
-			this->ySize = other.ySize;
-			this->zSize = other.zSize;
-			this->localMinPos = other.localMaxPos;
-			this->localMaxPos = other.localMaxPos;
+			this->_localCenter = other._localCenter;
+			this->_xSize = other._xSize;
+			this->_ySize = other._ySize;
+			this->_zSize = other._zSize;
+			this->_localMinPos = other._localMaxPos;
+			this->_localMaxPos = other._localMaxPos;
 		}
 	};
 
 	CollisionComponent();
 	virtual ~CollisionComponent();
 
-	enum CollisionType
+	enum COLLISION_TYPE
 	{
-		Type_Box,
-		Type_Sphere
+		COLLISION_TYPE_BOX,
+		COLLISION_TYPE_SPHERE
 	};
 
-	CollisionType _type;
+	COLLISION_TYPE _type;
 	BoundingSphere _boundingSphere;
 	BoundingBox _boundingBox;
 
-	bool isTrigger;
-	bool locked;
+	bool _isTrigger;
+	bool _locked;
 
 	//디버그용 함수들...
 	void GetWorldCenterRadius(const TransformComponent &transform, Vector3 *pOutCenter, float *pOutRadius);

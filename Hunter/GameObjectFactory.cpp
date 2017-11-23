@@ -31,8 +31,17 @@ void GameObjectFactory::CreateObject(ArcheType type, const Vector3 & position)
 		RenderComponent &render = entity.AddComponent<RenderComponent>();
 		render._type = RenderComponent::Type::eStatic;
 		render._static = VIDEO->GetStaticXMesh("Rock01");
+		Assert(render._static.IsValid());
+
+		video::StaticXMesh *pMesh = VIDEO->GetStaticXMesh(render._static);
+
+		CollisionComponent &collision = entity.AddComponent<CollisionComponent>();
+		collision._boundingBox.Init(pMesh->_meshBoundInfo._min, pMesh->_meshBoundInfo._max);
+		collision._boundingSphere._localCenter = pMesh->_meshBoundInfo._center;
+		collision._boundingSphere._radius = pMesh->_meshBoundInfo._radius;
 
 		entity.Activate();
+
 	}break;
 	case eTree:
 	{
@@ -44,6 +53,15 @@ void GameObjectFactory::CreateObject(ArcheType type, const Vector3 & position)
 		RenderComponent &render = entity.AddComponent<RenderComponent>();
 		render._type = RenderComponent::Type::eStatic;
 		render._static = VIDEO->GetStaticXMesh("Tree01");
+
+		Assert(render._static.IsValid());
+
+		video::StaticXMesh *pMesh = VIDEO->GetStaticXMesh(render._static);
+
+		CollisionComponent &collision = entity.AddComponent<CollisionComponent>();
+		collision._boundingBox.Init(pMesh->_meshBoundInfo._min, pMesh->_meshBoundInfo._max);
+		collision._boundingSphere._localCenter = pMesh->_meshBoundInfo._center;
+		collision._boundingSphere._radius = pMesh->_meshBoundInfo._radius;
 
 		entity.Activate();
 	}break;
@@ -57,6 +75,15 @@ void GameObjectFactory::CreateObject(ArcheType type, const Vector3 & position)
 		RenderComponent &render = entity.AddComponent<RenderComponent>();
 		render._type = RenderComponent::Type::eStatic;
 		render._static = VIDEO->GetStaticXMesh("Grass01");
+
+		Assert(render._static.IsValid());
+
+		video::StaticXMesh *pMesh = VIDEO->GetStaticXMesh(render._static);
+
+		CollisionComponent &collision = entity.AddComponent<CollisionComponent>();
+		collision._boundingBox.Init(pMesh->_meshBoundInfo._min, pMesh->_meshBoundInfo._max);
+		collision._boundingSphere._localCenter = pMesh->_meshBoundInfo._center;
+		collision._boundingSphere._radius = pMesh->_meshBoundInfo._radius;
 
 		entity.Activate();
 	}break;

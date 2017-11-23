@@ -25,22 +25,22 @@ void CollisionSystem::Update(float deltaTime,float checkRange)
 			if (distance < checkRange)
 			{
 				//둘다 고정됬으면 검사하지않음
-				if (collision2.locked&& collision.locked) continue;
+				if (collision2._locked && collision._locked) continue;
 				//둘중 하나가 고정되어있음
-				if ((collision.locked && !collision2.locked) || (!collision.locked && collision2.locked))
+				if ((collision._locked && !collision2._locked) || (!collision._locked && collision2._locked))
 				{
 					//충돌했다면
-					if (Collision_AABBToAABB(collision._boundingBox.localMinPos, collision2._boundingBox.localMinPos,
-						collision._boundingBox.localMaxPos, collision2._boundingBox.localMaxPos))
+					if (Collision_AABBToAABB(collision._boundingBox._localMinPos, collision2._boundingBox._localMinPos,
+						collision._boundingBox._localMaxPos, collision2._boundingBox._localMaxPos))
 					{
 						//움직일수 없음의 이벤트
 
 						//트리거 검사
-						if (collision.isTrigger)
+						if (collision._isTrigger)
 						{
 
 						}
-						if (collision2.isTrigger)
+						if (collision2._isTrigger)
 						{
 
 						}
@@ -48,15 +48,15 @@ void CollisionSystem::Update(float deltaTime,float checkRange)
 					}
 				}
 				//둘다 고정되어 있지 않음
-				if (!collision.locked && !collision2.locked)
+				if (!collision._locked && !collision2._locked)
 				{
 					IsBlocking(&transform, &collision._boundingBox, &transform2, &collision2._boundingBox, 1.0f);
 					//트리거 검사
-					if (collision.isTrigger)
+					if (collision._isTrigger)
 					{
 
 					}
-					if (collision2.isTrigger)
+					if (collision2._isTrigger)
 					{
 
 					}
