@@ -2,10 +2,10 @@
 
 void GameCommand::Reset()
 {
-	_type = GameCommand::Type::eNone;
-	_movement._vertical = Movement::Vertical::eNoneV;
-	_movement._horizontal = Movement::Horizontal::eNoneH;
-	_behavior._type = Behavior::eNone;
+	_type = GAMECOMMAND_NONE;
+	_movement._vertical = VERTICAL_MOVEMENT_NONE;
+	_movement._horizontal = HORIZONTAL_MOVEMENT_NONE;
+	_behavior._type = BEHAVIOR_NONE;
 	_behavior._usageIndex = 0;
 	_interpreted = false;
 }

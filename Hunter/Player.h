@@ -61,37 +61,6 @@ class Player : public BaseGameObject
 	friend class PlayerStateMachine;
 	friend class PlayerCallbackHandler;
 public :
-	//struct AttackEvent
-	//{
-	//	int32 _a;
-	//};
-
-	//struct MoveEvent
-	//{
-	//	int32 _a;
-	//};
-	//struct InteractEvent
-	//{
-	//	int32 _a;
-	//};
-	//struct JumpEvent
-	//{
-	//	int32 _a;
-	//};
-
-	//struct PositionEvent
-	//{
-	//	int32 _a;
-	//};
-
-	//struct QueueActionEvent
-	//{
-	//	QueueActionEvent(const Action &action)
-	//		:_action(action)
-	//	{}
-	//	const Action &_action;
-	//};
-
 	friend class PlayerStanceState;
 public :
 	Player();
@@ -124,8 +93,6 @@ private :
 	EventChannel _channel;
 
 	float _speed{2.0f};
-
-	bool32 _inCombat{ false };
 
 };
 

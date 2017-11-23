@@ -11,6 +11,7 @@
 
 #include "WorldEditor.h"
 #include "Player.h"
+#include "Snake.h"
 
 class BaseScene : public IScene
 {
@@ -39,6 +40,7 @@ private:
 	Editor *_editor{};
 
 	Player _player;
+	Snake _snake;
 public:
 	//struct SpawnEvent
 	//{

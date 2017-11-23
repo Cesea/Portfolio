@@ -1,31 +1,23 @@
 #pragma once
 
-class TransformComponent;
+#include "BaseGameObject.h"
 
-class Enemy
-{
-	enum stateTag
+enum ENEMYSTATE
 	{
-		IDLE,
-		FIND,
-		RUN,
-		ATK1,
-		ATK2,
-		ATK3,
-		ATK4,
-		ATK5,
-		HURT,
-		DIE
+		ENEMYSTATE_IDLE,
+		ENEMYSTATE_RUN
 	};
+
+class Enemy : public BaseGameObject	
+{
+public:
+	virtual bool CreateFromWorld(World &world) = 0;
+	virtual void Update(float deltaTime) = 0;
+	Enemy();
+	virtual ~Enemy();
 
 protected:
 	float _hp;
 	float _speed;
-	stateTag _state;
 	std::vector<Vector3> _moveSegment;
-public:
-	virtual bool CreateFromWorld(World &world) = 0;
-	virtual void update(float deltaTime) = 0;
-	Enemy();
-	virtual ~Enemy();
 };

@@ -16,6 +16,7 @@ bool BaseScene::Init()
 	video::SkinnedXMesh::_sSkinnedEffectHandle = VIDEO->GetEffect("SkinnedMesh.fx");
 
 	InitPlayerAnimation();
+	InitSnakeAnimation();
 
 	_camera.SetRotationSpeed(10.0f);
 	_camera.SetMoveSpeed(20.0f);
@@ -42,9 +43,14 @@ bool BaseScene::Init()
 
 	//메쉬 불러오기..
 	Matrix correctionMat;
-	MatrixScaling(&correctionMat, 0.015f, 0.015f, 0.015f);
-	video::SkinnedXMeshHandle skinned  = VIDEO->CreateSkinnedXMesh("../resources/Models/Knight/Knight.X", &correctionMat, "Knight");
-	video::AnimationInstanceHandle ainmHandle = VIDEO->CreateAnimationInstance(skinned, "Knight0");
+	MatrixScaling(&correctionMat, 0.15f, 0.15f, 0.15f);
+	video::SkinnedXMeshHandle knight  = VIDEO->CreateSkinnedXMesh(
+		"../resources/Models/Knight/Knight.X", &correctionMat, "Knight");
+	video::AnimationInstanceHandle ainmHandle = VIDEO->CreateAnimationInstance(knight, "Knight0");
+
+	MatrixScaling(&correctionMat, 1.15f, 1.15f, 1.15f);
+	video::SkinnedXMeshHandle snakeMesh = VIDEO->CreateSkinnedXMesh(
+		"../resources/Models/Snake/Snake.X", &correctionMat, "Snake");
 
 	MatrixScaling(&correctionMat, 1.0f, 1.0f, 1.0f);
 	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Rock/Rock1_A.X", &correctionMat, "Rock01");
@@ -74,7 +80,8 @@ bool BaseScene::Init()
 	_world.AddSystem<ScriptSystem>(_scriptSystem);
 
 
-	_player.CreateFromWorld(_world);
+	//_player.CreateFromWorld(_world);
+	_snake.CreateFromWorld(_world);
 
 	//_entities.push_back(_world.CreateEntity());
 	//Entity &entity = _entities.back();

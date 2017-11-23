@@ -109,15 +109,15 @@ void Player::Handle(const InputManager::MousePressedEvent & event)
 
 	if (inputCode == _inputConfig._attack)
 	{
-		_currentCommand._type = GameCommand::Type::eAction;
-		_currentCommand._behavior._type = Behavior::Type::eAttack;
+		_currentCommand._type = GAMECOMMAND_ACTION;
+		_currentCommand._behavior._type = BEHAVIOR_ATTACK;
 		//_currentCommand._interpreted = false;
 		//_channel.Broadcast<Player::AttackEvent>(AttackEvent());
 	}
 	else if (inputCode == _inputConfig._block)
 	{
-		_currentCommand._type = GameCommand::Type::eAction;
-		_currentCommand._behavior._type = Behavior::Type::eBlock;
+		_currentCommand._type = GAMECOMMAND_ACTION;
+		_currentCommand._behavior._type = BEHAVIOR_BLOCK;
 		//_currentCommand._interpreted = false;
 	}
 }
@@ -128,40 +128,39 @@ void Player::Handle(const InputManager::KeyDownEvent & event)
 
 	if (_inputConfig._left == inputCode)
 	{
-		_currentCommand._type = GameCommand::Type::eMove;
-		_currentCommand._movement._horizontal = Movement::Horizontal::eLeft;
+		_currentCommand._type = GAMECOMMAND_MOVE;
+		_currentCommand._movement._horizontal = HORIZONTAL_MOVEMENT_LEFT;
 		//_currentCommand._behavior._type = Behavior::Type::eWalk;
 		//_currentCommand._interpreted = false;
 		//_channel.Broadcast<Player::MoveEvent>(Player::MoveEvent());
 	}
 	else if(_inputConfig._right == inputCode)
 	{
-		_currentCommand._type = GameCommand::Type::eMove;
-		_currentCommand._movement._horizontal = Movement::Horizontal::eRight;
+		_currentCommand._type = GAMECOMMAND_MOVE;
+		_currentCommand._movement._horizontal = HORIZONTAL_MOVEMENT_RIGHT;
 		//_currentCommand._behavior._type = Behavior::Type::eWalk;
 		//_currentCommand._interpreted = false;
 		//_channel.Broadcast<Player::MoveEvent>(Player::MoveEvent());
 	}
 	else if(_inputConfig._up == inputCode)
 	{
-		_currentCommand._type = GameCommand::Type::eMove;
-		_currentCommand._movement._vertical = Movement::Vertical::eUp;
+		_currentCommand._type = GAMECOMMAND_MOVE;
+		_currentCommand._movement._vertical = VERTICAL_MOVEMENT_UP;
 		//_currentCommand._behavior._type = Behavior::Type::eWalk;
 		//_currentCommand._interpreted = false;
 		//_channel.Broadcast<Player::MoveEvent>(Player::MoveEvent());
 	}
 	else if (_inputConfig._down == inputCode)
 	{
-		_currentCommand._type = GameCommand::Type::eMove;
-		_currentCommand._movement._vertical = Movement::Vertical::eDown;
+		_currentCommand._type = GAMECOMMAND_MOVE;
+		_currentCommand._movement._vertical = VERTICAL_MOVEMENT_DOWN;
 		//_currentCommand._behavior._type = Behavior::Type::eWalk;
 		//_currentCommand._interpreted = false;
 		//_channel.Broadcast<Player::MoveEvent>(Player::MoveEvent());
 	}
 	else if (_inputConfig._jump == inputCode)
 	{
-		_currentCommand._type = GameCommand::Type::eJump;
-		_currentCommand._movement._vertical = Movement::Vertical::eDown;
+		_currentCommand._type = GAMECOMMAND_JUMP;
 	}
 
 }

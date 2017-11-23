@@ -213,6 +213,15 @@
     <ClCompile Include="spawn.cpp">
       <Filter>Game\GameObject\Enemy\spawn</Filter>
     </ClCompile>
+    <ClCompile Include="Snake.cpp">
+      <Filter>Game\GameObject\Enemy\Snake</Filter>
+    </ClCompile>
+    <ClCompile Include="SnakeAnimationString.cpp">
+      <Filter>Game\GameObject\Enemy\Snake</Filter>
+    </ClCompile>
+    <ClCompile Include="SnakeStates.cpp">
+      <Filter>Game\GameObject\Enemy\Snake</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -526,6 +535,15 @@
     <ClInclude Include="BaseGameObject.h">
       <Filter>Game\GameObject</Filter>
     </ClInclude>
+    <ClInclude Include="Snake.h">
+      <Filter>Game\GameObject\Enemy\Snake</Filter>
+    </ClInclude>
+    <ClInclude Include="SnakeAnimationString.h">
+      <Filter>Game\GameObject\Enemy\Snake</Filter>
+    </ClInclude>
+    <ClInclude Include="SnakeStates.h">
+      <Filter>Game\GameObject\Enemy\Snake</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Core">
@@ -677,6 +695,9 @@
     </Filter>
     <Filter Include="Game\GameComponent\ParticleComponent">
       <UniqueIdentifier>{f177f821-793e-4350-bd39-9c7dd41881b3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\GameObject\Enemy\Snake">
+      <UniqueIdentifier>{89a2740d-465d-4b2d-ae00-0a66d64981ea}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

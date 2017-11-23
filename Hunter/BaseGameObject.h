@@ -13,9 +13,7 @@ public :
 
 protected :
 	Entity _entity;
-
 	bool32 _inCombat{false};
-
 	int32 _animationEnum;
 };
 

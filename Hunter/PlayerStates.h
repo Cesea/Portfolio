@@ -1,7 +1,6 @@
 #ifndef PLAYER_STATE_H
 #define PLAYER_STATE_H
 
-
 #include "State.h"
 #include "StateMachine.h"
 

@@ -27,14 +27,14 @@ bool Dragon::CreateFromWorld(World & world)
 	//NOTE : 이거 함수명 변경되었음...
 	renderComp._skinned = VIDEO->CreateAnimationInstance(_skinnedMeshHandle, "Anim0");
 	ScriptComponent & script = _entity.AddComponent<ScriptComponent>();
-	script.SetScript(MAKE_SCRIPT_DELEGATE(Dragon, update, *this));
+	script.SetScript(MAKE_SCRIPT_DELEGATE(Dragon, Update, *this));
 
 
 	_entity.Activate();
 	return true;
 }
 
-void Dragon::update(float deltaTime)
+void Dragon::Update(float deltaTime)
 {
 	TransformComponent &transComp = _entity.GetComponent<TransformComponent>();
 	transComp.SetWorldPosition(transComp.GetWorldPosition() + Vector3(0.0f, 0.0f, 0.1f));

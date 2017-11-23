@@ -50,20 +50,20 @@ void PlayerAttackState::Update(float deltaTime, const GameCommand &command)
 {
 	switch (command._type)
 	{
-	case GameCommand::eNone:
+	case GAMECOMMAND_NONE:
 	{
 	}break;
-	case GameCommand::eMove:
+	case GAMECOMMAND_MOVE :
 	{
 	}break;
-	case GameCommand::eAction:
+	case GAMECOMMAND_ACTION:
 	{
 		_pParent->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWarSwingLeft));
 	}break;
-	case GameCommand::eJump:
+	case GAMECOMMAND_JUMP:
 	{
 	}break;
-	case GameCommand::eInteract:
+	case GAMECOMMAND_INTERACT:
 	{
 	}break;
 	}
@@ -86,30 +86,30 @@ void PlayerCombatState::Update(float deltaTime, const GameCommand &command)
 {
 	switch (command._type)
 	{
-	case GameCommand::Type::eNone:
+	case GAMECOMMAND_NONE:
 	{
 	}break;
-	case GameCommand::Type::eMove:
+	case GAMECOMMAND_MOVE:
 	{
 	}break;
-	case GameCommand::Type::eAction:
+	case GAMECOMMAND_ACTION:
 	{
 		switch (command._behavior._type)
 		{
-			case Behavior::Type::eAttack:
+			case BEHAVIOR_ATTACK:
 			{
 				_pParent->ChangeState(META_TYPE(PlayerAttackState)->Name());
 			}break;
-			case Behavior::Type::eSpecialAttack:
+			case BEHAVIOR_SPECIAL_ATTACK:
 			{
 			}break;
-			case Behavior::Type::eSkill:
+			case BEHAVIOR_SKILL:
 			{
 			}break;
-			case Behavior::Type::eBlock:
+			case BEHAVIOR_BLOCK:
 			{
 			}break;
-			case Behavior::Type::eInteract:
+			case BEHAVIOR_INTERACT:
 			{
 			}break;
 		}
@@ -173,32 +173,32 @@ void PlayerStanceState::Update(float deltaTime, const GameCommand &command)
 {
 	switch (command._type)
 	{
-		case GameCommand::Type::eNone:
+		case GAMECOMMAND_NONE:
 		{
 		}break;
-		case GameCommand::Type::eMove:
+		case GAMECOMMAND_MOVE:
 		{
 		}break;
-		case GameCommand::Type::eAction:
+		case GAMECOMMAND_ACTION:
 		{
 			switch (command._behavior._type)
 			{
-			case Behavior::Type::eNone:
+			case BEHAVIOR_NONE:
 			{
 			}break;
-			case Behavior::Type::eAttack:
+			case BEHAVIOR_ATTACK:
 			{
 				_pParent->ChangeState(META_TYPE(PlayerCombatState)->Name());
 			}break;
-			case Behavior::Type::eInteract:
+			case BEHAVIOR_INTERACT:
 			{
 			}break;
 			}
 		}break;
-		case GameCommand::Type::eJump:
+		case GAMECOMMAND_JUMP:
 		{
 		}break;
-		case GameCommand::Type::eInteract:
+		case GAMECOMMAND_INTERACT:
 		{
 		}break;
 	}

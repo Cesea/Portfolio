@@ -1,54 +1,56 @@
 #ifndef GAME_COMMAND_H
 #define GAME_COMMAND_H
 
+enum VERTICAL_MOVEMENT_TYPE
+{
+	VERTICAL_MOVEMENT_NONE,
+	VERTICAL_MOVEMENT_UP,
+	VERTICAL_MOVEMENT_DOWN,
+};
+
+enum HORIZONTAL_MOVEMENT_TYPE
+{
+	HORIZONTAL_MOVEMENT_NONE,
+	HORIZONTAL_MOVEMENT_LEFT,
+	HORIZONTAL_MOVEMENT_RIGHT,
+};
+
 struct Movement
 {
-	enum Vertical
-	{
-		eNoneV,
-		eUp,
-		eDown
-	};
+	VERTICAL_MOVEMENT_TYPE _vertical;
+	HORIZONTAL_MOVEMENT_TYPE _horizontal;
+};
 
-	enum Horizontal
-	{
-		eNoneH,
-		eLeft,
-		eRight
-	};
-
-	Movement::Vertical _vertical{Movement::Vertical::eNoneV};
-	Movement::Horizontal _horizontal{Movement::Horizontal::eNoneH};
+enum BEHAVIOR_TYPE
+{
+	BEHAVIOR_NONE,
+	BEHAVIOR_ATTACK,
+	BEHAVIOR_SPECIAL_ATTACK,
+	BEHAVIOR_SKILL,
+	BEHAVIOR_BLOCK,
+	BEHAVIOR_FLY,
+	BEHAVIOR_INTERACT
 };
 
 struct Behavior
 {
-	enum Type
-	{
-		eNone,
-		eAttack,
-		eSpecialAttack,
-		eSkill,
-		eBlock,
-		eFly,
-		eInteract
-	};
-	Behavior::Type _type{Behavior::Type::eNone};
+	BEHAVIOR_TYPE _type{BEHAVIOR_NONE};
 	int32 _usageIndex{0};
+};
+
+
+enum GAMECOMMAND_TYPE
+{
+	GAMECOMMAND_NONE,
+	GAMECOMMAND_MOVE,
+	GAMECOMMAND_ACTION,
+	GAMECOMMAND_JUMP,
+	GAMECOMMAND_INTERACT,
 };
 
 struct GameCommand
 {
-	enum Type
-	{
-		eNone,
-		eMove,
-		eAction,
-		eJump,
-		eInteract,
-	};
-
-	Type _type{ GameCommand::Type::eNone };
+	GAMECOMMAND_TYPE _type{ GAMECOMMAND_NONE };
 	Movement _movement;
 	Behavior _behavior;
 	bool32 _interpreted{false};

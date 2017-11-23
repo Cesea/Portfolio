@@ -172,6 +172,9 @@
     <ClCompile Include="RenderSystem.cpp" />
     <ClCompile Include="ScriptComponent.cpp" />
     <ClCompile Include="ScriptSystem.cpp" />
+    <ClCompile Include="Snake.cpp" />
+    <ClCompile Include="SnakeAnimationString.cpp" />
+    <ClCompile Include="SnakeStates.cpp" />
     <ClCompile Include="spawn.cpp" />
     <ClCompile Include="spawnManager.cpp" />
     <ClCompile Include="SpriteManager.cpp" />
@@ -267,6 +270,9 @@
     <ClInclude Include="SceneChangeEffect.h" />
     <ClInclude Include="ScriptComponent.h" />
     <ClInclude Include="ScriptSystem.h" />
+    <ClInclude Include="Snake.h" />
+    <ClInclude Include="SnakeAnimationString.h" />
+    <ClInclude Include="SnakeStates.h" />
     <ClInclude Include="spawn.h" />
     <ClInclude Include="spawnManager.h" />
     <ClInclude Include="SpriteManager.h" />
