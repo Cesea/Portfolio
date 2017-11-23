@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "Dragon.h"
-
+#include "ScriptComponent.h"
 
 Dragon::Dragon()
 {
@@ -23,7 +23,11 @@ bool Dragon::CreateFromWorld(World & world)
 	transComp.MovePositionWorld(0, 0, 0);
 	RenderComponent &renderComp = _entity.AddComponent<RenderComponent>();
 	renderComp._type = RenderComponent::Type::eSkinned;
-	//renderComp._skinned = VIDEO->CreateSkinnedAnimation(_skinnedMeshHandle, "Anim0");
+
+	renderComp._skinned = VIDEO->CreateSkinnedAnimation(_skinnedMeshHandle, "Anim0");
+	ScriptComponent & script = _entity.AddComponent<ScriptComponent>();
+	script.SetScript(MAKE_SCRIPT_DELEGATE(Dragon, update, *this));
+
 
 	_entity.Activate();
 	return true;
@@ -31,4 +35,6 @@ bool Dragon::CreateFromWorld(World & world)
 
 void Dragon::update(float deltaTime)
 {
+	TransformComponent &transComp = _entity.GetComponent<TransformComponent>();
+	transComp.SetWorldPosition(transComp.GetWorldPosition() + Vector3(0.0f, 0.0f, 0.1f));
 }
