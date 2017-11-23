@@ -26,7 +26,7 @@ public :
 	bool Init();
 	void ShutDown();
 
-	virtual void Update(float deltaTime);
+	virtual void Update(float deltaTime, const InputManager &input);
 	EventChannel GetChannel() { return _channel; }
 private :
 	bool ChangeScene(const std::string &key);

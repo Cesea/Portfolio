@@ -14,23 +14,24 @@ Frustum::Frustum()
 	_rHWPos[5] = Vector3(1, 1, 1);
 	_rHWPos[6] = Vector3(-1, -1, 1);
 	_rHWPos[7] = Vector3(1, -1, 1);
+
+	_zFar = 100;
 }
+
 
 Frustum::~Frustum()
 {
 }
 
-void Frustum::UpdateFrustum(const Matrix & matViewProj)
+void Frustum::UpdateFrustum(const Camera &camera)
 {
-	//viewPojection 역행렬
 	Matrix inverse;
-	MatrixInverse(&inverse, NULL, &matViewProj);
+	MatrixInverse(&inverse, NULL, &camera.GetViewProjectionMatrix());
 
 	for (int i = 0; i < 8; i++)
 	{
 		Vec3TransformCoord(_pos + i, _rHWPos + i, &inverse);
 	}
-
 	//정면플랜
 	_plane[0].Create(_pos[0], _pos[1], _pos[2]);
 	//후면
@@ -70,7 +71,7 @@ bool Frustum::IsSphereInFrustum(const Vector3 &center, float radius) const
 {
 	Vector3 normal;
 
-	for (int i = 1; i < 4; i++)
+	for (int i = 1; i < 4; ++i)
 	{
 		normal.x = _plane[i].a;
 		normal.y = _plane[i].b;

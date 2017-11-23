@@ -57,9 +57,6 @@
     <ClCompile Include="ApplicationTimer.cpp">
       <Filter>Core\Timers</Filter>
     </ClCompile>
-    <ClCompile Include="TestScene.cpp">
-      <Filter>Game\GameScene\TestScene</Filter>
-    </ClCompile>
     <ClCompile Include="Ray.cpp">
       <Filter>Math</Filter>
     </ClCompile>
@@ -89,9 +86,6 @@
     </ClCompile>
     <ClCompile Include="Allocators.cpp">
       <Filter>Core\Memory</Filter>
-    </ClCompile>
-    <ClCompile Include="MoveSystem.cpp">
-      <Filter>Game\GameSystem\MovementSystem</Filter>
     </ClCompile>
     <ClCompile Include="ColiisionSystem.cpp">
       <Filter>Game\GameSystem\CollisionSystem</Filter>
@@ -128,9 +122,6 @@
     </ClCompile>
     <ClCompile Include="CollisionComponent.cpp">
       <Filter>Game\GameComponent\CollisionComponent</Filter>
-    </ClCompile>
-    <ClCompile Include="MoveComponent.cpp">
-      <Filter>Game\GameComponent\MoveComponent</Filter>
     </ClCompile>
     <ClCompile Include="RenderComponent.cpp">
       <Filter>Game\GameComponent\RenderComponent</Filter>
@@ -169,13 +160,52 @@
       <Filter>Game\GameSystem\ScriptSystem</Filter>
     </ClCompile>
     <ClCompile Include="Enemy.cpp">
-      <Filter>Game\Enemy</Filter>
+      <Filter>Game\GameObject\Enemy</Filter>
     </ClCompile>
     <ClCompile Include="Dragon.cpp">
-      <Filter>Game\Enemy\script</Filter>
+      <Filter>Game\GameObject\Enemy\script</Filter>
     </ClCompile>
     <ClCompile Include="spawnManager.cpp">
-      <Filter>Game\Enemy\spawn</Filter>
+      <Filter>Game\GameObject\Enemy\spawn</Filter>
+    </ClCompile>
+    <ClCompile Include="ActionSystem.cpp">
+      <Filter>Game\GameSystem\ActionSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="ActionComponent.cpp">
+      <Filter>Game\GameComponent\ActionComponent</Filter>
+    </ClCompile>
+    <ClCompile Include="Player.cpp">
+      <Filter>Game\GameObject\Player</Filter>
+    </ClCompile>
+    <ClCompile Include="PlayerStates.cpp">
+      <Filter>Game\GameObject\Player</Filter>
+    </ClCompile>
+    <ClCompile Include="GameCommand.cpp">
+      <Filter>Game\GameUtils\GameCommand</Filter>
+    </ClCompile>
+    <ClCompile Include="PlayerAnimationString.cpp">
+      <Filter>Game\GameObject\Player</Filter>
+    </ClCompile>
+    <ClCompile Include="TerrainEditorScene.cpp">
+      <Filter>Game\GameScene\TerrainEidtorScene</Filter>
+    </ClCompile>
+    <ClCompile Include="GizmoManager.cpp">
+      <Filter>Managers</Filter>
+    </ClCompile>
+    <ClCompile Include="SpriteManager.cpp">
+      <Filter>Managers</Filter>
+    </ClCompile>
+    <ClCompile Include="BaseLight.cpp">
+      <Filter>Game\GameUtils\Light</Filter>
+    </ClCompile>
+    <ClCompile Include="DirectionalLight.cpp">
+      <Filter>Game\GameUtils\Light</Filter>
+    </ClCompile>
+    <ClCompile Include="PointLight.cpp">
+      <Filter>Game\GameUtils\Light</Filter>
+    </ClCompile>
+    <ClCompile Include="GameObjectFactory.cpp">
+      <Filter>Managers</Filter>
     </ClCompile>
     <ClCompile Include="spawn.cpp">
       <Filter>Game\Enemy\spawn</Filter>
@@ -276,9 +306,6 @@
     <ClInclude Include="ApplicationTimer.h">
       <Filter>Core\Timers</Filter>
     </ClInclude>
-    <ClInclude Include="TestScene.h">
-      <Filter>Game\GameScene\TestScene</Filter>
-    </ClInclude>
     <ClInclude Include="Ray.h">
       <Filter>Math</Filter>
     </ClInclude>
@@ -348,9 +375,6 @@
     <ClInclude Include="DataBase.h">
       <Filter>Core\SubSystem\DataBase</Filter>
     </ClInclude>
-    <ClInclude Include="MoveSystem.h">
-      <Filter>Game\GameSystem\MovementSystem</Filter>
-    </ClInclude>
     <ClInclude Include="CollisionSystem.h">
       <Filter>Game\GameSystem\CollisionSystem</Filter>
     </ClInclude>
@@ -402,9 +426,6 @@
     <ClInclude Include="CollisionComponent.h">
       <Filter>Game\GameComponent\CollisionComponent</Filter>
     </ClInclude>
-    <ClInclude Include="MoveComponent.h">
-      <Filter>Game\GameComponent\MoveComponent</Filter>
-    </ClInclude>
     <ClInclude Include="RenderComponent.h">
       <Filter>Game\GameComponent\RenderComponent</Filter>
     </ClInclude>
@@ -439,14 +460,65 @@
       <Filter>Sub</Filter>
     </ClInclude>
     <ClInclude Include="Enemy.h">
-      <Filter>Game\Enemy</Filter>
+      <Filter>Game\GameObject\Enemy</Filter>
     </ClInclude>
     <ClInclude Include="resource.h" />
     <ClInclude Include="Dragon.h">
-      <Filter>Game\Enemy\script</Filter>
+      <Filter>Game\GameObject\Enemy\script</Filter>
     </ClInclude>
     <ClInclude Include="spawnManager.h">
-      <Filter>Game\Enemy\spawn</Filter>
+      <Filter>Game\GameObject\Enemy\spawn</Filter>
+    </ClInclude>
+    <ClInclude Include="ActionComponent.h">
+      <Filter>Game\GameComponent\ActionComponent</Filter>
+    </ClInclude>
+    <ClInclude Include="ActionSystem.h">
+      <Filter>Game\GameSystem\ActionSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="State.h">
+      <Filter>Sub\StateMachine</Filter>
+    </ClInclude>
+    <ClInclude Include="StateMachine.h">
+      <Filter>Sub\StateMachine</Filter>
+    </ClInclude>
+    <ClInclude Include="Player.h">
+      <Filter>Game\GameObject\Player</Filter>
+    </ClInclude>
+    <ClInclude Include="PlayerAnimationString.h">
+      <Filter>Game\GameObject\Player</Filter>
+    </ClInclude>
+    <ClInclude Include="GameCommand.h">
+      <Filter>Game\GameUtils\GameCommand</Filter>
+    </ClInclude>
+    <ClInclude Include="PlayerStates.h">
+      <Filter>Game\GameObject\Player</Filter>
+    </ClInclude>
+    <ClInclude Include="CombatManager.h">
+      <Filter>Game\GameManager</Filter>
+    </ClInclude>
+    <ClInclude Include="TerrainEditorScene.h">
+      <Filter>Game\GameScene\TerrainEidtorScene</Filter>
+    </ClInclude>
+    <ClInclude Include="GizmoManager.h">
+      <Filter>Managers</Filter>
+    </ClInclude>
+    <ClInclude Include="SpriteManager.h">
+      <Filter>Managers</Filter>
+    </ClInclude>
+    <ClInclude Include="BaseLight.h">
+      <Filter>Game\GameUtils\Light</Filter>
+    </ClInclude>
+    <ClInclude Include="DirectionalLight.h">
+      <Filter>Game\GameUtils\Light</Filter>
+    </ClInclude>
+    <ClInclude Include="PointLight.h">
+      <Filter>Game\GameUtils\Light</Filter>
+    </ClInclude>
+    <ClInclude Include="Light.h">
+      <Filter>Game\GameUtils\Light</Filter>
+    </ClInclude>
+    <ClInclude Include="GameObjectFactory.h">
+      <Filter>Managers</Filter>
     </ClInclude>
     <ClInclude Include="spawn.h">
       <Filter>Game\Enemy\spawn</Filter>
@@ -531,9 +603,6 @@
     <Filter Include="Game\GameSystem">
       <UniqueIdentifier>{d7142de2-c937-4586-a206-5c7d6e472e49}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Game\GameSystem\MovementSystem">
-      <UniqueIdentifier>{b0f7ecfb-8121-4aa0-88ba-91bf94352179}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Game\GameSystem\CollisionSystem">
       <UniqueIdentifier>{3c44ec6d-ab6d-4798-af60-0326aa391024}</UniqueIdentifier>
     </Filter>
@@ -546,9 +615,6 @@
     <Filter Include="Game\GameScene">
       <UniqueIdentifier>{8c9cd546-7171-45e7-b49f-873d7745382f}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Game\GameScene\TestScene">
-      <UniqueIdentifier>{5a71353e-00bc-4729-92c9-598c2955957d}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Game\GameUtils">
       <UniqueIdentifier>{563f8004-6a59-40ad-a91c-8b90fd7fda6e}</UniqueIdentifier>
     </Filter>
@@ -560,12 +626,6 @@
     </Filter>
     <Filter Include="Game\GameComponent\CollisionComponent">
       <UniqueIdentifier>{1f11db7f-2aa1-4a9a-81ab-03b8b476aca2}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Game\GameComponent\MoveComponent">
-      <UniqueIdentifier>{4fee0c64-cec2-4c14-b81f-933a66b3a09c}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Game\GameComponent\RenderComponent">
-      <UniqueIdentifier>{41f7ad9e-814b-41a9-9d48-8945cea0acbc}</UniqueIdentifier>
     </Filter>
     <Filter Include="Game\GameComponent\TransfromComponent">
       <UniqueIdentifier>{2fb70df9-3f23-48a0-9663-092d7ddb399f}</UniqueIdentifier>
@@ -582,20 +642,45 @@
     <Filter Include="Game\GameSystem\ScriptSystem">
       <UniqueIdentifier>{00b94380-2d5a-414d-ae33-03169cba4084}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Game\Enemy">
+    <Filter Include="Game\GameComponent\ActionComponent">
+      <UniqueIdentifier>{39f5f783-17f8-4853-99f2-cd47d44969cd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\GameSystem\ActionSystem">
+      <UniqueIdentifier>{dd3e75b1-7032-4010-9484-d20e8c7db150}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\GameObject">
+      <UniqueIdentifier>{1522c39a-8489-4679-b87b-978e2a93d64b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\GameObject\Enemy">
       <UniqueIdentifier>{893eb939-e5e3-4135-b266-7b9d5a97aac7}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Game\Enemy\spawn">
+    <Filter Include="Game\GameObject\Enemy\spawn">
       <UniqueIdentifier>{48ab3ce0-5cc8-4bd6-83a9-2a6af2b100d3}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Game\Enemy\script">
+    <Filter Include="Game\GameObject\Enemy\script">
       <UniqueIdentifier>{d0e7f8a4-65cc-4621-9885-04735fb50bb4}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Game\GameComponent\ParticleComponent">
-      <UniqueIdentifier>{1dedc840-fcf1-483c-8e8c-36ac841f068e}</UniqueIdentifier>
+
+    <Filter Include="Game\GameComponent\RenderComponent">
+      <UniqueIdentifier>{41f7ad9e-814b-41a9-9d48-8945cea0acbc}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Game\GameComponent\ParticleComponent\Particle">
-      <UniqueIdentifier>{d4f76645-adba-4afb-8942-c2c3d2761ffc}</UniqueIdentifier>
+    <Filter Include="Sub\StateMachine">
+      <UniqueIdentifier>{03a31a36-575e-41fb-83b9-1e21b39eca4a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\GameObject\Player">
+      <UniqueIdentifier>{8ae39ce4-3eee-409c-9264-da8bd4e7ac36}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\GameUtils\GameCommand">
+      <UniqueIdentifier>{c610a143-4bbe-4f78-94fe-cc759e7141e2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\GameManager">
+      <UniqueIdentifier>{270c9003-5fb1-488a-b4d6-faf623868371}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\GameScene\TerrainEidtorScene">
+      <UniqueIdentifier>{58f67160-6e81-4862-8dc6-41ab9d92edf6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\GameUtils\Light">
+      <UniqueIdentifier>{24fd2b98-dcb3-488a-b8cf-2d5152558813}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

@@ -3,85 +3,53 @@
 
 #include "IScene.h"
 
-#include "World.h"
-#include "MoveSystem.h"
 #include "RenderSystem.h"
+#include "ActionSystem.h"
 #include "ScriptSystem.h"
 
 #include "TransformSystem.h"
 
-#include "Terrain.h"
-
-#include "Camera.h"
-
 #include "WorldEditor.h"
+#include "Player.h"
 
 class BaseScene : public IScene
 {
 	friend class Terrain;
-public :
-	BaseScene() 
-		:_world(4096)
+public:
+	BaseScene()
+		:IScene::IScene()
 	{};
 	virtual ~BaseScene() {}
 
-	virtual bool32 Load();
-	virtual bool32 Unload();
-
-	virtual bool32 Init();
-	virtual bool32 Update(float deltaTime);
-	virtual bool32 Render();
+	virtual bool Init();
+	virtual bool Update(float deltaTime, const InputManager &input);
+	virtual bool Render();
 
 	virtual void Release();
+	virtual const char *GetSceneName() { return "BaseScene"; }
 
-	virtual const char *GetSceneName();
-	virtual bool32 IsActive();
-
-	void RegisterEvents();
-
-	void Handle(const InputManager::KeyPressedEvent &event);
-
-protected :
-
-protected :
-	bool32 _active;
-	video::RenderView *_mainRenderView{};
-
-	World _world;
-
+private:
 	TransformSystem _transformSystem;
 	RenderSystem _renderSystem;
 	ScriptSystem _scriptSystem;
-	std::vector<Entity> _entities;
-
-	Camera _camera;
-	video::StaticXMeshHandle _staticMeshHandle;
-	video::SkinnedXMeshHandle _skinnedMeshHandle;
-
-	std::vector<video::SkinnedAnimationHandle> _animations;
-
-	video::EffectHandle _staticEffect;
-	video::EffectHandle _skinnedEffect;
-	video::EffectHandle _terrainEffect;
-
-	std::vector<Vector3> _points;
-
+	ActionSystem _actionSystem;
 
 	EventChannel _channel;
 
 	Editor *_editor{};
-	video::FontHandle _font;
 
-
-public :
-
-	struct SpawnEvent
-	{
-		SpawnEvent(const Vector3 &position) : _position(position) {}
-		Vector3 _position;
-		float _timeStamp;
-	};
-	void Handle(const SpawnEvent &event);
+	Player _player;
+public:
+	//struct SpawnEvent
+	//{
+	//	SpawnEvent(const Vector3 &position)
+	//		:_position(position)
+	//	{}
+	//	bool32 _isStatic;
+	//	Vector3 _position;
+	//	char _name[32];
+	//};
+	//void Handle(const BaseScene::SpawnEvent &event);
 };
 
 #endif

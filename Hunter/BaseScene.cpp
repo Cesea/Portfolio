@@ -3,185 +3,177 @@
 
 using namespace video;
 
-bool32 BaseScene::Load()
-{
-	bool32 result = true;
-	return result;
-}
 
-bool32 BaseScene::Unload()
+bool BaseScene::Init()
 {
-	bool32 result = true;
-	return result;
-}
-
-bool32 BaseScene::Init()
-{
-	bool32 result = true;
+	bool result = true;
 	//RegisterEvents();
 
-	//렌더 타켓 설정
-	video::RenderViewHandle renderViewHandle= VIDEO->CreateRenderView("Main");
-	_mainRenderView = VIDEO->GetRenderView(renderViewHandle);
-	_mainRenderView->_clearColor = 0xff55330;
+	GAMEOBJECTFACTORY->SetCurrentScene(this);
+
+	video::StaticXMesh::_sEffectHandle = VIDEO->GetEffect("StaticMesh.fx");
+	video::SkinnedXMesh::_sStaticEffectHandle = VIDEO->GetEffect("StaticMesh.fx");
+	video::SkinnedXMesh::_sSkinnedEffectHandle = VIDEO->GetEffect("SkinnedMesh.fx");
+
+	InitPlayerAnimation();
 
 	_camera.SetRotationSpeed(10.0f);
 	_camera.SetMoveSpeed(20.0f);
 	_camera.GetTransform().MovePositionSelf(0.0f, 0.0f, -30.0f);
 
-	_mainRenderView->_pCamera = &_camera;
-
 	//터레인 로드
 	Terrain::TerrainConfig config;
 	config._heightFileName = "../resources/Textures/Height_map1024.jpg";
-	config._tile0FileName = "../resources/Textures/terrain1.jpg";
-	config._tile1FileName = "../resources/Textures/terrain2.png";
-	config._tile2FileName = "../resources/Textures/terrain3.png";
-	config._tile3FileName = "../resources/Textures/terrain4.png";
+	config._tile0FileName = "../resources/Textures/TerrainTexture01.jpg";
+	config._tile1FileName = "../resources/Textures/TerrainTexture02.jpg";
+	config._tile2FileName = "../resources/Textures/TerrainTexture03.png";
+	config._tile3FileName = "../resources/Textures/TerrainTexture04.png";
 	config._splatFileName = "../resources/Textures/Splat.png";
 
 	config._cellScale = 1.0f;
-	config._heightScale = 80.0f;
-	config._textureMult = 50;
+	config._heightScale = 20.0f;
+	config._textureMult = 300;
+	config._lodRatio = 0.1f;
 	config._sectionResolution = 64;
 
-	TERRAIN->SetScene(this);
-	TERRAIN->Create(config, 1);
-	_terrainEffect = VIDEO->GetEffect("TerrainBase.fx");
+	_pTerrain = new Terrain();
+	_pTerrain->SetScene(this);
+	_pTerrain->Create(config, 1, false);
 
 	//메쉬 불러오기..
 	Matrix correctionMat;
-	MatrixScaling(&correctionMat, 0.1f, 0.1f, 0.1f);
-	_skinnedMeshHandle = VIDEO->CreateSkinnedXMesh("../resources/Models/knight/Knight.X", &correctionMat, "Knight");
+	MatrixScaling(&correctionMat, 0.015f, 0.015f, 0.015f);
+	video::SkinnedXMeshHandle skinned  = VIDEO->CreateSkinnedXMesh("../resources/Models/Knight/Knight.X", &correctionMat, "Knight");
+	video::AnimationInstanceHandle ainmHandle = VIDEO->CreateAnimationInstance(skinned, "Knight0");
 
-	//MatrixScaling(&correctionMat, 1.0f, 1.0f, 1.0f);
-	//video::StaticXMeshHandle staticMeshHandle = VIDEO->CreateStaticXMesh("../resources/Models/environment/Rock/Rock1_A.X", &correctionMat, "Rock");
+	MatrixScaling(&correctionMat, 1.0f, 1.0f, 1.0f);
+	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Rock/Rock1_A.X", &correctionMat, "Rock01");
+	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Rock/Rock2_A.X", &correctionMat, "Rock02");
+	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Rock/Rock3_A.X", &correctionMat, "Rock03");
+	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Rock/Rock4_A.X", &correctionMat, "Rock04");
+	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Rock/Rock5_A.X", &correctionMat, "Rock05");
 
-	video::StaticXMesh::sDefaultEffectHandle = VIDEO->GetEffect("StaticMesh.fx");
-	video::SkinnedAnimation::sDefaultEffectHandle = VIDEO->GetEffect("SkinnedMesh.fx");
-	video::DebugBuffer::sDefaultEffectHandle = VIDEO->GetEffect("DebugShader.fx");
+	MatrixScaling(&correctionMat, 0.01f, 0.01f, 0.01f);
+	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Grass/Grass1.X", &correctionMat, "Grass01");
+	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Grass/Grass2.X", &correctionMat, "Grass02");
+	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Grass/Grass3.X", &correctionMat, "Grass03");
+	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Grass/Grass4.X", &correctionMat, "Grass04");
+	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Grass/Grass5.X", &correctionMat, "Grass05");
+
+	MatrixScaling(&correctionMat, 1.0f, 1.0f, 1.0f);
+	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Tree/Tree1.X", &correctionMat, "Tree01");
+	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Tree/Tree2.X", &correctionMat, "Tree02");
+	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Tree/Tree3.X", &correctionMat, "Tree03");
+	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Tree/Tree4.X", &correctionMat, "Tree04");
+	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Tree/Tree5.X", &correctionMat, "Tree05");
 
 	//엔티티 생성
 	_world.AddSystem<RenderSystem>(_renderSystem);
 	_world.AddSystem<TransformSystem>(_transformSystem);
+	_world.AddSystem<ActionSystem>(_actionSystem);
 	_world.AddSystem<ScriptSystem>(_scriptSystem);
 
-	for (uint32 z = 0; z < 2; ++z)
-	{
-		for (uint32 x = 0; x < 2; ++x)
-		{
-			int32 index = Index2D(x, z, 2);
-			_entities.push_back(_world.CreateEntity());
-			Entity &entity = _entities.back();
 
-			TransformComponent &transComp = entity.AddComponent<TransformComponent>();
-			transComp.MovePositionWorld(x * 10, /*TERRAIN->GetHeight(x * 10, z * 10)*/0 , z * 10);
-			RenderComponent &renderComp = entity.AddComponent<RenderComponent>();
-			renderComp._type = RenderComponent::Type::eSkinned;
-			renderComp._skinned = VIDEO->CreateSkinnedAnimation(_skinnedMeshHandle, "Anim" + std::to_string(index));
+	_player.CreateFromWorld(_world);
 
-			entity.Activate();
-		}
-	}
-
-	/*_entities.push_back(_world.CreateEntity());
-	Entity &entity = _entities.back();*/
-
+	//_entities.push_back(_world.CreateEntity());
+	//Entity &entity = _entities.back();
 	//TransformComponent &transComp = entity.AddComponent<TransformComponent>();
-	//transComp.MovePositionWorld(-5.0f, -0.0f, -5.0f);
+	//transComp.MovePositionWorld(0.0f, -0.0f, 0.0f);
 	//RenderComponent &renderComp = entity.AddComponent<RenderComponent>();
 	//renderComp._type = RenderComponent::Type::eStatic;
 	//renderComp._static = staticMeshHandle;
-
 	//entity.Activate();
 
 	//에디터 생성
-
 	imguiRenderInit();
 	_editor = new Editor;
 	_editor->Init();
 
-	_active = true;
 	return result;
 }
 
-bool32 BaseScene::Update(float deltaTime)
+bool BaseScene::Update(float deltaTime, const InputManager &input)
 {
-	bool32 result = true;
+	bool result = true;
 
-	_editor->Edit(RefVariant());
+	_editor->Edit(RefVariant(), input);
 
 	_world.Refresh();
 
+	_scriptSystem.Update(deltaTime);
 	_transformSystem.PreUpdate(deltaTime);
 
 	//Collision Check
 	_transformSystem.PostUpdate(deltaTime);
-	//_renderSystem.UpdateAnimations(deltaTime);
-	//Update Camera
-	_camera.PreUpdateMatrix();
-	_transformSystem.UpdateTransform(_camera.GetTransform());
-	_camera.UpdateMatrix();
+	_actionSystem.Update(deltaTime);
 
-	_scriptSystem.Update(deltaTime);
+	//Update Camera
+	{
+		_camera.PreUpdateMatrix();
+		_transformSystem.UpdateTransform(_camera.GetTransform());
+		_camera.UpdateMatrix();
+		_camera.UpdateCamToDevice();
+		_camera.UpdateFrustum();
+	}
 
 	//_channel.Update<BaseScene::SpawnEvent>(deltaTime);
 
 	return result;
 }
 
-bool32 BaseScene::Render()
+bool BaseScene::Render()
 {
-	Matrix model;
-	MatrixIdentity(&model);
+	video::StaticXMesh::SetCamera(_camera);
+	//video::StaticXMesh::SetBaseLight(_pDirectional);
 
-	DEBUG_DRAWER->DrawWorldGrid(5, 40);
-	DEBUG_DRAWER->FillRenderCommand(*_mainRenderView);
-	//DEBUG_DRAWER->DrawAABB(Vector3(0.0f, 5.0f, 0.0f), Vector3(12.0f, 10.0f, 10.0f), 0xff00ffff);
-	////DEBUG_DRAWER->DrawBox();
-	//DEBUG_DRAWER->FillRenderCommand(*_mainRenderView);
+	video::SkinnedXMesh::SetCamera(_camera);
+	//video::SkinnedXMesh::SetBaseLight(_pDirectional);
 
-	//_renderSystem.Render(*_mainRenderView);
-	TERRAIN->FillRenderCommand(*_mainRenderView);
+	gpDevice->Clear(0, nullptr, D3DCLEAR_TARGET | D3DCLEAR_STENCIL | D3DCLEAR_ZBUFFER, 0xff303040, 1.0f, 0);
+	gpDevice->BeginScene();
+	
+	GIZMOMANAGER->WorldGrid(1.0f, 20);
 
+	_pTerrain->Render(_camera);
+	_renderSystem.Render(_camera);
+	//TERRAIN->FillRenderCommand(*_mainRenderView);
 
-	_mainRenderView->PreRender();
-	_mainRenderView->ExecCommands();
 	imguiRenderDraw();
-	_mainRenderView->PostRender();
+
+	gpDevice->EndScene();
+	gpDevice->Present(nullptr, nullptr, NULL, nullptr);
 
 	return true;
 }
 
 void BaseScene::Release()
 {
-	_editor->Shutdown();
-	SAFE_DELETE(_editor);
-
-	imguiRenderDestroy();
 }
 
-const char * BaseScene::GetSceneName()
-{
-	return "BaseScene";
-}
-
-bool32 BaseScene::IsActive()
-{
-	return _active;
-}
-
-void BaseScene::RegisterEvents()
-{
-	EventChannel channel;
-	channel.Add<BaseScene::SpawnEvent, BaseScene>(*this);
-}
-
-void BaseScene::Handle(const SpawnEvent &event)
-{
-	static int a = 0;
-	_animations.push_back(VIDEO->CreateSkinnedAnimation(_skinnedMeshHandle, "aat"));
-	video::SkinnedAnimation *pAnimation = VIDEO->GetSkinnedAnimation(_animations.back());
-	pAnimation->Play(a++);
-
-}
+//void BaseScene::Handle(const BaseScene::SpawnEvent & event)
+//{
+//	_entities.push_back(_world.CreateEntity());
+//	Entity &entity = _entities.back();
+//	TransformComponent &refTransform = entity.AddComponent<TransformComponent>();
+//
+//	float terrainHeight = _pTerrain->GetHeight(event._position.x, event._position.z);
+//	refTransform.MovePositionWorld(Vector3(event._position.x, terrainHeight, event._position.z));
+//
+//	RenderComponent &refRender = entity.AddComponent<RenderComponent>();
+//
+//	if (event._isStatic)
+//	{
+//		refRender._type = RenderComponent::Type::eStatic;
+//		refRender._static = VIDEO->GetStaticXMesh(event._name);
+//		Assert(refRender._static.IsValid());
+//	}
+//	else
+//	{
+//		refRender._type = RenderComponent::Type::eSkinned;
+//		video::SkinnedXMeshHandle meshHandle = VIDEO->GetSkinnedXMesh(event._name);
+//		refRender._skinned = VIDEO->CreateAnimationInstance(meshHandle, event._name + std::to_string(entity.GetID().index));
+//		Assert(refRender._skinned.IsValid());
+//	}
+//	entity.Activate();
+//}

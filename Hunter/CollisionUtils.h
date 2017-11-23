@@ -4,7 +4,6 @@
 #include "CollisionComponent.h"
 #include "TransformComponent.h"
 
-
 struct AABB
 {
 	D3DXVECTOR3 min;

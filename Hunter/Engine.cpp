@@ -18,6 +18,12 @@ Engine::Engine()
 
 Engine::~Engine()
 {
+	GAMEOBJECTFACTORY->Release();
+	GAMEOBJECTFACTORY->ReleaseInstance();
+	GIZMOMANAGER->Release();
+	GIZMOMANAGER->ReleaseInstance();
+	SPRITEMANAGER->Release();
+	SPRITEMANAGER->ReleaseInstance();
 }
 
 void Engine::Run()
@@ -36,46 +42,48 @@ void Engine::Run()
 	while (_valid && _running)
 	{
 		MSG msg{};
-		_pInput->Update(0.0f);
 		while (PeekMessage(&msg, 0, 0, 0, PM_REMOVE))
 		{
 			switch (msg.message)
 			{
-				case WM_SYSKEYDOWN:
-				case WM_KEYDOWN :
-				case WM_SYSKEYUP :
-				case WM_KEYUP :
-				case WM_CHAR :
-				{
-					_pInput->keyboard.UpdateWithMessage(msg.message, msg.wParam, msg.lParam);
-				}break;
+			case WM_SYSKEYDOWN:
+			case WM_KEYDOWN:
+			case WM_SYSKEYUP:
+			case WM_KEYUP:
+			case WM_CHAR:
+			{
+				_pInput->keyboard.UpdateWithMessage(msg.message, msg.wParam, msg.lParam);
+			}break;
 
-				case WM_MOUSEWHEEL:
-				{
-					_pInput->mouse.UpdateWheelWithMessage(msg.wParam, msg.lParam);
-				}break;
+			case WM_MOUSEWHEEL:
+			{
+				_pInput->mouse.UpdateWheelWithMessage(msg.wParam, msg.lParam);
+			}break;
 
-				case WM_LBUTTONDOWN:
-				case WM_LBUTTONUP:
-				case WM_MBUTTONUP:
-				case WM_MBUTTONDOWN:
-				case WM_RBUTTONDOWN:
-				case WM_RBUTTONUP:
-				case WM_MOUSEMOVE:
-				{
-					_pInput->mouse.UpdateWithMessage(msg.wParam, msg.lParam);
-				}break;
+			case WM_LBUTTONDOWN:
+			case WM_LBUTTONUP:
+			case WM_MBUTTONUP:
+			case WM_MBUTTONDOWN:
+			case WM_RBUTTONDOWN:
+			case WM_RBUTTONUP:
+			case WM_MOUSEMOVE:
+			{
+				_pInput->mouse.UpdateWithMessage(msg.wParam, msg.lParam);
+			}break;
 
-				default :
-				{
-					TranslateMessage(&msg);
-					DispatchMessage(&msg);
-				}break;
+			default:
+			{
+				TranslateMessage(&msg);
+				DispatchMessage(&msg);
+			}break;
 			}
 		}
-		float deltaTime = APPTIMER->GetTargetTime();
 
-		_pScene->Update(deltaTime);
+		_pInput->Update();
+		float deltaTime = APPTIMER->GetTargetTime();
+		_pScene->Update(deltaTime, *_pInput.get());
+
+		_pInput->UpdatePrevInput();
 
 		APPTIMER->Tick();
 
@@ -152,7 +160,7 @@ bool Engine::InitializePlatform(HINSTANCE instanceHandle)
 	int32 clientHeight = clientRect.bottom - clientRect.top;
 
 	_windowHandle = CreateWindow(wc.lpszClassName, "Hunter", WS_OVERLAPPEDWINDOW,
-		CW_USEDEFAULT, CW_USEDEFAULT, clientWidth, clientHeight, nullptr, nullptr, _instanceHandle, nullptr);
+		WINSTARTX, WINSTARTY, clientWidth, clientHeight, nullptr, nullptr, _instanceHandle, nullptr);
 
 	if (!_windowHandle)
 	{
@@ -186,6 +194,11 @@ bool Engine::InitializeSystems()
 	{
 		return false;
 	}
+
+	GIZMOMANAGER->Init(gpDevice);
+	SPRITEMANAGER->Init(gpDevice);
+
+	GAMEOBJECTFACTORY->Init();
 
 	return true;
 }

@@ -48,7 +48,7 @@ namespace video
 			usage |= D3DUSAGE_DYNAMIC;
 		}
 
-		VIDEO_CHECK(gpDevice->CreateVertexBuffer(size, usage, 0,
+		VIDEO_CHECK(gpDevice->CreateVertexBuffer(size, usage, 0, 
 			D3DPOOL_DEFAULT, &_ptr, nullptr));
 
 		if (nullptr != data)
@@ -234,6 +234,15 @@ namespace video
 	void Effect::SetInt(LPCSTR name, const int32 value) const
 	{
 		_ptr->SetInt(name, value);
+	}
+	void Effect::SetFloat(LPCSTR name, const float value) const
+	{
+		_ptr->SetFloat(name, value);
+	}
+
+	void Effect::SetVector(LPCSTR name, const Vector4 &value) const
+	{
+		_ptr->SetVector(name, &value);
 	}
 
 	void Effect::CommitChanges() const

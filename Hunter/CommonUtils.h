@@ -11,14 +11,10 @@
 
 #include "Delegate.h"
 
-//TODO :
-#define BX_ALIGN_MASK(_value, _mask) ( ( (_value)+(_mask) ) & ( (~0)&(~(_mask) ) ) )
-#define BX_ALIGN_16(_value) BX_ALIGN_MASK(_value, 0xf)
-#define BX_ALIGN_256(_value) BX_ALIGN_MASK(_value, 0xff)
-#define BX_ALIGN_4096(_value) BX_ALIGN_MASK(_value, 0xfff)
+#include "State.h"
+#include "StateMachine.h"
 
-constexpr float EPSILON = 0.001f;
-constexpr float ONE_RAD = 0.017453f;
+
 
 struct IntRect
 {
@@ -31,6 +27,15 @@ struct IntRect
 	int32 _top;
 	int32 _right;
 	int32 _bottom;
+};
+
+struct StopWatch
+{
+	bool Tick(float deltaTime);
+	void Restart(float targetTime);
+	float _currentTime{};
+	float _targetTime{};
+
 };
 
 inline int32 Index2D(int32 x, int32 y, int32 xMax)
@@ -78,41 +83,6 @@ inline float Uint32ToFloat(uint32 ms)
 	return (float)ms * 0.001f;
 }
 
-inline float FAbs(float f)
-{
-	if (f < 0.0f)
-	{
-		return -f;
-	}
-	else
-	{
-		return f;
-	}
-}
-
-inline bool FloatEqual(float f1, float f2)
-{
-	if (FAbs(f1 - f2) < EPSILON)
-	{
-		return true;
-	}
-	else
-	{
-		return false;
-	}
-}
-
-inline bool FloatZero(float f)
-{
-	if (FAbs(f) < EPSILON)
-	{
-		return true;
-	}
-	else
-	{
-		return false;
-	}
-}
 
 inline int32 RectWidth(const RECT &rect)
 {
@@ -358,6 +328,36 @@ inline int absInt(int num)
 	{
 		return num;
 	}
+}
+
+inline float FMax(float f1, float f2)
+{
+	if (f1 > f2)
+	{
+		return f1;
+	}
+	else
+	{
+		return f2;
+	}
+}
+
+inline float FMin(float f1, float f2)
+{
+	if (f1 < f2)
+	{
+		return f1;
+	}
+	else
+	{
+		return f2;
+	}
+}
+
+//bottom값이 더 작다...
+inline bool IsInRect(const RECT *pRect, POINT p)
+{
+	return (p.x >= pRect->left) && (p.x <= pRect->right) && (p.y <= pRect->top) && (p.y >= pRect->bottom);
 }
 
 

@@ -4,8 +4,8 @@
 //#include "InputComponent.h"
 
 constexpr int32 MOUSE_BUTTON_LEFT = 0;
-constexpr int32 MOUSE_BUTTON_MIDDLE = 1;
-constexpr int32 MOUSE_BUTTON_RIGHT = 2;
+constexpr int32 MOUSE_BUTTON_MIDDLE = 2;
+constexpr int32 MOUSE_BUTTON_RIGHT = 1;
 
 class InputManager;
 
@@ -20,6 +20,7 @@ public :
 
 	void UpdateWithMessage(UINT msg, WPARAM wParam, LPARAM lParam);
 	void Update();
+	void UpdatePrevInput();
 
 	inline bool32 IsDown(int32 keyCode) const { return _currentState[keyCode]; }
 	inline bool32 IsReleased(int32 keyCode) const { return (!_currentState[keyCode] && _oldState[keyCode]); }
@@ -30,16 +31,14 @@ public :
 	inline bool32 IsAltDown() { return _altDown; }
 	inline bool32 IsControlDown() { return _ctrlDown; }
 
-	inline uint8 GetCharInput() const { return _vkCode; }
-	inline bool32 GetShiftDown() const { return _shiftDown; }
+	inline uint8 GetVKCode() const { return _vkCode; }
+	inline bool32 GetShiftDown() const { return _currentState[VK_SHIFT]; }
 	inline void SetCharInput(uint8 ch) { _vkCode = ch; }
 
 private :
 
 	void UpdateOnKeyUp(WPARAM wParam, LPARAM lParam);
 	void UpdateOnKeyDown(WPARAM wParam, LPARAM lParam);
-	void UpdateOnChar(WPARAM wParam, LPARAM lParam);
-
 	//void ProcessWindowMessage(bool32 *button, bool32 isDown);
 private :
 	bool _currentState[256] = {0, };
@@ -50,7 +49,7 @@ private :
 	bool32 _ctrlDown{};
 
 	WPARAM _wParam{};
-	uint8 _vkCode{};
+	uint32 _vkCode{};
 
 	InputManager *_pParent;
 };
@@ -68,6 +67,7 @@ public:
 	void UpdateWheelWithMessage(WPARAM wParam, LPARAM lParam);
 
 	void Update();
+	void UpdatePrevInput();
 
 	inline bool32 IsDown(int32 button) const { return _currentState[button]; }
 	inline bool32 IsReleased(int32 button) const { return (!_currentState[button] && _oldState[button]); }
@@ -170,16 +170,14 @@ public :
 	bool Init();
 	void ShutDown();
 
-	void Update(float deltaTime);
+	void Update();
+	void UpdatePrevInput();
 	EventChannel GetChannel() { return _channel; }
 
 	Keyboard keyboard;
 	Mouse mouse;
 private :
-
 	EventChannel _channel;
-
-
 };
 
 #endif

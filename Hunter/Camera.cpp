@@ -13,7 +13,11 @@ Camera::Camera()
 	_camNear = 0.01f;
 
 	//±âº» Far
-	_camFar = 100.0f;
+#if defined (DEBUG) || defined (_DEBUG)
+	_camFar = 500.0f;
+#else 
+	_camFar = 600.0f;
+#endif
 
 	_moveSpeed = 1.0f;
 	_rotationSpeed = 1.0f;
@@ -53,8 +57,17 @@ void Camera::UpdateMatrix()
 	MatrixInverse(&_matView, NULL, &_transform._matFinal);
 
 	_matViewProjection = _matView * _matProjection;
+}
 
-	_frustum.UpdateFrustum(_matViewProjection);
+void Camera::UpdateCamToDevice()
+{
+	gpDevice->SetTransform(D3DTS_VIEW, &_matView);
+	gpDevice->SetTransform(D3DTS_PROJECTION, &_matProjection);
+}
+
+void Camera::UpdateFrustum()
+{
+	_frustum.UpdateFrustum(*this);
 }
 
 void Camera::ComputeRay(const Vector2 & screenPos, Ray * pOutRay)
@@ -162,7 +175,7 @@ void Camera::Handle(const InputManager::KeyDownEvent & event)
 
 void Camera::Handle(const InputManager::MousePressedEvent & event)
 {
-	if (event.code == MOUSE_BUTTON_LEFT)
+	if (event.code == MOUSE_BUTTON_RIGHT)
 	{
 		_rotating = true;
 	}
@@ -170,7 +183,7 @@ void Camera::Handle(const InputManager::MousePressedEvent & event)
 
 void Camera::Handle(const InputManager::MouseReleasedEvent & event)
 {
-	if (event.code == MOUSE_BUTTON_LEFT)
+	if (event.code == MOUSE_BUTTON_RIGHT)
 	{
 		_rotating = false;
 	}

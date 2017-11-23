@@ -7,13 +7,20 @@
 
 class Camera
 {
-
 public:
+	float _fov;
+	float _camNear;
+	float _camFar;
+
 	Camera();
 	~Camera();
 
+	void CreateFromWorld(World &world);
+
 	void PreUpdateMatrix();
 	void UpdateMatrix();
+	void UpdateCamToDevice();
+	void UpdateFrustum();
 
 	void SetMoveSpeed(float speed) { _moveSpeed = speed; }
 	void SetRotationSpeed(float speed) { _rotationSpeed = speed; }
@@ -23,7 +30,7 @@ public:
 	const Matrix &GetViewProjectionMatrix() const { return _matViewProjection; }
 
 	void SetFov(float fov) { _fov = fov; }
-	float GetFov() { return _fov; }
+	float GetFov() const { return _fov; }
 
 	void OrthoToggle() { _ortho = !_ortho; }
 
@@ -42,9 +49,7 @@ public:
 
 protected:
 
-	float _fov;
-	float _camNear;
-	float _camFar;	
+	Entity _entity;
 
 	Matrix _matView;
 	Matrix _matProjection;

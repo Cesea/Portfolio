@@ -3,10 +3,33 @@
 
 #include "VideoResourceHandles.h"
 
+struct TransformComponent;
+class Light;
+class DirectionalLight;
+
+struct MeshBoundInfo
+{
+	Vector3 _min;
+	Vector3 _max;
+	Vector3 _center;
+	Vector3 _size;
+	Vector3 _halfSize;
+	float _radius;
+};
+
+struct MeshVertInfo
+{
+	uint32 _numVertices;
+	uint32 _numFaces;
+	std::vector<Vector3> _positions;
+	std::vector<Vector3> _normals;
+	std::vector<uint16> _indices;
+};
+
 namespace video
 {
 	struct SkinnedXMesh;
-	struct SkinnedAnimation;
+	struct AnimationInstance;
 }
 
 struct Bone : public D3DXFRAME
@@ -18,7 +41,12 @@ struct BoneMesh : public D3DXMESHCONTAINER
 {
 	bool32 _visible{ true };
 	ID3DXMesh *WorkingMesh;			
-	std::vector<video::MaterialHandle> _materialHandles;
+
+	std::vector<video::TextureHandle> _diffuseTextures;
+	std::vector<video::TextureHandle> _normalTextures;
+	std::vector<video::TextureHandle> _specularTextures;
+	std::vector<video::TextureHandle> _emissionTexture;
+	std::vector<D3DMATERIAL9> _materials;
 
 	Matrix** ppBoneMatrixPtrs{};		//본들의 행렬 [ 포인터 배열 ]
 	Matrix* pBoneOffsetMatices{};		//자신의 기본 행렬 배열
@@ -30,8 +58,7 @@ struct BoneMesh : public D3DXMESHCONTAINER
 	DWORD NumAttributesGroup{};		//메시의 속성 그룹수 ( 해당 메시에 메터리얼정보가 몇개있니? )
 	LPD3DXBUFFER BufBoneCombos{};			//본컴비네이션 ( 메시에 적용되는 본 ID 정보와 메터리얼 정보 )
 
-	video::VertexBufferHandle _vHandle;
-	video::IndexBufferHandle _iHandle;
+	MeshBoundInfo _boundInfo;
 };
 
 class BoneHierachy : public ID3DXAllocateHierarchy
@@ -57,30 +84,6 @@ public:
 
 namespace video
 {
-	struct MeshBoundInfo
-	{
-		Vector3 _min;
-		Vector3 _max;
-		Vector3 _center;
-		Vector3 _size;
-		Vector3 _halfSize;
-		float _radius;
-	};
-
-	struct MeshVertInfo
-	{
-		uint32 _numVertices;
-		uint32 _numFaces;
-		std::vector<Vector3> _positions;
-		std::vector<Vector3> _normals;
-		std::vector<uint16> _indices;
-	};
-
-	//struct MeshContainer
-	//{
-	//};
-	//NOTE : 지금 mesh가 staticMesh, skinnedmesh 두개로 나누어져 있다... 이것을 하나로 합할 수 있을까
-
 	void ResizeMeshAndGetInfos(ID3DXMesh *pMesh, const Matrix &correction, 
 		MeshVertInfo *pOutVertInfo, MeshBoundInfo *pOutBoundInfo);
 
@@ -89,118 +92,75 @@ namespace video
 	
 	struct StaticXMesh
 	{
+		static video::EffectHandle _sEffectHandle;
+		static void SetCamera(const Camera &camera);
+		static void SetBaseLight(DirectionalLight *pDirectional);
+
 		bool Create(const std::string &fileName, const Matrix* matCorrection = nullptr);
 		void Destroy();
 		void BuidSubMeshBoundInfo();
 
-		void FillRenderCommand(RenderView &renderView, video::EffectHandle effect, const Matrix *pMatrix = nullptr);
+		void Render(const TransformComponent &transform);
 
 		bool32 _visible{ true };
 		ID3DXMesh *_pMesh{};
 		uint32 _numMaterial{};
-		std::vector<video::MaterialHandle> _materialHandles;
+		std::vector<video::TextureHandle> _diffuseTextures;
+		std::vector<video::TextureHandle> _normalTextures;
+		std::vector<video::TextureHandle> _specularTextures;
+		std::vector<video::TextureHandle> _emissionTexture;
+		std::vector<D3DMATERIAL9> _materials;
+
+		//std::vector<video::MaterialHandle> _materialHandles;
 
 		MeshBoundInfo _meshBoundInfo{};
 		std::vector<MeshBoundInfo> _submeshBoundInfos;
 
 		D3DXATTRIBUTERANGE *_attributeRange{};
-
 		MeshVertInfo _meshVertInfo{};
-
-		VertexBufferHandle _vHandle;
-		IndexBufferHandle _iHandle;
-
-		static video::EffectHandle sDefaultEffectHandle;
 	};
-
-	//에니메이션을 위한 typedef
-
-	typedef std::vector<LPD3DXANIMATIONSET> AnimationSetVector;
-	typedef std::map<std::string, LPD3DXANIMATIONSET> AnimationTable;
-
-	typedef std::map<std::string, BoneMesh *> BoneMeshTable;
-	typedef std::map<std::string, Bone *> BoneTable;
 
 	struct SkinnedXMesh
 	{
+		static video::EffectHandle _sSkinnedEffectHandle;
+		static video::EffectHandle _sStaticEffectHandle;
+		static void SetCamera(const Camera &Camera);
+		static void SetBaseLight(DirectionalLight *pDirectionalLight);
+		static void SetTechniqueName(const std::string &name);
+
 		bool Create(const std::string &fileName, const Matrix* matCorrection = nullptr);
 		void Destroy();
 
 		void InitBoneMatrixPointer(Bone *pBone);
 
-		void Update(const Matrix *pWorld);
+		void Update(const Matrix *pMatrix);
 		void UpdateMatrices(Bone *pBone, Matrix *pParentMatrix) const;
 
-		//NOTE : 직접 사용하지 않고 밖에서 쓴다
+		virtual void Render(const TransformComponent &transform);
 
-		//void FillRenderCommand(RenderView &renderView, AnimationHandle animHandle, video::EffectHandle effect);
-		//void RenderBone(RenderView &renderView, Bone *pBone, AnimationHandle animHandle, video::EffectHandle effect) const;
+		void RenderBone(Bone* pBone);
 
 		Matrix _matCorrection;
 
 		Bone *_pRootBone{};
 		uint32 _numWorkingPalette;
+		Matrix *_workingPalettes{};
 		ID3DXAnimationController *_pAnimationController{};
 
 		uint32 _numSubset{};
-
-		BoneMeshTable _meshTable;
-		BoneTable _boneTable;
+		MeshBoundInfo _boundInfo{};
 	};
 
 
 	//SkinnedMesh는 한번만 불러오고, SkinnedAnimation은 여러개를 만들어서 사용하라....
-	struct SkinnedAnimation
+	struct AnimationInstance
 	{
 		bool Create(video::SkinnedXMeshHandle handle);
 		void Destroy();
-		void UpdateAnimation(float deltaTime);
-		void UpdateMesh(const Matrix &matrix);
-
-		void FillRenderCommand(RenderView &renderView, 
-			video::EffectHandle skinnedEffect, video::EffectHandle staticEffect);
-		void FillRenderCommandInternal(RenderView &renderView, 
-			video::EffectHandle skinnedEffect, video::EffectHandle staticEffect, Bone *pBone);
-
-		//void	RenderBoneName(cCamera* pCam, cTransform* pTransform);
-
-		void Play(const std::string &animName, float crossFadeTime = 0.0);
-		void Play(int32 animIndex, float crossFadeTime = 0.0);
-		void PlayOneShot(const std::string &animName, float inCrossFadeTime = 0.0, float outCrossFadeTime = 0.0f);
-		void PlayOneShotAfterHold(const std::string &animName, float crossFadeTime = 0.0);
-		void Stop() { _playing = false; }
-		void SetPlaySpeed(float speed);
-
-		void SetAnimation(LPD3DXANIMATIONSET animation);
 
 		SkinnedXMesh *_pSkinnedMesh{};
 
-		Matrix _world;
-
 		ID3DXAnimationController *_pAnimationController{};
-		uint32 _numAnimation;
-
-		Matrix *_workingPalettes{};
-		uint32 _numPalette{};
-
-		AnimationSetVector _animations;
-		AnimationTable _animationTable;
-
-		LPD3DXANIMATIONSET _pPlayingAnimationSet{};
-		D3DXTRACK_DESC _playingTrackDesc{};
-
-		bool32 _playing{};
-		bool32 _looping{};
-		LPD3DXANIMATIONSET _pPrevPlayAnimationSet{};
-
-		float _crossFadeTime{};
-		float _leftCrossFadeTime{};
-		float _outCrossFadeTime{};
-		double _animationPlayFactor{};
-
-		float _animDelta{};
-
-		static video::EffectHandle sDefaultEffectHandle;
 	};
 }
 

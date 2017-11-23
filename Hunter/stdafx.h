@@ -46,8 +46,16 @@
 
 #include <assert.h>
 
+#define WINSTARTX (100)
+#define WINSTARTY (100)
+
 #define WINSIZEX (1600)
 #define WINSIZEY (900)
+
+#define EDITORX (0)
+#define EDITORY (0)
+#define EDITORSIZEX (400)
+#define EDITORSIZEY (800)
 
 
 #include "Typedefs.h"
@@ -63,9 +71,11 @@
 #include "Engine.h"
 #include "GameUtils.h"
 
+#define TERRAIN Terrain::GetInstance()
 
 extern HWND gWindowHandle;
 extern IDirect3DDevice9 *gpDevice;
 extern Engine *gEngine;
+extern bool32 gEditorOn;
 
 #endif

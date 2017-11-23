@@ -2,7 +2,7 @@
 #include "SceneManager.h"
 
 #include "BaseScene.h"
-#include "TestScene.h"
+#include "TerrainEditorScene.h"
 
 SceneManager::SceneManager()
 {
@@ -20,10 +20,11 @@ bool SceneManager::Init()
 	AddScene(pScene->GetSceneName(), pScene);
 	ChangeScene(pScene->GetSceneName());
 
-	pScene = new TestScene;
+	pScene = new TerrainEditorScene;
 	AddScene(pScene->GetSceneName(), pScene);
 
 	GetChannel().Add<SceneChangeEvent, SceneManager>(*this);
+
 
 	return true;
 }
@@ -33,9 +34,9 @@ void SceneManager::ShutDown()
 	RemoveAllScenes();
 }
 
-void SceneManager::Update(float deltaTime)
+void SceneManager::Update(float deltaTime, const InputManager &input)
 {
-	_pCurrentScene->Update(deltaTime);
+	_pCurrentScene->Update(deltaTime, input);
 	_pCurrentScene->Render();
 }
 
@@ -84,7 +85,6 @@ void SceneManager::RemoveScene(const std::string & key)
 	if (find == _scenes.end())
 	{
 		find->second->Release();
-		find->second->Unload();
 		_scenes.erase(find);
 	}
 }
@@ -94,7 +94,6 @@ void SceneManager::RemoveAllScenes()
 	for (auto scene : _scenes)
 	{
 		scene.second->Release();
-		scene.second->Unload();
 	}
 	_scenes.clear();
 }

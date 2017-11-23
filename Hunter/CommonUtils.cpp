@@ -92,3 +92,22 @@ IntRect & IntRect::operator=(const IntRect & other)
 	_bottom = other._bottom;
 	return *this;
 }
+bool StopWatch::Tick(float deltaTime)
+{
+	_currentTime += deltaTime;
+	if (_targetTime > 0.0f)
+	{
+		if (_currentTime > _targetTime)
+		{
+			_currentTime -= _targetTime;
+			return true;
+		}
+	}
+	return false;
+}
+
+void StopWatch::Restart(float targetTime)
+{
+	_currentTime = 0.0f;
+	_targetTime = targetTime;
+}
