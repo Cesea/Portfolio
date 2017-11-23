@@ -70,6 +70,7 @@ public:
 
 	const StateTable &GetStateTable() { return _stateTable; }
 	virtual void QueueAction(const Action &action) = 0;
+	virtual void ClearActioniQueue() = 0;
 
 protected :
 	friend class State<T>;

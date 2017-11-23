@@ -42,180 +42,100 @@ void ActionComponent::Destroy()
 
 void ActionComponent::UpdateAnimation(float deltaTime)
 {
-	if (_actionQueue.HasAction())
+	_pAnimationController->GetTrackDesc( 0, &_playingTrackDesc );
+	_animationPlayFactor = _playingTrackDesc.Position / _pPlayingAnimationSet->GetPeriod();
+
+	if (!_blocking)
 	{
-		const Action &front = _actionQueue.Front();
-		if (Play(front))
+		if (_actionQueue.HasAction())
 		{
+			PlayActionImmediate(_actionQueue.Front());
 			_actionQueue.PopAction();
 		}
 	}
-
-	double per = _pPlayingAnimationSet->GetPeriod();
-
-	_pAnimationController->GetTrackDesc(0, &_playingTrackDesc);
-	_animationPlayFactor = _playingTrackDesc.Position / per;
-
-	if (_animationPlayFactor >= 0.95)
+	else
 	{
-		if (false == _looping)
+		if (_animationPlayFactor >= 0.95f)
 		{
-			//돌아갈 Animation 이 있다면..
-			if (nullptr != _pPrevPlayingAnimationSet)
+			if (_actionQueue.HasAction())
 			{
-				_crossFadeTime = _outCrossFadeTime;
-				_leftCrossFadeTime = _outCrossFadeTime;
-				_looping = true;
-				_playingAction = _prevAction;
-				SetAnimation(_pPrevPlayingAnimationSet);
-				_pPrevPlayingAnimationSet = nullptr;
+				PlayActionImmediate(_actionQueue.Front());
+				_actionQueue.PopAction();
 			}
-			else
+			else if (false == _looping)
 			{
-				this->Stop();
+				if (nullptr != _pPrevPlayingAnimationSet)
+				{
+					_crossFadeTime = _outCrossFadeTime;
+					_leftCrossFadeTime = _outCrossFadeTime;
+					_looping = true;
+					SetAnimation(_pPrevPlayingAnimationSet);
+					_pPrevPlayingAnimationSet = nullptr;
+				}
+				else
+				{
+					this->Stop();
+				}
 			}
 		}
-		_animationPlayFactor = _animationPlayFactor - (int32)_animationPlayFactor;
 	}
 
-	if (_playing)
+	_animationPlayFactor = _animationPlayFactor - (int32)_animationPlayFactor;	//정수부분 안생기게....
+
+	if ( _playing )
 	{
 		_animDelta = deltaTime;
 	}
 	else
 	{
-		_animDelta = 0;
+		_animDelta = 0.0f;
 	}
 
-	//크로스 페이드가 진행중이라면..
-	if (_leftCrossFadeTime > 0.0f)
+	if ( _leftCrossFadeTime > 0.0f )
 	{
-		//남은 크로스페이드 시간 뺀다
 		_leftCrossFadeTime -= deltaTime;
-
-		//크로스페이드 가끝났다.
-		if (_leftCrossFadeTime <= 0.0f)
+		if ( _leftCrossFadeTime <= 0.0f )
 		{
-			_pAnimationController->SetTrackWeight(0, 1);
-			_pAnimationController->SetTrackEnable(1, false);
-			//Console::Log("ttt\n");
+			_pAnimationController->SetTrackWeight( 0, 1 );
+			_pAnimationController->SetTrackEnable( 1, false );
 		}
 		else
 		{
-			float w1 = (_leftCrossFadeTime / _crossFadeTime);			//1번 Track 가중치
-			float w0 = 1.0f - w1;										//0번 Track 가중치
-
-			//Console::Log("%f %f\n", w1, w0);
-			_pAnimationController->SetTrackWeight(0, w0);
-			_pAnimationController->SetTrackWeight(1, w1);
+			float w1 = ( _leftCrossFadeTime / _crossFadeTime );	
+			float w0 = 1.0f - w1;
+			_pAnimationController->SetTrackWeight( 0, w0 );
+			_pAnimationController->SetTrackWeight( 1, w1 );
 		}
 	}
 }
 
-bool ActionComponent::Play(const Action & action)
+bool ActionComponent::PlayActionImmediate(const Action & action)
 {
-	if (strcmp(action._name, _playingAction._name) == 0)
+	if (action._stop && action._playOnce)
 	{
-		return true;
-	}
-
-	//현제 플레이 중인 엑션이 블로킹인지 아닌지 판단한다....
-	if (_playingAction._blocking)
-	{
-		if (_animationPlayFactor > 0.95)
-		{
-			if (action._playOnce)
-			{
-				auto found = _animationTable.find(action._name);
-				if (found != _animationTable.end())
-				{
-					_playing = true;
-					_looping = false;
-					_crossFadeTime = action._crossFadeTime;
-					_leftCrossFadeTime = action._crossFadeTime;
-
-					_outCrossFadeTime = action._outCrossFadeTime;
-
-					//if (!this->_playingAction._playOnce)
-					{
-						_pPrevPlayingAnimationSet = _pPlayingAnimationSet;
-
-						this->_prevAction = _playingAction;
-						this->_playingAction = action;
-					}
-
-					this->SetAnimation(found->second);
-					return true;
-				}
-			}
-			else
-			{
-				auto found = _animationTable.find(action._name);
-				if (found != _animationTable.end())
-				{
-					_playing = true;
-					_looping = true;
-					_crossFadeTime = action._crossFadeTime;
-					_leftCrossFadeTime = action._crossFadeTime;
-
-					this->_prevAction = this->_playingAction;
-					this->_playingAction = action;
-					this->SetAnimation(found->second);
-					return true;
-				}
-			}
-		}
-		_animationPlayFactor = _animationPlayFactor - (int32)_animationPlayFactor;
+		PlayOneShotAfterHold(action._name, action._crossFadeTime, action._blocking);
 	}
 	else
 	{
 		if (action._playOnce)
 		{
-			auto found = _animationTable.find(action._name);
-			if (found != _animationTable.end())
-			{
-				_playing = true;
-				_looping = false;
-				_pPrevPlayingAnimationSet = _pPlayingAnimationSet;
-
-				this->_prevAction = _playingAction;
-				this->_playingAction = action;
-
-				_crossFadeTime = action._crossFadeTime;
-				_leftCrossFadeTime = action._crossFadeTime;
-
-				_outCrossFadeTime = action._outCrossFadeTime;
-
-				this->SetAnimation(found->second);
-				return true;
-			}
+			PlayOneShot(action._name, action._crossFadeTime, action._outCrossFadeTime, action._blocking);
 		}
 		else
 		{
-			_playing = true;
-			_looping = true;
-
-			auto found = _animationTable.find(action._name);
-			if (found != _animationTable.end())
-			{
-				_crossFadeTime = action._crossFadeTime;
-				_leftCrossFadeTime = action._crossFadeTime;
-
-				this->_prevAction = this->_playingAction;
-				this->_playingAction = action;
-				this->SetAnimation(found->second);
-				return true;
-			}
+			Play(action._name, action._crossFadeTime, action._blocking);
 		}
 	}
-	return false;
+	return true;
 }
 
 //Play Functions ////////////////////////////////////////////////////////////
-void ActionComponent::Play(const std::string & animName, float crossFadeTime)
+void ActionComponent::Play(const std::string & animName, float crossFadeTime, bool32 blocking)
 {
 	_playing = true;
 	_looping = true;
+
+	_blocking = blocking;
 
 	AnimationSetTable::iterator find = _animationTable.find( animName );
 	if ( find != this->_animationTable.end() ) 
@@ -227,10 +147,12 @@ void ActionComponent::Play(const std::string & animName, float crossFadeTime)
 	}
 }
 
-void ActionComponent::Play(int32 animIndex, float crossFadeTime)
+void ActionComponent::Play(int32 animIndex, float crossFadeTime, bool32 blocking)
 {
 	_playing = true;
 	_looping = true;
+
+	_blocking = blocking;
 
 	if ( animIndex < _numAnimation ) 
 	{
@@ -241,10 +163,12 @@ void ActionComponent::Play(int32 animIndex, float crossFadeTime)
 	}
 }
 
-void ActionComponent::Play(LPD3DXANIMATIONSET animSet, float crossFadeTime)
+void ActionComponent::Play(LPD3DXANIMATIONSET animSet, float crossFadeTime, bool32 blocking)
 {
 	_playing = true;
 	_looping = true;
+
+	_blocking = blocking;
 
 	_crossFadeTime = crossFadeTime;
 	_leftCrossFadeTime = crossFadeTime;
@@ -252,10 +176,12 @@ void ActionComponent::Play(LPD3DXANIMATIONSET animSet, float crossFadeTime)
 	this->SetAnimation(animSet);
 }
 
-void ActionComponent::PlayOneShot(const std::string &animName, float inCrossFadeTime, float outCrossFadeTime)
+void ActionComponent::PlayOneShot(const std::string &animName, 
+	float inCrossFadeTime, float outCrossFadeTime, bool32 blocking)
 {
 	_playing = true;
 	_looping = false;
+	_blocking = blocking;
 
 	AnimationSetTable::iterator find = _animationTable.find( animName );
 	if ( find != _animationTable.end() ) 
@@ -271,10 +197,11 @@ void ActionComponent::PlayOneShot(const std::string &animName, float inCrossFade
 	}
 }
 
-void ActionComponent::PlayOneShotAfterHold(const std::string & animName, float crossFadeTime)
+void ActionComponent::PlayOneShotAfterHold(const std::string & animName, float crossFadeTime, bool32 blocking)
 {
 	_playing = true;
 	_looping = false;
+	_blocking = blocking;
 
 	AnimationSetTable::iterator find = _animationTable.find( animName );
 	if ( find != _animationTable.end() ) 

@@ -209,7 +209,6 @@
     <ClInclude Include="ActionComponent.h" />
     <ClInclude Include="ActionSystem.h" />
     <ClInclude Include="ApplicationTimer.h" />
-    <ClInclude Include="Assert.h" />
     <ClInclude Include="BaseLight.h" />
     <ClInclude Include="BaseScene.h" />
     <ClInclude Include="BaseSystem.h" />

@@ -1,34 +1,38 @@
 #ifndef PLAYER_H
 #define PLAYER_H
 
+#include "BaseGameObject.h"
 #include "PlayerAnimationString.h"
 
-#define TRANSITION_TIME 0.125f
-
+class Player;
 class PlayerStateMachine;
 
 struct PlayerCallbackData
 {
-	int32 _a;
-	Vector3 *_pPlayerPosition;
+	PlayerAnimationEnum *_animtionEnum;
 };
 
 class PlayerCallbackHandler : public ID3DXAnimationCallbackHandler
 {
 public :
+	bool Init(Player *pPlayer) { _pPlayer = pPlayer; }
     HRESULT CALLBACK HandleCallback( THIS_ UINT Track, LPVOID pCallbackData )
     {
         PlayerCallbackData* pData = ( PlayerCallbackData* )pCallbackData;
-
-        // this is set to NULL if we're not playing sounds
 		if (nullptr == pData)
 		{
             return S_OK;
 		}
 
-		Console::Log("%d\n", pData->_a);
+		switch (pData->_animtionEnum)
+		{
+
+		}
         return S_OK;
     }
+
+private :
+	Player *_pPlayer{};
 };
 
 struct InputConfig
@@ -48,11 +52,10 @@ struct InputConfig
 	//uint32 _block;
 };
 
-
-
-class Player 
+class Player : public BaseGameObject
 {
 	friend class PlayerStateMachine;
+	friend class PlayerCallbackHandler;
 public :
 	struct AttackEvent
 	{
@@ -90,9 +93,8 @@ public :
 	Player();
 	virtual ~Player();
 
-	void CreateFromWorld(World &world);
+	virtual bool CreateFromWorld(World &world);
 	void Update(float deltaTime);
-
 
 	void Handle(const InputManager::KeyPressedEvent &event);
 	void Handle(const InputManager::MousePressedEvent &event);
@@ -101,8 +103,6 @@ public :
 protected :
 
 	void SetupCallbackAndCompression();
-
-	Entity _entity;
 
 	PlayerCallbackData _callbackData;
 
@@ -114,12 +114,16 @@ protected :
 
 	void QueueAction(const Action &action);
 
+	PlayerAnimationEnum _currentAnimationEnum{};
+
 private :
 	void SetInputConfig();
 	InputConfig _inputConfig;
 	EventChannel _channel;
 
 	float _speed{2.0f};
+
+	bool32 _inCombat{ false };
 
 };
 

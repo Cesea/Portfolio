@@ -12,7 +12,7 @@ Player::~Player()
 {
 }
 
-void Player::CreateFromWorld(World & world)
+bool Player::CreateFromWorld(World & world)
 {
 	EventChannel channel;
 	channel.Add<InputManager::KeyPressedEvent, Player>(*this);
@@ -33,6 +33,7 @@ void Player::CreateFromWorld(World & world)
 	_pActionComp = &_entity.AddComponent<ActionComponent>();
 	_pActionComp->CreateFrom(renderComp._skinned);
 	_pActionComp->_pCallbackHandler = new PlayerCallbackHandler;
+	//_pActionComp->_pCallbackHandler->HandleCallback
 	SetupCallbackAndCompression();
 
 	_pActionComp->MakeAnimationList();
@@ -55,86 +56,23 @@ void Player::CreateFromWorld(World & world)
 void Player::Update(float deltaTime)
 {
 	_pStateMachine->Update(deltaTime, _currentCommand);
-
-	if (false == _currentCommand._interpreted)
-	{
-		if (_currentCommand._type == GameCommand::Type::eMove)
-		{
-			Vector3 delta{};
-			if (_currentCommand._movement._vertical == Movement::Vertical::eUp)
-			{
-				delta.z += 1.0f;
-			}
-			else if(_currentCommand._movement._vertical == Movement::Vertical::eDown)
-			{
-				delta.z -= 1.0f;
-			}
-
-			if (_currentCommand._movement._horizontal == Movement::Horizontal::eLeft)
-			{
-				delta.x -= 1.0f;
-			}
-			else if(_currentCommand._movement._horizontal == Movement::Horizontal::eRight)
-			{
-				delta.x += 1.0f;
-			}
-			delta *= deltaTime;
-			if (!delta.IsZero())
-			{
-				//Vec3Normalize(&delta, &delta);
-				//TransformComponent &refTransform = _entity.GetComponent<TransformComponent>();
-				//refTransform.MovePositionLocal(delta * deltaTime);
-				////아래의 줄을 TransformSystem에서 해야할까??
-				//refTransform._position.y = TERRAIN->GetHeight(refTransform._position.x, refTransform._position.z);
-			}
-		}
-		_currentCommand._interpreted = true;
-
-		_currentCommand.Reset();
-	}
-
-
-	//if (_lastCommand._interpreted == false)
-	//{
-	//	ActionComponent &refAction = _entity.GetComponent<ActionComponent>();
-	//	//refAction._actionQueue.PushAction(std::move(InterpretCommand(_lastCommand)));
-	//	Action test;
-	//	test._blocking = true;
-	//	test._crossFadeTime = 0.2f;
-	//	test._outCrossFadeTime = 0.2f;
-	//	test._playOnce = true;
-	//	strncpy(test._name, PlayerAnimationString[PlayerAnimationEnum::eWarSwingRight], strlen(PlayerAnimationString[PlayerAnimationEnum::eWarSwingRight]));
-	//	refAction._actionQueue.PushAction(test);
-	//	test._blocking = true;
-	//	test._crossFadeTime = 0.2f;
-	//	test._outCrossFadeTime = 0.2f;
-	//	test._playOnce = true;
-	//	memset(test._name, 0, sizeof(char) * ACTION_MAX_NAME);
-	//	strncpy(test._name, PlayerAnimationString[PlayerAnimationEnum::eWarDodgeToLeft], strlen(PlayerAnimationString[PlayerAnimationEnum::eWarDodgeToLeft]));
-	//	refAction._actionQueue.PushAction(test);
-	//	test._blocking = false;
-	//	test._crossFadeTime = 0.2f;
-	//	test._outCrossFadeTime = 0.2f;
-	//	test._playOnce = false;
-	//	memset(test._name, 0, sizeof(char) * ACTION_MAX_NAME);
-	//	strncpy(test._name, PlayerAnimationString[PlayerAnimationEnum::eWarCombatMode], strlen(PlayerAnimationString[PlayerAnimationEnum::eWarCombatMode]));
-	//	refAction._actionQueue.PushAction(test);
-	//	_lastCommand._interpreted = true;
-	//}
+	_currentCommand.Reset();
 }
 
 void Player::SetupCallbackAndCompression()
 {
-	//ActionComponent &refActionComp = _entity.GetComponent<ActionComponent>();
-	//TransformComponent &refTransform = _entity.GetComponent<TransformComponent>();
+	ActionComponent &refActionComp = _entity.GetComponent<ActionComponent>();
+	TransformComponent &refTransform = _entity.GetComponent<TransformComponent>();
 
-	//ID3DXAnimationController *pController = refActionComp._pAnimationController;
-	//uint32 numAnimationSet = pController->GetNumAnimationSets();
-	//ID3DXKeyframedAnimationSet *anim0;
+	ID3DXAnimationController *pController = refActionComp._pAnimationController;
+	uint32 numAnimationSet = pController->GetNumAnimationSets();
+	ID3DXKeyframedAnimationSet *anim0;
 	//ID3DXKeyframedAnimationSet *anim1;
 	//ID3DXKeyframedAnimationSet *anim2;
 	//ID3DXKeyframedAnimationSet *anim3;
 	//ID3DXKeyframedAnimationSet *anim4;
+
+	pController->GetAnimationSetByName(PlayerAnimationString[PlayerAnimationEnum::eWarSwingLeft], (ID3DXAnimationSet **)&anim0);
 
 	//pController->GetAnimationSet(0, (ID3DXAnimationSet **)&anim0);
 	//pController->GetAnimationSet(1, (ID3DXAnimationSet **)&anim1);
@@ -142,27 +80,21 @@ void Player::SetupCallbackAndCompression()
 	//pController->GetAnimationSet(3, (ID3DXAnimationSet **)&anim3);
 	//pController->GetAnimationSet(4, (ID3DXAnimationSet **)&anim4);
 
-	//_callbackData._pPlayerPosition = &refTransform._position;
+	_callbackData._animtionEnum = &_currentAnimationEnum;
 
-	//D3DXKEY_CALLBACK anim0Keys[2];
+	D3DXKEY_CALLBACK warSwingLeftKeys;
+	warSwingLeftKeys.Time = anim0->GetPeriod() / anim0->GetSourceTicksPerSecond();
+	warSwingLeftKeys.pCallbackData = (void *)&_callbackData;
 	//anim0Keys[0].Time = 0;
 	//anim0Keys[0].pCallbackData = (void *)&_callbackData;
 	//anim0Keys[1].Time = anim0->GetPeriod() / 2.0f * anim0->GetSourceTicksPerSecond();
 	//anim0Keys[1].pCallbackData = (void *)&_callbackData;
 
-	//AddCallbackKeysAndCompress(pController, anim0, 2, anim0Keys, D3DXCOMPRESS_DEFAULT, 0.1f);
+	AddCallbackKeysAndCompress(pController, anim0, 1, warSwingLeftKeys, D3DXCOMPRESS_DEFAULT, 0.1f);
 	//AddCallbackKeysAndCompress(pController, anim1, 2, anim0Keys, D3DXCOMPRESS_DEFAULT, 0.1f);
 	//AddCallbackKeysAndCompress(pController, anim2, 2, anim0Keys, D3DXCOMPRESS_DEFAULT, 0.1f);
 	//AddCallbackKeysAndCompress(pController, anim3, 2, anim0Keys, D3DXCOMPRESS_DEFAULT, 0.1f);
 	//AddCallbackKeysAndCompress(pController, anim4, 2, anim0Keys, D3DXCOMPRESS_DEFAULT, 0.1f);
-}
-
-
-
-void Player::Handle(const InputManager::KeyPressedEvent & event)
-{
-	uint32 inputCode = event.code;
-
 }
 
 void Player::Handle(const InputManager::MousePressedEvent & event)
@@ -171,15 +103,15 @@ void Player::Handle(const InputManager::MousePressedEvent & event)
 
 	if (inputCode == _inputConfig._attack)
 	{
-	/*	_currentCommand._type = GameCommand::Type::eAction;
+		_currentCommand._type = GameCommand::Type::eAction;
 		_currentCommand._behavior._type = Behavior::Type::eAttack;
-		_currentCommand._interpreted = false;*/
-		_channel.Broadcast<Player::AttackEvent>(AttackEvent());
+		//_currentCommand._interpreted = false;
+		//_channel.Broadcast<Player::AttackEvent>(AttackEvent());
 	}
 	else if (inputCode == _inputConfig._block)
 	{
-		//_currentCommand._type = GameCommand::Type::eAction;
-		//_currentCommand._behavior._type = Behavior::Type::eBlock;
+		_currentCommand._type = GameCommand::Type::eAction;
+		_currentCommand._behavior._type = Behavior::Type::eBlock;
 		//_currentCommand._interpreted = false;
 	}
 }
@@ -193,39 +125,39 @@ void Player::Handle(const InputManager::KeyDownEvent & event)
 		_currentCommand._type = GameCommand::Type::eMove;
 		_currentCommand._movement._horizontal = Movement::Horizontal::eLeft;
 		_currentCommand._behavior._type = Behavior::Type::eWalk;
-		_currentCommand._interpreted = false;
-		_channel.Broadcast<Player::MoveEvent>(Player::MoveEvent());
+		//_currentCommand._interpreted = false;
+		//_channel.Broadcast<Player::MoveEvent>(Player::MoveEvent());
 	}
 	else if(_inputConfig._right == inputCode)
 	{
 		_currentCommand._type = GameCommand::Type::eMove;
 		_currentCommand._movement._horizontal = Movement::Horizontal::eRight;
 		_currentCommand._behavior._type = Behavior::Type::eWalk;
-		_currentCommand._interpreted = false;
-		_channel.Broadcast<Player::MoveEvent>(Player::MoveEvent());
+		//_currentCommand._interpreted = false;
+		//_channel.Broadcast<Player::MoveEvent>(Player::MoveEvent());
 	}
 	else if(_inputConfig._up == inputCode)
 	{
 		_currentCommand._type = GameCommand::Type::eMove;
 		_currentCommand._movement._vertical = Movement::Vertical::eUp;
 		_currentCommand._behavior._type = Behavior::Type::eWalk;
-		_currentCommand._interpreted = false;
-		_channel.Broadcast<Player::MoveEvent>(Player::MoveEvent());
+		//_currentCommand._interpreted = false;
+		//_channel.Broadcast<Player::MoveEvent>(Player::MoveEvent());
 	}
 	else if (_inputConfig._down == inputCode)
 	{
 		_currentCommand._type = GameCommand::Type::eMove;
 		_currentCommand._movement._vertical = Movement::Vertical::eDown;
 		_currentCommand._behavior._type = Behavior::Type::eWalk;
-		_currentCommand._interpreted = false;
-		_channel.Broadcast<Player::MoveEvent>(Player::MoveEvent());
+		//_currentCommand._interpreted = false;
+		//_channel.Broadcast<Player::MoveEvent>(Player::MoveEvent());
 	}
 	else if (_inputConfig._jump == inputCode)
 	{
 		_currentCommand._type = GameCommand::Type::eJump;
 		_currentCommand._behavior._type = Behavior::Type::eJump;
 		_currentCommand._movement._vertical = Movement::Vertical::eDown;
-		_currentCommand._interpreted = false;
+		//_currentCommand._interpreted = false;
 	}
 
 }
@@ -237,7 +169,6 @@ void Player::QueueAction(const Action & action)
 
 void Player::SetInputConfig()
 {
-
 	_inputConfig._up = 'I';
 	_inputConfig._down = 'K';
 	_inputConfig._left = 'J';

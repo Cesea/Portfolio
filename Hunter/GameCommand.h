@@ -26,8 +26,6 @@ struct Behavior
 	enum Type
 	{
 		eNone,
-		eWalk,
-		eJump,
 		eAttack,
 		eSpecialAttack,
 		eSkill,

@@ -10,6 +10,8 @@
 typedef std::vector<LPD3DXANIMATIONSET> AnimationSetVector;
 typedef std::map<std::string, int32> AnimationSetTable;
 
+
+
 //기존의 에니메이션 셋을 삭제, 콜벡데이터를 넣었다면 새로 만들어서 Controller에 추가시킨다
 bool AddCallbackKeysAndCompress(LPD3DXANIMATIONCONTROLLER pAnimationController,
 	LPD3DXKEYFRAMEDANIMATIONSET pAnimationSet,
@@ -43,6 +45,7 @@ public :
 	void PopAction();
 
 	bool HasAction() { return (_head != _tail); }
+	void ClearQueue() { _tail = _head; }
 
 private :
 	Action _actions[ACTION_MAX_NUM]{};
@@ -64,7 +67,7 @@ public :
 
 	void UpdateAnimation(float deltaTime);
 	//인덱스로 찾기
-	bool Play(const Action &action);
+	bool PlayActionImmediate(const Action &action);
 	//void PlayOneShot(const Action &action);
 	//void PlayOneShotAfterHold(const Action &action);
 
@@ -74,11 +77,12 @@ public :
 	//void PlayOneShotAfterHold(const std::string &animName, float crossFadeTime = 0.0);
 
 
-	void Play( const std::string &animName, float crossFadeTime = 0.0 );
-	void Play( int32 animIndex, float crossFadeTime = 0.0 );
-	void Play( LPD3DXANIMATIONSET animSet, float crossFadeTime = 0.0 );
-	void PlayOneShot( const std::string &animName, float inCrossFadeTime = 0.0, float outCrossFadeTime = 0.0f );
-	void PlayOneShotAfterHold( const std::string &animName, float crossFadeTime = 0.0 );
+	void Play( const std::string &animName, float crossFadeTime = 0.0, bool32 blocking = false);
+	void Play( int32 animIndex, float crossFadeTime = 0.0, bool32 blocking = false);
+	void Play( LPD3DXANIMATIONSET animSet, float crossFadeTime = 0.0 , bool32 blocking = false);
+	void PlayOneShot( const std::string &animName, 
+		float inCrossFadeTime = 0.0, float outCrossFadeTime = 0.0f , bool32 blocking = false);
+	void PlayOneShotAfterHold( const std::string &animName, float crossFadeTime = 0.0 , bool32 blocking = false);
 
 	void Stop() { _playing = false; }
 	void SetPlaySpeed(float speed);
@@ -97,6 +101,7 @@ public :
 
 	bool32 _playing{};
 	bool32 _looping{};
+	bool32 _blocking{};
 	ID3DXAnimationSet *_pPrevPlayingAnimationSet{};
 	Action _prevAction;
 
@@ -107,7 +112,7 @@ public :
 
 	float _animDelta{};
 
-	ID3DXAnimationCallbackHandler *_pCallbackHandler{};
+	GameObjectAnimationCallbackHandler *_pCallbackHandler{};
 
 	AnimationSetVector _animations;
 	AnimationSetTable _animationTable;

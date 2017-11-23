@@ -12,9 +12,10 @@
 #define PLAYER_ANIM_LINK(Name) \
 	Action PlayerAnimationAction<Name>::_action;
 
-#define PLAYER_ANIM_DEFINE(Name, Blocking, PlayOnce, PlaySpeed, CrossFadeTime, OutCrossFadeTime)  \
+#define PLAYER_ANIM_DEFINE(Name, Blocking, PlayOnce, Stop, PlaySpeed, CrossFadeTime, OutCrossFadeTime)  \
 	PlayerAnimationAction<Name>::_action._blocking = Blocking; \
 	PlayerAnimationAction<Name>::_action._playOnce = PlayOnce; \
+	PlayerAnimationAction<Name>::_action._stop = Stop; \
 	PlayerAnimationAction<Name>::_action._playSpeed = PlaySpeed; \
 	PlayerAnimationAction<Name>::_action._crossFadeTime = CrossFadeTime; \
 	PlayerAnimationAction<Name>::_action._outCrossFadeTime = OutCrossFadeTime; \

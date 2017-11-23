@@ -25,6 +25,11 @@ public :
 		_pActor->_pActionComp->_actionQueue.PushAction(action);
 	}
 
+	virtual void ClearActioniQueue()
+	{
+		_pActor->_pActionComp->_actionQueue.ClearQueue();
+	}
+
 protected :
 };
 
@@ -53,7 +58,7 @@ public:
 
 	//void Handle(const Player::AttackEvent &event);
 protected:
-	StopWatch _toCombatTimer;
+	//StopWatch _toCombatTimer;
 };
 
 class PlayerCombatState : public PlayerState
@@ -65,9 +70,9 @@ public :
 	void Update(float deltaTime, const GameCommand &command) override;
 	void OnExit() override;
 
-	void Handle(const Player::AttackEvent &event);
+	//void Handle(const Player::AttackEvent &event);
 	//void Handle(const CombatEndEvent &event);
-	void Handle(const Player::MoveEvent &event);
+	//void Handle(const Player::MoveEvent &event);
 	//void Handle(const DamageEvent &event);
 
 private :
@@ -83,14 +88,13 @@ public:
 	void Update(float deltaTime, const GameCommand &command) override;
 	void OnExit() override;
 
-	void Handle(const Player::AttackEvent &event);
-	void Handle(const Player::MoveEvent &event);
+	//void Handle(const Player::AttackEvent &event);
+	//void Handle(const Player::MoveEvent &event);
 	//void Handle(const CombatBeginEvent &event);
 	//void Handle(const Player::InteractEvent &event);
 
 protected :
-
-	StopWatch _randomTimer;
+	//StopWatch _randomTimer;
 };
 
 class PlayerMoveState : public PlayerState
@@ -104,7 +108,7 @@ public :
 
 	//void Handle(const Player::JumpEvent &event);
 	//void Handle(const CombatBeginEvent &event);
-	void Handle(const Player::MoveEvent &event);
+	//void Handle(const Player::MoveEvent &event);
 
 protected :
 	StopWatch _toStanceTimer;

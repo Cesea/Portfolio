@@ -211,7 +211,7 @@
       <Filter>Game\GameUtils</Filter>
     </ClCompile>
     <ClCompile Include="spawn.cpp">
-      <Filter>Game\GameUtils</Filter>
+      <Filter>Game\GameObject\Enemy\spawn</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -359,9 +359,6 @@
     </ClInclude>
     <ClInclude Include="TypeTraits.h">
       <Filter>Sub</Filter>
-    </ClInclude>
-    <ClInclude Include="Assert.h">
-      <Filter>Debug</Filter>
     </ClInclude>
     <ClInclude Include="Memory.h">
       <Filter>Core\Memory</Filter>
@@ -521,7 +518,7 @@
       <Filter>Game\GameUtils</Filter>
     </ClInclude>
     <ClInclude Include="spawn.h">
-      <Filter>Game\GameUtils</Filter>
+      <Filter>Game\GameObject\Enemy\spawn</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -551,9 +548,6 @@
     </Filter>
     <Filter Include="Core\Timers">
       <UniqueIdentifier>{1a498917-4bd0-45a4-8cdb-28af30c3deb7}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Debug">
-      <UniqueIdentifier>{76a6963c-195a-47f4-bb35-80dc0a39ec35}</UniqueIdentifier>
     </Filter>
     <Filter Include="Core\SubSystem">
       <UniqueIdentifier>{e5f48745-5d7e-4565-bd8e-8884a513ad53}</UniqueIdentifier>
