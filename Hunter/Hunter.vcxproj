@@ -209,6 +209,7 @@
     <ClInclude Include="ActionComponent.h" />
     <ClInclude Include="ActionSystem.h" />
     <ClInclude Include="ApplicationTimer.h" />
+    <ClInclude Include="BaseGameObject.h" />
     <ClInclude Include="BaseLight.h" />
     <ClInclude Include="BaseScene.h" />
     <ClInclude Include="BaseSystem.h" />
@@ -235,6 +236,7 @@
     <ClInclude Include="GameCommand.h" />
     <ClInclude Include="GameComponent.h" />
     <ClInclude Include="GameObjectFactory.h" />
+    <ClInclude Include="GameObjects.h" />
     <ClInclude Include="GameSystems.h" />
     <ClInclude Include="GameUtils.h" />
     <ClInclude Include="GizmoManager.h" />

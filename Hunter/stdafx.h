@@ -71,8 +71,6 @@
 #include "Engine.h"
 #include "GameUtils.h"
 
-#define TERRAIN Terrain::GetInstance()
-
 extern HWND gWindowHandle;
 extern IDirect3DDevice9 *gpDevice;
 extern Engine *gEngine;

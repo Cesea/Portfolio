@@ -48,6 +48,25 @@ void PlayerAttackState::OnEnter()
 
 void PlayerAttackState::Update(float deltaTime, const GameCommand &command)
 {
+	switch (command._type)
+	{
+	case GameCommand::eNone:
+	{
+	}break;
+	case GameCommand::eMove:
+	{
+	}break;
+	case GameCommand::eAction:
+	{
+		_pParent->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWarSwingLeft));
+	}break;
+	case GameCommand::eJump:
+	{
+	}break;
+	case GameCommand::eInteract:
+	{
+	}break;
+	}
 }
 
 void PlayerAttackState::OnExit()
@@ -58,8 +77,6 @@ void PlayerAttackState::OnExit()
 void PlayerCombatState::OnEnter()
 {
 	EventChannel channel;
-	channel.Add<Player::AttackEvent, PlayerCombatState>(*this);
-	channel.Add<Player::MoveEvent, PlayerCombatState>(*this);
 
 	_toStanceTimer.Restart(3.0f);
 	_pParent->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWarCombatMode));
@@ -123,7 +140,6 @@ void PlayerCombatState::OnExit()
 void PlayerMoveState::OnEnter()
 {
 	EventChannel channel;
-	channel.Add<Player::MoveEvent, PlayerMoveState>(*this);
 
 	_toStanceTimer.Restart(1.0f);
 	_pParent->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWalk));
@@ -140,7 +156,6 @@ void PlayerMoveState::Update(float deltaTime, const GameCommand &command)
 void PlayerMoveState::OnExit()
 {
 	EventChannel channel;
-	channel.Remove<Player::MoveEvent, PlayerMoveState>(*this);
 }
 
 //void PlayerMoveState::Handle(const Player::MoveEvent & event)
@@ -151,10 +166,6 @@ void PlayerMoveState::OnExit()
 //Player Stance State///////////////////////////////////////////////////////////
 void PlayerStanceState::OnEnter()
 {
-	EventChannel channel;
-	channel.Add<Player::MoveEvent, PlayerStanceState>(*this);
-	channel.Add<Player::AttackEvent, PlayerStanceState>(*this);
-
 	_pParent->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eStandingFree));
 }
 

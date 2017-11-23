@@ -520,6 +520,12 @@
     <ClInclude Include="spawn.h">
       <Filter>Game\GameObject\Enemy\spawn</Filter>
     </ClInclude>
+    <ClInclude Include="GameObjects.h">
+      <Filter>Game\GameObject</Filter>
+    </ClInclude>
+    <ClInclude Include="BaseGameObject.h">
+      <Filter>Game\GameObject</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Core">

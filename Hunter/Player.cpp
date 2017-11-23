@@ -33,7 +33,7 @@ bool Player::CreateFromWorld(World & world)
 	_pActionComp = &_entity.AddComponent<ActionComponent>();
 	_pActionComp->CreateFrom(renderComp._skinned);
 	_pActionComp->_pCallbackHandler = new PlayerCallbackHandler;
-	//_pActionComp->_pCallbackHandler->HandleCallback
+	_pActionComp->_pCallbackHandler->Init(this);
 	SetupCallbackAndCompression();
 
 	_pActionComp->MakeAnimationList();
@@ -51,6 +51,8 @@ bool Player::CreateFromWorld(World & world)
 	_pStateMachine->ChangeState(META_TYPE(PlayerStanceState)->Name());
 
 	_currentCommand._interpreted = true;
+
+	return true;
 }
 
 void Player::Update(float deltaTime)
@@ -80,21 +82,25 @@ void Player::SetupCallbackAndCompression()
 	//pController->GetAnimationSet(3, (ID3DXAnimationSet **)&anim3);
 	//pController->GetAnimationSet(4, (ID3DXAnimationSet **)&anim4);
 
-	_callbackData._animtionEnum = &_currentAnimationEnum;
+	_callbackData._animtionEnum = (PlayerAnimationEnum *)&_animationEnum;
 
 	D3DXKEY_CALLBACK warSwingLeftKeys;
-	warSwingLeftKeys.Time = anim0->GetPeriod() / anim0->GetSourceTicksPerSecond();
+	warSwingLeftKeys.Time = anim0->GetPeriod() / 1.0f * anim0->GetSourceTicksPerSecond();
 	warSwingLeftKeys.pCallbackData = (void *)&_callbackData;
 	//anim0Keys[0].Time = 0;
 	//anim0Keys[0].pCallbackData = (void *)&_callbackData;
 	//anim0Keys[1].Time = anim0->GetPeriod() / 2.0f * anim0->GetSourceTicksPerSecond();
 	//anim0Keys[1].pCallbackData = (void *)&_callbackData;
 
-	AddCallbackKeysAndCompress(pController, anim0, 1, warSwingLeftKeys, D3DXCOMPRESS_DEFAULT, 0.1f);
+	AddCallbackKeysAndCompress(pController, anim0, 1, &warSwingLeftKeys, D3DXCOMPRESS_DEFAULT, 0.1f);
 	//AddCallbackKeysAndCompress(pController, anim1, 2, anim0Keys, D3DXCOMPRESS_DEFAULT, 0.1f);
 	//AddCallbackKeysAndCompress(pController, anim2, 2, anim0Keys, D3DXCOMPRESS_DEFAULT, 0.1f);
 	//AddCallbackKeysAndCompress(pController, anim3, 2, anim0Keys, D3DXCOMPRESS_DEFAULT, 0.1f);
 	//AddCallbackKeysAndCompress(pController, anim4, 2, anim0Keys, D3DXCOMPRESS_DEFAULT, 0.1f);
+}
+
+void Player::Handle(const InputManager::KeyPressedEvent & event)
+{
 }
 
 void Player::Handle(const InputManager::MousePressedEvent & event)
@@ -124,7 +130,7 @@ void Player::Handle(const InputManager::KeyDownEvent & event)
 	{
 		_currentCommand._type = GameCommand::Type::eMove;
 		_currentCommand._movement._horizontal = Movement::Horizontal::eLeft;
-		_currentCommand._behavior._type = Behavior::Type::eWalk;
+		//_currentCommand._behavior._type = Behavior::Type::eWalk;
 		//_currentCommand._interpreted = false;
 		//_channel.Broadcast<Player::MoveEvent>(Player::MoveEvent());
 	}
@@ -132,7 +138,7 @@ void Player::Handle(const InputManager::KeyDownEvent & event)
 	{
 		_currentCommand._type = GameCommand::Type::eMove;
 		_currentCommand._movement._horizontal = Movement::Horizontal::eRight;
-		_currentCommand._behavior._type = Behavior::Type::eWalk;
+		//_currentCommand._behavior._type = Behavior::Type::eWalk;
 		//_currentCommand._interpreted = false;
 		//_channel.Broadcast<Player::MoveEvent>(Player::MoveEvent());
 	}
@@ -140,7 +146,7 @@ void Player::Handle(const InputManager::KeyDownEvent & event)
 	{
 		_currentCommand._type = GameCommand::Type::eMove;
 		_currentCommand._movement._vertical = Movement::Vertical::eUp;
-		_currentCommand._behavior._type = Behavior::Type::eWalk;
+		//_currentCommand._behavior._type = Behavior::Type::eWalk;
 		//_currentCommand._interpreted = false;
 		//_channel.Broadcast<Player::MoveEvent>(Player::MoveEvent());
 	}
@@ -148,16 +154,14 @@ void Player::Handle(const InputManager::KeyDownEvent & event)
 	{
 		_currentCommand._type = GameCommand::Type::eMove;
 		_currentCommand._movement._vertical = Movement::Vertical::eDown;
-		_currentCommand._behavior._type = Behavior::Type::eWalk;
+		//_currentCommand._behavior._type = Behavior::Type::eWalk;
 		//_currentCommand._interpreted = false;
 		//_channel.Broadcast<Player::MoveEvent>(Player::MoveEvent());
 	}
 	else if (_inputConfig._jump == inputCode)
 	{
 		_currentCommand._type = GameCommand::Type::eJump;
-		_currentCommand._behavior._type = Behavior::Type::eJump;
 		_currentCommand._movement._vertical = Movement::Vertical::eDown;
-		//_currentCommand._interpreted = false;
 	}
 
 }

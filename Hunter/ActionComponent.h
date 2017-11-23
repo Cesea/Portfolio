@@ -10,7 +10,7 @@
 typedef std::vector<LPD3DXANIMATIONSET> AnimationSetVector;
 typedef std::map<std::string, int32> AnimationSetTable;
 
-
+class GameObjectAnimationCallbackHandler;
 
 //기존의 에니메이션 셋을 삭제, 콜벡데이터를 넣었다면 새로 만들어서 Controller에 추가시킨다
 bool AddCallbackKeysAndCompress(LPD3DXANIMATIONCONTROLLER pAnimationController,

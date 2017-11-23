@@ -12,7 +12,7 @@ struct PlayerCallbackData
 	PlayerAnimationEnum *_animtionEnum;
 };
 
-class PlayerCallbackHandler : public ID3DXAnimationCallbackHandler
+class PlayerCallbackHandler : public GameObjectAnimationCallbackHandler
 {
 public :
 	bool Init(Player *pPlayer) { _pPlayer = pPlayer; }
@@ -24,8 +24,12 @@ public :
             return S_OK;
 		}
 
-		switch (pData->_animtionEnum)
+		switch (*pData->_animtionEnum)
 		{
+		case PlayerAnimationEnum::eWarSwingLeft :
+		{
+			int a = 0;
+		}break;
 
 		}
         return S_OK;
@@ -57,36 +61,36 @@ class Player : public BaseGameObject
 	friend class PlayerStateMachine;
 	friend class PlayerCallbackHandler;
 public :
-	struct AttackEvent
-	{
-		int32 _a;
-	};
+	//struct AttackEvent
+	//{
+	//	int32 _a;
+	//};
 
-	struct MoveEvent
-	{
-		int32 _a;
-	};
-	struct InteractEvent
-	{
-		int32 _a;
-	};
-	struct JumpEvent
-	{
-		int32 _a;
-	};
+	//struct MoveEvent
+	//{
+	//	int32 _a;
+	//};
+	//struct InteractEvent
+	//{
+	//	int32 _a;
+	//};
+	//struct JumpEvent
+	//{
+	//	int32 _a;
+	//};
 
-	struct PositionEvent
-	{
-		int32 _a;
-	};
+	//struct PositionEvent
+	//{
+	//	int32 _a;
+	//};
 
-	struct QueueActionEvent
-	{
-		QueueActionEvent(const Action &action)
-			:_action(action)
-		{}
-		const Action &_action;
-	};
+	//struct QueueActionEvent
+	//{
+	//	QueueActionEvent(const Action &action)
+	//		:_action(action)
+	//	{}
+	//	const Action &_action;
+	//};
 
 	friend class PlayerStanceState;
 public :
@@ -113,8 +117,6 @@ protected :
 	ActionComponent *_pActionComp{};
 
 	void QueueAction(const Action &action);
-
-	PlayerAnimationEnum _currentAnimationEnum{};
 
 private :
 	void SetInputConfig();
