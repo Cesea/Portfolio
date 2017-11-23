@@ -24,7 +24,8 @@ bool Dragon::CreateFromWorld(World & world)
 	RenderComponent &renderComp = _entity.AddComponent<RenderComponent>();
 	renderComp._type = RenderComponent::Type::eSkinned;
 
-	renderComp._skinned = VIDEO->CreateSkinnedAnimation(_skinnedMeshHandle, "Anim0");
+	//NOTE : 이거 함수명 변경되었음...
+	renderComp._skinned = VIDEO->CreateAnimationInstance(_skinnedMeshHandle, "Anim0");
 	ScriptComponent & script = _entity.AddComponent<ScriptComponent>();
 	script.SetScript(MAKE_SCRIPT_DELEGATE(Dragon, update, *this));
 

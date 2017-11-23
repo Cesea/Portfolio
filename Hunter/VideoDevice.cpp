@@ -40,16 +40,11 @@ bool VideoDevice::Init()
 	LoadDefaultEffects();
 	MakeDefaultVertexDecls();
 
-	DEBUG_DRAWER->Init();
-
 	return true;
 }
 
 void VideoDevice::ShutDown()
 {
-	DEBUG_DRAWER->Shutdown();
-	DEBUG_DRAWER->ReleaseInstance();
-
 	COM_RELEASE(gpDevice);
 	COM_RELEASE(_pD3D);
 }

@@ -79,11 +79,11 @@
       <SDLCheck>true</SDLCheck>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Include;$(SolutionDir)externals\FreeType\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Include;C:\Work\port\Portfolio\Hunter\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-      <AdditionalLibraryDirectories>C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Lib\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Lib\x86;C:\Work\port\Portfolio\Hunter\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>d3d9.lib;d3dx9.lib;fmodstudio_vc.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
@@ -141,7 +141,6 @@
     <ClCompile Include="CollisionUtils.cpp" />
     <ClCompile Include="CommonUtils.cpp" />
     <ClCompile Include="Console.cpp" />
-    <ClCompile Include="DebugDrawer.cpp" />
     <ClCompile Include="DirectionalLight.cpp" />
     <ClCompile Include="Dragon.cpp" />
     <ClCompile Include="Enemy.cpp" />
@@ -224,7 +223,6 @@
     <ClInclude Include="Console.h" />
     <ClInclude Include="ContainerCheck.h" />
     <ClInclude Include="DataBase.h" />
-    <ClInclude Include="DebugDrawer.h" />
     <ClInclude Include="Delegate.h" />
     <ClInclude Include="DirectionalLight.h" />
     <ClInclude Include="Dragon.h" />
