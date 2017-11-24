@@ -50,7 +50,7 @@ bool BaseScene::Init()
 
 	MatrixScaling(&correctionMat, 1.15f, 1.15f, 1.15f);
 	video::SkinnedXMeshHandle snakeMesh = VIDEO->CreateSkinnedXMesh(
-		"../resources/Models/Snake/Snake.X", &correctionMat, "Snake");
+		"../resources/Models/Snake/Snake_Red.X", &correctionMat, "Snake");
 
 	MatrixScaling(&correctionMat, 1.0f, 1.0f, 1.0f);
 	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Rock/Rock1_A.X", &correctionMat, "Rock01");

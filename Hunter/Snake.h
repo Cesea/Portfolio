@@ -39,6 +39,22 @@ class Snake : public Enemy
 {
 	friend class SnakeStateMachine;
 	friend class SnakeCallbackHandler;
+
+private:
+	enum SNAKESTATE
+	{
+		SNAKESTATE_IDLE,
+		SNAKESTATE_PATROL,
+		SNAKESTATE_FIND,
+		SNAKESTATE_RUN,
+		SNAKESTATE_ATK1,
+		SNAKESTATE_ATK2,
+		SNAKESTATE_ATK3,
+		SNAKESTATE_STAND,
+		SNAKESTATE_HURT,
+		SNAKESTATE_DIE,
+	};
+	SNAKESTATE _state;
 public:
 	Snake();
 	virtual ~Snake();
@@ -58,6 +74,8 @@ protected:
 	ActionComponent *_pActionComp{};
 
 	void QueueAction(const Action &action);
+public:
+	bool findPlayer(Vector3 forward,Vector3 playerPos, Vector3 myPos, float range1,float range2,float findRadian);
 };
 
 #endif
