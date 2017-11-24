@@ -62,8 +62,11 @@ public:
 	virtual bool CreateFromWorld(World &world);
 	void Update(float deltaTime);
 <<<<<<< HEAD
+<<<<<<< HEAD
 	void render();
 =======
+=======
+>>>>>>> parent of 4902ea6... Gizmo추가
 
 >>>>>>> parent of 4902ea6... Gizmo추가
 protected:

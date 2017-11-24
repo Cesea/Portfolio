@@ -145,7 +145,11 @@ bool BaseScene::Render()
 
 	imguiRenderDraw();
 <<<<<<< HEAD
+<<<<<<< HEAD
 	_snake.render();
+=======
+
+>>>>>>> parent of 4902ea6... Gizmo추가
 =======
 
 >>>>>>> parent of 4902ea6... Gizmo추가
