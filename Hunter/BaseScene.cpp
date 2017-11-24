@@ -144,7 +144,11 @@ bool BaseScene::Render()
 	//TERRAIN->FillRenderCommand(*_mainRenderView);
 
 	imguiRenderDraw();
+<<<<<<< HEAD
 	_snake.render();
+=======
+
+>>>>>>> parent of 4902ea6... Gizmo추가
 	gpDevice->EndScene();
 	gpDevice->Present(nullptr, nullptr, NULL, nullptr);
 

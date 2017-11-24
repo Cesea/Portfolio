@@ -289,8 +289,11 @@ bool Snake::findPlayer(Vector3 forward,Vector3 playerPos, Vector3 myPos, float r
 
 	return false;
 }
+<<<<<<< HEAD
 
 void Snake::render()
 {
 	GIZMOMANAGER->Circle(_playerPos, 0.25f, Vector3(0, 1, 0), 0xFFFF0000);
 }
+=======
+>>>>>>> parent of 4902ea6... Gizmo추가
