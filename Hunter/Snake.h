@@ -61,6 +61,7 @@ public:
 
 	virtual bool CreateFromWorld(World &world);
 	void Update(float deltaTime);
+	void Render();
 
 protected:
 	void SetupCallbackAndCompression();

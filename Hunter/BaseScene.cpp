@@ -147,7 +147,7 @@ bool BaseScene::Render()
 	//TERRAIN->FillRenderCommand(*_mainRenderView);
 
 	imguiRenderDraw();
-
+	_snake.Render();
 	gpDevice->EndScene();
 	gpDevice->Present(nullptr, nullptr, NULL, nullptr);
 
