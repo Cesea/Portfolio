@@ -222,6 +222,15 @@
     <ClCompile Include="SnakeStates.cpp">
       <Filter>Game\GameObject\Enemy\Snake</Filter>
     </ClCompile>
+    <ClCompile Include="Turtle.cpp">
+      <Filter>Game\GameObject\Enemy\Turtle</Filter>
+    </ClCompile>
+    <ClCompile Include="TurtleAnimationString.cpp">
+      <Filter>Game\GameObject\Enemy\Turtle</Filter>
+    </ClCompile>
+    <ClCompile Include="TurtleStates.cpp">
+      <Filter>Game\GameObject\Enemy\Turtle</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -544,6 +553,15 @@
     <ClInclude Include="Lights.h">
       <Filter>Game\GameUtils\Light</Filter>
     </ClInclude>
+    <ClInclude Include="Turtle.h">
+      <Filter>Game\GameObject\Enemy\Turtle</Filter>
+    </ClInclude>
+    <ClInclude Include="TurtleAnimationString.h">
+      <Filter>Game\GameObject\Enemy\Turtle</Filter>
+    </ClInclude>
+    <ClInclude Include="TurtleStates.h">
+      <Filter>Game\GameObject\Enemy\Turtle</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Core">
@@ -698,6 +716,9 @@
     </Filter>
     <Filter Include="Game\GameObject\Enemy\Snake">
       <UniqueIdentifier>{89a2740d-465d-4b2d-ae00-0a66d64981ea}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\GameObject\Enemy\Turtle">
+      <UniqueIdentifier>{b66c83e9-946e-43df-a273-bbe371f59f11}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

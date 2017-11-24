@@ -194,6 +194,9 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="TransformSystem.cpp" />
+    <ClCompile Include="Turtle.cpp" />
+    <ClCompile Include="TurtleAnimationString.cpp" />
+    <ClCompile Include="TurtleStates.cpp" />
     <ClCompile Include="Variant.cpp" />
     <ClCompile Include="VariantBase.cpp" />
     <ClCompile Include="Vector2.cpp" />
@@ -300,6 +303,9 @@
     <ClInclude Include="SingletonBase.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="TransformSystem.h" />
+    <ClInclude Include="Turtle.h" />
+    <ClInclude Include="TurtleAnimationString.h" />
+    <ClInclude Include="TurtleStates.h" />
     <ClInclude Include="Typedefs.h" />
     <ClInclude Include="TypeTraits.h" />
     <ClInclude Include="Variant.h" />

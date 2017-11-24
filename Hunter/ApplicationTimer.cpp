@@ -30,9 +30,11 @@ void ApplicationTimer::Tick()
 	_currentDeltaMS = (int32)(_currentDeltaSecond * 1000);
 
 	int64 timeToSleep = _targetFramePerMS - _currentDeltaMS;
+
+	//Console::Log("%d\n", (int32)timeToSleep);
 	if (timeToSleep > 0)
 	{
-		Sleep(timeToSleep);
+		Sleep(timeToSleep-1);
 	}
 
 	QueryPerformanceCounter(&_currentCounter);

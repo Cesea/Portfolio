@@ -261,7 +261,7 @@ void Snake::QueueAction(const Action & action)
 	_pActionComp->_actionQueue.PushAction(action);
 }
 
-bool Snake::findPlayer(Vector3 forward,Vector3 playerPos, Vector3 myPos, float range1, float range2, float findRadian)
+bool Snake::findPlayer(Vector3 forward, Vector3 playerPos, Vector3 myPos, float range1, float range2, float findRadian)
 {
 	Vector3 toPlayer = playerPos - myPos;
 	float distance = Vec3Length(&toPlayer);
