@@ -33,7 +33,7 @@ private :
 	void RegisterEvent();
 	void UnRegisterEvent();
 
-	void CreateObject(ArcheType type, const Vector3 &position);
+	void CreateObject(ArcheType type, ResourceHandle handle, const Vector3 &position);
 
 public :
 	//struct CreateObjectEvent
@@ -50,13 +50,15 @@ public :
 
 	struct CreateObjectOnClickEvent
 	{
-		CreateObjectOnClickEvent(ArcheType type, const Vector2 &cursorPos)
-			:_type(type), _cursorPos(cursorPos)
+		CreateObjectOnClickEvent(ArcheType type, ResourceHandle handle, const Vector2 &cursorPos)
+			:_type(type), _cursorPos(cursorPos), _handle(handle)
 		{
 		}
 
 		ArcheType _type;
 		Vector2 _cursorPos;
+
+		ResourceHandle _handle;
 	};
 	void Handle(const CreateObjectOnClickEvent &event);
 

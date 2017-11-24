@@ -15,19 +15,36 @@ struct ResourceHandle
 		this->index = 0;
 		this->count = 0;
 	}
+
+	ResourceHandle(const ResourceHandle &other)
+	{
+		this->index = other.index;
+		this->count	= other.count;
+	}
+
+	const ResourceHandle &operator= (const ResourceHandle &other)
+	{
+		this->index = other.index;
+		this->count	= other.count;
+		return *this;
+	}
+
 	ResourceHandle(uint16 index, uint16 count)
 	{
 		this->index = index;
 		this->count = count;
 	}
+
 	uint32 Value() const
 	{
 		return (count << VIDEO_CONFIG_RESOURCE_COUNT_BIT) | index;
 	}
+
 	bool32 IsValid() const
 	{
 		return (Value() != 0);
 	}
+
 	void MakeInvalid()
 	{
 		this->index = 0;

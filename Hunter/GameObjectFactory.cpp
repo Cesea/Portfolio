@@ -14,7 +14,7 @@ void GameObjectFactory::Release()
 	_pCurrentScene = nullptr;
 }
 
-void GameObjectFactory::CreateObject(ArcheType type, const Vector3 & position)
+void GameObjectFactory::CreateObject(ArcheType type, ResourceHandle handle, const Vector3 & position)
 {
 	switch (type)
 	{
@@ -30,10 +30,14 @@ void GameObjectFactory::CreateObject(ArcheType type, const Vector3 & position)
 		transform._position = position;
 		RenderComponent &render = entity.AddComponent<RenderComponent>();
 		render._type = RenderComponent::Type::eStatic;
-		render._static = VIDEO->GetStaticXMesh("Rock01");
-		Assert(render._static.IsValid());
 
-		video::StaticXMesh *pMesh = VIDEO->GetStaticXMesh(render._static);
+		video::StaticXMeshHandle meshHandle;
+		meshHandle.count = handle.count;
+		meshHandle.index = handle.index;
+		Assert(meshHandle.IsValid());
+		render._static = meshHandle;
+
+		video::StaticXMesh *pMesh = VIDEO->GetStaticXMesh(meshHandle);
 
 		CollisionComponent &collision = entity.AddComponent<CollisionComponent>();
 		collision._boundingBox.Init(pMesh->_meshBoundInfo._min, pMesh->_meshBoundInfo._max);
@@ -52,9 +56,12 @@ void GameObjectFactory::CreateObject(ArcheType type, const Vector3 & position)
 		transform._position = position;
 		RenderComponent &render = entity.AddComponent<RenderComponent>();
 		render._type = RenderComponent::Type::eStatic;
-		render._static = VIDEO->GetStaticXMesh("Tree01");
 
-		Assert(render._static.IsValid());
+		video::StaticXMeshHandle meshHandle;
+		meshHandle.count = handle.count;
+		meshHandle.index = handle.index;
+		Assert(meshHandle.IsValid());
+		render._static = meshHandle;
 
 		video::StaticXMesh *pMesh = VIDEO->GetStaticXMesh(render._static);
 
@@ -74,9 +81,12 @@ void GameObjectFactory::CreateObject(ArcheType type, const Vector3 & position)
 		transform._position = position;
 		RenderComponent &render = entity.AddComponent<RenderComponent>();
 		render._type = RenderComponent::Type::eStatic;
-		render._static = VIDEO->GetStaticXMesh("Grass01");
 
-		Assert(render._static.IsValid());
+		video::StaticXMeshHandle meshHandle;
+		meshHandle.count = handle.count;
+		meshHandle.index = handle.index;
+		Assert(meshHandle.IsValid());
+		render._static = meshHandle;
 
 		video::StaticXMesh *pMesh = VIDEO->GetStaticXMesh(render._static);
 
@@ -106,7 +116,7 @@ void GameObjectFactory::Handle(const CreateObjectOnClickEvent & event)
 
 	if (_pCurrentScene->_pTerrain->IsIntersectRay(ray, &terrainHitPos))
 	{
-		CreateObject(event._type, terrainHitPos);
+		CreateObject(event._type, event._handle, terrainHitPos);
 	}
 
 }

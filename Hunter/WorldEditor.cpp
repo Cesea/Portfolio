@@ -168,8 +168,12 @@ void Editor::InTerrainEditMode()
 			objectType = ArcheType::eTree;
 		}
 
+		ResourceHandle resourceHandle;
+		resourceHandle.count = _terrainEditor._currentStaticHandle.count;
+		resourceHandle.index = _terrainEditor._currentStaticHandle.index;
+
 		_channel.Broadcast<GameObjectFactory::CreateObjectOnClickEvent>(
-			GameObjectFactory::CreateObjectOnClickEvent(objectType, Vector2(_mx, _my)));
+			GameObjectFactory::CreateObjectOnClickEvent(objectType, resourceHandle, Vector2(_mx, _my)));
 	}
 }
 
