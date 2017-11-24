@@ -93,6 +93,17 @@ private :
 	EventChannel _channel;
 
 	float _speed{2.0f};
+public :
+
+	struct PlayerPositionEvent
+	{
+		PlayerPositionEvent(const Vector3 &position)
+			:_position(position)
+		{
+		}
+		Vector3 _position;
+
+	};
 
 };
 

@@ -22,6 +22,6 @@ void InitSnakeAnimation()
 	SNAKE_ANIM_DEFINE(SNAKE_HIT2, false, false, false, 1.0f, 0.2f, 0.2f);
 	SNAKE_ANIM_DEFINE(SNAKE_IDLE, false, false, false, 1.0f, 0.2f, 0.2f);
 	SNAKE_ANIM_DEFINE(SNAKE_MOVE, false, false, false, 1.0f, 0.2f, 0.2f);
-	SNAKE_ANIM_DEFINE(SNAKE_ROAR, false, false, false, 1.0f, 0.2f, 0.2f);
+	SNAKE_ANIM_DEFINE(SNAKE_ROAR, false, true, false, 2.0f, 0.2f, 0.2f);
 	SNAKE_ANIM_DEFINE(SNAKE_STAND, false, false, false, 1.0f, 0.2f, 0.2f);
 }
