@@ -247,7 +247,7 @@
     <ClInclude Include="imgui.h" />
     <ClInclude Include="Allocators.h" />
     <ClInclude Include="imguiRenderer.h" />
-    <ClInclude Include="Light.h" />
+    <ClInclude Include="Lights.h" />
     <ClInclude Include="Math.h" />
     <ClInclude Include="MathUtils.h" />
     <ClInclude Include="Matrix.h" />

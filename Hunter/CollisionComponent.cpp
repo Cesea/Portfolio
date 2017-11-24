@@ -40,7 +40,6 @@ void CollisionComponent::GetWorldBox(const TransformComponent & transform, Vecto
 	{
 		Vec3TransformCoord(pOutBoxPos + i, vertices + i, &finalMatrix);
 	}
-
 }
 
 void CollisionComponent::GetWorldAABBMinMax(const TransformComponent & transform, 

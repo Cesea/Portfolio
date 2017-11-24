@@ -28,6 +28,8 @@ protected :
 	std::vector<Entity> _entities;
 	Camera _camera;
 	Terrain *_pTerrain{};
+
+	DirectionalLight *_pMainLight;
 };
 
 #endif

@@ -16,8 +16,6 @@ public:
 	virtual Matrix GetLightMatrix();
 
 	virtual void RenderGizmo();
-	virtual void SetWorldPosition(const Vector3 &position);
-	virtual void SetRotateWorld(float x, float y, float z);
 };
 
 

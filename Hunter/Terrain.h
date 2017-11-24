@@ -4,8 +4,18 @@
 class BaseScene;
 class QuadTree;
 
-//#define TERRAIN_CHUNK_RES (128)
+constexpr int32 TERRAIN_CHUNK_DIM = 64;
 
+constexpr int32 TERRAIN_HORI_SIZE = 1024;
+constexpr int32 TERRAIN_VERT_SIZE = 1024;
+
+constexpr int32 TERRAIN_HORI_HALF_SIZE = TERRAIN_HORI_SIZE / 2;
+constexpr int32 TERRAIN_VERT_HALF_SIZE = TERRAIN_VERT_SIZE / 2;
+
+constexpr int32 TERRAIN_HORI_CHUNK_COUNT = TERRAIN_HORI_SIZE / TERRAIN_CHUNK_DIM;
+constexpr int32 TERRAIN_VERT_CHUNK_COUNT = TERRAIN_VERT_SIZE / TERRAIN_CHUNK_DIM;
+
+//터레인 하나의 청크에 대한 위치이다
 struct TerrainChunkPos
 {
 	int32 _x{};
@@ -14,6 +24,25 @@ struct TerrainChunkPos
 	float _relX{};
 	float _relZ{};
 };
+
+//청크 안에서
+struct TerrainTilePos
+{
+	int32 _chunkX{};
+	int32 _chunkZ{};
+
+	int32 _tileX{};
+	int32 _tileZ{};
+
+	float _relX{};
+	float _relZ{};
+};
+
+TerrainChunkPos ConvertWorldPosToChunkPos(const Vector3 &worldPos);
+TerrainTilePos ConvertWorldPostoTilePos(const Vector3 &worldPos);
+
+const Vector3 ConvertChunkPosToWorldPos(const TerrainChunkPos &chunkPos);
+const Vector3 ConvertTilePosToWorldPos(const TerrainTilePos &tilePos);
 
 class Terrain 
 {
@@ -78,8 +107,10 @@ public:
 		video::VertexBufferHandle _vHandle{};
 		video::IndexBufferHandle _iHandle{};
 
-		QuadTree* _pQuadTree{};  //쿼드 트리
+		//QuadTree* _pQuadTree{};  //쿼드 트리
 		video::TerrainVertex *_pVertices;
+
+		std::vector<Entity> _entities;
 	};
 
 	Terrain() {}
@@ -108,8 +139,8 @@ private:
 
 	void SmoothTerrain(int32 passed);
 
-	video::VertexBufferHandle _vHandle{};
-	video::IndexBufferHandle _iHandle{};
+	//video::VertexBufferHandle _vHandle{};
+	//video::IndexBufferHandle _iHandle{};
 
 	video::VertexDeclHandle _declHandle{};
 	//video::MaterialHandle _materialHandle{};
@@ -167,7 +198,7 @@ private:
 	QuadTree* _pQuadTree{};  //쿼드 트리
 	BaseScene *_pScene;
 
-	TerrainChunk *_pSections{};
+	TerrainChunk *_pChunks{};
 };
 
 #endif

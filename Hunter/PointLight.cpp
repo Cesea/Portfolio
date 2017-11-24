@@ -37,10 +37,3 @@ void PointLight::RenderGizmo()
 {
 }
 
-void PointLight::SetWorldPosition(const Vector3 & position)
-{
-}
-
-void PointLight::SetRotateWorld(float x, float y, float z)
-{
-}

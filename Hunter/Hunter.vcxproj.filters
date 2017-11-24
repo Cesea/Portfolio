@@ -514,9 +514,6 @@
     <ClInclude Include="PointLight.h">
       <Filter>Game\GameUtils\Light</Filter>
     </ClInclude>
-    <ClInclude Include="Light.h">
-      <Filter>Game\GameUtils\Light</Filter>
-    </ClInclude>
     <ClInclude Include="GameObjectFactory.h">
       <Filter>Managers</Filter>
     </ClInclude>
@@ -543,6 +540,9 @@
     </ClInclude>
     <ClInclude Include="SnakeStates.h">
       <Filter>Game\GameObject\Enemy\Snake</Filter>
+    </ClInclude>
+    <ClInclude Include="Lights.h">
+      <Filter>Game\GameUtils\Light</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

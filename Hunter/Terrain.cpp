@@ -101,14 +101,16 @@ void Terrain::Destroy()
 {
 	_pScene = nullptr;
 
-	VIDEO->DestroyVertexBuffer(_vHandle);
-	VIDEO->DestroyIndexBuffer(_iHandle);
-	//for (int32 i = 0; i < _numSectionX * _numSectionZ; ++i)
-	//{
-	//	VIDEO->DestroyVertexBuffer(_pSections[i]._vHandle);
-	//	VIDEO->DestroyIndexBuffer(_pSections[i]._iHandle);
-	//}
-	SAFE_DELETE_ARRAY(_pSections);
+	//VIDEO->DestroyVertexBuffer(_vHandle);
+	//VIDEO->DestroyIndexBuffer(_iHandle);
+
+	for (int32 i = 0; i < _numSectionX * _numSectionZ; ++i)
+	{
+		VIDEO->DestroyVertexBuffer(_pChunks[i]._vHandle);
+		VIDEO->DestroyIndexBuffer(_pChunks[i]._iHandle);
+	}
+
+	SAFE_DELETE_ARRAY(_pChunks);
 
 	VIDEO->DestroyVertexDecl(_declHandle);
 
@@ -371,14 +373,13 @@ void Terrain::Render(const Camera & camera)
 {
 	//월드 행렬셋팅
 	video::Effect *pEffect = VIDEO->GetEffect(_effect);
-	video::VertexBuffer *vBuffer = VIDEO->GetVertexBuffer(_vHandle);
-	video::IndexBuffer *iBuffer = VIDEO->GetIndexBuffer(_iHandle);
-	video::VertexDecl *decl = VIDEO->GetVertexDecl(vBuffer->_decl);
+	//video::VertexBuffer *vBuffer = VIDEO->GetVertexBuffer(_vHandle);
+	//video::IndexBuffer *iBuffer = VIDEO->GetIndexBuffer(_iHandle);
+	//video::VertexDecl *decl = VIDEO->GetVertexDecl(vBuffer->_decl);
 
 	Matrix matInd;
 	MatrixIdentity(&matInd);
 	pEffect->SetMatrix("matWorld", matInd);
-
 
 	//뷰 행렬셋팅
 	pEffect->SetMatrix("matViewProjection", camera.GetViewProjectionMatrix());
@@ -396,24 +397,38 @@ void Terrain::Render(const Camera & camera)
 
 	//광원 셋팅
 	//m_pTerrainEffect->SetVector( "worldLightDir", &D3DXVECTOR4( dirLight, 1 ) );
-
-
 	pEffect->SetTechnique("Base");
 
-	uint32 numPass = pEffect->BeginEffect();
-
-	for (uint32 i = 0; i < numPass; i++) 
+	for (int32 i = 0; i < _numSectionX * _numSectionZ; ++i)
 	{
-		pEffect->BeginPass(i);
+		TerrainChunk &refChunk = _pChunks[i];
+		if (camera.GetFrustum().IsSphereInFrustum(
+			Vector3(refChunk._relCenterX, 0.0f, refChunk._relCenterZ), refChunk._radius))
+		{
+			video::VertexBuffer *vBuffer = VIDEO->GetVertexBuffer(refChunk._vHandle);
+			video::IndexBuffer *iBuffer = VIDEO->GetIndexBuffer(refChunk._iHandle);
+			video::VertexDecl *decl = VIDEO->GetVertexDecl(vBuffer->_decl);
 
-		gpDevice->SetStreamSource(0, vBuffer->_ptr, 0, sizeof(video::TerrainVertex));
-		gpDevice->SetVertexDeclaration(decl->_ptr);
-		gpDevice->SetIndices(iBuffer->_ptr);
-		gpDevice->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, 0, _numTotalVertex, 0, _numTotalFace);
+			gpDevice->SetStreamSource(0, vBuffer->_ptr, 0, sizeof(video::TerrainVertex));
+			gpDevice->SetVertexDeclaration(decl->_ptr);
+			gpDevice->SetIndices(iBuffer->_ptr);
 
-		pEffect->EndPass();
+			uint32 numPass = pEffect->BeginEffect();
+
+			for (uint32 i = 0; i < numPass; i++)
+			{
+				pEffect->BeginPass(i);
+
+				gpDevice->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, 0, 
+					_sectionNumVertexX * _sectionNumVertexZ, 0, _sectionNumCellX * _sectionNumCellX * 2);
+
+				pEffect->EndPass();
+			}
+			pEffect->EndEffect();
+
+		}
 	}
-	pEffect->EndEffect();
+
 }
 
 bool Terrain::CreateTerrain(int32 smooth, int32 tileNum)
@@ -570,7 +585,7 @@ bool Terrain::CreateTerrain(int32 smooth, int32 tileNum)
 
 	_declHandle = VIDEO->CreateVertexDecl(&decl, "TerrainDecl");
 
-	if (_inEditMode)
+	/*if (_inEditMode)
 	{
 		Memory mem;
 		mem._data = nullptr;
@@ -597,20 +612,17 @@ bool Terrain::CreateTerrain(int32 smooth, int32 tileNum)
 		mem._size = sizeof(uint32) * _numCellX * _numCellZ * 2 * 3;
 
 		_iHandle = VIDEO->CreateIndexBuffer(&mem, sizeof(uint32));
+	}*/
+
+	_pChunks = new TerrainChunk[_numSectionX * _numSectionZ];
+
+	for (uint32 z = 0; z < _numSectionZ; ++z)
+	{
+		for (uint32 x = 0; x < _numSectionX; ++x)
+		{
+			CreateTerrainSection(x, z, _terrainVertices);
+		}
 	}
-
-	//refSection._iHandle = VIDEO->GetIndexBuffer("TerrainSectionIndex");
-	//if (!refSection._iHandle.IsValid())
-	//_pSections = new Terrain::TerrainSection[_numSectionX * _numSectionZ];
-	//Assert(_pSections);
-
-	//for (uint32 z = 0; z < _numSectionZ; ++z)
-	//{
-	//	for (uint32 x = 0; x < _numSectionX; ++x)
-	//	{
-	//		CreateTerrainSection(x, z, _terrainVertices);
-	//	}
-	//}
 
 	SAFE_DELETE_ARRAY(poses);
 	SAFE_DELETE_ARRAY(normals);
@@ -626,92 +638,99 @@ bool Terrain::CreateTerrain(int32 smooth, int32 tileNum)
 	return true;
 }
 
-//bool Terrain::CreateTerrainSection(int32 x, int32 z, const video::TerrainVertex * pTerrainVertices)
-//{
-//	int32 sectionIndex = Index2D(x, z, _numSectionX);
-//
-//	TerrainChunk &refSection = _pSections[sectionIndex];
-//
-//	refSection._indexX = x;
-//	refSection._indexZ = z;
-//
-//	int32 globalStartX = x * _sectionResolution;
-//	int32 globalStartZ = z * _sectionResolution;
-//
-//	std::vector<video::TerrainVertex> vertices;
-//	std::vector<uint16> indices;
-//
-//	vertices.reserve(((_sectionNumVertexX ) * (_sectionNumVertexZ )) + 1);
-//	indices.reserve((_sectionNumCellX * (_sectionNumCellZ + 1)) * 3 * 2 + 1);
-//	
-//	vertices.clear();
-//	indices.clear();
-//
-//	//버텍스 정보 넣기...
-//	for (int32 localZ = 0; localZ < _sectionNumVertexZ; localZ++)
-//	{
-//		for (int32 localX = 0; localX < _sectionNumVertexX; localX++)
-//		{
-//			int32 globalX = globalStartX + localX;
-//			int32 globalZ = globalStartZ + localZ;
-//
-//			int32 globalIndex = Index2D(globalX, globalZ, _numVertexX);
-//
-//			vertices.push_back(pTerrainVertices[globalIndex]);
-//		}
-//	}
-//
-//	refSection._startX = vertices[0]._pos.x;
-//	refSection._startZ = vertices[0]._pos.z;
-//
-//	refSection._endX = vertices.back()._pos.x;
-//	refSection._endZ = vertices.back()._pos.z;
-//
-//	for (uint32 z = 0; z < _sectionResolution; z++)
-//	{
-//		for (uint32 x = 0; x < _sectionResolution ; x++)
-//		{
-//			uint32 lb = z * _sectionNumVertexX + x;
-//			uint32 lt = (z + 1) * _sectionNumVertexX + x;
-//			uint32 rt = ((z + 1)* _sectionNumVertexX) + (x + 1);
-//			uint32 rb = (z * _sectionNumVertexX) + (x + 1);
-//
-//			indices.push_back((uint16)lb);
-//			indices.push_back((uint16)lt);
-//			indices.push_back((uint16)rt);
-//
-//			indices.push_back((uint16)lb);
-//			indices.push_back((uint16)rt);
-//			indices.push_back((uint16)rb);
-//		}
-//	}
-//
-//	Memory mem;
-//	mem._data = &vertices[0];
-//	mem._size = sizeof(video::TerrainVertex) * _sectionNumVertexX * _sectionNumVertexZ;
-//
-//	int32 size = sizeof(video::TerrainVertex) * vertices.size();
-//
-//	//refSection._vHandle = VIDEO->CreateVertexBuffer(&mem, _declHandle);
-//	//Assert(refSection._vHandle.IsValid());
-//
-//	//mem._data = &indices[0];
-//	//mem._size = sizeof(uint16) * _sectionResolution * _sectionResolution * 2 * 3;
-//
-//	////refSection._iHandle = VIDEO->GetIndexBuffer("TerrainSectionIndex");
-//	////if (!refSection._iHandle.IsValid())
-//	//{
-//	//	refSection._iHandle = VIDEO->CreateIndexBuffer(&mem, sizeof(uint16));
-//	//}
-//
-//	//Assert(refSection._iHandle.IsValid());
-//
-//	refSection._centerX = (refSection._startX + refSection._endX) * 0.5f;
-//	refSection._centerZ = (refSection._startZ + refSection._endZ) * 0.5f;
-//	refSection._radius = (refSection._centerX - refSection._startX) * 1.2f;
-//
-//	return true;
-//}
+bool Terrain::CreateTerrainSection(int32 x, int32 z, const video::TerrainVertex * pTerrainVertices)
+{
+	int32 sectionIndex = Index2D(x, z, _numSectionX);
+
+	TerrainChunk &refSection = _pChunks[sectionIndex];
+
+	refSection._chunkX = x;
+	refSection._chunkZ = z;
+
+	int32 globalStartX = x * _sectionResolution;
+	int32 globalStartZ = z * _sectionResolution;
+
+	std::vector<video::TerrainVertex> vertices;
+	std::vector<uint16> indices;
+
+	vertices.reserve(((_sectionNumVertexX ) * (_sectionNumVertexZ )) + 1);
+	indices.reserve((_sectionNumCellX * (_sectionNumCellZ + 1)) * 3 * 2 + 1);
+	
+	vertices.clear();
+	indices.clear();
+
+	//버텍스 정보 넣기...
+	for (int32 localZ = 0; localZ < _sectionNumVertexZ; localZ++)
+	{
+		for (int32 localX = 0; localX < _sectionNumVertexX; localX++)
+		{
+			int32 globalX = globalStartX + localX;
+			int32 globalZ = globalStartZ + localZ;
+
+			int32 globalIndex = Index2D(globalX, globalZ, _numVertexX);
+
+			vertices.push_back(pTerrainVertices[globalIndex]);
+		}
+	}
+
+	refSection._relStartX = vertices[0]._pos.x;
+	refSection._relStartZ = vertices[0]._pos.z;
+
+	refSection._relEndX = vertices.back()._pos.x;
+	refSection._relEndZ = vertices.back()._pos.z;
+
+	for (uint32 z = 0; z < _sectionResolution; z++)
+	{
+		for (uint32 x = 0; x < _sectionResolution ; x++)
+		{
+			uint32 lt = z * _sectionNumVertexX + x;
+			uint32 rt = z * _sectionNumVertexX + x + 1;
+			uint32 lb = ((z + 1) * _sectionNumVertexX) + x;
+			uint32 rb = ((z + 1) * _sectionNumVertexX) + (x + 1);
+
+			indices.push_back((uint16)lt);
+			indices.push_back((uint16)rt);
+			indices.push_back((uint16)lb);
+
+			indices.push_back((uint16)lb);
+			indices.push_back((uint16)rt);
+			indices.push_back((uint16)rb);
+		}
+	}
+
+
+	if (_inEditMode)
+	{
+	}
+	else
+	{
+
+		Memory mem;
+
+		mem._data = &vertices[0];
+		mem._size = sizeof(video::TerrainVertex) * _sectionNumVertexX * _sectionNumVertexZ;
+
+		refSection._vHandle = VIDEO->CreateVertexBuffer(&mem, _declHandle);
+		Assert(refSection._vHandle.IsValid());
+
+		mem._data = &indices[0];
+		mem._size = sizeof(uint16) * _sectionResolution * _sectionResolution * 2 * 3;
+
+
+		if (!refSection._iHandle.IsValid())
+		{
+			refSection._iHandle = VIDEO->CreateIndexBuffer(&mem, sizeof(uint16));
+		}
+
+		Assert(refSection._iHandle.IsValid());
+	}
+
+	refSection._relCenterX = (refSection._relStartX + refSection._relEndX) * 0.5f;
+	refSection._relCenterZ = (refSection._relStartZ + refSection._relEndZ) * 0.5f;
+	refSection._radius = (refSection._relCenterX - refSection._relStartX) * 1.2f;
+
+	return true;
+}
 
 void Terrain::SmoothTerrain(int32 passed)
 {
@@ -800,4 +819,49 @@ void Terrain::SmoothTerrain(int32 passed)
 	}
 
 	SAFE_DELETE_ARRAY(smooth);
+}
+
+TerrainChunkPos ConvertWorldPosToChunkPos(const Vector3 & worldPos)
+{
+	TerrainChunkPos result;
+
+	float terrainPosX = worldPos.x + (float)TERRAIN_HORI_HALF_SIZE;
+	float terrainPosZ = -worldPos.z + (float)TERRAIN_VERT_HALF_SIZE;
+
+	result._x = (int32)(terrainPosX / TERRAIN_CHUNK_DIM);
+	result._z = (int32)(terrainPosZ / TERRAIN_CHUNK_DIM);
+
+	result._relX = terrainPosX - (float)result._x;
+	result._relZ = terrainPosZ - (float)result._z;
+
+	return result;
+}
+
+TerrainTilePos ConvertWorldPostoTilePos(const Vector3 & worldPos)
+{
+	TerrainTilePos result;
+	
+	float terrainPosX = worldPos.x + (float)TERRAIN_HORI_HALF_SIZE;
+	float terrainPosZ = -worldPos.z + (float)TERRAIN_VERT_HALF_SIZE;
+
+	result._chunkX = (int32)(terrainPosX / TERRAIN_CHUNK_DIM);
+	result._chunkZ = (int32)(terrainPosZ / TERRAIN_CHUNK_DIM);
+
+	//result._tileX = (int32)(terrainPosX - (float)result._chunkX);
+	//result._tileZ = (int32)(terrainPosZ - (float)result._chunkZ);
+
+	//result._relX = ;
+	//result._relZ = ;
+
+	return result;
+}
+
+const Vector3 ConvertChunkPosToWorldPos(const TerrainChunkPos & chunkPos)
+{
+	return Vector3();
+}
+
+const Vector3 ConvertTilePosToWorldPos(const TerrainTilePos & tilePos)
+{
+	return Vector3();
 }

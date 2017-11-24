@@ -27,20 +27,15 @@ Matrix DirectionalLight::GetLightMatrix()
 	memcpy(&matLight._31, &_color, sizeof(FLOAT) * 3);
 	matLight._34 = _intensity;
 
-
 	return matLight;
 }
 
-void DirectionalLight::SetWorldPosition(const Vector3 &position)
+void DirectionalLight::SetTarget(const Vector3 & target)
 {
 	TransformComponent &refTransform = _entity.GetComponent<TransformComponent>();
-	refTransform.SetWorldPosition(position);
-}
-
-void DirectionalLight::SetRotateWorld(float x, float y, float z)
-{
-	TransformComponent &refTransform = _entity.GetComponent<TransformComponent>();
-	refTransform.SetRotateWorld(x, y, z);
+	Vector3 direction = target - refTransform._position;
+	Vec3Normalize(&direction, &direction);
+	refTransform.LookDirection(direction);
 }
 
 void DirectionalLight::RenderGizmo()

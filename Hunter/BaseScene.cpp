@@ -15,6 +15,7 @@ bool BaseScene::Init()
 	video::SkinnedXMesh::_sStaticEffectHandle = VIDEO->GetEffect("StaticMesh.fx");
 	video::SkinnedXMesh::_sSkinnedEffectHandle = VIDEO->GetEffect("SkinnedMesh.fx");
 
+
 	InitPlayerAnimation();
 	InitSnakeAnimation();
 
@@ -35,7 +36,7 @@ bool BaseScene::Init()
 	config._heightScale = 20.0f;
 	config._textureMult = 300;
 	config._lodRatio = 0.1f;
-	config._sectionResolution = 64;
+	config._sectionResolution = TERRAIN_CHUNK_DIM;
 
 	_pTerrain = new Terrain();
 	_pTerrain->SetScene(this);
@@ -78,6 +79,12 @@ bool BaseScene::Init()
 	_world.AddSystem<TransformSystem>(_transformSystem);
 	_world.AddSystem<ActionSystem>(_actionSystem);
 	_world.AddSystem<ScriptSystem>(_scriptSystem);
+
+	//라이트 생성
+	_pMainLight = new DirectionalLight();
+	_pMainLight->CreateFromWorld(_world);
+	_pMainLight->SetWorldPosition(Vector3(0.0f, -5.0f, 5.0f));
+	_pMainLight->SetTarget(Vector3(0.0f, 0.0f, 0.0f));
 
 	//_player.CreateFromWorld(_world);
 	_snake.CreateFromWorld(_world);
@@ -122,10 +129,10 @@ bool BaseScene::Update(float deltaTime, const InputManager &input)
 bool BaseScene::Render()
 {
 	video::StaticXMesh::SetCamera(_camera);
-	//video::StaticXMesh::SetBaseLight(_pDirectional);
+	video::StaticXMesh::SetBaseLight(_pMainLight);
 
 	video::SkinnedXMesh::SetCamera(_camera);
-	//video::SkinnedXMesh::SetBaseLight(_pDirectional);
+	video::SkinnedXMesh::SetBaseLight(_pMainLight);
 
 	gpDevice->Clear(0, nullptr, D3DCLEAR_TARGET | D3DCLEAR_STENCIL | D3DCLEAR_ZBUFFER, 0xff303040, 1.0f, 0);
 	gpDevice->BeginScene();

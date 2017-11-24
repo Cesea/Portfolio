@@ -66,7 +66,25 @@ struct PS_OUTPUT
 
 float4 ps_default(PS_INPUT input) : COLOR
 {
-	return tex2D(Diffuse, input.Texcoord);
+//	float3 lightDirection = -float3(baseDirectionLight._21, 
+//			baseDirectionLight._22, 
+//			baseDirectionLight._23);
+
+	float4 diffTex = tex2D(Diffuse, input.Texcoord);
+
+	//float3x3 TBN = float3x3(
+	//	normalize(Input.Tangent),
+	//	normalize(Input.Binormal),
+	//	normalize(Input.Normal)
+	//	);
+
+	float3 lightDir = float3(1.0f, 1.0f, -1.0f);
+	lightDir = normalize(lightDir);
+
+	float diffuseIntensity = saturate(dot(input.Normal, lightDir));
+
+	diffTex.rgb *= diffuseIntensity;
+	return diffTex;
 }
 
 PS_OUTPUT ps_main(PS_INPUT Input)

@@ -8,7 +8,7 @@
 
 #include "GameObjects.h"
 
-#include "Light.h"
+#include "Lights.h"
 
 #include "Terrain.h"
 
