@@ -289,7 +289,3 @@ bool Snake::findPlayer(Vector3 forward,Vector3 playerPos, Vector3 myPos, float r
 
 	return false;
 }
-void Snake::Render()
-{
-	GIZMOMANAGER->Circle(_playerPos, 0.5f, Vector3(0, 1, 0), 0xFFFF0000);
-}
