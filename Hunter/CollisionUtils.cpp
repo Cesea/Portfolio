@@ -435,7 +435,8 @@ bool IsBlocking(TransformComponent * pTransA, CollisionComponent::BoundingBox * 
 
 }
 
-bool IsRayHitBound(const Ray & ray, const CollisionComponent::BoundingSphere & boundingSphere, TransformComponent & transform, Vector3 * pOutHitPos, Vector3 * pOutHitNormal)
+bool IsRayHitBound(const Ray & ray, const CollisionComponent::BoundingSphere & boundingSphere, 
+	const TransformComponent & transform, Vector3 * pOutHitPos, Vector3 * pOutHitNormal)
 {
 	Matrix matWorld = transform.GetFinalMatrix();
 

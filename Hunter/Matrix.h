@@ -50,6 +50,12 @@ private :
 
 Matrix operator * (float f, const Matrix& other);
 
+inline HRESULT MatrixDecompose (Vector3 *pOutScale, Quaternion *pOutRotation,
+	Vector3 *pOutTranslation, const Matrix *pM)
+{
+	return D3DXMatrixDecompose(pOutScale, pOutRotation, pOutTranslation, pM);
+}
+
 inline Matrix* MatrixIdentity ( Matrix *pOut )
 {
 	return (Matrix *)D3DXMatrixIdentity(pOut);

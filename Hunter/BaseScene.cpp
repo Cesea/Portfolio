@@ -20,9 +20,6 @@ bool BaseScene::Init()
 	InitPlayerAnimation();
 	InitSnakeAnimation();
 
-	_camera.SetRotationSpeed(10.0f);
-	_camera.SetMoveSpeed(20.0f);
-	_camera.GetTransform().MovePositionSelf(0.0f, 0.0f, -30.0f);
 
 	//터레인 로드
 	Terrain::TerrainConfig config;
@@ -61,7 +58,6 @@ bool BaseScene::Init()
 	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Rock/Rock4_A.X", &correctionMat, "Rock04");
 	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Rock/Rock5_A.X", &correctionMat, "Rock05");
 
-
 	MatrixScaling(&correctionMat, 0.01f, 0.01f, 0.01f);
 	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Grass/Grass1.X", &correctionMat, "Grass01");
 	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Grass/Grass2.X", &correctionMat, "Grass02");
@@ -83,6 +79,11 @@ bool BaseScene::Init()
 	_world.AddSystem<ScriptSystem>(_scriptSystem);
 	_world.AddSystem<CollisionSystem>(_collisionSystem);
 
+	//카메라 생성
+	_camera.CreateFromWorld(_world);
+	_camera.SetRotationSpeed(10.0f);
+	_camera.SetMoveSpeed(20.0f);
+
 	//라이트 생성
 	_pMainLight = new DirectionalLight();
 	_pMainLight->CreateFromWorld(_world);
@@ -90,7 +91,7 @@ bool BaseScene::Init()
 	_pMainLight->SetTarget(Vector3(0.0f, 0.0f, 0.0f));
 
 	//_player.CreateFromWorld(_world);
-	_snake.CreateFromWorld(_world);
+	//_snake.CreateFromWorld(_world);
 
 	//에디터 생성
 	imguiRenderInit();
@@ -109,6 +110,8 @@ bool BaseScene::Update(float deltaTime, const InputManager &input)
 	_world.Refresh();
 
 	_scriptSystem.Update(deltaTime);
+
+	_camera.PreUpdateMatrix();
 	_transformSystem.PreUpdate(deltaTime);
 
 	//Collision Check
@@ -117,8 +120,6 @@ bool BaseScene::Update(float deltaTime, const InputManager &input)
 
 	//Update Camera
 	{
-		_camera.PreUpdateMatrix();
-		_transformSystem.UpdateTransform(_camera.GetTransform());
 		_camera.UpdateMatrix();
 		_camera.UpdateCamToDevice();
 		_camera.UpdateFrustum();

@@ -96,14 +96,12 @@ public :
 	uint32 _numAnimation{};
 
 	ID3DXAnimationSet *_pPlayingAnimationSet{};
-	Action _playingAction;
 	D3DXTRACK_DESC _playingTrackDesc{};
 
 	bool32 _playing{};
 	bool32 _looping{};
 	bool32 _blocking{};
 	ID3DXAnimationSet *_pPrevPlayingAnimationSet{};
-	Action _prevAction;
 
 	float _crossFadeTime{};
 	float _leftCrossFadeTime{};

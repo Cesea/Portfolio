@@ -38,9 +38,16 @@ struct Sphere
 bool IsRayHitBound(
 	const Ray &ray,
 	const CollisionComponent::BoundingSphere &boundingSphere,
-	TransformComponent &transform,	
+	const TransformComponent &transform,	
 	Vector3* pOutHitPos, 
 	Vector3* pOutHitNormal);
+
+bool IsRayHitBound(
+		const Ray &ray,
+		const CollisionComponent::BoundingBox &boundingBox,
+		const TransformComponent &transform,
+		Vector3 *pOutHitPos, 
+		Vector3 *pOutHitNormal);
 
 
 

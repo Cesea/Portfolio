@@ -841,11 +841,14 @@ TerrainTilePos ConvertWorldPostoTilePos(const Vector3 & worldPos)
 	result._chunkX = (int32)(terrainPosX / TERRAIN_CHUNK_DIM);
 	result._chunkZ = (int32)(terrainPosZ / TERRAIN_CHUNK_DIM);
 
-	//result._tileX = (int32)(terrainPosX - (float)result._chunkX);
-	//result._tileZ = (int32)(terrainPosZ - (float)result._chunkZ);
+	int32 chunkStartX = result._chunkX * TERRAIN_CHUNK_DIM;
+	int32 chunkStartZ = result._chunkZ * TERRAIN_CHUNK_DIM;
 
-	//result._relX = ;
-	//result._relZ = ;
+	result._tileX = (int32)(terrainPosX - (float)chunkStartX);
+	result._tileZ = (int32)(terrainPosZ - (float)chunkStartZ);
+
+	result._relX = (float)(terrainPosX - (float)chunkStartX);
+	result._relZ = (float)(terrainPosZ - (float)chunkStartZ);
 
 	return result;
 }

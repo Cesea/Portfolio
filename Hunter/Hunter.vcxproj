@@ -179,7 +179,6 @@
     <ClCompile Include="spawnManager.cpp" />
     <ClCompile Include="SpriteManager.cpp" />
     <ClCompile Include="Terrain.cpp" />
-    <ClCompile Include="TerrainEditorScene.cpp" />
     <ClCompile Include="TextSerializer.cpp" />
     <ClCompile Include="tinyxml2.cpp" />
     <ClCompile Include="TransformComponent.cpp" />
@@ -283,7 +282,6 @@
     <ClInclude Include="StateMachine.h" />
     <ClInclude Include="System.h" />
     <ClInclude Include="Terrain.h" />
-    <ClInclude Include="TerrainEditorScene.h" />
     <ClInclude Include="TextSerializer.h" />
     <ClInclude Include="tinyxml2.h" />
     <ClInclude Include="TransformComponent.h" />

@@ -28,6 +28,11 @@ const Entity::ID & Entity::GetID() const
 	return _id;
 }
 
+Entity::ID & Entity::GetID()
+{
+	return _id;
+}
+
 World & Entity::GetWorld() const
 {
 	Assert(_world);

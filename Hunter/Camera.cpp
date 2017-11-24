@@ -33,12 +33,21 @@ Camera::~Camera()
 {
 }
 
+void Camera::CreateFromWorld(World & world)
+{
+	_entity = world.CreateEntity();
+	_entity.AddComponent<TransformComponent>();
+
+
+	_entity.Activate();
+}
+
 void Camera::PreUpdateMatrix()
 {
 	//이동값이 남아있다면 움직여라
 	if (!_toMove.IsZero())
 	{
-		_transform.MovePositionSelf(_toMove);
+		_entity.GetComponent<TransformComponent>().MovePositionSelf(_toMove);
 		_toMove = Vector3(0.0f, 0.0f, 0.0f);
 	}
 }
@@ -54,7 +63,7 @@ void Camera::UpdateMatrix()
 		_camFar);
 
 	//뷰행렬 카메라 월드위치에 대한 역행렬이다.
-	MatrixInverse(&_matView, NULL, &_transform._matFinal);
+	MatrixInverse(&_matView, NULL, &_entity.GetComponent<TransformComponent>()._matFinal);
 
 	_matViewProjection = _matView * _matProjection;
 }
@@ -87,8 +96,10 @@ void Camera::ComputeRay(const Vector2 & screenPos, Ray * pOutRay)
 	//동차로 위치에 화각 스케일량을 나눈다.
 	Vector3 direction( factorX / _matProjection._11, factorY / _matProjection._22, 1.0f);
 
+	TransformComponent &refTransform = _entity.GetComponent<TransformComponent>();
+
 	//카메라 월드 행렬
-	Matrix matCamWorld = _transform.GetFinalMatrix();
+	Matrix matCamWorld = refTransform.GetFinalMatrix();
 
 	//레이의 방향을 동차에서 얻은 벡터를 카메라 월드 매트릭스
 	//월드 방향이 나온다.
@@ -102,7 +113,7 @@ void Camera::ComputeRay(const Vector2 & screenPos, Ray * pOutRay)
 	pOutRay->direction = direction;
 
 	//레이의 오리진은 카메라 위치가 된다.
-	pOutRay->origin = _transform.GetWorldPosition();
+	pOutRay->origin = refTransform.GetWorldPosition();
 }
 
 bool Camera::GetWorldPosToScreenPos(const Vector3 & worldPos, Vector2 * pOutScreenPos)
@@ -210,6 +221,6 @@ void Camera::Handle(const InputManager::MouseMoveEvent & event)
 
 		ClampFloat(_verticalAngle, MIN_VERT_ANGLE, MAX_VERT_ANGLE);
 
-		_transform.SetRotateWorld(_verticalAngle * ONE_RAD, _horizontalAngle * ONE_RAD, 0.0f);
+		_entity.GetComponent<TransformComponent>().SetRotateWorld(_verticalAngle * ONE_RAD, _horizontalAngle * ONE_RAD, 0.0f);
 	}
 }

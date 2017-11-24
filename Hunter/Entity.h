@@ -46,20 +46,32 @@ public:
 		{
 			return Value() == other.Value();
 		}
+
+
 	};
 
 	Entity();
 
 	Entity(World& world, ID id);
 
-	Entity(const Entity&) = default;
+	Entity(const Entity &other)
+	{
+		_id = other._id;;
+		_world = other._world;
+	}
 	Entity(Entity&&) = default;
-	Entity& operator=(const Entity&) = default;
+	Entity& operator=(const Entity &other)
+	{
+		_id = other._id;;
+		_world = other._world;
+		return *this;
+	}
 	Entity& operator=(Entity&&) = default;
 
 	bool IsValid() const;
 
 	const ID& GetID() const;
+	ID &GetID();
 
 	World& GetWorld() const;
 

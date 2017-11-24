@@ -29,7 +29,6 @@ void ActionComponent::SetFirstAction(const Action &action)
 	{
 		_playing = true;
 		_looping = true;
-		_playingAction = action;
 		SetAnimation(found->second);
 	}
 }

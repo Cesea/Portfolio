@@ -199,6 +199,9 @@ private:
 	BaseScene *_pCurrentScene;
 
 	TerrainChunk *_pChunks{};
+
+	//플레이어의 청크위치를 받으면서 월드를 업데이트 시킨다
+	//Player *_pPlayer{};
 };
 
 #endif

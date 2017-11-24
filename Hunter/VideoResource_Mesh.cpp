@@ -200,7 +200,7 @@ namespace video
 
 		pEffect->SetMatrix("matViewProjection", matViewProj);
 
-		Vector3 vEyePos = camera.GetTransform().GetWorldPosition();
+		Vector3 vEyePos = camera.GetEntity().GetComponent<TransformComponent>().GetWorldPosition();
 
 		pEffect->_ptr->SetVector("vEyePos", &Vector4(vEyePos, 1));
 		pEffect->_ptr->SetFloat("camFar", camera._camFar);
@@ -269,66 +269,121 @@ namespace video
 			//메터리얼의 Texture 정보가 있다면..
 			if (pMaterials[i].pTextureFilename != nullptr)
 			{
-
 				//tex 파일경로는 Mesh 파일경로 + texture 파일이름
 				texFilePath = path + pMaterials[i].pTextureFilename;
-				//Texture 로딩하고 푸쉬
-				video::TextureHandle diffuseHandle = VIDEO->GetTexture(texFilePath);
-				if (!diffuseHandle.IsValid())
+
+				if (strncmp(pMaterials[i].pTextureFilename, "Rocks", 4) == 0)
 				{
-					_diffuseTextures.push_back(VIDEO->CreateTexture(texFilePath, texFilePath));
-				}
-
-				//파일 이름과 확장자 위치
-				int dotIndex = texFilePath.find_last_of(".");
-
-				//파일 명과 확장자를 나눈다.
-				texFile = texFilePath.substr(0, dotIndex);
-				texExp = texFilePath.substr(dotIndex + 1, fileName.length());
-
-				texFilePath = texFile + "_N." + texExp;
-
-				video::TextureHandle normalHandle = VIDEO->GetTexture(texFilePath);
-				if (!normalHandle.IsValid())
-				{
-					video::TextureHandle loadedHandle = VIDEO->CreateTexture(texFilePath, texFilePath);
-					if (!loadedHandle.IsValid())
+					video::TextureHandle diffuseHandle = VIDEO->GetTexture(texFilePath);
+					if (!diffuseHandle.IsValid())
 					{
-						_normalTextures.push_back(VIDEO->GetTexture("normalDefault.png"));
+						_diffuseTextures.push_back(VIDEO->CreateTexture(texFilePath, texFilePath));
 					}
 					else
 					{
-						_normalTextures.push_back(loadedHandle);
+						_diffuseTextures.push_back(diffuseHandle);
 					}
-				}
 
-				texFilePath = texFile + "_S." + texExp;
-				video::TextureHandle specularHandle = VIDEO->GetTexture(texFilePath);
-				if (!specularHandle.IsValid())
-				{
-					video::TextureHandle loadedHandle = VIDEO->CreateTexture(texFilePath, texFilePath);
-					if (!loadedHandle.IsValid())
+					texFilePath = path + "RocksStonesAlbedo_N.png";
+					video::TextureHandle normalHandle = VIDEO->GetTexture(texFilePath);
+					if (!normalHandle.IsValid())
 					{
-						_specularTextures.push_back(VIDEO->GetTexture("specularDefault.png"));
+						video::TextureHandle loadedHandle = VIDEO->CreateTexture(texFilePath, texFilePath);
+						if (!loadedHandle.IsValid())
+						{
+							_normalTextures.push_back(VIDEO->GetTexture("normalDefault.png"));
+						}
+						else
+						{
+							_normalTextures.push_back(loadedHandle);
+						}
 					}
 					else
 					{
-						_specularTextures.push_back(loadedHandle);
+						_normalTextures.push_back(normalHandle);
 					}
-				}
 
-				texFilePath = texFile + "_E." + texExp;
-				video::TextureHandle emissionHandle = VIDEO->GetTexture(texFilePath);
-				if (!emissionHandle.IsValid())
-				{
-					video::TextureHandle loadedHandle = VIDEO->CreateTexture(texFilePath, texFilePath);
-					if (!loadedHandle.IsValid())
+					texFilePath = path + "RocksStonesAlbedo_S.png";
+					video::TextureHandle specularHandle = VIDEO->GetTexture(texFilePath);
+					if (!specularHandle.IsValid())
 					{
-						_emissionTexture.push_back(VIDEO->GetTexture("emissionDefault.png"));
+						video::TextureHandle loadedHandle = VIDEO->CreateTexture(texFilePath, texFilePath);
+						if (!loadedHandle.IsValid())
+						{
+							_specularTextures.push_back(VIDEO->GetTexture("specularDefault.png"));
+						}
+						else
+						{
+							_specularTextures.push_back(loadedHandle);
+						}
 					}
 					else
 					{
-						_emissionTexture.push_back(loadedHandle);
+						_specularTextures.push_back(specularHandle);
+					}
+
+					_emissionTexture.push_back(VIDEO->GetTexture("emissionDefault.png"));
+				}
+				else
+				{
+					//Texture 로딩하고 푸쉬
+					video::TextureHandle diffuseHandle = VIDEO->GetTexture(texFilePath);
+					if (!diffuseHandle.IsValid())
+					{
+						_diffuseTextures.push_back(VIDEO->CreateTexture(texFilePath, texFilePath));
+					}
+
+					//파일 이름과 확장자 위치
+					int dotIndex = texFilePath.find_last_of(".");
+
+					//파일 명과 확장자를 나눈다.
+					texFile = texFilePath.substr(0, dotIndex);
+					texExp = texFilePath.substr(dotIndex + 1, fileName.length());
+
+					texFilePath = texFile + "_N." + texExp;
+
+					video::TextureHandle normalHandle = VIDEO->GetTexture(texFilePath);
+					if (!normalHandle.IsValid())
+					{
+						video::TextureHandle loadedHandle = VIDEO->CreateTexture(texFilePath, texFilePath);
+						if (!loadedHandle.IsValid())
+						{
+							_normalTextures.push_back(VIDEO->GetTexture("normalDefault.png"));
+						}
+						else
+						{
+							_normalTextures.push_back(loadedHandle);
+						}
+					}
+
+					texFilePath = texFile + "_S." + texExp;
+					video::TextureHandle specularHandle = VIDEO->GetTexture(texFilePath);
+					if (!specularHandle.IsValid())
+					{
+						video::TextureHandle loadedHandle = VIDEO->CreateTexture(texFilePath, texFilePath);
+						if (!loadedHandle.IsValid())
+						{
+							_specularTextures.push_back(VIDEO->GetTexture("specularDefault.png"));
+						}
+						else
+						{
+							_specularTextures.push_back(loadedHandle);
+						}
+					}
+
+					texFilePath = texFile + "_E." + texExp;
+					video::TextureHandle emissionHandle = VIDEO->GetTexture(texFilePath);
+					if (!emissionHandle.IsValid())
+					{
+						video::TextureHandle loadedHandle = VIDEO->CreateTexture(texFilePath, texFilePath);
+						if (!loadedHandle.IsValid())
+						{
+							_emissionTexture.push_back(VIDEO->GetTexture("emissionDefault.png"));
+						}
+						else
+						{
+							_emissionTexture.push_back(loadedHandle);
+						}
 					}
 				}
 			}
@@ -442,7 +497,7 @@ namespace video
 
 		pSkinned->SetMatrix("matViewProjection", matViewProj);
 
-		Vector3 vEyePos = camera.GetTransform().GetWorldPosition();
+		Vector3 vEyePos = camera.GetEntity().GetComponent<TransformComponent>().GetWorldPosition();
 
 		pSkinned->_ptr->SetVector("vEyePos", &Vector4(vEyePos, 1));
 		pSkinned->_ptr->SetFloat("camFar", camera._camFar);
@@ -452,7 +507,7 @@ namespace video
 
 		pStatic->SetMatrix("matViewProjection", matViewProj);
 
-		vEyePos = camera.GetTransform().GetWorldPosition();
+		vEyePos = camera.GetEntity().GetComponent<TransformComponent>().GetWorldPosition();
 
 		pStatic->_ptr->SetVector("vEyePos", &Vector4(vEyePos, 1));
 		pStatic->_ptr->SetFloat("camFar", camera._camFar);
@@ -860,9 +915,6 @@ STDMETHODIMP BoneHierachy::CreateMeshContainer(LPCSTR Name, CONST D3DXMESHDATA *
 	DWORD numAdjacency = 3 * (boneMesh->MeshData.pMesh->GetNumFaces());		//인접정보의 수
 	boneMesh->pAdjacency = new DWORD[numAdjacency];							//인접 정보의 수만큼 증가
 	memcpy(boneMesh->pAdjacency, pAdjacency, sizeof(DWORD) * numAdjacency);
-
-
-
 
 	std::string texFilePath;
 	std::string texExp;			//파일 확장자 명

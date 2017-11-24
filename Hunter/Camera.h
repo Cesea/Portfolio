@@ -39,13 +39,13 @@ public:
 
 	const Frustum &GetFrustum() const { return _frustum; }
 
-	const TransformComponent &GetTransform() const { return _transform; }
-	TransformComponent &GetTransform() { return _transform; }
 
 	void Handle(const InputManager::KeyDownEvent &event);
 	void Handle(const InputManager::MousePressedEvent &event);
 	void Handle(const InputManager::MouseReleasedEvent &event);
 	void Handle(const InputManager::MouseMoveEvent &event);
+
+	const Entity &GetEntity() const { return _entity; }
 
 protected:
 
@@ -54,7 +54,6 @@ protected:
 	Matrix _matView;
 	Matrix _matProjection;
 	Matrix _matViewProjection;
-	TransformComponent _transform;
 
 	bool32 _ortho;
 	bool32 _rotating{false};

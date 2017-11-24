@@ -186,7 +186,7 @@ void Editor::InObjectEditMode()
 	}
 
 	ImguiIndent();
-	if (nullptr == _objectEditor._pSelectingEntity)
+	if (_objectEditor._selectingEntity.GetID().IsNull())
 	{
 		ImguiLabel("Select Object To Edit!!");
 		if ( _leftButtonPressed &&
@@ -198,6 +198,13 @@ void Editor::InObjectEditMode()
 	else
 	{
 		ImguiLabel("Editing Object");
+
+		if (ImguiButton("Delete Object"))
+		{
+			_objectEditor._selectingEntity.Kill();
+			_objectEditor.Reset();
+		}
+
 		if (ImguiButton("Reset Seletion"))
 		{
 			_objectEditor.Reset();
@@ -223,6 +230,25 @@ void Editor::InObjectEditMode()
 				ImguiSlider("X", &_objectEditor._pTransform->_scale.x, 0.0f, 100.0f, 0.1f);
 				ImguiSlider("Y", &_objectEditor._pTransform->_scale.y, 0.0f, 100.0f, 0.1f);
 				ImguiSlider("Z", &_objectEditor._pTransform->_scale.z, 0.0f, 100.0f, 0.1f);
+				ImguiUnindent();
+			}
+
+			ImguiLabel("Orientation");
+			{
+				//지금 물체에 대한 모든 Transform정보를 가져올 수 있지만 함수가 비싸다...더 좋은 방법을 찾아보자.
+				Quaternion  quaternion;
+				Vector3 translation, scale;
+
+				MatrixDecompose(&scale, &quaternion, &translation, &_objectEditor._pTransform->GetFinalMatrix());
+
+				ImguiIndent();
+
+				ImguiSlider("X", &quaternion.x, 0.0f, 1.0f, 0.1f);
+				ImguiSlider("Y", &quaternion.y, 0.0f, 1.0f, 0.1f);
+				ImguiSlider("Z", &quaternion.z, 0.0f, 1.0f, 0.1f);
+
+				_objectEditor._pTransform->SetRotateWorld(quaternion);
+
 				ImguiUnindent();
 			}
 
@@ -324,7 +350,7 @@ void Editor::Edit(RefVariant &object, const InputManager &input)
 
 void Editor::SetEdittingEntity(Entity & entity)
 {
-	_objectEditor.OnNewSelection(&entity);
+	_objectEditor.OnNewSelection(entity);
 	//_objectEditor._pSelectingEntity = &entity;
 }
 
@@ -341,31 +367,31 @@ void Brush::Init()
 {
 }
 
-void ObjectEditor::OnNewSelection(Entity * pEntity)
+void ObjectEditor::OnNewSelection(Entity entity)
 {
-	if (nullptr != pEntity)
+	if (!entity.GetID().IsNull())
 	{
-		if (pEntity->HasComponent<TransformComponent>())
+		if (entity.HasComponent<TransformComponent>())
 		{
-			_pTransform = &pEntity->GetComponent<TransformComponent>();
+			_pTransform = &entity.GetComponent<TransformComponent>();
 		}
-		if (pEntity->HasComponent<RenderComponent>())
+		if (entity.HasComponent<RenderComponent>())
 		{
-			_pRender = &pEntity->GetComponent<RenderComponent>();
+			_pRender = &entity.GetComponent<RenderComponent>();
 		}
-		if (pEntity->HasComponent<ScriptComponent>())
+		if (entity.HasComponent<ScriptComponent>())
 		{
-			_pScript = &pEntity->GetComponent<ScriptComponent>();
+			_pScript = &entity.GetComponent<ScriptComponent>();
 		}
-		if (pEntity->HasComponent<CollisionComponent>())
+		if (entity.HasComponent<CollisionComponent>())
 		{
-			_pCollision = &pEntity->GetComponent<CollisionComponent>();
+			_pCollision = &entity.GetComponent<CollisionComponent>();
 		}
-		if (pEntity->HasComponent<ActionComponent>())
+		if (entity.HasComponent<ActionComponent>())
 		{
-			_pAction = &pEntity->GetComponent<ActionComponent>();
+			_pAction = &entity.GetComponent<ActionComponent>();
 		}
 
-		_pSelectingEntity = pEntity;
+		_selectingEntity = entity;
 	}
 }

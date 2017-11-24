@@ -81,7 +81,7 @@ struct ObjectEditor
 {
 	void Reset()
 	{
-		_pSelectingEntity = nullptr;
+		_selectingEntity.GetID().Clear();
 
 		_pTransform = nullptr;
 		_pRender = nullptr;
@@ -90,7 +90,7 @@ struct ObjectEditor
 		_pAction = nullptr;
 	}
 
-	void OnNewSelection(Entity *pEntity);
+	void OnNewSelection(Entity entity);
 
 	TransformComponent *_pTransform{};
 	RenderComponent *_pRender{};
@@ -98,7 +98,7 @@ struct ObjectEditor
 	CollisionComponent *_pCollision{};
 	ActionComponent *_pAction{};
 
-	Entity *_pSelectingEntity{ nullptr};
+	Entity _selectingEntity{ };
 };
 
 

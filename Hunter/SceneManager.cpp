@@ -2,7 +2,6 @@
 #include "SceneManager.h"
 
 #include "BaseScene.h"
-#include "TerrainEditorScene.h"
 
 SceneManager::SceneManager()
 {
@@ -20,11 +19,7 @@ bool SceneManager::Init()
 	AddScene(pScene->GetSceneName(), pScene);
 	ChangeScene(pScene->GetSceneName());
 
-	pScene = new TerrainEditorScene;
-	AddScene(pScene->GetSceneName(), pScene);
-
 	GetChannel().Add<SceneChangeEvent, SceneManager>(*this);
-
 
 	return true;
 }
