@@ -99,7 +99,7 @@ void Terrain::RegisterEvents()
 
 void Terrain::Destroy()
 {
-	_pScene = nullptr;
+	_pCurrentScene = nullptr;
 
 	//VIDEO->DestroyVertexBuffer(_vHandle);
 	//VIDEO->DestroyIndexBuffer(_iHandle);
@@ -383,6 +383,7 @@ void Terrain::Render(const Camera & camera)
 
 	//ºä Çà·Ä¼ÂÆÃ
 	pEffect->SetMatrix("matViewProjection", camera.GetViewProjectionMatrix());
+	pEffect->SetMatrix("baseDirectionalLight", _pCurrentScene->_pMainLight->GetLightMatrix());
 
 	//Texture ¼ÂÆÃ
 	pEffect->SetTexture("Terrain0_Tex", *VIDEO->GetTexture(_tile0Handle));
@@ -391,12 +392,6 @@ void Terrain::Render(const Camera & camera)
 	pEffect->SetTexture("Terrain3_Tex", *VIDEO->GetTexture(_tile3Handle));
 	pEffect->SetTexture("TerrainControl_Tex", *VIDEO->GetTexture(_tileSplatHandle));
 
-	//±¤¿ø ¼ÂÆÃ
-	//D3DXVECTOR3 dirLight = pDirectionLight->pTransform->GetForward();
-	//pEffect->SetVector("worldLightDir", D3DXVECTOR4(dirLight, 1));
-
-	//±¤¿ø ¼ÂÆÃ
-	//m_pTerrainEffect->SetVector( "worldLightDir", &D3DXVECTOR4( dirLight, 1 ) );
 	pEffect->SetTechnique("Base");
 
 	for (int32 i = 0; i < _numSectionX * _numSectionZ; ++i)
@@ -704,7 +699,6 @@ bool Terrain::CreateTerrainSection(int32 x, int32 z, const video::TerrainVertex 
 	}
 	else
 	{
-
 		Memory mem;
 
 		mem._data = &vertices[0];

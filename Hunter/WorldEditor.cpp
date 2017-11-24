@@ -175,9 +175,75 @@ void Editor::InTerrainEditMode()
 
 void Editor::InObjectEditMode()
 {
-	if (ImguiCollapse("TerrainEditor", nullptr, _editing))
+	if (ImguiCollapse("ObjectEditMode", nullptr, _editing))
 	{
+		_objectEditor.Reset();
 		ChangeEditState(EditMode::eNone);
+	}
+
+	ImguiIndent();
+	if (nullptr == _objectEditor._pSelectingEntity)
+	{
+		ImguiLabel("Select Object To Edit!!");
+		if ( _leftButtonPressed &&
+			!(_mx > 0 && _mx < EDITORX + EDITORSIZEX && _my >= 0 && _my < EDITORY + EDITORSIZEY))
+		{
+			_channel.Broadcast<Editor::GetObjectFromSceneEvent>( Editor::GetObjectFromSceneEvent(Vector2(_mx, _my)));
+		}
+	}
+	else
+	{
+		ImguiLabel("Editing Object");
+		if (ImguiButton("Reset Seletion"))
+		{
+			_objectEditor.Reset();
+		}
+
+		if (_objectEditor._pTransform)
+		{
+			ImguiLabel("Transform Component");
+			ImguiIndent();
+
+			ImguiLabel("Position");
+			{
+				ImguiIndent();
+				ImguiSlider("X", &_objectEditor._pTransform->_position.x, -100.0f, 100.0f, 0.1f);
+				ImguiSlider("Y", &_objectEditor._pTransform->_position.y, -100.0f, 100.0f, 0.1f);
+				ImguiSlider("Z", &_objectEditor._pTransform->_position.z, -100.0f, 100.0f, 0.1f);
+				ImguiUnindent();
+			}
+
+			ImguiLabel("Scale");
+			{
+				ImguiIndent();
+				ImguiSlider("X", &_objectEditor._pTransform->_scale.x, 0.0f, 100.0f, 0.1f);
+				ImguiSlider("Y", &_objectEditor._pTransform->_scale.y, 0.0f, 100.0f, 0.1f);
+				ImguiSlider("Z", &_objectEditor._pTransform->_scale.z, 0.0f, 100.0f, 0.1f);
+				ImguiUnindent();
+			}
+
+			ImguiUnindent();
+		}
+
+		if (_objectEditor._pRender)
+		{
+
+		}
+
+		if (_objectEditor._pScript)
+		{
+
+		}
+
+		if (_objectEditor._pCollision)
+		{
+
+		}
+
+		if (_objectEditor._pAction)
+		{
+
+		}
 	}
 }
 
@@ -252,6 +318,12 @@ void Editor::Edit(RefVariant &object, const InputManager &input)
 
 }
 
+void Editor::SetEdittingEntity(Entity & entity)
+{
+	_objectEditor.OnNewSelection(&entity);
+	//_objectEditor._pSelectingEntity = &entity;
+}
+
 void Editor::Render(video::RenderView * renderView)
 {
 }
@@ -265,3 +337,31 @@ void Brush::Init()
 {
 }
 
+void ObjectEditor::OnNewSelection(Entity * pEntity)
+{
+	if (nullptr != pEntity)
+	{
+		if (pEntity->HasComponent<TransformComponent>())
+		{
+			_pTransform = &pEntity->GetComponent<TransformComponent>();
+		}
+		if (pEntity->HasComponent<RenderComponent>())
+		{
+			_pRender = &pEntity->GetComponent<RenderComponent>();
+		}
+		if (pEntity->HasComponent<ScriptComponent>())
+		{
+			_pScript = &pEntity->GetComponent<ScriptComponent>();
+		}
+		if (pEntity->HasComponent<CollisionComponent>())
+		{
+			_pCollision = &pEntity->GetComponent<CollisionComponent>();
+		}
+		if (pEntity->HasComponent<ActionComponent>())
+		{
+			_pAction = &pEntity->GetComponent<ActionComponent>();
+		}
+
+		_pSelectingEntity = pEntity;
+	}
+}

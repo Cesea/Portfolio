@@ -202,7 +202,7 @@ namespace video
 
 		Vector3 vEyePos = camera.GetTransform().GetWorldPosition();
 
-		pEffect->_ptr->SetVector("vEyePos", &D3DXVECTOR4(vEyePos, 1));
+		pEffect->_ptr->SetVector("vEyePos", &Vector4(vEyePos, 1));
 		pEffect->_ptr->SetFloat("camFar", camera._camFar);
 		pEffect->_ptr->SetFloat("camNear", camera._camNear);
 	}
@@ -352,6 +352,7 @@ namespace video
 		_attributeRange = new D3DXATTRIBUTERANGE[attributeTableSize];
 		_pMesh->GetAttributeTable(_attributeRange, &attributeTableSize);
 
+
 		// 메쉬 보정 처리
 		if (nullptr != matCorrection)
 		{
@@ -416,10 +417,10 @@ namespace video
 			for (uint32 m = 0; m < this->_numMaterial; m++) 
 			{
 				////텍스쳐 셋팅
-				pEffect->SetTexture("Diffuse_Tex", *VIDEO->GetTexture(_diffuseTextures[m]));
-				pEffect->SetTexture("Normal_Tex", *VIDEO->GetTexture(_normalTextures[m]));
-				pEffect->SetTexture("Specular_Tex", *VIDEO->GetTexture(_specularTextures[m]));
-				pEffect->SetTexture("Emission_Tex", *VIDEO->GetTexture(_emissionTexture[m]));
+				pEffect->SetTexture("DiffuseTexture", *VIDEO->GetTexture(_diffuseTextures[m]));
+				pEffect->SetTexture("NormalTexture", *VIDEO->GetTexture(_normalTextures[m]));
+				pEffect->SetTexture("SpecularTexture", *VIDEO->GetTexture(_specularTextures[m]));
+				pEffect->SetTexture("EmissionTexture", *VIDEO->GetTexture(_emissionTexture[m]));
 				////스펙파워
 				pEffect->SetFloat("fSpecPower", this->_materials[m].Power);
 
@@ -1048,6 +1049,8 @@ STDMETHODIMP BoneHierachy::CreateMeshContainer(LPCSTR Name, CONST D3DXMESHDATA *
 		}
 	}
 	*ppNewMeshContainer = boneMesh;
+
+
 	
 	SAFE_RELEASE(d3dDevice);
 	return S_OK;

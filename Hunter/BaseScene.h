@@ -34,6 +34,7 @@ private:
 	RenderSystem _renderSystem;
 	ScriptSystem _scriptSystem;
 	ActionSystem _actionSystem;
+	CollisionSystem _collisionSystem;
 
 	EventChannel _channel;
 
@@ -42,16 +43,8 @@ private:
 	Player _player;
 	Snake _snake;
 public:
-	//struct SpawnEvent
-	//{
-	//	SpawnEvent(const Vector3 &position)
-	//		:_position(position)
-	//	{}
-	//	bool32 _isStatic;
-	//	Vector3 _position;
-	//	char _name[32];
-	//};
-	//void Handle(const BaseScene::SpawnEvent &event);
+
+	void Handle(const Editor::GetObjectFromSceneEvent &event);
 };
 
 #endif

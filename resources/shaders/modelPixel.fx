@@ -70,21 +70,9 @@ float4 ps_default(PS_INPUT input) : COLOR
 //			baseDirectionLight._22, 
 //			baseDirectionLight._23);
 
-	float4 diffTex = tex2D(Diffuse, input.Texcoord);
+	float3 diffuseColor = tex2D(Diffuse, input.Texcoord).rgb;
 
-	//float3x3 TBN = float3x3(
-	//	normalize(Input.Tangent),
-	//	normalize(Input.Binormal),
-	//	normalize(Input.Normal)
-	//	);
-
-	float3 lightDir = float3(1.0f, 1.0f, -1.0f);
-	lightDir = normalize(lightDir);
-
-	float diffuseIntensity = saturate(dot(input.Normal, lightDir));
-
-	diffTex.rgb *= diffuseIntensity;
-	return diffTex;
+	return float4(diffuseColor, 1.0f);
 }
 
 PS_OUTPUT ps_main(PS_INPUT Input)

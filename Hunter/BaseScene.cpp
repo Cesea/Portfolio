@@ -7,6 +7,7 @@ using namespace video;
 bool BaseScene::Init()
 {
 	bool result = true;
+	_channel.Add<Editor::GetObjectFromSceneEvent, BaseScene>(*this);
 	//RegisterEvents();
 
 	GAMEOBJECTFACTORY->SetCurrentScene(this);
@@ -60,6 +61,7 @@ bool BaseScene::Init()
 	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Rock/Rock4_A.X", &correctionMat, "Rock04");
 	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Rock/Rock5_A.X", &correctionMat, "Rock05");
 
+
 	MatrixScaling(&correctionMat, 0.01f, 0.01f, 0.01f);
 	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Grass/Grass1.X", &correctionMat, "Grass01");
 	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Grass/Grass2.X", &correctionMat, "Grass02");
@@ -79,11 +81,12 @@ bool BaseScene::Init()
 	_world.AddSystem<TransformSystem>(_transformSystem);
 	_world.AddSystem<ActionSystem>(_actionSystem);
 	_world.AddSystem<ScriptSystem>(_scriptSystem);
+	_world.AddSystem<CollisionSystem>(_collisionSystem);
 
 	//라이트 생성
 	_pMainLight = new DirectionalLight();
 	_pMainLight->CreateFromWorld(_world);
-	_pMainLight->SetWorldPosition(Vector3(0.0f, -5.0f, 5.0f));
+	_pMainLight->SetWorldPosition(Vector3(0.0f, 5.0f, 5.0f));
 	_pMainLight->SetTarget(Vector3(0.0f, 0.0f, 0.0f));
 
 	//_player.CreateFromWorld(_world);
@@ -153,6 +156,32 @@ bool BaseScene::Render()
 
 void BaseScene::Release()
 {
+}
+
+void BaseScene::Handle(const Editor::GetObjectFromSceneEvent & event)
+{
+	Vector3 position;
+	Vector3 terrainHitPos;
+	Ray ray;
+	_camera.ComputeRay(event._cursorPos, &ray);
+	std::vector<Entity> collidingEntity{};
+	std::vector<float> collidingDistance;
+
+	_collisionSystem.QueryRayEntityHit(ray, &collidingEntity, &collidingDistance);
+	if (collidingEntity.size() > 0)
+	{
+		float minDistance = 9999.0f;
+		int32 minIndex = 0;
+		for (int32 i = 0; i < collidingDistance.size(); ++i)
+		{
+			if (collidingDistance[i] < minDistance)
+			{
+				minDistance = collidingDistance[i];
+				minIndex = i;
+			}
+		}
+		_editor->SetEdittingEntity(collidingEntity[minIndex]);
+	}
 }
 
 //void BaseScene::Handle(const BaseScene::SpawnEvent & event)

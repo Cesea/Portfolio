@@ -116,7 +116,7 @@ public:
 	Terrain() {}
 	~Terrain();
 
-	void SetScene(BaseScene *pScene) { _pScene = pScene; }
+	void SetScene(BaseScene *pScene) { _pCurrentScene = pScene; }
 	bool Create(const Terrain::TerrainConfig &config, int32 smoothLevel, bool32 inEditMode);
 
 	void RegisterEvents();
@@ -196,7 +196,7 @@ private:
 	TerrainFace *_terrainFaces{};
 
 	QuadTree* _pQuadTree{};  //Äõµå Æ®¸®
-	BaseScene *_pScene;
+	BaseScene *_pCurrentScene;
 
 	TerrainChunk *_pChunks{};
 };

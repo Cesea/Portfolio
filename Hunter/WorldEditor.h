@@ -9,6 +9,12 @@ class Terrain;
 
 #define EDITOR_MAX_NAME_VAR 32
 
+struct TransformComponent;
+struct RenderComponent;
+struct ScriptComponent;
+struct CollisionComponent;
+struct ActionComponent;
+
 class Gizmo
 {
 public :
@@ -75,9 +81,24 @@ struct ObjectEditor
 {
 	void Reset()
 	{
+		_pSelectingEntity = nullptr;
 
+		_pTransform = nullptr;
+		_pRender = nullptr;
+		_pScript = nullptr;
+		_pCollision = nullptr;
+		_pAction = nullptr;
 	}
-	bool32 _editingTransform{};
+
+	void OnNewSelection(Entity *pEntity);
+
+	TransformComponent *_pTransform{};
+	RenderComponent *_pRender{};
+	ScriptComponent *_pScript{};
+	CollisionComponent *_pCollision{};
+	ActionComponent *_pAction{};
+
+	Entity *_pSelectingEntity{ nullptr};
 };
 
 
@@ -90,7 +111,18 @@ public :
 	virtual void Init();
 	virtual void Shutdown();
 
+	struct GetObjectFromSceneEvent
+	{
+		GetObjectFromSceneEvent(const Vector2 &cursorPos)
+			:_cursorPos(cursorPos)
+		{}
+		Vector2 _cursorPos;
+	};
+
 	virtual void Edit(RefVariant &pObject, const InputManager &input);
+
+	void SetEdittingEntity(Entity &entity);
+
 	void Render(video::RenderView *renderView);
 public:
 	void RegisterEvents();
@@ -126,6 +158,7 @@ public :
 	void UpdateInput(const InputManager &input);
 
 	TerrainEditor _terrainEditor;
+	ObjectEditor _objectEditor;
 
 	EventChannel _channel;
 };

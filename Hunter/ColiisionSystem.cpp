@@ -66,6 +66,29 @@ void CollisionSystem::Update(float deltaTime,float checkRange)
 	}
 }
 
+void CollisionSystem::QueryRayEntityHit(const Ray &ray, std::vector<Entity>* pOutCollidingEntity, 
+	std::vector<float> *pOutDistance)
+{
+	auto &entities = GetEntities();
+
+	Vector3 hitPos;
+	for (uint32 i = 0; i < entities.size(); ++i)
+	{
+		CollisionComponent &refCollision = entities[i].GetComponent<CollisionComponent>();
+		TransformComponent &transform = entities[i].GetComponent<TransformComponent>();
+
+		if (IsRayHitBound(ray, refCollision._boundingSphere, transform, &hitPos, nullptr))
+		{
+			pOutCollidingEntity->push_back(entities[i]);
+
+			float distance = Vec3LengthSq(&(hitPos - ray.origin));
+			pOutDistance->push_back(distance);
+		}
+	}
+
+	int a = 0;
+}
+
 void CollisionSystem::Initialize()
 {
 }
