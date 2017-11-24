@@ -60,7 +60,7 @@ bool Snake::CreateFromWorld(World & world)
 	_findDistance =	1.0f;
 	_findRadian = D3DX_PI / 3;
 	_findStareDistance = 20.0f;
-	_roarTime = 90;
+	_roarTime = 180;
 	_roarCount = _roarTime;
 
 	_battle = false;
@@ -288,4 +288,9 @@ bool Snake::findPlayer(Vector3 forward,Vector3 playerPos, Vector3 myPos, float r
 	}
 
 	return false;
+}
+
+void Snake::render()
+{
+	GIZMOMANAGER->Circle(_playerPos, 0.25f, Vector3(0, 1, 0), 0xFFFF0000);
 }
