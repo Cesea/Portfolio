@@ -99,7 +99,7 @@ float4 ps_main(vs_output input) : COLOR
 
 	float4 ambient = float4(0.2f, 0.2f, 0.2f, 1.0f);
 
-	return diffuseColor * ambient + diffuseColor * d + diffuseColor * s;
+	return diffuseColor;
 }
 
 

@@ -4,6 +4,7 @@
 #include "World.h"
 #include "Terrain.h"
 #include "Camera.h"
+#include "BaseGameObject.h"
 
 class IScene
 {
@@ -11,7 +12,7 @@ public :
 	friend class GameObjectFactory;
 
 	IScene()
-		:_world(4096), _entities(4096)
+		:_world(4096)
 	{};
 	virtual ~IScene() {}
 
@@ -25,7 +26,7 @@ public :
 
 protected :
 	World _world;
-	std::vector<Entity> _entities;
+	std::vector<BaseGameObject *> _gameObjects;
 	Camera _camera;
 	Terrain *_pTerrain{};
 

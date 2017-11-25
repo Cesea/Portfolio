@@ -1,35 +1,38 @@
 #include "stdafx.h"
 #include "GameObjectFactory.h"
 
+#include "Player.h"
+#include "Snake.h"
+
 //#include "World.h"
 
 void GameObjectFactory::Init()
 {
 	_channel.Add<GameObjectFactory::CreateObjectOnClickEvent, GameObjectFactory>(*this);
+	_channel.Add<GameObjectFactory::CreateObjectOnLocationEvent, GameObjectFactory>(*this);
 }
 
 void GameObjectFactory::Release()
 {
 	_channel.Remove<GameObjectFactory::CreateObjectOnClickEvent, GameObjectFactory>(*this);
+	_channel.Remove<GameObjectFactory::CreateObjectOnLocationEvent, GameObjectFactory>(*this);
 	_pCurrentScene = nullptr;
 }
 
-void GameObjectFactory::CreateObject(ArcheType type, ResourceHandle handle, const Vector3 & position)
+void GameObjectFactory::CreateObject(ARCHE_TYPE type, ResourceHandle handle, const Vector3 & position)
 {
 	switch (type)
 	{
-	case eHero:
+	case ARCHE_ROCK:
 	{
-	}break;
-	case eRock:
-	{
-		_pCurrentScene->_entities.push_back(_pCurrentScene->_world.CreateEntity());
-		Entity &entity = _pCurrentScene->_entities.back();
+		Entity &entity = _pCurrentScene->_world.CreateEntity();
 
 		TransformComponent &transform = entity.AddComponent<TransformComponent>();
 		transform._position = position;
 		RenderComponent &render = entity.AddComponent<RenderComponent>();
 		render._type = RenderComponent::Type::eStatic;
+
+		_pCurrentScene->_pTerrain->AddEntityToSection(entity, position);
 
 		video::StaticXMeshHandle meshHandle;
 		meshHandle.count = handle.count;
@@ -47,13 +50,15 @@ void GameObjectFactory::CreateObject(ArcheType type, ResourceHandle handle, cons
 		entity.Activate();
 
 	}break;
-	case eTree:
+	case ARCHE_TREE:
 	{
-		_pCurrentScene->_entities.push_back(_pCurrentScene->_world.CreateEntity());
-		Entity &entity = _pCurrentScene->_entities.back();
+		Entity &entity = _pCurrentScene->_world.CreateEntity();
 
 		TransformComponent &transform = entity.AddComponent<TransformComponent>();
 		transform._position = position;
+
+		_pCurrentScene->_pTerrain->AddEntityToSection(entity, position);
+
 		RenderComponent &render = entity.AddComponent<RenderComponent>();
 		render._type = RenderComponent::Type::eStatic;
 
@@ -72,13 +77,15 @@ void GameObjectFactory::CreateObject(ArcheType type, ResourceHandle handle, cons
 
 		entity.Activate();
 	}break;
-	case eGrass:
+	case ARCHE_GRASS:
 	{
-		_pCurrentScene->_entities.push_back(_pCurrentScene->_world.CreateEntity());
-		Entity &entity = _pCurrentScene->_entities.back();
+		Entity &entity = _pCurrentScene->_world.CreateEntity();
 
 		TransformComponent &transform = entity.AddComponent<TransformComponent>();
 		transform._position = position;
+
+		_pCurrentScene->_pTerrain->AddEntityToSection(entity, position);
+
 		RenderComponent &render = entity.AddComponent<RenderComponent>();
 		render._type = RenderComponent::Type::eStatic;
 
@@ -97,9 +104,28 @@ void GameObjectFactory::CreateObject(ArcheType type, ResourceHandle handle, cons
 
 		entity.Activate();
 	}break;
-	case eDragon:
+	case ARCHE_DRAGON :
 	{
 	}break;
+	case ARCHE_HERO :
+	{
+		_pCurrentScene->_gameObjects.push_back(new Player());
+		BaseGameObject *pBack = _pCurrentScene->_gameObjects.back();
+		pBack->CreateFromWorld(_pCurrentScene->_world);
+		TransformComponent &refTransform = pBack->_entity.GetComponent<TransformComponent>();
+		refTransform._position = position;
+	}break;
+	case ARCHE_SNAKE :
+	{
+		_pCurrentScene->_gameObjects.push_back(new Snake());
+		BaseGameObject *pBack = _pCurrentScene->_gameObjects.back();
+		pBack->CreateFromWorld(_pCurrentScene->_world);
+		TransformComponent &refTransform = pBack->_entity.GetComponent<TransformComponent>();
+		refTransform._position = position;
+
+		int a = 0;
+	}break;
+
 	}
 }
 
@@ -119,4 +145,9 @@ void GameObjectFactory::Handle(const CreateObjectOnClickEvent & event)
 		CreateObject(event._type, event._handle, terrainHitPos);
 	}
 
+}
+
+void GameObjectFactory::Handle(const CreateObjectOnLocationEvent & event)
+{
+	CreateObject(event._type, event._handle, event._position);
 }

@@ -154,18 +154,18 @@ void Editor::InTerrainEditMode()
 		_leftButtonPressed &&
 		!(_mx > 0 && _mx < EDITORX + EDITORSIZEX && _my >= 0 && _my < EDITORY + EDITORSIZEY))
 	{
-		ArcheType objectType;
+		ARCHE_TYPE objectType;
 		if (_terrainEditor._editingGrass)
 		{
-			objectType = ArcheType::eGrass;
+			objectType = ARCHE_GRASS;
 		}
 		else if (_terrainEditor._editingRock)
 		{
-			objectType = ArcheType::eRock;
+			objectType = ARCHE_ROCK;
 		}
 		else if (_terrainEditor._editingTree)
 		{
-			objectType = ArcheType::eTree;
+			objectType = ARCHE_TREE;
 		}
 
 		ResourceHandle resourceHandle;

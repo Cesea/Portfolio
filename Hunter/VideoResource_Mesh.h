@@ -58,6 +58,7 @@ struct BoneMesh : public D3DXMESHCONTAINER
 	DWORD NumAttributesGroup{};		//메시의 속성 그룹수 ( 해당 메시에 메터리얼정보가 몇개있니? )
 	LPD3DXBUFFER BufBoneCombos{};			//본컴비네이션 ( 메시에 적용되는 본 ID 정보와 메터리얼 정보 )
 
+	MeshVertInfo _vertInfo;
 	MeshBoundInfo _boundInfo;
 };
 

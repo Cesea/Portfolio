@@ -7,6 +7,113 @@ namespace video
 	EffectHandle SkinnedXMesh::_sSkinnedEffectHandle;
 	EffectHandle SkinnedXMesh::_sStaticEffectHandle;
 
+	void CalculateMeshBoundInfo(ID3DXMesh *pMesh, const Matrix &correction, MeshBoundInfo *pOutBoundInfo)
+	{
+		D3DVERTEXELEMENT9 vertexElements[MAX_FVF_DECL_SIZE];
+
+		pMesh->GetDeclaration(vertexElements);
+		int32 positionOffset = -1;
+		int32 normalOffet = -1;
+		int32 tangentOffet = -1;
+		int32 binormalOffet = -1;
+
+		//일단 돌아재낀다..
+		for (uint32 i = 0; i < MAX_FVF_DECL_SIZE; i++)
+		{
+			if (vertexElements[i].Type == D3DDECLTYPE_UNUSED)
+			{
+				break;
+			}
+			if (vertexElements[i].Usage == D3DDECLUSAGE_POSITION)
+			{
+				positionOffset = vertexElements[i].Offset;
+			}
+			else if (vertexElements[i].Usage == D3DDECLUSAGE_NORMAL)
+			{
+				normalOffet = vertexElements[i].Offset;
+			}
+			//정점탄젠트 정보를 만났다면...
+			else if (vertexElements[i].Usage == D3DDECLUSAGE_TANGENT)
+			{
+				tangentOffet = vertexElements[i].Offset;
+			}
+			//정점바이노말 정보를 만났다면...
+			else if (vertexElements[i].Usage == D3DDECLUSAGE_BINORMAL)
+			{
+				binormalOffet = vertexElements[i].Offset;
+			}
+		}
+
+		uint32 vertexStride = D3DXGetDeclVertexSize(vertexElements, 0);
+
+		//메쉬의 버텍스 버퍼를 Lock 한다
+		void* pVertexData = nullptr;
+		pMesh->LockVertexBuffer(0, &pVertexData);
+
+		//바운드 MinMax 계산을 위한 초기화......
+		pOutBoundInfo->_min = Vector3(0, 0, 0);
+		pOutBoundInfo->_max = Vector3(0, 0, 0);
+
+		//버텍스 수만클 돌아 재낀다....
+		for (uint32 i = 0; i < pMesh->GetNumVertices(); i++)
+		{
+			//버텍스 시작 주소
+			uint8* pVertex = ((uint8*)pVertexData + (i * vertexStride));
+
+			//정점 위치가 있다면...
+			if (positionOffset != -1)
+			{
+				Vector3* pos = (Vector3*)(pVertex + positionOffset);
+
+				Vec3TransformCoord(pos, pos, &correction);
+
+				//정점 최소 값갱신
+				if (pOutBoundInfo->_min.x > pos->x)		pOutBoundInfo->_min.x = pos->x;
+				if (pOutBoundInfo->_min.y > pos->y)		pOutBoundInfo->_min.y = pos->y;
+				if (pOutBoundInfo->_min.z > pos->z)		pOutBoundInfo->_min.z = pos->z;
+
+				//정점 최대 값갱신
+				if (pOutBoundInfo->_max.x < pos->x)		pOutBoundInfo->_max.x = pos->x;
+				if (pOutBoundInfo->_max.y < pos->y)		pOutBoundInfo->_max.y = pos->y;
+				if (pOutBoundInfo->_max.z < pos->z)		pOutBoundInfo->_max.z = pos->z;
+			}
+
+			//노말정보가 있다면..
+			if (normalOffet != -1)
+			{
+				Vector3* nor = (Vector3*)(pVertex + normalOffet);
+				Vec3TransformNormal(nor, nor, &correction);
+				Vec3Normalize(nor, nor);
+			}
+			//tangent 정보가 있다면.
+			if (tangentOffet != -1)
+			{
+				Vector3* tangent = (Vector3*)(pVertex + tangentOffet);
+				Vec3TransformNormal(tangent, tangent, &correction);
+				Vec3Normalize(tangent, tangent);
+			}
+			//binormal 정보가 있다면
+			if (binormalOffet != -1)
+			{
+				Vector3* binor = (Vector3*)(pVertex + binormalOffet);
+				Vec3TransformNormal(binor, binor, &correction);
+				Vec3Normalize(binor, binor);
+			}
+		}
+		pMesh->UnlockVertexBuffer();
+
+		//Bound 추가 계산
+		pOutBoundInfo->_center = (pOutBoundInfo->_min + pOutBoundInfo->_max) * 0.5f;
+
+		pOutBoundInfo->_size =
+			Vector3(pOutBoundInfo->_max.x - pOutBoundInfo->_min.x,
+				pOutBoundInfo->_max.y - pOutBoundInfo->_min.y,
+				pOutBoundInfo->_max.z - pOutBoundInfo->_min.z);
+
+		pOutBoundInfo->_halfSize = pOutBoundInfo->_size * 0.5f;
+		pOutBoundInfo->_radius = D3DXVec3Length(&(pOutBoundInfo->_center - pOutBoundInfo->_min));
+	}
+
 	void ResizeMeshAndGetInfos(ID3DXMesh *pMesh, const Matrix &correction,
 		MeshVertInfo *pOutVertInfo, MeshBoundInfo *pOutBoundInfo)
 	{
@@ -767,7 +874,6 @@ namespace video
 			}
 			else
 			{
-
 				video::Effect *pStaticEffect = VIDEO->GetEffect(_sStaticEffectHandle);
 				pStaticEffect->SetMatrix("matWorld", pBone->CombinedTransformationMatrix);
 				for (DWORD i = 0; i < pBoneMesh->NumAttributesGroup; i++)
@@ -789,9 +895,7 @@ namespace video
 						pStaticEffect->EndPass();
 					}
 					pStaticEffect->EndEffect();
-
 				}
-				
 			}
 		}
 
@@ -1043,7 +1147,11 @@ STDMETHODIMP BoneHierachy::CreateMeshContainer(LPCSTR Name, CONST D3DXMESHDATA *
 
 	//속성테이블을 얻는다.
 	boneMesh->MeshData.pMesh->GetAttributeTable(NULL, &boneMesh->NumAttributesGroup);
-																					
+
+	//메쉬의 바운드 정보를 얻는다
+	Matrix matIden;
+	MatrixIdentity(&matIden);
+	video::CalculateMeshBoundInfo(boneMesh->MeshData.pMesh, matIden, &boneMesh->_boundInfo);
 
 	//SkinInfo가 있다면, 여기서 WorkingMesh로 인덱스 버퍼를 얻고 아니라면 MeshData안에 있는 메쉬로 버퍼를 가져온다.
 	if (nullptr != pSkinInfo)

@@ -16,10 +16,8 @@ bool BaseScene::Init()
 	video::SkinnedXMesh::_sStaticEffectHandle = VIDEO->GetEffect("StaticMesh.fx");
 	video::SkinnedXMesh::_sSkinnedEffectHandle = VIDEO->GetEffect("SkinnedMesh.fx");
 
-
 	InitPlayerAnimation();
 	InitSnakeAnimation();
-
 
 	//터레인 로드
 	Terrain::TerrainConfig config;
@@ -42,7 +40,7 @@ bool BaseScene::Init()
 
 	//메쉬 불러오기..
 	Matrix correctionMat;
-	MatrixScaling(&correctionMat, 0.15f, 0.15f, 0.15f);
+	MatrixScaling(&correctionMat, 0.01f, 0.01f, 0.01f);
 	video::SkinnedXMeshHandle knight  = VIDEO->CreateSkinnedXMesh(
 		"../resources/Models/Knight/Knight.X", &correctionMat, "Knight");
 	video::AnimationInstanceHandle ainmHandle = VIDEO->CreateAnimationInstance(knight, "Knight0");
@@ -90,6 +88,15 @@ bool BaseScene::Init()
 	_pMainLight->SetWorldPosition(Vector3(0.0f, 5.0f, 5.0f));
 	_pMainLight->SetTarget(Vector3(0.0f, 0.0f, 0.0f));
 
+	//_channel.Broadcast<GameObjectFactory::CreateObjectOnLocationEvent>(
+	//	GameObjectFactory::CreateObjectOnLocationEvent(ARCHE_HERO, ResourceHandle(), Vector3(0.0f, 0.0f, 0.0f)));
+
+	_channel.Broadcast<GameObjectFactory::CreateObjectOnLocationEvent>(
+		GameObjectFactory::CreateObjectOnLocationEvent(ARCHE_SNAKE, ResourceHandle(), Vector3(0.0f, 5.0f, 0.0f)));
+
+	_channel.Broadcast<GameObjectFactory::CreateObjectOnLocationEvent>(
+		GameObjectFactory::CreateObjectOnLocationEvent(ARCHE_HERO, ResourceHandle(), Vector3(0.0f, 0.0f, 0.0f)));
+
 	//_player.CreateFromWorld(_world);
 	//_snake.CreateFromWorld(_world);
 
@@ -115,7 +122,7 @@ bool BaseScene::Update(float deltaTime, const InputManager &input)
 	_transformSystem.PreUpdate(deltaTime);
 
 	//Collision Check
-	_transformSystem.PostUpdate(deltaTime);
+	//_transformSystem.PostUpdate(deltaTime);
 	_actionSystem.Update(deltaTime);
 
 	//Update Camera
@@ -145,11 +152,8 @@ bool BaseScene::Render()
 
 	_pTerrain->Render(_camera);
 	_renderSystem.Render(_camera);
-	//TERRAIN->FillRenderCommand(*_mainRenderView);
 
 	imguiRenderDraw();
-
-	_snake.render();
 
 
 	gpDevice->EndScene();

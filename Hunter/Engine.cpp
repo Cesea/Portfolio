@@ -189,16 +189,17 @@ bool Engine::InitializeSystems()
 		return false;
 	}
 
+	GIZMOMANAGER->Init(gpDevice);
+	SPRITEMANAGER->Init(gpDevice);
+
+	GAMEOBJECTFACTORY->Init();
+
+
 	_pScene = std::make_shared<SceneManager>(SceneManager());
 	if (!_pScene->Init())
 	{
 		return false;
 	}
-
-	GIZMOMANAGER->Init(gpDevice);
-	SPRITEMANAGER->Init(gpDevice);
-
-	GAMEOBJECTFACTORY->Init();
 
 	return true;
 }

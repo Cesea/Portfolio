@@ -840,15 +840,14 @@ TerrainTilePos ConvertWorldPostoTilePos(const Vector3 & worldPos)
 
 	result._chunkX = (int32)(terrainPosX / TERRAIN_CHUNK_DIM);
 	result._chunkZ = (int32)(terrainPosZ / TERRAIN_CHUNK_DIM);
-
 	int32 chunkStartX = result._chunkX * TERRAIN_CHUNK_DIM;
 	int32 chunkStartZ = result._chunkZ * TERRAIN_CHUNK_DIM;
 
-	result._tileX = (int32)(terrainPosX - (float)chunkStartX);
-	result._tileZ = (int32)(terrainPosZ - (float)chunkStartZ);
+	result._tileX = ((int32)terrainPosX - (int32)chunkStartX);
+	result._tileZ = ((int32)terrainPosZ - (int32)chunkStartZ);
 
-	result._relX = (float)(terrainPosX - (float)chunkStartX);
-	result._relZ = (float)(terrainPosZ - (float)chunkStartZ);
+	result._relX = (float)(terrainPosX - (float)(chunkStartX + result._tileX));
+	result._relZ = (float)(terrainPosZ - (float)(chunkStartZ + result._tileZ));
 
 	return result;
 }
@@ -861,4 +860,20 @@ const Vector3 ConvertChunkPosToWorldPos(const TerrainChunkPos & chunkPos)
 const Vector3 ConvertTilePosToWorldPos(const TerrainTilePos & tilePos)
 {
 	return Vector3();
+}
+
+void Terrain::TerrainChunk::ValidateEntities()
+{
+	for (int32 i = 0; i < _entities.size(); ++i)
+	{
+		_entities[i].Deactivate();
+	}
+}
+
+void Terrain::TerrainChunk::InvalidateEntities()
+{
+	for (int32 i = 0; i < _entities.size(); ++i)
+	{
+		_entities[i].Activate();
+	}
 }

@@ -100,7 +100,10 @@ public :
 
 	bool32 _playing{};
 	bool32 _looping{};
+
 	bool32 _blocking{};
+	bool32 _prevBlocking{};
+
 	ID3DXAnimationSet *_pPrevPlayingAnimationSet{};
 
 	float _crossFadeTime{};

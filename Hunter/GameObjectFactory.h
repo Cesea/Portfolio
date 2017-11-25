@@ -5,15 +5,15 @@
 
 class IScene;
 
-enum ArcheType
+enum ARCHE_TYPE
 {
-	eHero,
-	eRock,
-	eTree,
-	eGrass,
-	eSnake,
-	eTurtle,
-	eDragon,
+	ARCHE_HERO,
+	ARCHE_ROCK,
+	ARCHE_GRASS,
+	ARCHE_TREE,
+	ARCHE_SNAKE,
+	ARCHE_TURTLE,
+	ARCHE_DRAGON,
 };
 
 class GameObjectFactory : public SingletonBase<GameObjectFactory>
@@ -33,7 +33,7 @@ private :
 	void RegisterEvent();
 	void UnRegisterEvent();
 
-	void CreateObject(ArcheType type, ResourceHandle handle, const Vector3 &position);
+	void CreateObject(ARCHE_TYPE type, ResourceHandle handle, const Vector3 &position);
 
 public :
 	//struct CreateObjectEvent
@@ -50,17 +50,29 @@ public :
 
 	struct CreateObjectOnClickEvent
 	{
-		CreateObjectOnClickEvent(ArcheType type, ResourceHandle handle, const Vector2 &cursorPos)
+		CreateObjectOnClickEvent(ARCHE_TYPE type, ResourceHandle handle, const Vector2 &cursorPos)
 			:_type(type), _cursorPos(cursorPos), _handle(handle)
 		{
 		}
 
-		ArcheType _type;
+		ARCHE_TYPE _type;
 		Vector2 _cursorPos;
 
 		ResourceHandle _handle;
 	};
 	void Handle(const CreateObjectOnClickEvent &event);
+
+	struct CreateObjectOnLocationEvent
+	{
+		CreateObjectOnLocationEvent(ARCHE_TYPE type, ResourceHandle handle, const Vector3 &position)
+			:_type(type), _handle(handle), _position(position)
+		{
+		}
+		ARCHE_TYPE _type;
+		ResourceHandle _handle;
+		Vector3 _position;
+	};
+	void Handle(const CreateObjectOnLocationEvent &event);
 
 	EventChannel _channel;
 };

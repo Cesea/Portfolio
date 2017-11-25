@@ -28,8 +28,9 @@ struct TerrainChunkPos
 //청크 안에서
 struct TerrainTilePos
 {
-	int32 _chunkX{};
-	int32 _chunkZ{};
+	int32 _chunkX;
+	int32 _chunkZ;
+
 
 	int32 _tileX{};
 	int32 _tileZ{};
@@ -88,6 +89,9 @@ public:
 
 	struct TerrainChunk
 	{
+		void ValidateEntities();
+		void InvalidateEntities();
+
 		TerrainChunkPos _chunkPos;
 
 		int32 _chunkX{};
@@ -130,7 +134,7 @@ public:
 
 	void Render(const Camera &camear);
 
-	//void ElevateVertex();
+	void AddEntityToSection(const Entity &entity, const Vector3 &position);
 
 private:
 	bool CreateTerrain(int32 smooth, int32 tileNum);

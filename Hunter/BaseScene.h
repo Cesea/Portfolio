@@ -40,8 +40,8 @@ private:
 
 	Editor *_editor{};
 
-	Player _player;
-	Snake _snake;
+	//Player _player;
+	//Snake _snake;
 public:
 
 	void Handle(const Editor::GetObjectFromSceneEvent &event);

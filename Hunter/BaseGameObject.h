@@ -5,6 +5,7 @@
 
 class BaseGameObject
 {
+	friend class GameObjectFactory;
 public :
 	BaseGameObject() {}
 	virtual ~BaseGameObject() {}

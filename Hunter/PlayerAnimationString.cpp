@@ -80,8 +80,8 @@ void InitPlayerAnimation()
 	PLAYER_ANIM_DEFINE(eWarCharging, true, true, false, 1.0f, 0.2f, 0.2f);
 	PLAYER_ANIM_DEFINE(eWarDodgeToLeft, true, true, false, 1.0f, 0.2f, 0.2f);
 	PLAYER_ANIM_DEFINE(eWarDodgeToRight, true, true, false, 1.0f, 0.2f, 0.2f);
-	PLAYER_ANIM_DEFINE(eWarMovingLeft, true, true, false, 1.0f, 0.2f, 0.2f);
-	PLAYER_ANIM_DEFINE(eWarMovingRight, true, true, false, 1.0f, 0.2f, 0.2f);
+	PLAYER_ANIM_DEFINE(eWarMovingLeft, false, false, false, 1.0f, 0.2f, 0.2f);
+	PLAYER_ANIM_DEFINE(eWarMovingRight, false, false, false, 1.0f, 0.2f, 0.2f);
 	PLAYER_ANIM_DEFINE(eWarParryFromStraightDown, true, true, false, 1.0f, 0.2f, 0.2f);
 	PLAYER_ANIM_DEFINE(eWarParryFront, true, true, false, 1.0f, 0.2f, 0.2f);
 	PLAYER_ANIM_DEFINE(eWarRunSwingLeft, true, true, false, 1.0f, 0.2f, 0.2f);
@@ -92,8 +92,8 @@ void InitPlayerAnimation()
 	PLAYER_ANIM_DEFINE(eWarSpecialAttackA, true, true, false, 1.0f, 0.2f, 0.2f);
 	PLAYER_ANIM_DEFINE(eWarSpecialAttackB, true, true, false, 1.0f, 0.2f, 0.2f);
 	PLAYER_ANIM_DEFINE(eWarSwingHighStraigtDown, true, true, false, 1.0f, 0.2f, 0.2f);
-	PLAYER_ANIM_DEFINE(eWarSwingLeft, true, true, false, 1.0f, 0.2f, 0.15f);
-	PLAYER_ANIM_DEFINE(eWarSwingRight, true, true, false, 1.0f, 0.2f, 0.15f);
+	PLAYER_ANIM_DEFINE(eWarSwingLeft, true, true, false, 1.0f, 0.2f, 0.2f);
+	PLAYER_ANIM_DEFINE(eWarSwingRight, true, true, false, 1.0f, 0.2f, 0.2f);
 	PLAYER_ANIM_DEFINE(eWarTakingHit, true, true, false, 1.0f, 0.2f, 0.2f);
 	PLAYER_ANIM_DEFINE(eWarThrustMid, true, true, false, 1.0f, 0.2f, 0.2f);
 	PLAYER_ANIM_DEFINE(eBoring, true, true, false, 1.0f, 0.2f, 0.2f);

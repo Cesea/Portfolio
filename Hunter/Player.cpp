@@ -18,7 +18,6 @@ bool Player::CreateFromWorld(World & world)
 	channel.Add<InputManager::KeyPressedEvent, Player>(*this);
 	channel.Add<InputManager::KeyDownEvent, Player>(*this);
 	channel.Add<InputManager::MousePressedEvent, Player>(*this);
-	SetInputConfig();
 	_entity = world.CreateEntity();
 
 	TransformComponent &transComp = _entity.AddComponent<TransformComponent>();
@@ -45,7 +44,6 @@ bool Player::CreateFromWorld(World & world)
 	_pStateMachine->Init(this);
 	_pStateMachine->RegisterState(META_TYPE(PlayerStanceState)->Name(), new PlayerStanceState());
 	_pStateMachine->RegisterState(META_TYPE(PlayerMoveState)->Name(), new PlayerMoveState());
-	_pStateMachine->RegisterState(META_TYPE(PlayerAttackState)->Name(), new PlayerAttackState());
 	_pStateMachine->RegisterState(META_TYPE(PlayerCombatState)->Name(), new PlayerCombatState());
 	_pStateMachine->RegisterState(META_TYPE(PlayerDeadState)->Name(), new PlayerDeadState());
 	_pStateMachine->ChangeState(META_TYPE(PlayerStanceState)->Name());
@@ -58,6 +56,7 @@ bool Player::CreateFromWorld(World & world)
 void Player::Update(float deltaTime)
 {
 	_pStateMachine->Update(deltaTime, _currentCommand);
+
 	_currentCommand.Reset();
 }
 
@@ -107,18 +106,15 @@ void Player::Handle(const InputManager::MousePressedEvent & event)
 {
 	uint32 inputCode = event.code;
 
-	if (inputCode == _inputConfig._attack)
+	if (inputCode == MOUSE_BUTTON_LEFT)
 	{
 		_currentCommand._type = GAMECOMMAND_ACTION;
 		_currentCommand._behavior._type = BEHAVIOR_ATTACK;
-		//_currentCommand._interpreted = false;
-		//_channel.Broadcast<Player::AttackEvent>(AttackEvent());
 	}
-	else if (inputCode == _inputConfig._block)
+	else if (inputCode == MOUSE_BUTTON_RIGHT)
 	{
 		_currentCommand._type = GAMECOMMAND_ACTION;
 		_currentCommand._behavior._type = BEHAVIOR_BLOCK;
-		//_currentCommand._interpreted = false;
 	}
 }
 
@@ -126,7 +122,7 @@ void Player::Handle(const InputManager::KeyDownEvent & event)
 {
 	uint32 inputCode = event.code;
 
-	if (_inputConfig._left == inputCode)
+	if ('J' == inputCode)
 	{
 		_currentCommand._type = GAMECOMMAND_MOVE;
 		_currentCommand._movement._horizontal = HORIZONTAL_MOVEMENT_LEFT;
@@ -134,7 +130,7 @@ void Player::Handle(const InputManager::KeyDownEvent & event)
 		//_currentCommand._interpreted = false;
 		//_channel.Broadcast<Player::MoveEvent>(Player::MoveEvent());
 	}
-	else if(_inputConfig._right == inputCode)
+	else if('L' == inputCode)
 	{
 		_currentCommand._type = GAMECOMMAND_MOVE;
 		_currentCommand._movement._horizontal = HORIZONTAL_MOVEMENT_RIGHT;
@@ -142,7 +138,7 @@ void Player::Handle(const InputManager::KeyDownEvent & event)
 		//_currentCommand._interpreted = false;
 		//_channel.Broadcast<Player::MoveEvent>(Player::MoveEvent());
 	}
-	else if(_inputConfig._up == inputCode)
+	else if('I' == inputCode)
 	{
 		_currentCommand._type = GAMECOMMAND_MOVE;
 		_currentCommand._movement._vertical = VERTICAL_MOVEMENT_UP;
@@ -150,7 +146,7 @@ void Player::Handle(const InputManager::KeyDownEvent & event)
 		//_currentCommand._interpreted = false;
 		//_channel.Broadcast<Player::MoveEvent>(Player::MoveEvent());
 	}
-	else if (_inputConfig._down == inputCode)
+	else if ('K' == inputCode)
 	{
 		_currentCommand._type = GAMECOMMAND_MOVE;
 		_currentCommand._movement._vertical = VERTICAL_MOVEMENT_DOWN;
@@ -158,30 +154,13 @@ void Player::Handle(const InputManager::KeyDownEvent & event)
 		//_currentCommand._interpreted = false;
 		//_channel.Broadcast<Player::MoveEvent>(Player::MoveEvent());
 	}
-	else if (_inputConfig._jump == inputCode)
+	else if (VK_SPACE == inputCode)
 	{
 		_currentCommand._type = GAMECOMMAND_JUMP;
 	}
-
 }
 
 void Player::QueueAction(const Action & action)
 {
 	_pActionComp->_actionQueue.PushAction(action);
 }
-
-void Player::SetInputConfig()
-{
-	_inputConfig._up = 'I';
-	_inputConfig._down = 'K';
-	_inputConfig._left = 'J';
-	_inputConfig._right = 'L';
-	_inputConfig._jump = VK_SPACE;
-	_inputConfig._sneak = VK_CONTROL;
-
-	_inputConfig._attack = MOUSE_BUTTON_LEFT;
-	_inputConfig._block = MOUSE_BUTTON_RIGHT;
-
-	_inputConfig._special = 'U';
-}
-

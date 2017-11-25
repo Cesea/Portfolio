@@ -46,20 +46,6 @@ protected :
 	GameCommand _lastCommand;
 };
 
-class PlayerAttackState : public PlayerState
-{
-public:
-	DECLARE_META(PlayerAttackState);
-
-	void OnEnter() override;
-	void Update(float deltaTime, const GameCommand &command) override;
-	void OnExit() override;
-
-	//void Handle(const Player::AttackEvent &event);
-protected:
-	//StopWatch _toCombatTimer;
-};
-
 class PlayerCombatState : public PlayerState
 {
 public :
@@ -75,7 +61,11 @@ public :
 	//void Handle(const DamageEvent &event);
 
 private :
-	StopWatch _toStanceTimer;
+	StopWatch _comboTimer;
+	int32 _curretComboCount{};
+	void Attack();
+
+
 };
 
 class PlayerStanceState : public PlayerState
@@ -104,10 +94,6 @@ public :
 	void OnEnter() override;
 	void Update(float deltaTime, const GameCommand &command) override;
 	void OnExit() override;
-
-	//void Handle(const Player::JumpEvent &event);
-	//void Handle(const CombatBeginEvent &event);
-	//void Handle(const Player::MoveEvent &event);
 
 protected :
 	StopWatch _toStanceTimer;

@@ -56,18 +56,14 @@ void ActionComponent::UpdateAnimation(float deltaTime)
 	{
 		if (_animationPlayFactor >= 0.95f)
 		{
-			if (_actionQueue.HasAction())
-			{
-				PlayActionImmediate(_actionQueue.Front());
-				_actionQueue.PopAction();
-			}
-			else if (false == _looping)
+			if (false == _looping)
 			{
 				if (nullptr != _pPrevPlayingAnimationSet)
 				{
 					_crossFadeTime = _outCrossFadeTime;
 					_leftCrossFadeTime = _outCrossFadeTime;
 					_looping = true;
+					_blocking = _prevBlocking;
 					SetAnimation(_pPrevPlayingAnimationSet);
 					_pPrevPlayingAnimationSet = nullptr;
 				}
@@ -75,6 +71,11 @@ void ActionComponent::UpdateAnimation(float deltaTime)
 				{
 					this->Stop();
 				}
+			}
+			else if (_actionQueue.HasAction())
+			{
+				PlayActionImmediate(_actionQueue.Front());
+				_actionQueue.PopAction();
 			}
 		}
 	}
@@ -180,6 +181,9 @@ void ActionComponent::PlayOneShot(const std::string &animName,
 {
 	_playing = true;
 	_looping = false;
+
+	_prevBlocking = _blocking;
+
 	_blocking = blocking;
 
 	AnimationSetTable::iterator find = _animationTable.find( animName );
@@ -200,6 +204,9 @@ void ActionComponent::PlayOneShotAfterHold(const std::string & animName, float c
 {
 	_playing = true;
 	_looping = false;
+
+	_prevBlocking = _blocking;
+
 	_blocking = blocking;
 
 	AnimationSetTable::iterator find = _animationTable.find( animName );

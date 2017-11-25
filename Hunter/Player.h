@@ -39,23 +39,6 @@ private :
 	Player *_pPlayer{};
 };
 
-struct InputConfig
-{
-	uint32 _up;
-	uint32 _down;
-	uint32 _left;
-	uint32 _right;
-	uint32 _jump;
-	uint32 _sneak;
-	uint32 _special;
-
-	uint32 _attack;
-	uint32 _block;
-	//마우스 키로 하자..
-	//uint32 _attack;
-	//uint32 _block;
-};
-
 class Player : public BaseGameObject
 {
 	friend class PlayerStateMachine;
@@ -73,26 +56,20 @@ public :
 	void Handle(const InputManager::MousePressedEvent &event);
 	void Handle(const InputManager::KeyDownEvent &event);
 
-protected :
-
+private :
 	void SetupCallbackAndCompression();
-
 	PlayerCallbackData _callbackData;
-
 	PlayerStateMachine *_pStateMachine;
-
 	GameCommand _currentCommand;
-
 	ActionComponent *_pActionComp{};
-
 	void QueueAction(const Action &action);
 
-private :
-	void SetInputConfig();
-	InputConfig _inputConfig;
-	EventChannel _channel;
+	//TerrainChunkPos _chunkPos;
+	TerrainTilePos _tilePos;
 
-	float _speed{2.0f};
+private :
+	EventChannel _channel;
+	float _speed{20.0f};
 public :
 
 	struct PlayerPositionEvent
@@ -102,7 +79,6 @@ public :
 		{
 		}
 		Vector3 _position;
-
 	};
 
 };

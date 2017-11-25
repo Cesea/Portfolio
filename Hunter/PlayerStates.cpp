@@ -3,11 +3,6 @@
 
 #include "Player.h"
 
-DEFINE_META(PlayerAttackState)
-{
-	//ADD_MEMBER(_pActor);
-}
-
 DEFINE_META(PlayerStanceState)
 {
 	//ADD_MEMBER(_pActor);
@@ -41,44 +36,11 @@ void PlayerState::Release()
 }
 
 //PlayerAttackState///////////////////////////////////////////////////////////
-void PlayerAttackState::OnEnter()
-{
-	_pParent->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWarSwingLeft));
-}
-
-void PlayerAttackState::Update(float deltaTime, const GameCommand &command)
-{
-	switch (command._type)
-	{
-	case GAMECOMMAND_NONE:
-	{
-	}break;
-	case GAMECOMMAND_MOVE :
-	{
-	}break;
-	case GAMECOMMAND_ACTION:
-	{
-		_pParent->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWarSwingLeft));
-	}break;
-	case GAMECOMMAND_JUMP:
-	{
-	}break;
-	case GAMECOMMAND_INTERACT:
-	{
-	}break;
-	}
-}
-
-void PlayerAttackState::OnExit()
-{
-}
-
 //PlayerCombatState///////////////////////////////////////////////////////////
 void PlayerCombatState::OnEnter()
 {
 	EventChannel channel;
 
-	_toStanceTimer.Restart(3.0f);
 	_pParent->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWarCombatMode));
 }
 
@@ -98,7 +60,8 @@ void PlayerCombatState::Update(float deltaTime, const GameCommand &command)
 		{
 			case BEHAVIOR_ATTACK:
 			{
-				_pParent->ChangeState(META_TYPE(PlayerAttackState)->Name());
+				Attack();
+				_pParent->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWarSwingLeft));
 			}break;
 			case BEHAVIOR_SPECIAL_ATTACK:
 			{
@@ -119,8 +82,11 @@ void PlayerCombatState::Update(float deltaTime, const GameCommand &command)
 
 void PlayerCombatState::OnExit()
 {
-	_toStanceTimer.Restart(3.0f);
 	_pParent->ClearActioniQueue();
+}
+
+void PlayerCombatState::Attack()
+{
 }
 
 //void PlayerCombatState::Handle(const Player::AttackEvent & event)
@@ -151,17 +117,31 @@ void PlayerMoveState::Update(float deltaTime, const GameCommand &command)
 	{
 		_pParent->ChangeState(META_TYPE(PlayerStanceState)->Name());
 	}
+
+	if (command._type == GAMECOMMAND_MOVE)
+	{
+		if (command._movement._horizontal == HORIZONTAL_MOVEMENT_LEFT)
+		{
+		}
+		else if (command._movement._horizontal == HORIZONTAL_MOVEMENT_RIGHT)
+		{
+
+		}
+
+		if (command._movement._horizontal == HORIZONTAL_MOVEMENT_LEFT)
+		{
+		}
+		else if (command._movement._horizontal == HORIZONTAL_MOVEMENT_RIGHT)
+		{
+		}
+	}
+
 }
 
 void PlayerMoveState::OnExit()
 {
 	EventChannel channel;
 }
-
-//void PlayerMoveState::Handle(const Player::MoveEvent & event)
-//{
-//	_toStanceTimer.Restart(1.0f);
-//}
 
 //Player Stance State///////////////////////////////////////////////////////////
 void PlayerStanceState::OnEnter()
@@ -178,6 +158,7 @@ void PlayerStanceState::Update(float deltaTime, const GameCommand &command)
 		}break;
 		case GAMECOMMAND_MOVE:
 		{
+			_pParent->ChangeState(META_TYPE(PlayerMoveState)->Name());
 		}break;
 		case GAMECOMMAND_ACTION:
 		{
@@ -202,23 +183,6 @@ void PlayerStanceState::Update(float deltaTime, const GameCommand &command)
 		{
 		}break;
 	}
-	//if (_randomTimer.Tick(deltaTime))
-	//{
-	//	int32 randomNumber = RandInt(0, 30);
-	//	if (randomNumber >= 0 && randomNumber < 10)
-	//	{
-	//		_pParent->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eSalute));
-	//	}
-	//	else if (randomNumber >= 10 && randomNumber < 20)
-	//	{
-	//		_pParent->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eBoring));
-	//	}
-	//	else if (randomNumber >= 20 && randomNumber < 30)
-	//	{
-	//		_pParent->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eLookingAround));
-	//	}
-	//	_randomTimer.Restart(RandFloat(5.0f, 7.0f));
-	//}
 }
 
 void PlayerStanceState::OnExit()
