@@ -40,7 +40,7 @@ void ImguiLabel(const char* text);
 void ImguiValue(const char* text);
 bool ImguiSlider(const char* text, float* val, float vmin, float vmax, float vinc, bool enabled = true);
 
-bool imguiEdit(char *text, int32 width, bool enable = true);
+bool ImguiEdit(char *text, int32 width, bool enable = true);
 
 void ImguiDrawText(int32 x, int32 y, int32 align, const char* text, uint32 color);
 

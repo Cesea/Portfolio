@@ -155,7 +155,8 @@ PS_OUTPUT ps_main( PS_INPUT Input )
    depth = b / (z - a);
 
 
-   Output.baseColor = float4(finalColor * diff, 1);
+   //Output.baseColor = float4(finalColor * diff, 1);
+   Output.baseColor = float4(1.0f, 1.0f, 1.0f, 1.0f);
    Output.normalDepth = float4(worldNormal, depth);		//alpha °ª¿¡ µª½º¸¦ ½è´Ù.
 
    return Output;

@@ -28,8 +28,6 @@ protected :
 	World _world;
 	std::vector<BaseGameObject *> _gameObjects;
 	Camera _camera;
-	Terrain *_pTerrain{};
-
 	DirectionalLight *_pMainLight;
 };
 

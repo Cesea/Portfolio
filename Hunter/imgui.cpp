@@ -688,21 +688,21 @@ bool ImguiSlider(const char * text, float * val, float vmin, float vmax, float v
 	{
 		AddCommandText(x + SLIDER_HEIGHT / 2, y + SLIDER_HEIGHT / 2 - TEXT_HEIGHT / 2, ImguiTextAlign::eImguiAlignLeft, text, 
 			IsHot(id) ? ImguiRGBA(255, 196, 0, 255) : ImguiRGBA(255, 255, 255, 200));
-		AddCommandText(x + w - SLIDER_HEIGHT / 2, y + SLIDER_HEIGHT / 2 - TEXT_HEIGHT / 2, ImguiTextAlign::eImguiAlignLeft, msg, 
+		AddCommandText(x + w - SLIDER_HEIGHT, y + SLIDER_HEIGHT / 2 - TEXT_HEIGHT / 2, ImguiTextAlign::eImguiAlignLeft, msg, 
 			IsHot(id) ? ImguiRGBA(255, 196, 0, 255) : ImguiRGBA(255, 255, 255, 200));
 	}
 	else 
 	{
 		AddCommandText(x + SLIDER_HEIGHT / 2, y + SLIDER_HEIGHT / 2 - TEXT_HEIGHT / 2, 
 			ImguiTextAlign::eImguiAlignLeft, text, ImguiRGBA(128, 128, 128, 200));
-		AddCommandText(x + w - SLIDER_HEIGHT / 2, y + SLIDER_HEIGHT / 2 - TEXT_HEIGHT / 2, 
+		AddCommandText(x + w - SLIDER_HEIGHT, y + SLIDER_HEIGHT / 2 - TEXT_HEIGHT / 2, 
 			ImguiTextAlign::eImguiAlignLeft, msg, ImguiRGBA(128, 128, 128, 200));
 	}
 
 	return res || valChanged;
 }
 
-bool imguiEdit(char * text, int32 width, bool enable)
+bool ImguiEdit(char * text, int32 width, bool enable)
 {
 	gState._widgetID++;
 	unsigned int id = (gState._areaID << 16) | gState._widgetID;

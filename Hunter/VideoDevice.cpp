@@ -247,11 +247,11 @@ void video::VideoDevice::LoadDefaultTextures()
 	TextureHandle specular = VIDEO->CreateTexture("../resources/Textures/specularDefault.png", "specularDefault.png");
 	TextureHandle emission = VIDEO->CreateTexture("../resources/Textures/emissionDefault.png", "emissionDefault.png");
 
-	MaterialHandle material = VIDEO->CreateMaterial("Default");
-	VIDEO->MaterialAddTexture(material, VIDEO_TEXTURE0, diffuse);
-	VIDEO->MaterialAddTexture(material, VIDEO_TEXTURE1, normal);
-	VIDEO->MaterialAddTexture(material, VIDEO_TEXTURE2, specular);
-	VIDEO->MaterialAddTexture(material, VIDEO_TEXTURE3, emission);
+	//MaterialHandle material = VIDEO->CreateMaterial("Default");
+	//VIDEO->MaterialAddTexture(material, VIDEO_TEXTURE0, diffuse);
+	//VIDEO->MaterialAddTexture(material, VIDEO_TEXTURE1, normal);
+	//VIDEO->MaterialAddTexture(material, VIDEO_TEXTURE2, specular);
+	//VIDEO->MaterialAddTexture(material, VIDEO_TEXTURE3, emission);
 }
 
 void video::VideoDevice::MakeDefaultVertexDecls()

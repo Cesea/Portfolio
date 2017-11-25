@@ -31,6 +31,11 @@ void Editor::ChangeEditState(EditMode mode)
 		_editing = true;
 		gEditorOn = true;
 	} break;
+	case Editor::eObjectLocate:
+	{
+		_editing = true;
+		gEditorOn = true;
+	} break;
 	case Editor::eObjectEdit:
 	{
 		_editing = true;
@@ -40,19 +45,105 @@ void Editor::ChangeEditState(EditMode mode)
 	_currentMode = mode;
 }
 
+//struct TerrainConfig
+//
+//	{
+//		bool32 _createFromHeightMap;
+//		bool32 _createFromBuffer;
+//
+//		int32 _xResolution;
+//		int32 _zResolution;
+//
+//		//만약 CreateFromHeightMap이 true라면 heightmap을 읽어서 로드한다...
+//		//CreateFromBuffer가 true라면 버텍스 버퍼와 인덱스 버퍼를 읽어서 로드 한다.
+//		std::string _heightFileName;
+//		std::string _tile0FileName;
+//		std::string _tile1FileName;
+//		std::string _tile2FileName;
+//		std::string _tile3FileName;
+//		std::string _splatFileName;
+//
+//		float _heightScale;
+//		//uv가 얼마나 반복 될 것인지...
+//		float _textureMult;
+//	};
+
 void Editor::InTerrainEditMode()
 {
-	if (ImguiCollapse("TerrainEditor", nullptr, _editing))
+	if (ImguiCollapse("Terrain Editor", nullptr, _editing))
+	{
+		ChangeEditState(EditMode::eNone);
+	}
+	ImguiIndent();
+
+	//범위 조정
+	if (ImguiCollapse("Edit Extent", nullptr, _terrainEditor._editingExtent))
+	{
+		_terrainEditor._editingExtent = !_terrainEditor._editingExtent;
+	}
+	if (_terrainEditor._editingExtent)
+	{
+		ImguiIndent();
+		ImguiSlider("X Extent", (float *)&_terrainEditor._countX, 1.0f, 10.0f, 1.0f);
+		ImguiSlider("Z Extent", (float *)&_terrainEditor._countZ, 1.0f, 10.0f, 1.0f);
+
+		if (ImguiButton("Create Terrain!!!"))
+		{
+			_terrainEditor._terrainConfig._xChunkCount = (int32)_terrainEditor._countX;
+			_terrainEditor._terrainConfig._zChunkCount = (int32)_terrainEditor._countZ;
+
+			TERRAIN->RebuildTerrain(_terrainEditor._terrainConfig);
+		}
+		ImguiUnindent();
+	}
+	//높이 조정
+	if (ImguiCollapse("Edit Height", nullptr, _terrainEditor._editingHeight))
+	{
+		_terrainEditor._editingHeight = !_terrainEditor._editingHeight;
+	}
+	if (_terrainEditor._editingHeight)
+	{
+		ImguiIndent();
+		ImguiUnindent();
+	}
+	//텍스쳐 조정
+	if (ImguiCollapse("Edit Texture", nullptr, _terrainEditor._editingTexture))
+	{
+		_terrainEditor._editingTexture = !_terrainEditor._editingTexture;
+	}
+	if (_terrainEditor._editingTexture)
+	{
+		ImguiIndent();
+		ImguiUnindent();
+	}
+
+	ImguiEdit(_terrainEditor._fileName, 120);
+	if (ImguiButton("Save Terrain"))
+	{
+		TERRAIN->SaveTerrain(_terrainEditor._fileName);
+	}
+
+	if (ImguiButton("Load Terrain"))
+	{
+		TERRAIN->LoadTerrain(_terrainEditor._fileName);
+	}
+
+	ImguiUnindent();
+}
+
+void Editor::InObjectLocateMode()
+{
+	if (ImguiCollapse("Object Locator", nullptr, _editing))
 	{
 		ChangeEditState(EditMode::eNone);
 	}
 
 	ImguiIndent();
 
-	ImguiSlider("Num Object To Paint", (float *)&_terrainEditor._numObjectToPaint, 0.0f, 5.0f, 1.0f);
-	ImguiSlider("Object Spreadness", (float *)&_terrainEditor._spreadness, 0.0f, 5.0f, 0.2f);
+	ImguiSlider("Num Object To Paint", (float *)&_objectLocator._numObjectToPaint, 0.0f, 5.0f, 1.0f);
+	ImguiSlider("Object Spreadness", (float *)&_objectLocator._spreadness, 0.0f, 5.0f, 0.2f);
 
-	if (!_terrainEditor._currentStaticHandle.IsValid())
+	if (!_objectLocator._currentStaticHandle.IsValid())
 	{
 		ImguiLabel("No Item Selected");
 	}
@@ -61,116 +152,116 @@ void Editor::InTerrainEditMode()
 		ImguiLabel("Paint Item!!!");
 		if (ImguiButton("Reset Selection"))
 		{
-			_terrainEditor._currentStaticHandle.MakeInvalid();
+			_objectLocator._currentStaticHandle.MakeInvalid();
 		}
 	}
 
 	//에디터에서 하나의 타입을 에디팅 하고 있을때 다른 옵션들은 꺼진다
-	if (false == _terrainEditor._editingRock)
+	if (false == _objectLocator._editingRock)
 	{
-		if (ImguiCollapse("Rocks", nullptr, _terrainEditor._editingRock))
+		if (ImguiCollapse("Rocks", nullptr, _objectLocator._editingRock))
 		{
-			_terrainEditor._editingRock = !_terrainEditor._editingRock;
-			_terrainEditor._editingGrass = false;
-			_terrainEditor._editingTree = false;
+			_objectLocator._editingRock = !_objectLocator._editingRock;
+			_objectLocator._editingGrass = false;
+			_objectLocator._editingTree = false;
 		}
 	}
 	else
 	{
-		if (ImguiCollapse("Rocks", nullptr, _terrainEditor._editingRock))
+		if (ImguiCollapse("Rocks", nullptr, _objectLocator._editingRock))
 		{
-			_terrainEditor._editingRock = !_terrainEditor._editingRock;
+			_objectLocator._editingRock = !_objectLocator._editingRock;
 		}
 
 		ImguiIndent();
 		if (ImguiButton("Rock01"))
 		{
-			_terrainEditor._currentStaticHandle = VIDEO->GetStaticXMesh("Rock01");
+			_objectLocator._currentStaticHandle = VIDEO->GetStaticXMesh("Rock01");
 			//_channel.Broadcast<GameObjectFactory::CreateObjectEvent>(
 			//	GameObjectFactory::CreateObjectEvent(ArcheType::eRock, Vector3(0.0f, 0.0f, 0.0f)));
 		}
 		if (ImguiButton("Rock02"))
 		{
-			_terrainEditor._currentStaticHandle = VIDEO->GetStaticXMesh("Rock02");
+			_objectLocator._currentStaticHandle = VIDEO->GetStaticXMesh("Rock02");
 		}
 		ImguiUnindent();
 	}
 
-	if (false == _terrainEditor._editingTree)
+	if (false == _objectLocator._editingTree)
 	{
-		if (ImguiCollapse("Trees", nullptr, _terrainEditor._editingTree))
+		if (ImguiCollapse("Trees", nullptr, _objectLocator._editingTree))
 		{
-			_terrainEditor._editingTree = !_terrainEditor._editingTree;
-			_terrainEditor._editingRock = false;
-			_terrainEditor._editingGrass = false;
+			_objectLocator._editingTree = !_objectLocator._editingTree;
+			_objectLocator._editingRock = false;
+			_objectLocator._editingGrass = false;
 		}
 	}
 	else
 	{
-		if (ImguiCollapse("Trees", nullptr, _terrainEditor._editingTree))
+		if (ImguiCollapse("Trees", nullptr, _objectLocator._editingTree))
 		{
-			_terrainEditor._editingTree = !_terrainEditor._editingTree;
+			_objectLocator._editingTree = !_objectLocator._editingTree;
 		}
 		ImguiIndent();
 		if (ImguiButton("Tree01"))
 		{
-			_terrainEditor._currentStaticHandle = VIDEO->GetStaticXMesh("Tree01");
+			_objectLocator._currentStaticHandle = VIDEO->GetStaticXMesh("Tree01");
 		}
 		if (ImguiButton("Tree01"))
 		{
-			_terrainEditor._currentStaticHandle = VIDEO->GetStaticXMesh("Tree02");
+			_objectLocator._currentStaticHandle = VIDEO->GetStaticXMesh("Tree02");
 		}
 		ImguiUnindent();
 	}
 
-	if (false == _terrainEditor._editingGrass)
+	if (false == _objectLocator._editingGrass)
 	{
-		if (ImguiCollapse("Grass", nullptr, _terrainEditor._editingGrass))
+		if (ImguiCollapse("Grass", nullptr, _objectLocator._editingGrass))
 		{
-			_terrainEditor._editingGrass = !_terrainEditor._editingGrass;
-			_terrainEditor._editingRock = false;
-			_terrainEditor._editingTree = false;
+			_objectLocator._editingGrass = !_objectLocator._editingGrass;
+			_objectLocator._editingRock = false;
+			_objectLocator._editingTree = false;
 		}
 	}
 	else
 	{
-		if (ImguiCollapse("Grass", nullptr, _terrainEditor._editingGrass))
+		if (ImguiCollapse("Grass", nullptr, _objectLocator._editingGrass))
 		{
-			_terrainEditor._editingGrass = !_terrainEditor._editingGrass;
+			_objectLocator._editingGrass = !_objectLocator._editingGrass;
 		}
 		ImguiIndent();
 		if (ImguiButton("Grass"))
 		{
-			_terrainEditor._currentStaticHandle = VIDEO->GetStaticXMesh("Grass01");
+			_objectLocator._currentStaticHandle = VIDEO->GetStaticXMesh("Grass01");
 		}
 		if (ImguiButton("Grass"))
 		{
-			_terrainEditor._currentStaticHandle = VIDEO->GetStaticXMesh("Grass02");
+			_objectLocator._currentStaticHandle = VIDEO->GetStaticXMesh("Grass02");
 		}
 		ImguiUnindent();
 	}
 
-	if (_terrainEditor._currentStaticHandle.IsValid() &&
+	if (_objectLocator._currentStaticHandle.IsValid() &&
 		_leftButtonPressed &&
 		!(_mx > 0 && _mx < EDITORX + EDITORSIZEX && _my >= 0 && _my < EDITORY + EDITORSIZEY))
 	{
 		ARCHE_TYPE objectType;
-		if (_terrainEditor._editingGrass)
+		if (_objectLocator._editingGrass)
 		{
 			objectType = ARCHE_GRASS;
 		}
-		else if (_terrainEditor._editingRock)
+		else if (_objectLocator._editingRock)
 		{
 			objectType = ARCHE_ROCK;
 		}
-		else if (_terrainEditor._editingTree)
+		else if (_objectLocator._editingTree)
 		{
 			objectType = ARCHE_TREE;
 		}
 
 		ResourceHandle resourceHandle;
-		resourceHandle.count = _terrainEditor._currentStaticHandle.count;
-		resourceHandle.index = _terrainEditor._currentStaticHandle.index;
+		resourceHandle.count = _objectLocator._currentStaticHandle.count;
+		resourceHandle.index = _objectLocator._currentStaticHandle.index;
 
 		_channel.Broadcast<GameObjectFactory::CreateObjectOnClickEvent>(
 			GameObjectFactory::CreateObjectOnClickEvent(objectType, resourceHandle, Vector2(_mx, _my)));
@@ -291,19 +382,10 @@ void Editor::UpdateInput(const InputManager & input)
 
 void Editor::Init()
 {
-	//strcpy(_name, "TerrainEditor");
-	//strcpy(_button, "Button");
-	//strcpy(_collapse, "Collapse");
-	
-	//this->RegisterEvents();
 }
 
 void Editor::Shutdown()
 {
-	//if (nullptr != _pEdittingObject)
-	//{
-	//	_pEdittingObject = nullptr;
-	//}
 }
 
 void Editor::Edit(RefVariant &object, const InputManager &input)
@@ -318,27 +400,35 @@ void Editor::Edit(RefVariant &object, const InputManager &input)
 		if (ImguiCollapse("Terrain Editor", nullptr, _editing))
 		{
 			ChangeEditState(EditMode::eTerrainEdit);
-			
+		}
+		if (ImguiCollapse("Object Locator", nullptr, _editing))
+		{
+			ChangeEditState(EditMode::eObjectLocate);
 		}
 		if (ImguiCollapse("Object Editor", nullptr, _editing))
 		{
 			ChangeEditState(EditMode::eObjectEdit);
-			_editing = true;
-			gEditorOn = true;
 		}
-
 	} break;
-	case Editor::eTerrainEdit:
+	
+	case Editor::eTerrainEdit :
 	{
-		ImguiBeginScrollArea("TerrainEditor", EDITORX, EDITORY, EDITORSIZEX, EDITORSIZEY, &_scroll);
+		ImguiBeginScrollArea("Terrain Editor", EDITORX, EDITORY, EDITORSIZEX, EDITORSIZEY, &_scroll);
 		InTerrainEditMode();
+		ImguiEndScrollArea();
+	}break;
+
+	case Editor::eObjectLocate:
+	{
+		ImguiBeginScrollArea("Object Locator", EDITORX, EDITORY, EDITORSIZEX, EDITORSIZEY, &_scroll);
+		InObjectLocateMode();
 		ImguiEndScrollArea();
 
 	} break;
 
 	case Editor::eObjectEdit:
 	{
-		ImguiBeginScrollArea("ObjectEditor", EDITORX, EDITORY, EDITORSIZEX, EDITORSIZEY, &_scroll);
+		ImguiBeginScrollArea("ObjectE ditor", EDITORX, EDITORY, EDITORSIZEX, EDITORSIZEY, &_scroll);
 		InObjectEditMode();
 		ImguiEndScrollArea();
 	} break;
@@ -354,16 +444,7 @@ void Editor::SetEdittingEntity(Entity & entity)
 	//_objectEditor._pSelectingEntity = &entity;
 }
 
-void Editor::Render(video::RenderView * renderView)
-{
-}
-
-
-void Gizmo::Init()
-{
-}
-
-void Brush::Init()
+void Editor::Render()
 {
 }
 
@@ -394,4 +475,8 @@ void ObjectEditor::OnNewSelection(Entity entity)
 
 		_selectingEntity = entity;
 	}
+}
+
+void TerrainEditor::Reset()
+{
 }

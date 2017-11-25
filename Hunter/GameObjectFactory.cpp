@@ -32,7 +32,7 @@ void GameObjectFactory::CreateObject(ARCHE_TYPE type, ResourceHandle handle, con
 		RenderComponent &render = entity.AddComponent<RenderComponent>();
 		render._type = RenderComponent::Type::eStatic;
 
-		_pCurrentScene->_pTerrain->AddEntityToSection(entity, position);
+		TERRAIN->AddEntityToSection(entity, position);
 
 		video::StaticXMeshHandle meshHandle;
 		meshHandle.count = handle.count;
@@ -57,7 +57,7 @@ void GameObjectFactory::CreateObject(ARCHE_TYPE type, ResourceHandle handle, con
 		TransformComponent &transform = entity.AddComponent<TransformComponent>();
 		transform._position = position;
 
-		_pCurrentScene->_pTerrain->AddEntityToSection(entity, position);
+		TERRAIN->AddEntityToSection(entity, position);
 
 		RenderComponent &render = entity.AddComponent<RenderComponent>();
 		render._type = RenderComponent::Type::eStatic;
@@ -84,7 +84,7 @@ void GameObjectFactory::CreateObject(ARCHE_TYPE type, ResourceHandle handle, con
 		TransformComponent &transform = entity.AddComponent<TransformComponent>();
 		transform._position = position;
 
-		_pCurrentScene->_pTerrain->AddEntityToSection(entity, position);
+		TERRAIN->AddEntityToSection(entity, position);
 
 		RenderComponent &render = entity.AddComponent<RenderComponent>();
 		render._type = RenderComponent::Type::eStatic;
@@ -140,7 +140,7 @@ void GameObjectFactory::Handle(const CreateObjectOnClickEvent & event)
 	Ray ray;
 	_pCurrentScene->_camera.ComputeRay(event._cursorPos, &ray);
 
-	if (_pCurrentScene->_pTerrain->IsIntersectRay(ray, &terrainHitPos))
+	if (TERRAIN->IsIntersectRay(ray, &terrainHitPos))
 	{
 		CreateObject(event._type, event._handle, terrainHitPos);
 	}

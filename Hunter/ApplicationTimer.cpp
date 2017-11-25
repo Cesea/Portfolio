@@ -34,7 +34,7 @@ void ApplicationTimer::Tick()
 	//Console::Log("%d\n", (int32)timeToSleep);
 	if (timeToSleep > 0)
 	{
-		Sleep(timeToSleep-1);
+		Sleep(timeToSleep);
 	}
 
 	QueryPerformanceCounter(&_currentCounter);

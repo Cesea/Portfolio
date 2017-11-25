@@ -6,7 +6,6 @@ class Entity;
 class Terrain;
 
 #define EDITOR_MAX_NAME 64
-
 #define EDITOR_MAX_NAME_VAR 32
 
 struct TransformComponent;
@@ -15,46 +14,50 @@ struct ScriptComponent;
 struct CollisionComponent;
 struct ActionComponent;
 
-class Gizmo
-{
-public :
-	enum Type
-	{
-		eTranslation = 0,
-		eRotation,
-		eScaling,
-	};
-	void Init();
-
-//	void MakeTransformCenter(std::vector<EntityHandle> entities);
-//	void Edit(std::vector<EntityHandle> entities);
+//class Gizmo
+//{
+//public :
+//	enum Type
+//	{
+//		eTranslation = 0,
+//		eRotation,
+//		eScaling,
+//	};
+//	void Init();
+//	void ChangeMode(Gizmo::Type type);
 //
-//private :
-//	void ChangeTranslation(std::vector<EntityHandle> entities);
-//	void ChangeRotation(std::vector<EntityHandle> entities);
-//	void ChangeScaling(std::vector<EntityHandle> entities);
+//	video::StaticXMeshHandle _x;
+//	video::StaticXMeshHandle _t;
+//	video::StaticXMeshHandle _z;
+//};
 //
-//	TransformComponent transform;
-
-	void ChangeMode(Gizmo::Type type);
-
-	video::StaticXMeshHandle _x;
-	video::StaticXMeshHandle _t;
-	video::StaticXMeshHandle _z;
-};
-
-class Brush
-{
-public :
-	void Init();
-
-	Vector3 _position;
-
-	video::VertexBufferHandle _vHandle;
-	video::MaterialHandle _mHandle;
-};
+//class Brush
+//{
+//public :
+//	void Init();
+//
+//	Vector3 _position;
+//
+//	video::VertexBufferHandle _vHandle;
+//	video::MaterialHandle _mHandle;
+//};
 
 struct TerrainEditor
+{
+	void Reset();
+
+	bool32 _editingExtent;
+	bool32 _editingHeight;
+	bool32 _editingTexture;
+
+	float _countX{};
+	float _countZ{};
+	Terrain::TerrainConfig _terrainConfig{};
+
+	char _fileName[EDITOR_MAX_NAME];
+};
+
+struct ObjectLocator
 {
 	void Reset()
 	{
@@ -123,28 +126,28 @@ public :
 
 	void SetEdittingEntity(Entity &entity);
 
-	void Render(video::RenderView *renderView);
+	void Render();
 public:
 	void RegisterEvents();
 public :
+
 	Entity *_selectedEntity{};
 
 	enum EditMode
 	{
 		eNone,
 		eTerrainEdit,
+		eObjectLocate,
 		eObjectEdit
 	};
 	void ChangeEditState(EditMode mode);
 
-	void InNoneMode(RefVariant object);
 	void InTerrainEditMode();
+	void InObjectLocateMode();
 	void InObjectEditMode();
 
 	EditMode _currentMode;
 	
-	Brush _brush;
-	Gizmo _gizmo;
 	bool32 _editing{ false };
 
 	int32 _mx;
@@ -158,6 +161,7 @@ public :
 	void UpdateInput(const InputManager &input);
 
 	TerrainEditor _terrainEditor;
+	ObjectLocator _objectLocator;
 	ObjectEditor _objectEditor;
 
 	EventChannel _channel;
