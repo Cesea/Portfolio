@@ -712,6 +712,14 @@ void Terrain::RebuildTerrain(const Terrain::TerrainConfig &config)
 	Create(config, true);
 }
 
+void Terrain::ReCreateQuadTree()
+{
+	SAFE_DELETE(_pQuadTree);
+	_pQuadTree = new QuadTree;
+	_pQuadTree->Init(_terrainVertices, _numVertexX, TERRAIN_CHUNK_DIM);
+}
+
+
 bool Terrain::CreateTerrainSection(int32 x, int32 z, const video::TerrainVertex * pTerrainVertices)
 {
 	int32 sectionIndex = Index2D(x, z, _xChunkCount);
@@ -814,17 +822,39 @@ void Terrain::AddHeightOnCursorPos(const Vector2 & cursorPos, float brushRadius,
 	{
 		TerrainTilePos tilePos =  ConvertWorldPostoTilePos(worldPos);
 
+		int32 centerX = tilePos._chunkX * TERRAIN_CHUNK_DIM + tilePos._tileX;
+		int32 centerZ = tilePos._chunkZ * TERRAIN_CHUNK_DIM + tilePos._tileZ;
+
 		for (int32 z = -radius; z <= radius; ++z)
 		{
 			for (int32 x = -radius; x <= radius; ++x)
 			{
-				int32 globalX = tilePos._chunkX * TERRAIN_CHUNK_DIM + tilePos._tileX;
-				int32 globalZ = tilePos._chunkZ * TERRAIN_CHUNK_DIM + tilePos._tileZ;
+				int32 editX = centerX + x;
+				int32 editZ = centerZ + z;
+				
+				float radialPower = (float)(radius - absInt(x)) * (radius - absInt(z)) / (brushRadius * brushRadius);
 
-				_terrainVertices[Index2D(globalX, globalZ, _numVertexX)]._pos.y += 1;
-				//ComputeTangentAndBinormal
+				editX = ClampInt(editX, 0, _numVertexX - 1);
+				editZ = ClampInt(editZ, 0, _numVertexZ - 1);
+				_terrainVertices[Index2D(editX, editZ, _numVertexX)]._pos.y += intensity * radialPower * 0.02f;
+
+				ClampFloat(_terrainVertices[Index2D(editX, editZ, _numVertexX)]._pos.y, 0.0f, 10.0f);
 			}
 		}
+
+		//normal, binormal, tangent의 계산은 radius보다 1씩 범위를 넓혀서 계산한다
+		int32 minX, minZ, maxX, maxZ;
+		minX = centerX - radius - 1;
+		maxX = centerX + radius + 1;
+		minZ = centerZ - radius - 1;
+		maxZ = centerZ + radius + 1;
+
+		ClampInt(minX, 0, _numVertexX - 1);
+		ClampInt(maxX, 0, _numVertexX - 1);
+		ClampInt(minZ, 0, _numVertexZ - 1);
+		ClampInt(maxZ, 0, _numVertexZ - 1);
+
+		RebuildSection(minX, maxX, minZ, maxZ);
 	}
 }
 
@@ -978,4 +1008,69 @@ void Terrain::TerrainChunk::InvalidateEntities()
 	{
 		_entities[i].Activate();
 	}
+}
+
+void Terrain::RebuildSection(int32 minX, int32 maxX, int32 minZ, int32 maxZ)
+{
+	int32 numVertX = maxX - minX + 1;
+	int32 numVertZ = maxZ - minZ + 1;
+
+	int32 triNum = (numVertZ - 1) * (numVertZ - 1) * 2;
+
+	Vector3 *vertices = new Vector3[numVertX * numVertZ];
+	int32 counter = 0;
+	for (int32 z = minZ; z <= maxZ; ++z)
+	{
+		for (int32 x = minX; x <= maxX; ++x)
+		{
+			vertices[counter++] = _terrainVertices[Index2D(x, z, _numVertexX)]._pos;
+		}
+	}
+	//SmoothTerrain(1);
+
+	counter = 0;
+	uint32 *indices = new uint32[triNum * 3];
+	for (int32 z = 0; z < numVertZ - 1; ++z)
+	{
+		for (int32 x = 0; x < numVertX - 1; ++x)
+		{
+			int32 lt = x + z * numVertX;
+			int32 rt = (x + 1) + z * numVertX;
+			int32 lb = x + (z + 1) * numVertX;
+			int32 rb = (x + 1) + (z + 1) * numVertX;
+
+			indices[counter++] = lt;
+			indices[counter++] = rt;
+			indices[counter++] = lb;
+
+			indices[counter++] = lb;
+			indices[counter++] = rt;
+			indices[counter++] = rb;
+		}
+	}
+
+	Vector3 *normals = new Vector3[numVertZ * numVertZ];
+	//노말계산
+	ComputeNormal(normals, vertices, numVertX * numVertZ, indices, triNum * 3);
+
+	counter = 0;
+	for (int32 z = minZ; z <= maxZ; ++z)
+	{
+		for (int32 x = minX; x <= maxX; ++x)
+		{
+			_terrainVertices[Index2D(x, z, _numVertexX)]._normal = normals[counter++];
+		}
+	}
+	//탄젠트 바이노말 계산
+	//ComputeTangentAndBinormal(tangents, binormals, poses, normals,
+	//	uvs, indices, _numTotalFace, _numTotalVertex);
+
+
+	SAFE_DELETE_ARRAY(vertices);
+	SAFE_DELETE_ARRAY(normals);
+	SAFE_DELETE_ARRAY(indices);
+}
+
+void Terrain::SmoothSection(int32 minX, int32 maxX, int32 minZ, int32 maxZ, int32 mult)
+{
 }

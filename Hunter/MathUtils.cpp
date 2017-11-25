@@ -1,8 +1,8 @@
 #include "stdafx.h"
 
-void ComputeNormal(Vector3 * pNormal, const Vector3 * pVertices, int verticeNum, const uint32 * pIndices, int indicesNum)
+void ComputeNormal(Vector3 * pOutNormal, const Vector3 * pVertices, int verticeNum, const uint32 * pIndices, int indicesNum)
 {
-	ZeroMemory(pNormal, sizeof(Vector3) * verticeNum);
+	ZeroMemory(pOutNormal, sizeof(Vector3) * verticeNum);
 
 	DWORD triNum = indicesNum / 3;
 
@@ -29,13 +29,13 @@ void ComputeNormal(Vector3 * pNormal, const Vector3 * pVertices, int verticeNum,
 		Vector3 normal;
 		Vec3Normalize(&normal, &cross);
 
-		pNormal[i0] += normal;
-		pNormal[i1] += normal;
-		pNormal[i2] += normal;
+		pOutNormal[i0] += normal;
+		pOutNormal[i1] += normal;
+		pOutNormal[i2] += normal;
 	}
 	for (DWORD i = 0; i < verticeNum; i++)
 	{
-		Vec3Normalize(&pNormal[i], &pNormal[i]);
+		Vec3Normalize(&pOutNormal[i], &pOutNormal[i]);
 	}
 }
 

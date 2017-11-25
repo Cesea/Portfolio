@@ -52,10 +52,11 @@ struct TerrainEditor
 
 	bool32 _grow{true};
 	bool32 _dig{false};
+	bool32 _smooth{false};
 	bool32 _flat{false};
 
-	float _brushRadius{};
-	float _brushIntensity{};
+	float _brushRadius{2.0f};
+	float _brushIntensity{3.0f};
 
 	float _countX{};
 	float _countZ{};

@@ -21,8 +21,8 @@ bool BaseScene::Init()
 
 	//터레인 로드
 	Terrain::TerrainConfig config;
-	config._xChunkCount = 3;
-	config._zChunkCount = 3;
+	config._xChunkCount = 4;
+	config._zChunkCount = 4;
 	config._tile0FileName = "../resources/Textures/TerrainTexture01.jpg";
 	config._tile1FileName = "../resources/Textures/TerrainTexture02.jpg";
 	config._tile2FileName = "../resources/Textures/TerrainTexture03.png";

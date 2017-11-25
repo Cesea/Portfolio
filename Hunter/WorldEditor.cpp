@@ -106,21 +106,74 @@ void Editor::InTerrainEditMode()
 	if (ImguiCollapse("Edit Height", nullptr, _terrainEditor._editingHeight))
 	{
 		_terrainEditor._editingHeight = !_terrainEditor._editingHeight;
+		if (_terrainEditor._editingHeight)
+		{
+			_terrainEditor._editingExtent = false;
+			_terrainEditor._editingTexture = false;
+		}
 	}
 	if (_terrainEditor._editingHeight)
 	{
 		ImguiIndent();
 
-		ImguiSlider("Brush Radius", &_terrainEditor._brushRadius, 1.0f, 10.0f, 0.1f);
-		ImguiSlider("Brush Intensity", &_terrainEditor._brushIntensity, 0.0f, 1.0f, 0.05f);
+		ImguiSlider("Brush Radius", &_terrainEditor._brushRadius, 4.0f, 10.0f, 0.1f);
+		ImguiSlider("Brush Intensity", &_terrainEditor._brushIntensity, 1.0f, 10.0f, 0.05f);
 
-		ImguiCheck("Grow", _terrainEditor._grow);
-		ImguiCheck("Dig", _terrainEditor._dig);
-		ImguiCheck("Flat", _terrainEditor._flat);
-
-		if (_mouseLeftDown)
+		if (ImguiCheck("Grow", _terrainEditor._grow))
 		{
-			TERRAIN->AddHeightOnCursorPos(Vector2((float)_mx, (float)_my), _terrainEditor._brushRadius, _terrainEditor._brushIntensity);
+			_terrainEditor._grow = !_terrainEditor._grow;
+			_terrainEditor._dig = false;
+			_terrainEditor._smooth = false;
+			_terrainEditor._flat = false;
+		}
+		if (ImguiCheck("Dig", _terrainEditor._dig))
+		{
+			_terrainEditor._dig = !_terrainEditor._dig;
+
+			_terrainEditor._grow = false;
+			_terrainEditor._smooth = false;
+			_terrainEditor._flat = false;
+		}
+		if (ImguiCheck("Smooth", _terrainEditor._smooth))
+		{
+			_terrainEditor._smooth = !_terrainEditor._smooth;
+
+			_terrainEditor._grow = false;
+			_terrainEditor._dig = false;
+			_terrainEditor._flat = false;
+		}
+		if (ImguiCheck("Flat", _terrainEditor._flat))
+		{
+			_terrainEditor._flat = !_terrainEditor._flat;
+
+			_terrainEditor._grow = false;
+			_terrainEditor._dig = false;
+			_terrainEditor._smooth = false;
+		}
+
+		if (ImguiButton("Rebuild QuadTree"))
+		{
+			TERRAIN->ReCreateQuadTree();
+		}
+
+		if (_mouseLeftDown && 
+			!(_mx > 0  && _mx < EDITORSIZEX && _my > 0 && _my < EDITORSIZEX))
+		{
+			if (_terrainEditor._grow)
+			{
+				TERRAIN->AddHeightOnCursorPos(Vector2((float)_mx, (float)_my), _terrainEditor._brushRadius, _terrainEditor._brushIntensity);
+			}
+			else if (_terrainEditor._dig)
+			{
+				TERRAIN->AddHeightOnCursorPos(Vector2((float)_mx, (float)_my), _terrainEditor._brushRadius, -_terrainEditor._brushIntensity);
+			}
+			else if (_terrainEditor._smooth)
+			{
+
+			}
+			else if (_terrainEditor._flat)
+			{
+			}
 		}
 		ImguiUnindent();
 	}
@@ -129,6 +182,11 @@ void Editor::InTerrainEditMode()
 	if (ImguiCollapse("Edit Texture", nullptr, _terrainEditor._editingTexture))
 	{
 		_terrainEditor._editingTexture = !_terrainEditor._editingTexture;
+		if (_terrainEditor._editingTexture)
+		{
+			_terrainEditor._editingExtent = false;
+			_terrainEditor._editingHeight = false;
+		}
 	}
 	if (_terrainEditor._editingTexture)
 	{

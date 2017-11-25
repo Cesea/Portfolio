@@ -4,7 +4,6 @@ float4x4 matViewProjection : ViewProjection;
 float camNear;			//카메라 근거리 평면
 float camFar;			//카메라 원거리 평면
 
-
 float4x4 baseDirectionalLight;
 
 //-----------------------------------------------------------------------------
@@ -154,9 +153,8 @@ PS_OUTPUT ps_main( PS_INPUT Input )
    float b = -camNear / (camFar - camNear);
    depth = b / (z - a);
 
-
    //Output.baseColor = float4(finalColor * diff, 1);
-   Output.baseColor = float4(1.0f, 1.0f, 1.0f, 1.0f);
+   Output.baseColor = float4(diff, diff, diff, 1.0f);
    Output.normalDepth = float4(worldNormal, depth);		//alpha 값에 뎁스를 썼다.
 
    return Output;

@@ -137,6 +137,8 @@ private:
 	bool CreateTerrain(int32 tileNum);
 	//Editor Only
 	void RebuildTerrain(const Terrain::TerrainConfig &config);
+	void ReCreateQuadTree();
+
 
 	bool CreateTerrainSection(int32 x, int32 z, const video::TerrainVertex *pTerrainVertices);
 
@@ -146,6 +148,9 @@ private:
 	video::VertexDeclHandle _declHandle{};
 	//video::MaterialHandle _materialHandle{};
 	video::EffectHandle _effect{};
+
+	void RebuildSection(int32 minX, int32 maxX, int32 minZ, int32 maxZ);
+	void SmoothSection(int32 minX, int32 maxX, int32 minZ, int32 maxZ, int32 mult);
 
 private:
 

@@ -94,18 +94,16 @@ inline int32 RectHeight(const RECT &rect)
 	return rect.bottom - rect.top;
 }
 
-inline float ClampFloat(float value, float min, float max)
+inline void ClampFloat(float &value, float min, float max)
 {
-	float result = value;
-	if (result < min)
+	if (value < min)
 	{
-		result = min;
+		value = min;
 	}
-	else if (result > max)
+	else if (value > max)
 	{
-		result = max;
+		value = max;
 	}
-	return result;
 }
 
 inline float Clamp01(float value)
@@ -136,7 +134,7 @@ inline float ClampMinusOnePlusOne(float value)
 	return result;
 }
 
-inline int32 ClampInt(int32 value, int32 min, int32 max)
+inline int32 ClampInt(int32 &value, int32 min, int32 max)
 {
 	int32  result = value;
 	if (result < min)
