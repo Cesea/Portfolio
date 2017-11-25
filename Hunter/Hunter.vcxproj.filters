@@ -453,9 +453,6 @@
     <ClInclude Include="imgui.h">
       <Filter>GUI</Filter>
     </ClInclude>
-    <ClInclude Include="imguiRenderer.h">
-      <Filter>GUI</Filter>
-    </ClInclude>
     <ClInclude Include="ScriptComponent.h">
       <Filter>Game\GameComponent\ScriptComponent</Filter>
     </ClInclude>
@@ -555,6 +552,9 @@
     </ClInclude>
     <ClInclude Include="TurtleStates.h">
       <Filter>Game\GameObject\Enemy\Turtle</Filter>
+    </ClInclude>
+    <ClInclude Include="imguiRenderer.h">
+      <Filter>GUI</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

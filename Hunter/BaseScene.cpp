@@ -37,7 +37,7 @@ bool BaseScene::Init()
 
 	//_pTerrain = new Terrain();
 	TERRAIN->SetScene(this);
-	TERRAIN->Create(config, false);
+	TERRAIN->Create(config, true);
 
 	//메쉬 불러오기..
 	Matrix correctionMat;

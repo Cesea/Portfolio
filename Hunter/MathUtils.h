@@ -12,7 +12,7 @@ void ComputeNormal( Vector3 *pNormal, // 결과로 받을 노말
 	const uint32 * pIndices, //인덱스 배열 포인트
 	int indicesNum //인덱스 숫자 
 );
-void ComputeTangentAngBinormal(
+void ComputeTangentAndBinormal(
 	Vector3* outTangents,
 	Vector3* outBinormal,
 	const Vector3 *pPotisions,

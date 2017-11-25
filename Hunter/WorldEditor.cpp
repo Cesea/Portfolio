@@ -80,12 +80,17 @@ void Editor::InTerrainEditMode()
 	if (ImguiCollapse("Edit Extent", nullptr, _terrainEditor._editingExtent))
 	{
 		_terrainEditor._editingExtent = !_terrainEditor._editingExtent;
+		if (_terrainEditor._editingExtent)
+		{
+			_terrainEditor._editingHeight = false;
+			_terrainEditor._editingTexture = false;
+		}
 	}
 	if (_terrainEditor._editingExtent)
 	{
 		ImguiIndent();
-		ImguiSlider("X Extent", (float *)&_terrainEditor._countX, 1.0f, 10.0f, 1.0f);
-		ImguiSlider("Z Extent", (float *)&_terrainEditor._countZ, 1.0f, 10.0f, 1.0f);
+		ImguiSlider("X Extent", (float *)&_terrainEditor._countX, 0.0f, 16.0f, 2.0f);
+		ImguiSlider("Z Extent", (float *)&_terrainEditor._countZ, 0.0f, 16.0f, 2.0f);
 
 		if (ImguiButton("Create Terrain!!!"))
 		{
@@ -96,6 +101,7 @@ void Editor::InTerrainEditMode()
 		}
 		ImguiUnindent();
 	}
+	
 	//높이 조정
 	if (ImguiCollapse("Edit Height", nullptr, _terrainEditor._editingHeight))
 	{
@@ -104,8 +110,21 @@ void Editor::InTerrainEditMode()
 	if (_terrainEditor._editingHeight)
 	{
 		ImguiIndent();
+
+		ImguiSlider("Brush Radius", &_terrainEditor._brushRadius, 1.0f, 10.0f, 0.1f);
+		ImguiSlider("Brush Intensity", &_terrainEditor._brushIntensity, 0.0f, 1.0f, 0.05f);
+
+		ImguiCheck("Grow", _terrainEditor._grow);
+		ImguiCheck("Dig", _terrainEditor._dig);
+		ImguiCheck("Flat", _terrainEditor._flat);
+
+		if (_mouseLeftDown)
+		{
+			TERRAIN->AddHeightOnCursorPos(Vector2((float)_mx, (float)_my), _terrainEditor._brushRadius, _terrainEditor._brushIntensity);
+		}
 		ImguiUnindent();
 	}
+
 	//텍스쳐 조정
 	if (ImguiCollapse("Edit Texture", nullptr, _terrainEditor._editingTexture))
 	{
@@ -372,7 +391,8 @@ void Editor::UpdateInput(const InputManager & input)
 {
 	_mx = input.mouse.GetCurrentPoint().x;
 	_my = input.mouse.GetCurrentPoint().y;
-	_mb = input.mouse.IsDown(MOUSE_BUTTON_LEFT);
+	_mouseLeftDown = input.mouse.IsDown(MOUSE_BUTTON_LEFT);
+	_mouseRightDown = input.mouse.IsDown(MOUSE_BUTTON_RIGHT);
 
 	_leftButtonPressed = input.mouse.IsPressed(MOUSE_BUTTON_LEFT);
 	_shiftDown = input.keyboard.GetShiftDown();
@@ -391,7 +411,7 @@ void Editor::Shutdown()
 void Editor::Edit(RefVariant &object, const InputManager &input)
 {
 	UpdateInput(input);
-	ImguiBeginFrame(_mx, _my, _mb, _scroll, _key, _shiftDown);
+	ImguiBeginFrame(_mx, _my, _mouseLeftDown, _scroll, _key, _shiftDown);
 
 	switch (_currentMode)
 	{

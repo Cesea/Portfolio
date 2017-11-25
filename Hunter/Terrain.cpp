@@ -27,6 +27,9 @@ bool Terrain::Create(const Terrain::TerrainConfig &config, bool32 inEditMode)
 	_terrainSizeX = _numCellX;
 	_terrainSizeZ = _numCellZ;
 
+	_terrainHalfSizeX = _terrainSizeX / 2;
+	_terrainHalfSizeZ = _terrainSizeZ / 2;
+
 	//ÃÑ »ï°¢Çü¼ö´Â
 	_numTotalFace = _totalCellNum * 2;
 
@@ -615,7 +618,7 @@ bool Terrain::CreateTerrain(int32 tileNum)
 	ComputeNormal(normals, poses, _numTotalVertex, indices, _numTotalFace * 3);
 
 	//ÅºÁ¨Æ® ¹ÙÀÌ³ë¸» °è»ê
-	ComputeTangentAngBinormal( tangents, binormals, poses, normals,
+	ComputeTangentAndBinormal( tangents, binormals, poses, normals,
 		uvs, indices, _numTotalFace, _numTotalVertex);
 
 	//°è»êµÈ°Å ´ëÀÔ
@@ -799,6 +802,32 @@ bool Terrain::CreateTerrainSection(int32 x, int32 z, const video::TerrainVertex 
 	return true;
 }
 
+void Terrain::AddHeightOnCursorPos(const Vector2 & cursorPos, float brushRadius, float intensity)
+{
+	Ray ray;
+	_pCurrentScene->_camera.ComputeRay(cursorPos, &ray);
+
+	int32 radius = (int32)brushRadius;
+
+	Vector3 worldPos;
+	if (IsIntersectRay(ray, &worldPos))
+	{
+		TerrainTilePos tilePos =  ConvertWorldPostoTilePos(worldPos);
+
+		for (int32 z = -radius; z <= radius; ++z)
+		{
+			for (int32 x = -radius; x <= radius; ++x)
+			{
+				int32 globalX = tilePos._chunkX * TERRAIN_CHUNK_DIM + tilePos._tileX;
+				int32 globalZ = tilePos._chunkZ * TERRAIN_CHUNK_DIM + tilePos._tileZ;
+
+				_terrainVertices[Index2D(globalX, globalZ, _numVertexX)]._pos.y += 1;
+				//ComputeTangentAndBinormal
+			}
+		}
+	}
+}
+
 void Terrain::SmoothTerrain(int32 passed)
 {
 	if (passed <= 0)
@@ -888,12 +917,12 @@ void Terrain::SmoothTerrain(int32 passed)
 	SAFE_DELETE_ARRAY(smooth);
 }
 
-TerrainChunkPos ConvertWorldPosToChunkPos(const Vector3 & worldPos)
+TerrainChunkPos Terrain::ConvertWorldPosToChunkPos(const Vector3 & worldPos)
 {
 	TerrainChunkPos result;
 
-	float terrainPosX = worldPos.x + (float)TERRAIN_HORI_HALF_SIZE;
-	float terrainPosZ = -worldPos.z + (float)TERRAIN_VERT_HALF_SIZE;
+	float terrainPosX = worldPos.x + (float)_terrainHalfSizeX;
+	float terrainPosZ = -worldPos.z + (float)_terrainHalfSizeZ;
 
 	result._x = (int32)(terrainPosX / TERRAIN_CHUNK_DIM);
 	result._z = (int32)(terrainPosZ / TERRAIN_CHUNK_DIM);
@@ -904,12 +933,12 @@ TerrainChunkPos ConvertWorldPosToChunkPos(const Vector3 & worldPos)
 	return result;
 }
 
-TerrainTilePos ConvertWorldPostoTilePos(const Vector3 & worldPos)
+TerrainTilePos Terrain::ConvertWorldPostoTilePos(const Vector3 & worldPos)
 {
 	TerrainTilePos result;
 	
-	float terrainPosX = worldPos.x + (float)TERRAIN_HORI_HALF_SIZE;
-	float terrainPosZ = -worldPos.z + (float)TERRAIN_VERT_HALF_SIZE;
+	float terrainPosX = worldPos.x + (float)_terrainHalfSizeX;
+	float terrainPosZ = -worldPos.z + (float)_terrainHalfSizeZ;
 
 	result._chunkX = (int32)(terrainPosX / TERRAIN_CHUNK_DIM);
 	result._chunkZ = (int32)(terrainPosZ / TERRAIN_CHUNK_DIM);

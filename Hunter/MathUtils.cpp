@@ -39,7 +39,7 @@ void ComputeNormal(Vector3 * pNormal, const Vector3 * pVertices, int verticeNum,
 	}
 }
 
-void ComputeTangentAngBinormal(Vector3 * outTangents, Vector3 * outBinormal, const Vector3 * pPotisions, 
+void ComputeTangentAndBinormal(Vector3 * outTangents, Vector3 * outBinormal, const Vector3 * pPotisions, 
 	const Vector3 * pNormals, const Vector2 * pUVs, const uint32 * pIndices, uint32 NumTris, uint32 NumVertices)
 {
 	ZeroMemory(outTangents, sizeof(Vector3), *NumVertices);

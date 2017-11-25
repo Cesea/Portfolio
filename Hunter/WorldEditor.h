@@ -50,6 +50,13 @@ struct TerrainEditor
 	bool32 _editingHeight;
 	bool32 _editingTexture;
 
+	bool32 _grow{true};
+	bool32 _dig{false};
+	bool32 _flat{false};
+
+	float _brushRadius{};
+	float _brushIntensity{};
+
 	float _countX{};
 	float _countZ{};
 	Terrain::TerrainConfig _terrainConfig{};
@@ -152,7 +159,10 @@ public :
 
 	int32 _mx;
 	int32 _my;
-	int8 _mb;
+
+	uint8 _mouseLeftDown;
+	uint8 _mouseRightDown;
+
 	bool32 _leftButtonPressed{};
 	int32 _scroll;
 	bool32 _shiftDown;

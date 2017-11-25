@@ -524,7 +524,7 @@ bool ImguiCheck(const char * text, bool checked, bool enabled)
 	unsigned int id = (gState._areaID << 16) | gState._widgetID;
 
 	int x = gState._widgetX;
-	int y = gState._widgetY - BUTTON_HEIGHT;
+	int y = gState._widgetY;
 	int w = gState._widgetW;
 	int h = BUTTON_HEIGHT;
 	gState._widgetY += BUTTON_HEIGHT + DEFAULT_SPACING;

@@ -8,8 +8,8 @@ static IDirect3DStateBlock9 *gStateBlock = nullptr;
 static Matrix gIMViewMatrix;
 static Matrix gIMProjectionMatrix;
 
+video::FontHandle gFontHandle;
 
-static video::FontHandle gFontHandle;
 
 struct UIVertex
 {

@@ -10,14 +10,12 @@ constexpr int32 TERRAIN_SHOW_EXTENT = 2;
 
 constexpr int32 TERRAIN_CHUNK_DIM = 64;
 
-constexpr int32 TERRAIN_HORI_SIZE = 1024;
-constexpr int32 TERRAIN_VERT_SIZE = 1024;
-
-constexpr int32 TERRAIN_HORI_HALF_SIZE = TERRAIN_HORI_SIZE / 2;
-constexpr int32 TERRAIN_VERT_HALF_SIZE = TERRAIN_VERT_SIZE / 2;
-
-constexpr int32 TERRAIN_HORI_CHUNK_COUNT = TERRAIN_HORI_SIZE / TERRAIN_CHUNK_DIM;
-constexpr int32 TERRAIN_VERT_CHUNK_COUNT = TERRAIN_VERT_SIZE / TERRAIN_CHUNK_DIM;
+//constexpr int32 TERRAIN_HORI_SIZE = 1024;
+//constexpr int32 TERRAIN_VERT_SIZE = 1024;
+//constexpr int32 TERRAIN_HORI_HALF_SIZE = TERRAIN_HORI_SIZE / 2;
+//constexpr int32 TERRAIN_VERT_HALF_SIZE = TERRAIN_VERT_SIZE / 2;
+//constexpr int32 TERRAIN_HORI_CHUNK_COUNT = TERRAIN_HORI_SIZE / TERRAIN_CHUNK_DIM;
+//constexpr int32 TERRAIN_VERT_CHUNK_COUNT = TERRAIN_VERT_SIZE / TERRAIN_CHUNK_DIM;
 
 //터레인 하나의 청크에 대한 위치이다
 struct TerrainChunkPos
@@ -43,11 +41,7 @@ struct TerrainTilePos
 	float _relZ{};
 };
 
-TerrainChunkPos ConvertWorldPosToChunkPos(const Vector3 &worldPos);
-TerrainTilePos ConvertWorldPostoTilePos(const Vector3 &worldPos);
 
-const Vector3 ConvertChunkPosToWorldPos(const TerrainChunkPos &chunkPos);
-const Vector3 ConvertTilePosToWorldPos(const TerrainTilePos &tilePos);
 
 class Terrain : public SingletonBase<Terrain>
 {
@@ -130,6 +124,12 @@ public:
 
 	void AddEntityToSection(const Entity &entity, const Vector3 &position);
 
+	TerrainChunkPos ConvertWorldPosToChunkPos(const Vector3 &worldPos);
+	TerrainTilePos ConvertWorldPostoTilePos(const Vector3 &worldPos);
+
+	const Vector3 ConvertChunkPosToWorldPos(const TerrainChunkPos &chunkPos);
+	const Vector3 ConvertTilePosToWorldPos(const TerrainTilePos &tilePos);
+
 private:
 	bool CreateInGame(const Terrain::TerrainConfig &config);
 	bool CreateEdit(const Terrain::TerrainConfig &config);
@@ -140,6 +140,7 @@ private:
 
 	bool CreateTerrainSection(int32 x, int32 z, const video::TerrainVertex *pTerrainVertices);
 
+	void AddHeightOnCursorPos(const Vector2 &cursorPos, float brushRadius, float intensity);
 	void SmoothTerrain(int32 passed);
 
 	video::VertexDeclHandle _declHandle{};
@@ -177,6 +178,8 @@ private:
 
 	float	_terrainSizeX{};
 	float	_terrainSizeZ{};
+	float _terrainHalfSizeX{};
+	float _terrainHalfSizeZ{};
 
 	//정확한 높이 계산을 하기 위해
 	float   _terrainStartX{};

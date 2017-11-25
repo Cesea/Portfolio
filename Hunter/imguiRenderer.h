@@ -3,6 +3,8 @@
 
 #include "imgui.h"
 
+extern video::FontHandle gFontHandle;
+
 bool imguiRenderInit();
 
 void imguiRenderDestroy();
