@@ -139,18 +139,19 @@ private:
 	void RebuildTerrain(const Terrain::TerrainConfig &config);
 	void ReCreateQuadTree();
 
-
 	bool CreateTerrainSection(int32 x, int32 z, const video::TerrainVertex *pTerrainVertices);
 
 	void AddHeightOnCursorPos(const Vector2 &cursorPos, float brushRadius, float intensity);
+	void SmoothOnCursorPos(const Vector2 &cursorPos, float brushRadius);
 	void SmoothTerrain(int32 passed);
+
+	void RebuildSection(int32 minX, int32 maxX, int32 minZ, int32 maxZ);
+	void SmoothSection(int32 minX, int32 maxX, int32 minZ, int32 maxZ);
 
 	video::VertexDeclHandle _declHandle{};
 	//video::MaterialHandle _materialHandle{};
 	video::EffectHandle _effect{};
 
-	void RebuildSection(int32 minX, int32 maxX, int32 minZ, int32 maxZ);
-	void SmoothSection(int32 minX, int32 maxX, int32 minZ, int32 maxZ, int32 mult);
 
 private:
 

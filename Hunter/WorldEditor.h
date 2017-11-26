@@ -62,6 +62,11 @@ struct TerrainEditor
 	float _countZ{};
 	Terrain::TerrainConfig _terrainConfig{};
 
+	char _textureName01[EDITOR_MAX_NAME]{0, };
+	char _textureName02[EDITOR_MAX_NAME]{0, };
+	char _textureName03[EDITOR_MAX_NAME]{0, };
+	char _textureName04[EDITOR_MAX_NAME]{0, };
+
 	char _fileName[EDITOR_MAX_NAME];
 };
 

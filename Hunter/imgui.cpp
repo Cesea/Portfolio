@@ -711,7 +711,7 @@ bool ImguiEdit(char * text, int32 width, bool enable)
 	int y = gState._widgetY;
 	int w = gState._widgetW;
 	int h = BUTTON_HEIGHT;
-	gState._widgetY += BUTTON_HEIGHT; // + DEFAULT_SPACING;
+	gState._widgetY += BUTTON_HEIGHT + DEFAULT_SPACING;
 
 	bool over = enable && InRect(x, y, w, h);
 	bool mouseResult = ButtonLogic(id, over);

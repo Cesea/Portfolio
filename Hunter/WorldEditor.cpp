@@ -169,7 +169,7 @@ void Editor::InTerrainEditMode()
 			}
 			else if (_terrainEditor._smooth)
 			{
-
+				TERRAIN->SmoothOnCursorPos(Vector2((float)_mx, (float)_my), _terrainEditor._brushRadius);
 			}
 			else if (_terrainEditor._flat)
 			{
@@ -191,19 +191,109 @@ void Editor::InTerrainEditMode()
 	if (_terrainEditor._editingTexture)
 	{
 		ImguiIndent();
+		
+		ImguiLabel("Texture01");
+		{
+			ImguiIndent();
+			ImguiEdit(_terrainEditor._textureName01, 120);
+			if (ImguiButton("LoadTexture"))
+			{
+				video::TextureHandle loadedTexture = VIDEO->CreateTexture(_terrainEditor._textureName01, _terrainEditor._textureName01);
+				if (loadedTexture.IsValid())
+				{
+					VIDEO->DestroyTexture(TERRAIN->_tile0Handle);
+					TERRAIN->_tile0Handle = loadedTexture;
+				}
+				else
+				{
+					ZeroMemory(_terrainEditor._textureName01, sizeof(char) * EDITOR_MAX_NAME);
+					strncpy(_terrainEditor._textureName01, "Texture Not Found", EDITOR_MAX_NAME);
+				}
+			}
+			ImguiUnindent();
+		}
+
+		ImguiLabel("Texture02");
+		{
+			ImguiIndent();
+			ImguiEdit(_terrainEditor._textureName02, 120);
+			if (ImguiButton("LoadTexture"))
+			{
+				video::TextureHandle loadedTexture = VIDEO->CreateTexture(_terrainEditor._textureName02, _terrainEditor._textureName02);
+				if (loadedTexture.IsValid())
+				{
+					VIDEO->DestroyTexture(TERRAIN->_tile1Handle);
+					TERRAIN->_tile1Handle = loadedTexture;
+				}
+				else
+				{
+					ZeroMemory(_terrainEditor._textureName02, sizeof(char) * EDITOR_MAX_NAME);
+					strncpy(_terrainEditor._textureName02, "Texture Not Found", EDITOR_MAX_NAME);
+				}
+			}
+			ImguiUnindent();
+		}
+
+		ImguiLabel("Texture03");
+		{
+			ImguiIndent();
+			ImguiEdit(_terrainEditor._textureName03, 120);
+			if (ImguiButton("LoadTexture"))
+			{
+				video::TextureHandle loadedTexture = VIDEO->CreateTexture(_terrainEditor._textureName03, _terrainEditor._textureName03);
+				if (loadedTexture.IsValid())
+				{
+					VIDEO->DestroyTexture(TERRAIN->_tile2Handle);
+					TERRAIN->_tile2Handle = loadedTexture;
+				}
+				else
+				{
+					ZeroMemory(_terrainEditor._textureName03, sizeof(char) * EDITOR_MAX_NAME);
+					strncpy(_terrainEditor._textureName03, "Texture Not Found", EDITOR_MAX_NAME);
+				}
+			}
+			ImguiUnindent();
+		}
+
+		ImguiLabel("Texture04");
+		{
+			ImguiIndent();
+			ImguiEdit(_terrainEditor._textureName04, 120);
+			if (ImguiButton("LoadTexture"))
+			{
+				video::TextureHandle loadedTexture = VIDEO->CreateTexture(_terrainEditor._textureName04, _terrainEditor._textureName04);
+				if (loadedTexture.IsValid())
+				{
+					VIDEO->DestroyTexture(TERRAIN->_tile3Handle);
+					TERRAIN->_tile3Handle = loadedTexture;
+				}
+				else
+				{
+					ZeroMemory(_terrainEditor._textureName04, sizeof(char) * EDITOR_MAX_NAME);
+					strncpy(_terrainEditor._textureName04, "Texture Not Found", EDITOR_MAX_NAME);
+				}
+			}
+			ImguiUnindent();
+		}
+
 		ImguiUnindent();
 	}
 
-	ImguiEdit(_terrainEditor._fileName, 120);
-	if (ImguiButton("Save Terrain"))
+	ImguiLabel("File Name");
+	ImguiIndent();
 	{
-		TERRAIN->SaveTerrain(_terrainEditor._fileName);
-	}
+		ImguiEdit(_terrainEditor._fileName, 120);
+		if (ImguiButton("Save Terrain"))
+		{
+			TERRAIN->SaveTerrain(_terrainEditor._fileName);
+		}
 
-	if (ImguiButton("Load Terrain"))
-	{
-		TERRAIN->LoadTerrain(_terrainEditor._fileName);
+		if (ImguiButton("Load Terrain"))
+		{
+			TERRAIN->LoadTerrain(_terrainEditor._fileName);
+		}
 	}
+	ImguiUnindent();
 
 	ImguiUnindent();
 }

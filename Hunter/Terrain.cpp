@@ -858,6 +858,41 @@ void Terrain::AddHeightOnCursorPos(const Vector2 & cursorPos, float brushRadius,
 	}
 }
 
+void Terrain::SmoothOnCursorPos(const Vector2 & cursorPos, float brushRadius)
+{
+	Ray ray;
+	_pCurrentScene->_camera.ComputeRay(cursorPos, &ray);
+
+	int32 radius = (int32)brushRadius;
+
+	Vector3 worldPos;
+
+	if (IsIntersectRay(ray, &worldPos))
+	{
+		TerrainTilePos tilePos = ConvertWorldPostoTilePos(worldPos);
+
+		int32 centerX = tilePos._chunkX * TERRAIN_CHUNK_DIM + tilePos._tileX;
+		int32 centerZ = tilePos._chunkZ * TERRAIN_CHUNK_DIM + tilePos._tileZ;
+
+
+		int32 minX, maxX, minZ, maxZ;
+		minX = centerX - radius - 3;
+		maxX = centerX + radius + 3;
+		minZ = centerZ - radius - 3;
+		maxZ = centerZ + radius + 3;
+
+		ClampInt(minX, 0, _numVertexX);
+		ClampInt(maxX, 0, _numVertexX);
+		ClampInt(minZ, 0, _numVertexZ);
+		ClampInt(maxZ, 0, _numVertexZ);
+
+		SmoothSection(minX, maxX, minZ, maxZ);
+
+		RebuildSection(minX, maxX, minZ, maxZ);
+	}
+
+}
+
 void Terrain::SmoothTerrain(int32 passed)
 {
 	if (passed <= 0)
@@ -1065,12 +1100,97 @@ void Terrain::RebuildSection(int32 minX, int32 maxX, int32 minZ, int32 maxZ)
 	//ComputeTangentAndBinormal(tangents, binormals, poses, normals,
 	//	uvs, indices, _numTotalFace, _numTotalVertex);
 
-
 	SAFE_DELETE_ARRAY(vertices);
 	SAFE_DELETE_ARRAY(normals);
 	SAFE_DELETE_ARRAY(indices);
 }
 
-void Terrain::SmoothSection(int32 minX, int32 maxX, int32 minZ, int32 maxZ, int32 mult)
+void Terrain::SmoothSection(int32 minX, int32 maxX, int32 minZ, int32 maxZ)
 {
+	int32 numVertX = maxX - minX + 1;
+	int32 numVertZ = maxZ - minZ + 1;
+
+	
+
+	//int32 triNum = (numVertZ - 1) * (numVertZ - 1) * 2;
+
+	float* smooth = new float[_numTotalVertex];
+
+	//while (passed > 0) {
+
+		//passed--;
+
+	for (int32 z = minZ; z < maxZ; z++)
+	{
+		for (int32 x = minX; x < maxX; x++)
+		{
+			int32 adjacentSections = 0;		//몇개의 정점과 평균값을 내니?
+			float totalSections = 0.0f;		//주변의 정점 높이 총합은 얼마니?
+
+			if ((x - 1) > 0)
+			{
+				totalSections += _terrainVertices[(z * _numVertexX) + (x - 1)]._pos.y;
+				adjacentSections++;
+
+				//왼쪽 상단
+				if ((z - 1) > 0)
+				{
+					totalSections += _terrainVertices[((z - 1) * _numVertexX) + (x - 1)]._pos.y;
+					adjacentSections++;
+				}
+				//왼쪽 하단
+				if ((z + 1) < _numVertexZ)
+				{
+					totalSections += _terrainVertices[((z + 1) * _numVertexX) + (x - 1)]._pos.y;
+					adjacentSections++;
+				}
+			}
+
+			//오른쪽 체크
+			if ((x + 1) < _numVertexX)
+			{
+				totalSections += _terrainVertices[(z * _numVertexX) + (x + 1)]._pos.y;
+				adjacentSections++;
+				//오른쪽 상단
+				if ((z - 1) > 0)
+				{
+					totalSections += _terrainVertices[((z - 1) * _numVertexX) + (x + 1)]._pos.y;
+					adjacentSections++;
+				}
+				//오른쪽 하단 
+				if ((z + 1) < _numVertexZ)
+				{
+					totalSections += _terrainVertices[((z + 1) * _numVertexX) + (x + 1)]._pos.y;
+					adjacentSections++;
+				}
+			}
+
+			//상단
+			if ((z - 1) > 0)
+			{
+				totalSections += _terrainVertices[((z - 1) * _numVertexX) + x]._pos.y;
+				adjacentSections++;
+			}
+
+			//하단
+			if ((z + 1) < _numVertexZ)
+			{
+				totalSections += _terrainVertices[((z + 1) * _numVertexX) + x]._pos.y;
+				adjacentSections++;
+			}
+
+			smooth[(z * _numVertexX) + x] = ( _terrainVertices[(z * _numVertexX) + x]._pos.y + (totalSections / adjacentSections)) * 0.5f;
+		}
+	}
+
+	//위에서 계산된 y 스무싱 적용
+	for (int32 z = minZ; z < maxZ; z++)
+	{
+		for (int32 x = minX; x < maxX; x++)
+		{
+			_terrainVertices[Index2D(x, z, _numVertexX)]._pos.y = smooth[Index2D(x, z, _numVertexX)];
+
+		}
+	}
+	SAFE_DELETE_ARRAY(smooth);
 }
