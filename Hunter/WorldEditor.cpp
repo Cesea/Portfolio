@@ -229,9 +229,15 @@ void Editor::InTerrainEditMode()
 #pragma endregion
 		
 #pragma region Texture Load
+		//Tile Texture 0/////////////////////////////////////////////////////
 		ImguiLabel("Texture00");
 		{
 			ImguiIndent();
+
+			if (TERRAIN->_tile0Handle.IsValid())
+			{
+				ImguiDrawTexture(0, 0, 64, 64, TERRAIN->_tile0Handle);
+			}
 			ImguiEdit(_terrainEditor._textureName00, 120);
 			if (ImguiButton("LoadTexture"))
 			{
@@ -258,9 +264,15 @@ void Editor::InTerrainEditMode()
 			ImguiUnindent();
 		}
 
+		//Tile Texture 1/////////////////////////////////////////////////////
 		ImguiLabel("Texture01");
 		{
 			ImguiIndent();
+
+			if (TERRAIN->_tile1Handle.IsValid())
+			{
+				ImguiDrawTexture(0, 0, 64, 64, TERRAIN->_tile1Handle);
+			}
 			ImguiEdit(_terrainEditor._textureName01, 120);
 			if (ImguiButton("LoadTexture"))
 			{
@@ -287,9 +299,15 @@ void Editor::InTerrainEditMode()
 			ImguiUnindent();
 		}
 
+		//Tile Texture 2/////////////////////////////////////////////////////
 		ImguiLabel("Texture02");
 		{
 			ImguiIndent();
+
+			if (TERRAIN->_tile2Handle.IsValid())
+			{
+				ImguiDrawTexture(0, 0, 64, 64, TERRAIN->_tile2Handle);
+			}
 			ImguiEdit(_terrainEditor._textureName02, 120);
 			if (ImguiButton("LoadTexture"))
 			{
@@ -316,9 +334,14 @@ void Editor::InTerrainEditMode()
 			ImguiUnindent();
 		}
 
+		//Tile Texture 3/////////////////////////////////////////////////////
 		ImguiLabel("Texture03");
 		{
 			ImguiIndent();
+			if (TERRAIN->_tile3Handle.IsValid())
+			{
+				ImguiDrawTexture(0, 0, 64, 64, TERRAIN->_tile3Handle);
+			}
 			ImguiEdit(_terrainEditor._textureName03, 120);
 			if (ImguiButton("LoadTexture"))
 			{

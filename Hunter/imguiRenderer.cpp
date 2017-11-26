@@ -23,9 +23,8 @@ struct UITextureVertex
 {
 	Vector3 _position;
 	Vector2 _texcoord;
-	uint32 _color;
 
-	enum { FVF = D3DFVF_XYZ | D3DFVF_TEX1 | D3DFVF_DIFFUSE };
+	enum { FVF = D3DFVF_XYZ | D3DFVF_TEX1 };
 
 };
 
@@ -87,40 +86,50 @@ void DrawLine(int32 x0, int32 y0, int32 x1, int32 y1, D3DCOLOR color)
 
 void DrawTexture(int32 x0, int32 y0, int32 x1, int32 y1, video::TextureHandle handle)
 {
-	//UIVertex vertices[4];
-	//vertices[0]._color = 0xffffffff;
-	//vertices[1]._color = 0xffffffff;
-	//vertices[2]._color = 0xffffffff;
-	//vertices[3]._color = 0xffffffff;
+	UITextureVertex vertices[4];
 
-	//vertices[0]._position.x = (float)x0;
-	//vertices[0]._position.y = (float)y0;
-	//vertices[0]._position.z = 0.0f;
+	vertices[0]._position.x = (float)x0;
+	vertices[0]._position.y = (float)y0;
+	vertices[0]._position.z = 0.0f;
 
-	//vertices[1]._position.x = (float)x1;
-	//vertices[1]._position.y = (float)y0;
-	//vertices[1]._position.z = 0.0f;
+	vertices[1]._position.x = (float)x1;
+	vertices[1]._position.y = (float)y0;
+	vertices[1]._position.z = 0.0f;
 
-	//vertices[2]._position.x = (float)x1;
-	//vertices[2]._position.y = (float)y1;
-	//vertices[2]._position.z = 0.0f;
+	vertices[2]._position.x = (float)x1;
+	vertices[2]._position.y = (float)y1;
+	vertices[2]._position.z = 0.0f;
 
-	//vertices[3]._position.x = (float)x0;
-	//vertices[3]._position.y = (float)y1;
-	//vertices[3]._position.z = 0.0f;
+	vertices[3]._position.x = (float)x0;
+	vertices[3]._position.y = (float)y1;
+	vertices[3]._position.z = 0.0f;
 
-	//uint16 indices[6];
-	//indices[0] = 0; indices[1] = 1; indices[2] = 2;
-	//indices[3] = 0; indices[4] = 2; indices[5] = 3;
+	vertices[0]._texcoord.x = 0.0f;
+	vertices[0]._texcoord.y = 0.0f;
 
-	//gpDevice->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_DISABLE);
-	//gpDevice->SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_DISABLE);
-	//gpDevice->SetFVF(UIVertex::FVF);
+	vertices[1]._texcoord.x = 1.0f;
+	vertices[1]._texcoord.y = 0.0f;
 
-	//gpDevice->SetTexture(0, VIDEO->GetTexture(handle)->_ptr);
-	//HRESULT re = gpDevice->DrawIndexedPrimitiveUP(D3DPT_TRIANGLELIST, 0, 4, 2, indices, D3DFMT_INDEX16,
-	//	vertices, sizeof(UIVertex));
-	//gpDevice->SetTexture(0, nullptr);
+	vertices[2]._texcoord.x = 1.0f;
+	vertices[2]._texcoord.y = 1.0f;
+
+	vertices[3]._texcoord.x = 0.0f;
+	vertices[3]._texcoord.y = 1.0f;
+
+	uint16 indices[6];
+	indices[0] = 0; indices[1] = 1; indices[2] = 2;
+	indices[3] = 0; indices[4] = 2; indices[5] = 3;
+
+	gpDevice->SetFVF(UITextureVertex::FVF);
+
+	//gpDevice->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_ADD);
+	gpDevice->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_SELECTARG1);
+	gpDevice->SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_DISABLE);
+	gpDevice->SetTexture(0, VIDEO->GetTexture(handle)->_ptr);
+	HRESULT re = gpDevice->DrawIndexedPrimitiveUP(D3DPT_TRIANGLELIST, 0, 4, 2, indices, D3DFMT_INDEX16,
+		vertices, sizeof(UITextureVertex));
+	gpDevice->SetTexture(0, nullptr);
+
 }
 
 void DrawFont(int32 id, int32 x, int32 y, uint32 color, const char *str, DWORD format)
@@ -287,12 +296,12 @@ void imguiRenderDraw()
 		{
 			DrawFont(0, cmd._text._x, cmd._text._y, cmd._color, cmd._text._text, cmd._text._align);
 		}
-		//else if (cmd._type == ImguiCommandType::eCommandTexture)
-		//{
-		//	DrawTexture(cmd._texture._x, cmd._texture._y, 
-		//		cmd._texture._x + cmd._texture._w, cmd._texture._y + cmd._texture._h, 
-		//		cmd._texture._handle);
-		//}
+		else if (cmd._type == ImguiCommandType::eCommandTexture)
+		{
+			DrawTexture(cmd._texture._x, cmd._texture._y, 
+				cmd._texture._x + cmd._texture._w, cmd._texture._y + cmd._texture._h, 
+				cmd._texture._handle);
+		}
 		else if (cmd._type == ImguiCommandType::eCommandScissor)
 		{
 			if (cmd._flags)

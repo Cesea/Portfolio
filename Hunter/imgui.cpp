@@ -91,6 +91,21 @@ static void AddCommandTriangle(int32 x, int32 y, int32 w, int32 h, int32 flags, 
 	cmd._rect._h = (int16)(h);
 }
 
+static void AddCommandTexture(int16 x, int16 y, int16 w, int16 h, video::TextureHandle handle)
+{
+	if (gIMCommandQueueSize >= IMGUI_COMMAND_QUEUE_SIZE)
+	{
+		return;
+	}
+	ImguiCommand& cmd = gIMCommandQueue[gIMCommandQueueSize++];
+	cmd._type = ImguiCommandType::eCommandTexture;
+	cmd._texture._x = (int16)(x);
+	cmd._texture._y = (int16)(y);
+	cmd._texture._w = (int16)(w);
+	cmd._texture._h = (int16)(h);
+	cmd._texture._handle = handle;
+}
+
 static void AddCommandText(int32 x, int32 y, int32 align, const char* text, uint32 color) 
 {
 	if (gIMCommandQueueSize >= IMGUI_COMMAND_QUEUE_SIZE)
@@ -290,11 +305,11 @@ static const int BUTTON_HEIGHT = 20;
 static const int SLIDER_HEIGHT = 20;
 static const int SLIDER_MARKER_WIDTH = 10;
 static const int CHECK_SIZE = 8;
-static const int DEFAULT_SPACING = 4;
+static const int DEFAULT_SPACING = 2;
 static const int TEXT_HEIGHT = 8;
-static const int SCROLL_AREA_PADDING = 6;
+static const int SCROLL_AREA_PADDING = 4;
 static const int INDENT_SIZE = 16;
-static const int AREA_HEADER = 28;
+static const int AREA_HEADER = 24;
 
 static int g_scrollTop = 0;
 static int g_scrollBottom = 0;
@@ -702,9 +717,15 @@ bool ImguiSlider(const char * text, float * val, float vmin, float vmax, float v
 	return res || valChanged;
 }
 
-//void ImguiDrawTexture(video::TextureHandle handle, int16 size)
-//{
-//}
+void ImguiDrawTexture( int16 xOffset, int16 yOffset, int16 width, int16 height, video::TextureHandle handle)
+{
+	const int32 x = gState._widgetX;
+	const int32 y = gState._widgetY;
+	const int32 w = gState._widgetW;
+	gState._widgetY += DEFAULT_SPACING + height;
+	AddCommandTexture(x + xOffset, y + yOffset, width ,height, handle);
+
+}
 
 bool ImguiEdit(char * text, int32 width, bool enable)
 {

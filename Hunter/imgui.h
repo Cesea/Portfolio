@@ -42,7 +42,7 @@ void ImguiLabel(const char* text);
 void ImguiValue(const char* text);
 bool ImguiSlider(const char* text, float* val, float vmin, float vmax, float vinc, bool enabled = true);
 
-void ImguiDrawTexture(video::TextureHandle handle, int16 size);
+void ImguiDrawTexture( int16 xOffset, int16 yOffset, int16 width, int16 height, video::TextureHandle handle);
 
 bool ImguiEdit(char *text, int32 width, bool enable = true);
 
@@ -80,7 +80,6 @@ struct ImguiLine
 
 struct ImguiTexture
 {
-	//ImguiTexture() {}
 	int16 _x, _y, _w, _h;
 	video::TextureHandle _handle{};
 };
@@ -97,7 +96,7 @@ struct ImguiCommand
 		ImguiLine _line;
 		ImguiRect _rect;
 		ImguiText _text;
-		//ImguiTexture _texture;
+		ImguiTexture _texture;
 	};
 };
 
