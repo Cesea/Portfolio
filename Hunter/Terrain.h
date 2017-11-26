@@ -10,6 +10,8 @@ constexpr int32 TERRAIN_SHOW_EXTENT = 2;
 
 constexpr int32 TERRAIN_CHUNK_DIM = 64;
 
+constexpr int32 TERRAIN_ALPHA_TEXTURE_SIZE = 512;
+
 //constexpr int32 TERRAIN_HORI_SIZE = 1024;
 //constexpr int32 TERRAIN_VERT_SIZE = 1024;
 //constexpr int32 TERRAIN_HORI_HALF_SIZE = TERRAIN_HORI_SIZE / 2;
@@ -131,8 +133,8 @@ public:
 	const Vector3 ConvertTilePosToWorldPos(const TerrainTilePos &tilePos);
 
 private:
-	bool CreateInGame(const Terrain::TerrainConfig &config);
-	bool CreateEdit(const Terrain::TerrainConfig &config);
+	//bool CreateInGame(const Terrain::TerrainConfig &config);
+	//bool CreateEdit(const Terrain::TerrainConfig &config);
 
 	bool CreateTerrain(int32 tileNum);
 	//Editor Only
@@ -147,6 +149,10 @@ private:
 
 	void RebuildSection(int32 minX, int32 maxX, int32 minZ, int32 maxZ);
 	void SmoothSection(int32 minX, int32 maxX, int32 minZ, int32 maxZ);
+
+	void DrawAlphaTextureOnCursorPos(const Vector2 & cursorPos, float innerRadius, float outterRadius, 
+		float intensity, video::TextureHandle alphaHandle, int32 channel);
+
 
 	video::VertexDeclHandle _declHandle{};
 	//video::MaterialHandle _materialHandle{};

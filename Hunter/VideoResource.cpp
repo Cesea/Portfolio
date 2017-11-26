@@ -344,6 +344,19 @@ namespace video
 		return true;
 	}
 
+	bool Texture::Create(int32 width, int32 height, D3DFORMAT fmt, D3DPOOL pool)
+	{
+		if (FAILED(D3DXCreateTexture(gpDevice, width, height, 1, 0, fmt, pool, &_ptr)))
+		{
+			Console::Log("Texture Creation failed\n");
+			return false;
+		}
+		_width = width;
+		_height = height;
+		_format = fmt;
+		return true;
+	}
+
 	void Texture::Destroy()
 	{
 		COM_RELEASE(_ptr);

@@ -74,7 +74,12 @@ namespace video
 		void DestroyVertexDecl(VertexDeclHandle handle);
 
 		//텍스쳐 생성
+		//파일로부터 텍스쳐를 생성한다.
 		TextureHandle CreateTexture(const std::string &fileName, const std::string &name = "");
+		//주어진 인자로부터 빈 텍스쳐를 생성한다.
+		TextureHandle CreateTexture(int32 width, int32 height, D3DFORMAT format, D3DPOOL pool, 
+			const std::string &name = "");
+
 		TextureHandle GetTexture(const std::string &name);
 		Texture *GetTexture(TextureHandle handle);
 		void DestroyTexture(TextureHandle handle);

@@ -464,6 +464,19 @@ TextureHandle video::VideoDevice::CreateTexture(const std::string &fileName, con
 	return result;
 }
 
+TextureHandle video::VideoDevice::CreateTexture(int32 width, int32 height, 
+	D3DFORMAT format, D3DPOOL pool, const std::string &name)
+{
+	TextureHandle result = _textureHandlePool.Create(name);
+	if (!_textures[result.index].Create(width, height, format, pool))
+	{
+		//텍스쳐의 생성에 실패했다면 만든 핸들은 지우고 빈 핸들을 반환한다
+		_textureHandlePool.Remove(result);
+		return TextureHandle();
+	}
+	return result;
+}
+
 TextureHandle video::VideoDevice::GetTexture(const std::string & name)
 {
 	return _textureHandlePool.Get(name);

@@ -1,4 +1,4 @@
-#include "stdafx.h"
+ï»¿#include "stdafx.h"
 #include "Terrain.h"
 
 #include "QuadTree.h"
@@ -13,27 +13,27 @@ bool Terrain::Create(const Terrain::TerrainConfig &config, bool32 inEditMode)
 {
 	_inEditMode = inEditMode;
 
-	//°¡·Î¼¼·Î Á¤Á¡ ¼ö¸¦ ±¸ÇÑ´Ù.
-	//°¡·Î ¼¼·Î Á¤Á¡ÀÇ ¼ö´Â TILE_CHUNK_DIM * tileExtent + 1°ú °°´Ù..
+	//ê°€ë¡œì„¸ë¡œ ì •ì  ìˆ˜ë¥¼ êµ¬í•œë‹¤.
+	//ê°€ë¡œ ì„¸ë¡œ ì •ì ì˜ ìˆ˜ëŠ” TILE_CHUNK_DIM * tileExtent + 1ê³¼ ê°™ë‹¤..
 	_numVertexX = TERRAIN_CHUNK_DIM * config._xChunkCount + 1;		
 	_numVertexZ = TERRAIN_CHUNK_DIM * config._zChunkCount + 1;		
-	_numTotalVertex = _numVertexX * _numVertexZ;		//ÃÑ Á¤Á¡ °¹¼ö
+	_numTotalVertex = _numVertexX * _numVertexZ;		//ì´ ì •ì  ê°¯ìˆ˜
 
 	_numCellX = _numVertexX - 1;
 	_numCellZ = _numVertexZ - 1;
 	_totalCellNum = _numCellX * _numCellZ;
 
-	//ÅÍ·¹ÀÎ Å©±â
+	//í„°ë ˆì¸ í¬ê¸°
 	_terrainSizeX = _numCellX;
 	_terrainSizeZ = _numCellZ;
 
 	_terrainHalfSizeX = _terrainSizeX / 2;
 	_terrainHalfSizeZ = _terrainSizeZ / 2;
 
-	//ÃÑ »ï°¢Çü¼ö´Â
+	//ì´ ì‚¼ê°í˜•ìˆ˜ëŠ”
 	_numTotalFace = _totalCellNum * 2;
 
-	//Section ¼³Á¤
+	//Section ì„¤ì •
 	_sectionResolution = TERRAIN_CHUNK_DIM;
 		
 	_xChunkCount = config._xChunkCount;
@@ -45,7 +45,7 @@ bool Terrain::Create(const Terrain::TerrainConfig &config, bool32 inEditMode)
 	_sectionNumVertexX = _sectionNumCellX + 1;
 	_sectionNumVertexZ = _sectionNumCellZ + 1;
 
-	//Terrain config º¹»ç
+	//Terrain config ë³µì‚¬
 	_currentConfig._xChunkCount = config._xChunkCount;
 	_currentConfig._zChunkCount = config._zChunkCount;
 	_currentConfig._textureMult = config._textureMult;
@@ -57,20 +57,19 @@ bool Terrain::Create(const Terrain::TerrainConfig &config, bool32 inEditMode)
 		return false;
 	}
 
-	//ÅÍ·¹ÀÎ ¹üÀ§
+	//í„°ë ˆì¸ ë²”ìœ„
 	_terrainStartX = _terrainVertices[0]._pos.x;
 	_terrainStartZ = _terrainVertices[0]._pos.z;
 	_terrainEndX = _terrainVertices[_numTotalVertex - 1]._pos.x;
 	_terrainEndZ = _terrainVertices[_numTotalVertex - 1]._pos.z;
 
-	//ÄõµåÆ®¸®¸¦ ¸¸µç´Ù.
+	//ì¿¼ë“œíŠ¸ë¦¬ë¥¼ ë§Œë“ ë‹¤.
 	_pQuadTree = new QuadTree;
 	_pQuadTree->Init(_terrainVertices, _numVertexX, _sectionResolution);
 
-	//ÅÍ·¹ÀÎ Texture ·Îµù
+	//í„°ë ˆì¸ Texture ë¡œë”©
 	_effect = VIDEO->GetEffect("TerrainBase.fx");
 	//_materialHandle = VIDEO->CreateMaterial("TerrainMaterial");
-
 	if (_currentConfig._tile0FileName != config._tile0FileName)
 	{
 		video::TextureHandle loadedHandle = VIDEO->CreateTexture(config._tile0FileName, config._tile0FileName);
@@ -78,6 +77,10 @@ bool Terrain::Create(const Terrain::TerrainConfig &config, bool32 inEditMode)
 		{
 			_tile0Handle = loadedHandle;
 		}
+	}
+	else if (!_tile0Handle.IsValid())
+	{
+
 	}
 
 	if (_currentConfig._tile1FileName != config._tile1FileName)
@@ -105,6 +108,8 @@ bool Terrain::Create(const Terrain::TerrainConfig &config, bool32 inEditMode)
 			_tile3Handle = loadedHandle;
 		}
 	}
+
+	//ë§Œì•½ configì—ì„œ Splat í…ìŠ¤ì³ê°€ ë„˜ì–´ì™”ë‹¤ë©´
 	if (config._splatFileName.length() > 0)
 	{
 		_tileSplatHandle = VIDEO->CreateTexture(config._splatFileName);
@@ -113,18 +118,40 @@ bool Terrain::Create(const Terrain::TerrainConfig &config, bool32 inEditMode)
 			_tileSplatHandle = VIDEO->GetTexture("diffuseDefault");
 		}
 	}
+	//ë§Œì•½ configì—ì„œ Splat í…ìŠ¤ì³ê°€ ë„˜ì–´ì˜¤ì§€ ì•Šì•˜ë‹¤ë©´, ìƒˆë¡œìš´ í…ìŠ¤ì³ë¥¼ ìƒì„±í•˜ë„ë¡ í•œë‹¤...
+	//ê·¸ë¦¬ê³  ëª¨ë“  ê°’ì„ 0x00000000ë¡œ ì±„ìš´ë‹¤.
+	else
+	{
+		_tileSplatHandle = VIDEO->CreateTexture(TERRAIN_ALPHA_TEXTURE_SIZE, TERRAIN_ALPHA_TEXTURE_SIZE,
+			D3DFMT_A8R8G8B8, D3DPOOL_MANAGED);
+
+		video::Texture *pTexture = VIDEO->GetTexture(_tileSplatHandle);
+		D3DLOCKED_RECT lockRect{};
+		if (SUCCEEDED(pTexture->_ptr->LockRect(0, &lockRect, nullptr, 0)))
+		{
+			uint32 *pPixel = (uint32 *)lockRect.pBits;
+			for (int32 y = 0; y < TERRAIN_ALPHA_TEXTURE_SIZE; ++y)
+			{
+				for (int32 x = 0; x < TERRAIN_ALPHA_TEXTURE_SIZE; ++x)
+				{
+					*pPixel = 0x00000000;
+					pPixel++;
+				}
+			}
+			pTexture->_ptr->UnlockRect(0);
+		}
+		//ì•ŒíŒŒ í…ìŠ¤ì³ì˜ Lock ì„ ì‹¤íŒ¨í•˜ì˜€ë‹¤...
+		else
+		{
+			Console::Log("Alpha Texture Lock failed\n");
+		}
+	}
 
 	_currentConfig._tile0FileName = config._tile0FileName;
 	_currentConfig._tile1FileName = config._tile1FileName;
 	_currentConfig._tile2FileName = config._tile2FileName;
 	_currentConfig._tile3FileName = config._tile3FileName;
 	_currentConfig._splatFileName = config._splatFileName;
-
-	//VIDEO->MaterialAddTexture(_materialHandle, VIDEO_TEXTURE0, _tile0Handle);
-	//VIDEO->MaterialAddTexture(_materialHandle, VIDEO_TEXTURE1, _tile1Handle);
-	//VIDEO->MaterialAddTexture(_materialHandle, VIDEO_TEXTURE2, _tile2Handle);
-	//VIDEO->MaterialAddTexture(_materialHandle, VIDEO_TEXTURE3, _tile3Handle);
-	//VIDEO->MaterialAddTexture(_materialHandle, VIDEO_TEXTURE4, _tileSplatHandle);
 }
 
 void Terrain::RegisterEvents()
@@ -241,14 +268,14 @@ bool Terrain::IsIntersectRay(const Ray &ray, Vector3 *pOutHit)
 {
 	std::vector<Vector3> hits;
 
-	//ÃÖ»ó´Ü Äõµå Æ®¸® ºÎÅÍ Ray Check µé¾î°£´Ù.
+	//ìµœìƒë‹¨ ì¿¼ë“œ íŠ¸ë¦¬ ë¶€í„° Ray Check ë“¤ì–´ê°„ë‹¤.
 	_pQuadTree->GetRayHits(ray, &hits);
 
 	if (hits.size() == 0)
 	{
 		return false;
 	}
-	//¸ÕÀú Ã³À½ À§Ä¡È­ Ã³À½ À§Ä¡¿¡ ´ëÇÑ °Å¸® ´ëÀÔ
+	//ë¨¼ì € ì²˜ìŒ ìœ„ì¹˜í™” ì²˜ìŒ ìœ„ì¹˜ì— ëŒ€í•œ ê±°ë¦¬ ëŒ€ì…
 	Vector3 hitPos = hits[0];
 	Vector3 dir = hitPos - ray.origin;
 	float distSq = Vec3LengthSq(&dir);
@@ -269,7 +296,7 @@ bool Terrain::IsIntersectRay(const Ray &ray, Vector3 *pOutHit)
 
 float Terrain::GetHeight(float x, float z)
 {
-	//ÅÍ·¹ÀÎ ¹üÀ§À» ³Ñ¾î°¡¸é 0.0 °ªÀ» ¸®ÅÏÇÑ´Ù
+	//í„°ë ˆì¸ ë²”ìœ„ì„ ë„˜ì–´ê°€ë©´ 0.0 ê°’ì„ ë¦¬í„´í•œë‹¤
 	if (x < _terrainStartX || x > _terrainEndX ||
 		z > _terrainStartZ || z < _terrainEndZ) 
 	{
@@ -279,16 +306,16 @@ float Terrain::GetHeight(float x, float z)
 	float pX = x - _terrainStartX;
 	float pZ = -(z + _terrainEndZ);
 
-	//ÇØ´ç À§Ä¡°¡ ¾î´À ¼¿¿¡ Æ÷ÇÔµÇ´ÂÁö ÆÄ¾Ç
+	//í•´ë‹¹ ìœ„ì¹˜ê°€ ì–´ëŠ ì…€ì— í¬í•¨ë˜ëŠ”ì§€ íŒŒì•…
 	float invCell = 1.0f;
 	pX *= invCell;
 	pZ *= invCell;
 
-	//ÇØ´ç À§Ä¡ÀÇ ¼¿ ÀÎµ¦½º
+	//í•´ë‹¹ ìœ„ì¹˜ì˜ ì…€ ì¸ë±ìŠ¤
 	int idxX = static_cast<int>(pX);
 	int idxZ = static_cast<int>(pZ);
 
-	//¼¿ÀÇ ³×±ºµ¥ Á¤Á¡À» ¾ò´Â´Ù.
+	//ì…€ì˜ ë„¤êµ°ë° ì •ì ì„ ì–»ëŠ”ë‹¤.
 	// lt-----rt
 	//  |    /|
 	//  |   / |
@@ -302,28 +329,28 @@ float Terrain::GetHeight(float x, float z)
 	Vector3 lb = _terrainVertices[(idxZ + 1) * _numVertexX + idxX]._pos;
 	Vector3 rb = _terrainVertices[(idxZ + 1) * _numVertexX + idxX + 1]._pos;
 
-	//ÇØ´ç ¼Ğ¿¡¼­ÀÇ delta ·®À» ±¸ÇÑ´Ù.
+	//í•´ë‹¹ ì…¸ì—ì„œì˜ delta ëŸ‰ì„ êµ¬í•œë‹¤.
 	float dX = pX - static_cast<float>(idxX);
 	float dZ = pZ - static_cast<float>(idxZ);
 
 	float fHeight = 0.0f;
 
-	//ÇØ´ç Á¡ÀÌ ÁÂ»ó´Ü¿¡ ÀÖ´Ï?
+	//í•´ë‹¹ ì ì´ ì¢Œìƒë‹¨ì— ìˆë‹ˆ?
 	if (dX < 1.0f - dZ)
 	{
-		float deltaU = rt.y - lt.y;	//lt Á¤Á¡¿¡¼­ rt Á¤Á¡±îÁöÀÇ y À§Ä¡ÀÇ º¯À§·®
-		float deltaV = lb.y - lt.y; //lt Á¤Á¡¿¡¼­ lb Á¤Á¡±îÁöÀÇ y À§Ä¡ÀÇ º¯À§·®
+		float deltaU = rt.y - lt.y;	//lt ì •ì ì—ì„œ rt ì •ì ê¹Œì§€ì˜ y ìœ„ì¹˜ì˜ ë³€ìœ„ëŸ‰
+		float deltaV = lb.y - lt.y; //lt ì •ì ì—ì„œ lb ì •ì ê¹Œì§€ì˜ y ìœ„ì¹˜ì˜ ë³€ìœ„ëŸ‰
 
 		fHeight = lt.y + (deltaU * dX) + (deltaV * dZ);
 	}
-	//ÇØ´ç Á¡ÀÌ ¿ìÇÏ´ÜÀÌ ÀÖ´Ï?
+	//í•´ë‹¹ ì ì´ ìš°í•˜ë‹¨ì´ ìˆë‹ˆ?
 	else
 	{
 		float deltaU = lb.y - rb.y;
 		float deltaV = rt.y - rb.y;
 
-		//¿ì¿¡¼­ ÁÂ·Î ÇÏ¿¡¼­ »óÀ¸·Î º¸°£¹æÇâÀÌ ¹Ù²î¾ú±â ¶§¹®¿¡
-		//delta ·®À» ¿ª¼ö·Î ÃëÇÑ´Ù.
+		//ìš°ì—ì„œ ì¢Œë¡œ í•˜ì—ì„œ ìƒìœ¼ë¡œ ë³´ê°„ë°©í–¥ì´ ë°”ë€Œì—ˆê¸° ë•Œë¬¸ì—
+		//delta ëŸ‰ì„ ì—­ìˆ˜ë¡œ ì·¨í•œë‹¤.
 		dX = 1.0f - dX;
 		dZ = 1.0f - dZ;
 
@@ -335,27 +362,27 @@ float Terrain::GetHeight(float x, float z)
 
 float Terrain::GetSlant(Vector3 * pOut, float gravityPower, float x, float z)
 {
-	//ÅÍ·¹ÀÎ ¹üÀ§À» ³Ñ¾î°¡¸é 0.0 °ªÀ» ¸®ÅÏÇÑ´Ù
+	//í„°ë ˆì¸ ë²”ìœ„ì„ ë„˜ì–´ê°€ë©´ 0.0 ê°’ì„ ë¦¬í„´í•œë‹¤
 	if (x < _terrainStartX || x > _terrainEndX ||
 		z > _terrainStartZ || z < _terrainEndZ) 
 	{
 		return false;
 	}
 
-	//Terrain ÀÇ ÁÂ»ó´Ü 0 À» ±âÁØÀ¸·Î ¿ùµå Terrain ÀÇ »óÅÂÀû À§Ä¡¸¦ Ã£ÀÚ
+	//Terrain ì˜ ì¢Œìƒë‹¨ 0 ì„ ê¸°ì¤€ìœ¼ë¡œ ì›”ë“œ Terrain ì˜ ìƒíƒœì  ìœ„ì¹˜ë¥¼ ì°¾ì
 	float pX = x - _terrainStartX;
 	float pZ = -(z + _terrainEndZ);
 
-	//ÇØ´ç À§Ä¡°¡ ¾î´À ¼¿¿¡ Æ÷ÇÔµÇ´ÂÁö ÆÄ¾Ç
+	//í•´ë‹¹ ìœ„ì¹˜ê°€ ì–´ëŠ ì…€ì— í¬í•¨ë˜ëŠ”ì§€ íŒŒì•…
 	float invCell = 1.0f;
 	pX *= invCell;
 	pZ *= invCell;
 
-	//ÇØ´ç À§Ä¡ÀÇ ¼¿ ÀÎµ¦½º
+	//í•´ë‹¹ ìœ„ì¹˜ì˜ ì…€ ì¸ë±ìŠ¤
 	int idxX = static_cast<int>(pX);
 	int idxZ = static_cast<int>(pZ);
 
-	//¼¿ÀÇ ³×±ºµ¥ Á¤Á¡À» ¾ò´Â´Ù.
+	//ì…€ì˜ ë„¤êµ°ë° ì •ì ì„ ì–»ëŠ”ë‹¤.
 	// lt-----rt
 	//  |    /|
 	//  |   / |
@@ -368,42 +395,42 @@ float Terrain::GetSlant(Vector3 * pOut, float gravityPower, float x, float z)
 	Vector3 lb = _terrainVertices[(idxZ + 1) * _numVertexX + idxX]._pos;
 	Vector3 rb = _terrainVertices[(idxZ + 1) * _numVertexX + idxX + 1]._pos;
 
-	//ÇØ´ç ¼Ğ¿¡¼­ÀÇ delta ·®À» ±¸ÇÑ´Ù.
+	//í•´ë‹¹ ì…¸ì—ì„œì˜ delta ëŸ‰ì„ êµ¬í•œë‹¤.
 	float dX = pX - static_cast<float>(idxX);
 	float dZ = pZ - static_cast<float>(idxZ);
 
 	float fHeight = 0.0f;
 
-	//Æú¸®°ïÀÇ ³ë¸» º¤ÅÍ
+	//í´ë¦¬ê³¤ì˜ ë…¸ë§ ë²¡í„°
 	Vector3 normal;
 
-	//ÇØ´ç Á¡ÀÌ ÁÂ»ó´Ü¿¡ ÀÖ´Ï?
+	//í•´ë‹¹ ì ì´ ì¢Œìƒë‹¨ì— ìˆë‹ˆ?
 	if (dX < 1.0f - dZ)
 	{
-		//ÇØ´çÆú¸®°ïÀÇ ¹ı¼± º¤ÅÍ¸¦ ±¸ÇÑ´Ù.
+		//í•´ë‹¹í´ë¦¬ê³¤ì˜ ë²•ì„  ë²¡í„°ë¥¼ êµ¬í•œë‹¤.
 		Vector3 edge1 = rt - lt;
 		Vector3 edge2 = lb - lt;
 		Vec3Cross(&normal, &edge1, &edge2);
 	}
 	else
 	{
-		//ÇØ´çÆú¸®°ïÀÇ ¹ı¼± º¤ÅÍ¸¦ ±¸ÇÑ´Ù.
+		//í•´ë‹¹í´ë¦¬ê³¤ì˜ ë²•ì„  ë²¡í„°ë¥¼ êµ¬í•œë‹¤.
 		Vector3 edge1 = rt - lb;
 		Vector3 edge2 = rb - lb;
 		Vec3Cross(&normal, &edge1, &edge2);
 	}
 
-	//³ë¸»Àº Á¤±ÔÈ­
+	//ë…¸ë§ì€ ì •ê·œí™”
 	Vec3Normalize(&normal, &normal);
 
 
-	//Áß·Â ¹æÇâ
+	//ì¤‘ë ¥ ë°©í–¥
 	Vector3 gravity(0, -gravityPower, 0);
 
-	//°æ»ç¸éÀÇ ¿ìÃø
+	//ê²½ì‚¬ë©´ì˜ ìš°ì¸¡
 	Vector3 right;
 	Vec3Cross(&right, &normal, &gravity);
-	//¿ìÃøº¤ÅÍ¿¡¼­ ¹ı¼±º¤ÅÍ¸¦ ¿ÜÀûÇÑ °á°ú°¡ °æ»ç¸éÀÇ °æ»ç ¹æÇâÀÌ µÈ´Ù.
+	//ìš°ì¸¡ë²¡í„°ì—ì„œ ë²•ì„ ë²¡í„°ë¥¼ ì™¸ì í•œ ê²°ê³¼ê°€ ê²½ì‚¬ë©´ì˜ ê²½ì‚¬ ë°©í–¥ì´ ëœë‹¤.
 	Vec3Cross(pOut, &right, &normal);
 
 	return true;
@@ -411,7 +438,7 @@ float Terrain::GetSlant(Vector3 * pOut, float gravityPower, float x, float z)
 
 void Terrain::Render(const Camera & camera)
 {
-	//¿ùµå Çà·Ä¼ÂÆÃ
+	//ì›”ë“œ í–‰ë ¬ì…‹íŒ…
 	video::Effect *pEffect = VIDEO->GetEffect(_effect);
 	//video::VertexBuffer *vBuffer = VIDEO->GetVertexBuffer(_vHandle);
 	//video::IndexBuffer *iBuffer = VIDEO->GetIndexBuffer(_iHandle);
@@ -421,11 +448,11 @@ void Terrain::Render(const Camera & camera)
 	MatrixIdentity(&matInd);
 	pEffect->SetMatrix("matWorld", matInd);
 
-	//ºä Çà·Ä¼ÂÆÃ
+	//ë·° í–‰ë ¬ì…‹íŒ…
 	pEffect->SetMatrix("matViewProjection", camera.GetViewProjectionMatrix());
 	pEffect->SetMatrix("baseDirectionalLight", _pCurrentScene->_pMainLight->GetLightMatrix());
 
-	//Texture ¼ÂÆÃ
+	//Texture ì…‹íŒ…
 	pEffect->SetTexture("Terrain0_Tex", *VIDEO->GetTexture(_tile0Handle));
 	pEffect->SetTexture("Terrain1_Tex", *VIDEO->GetTexture(_tile1Handle));
 	pEffect->SetTexture("Terrain2_Tex", *VIDEO->GetTexture(_tile2Handle));
@@ -447,7 +474,7 @@ void Terrain::Render(const Camera & camera)
 					video::IndexBuffer *iBuffer = VIDEO->GetIndexBuffer(refChunk._iHandle);
 					video::VertexDecl *decl = VIDEO->GetVertexDecl(vBuffer->_decl);
 
-					//¹öÅØ½º ¹öÆÛ¿¡ Á¤Á¡ Á¤º¸¸¦ ³Ö´Â´Ù
+					//ë²„í…ìŠ¤ ë²„í¼ì— ì •ì  ì •ë³´ë¥¼ ë„£ëŠ”ë‹¤
 					video::TerrainVertex *pVertexData = nullptr;
 					video::TerrainVertex *pToCopy = _terrainVertices;
 					vBuffer->_ptr->Lock(0, 0, (void **)&pVertexData, D3DLOCK_DISCARD);
@@ -464,7 +491,7 @@ void Terrain::Render(const Camera & camera)
 
 					vBuffer->_ptr->Unlock();
 
-					//ÀÎµ¦½º ¹öÆÛ¿¡ Á¤Á¡ Á¤º¸¸¦ ³Ö´Â´Ù
+					//ì¸ë±ìŠ¤ ë²„í¼ì— ì •ì  ì •ë³´ë¥¼ ë„£ëŠ”ë‹¤
 					void *pIndexData = nullptr;
 					iBuffer->_ptr->Lock(0, 0, (void **)&pIndexData, D3DLOCK_DISCARD);
 					memcpy(pIndexData, _chunkIndex, sizeof(TerrainFace) * TERRAIN_CHUNK_DIM * TERRAIN_CHUNK_DIM * 2);
@@ -545,7 +572,7 @@ bool Terrain::CreateTerrain(int32 tileNum)
 		{
 			Vector3 _pos;
 
-			//Á¤Á¡ÀÇ x, z À§Ä¡ °è»ê
+			//ì •ì ì˜ x, z ìœ„ì¹˜ ê³„ì‚°
 			_pos.x = terrainStartX + x;
 			_pos.z = terrainStartZ - z;
 
@@ -558,18 +585,18 @@ bool Terrain::CreateTerrain(int32 tileNum)
 			tileUV.x = x * tileIntervalX;
 			tileUV.y = z * tileIntervalY;
 
-			//¹öÅØ½º ¹è¿­ÀÎµ¦½º °è»ê
+			//ë²„í…ìŠ¤ ë°°ì—´ì¸ë±ìŠ¤ ê³„ì‚°
 			int32 idx = z * _numVertexX + x;
 
 			_terrainVertices[idx]._pos = _pos;
-			_terrainVertices[idx]._normal = Vector3(0, 0, 0);	//¾Æ·¡¿¡¼­ Á¤Á¡ ³ë¸» ±¸ÇÒ¶§ ´õÇØÁö´Ï ÀÏ´Ü 0 º¤ÅÍ·Î ÃÊ±âÈ­
+			_terrainVertices[idx]._normal = Vector3(0, 0, 0);	//ì•„ë˜ì—ì„œ ì •ì  ë…¸ë§ êµ¬í• ë•Œ ë”í•´ì§€ë‹ˆ ì¼ë‹¨ 0 ë²¡í„°ë¡œ ì´ˆê¸°í™”
 			_terrainVertices[idx]._baseUV = baseUV;
 			_terrainVertices[idx]._tileUV = tileUV;
 		}
 	}
-	//ÅÍ·¹ÀÎ ½º¹«½Ì 
+	//í„°ë ˆì¸ ìŠ¤ë¬´ì‹± 
 	//SmoothTerrain(smooth);
-	// Á¤Á¡ ÀÎµ¦½º¸¦ ±¸ÇÑ´Ù.....
+	// ì •ì  ì¸ë±ìŠ¤ë¥¼ êµ¬í•œë‹¤.....
 	TerrainFace *terrainFaces = new TerrainFace[_numTotalFace];
 
 	int32 idx = 0;
@@ -577,20 +604,20 @@ bool Terrain::CreateTerrain(int32 tileNum)
 	{
 		for (uint32 x = 0; x < _numCellX; x++) 
 		{
-			//ÇØ´ç ¼¿¿¡ ´ëÇÑ Á¤Á¡ ÀÎµ¦½º¸¦ ¾òÀÚ
+			//í•´ë‹¹ ì…€ì— ëŒ€í•œ ì •ì  ì¸ë±ìŠ¤ë¥¼ ì–»ì
 
 			uint32 lt = z * _numVertexX + x;
 			uint32 rt = z * _numVertexX + x + 1;
 			uint32 lb = ((z + 1)* _numVertexX) + x;
 			uint32 rb = ((z + 1) * _numVertexX) + (x + 1);
 
-			//¼¿ÀÇ »ï°¢Çü ÇÏ³ª
+			//ì…€ì˜ ì‚¼ê°í˜• í•˜ë‚˜
 			terrainFaces[idx].i0 = lt;
 			terrainFaces[idx].i1 = rt;
 			terrainFaces[idx].i2 = lb;
 			idx++;
 
-			//¼¿ÀÇ »ï°¢Çü ÇÏ³ª
+			//ì…€ì˜ ì‚¼ê°í˜• í•˜ë‚˜
 			terrainFaces[idx].i0 = lb;
 			terrainFaces[idx].i1 = rt;
 			terrainFaces[idx].i2 = rb;
@@ -598,30 +625,30 @@ bool Terrain::CreateTerrain(int32 tileNum)
 		}
 	}
 	//
-	// ³ë¸»ÀÌ¶û Binormal ÀÌ¶û Tangent °è»êÇÏÀÚ...
+	// ë…¸ë§ì´ë‘ Binormal ì´ë‘ Tangent ê³„ì‚°í•˜ì...
 	//
-	Vector3* poses = new Vector3[_numTotalVertex];		//Á¤Á¡À§Ä¡
+	Vector3* poses = new Vector3[_numTotalVertex];		//ì •ì ìœ„ì¹˜
 	Vector3* normals = new Vector3[_numTotalVertex];
 	Vector3* tangents = new Vector3[_numTotalVertex];
 	Vector3* binormals = new Vector3[_numTotalVertex];
 	Vector2* uvs = new Vector2[_numTotalVertex];
 	uint32* indices = (uint32*)terrainFaces;
 
-	//Á¤Á¡À§Ä¡ ¹× UV ´ëÀÔ
+	//ì •ì ìœ„ì¹˜ ë° UV ëŒ€ì…
 	for (uint32 i = 0; i < this->_numTotalVertex; i++) 
 	{
 		poses[i] = _terrainVertices[i]._pos;
 		uvs[i] = _terrainVertices[i]._baseUV;
 	}
 
-	//³ë¸»°è»ê
+	//ë…¸ë§ê³„ì‚°
 	ComputeNormal(normals, poses, _numTotalVertex, indices, _numTotalFace * 3);
 
-	//ÅºÁ¨Æ® ¹ÙÀÌ³ë¸» °è»ê
+	//íƒ„ì  íŠ¸ ë°”ì´ë…¸ë§ ê³„ì‚°
 	ComputeTangentAndBinormal( tangents, binormals, poses, normals,
 		uvs, indices, _numTotalFace, _numTotalVertex);
 
-	//°è»êµÈ°Å ´ëÀÔ
+	//ê³„ì‚°ëœê±° ëŒ€ì…
 	for (int32 i = 0; i < this->_numTotalVertex; i++) 
 	{
 		this->_terrainVertices[i]._normal = normals[i];
@@ -679,7 +706,7 @@ bool Terrain::CreateTerrain(int32 tileNum)
 	SAFE_DELETE_ARRAY(binormals);
 	SAFE_DELETE_ARRAY(uvs);
 
-	//¿¡µ÷¸ğµå°¡ ¾Æ´Ò¶§ indexÁ¤º¸´Â ÇÊ¿ä ¾ø´Ù
+	//ì—ë”§ëª¨ë“œê°€ ì•„ë‹ë•Œ indexì •ë³´ëŠ” í•„ìš” ì—†ë‹¤
 	SAFE_DELETE_ARRAY(indices);
 
 	return true;
@@ -708,7 +735,7 @@ void Terrain::RebuildTerrain(const Terrain::TerrainConfig &config)
 	SAFE_DELETE_ARRAY(_chunkIndex);
 	SAFE_DELETE(_pQuadTree);
 
-	//Rebuild¸ğµå´Â Ç×»ó ¿¡µğÅÍ¿¡¼­ ºÒ¸°´Ù.
+	//Rebuildëª¨ë“œëŠ” í•­ìƒ ì—ë””í„°ì—ì„œ ë¶ˆë¦°ë‹¤.
 	Create(config, true);
 }
 
@@ -741,7 +768,7 @@ bool Terrain::CreateTerrainSection(int32 x, int32 z, const video::TerrainVertex 
 	vertices.clear();
 	//indices.clear();
 
-	//¹öÅØ½º Á¤º¸ ³Ö±â...
+	//ë²„í…ìŠ¤ ì •ë³´ ë„£ê¸°...
 	for (int32 localZ = 0; localZ < _sectionNumVertexZ; localZ++)
 	{
 		for (int32 localX = 0; localX < _sectionNumVertexX; localX++)
@@ -842,7 +869,7 @@ void Terrain::AddHeightOnCursorPos(const Vector2 & cursorPos, float brushRadius,
 			}
 		}
 
-		//normal, binormal, tangentÀÇ °è»êÀº radiusº¸´Ù 1¾¿ ¹üÀ§¸¦ ³ĞÇô¼­ °è»êÇÑ´Ù
+		//normal, binormal, tangentì˜ ê³„ì‚°ì€ radiusë³´ë‹¤ 1ì”© ë²”ìœ„ë¥¼ ë„“í˜€ì„œ ê³„ì‚°í•œë‹¤
 		int32 minX, minZ, maxX, maxZ;
 		minX = centerX - radius - 1;
 		maxX = centerX + radius + 1;
@@ -910,22 +937,22 @@ void Terrain::SmoothTerrain(int32 passed)
 		{
 			for (int32 x = 0; x < _numVertexX; x++) 
 			{
-				int32 adjacentSections = 0;		//¸î°³ÀÇ Á¤Á¡°ú Æò±Õ°ªÀ» ³»´Ï?
-				float totalSections = 0.0f;		//ÁÖº¯ÀÇ Á¤Á¡ ³ôÀÌ ÃÑÇÕÀº ¾ó¸¶´Ï?
+				int32 adjacentSections = 0;		//ëª‡ê°œì˜ ì •ì ê³¼ í‰ê· ê°’ì„ ë‚´ë‹ˆ?
+				float totalSections = 0.0f;		//ì£¼ë³€ì˜ ì •ì  ë†’ì´ ì´í•©ì€ ì–¼ë§ˆë‹ˆ?
 
-												//¿ŞÂÊÃ¼Å©
+												//ì™¼ìª½ì²´í¬
 				if ((x - 1) > 0) 
 				{
 					totalSections += _terrainVertices[(z * _numVertexX) + (x - 1)]._pos.y;
 					adjacentSections++;
 
-					//¿ŞÂÊ »ó´Ü
+					//ì™¼ìª½ ìƒë‹¨
 					if ((z - 1) > 0) 
 					{
 						totalSections += _terrainVertices[((z - 1) * _numVertexX) + (x - 1)]._pos.y;
 						adjacentSections++;
 					}
-					//¿ŞÂÊ ÇÏ´Ü
+					//ì™¼ìª½ í•˜ë‹¨
 					if ((z + 1) < _numVertexZ) 
 					{
 						totalSections += _terrainVertices[((z + 1) * _numVertexX) + (x - 1)]._pos.y;
@@ -933,18 +960,18 @@ void Terrain::SmoothTerrain(int32 passed)
 					}
 				}
 
-				//¿À¸¥ÂÊ Ã¼Å©
+				//ì˜¤ë¥¸ìª½ ì²´í¬
 				if ((x + 1) < _numVertexX) 
 				{
 					totalSections += _terrainVertices[(z * _numVertexX) + (x + 1)]._pos.y;
 					adjacentSections++;
-					//¿À¸¥ÂÊ »ó´Ü
+					//ì˜¤ë¥¸ìª½ ìƒë‹¨
 					if ((z - 1) > 0) 
 					{
 						totalSections += _terrainVertices[((z - 1) * _numVertexX) + (x + 1)]._pos.y;
 						adjacentSections++;
 					}
-					//¿À¸¥ÂÊ ÇÏ´Ü 
+					//ì˜¤ë¥¸ìª½ í•˜ë‹¨ 
 					if ((z + 1) < _numVertexZ) 
 					{
 						totalSections += _terrainVertices[((z + 1) * _numVertexX) + (x + 1)]._pos.y;
@@ -953,14 +980,14 @@ void Terrain::SmoothTerrain(int32 passed)
 				}
 
 
-				//»ó´Ü
+				//ìƒë‹¨
 				if ((z - 1) > 0)
 				{
 					totalSections += _terrainVertices[((z - 1) * _numVertexX) + x]._pos.y;
 					adjacentSections++;
 				}
 
-				//ÇÏ´Ü
+				//í•˜ë‹¨
 				if ((z + 1) < _numVertexZ)
 				{
 					totalSections += _terrainVertices[((z + 1) * _numVertexX) + x]._pos.y;
@@ -972,7 +999,7 @@ void Terrain::SmoothTerrain(int32 passed)
 			}
 		}
 
-		//À§¿¡¼­ °è»êµÈ y ½º¹«½Ì Àû¿ë
+		//ìœ„ì—ì„œ ê³„ì‚°ëœ y ìŠ¤ë¬´ì‹± ì ìš©
 		for (int32 i = 0; i < _numTotalVertex; i++) 
 		{
 			_terrainVertices[i]._pos.y = smooth[i];
@@ -1085,7 +1112,7 @@ void Terrain::RebuildSection(int32 minX, int32 maxX, int32 minZ, int32 maxZ)
 	}
 
 	Vector3 *normals = new Vector3[numVertZ * numVertZ];
-	//³ë¸»°è»ê
+	//ë…¸ë§ê³„ì‚°
 	ComputeNormal(normals, vertices, numVertX * numVertZ, indices, triNum * 3);
 
 	counter = 0;
@@ -1096,7 +1123,7 @@ void Terrain::RebuildSection(int32 minX, int32 maxX, int32 minZ, int32 maxZ)
 			_terrainVertices[Index2D(x, z, _numVertexX)]._normal = normals[counter++];
 		}
 	}
-	//ÅºÁ¨Æ® ¹ÙÀÌ³ë¸» °è»ê
+	//íƒ„ì  íŠ¸ ë°”ì´ë…¸ë§ ê³„ì‚°
 	//ComputeTangentAndBinormal(tangents, binormals, poses, normals,
 	//	uvs, indices, _numTotalFace, _numTotalVertex);
 
@@ -1110,8 +1137,6 @@ void Terrain::SmoothSection(int32 minX, int32 maxX, int32 minZ, int32 maxZ)
 	int32 numVertX = maxX - minX + 1;
 	int32 numVertZ = maxZ - minZ + 1;
 
-	
-
 	//int32 triNum = (numVertZ - 1) * (numVertZ - 1) * 2;
 
 	float* smooth = new float[_numTotalVertex];
@@ -1124,21 +1149,21 @@ void Terrain::SmoothSection(int32 minX, int32 maxX, int32 minZ, int32 maxZ)
 	{
 		for (int32 x = minX; x < maxX; x++)
 		{
-			int32 adjacentSections = 0;		//¸î°³ÀÇ Á¤Á¡°ú Æò±Õ°ªÀ» ³»´Ï?
-			float totalSections = 0.0f;		//ÁÖº¯ÀÇ Á¤Á¡ ³ôÀÌ ÃÑÇÕÀº ¾ó¸¶´Ï?
+			int32 adjacentSections = 0;		//ëª‡ê°œì˜ ì •ì ê³¼ í‰ê· ê°’ì„ ë‚´ë‹ˆ?
+			float totalSections = 0.0f;		//ì£¼ë³€ì˜ ì •ì  ë†’ì´ ì´í•©ì€ ì–¼ë§ˆë‹ˆ?
 
 			if ((x - 1) > 0)
 			{
 				totalSections += _terrainVertices[(z * _numVertexX) + (x - 1)]._pos.y;
 				adjacentSections++;
 
-				//¿ŞÂÊ »ó´Ü
+				//ì™¼ìª½ ìƒë‹¨
 				if ((z - 1) > 0)
 				{
 					totalSections += _terrainVertices[((z - 1) * _numVertexX) + (x - 1)]._pos.y;
 					adjacentSections++;
 				}
-				//¿ŞÂÊ ÇÏ´Ü
+				//ì™¼ìª½ í•˜ë‹¨
 				if ((z + 1) < _numVertexZ)
 				{
 					totalSections += _terrainVertices[((z + 1) * _numVertexX) + (x - 1)]._pos.y;
@@ -1146,18 +1171,18 @@ void Terrain::SmoothSection(int32 minX, int32 maxX, int32 minZ, int32 maxZ)
 				}
 			}
 
-			//¿À¸¥ÂÊ Ã¼Å©
+			//ì˜¤ë¥¸ìª½ ì²´í¬
 			if ((x + 1) < _numVertexX)
 			{
 				totalSections += _terrainVertices[(z * _numVertexX) + (x + 1)]._pos.y;
 				adjacentSections++;
-				//¿À¸¥ÂÊ »ó´Ü
+				//ì˜¤ë¥¸ìª½ ìƒë‹¨
 				if ((z - 1) > 0)
 				{
 					totalSections += _terrainVertices[((z - 1) * _numVertexX) + (x + 1)]._pos.y;
 					adjacentSections++;
 				}
-				//¿À¸¥ÂÊ ÇÏ´Ü 
+				//ì˜¤ë¥¸ìª½ í•˜ë‹¨ 
 				if ((z + 1) < _numVertexZ)
 				{
 					totalSections += _terrainVertices[((z + 1) * _numVertexX) + (x + 1)]._pos.y;
@@ -1165,14 +1190,14 @@ void Terrain::SmoothSection(int32 minX, int32 maxX, int32 minZ, int32 maxZ)
 				}
 			}
 
-			//»ó´Ü
+			//ìƒë‹¨
 			if ((z - 1) > 0)
 			{
 				totalSections += _terrainVertices[((z - 1) * _numVertexX) + x]._pos.y;
 				adjacentSections++;
 			}
 
-			//ÇÏ´Ü
+			//í•˜ë‹¨
 			if ((z + 1) < _numVertexZ)
 			{
 				totalSections += _terrainVertices[((z + 1) * _numVertexX) + x]._pos.y;
@@ -1183,7 +1208,7 @@ void Terrain::SmoothSection(int32 minX, int32 maxX, int32 minZ, int32 maxZ)
 		}
 	}
 
-	//À§¿¡¼­ °è»êµÈ y ½º¹«½Ì Àû¿ë
+	//ìœ„ì—ì„œ ê³„ì‚°ëœ y ìŠ¤ë¬´ì‹± ì ìš©
 	for (int32 z = minZ; z < maxZ; z++)
 	{
 		for (int32 x = minX; x < maxX; x++)
@@ -1193,4 +1218,86 @@ void Terrain::SmoothSection(int32 minX, int32 maxX, int32 minZ, int32 maxZ)
 		}
 	}
 	SAFE_DELETE_ARRAY(smooth);
+}
+
+void Terrain::DrawAlphaTextureOnCursorPos(const Vector2 & cursorPos, 
+	float innerRadius, float outterRadius, float intensity, video::TextureHandle alphaHandle, int32 channel)
+{
+	Ray ray;
+	_pCurrentScene->_camera.ComputeRay(cursorPos, &ray);
+
+	Vector3 worldPos;
+
+	if (IsIntersectRay(ray, &worldPos))
+	{
+		TerrainTilePos tilePos = ConvertWorldPostoTilePos(worldPos);
+
+		int32 centerX = tilePos._chunkX * TERRAIN_CHUNK_DIM + tilePos._tileX;
+		int32 centerZ = tilePos._chunkZ * TERRAIN_CHUNK_DIM + tilePos._tileZ;
+
+		//ì•ŒíŒŒ í…ìŠ¤ì³ì˜ 1í”½ì…€ì´ ì§€í˜•ì— ëŒ€í•´Âˆì„œ ì–¼ë§ˆì˜ í¬ê¸°ì¸ì§€ë¥¼ êµ¬í•œë‹¤..
+		float pixelSize = (float)_terrainSizeX / (float)TERRAIN_ALPHA_TEXTURE_SIZE;
+		//ì§€í˜•ì˜ ë¸ŒëŸ¬Âˆì‰¬ í¬ê¸°ì— ëŒ€í•œ ì•ŒÂˆíŒŒ í…ìŠ¤ì³ì˜ ë¸ŒëŸ¬ì‰¬ í¬Âˆê¸°ë¥¼ êµ¬í•œë‹¤ 
+		int32 brushSize = (int32)(outterRadius/ pixelSize);
+
+		float tu = centerX / _terrainSizeX;
+		float tv = centerZ / _terrainSizeZ;
+
+		int32 centerPixelX = (int32)(tu * TERRAIN_ALPHA_TEXTURE_SIZE);
+		int32 centerPixelY = (int32)(tv * TERRAIN_ALPHA_TEXTURE_SIZE);
+
+		int32 minPixelX = centerPixelX - brushSize;
+		int32 maxPixelX = centerPixelX + brushSize;
+		int32 minPixelY = centerPixelY - brushSize;
+		int32 maxPixelY = centerPixelY + brushSize;
+
+		ClampInt(minPixelX, 0, TERRAIN_ALPHA_TEXTURE_SIZE);
+		ClampInt(maxPixelX, 0, TERRAIN_ALPHA_TEXTURE_SIZE);
+		ClampInt(minPixelY, 0, TERRAIN_ALPHA_TEXTURE_SIZE);
+		ClampInt(minPixelY, 0, TERRAIN_ALPHA_TEXTURE_SIZE);
+
+		D3DLOCKED_RECT lockRect{};
+		video::Texture *pTexture = VIDEO->GetTexture(_tileSplatHandle);
+		pTexture->_ptr->LockRect(0, &lockRect, nullptr, 0);
+
+		uint8 *pStart = (uint8 *)lockRect.pBits;
+
+		uint8 write{};
+
+		for (int32 y = minPixelY; y < maxPixelY; ++y)
+		{
+			for (int32 x = minPixelX; x < maxPixelX; ++x)
+			{
+				int32 in = (lockRect.Pitch * y) + (x * 4);
+
+				uint8 read = pStart[in];
+
+				Vector3 diff = Vector3(x * pixelSize, 0.0f, y * pixelSize) -
+					Vector3(centerPixelX * pixelSize, 0.0f, centerPixelX * pixelSize);
+				float length = Vec3Length(&diff);
+				if (length <= innerRadius)
+				{
+					write = 0xff;
+				}
+				else if(length <= outterRadius)
+				{
+					length -= innerRadius;
+					int32 smooth = (int32)(outterRadius - innerRadius);
+					write = (uint8)((smooth - length) / (float)(smooth)) * 0xff;
+
+				}
+				else
+				{
+					continue;
+				}
+
+				read = (read < write) ? write : read;
+
+				pStart[in++] = read;
+				pStart[in++] = read;
+				pStart[in++] = read;
+				pStart[in++] = read;
+			}
+		}
+	}
 }

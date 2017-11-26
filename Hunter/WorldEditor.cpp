@@ -192,17 +192,42 @@ void Editor::InTerrainEditMode()
 	{
 		ImguiIndent();
 		
+		ImguiLabel("Texture00");
+		{
+			ImguiIndent();
+			ImguiEdit(_terrainEditor._textureName00, 120);
+			if (ImguiButton("LoadTexture"))
+			{
+				video::TextureHandle loadedTexture = VIDEO->CreateTexture(_terrainEditor._textureName00,
+					_terrainEditor._textureName00);
+				if (loadedTexture.IsValid())
+				{
+					VIDEO->DestroyTexture(TERRAIN->_tile0Handle);
+					TERRAIN->_tile0Handle = loadedTexture;
+					TERRAIN->_currentConfig._tile0FileName = _terrainEditor._textureName00;
+				}
+				else
+				{
+					ZeroMemory(_terrainEditor._textureName00, sizeof(char) * EDITOR_MAX_NAME);
+					strncpy(_terrainEditor._textureName00, "Texture Not Found", EDITOR_MAX_NAME);
+				}
+			}
+			ImguiUnindent();
+		}
+
 		ImguiLabel("Texture01");
 		{
 			ImguiIndent();
 			ImguiEdit(_terrainEditor._textureName01, 120);
 			if (ImguiButton("LoadTexture"))
 			{
-				video::TextureHandle loadedTexture = VIDEO->CreateTexture(_terrainEditor._textureName01, _terrainEditor._textureName01);
+				video::TextureHandle loadedTexture = VIDEO->CreateTexture(_terrainEditor._textureName01,
+					_terrainEditor._textureName01);
 				if (loadedTexture.IsValid())
 				{
-					VIDEO->DestroyTexture(TERRAIN->_tile0Handle);
-					TERRAIN->_tile0Handle = loadedTexture;
+					VIDEO->DestroyTexture(TERRAIN->_tile1Handle);
+					TERRAIN->_tile1Handle = loadedTexture;
+					TERRAIN->_currentConfig._tile1FileName = _terrainEditor._textureName01;
 				}
 				else
 				{
@@ -219,11 +244,13 @@ void Editor::InTerrainEditMode()
 			ImguiEdit(_terrainEditor._textureName02, 120);
 			if (ImguiButton("LoadTexture"))
 			{
-				video::TextureHandle loadedTexture = VIDEO->CreateTexture(_terrainEditor._textureName02, _terrainEditor._textureName02);
+				video::TextureHandle loadedTexture = VIDEO->CreateTexture(_terrainEditor._textureName02,
+					_terrainEditor._textureName02);
 				if (loadedTexture.IsValid())
 				{
-					VIDEO->DestroyTexture(TERRAIN->_tile1Handle);
-					TERRAIN->_tile1Handle = loadedTexture;
+					VIDEO->DestroyTexture(TERRAIN->_tile2Handle);
+					TERRAIN->_tile2Handle = loadedTexture;
+					TERRAIN->_currentConfig._tile2FileName = _terrainEditor._textureName02;
 				}
 				else
 				{
@@ -240,11 +267,13 @@ void Editor::InTerrainEditMode()
 			ImguiEdit(_terrainEditor._textureName03, 120);
 			if (ImguiButton("LoadTexture"))
 			{
-				video::TextureHandle loadedTexture = VIDEO->CreateTexture(_terrainEditor._textureName03, _terrainEditor._textureName03);
+				video::TextureHandle loadedTexture = VIDEO->CreateTexture(_terrainEditor._textureName03,
+					_terrainEditor._textureName03);
 				if (loadedTexture.IsValid())
 				{
-					VIDEO->DestroyTexture(TERRAIN->_tile2Handle);
-					TERRAIN->_tile2Handle = loadedTexture;
+					VIDEO->DestroyTexture(TERRAIN->_tile3Handle);
+					TERRAIN->_tile3Handle = loadedTexture;
+					TERRAIN->_currentConfig._tile3FileName = _terrainEditor._textureName03;
 				}
 				else
 				{
@@ -255,26 +284,13 @@ void Editor::InTerrainEditMode()
 			ImguiUnindent();
 		}
 
-		ImguiLabel("Texture04");
+		//여기서 선택되어있는 텍스쳐를 그리는 작업을 실행하자...
+		if (_mouseLeftDown && 
+			!(_mx > 0  && _mx < EDITORSIZEX && _my > 0 && _my < EDITORSIZEX))
 		{
-			ImguiIndent();
-			ImguiEdit(_terrainEditor._textureName04, 120);
-			if (ImguiButton("LoadTexture"))
-			{
-				video::TextureHandle loadedTexture = VIDEO->CreateTexture(_terrainEditor._textureName04, _terrainEditor._textureName04);
-				if (loadedTexture.IsValid())
-				{
-					VIDEO->DestroyTexture(TERRAIN->_tile3Handle);
-					TERRAIN->_tile3Handle = loadedTexture;
-				}
-				else
-				{
-					ZeroMemory(_terrainEditor._textureName04, sizeof(char) * EDITOR_MAX_NAME);
-					strncpy(_terrainEditor._textureName04, "Texture Not Found", EDITOR_MAX_NAME);
-				}
-			}
-			ImguiUnindent();
+
 		}
+
 
 		ImguiUnindent();
 	}
@@ -545,7 +561,7 @@ void Editor::UpdateInput(const InputManager & input)
 	_leftButtonPressed = input.mouse.IsPressed(MOUSE_BUTTON_LEFT);
 	_shiftDown = input.keyboard.GetShiftDown();
 	//Console::Log("%d\n", input.keyboard.GetVKCode());
-	_key = MapVirtualKey(input.keyboard.GetVKCode(), MAPVK_VK_TO_CHAR);
+	_key = input.keyboard.GetVKCode();
 }
 
 void Editor::Init()

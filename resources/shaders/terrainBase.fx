@@ -153,13 +153,12 @@ PS_OUTPUT ps_main( PS_INPUT Input )
    float b = -camNear / (camFar - camNear);
    depth = b / (z - a);
 
-   //Output.baseColor = float4(finalColor * diff, 1);
+   Output.baseColor = float4(finalColor * diff, 1);
    Output.baseColor = float4(diff, diff, diff, 1.0f);
    Output.normalDepth = float4(worldNormal, depth);		//alpha °ª¿¡ µª½º¸¦ ½è´Ù.
 
    return Output;
 }
-
 
 float bias = 0.01f;
 

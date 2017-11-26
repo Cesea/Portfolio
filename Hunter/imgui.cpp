@@ -702,6 +702,10 @@ bool ImguiSlider(const char * text, float * val, float vmin, float vmax, float v
 	return res || valChanged;
 }
 
+//void ImguiDrawTexture(video::TextureHandle handle, int16 size)
+//{
+//}
+
 bool ImguiEdit(char * text, int32 width, bool enable)
 {
 	gState._widgetID++;
