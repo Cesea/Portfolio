@@ -57,6 +57,7 @@ void TransformComponent::Reset(int resetFlag /*= -1*/)
 		//this->_axis[1] = Vector3( 0, 1, 0 );
 		//this->_axis[2] = Vector3( 0, 0, 1 );
 
+
 		this->_right = Vector3(1, 0, 0);
 		this->_up = Vector3(0, 1, 0);
 		this->_forward = Vector3(0, 0, 1);

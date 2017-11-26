@@ -113,6 +113,10 @@ struct ObjectEditor
 		_pScript = nullptr;
 		_pCollision = nullptr;
 		_pAction = nullptr;
+
+		QuaternionIdentity(&_xRotation);
+		QuaternionIdentity(&_yRotation);
+		QuaternionIdentity(&_zRotation);
 	}
 
 	void OnNewSelection(Entity entity);
@@ -124,6 +128,10 @@ struct ObjectEditor
 	ActionComponent *_pAction{};
 
 	Entity _selectingEntity{ };
+
+	Quaternion _xRotation;
+	Quaternion _yRotation;
+	Quaternion _zRotation;
 };
 
 

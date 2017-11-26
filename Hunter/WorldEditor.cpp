@@ -378,8 +378,6 @@ void Editor::InTerrainEditMode()
 				_terrainEditor._brushInnerRadius, _terrainEditor._brushOutterRadius,
 				_terrainEditor._brushIntensity, video::TextureHandle(), _terrainEditor._channel);
 		}
-
-
 		ImguiUnindent();
 	}
 
@@ -597,19 +595,26 @@ void Editor::InObjectEditMode()
 
 			ImguiLabel("Orientation");
 			{
-				//지금 물체에 대한 모든 Transform정보를 가져올 수 있지만 함수가 비싸다...더 좋은 방법을 찾아보자.
-				Quaternion  quaternion;
-				Vector3 translation, scale;
 
-				MatrixDecompose(&scale, &quaternion, &translation, &_objectEditor._pTransform->GetFinalMatrix());
+				Quaternion test;
+				Matrix rotation = _objectEditor._pTransform->_matFinal;
+				rotation._41 = 0;
+				rotation._42 = 0;
+				rotation._43 = 0;
+
+				QuaternionRotationMatrix(&test, &rotation);
+
+				Console::Log("%f %f %f %f\n", test.x, test.y, test.z, test.w);
 
 				ImguiIndent();
 
-				ImguiSlider("X", &quaternion.x, 0.0f, 1.0f, 0.1f);
-				ImguiSlider("Y", &quaternion.y, 0.0f, 1.0f, 0.1f);
-				ImguiSlider("Z", &quaternion.z, 0.0f, 1.0f, 0.1f);
+				ImguiSlider("X", &test.x, 0.0f, 1.0f, 0.01f);
+				ImguiSlider("Y", &test.y, 0.0f, 1.0f, 0.01f);
+				ImguiSlider("Z", &test.z, 0.0f, 1.0f, 0.01f);
 
-				_objectEditor._pTransform->SetRotateWorld(quaternion);
+				QuaternionNormalize(&test, &test);
+
+				_objectEditor._pTransform->SetRotateWorld(test);
 
 				ImguiUnindent();
 			}

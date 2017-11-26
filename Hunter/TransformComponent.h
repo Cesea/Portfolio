@@ -34,7 +34,6 @@ struct TransformComponent : public Component
 	void SetLocalPosition(float x, float y, float z);
 	void SetLocalPosition(Vector3 pos);
 
-
 	//자신의 축기준으로 이동 시킨다.
 	void MovePositionSelf(float dx, float dy, float dz);
 	void MovePositionSelf(Vector3 delta);
@@ -134,7 +133,8 @@ struct TransformComponent : public Component
 
 	union
 	{
-		struct{
+		struct
+		{
 			Vector3	_axis[3];
 		};
 		struct
@@ -158,7 +158,6 @@ struct TransformComponent : public Component
 	TransformComponent* _pNextSibling;
 
 	bool32 _transformDirty;
-
 };
 
 #endif
