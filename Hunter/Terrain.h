@@ -143,11 +143,14 @@ private:
 
 	bool CreateTerrainSection(int32 x, int32 z, const video::TerrainVertex *pTerrainVertices);
 
-	void AddHeightOnCursorPos(const Vector2 &cursorPos, float brushRadius, float intensity);
+	void AddHeightOnCursorPos(const Vector2 &cursorPos, float innerRadius, float outterRadius, float intensity);
 	void SmoothOnCursorPos(const Vector2 &cursorPos, float brushRadius);
 	void SmoothTerrain(int32 passed);
 
+	void AddHeightGausian(int32 minX, int32 maxX, int32 minZ, int32 maxZ, float mult);
+
 	void RebuildSection(int32 minX, int32 maxX, int32 minZ, int32 maxZ);
+
 	void SmoothSection(int32 minX, int32 maxX, int32 minZ, int32 maxZ);
 
 	void DrawAlphaTextureOnCursorPos(const Vector2 & cursorPos, float innerRadius, float outterRadius, 

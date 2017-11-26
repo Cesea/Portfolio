@@ -99,9 +99,6 @@
     <ClCompile Include="CollisionUtils.cpp">
       <Filter>Game\GameSystem\CollisionSystem</Filter>
     </ClCompile>
-    <ClCompile Include="Hash.cpp">
-      <Filter>Sub</Filter>
-    </ClCompile>
     <ClCompile Include="VideoDevice.cpp">
       <Filter>Core\SubSystem\VideoDevice</Filter>
     </ClCompile>
@@ -395,9 +392,6 @@
     </ClInclude>
     <ClInclude Include="SceneChangeEffect.h">
       <Filter>Core\SubSystem\SceneeManager</Filter>
-    </ClInclude>
-    <ClInclude Include="Hash.h">
-      <Filter>Sub</Filter>
     </ClInclude>
     <ClInclude Include="VideoDevice.h">
       <Filter>Core\SubSystem\VideoDevice</Filter>

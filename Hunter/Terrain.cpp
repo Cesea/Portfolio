@@ -197,9 +197,16 @@ void Terrain::Destroy()
 	SAFE_DELETE_ARRAY(_chunkIndex);
 	SAFE_DELETE(_pQuadTree);
 }
+//터레인 파일의 구조..
+//'T''R' Magic Number TR
+//int32 : ChunkDim  터레인 청크의 크기
+//int32 : xExtent 터레인 청크 x갯수
+//int32 : zExtent 터레인 청크 z갯수
+
 
 void Terrain::SaveTerrain(const std::string & fileName)
 {
+	
 }
 
 void Terrain::LoadTerrain(const std::string & fileName)
@@ -588,6 +595,7 @@ bool Terrain::CreateTerrain(int32 tileNum)
 			//정점의 x, z 위치 계산
 			_pos.x = terrainStartX + x;
 			_pos.z = terrainStartZ - z;
+			_pos.y = 2.0f;
 
 			Vector2 baseUV;
 			baseUV.x = x / static_cast<float>(_numVertexX - 1);
@@ -850,12 +858,12 @@ bool Terrain::CreateTerrainSection(int32 x, int32 z, const video::TerrainVertex 
 	return true;
 }
 
-void Terrain::AddHeightOnCursorPos(const Vector2 & cursorPos, float brushRadius, float intensity)
+void Terrain::AddHeightOnCursorPos(const Vector2 &cursorPos, float innerRadius, float outterRadius, float intensity)
 {
 	Ray ray;
 	_pCurrentScene->_camera.ComputeRay(cursorPos, &ray);
 
-	int32 radius = (int32)brushRadius;
+	int32 radius = (int32)outterRadius;
 
 	Vector3 worldPos;
 	if (IsIntersectRay(ray, &worldPos))
@@ -865,24 +873,6 @@ void Terrain::AddHeightOnCursorPos(const Vector2 & cursorPos, float brushRadius,
 		int32 centerX = tilePos._chunkX * TERRAIN_CHUNK_DIM + tilePos._tileX;
 		int32 centerZ = tilePos._chunkZ * TERRAIN_CHUNK_DIM + tilePos._tileZ;
 
-		for (int32 z = -radius; z <= radius; ++z)
-		{
-			for (int32 x = -radius; x <= radius; ++x)
-			{
-				int32 editX = centerX + x;
-				int32 editZ = centerZ + z;
-				
-				float radialPower = (float)(radius - absInt(x)) * (radius - absInt(z)) / (brushRadius * brushRadius);
-
-				editX = ClampInt(editX, 0, _numVertexX - 1);
-				editZ = ClampInt(editZ, 0, _numVertexZ - 1);
-				_terrainVertices[Index2D(editX, editZ, _numVertexX)]._pos.y += intensity * radialPower * 0.02f;
-
-				ClampFloat(_terrainVertices[Index2D(editX, editZ, _numVertexX)]._pos.y, 0.0f, 10.0f);
-			}
-		}
-
-		//normal, binormal, tangent의 계산은 radius보다 1씩 범위를 넓혀서 계산한다
 		int32 minX, minZ, maxX, maxZ;
 		minX = centerX - radius - 1;
 		maxX = centerX + radius + 1;
@@ -893,8 +883,26 @@ void Terrain::AddHeightOnCursorPos(const Vector2 & cursorPos, float brushRadius,
 		ClampInt(maxX, 0, _numVertexX - 1);
 		ClampInt(minZ, 0, _numVertexZ - 1);
 		ClampInt(maxZ, 0, _numVertexZ - 1);
+		AddHeightGausian(minX, maxX, minZ, maxZ, intensity);
+
+		//for (int32 z = -radius; z <= radius; ++z)
+		//{
+		//	for (int32 x = -radius; x <= radius; ++x)
+		//	{
+		//		int32 editX = centerX + x;
+		//		int32 editZ = centerZ + z;
+		//		
+		//		float radialPower = (float)(radius - absInt(x)) * (radius - absInt(z)) / (brushRadius * brushRadius);
+		//		ClampInt(editX, 0, _numVertexX - 1);
+		//		ClampInt(editZ, 0, _numVertexZ - 1);
+		//		_terrainVertices[Index2D(editX, editZ, _numVertexX)]._pos.y += intensity * radialPower * 0.02f;
+		//		//ClampFloat(_terrainVertices[Index2D(editX, editZ, _numVertexX)]._pos.y, 0.0f, 10.0f);
+		//	}
+		//}
+		//normal, binormal, tangent의 계산은 radius보다 1씩 범위를 넓혀서 계산한다
 
 		RebuildSection(minX, maxX, minZ, maxZ);
+
 	}
 }
 
@@ -926,6 +934,7 @@ void Terrain::SmoothOnCursorPos(const Vector2 & cursorPos, float brushRadius)
 		ClampInt(minZ, 0, _numVertexZ);
 		ClampInt(maxZ, 0, _numVertexZ);
 
+		//SmoothSectionGausian(minX, maxX, minZ, maxZ);
 		SmoothSection(minX, maxX, minZ, maxZ);
 
 		RebuildSection(minX, maxX, minZ, maxZ);
@@ -1093,12 +1102,15 @@ void Terrain::RebuildSection(int32 minX, int32 maxX, int32 minZ, int32 maxZ)
 	int32 triNum = (numVertZ - 1) * (numVertZ - 1) * 2;
 
 	Vector3 *vertices = new Vector3[numVertX * numVertZ];
+	Vector2 *uvs = new Vector2[numVertX * numVertZ];
 	int32 counter = 0;
+
 	for (int32 z = minZ; z <= maxZ; ++z)
 	{
 		for (int32 x = minX; x <= maxX; ++x)
 		{
-			vertices[counter++] = _terrainVertices[Index2D(x, z, _numVertexX)]._pos;
+			vertices[counter] = _terrainVertices[Index2D(x, z, _numVertexX)]._pos;
+			uvs[counter++] = _terrainVertices[Index2D(x, z, _numVertexX)]._baseUV;;
 		}
 	}
 	//SmoothTerrain(1);
@@ -1124,9 +1136,14 @@ void Terrain::RebuildSection(int32 minX, int32 maxX, int32 minZ, int32 maxZ)
 		}
 	}
 
-	Vector3 *normals = new Vector3[numVertZ * numVertZ];
+	Vector3 *normals = new Vector3[numVertX * numVertZ];
+	Vector3 *binormals = new Vector3[numVertX * numVertZ];
+	Vector3 *tangents = new Vector3[numVertX * numVertZ];
+
 	//노말계산
 	ComputeNormal(normals, vertices, numVertX * numVertZ, indices, triNum * 3);
+
+	ComputeTangentAndBinormal(tangents, binormals, vertices, normals, uvs, indices, triNum, numVertX * numVertZ);
 
 	counter = 0;
 	for (int32 z = minZ; z <= maxZ; ++z)
@@ -1141,7 +1158,10 @@ void Terrain::RebuildSection(int32 minX, int32 maxX, int32 minZ, int32 maxZ)
 	//	uvs, indices, _numTotalFace, _numTotalVertex);
 
 	SAFE_DELETE_ARRAY(vertices);
+	SAFE_DELETE_ARRAY(uvs);
 	SAFE_DELETE_ARRAY(normals);
+	SAFE_DELETE_ARRAY(binormals);
+	SAFE_DELETE_ARRAY(tangents);
 	SAFE_DELETE_ARRAY(indices);
 }
 
@@ -1150,13 +1170,7 @@ void Terrain::SmoothSection(int32 minX, int32 maxX, int32 minZ, int32 maxZ)
 	int32 numVertX = maxX - minX + 1;
 	int32 numVertZ = maxZ - minZ + 1;
 
-	//int32 triNum = (numVertZ - 1) * (numVertZ - 1) * 2;
-
 	float* smooth = new float[_numTotalVertex];
-
-	//while (passed > 0) {
-
-		//passed--;
 
 	for (int32 z = minZ; z < maxZ; z++)
 	{
@@ -1233,7 +1247,100 @@ void Terrain::SmoothSection(int32 minX, int32 maxX, int32 minZ, int32 maxZ)
 	SAFE_DELETE_ARRAY(smooth);
 }
 
-void Terrain::DrawAlphaTextureOnCursorPos(const Vector2 & cursorPos, 
+void Terrain::AddHeightGausian(int32 minX, int32 maxX, int32 minZ, int32 maxZ, float mult)
+{
+	int32 numVertX = maxX - minX + 1;
+	int32 numVertZ = maxZ - minZ + 1;
+
+	float* smooth = new float[numVertX * numVertZ];
+
+	//int32 kernel[3][3] = 
+	//{
+	//	{1, 2, 1},
+	//	{2, 4, 2},
+	//	{1, 2, 1}
+	//};
+
+	int32 counter = 0;
+	for (int32 z = minZ; z < maxZ; z++)
+	{
+		for (int32 x = minX; x < maxX; x++)
+		{
+			int32 adjacentSections = 0;		//몇개의 정점과 평균값을 내니?
+			float totalSections = 0.0f;		//주변의 정점 높이 총합은 얼마니?
+
+			if ((x - 1) > 0)
+			{
+				totalSections += _terrainVertices[(z * _numVertexX) + (x - 1)]._pos.y * 2.0f;
+				adjacentSections += 2;
+
+				//왼쪽 상단
+				if ((z - 1) > 0)
+				{
+					totalSections += _terrainVertices[((z - 1) * _numVertexX) + (x - 1)]._pos.y * 1.0f;
+					adjacentSections += 1;
+				}
+				//왼쪽 하단
+				if ((z + 1) < _numVertexZ)
+				{
+					totalSections += _terrainVertices[((z + 1) * _numVertexX) + (x - 1)]._pos.y * 1.0f;
+					adjacentSections += 1;
+				}
+			}
+
+			//오른쪽 체크
+			if ((x + 1) < _numVertexX)
+			{
+				totalSections += _terrainVertices[(z * _numVertexX) + (x + 1)]._pos.y * 2.9f;
+				adjacentSections += 2;
+				//오른쪽 상단
+				if ((z - 1) > 0)
+				{
+					totalSections += _terrainVertices[((z - 1) * _numVertexX) + (x + 1)]._pos.y * 1.0f;
+					adjacentSections += 1;
+				}
+				//오른쪽 하단 
+				if ((z + 1) < _numVertexZ)
+				{
+					totalSections += _terrainVertices[((z + 1) * _numVertexX) + (x + 1)]._pos.y * 1.0f;
+					adjacentSections += 1;
+				}
+			}
+
+			//상단
+			if ((z - 1) > 0)
+			{
+				totalSections += _terrainVertices[((z - 1) * _numVertexX) + x]._pos.y * 2.0f;
+				adjacentSections += 2;
+			}
+			//하단
+			if ((z + 1) < _numVertexZ)
+			{
+				totalSections += _terrainVertices[((z + 1) * _numVertexX) + x]._pos.y * 2.0f;
+				adjacentSections += 2;
+			}
+
+			totalSections += _terrainVertices[Index2D(x, z, _numVertexX)]._pos.y * 4.0f;
+			adjacentSections += 4;
+
+			smooth[counter++] = (totalSections / (float)adjacentSections) * mult;
+		}
+	}
+
+	counter = 0;
+	//위에서 계산된 y 스무싱 적용
+	for (int32 z = minZ; z < maxZ; z++)
+	{
+		for (int32 x = minX; x < maxX; x++)
+		{
+			_terrainVertices[Index2D(x, z, _numVertexX)]._pos.y = smooth[counter++];
+
+		}
+	}
+	SAFE_DELETE_ARRAY(smooth);
+}
+
+void Terrain::DrawAlphaTextureOnCursorPos(const Vector2 & cursorPos,
 	float innerRadius, float outterRadius, float intensity, video::TextureHandle alphaHandle, int32 channel)
 {
 	Ray ray;
@@ -1271,49 +1378,55 @@ void Terrain::DrawAlphaTextureOnCursorPos(const Vector2 & cursorPos,
 
 		D3DLOCKED_RECT lockRect{};
 		video::Texture *pTexture = VIDEO->GetTexture(_tileSplatHandle);
-		pTexture->_ptr->LockRect(0, &lockRect, nullptr, 0);
-
-		uint8 *pStart = (uint8 *)lockRect.pBits;
-
-		uint8 write{};
-
-		for (int32 y = minPixelY; y < maxPixelY; ++y)
+		if (SUCCEEDED(pTexture->_ptr->LockRect(0, &lockRect, nullptr, 0)))
 		{
-			for (int32 x = minPixelX; x < maxPixelX; ++x)
+
+			uint8 *pStart = (uint8 *)lockRect.pBits;
+
+			uint8 write{};
+
+			for (int32 y = minPixelY; y < maxPixelY; ++y)
 			{
-				int32 in = (lockRect.Pitch * y) + (x * 4);
-
-				uint8 read = pStart[in];
-
-				Vector3 diff = Vector3(x * pixelSize, 0.0f, y * pixelSize) -
-					Vector3(centerPixelX * pixelSize, 0.0f, centerPixelX * pixelSize);
-				float length = Vec3Length(&diff);
-				if (length <= innerRadius)
+				for (int32 x = minPixelX; x < maxPixelX; ++x)
 				{
-					write = 0xff;
-				}
-				else if(length <= outterRadius)
-				{
-					length -= innerRadius;
-					int32 smooth = (int32)(outterRadius - innerRadius);
-					write = (uint8)((smooth - length) / (float)(smooth)) * 0xff;
+					int32 in = (lockRect.Pitch * y) + (x * 4);
 
-				}
-				else
-				{
-					continue;
-				}
+					uint8 read = pStart[in];
 
-				read = (read < write) ? write : read;
+					Vector3 diff = Vector3(x * pixelSize, 0.0f, y * pixelSize) -
+						Vector3(centerPixelX * pixelSize, 0.0f, centerPixelY * pixelSize);
+					float length = Vec3Length(&diff);
+					if (length <= innerRadius)
+					{
+						write = 0xff;
+					}
+					else if(length <= outterRadius)
+					{
+						length -= innerRadius;
+						int32 smooth = (int32)(outterRadius - innerRadius);
+						write = (uint8)((smooth - length) / (float)(smooth)) * 0xff;
+					}
+					else
+					{
+						continue;
+					}
 
-				pStart[in++] = read;
-				pStart[in++] = read;
-				pStart[in++] = read;
-				pStart[in++] = read;
+					read = (read < write) ? write : read;
+					for (int32 i = 0; i < 4; ++i)
+					{
+						if (i == channel)
+						{
+							pStart[in] = read;
+						}
+						else
+						{
+							pStart[in] = 0x00;
+						}
+						in++;
+					}
+				}
 			}
+			pTexture->_ptr->UnlockRect(0);
 		}
-
-		pTexture->_ptr->UnlockRect(0);
-
 	}
 }

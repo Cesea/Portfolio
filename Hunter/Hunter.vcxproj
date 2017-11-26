@@ -152,7 +152,6 @@
     <ClCompile Include="GameCommand.cpp" />
     <ClCompile Include="GameObjectFactory.cpp" />
     <ClCompile Include="GizmoManager.cpp" />
-    <ClCompile Include="Hash.cpp" />
     <ClCompile Include="imgui.cpp" />
     <ClCompile Include="imguiRenderer.cpp" />
     <ClCompile Include="MathUtils.cpp" />
@@ -245,7 +244,6 @@
     <ClInclude Include="GameSystems.h" />
     <ClInclude Include="GameUtils.h" />
     <ClInclude Include="GizmoManager.h" />
-    <ClInclude Include="Hash.h" />
     <ClInclude Include="imgui.h" />
     <ClInclude Include="Allocators.h" />
     <ClInclude Include="imguiRenderer.h" />

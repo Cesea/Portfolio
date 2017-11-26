@@ -131,10 +131,10 @@ class Editor
 {
 public :
 	Editor();
-	virtual ~Editor();
+	~Editor();
 
-	virtual void Init();
-	virtual void Shutdown();
+	void Init();
+	void Shutdown();
 
 	struct GetObjectFromSceneEvent
 	{

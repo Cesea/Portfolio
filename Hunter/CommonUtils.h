@@ -7,8 +7,6 @@
 
 #include "TypeTraits.h"
 
-#include "Hash.h"
-
 #include "Delegate.h"
 
 #include "State.h"
@@ -134,18 +132,16 @@ inline float ClampMinusOnePlusOne(float value)
 	return result;
 }
 
-inline int32 ClampInt(int32 &value, int32 min, int32 max)
+inline void ClampInt(int32 &value, int32 min, int32 max)
 {
-	int32  result = value;
-	if (result < min)
+	if (value < min)
 	{
-		result = min;
+		value = min;
 	}
-	if (result > max)
+	if (value > max)
 	{
-		result = max;
+		value = max;
 	}
-	return result;
 }
 
 POINT PointMake(int x, int y);

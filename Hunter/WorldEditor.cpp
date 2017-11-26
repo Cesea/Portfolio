@@ -45,29 +45,6 @@ void Editor::ChangeEditState(EditMode mode)
 	_currentMode = mode;
 }
 
-//struct TerrainConfig
-//
-//	{
-//		bool32 _createFromHeightMap;
-//		bool32 _createFromBuffer;
-//
-//		int32 _xResolution;
-//		int32 _zResolution;
-//
-//		//만약 CreateFromHeightMap이 true라면 heightmap을 읽어서 로드한다...
-//		//CreateFromBuffer가 true라면 버텍스 버퍼와 인덱스 버퍼를 읽어서 로드 한다.
-//		std::string _heightFileName;
-//		std::string _tile0FileName;
-//		std::string _tile1FileName;
-//		std::string _tile2FileName;
-//		std::string _tile3FileName;
-//		std::string _splatFileName;
-//
-//		float _heightScale;
-//		//uv가 얼마나 반복 될 것인지...
-//		float _textureMult;
-//	};
-
 void Editor::InTerrainEditMode()
 {
 	if (ImguiCollapse("Terrain Editor", nullptr, _editing))
@@ -117,9 +94,9 @@ void Editor::InTerrainEditMode()
 		ImguiIndent();
 
 		//TODO : 브러쉬가 Inner, Outter Radius의 영향을 제대로 받게끔 고치자
-		ImguiSlider("Brush Inner Radius", &_terrainEditor._brushInnerRadius, 4.0f, 10.0f, 0.1f);
-		ImguiSlider("Brush Outter Radius", &_terrainEditor._brushOutterRadius, 4.0f, 10.0f, 0.1f);
-		ImguiSlider("Brush Intensity", &_terrainEditor._brushIntensity, 1.0f, 10.0f, 0.05f);
+		ImguiSlider("Brush Inner Radius", &_terrainEditor._brushInnerRadius, 0.0f, 2.0f, 0.1f);
+		ImguiSlider("Brush Outter Radius", &_terrainEditor._brushOutterRadius, 2.0f, 5.0f, 0.1f);
+		ImguiSlider("Brush Intensity", &_terrainEditor._brushIntensity, 0.0f, 1.0f, 0.05f);
 
 		if (ImguiCheck("Grow", _terrainEditor._grow))
 		{
@@ -164,12 +141,13 @@ void Editor::InTerrainEditMode()
 			if (_terrainEditor._grow)
 			{
 				TERRAIN->AddHeightOnCursorPos(Vector2((float)_mx, (float)_my), 
-					_terrainEditor._brushInnerRadius, _terrainEditor._brushIntensity);
+					_terrainEditor._brushInnerRadius, _terrainEditor._brushOutterRadius, _terrainEditor._brushIntensity);
 			}
 			else if (_terrainEditor._dig)
 			{
 				TERRAIN->AddHeightOnCursorPos(Vector2((float)_mx, (float)_my), 
-					_terrainEditor._brushInnerRadius, -_terrainEditor._brushIntensity);
+					_terrainEditor._brushInnerRadius, _terrainEditor._brushOutterRadius,
+					-_terrainEditor._brushIntensity);
 			}
 			else if (_terrainEditor._smooth)
 			{
@@ -195,9 +173,11 @@ void Editor::InTerrainEditMode()
 	if (_terrainEditor._editingTexture)
 	{
 		ImguiIndent();
+		ImguiSlider("Brush Inner Radius", &_terrainEditor._brushInnerRadius, 4.0f, 10.0f, 0.1f);
+		ImguiSlider("Brush Outter Radius", &_terrainEditor._brushOutterRadius, 4.0f, 10.0f, 0.1f);
 
-		ImguiLabel("Select Texture");
 #pragma region Texture Select
+		ImguiLabel("Select Texture");
 		{
 			ImguiIndent();
 			if (ImguiCheck("Texture0", _terrainEditor._r))
@@ -651,6 +631,15 @@ void Editor::UpdateInput(const InputManager & input)
 
 void Editor::Init()
 {
+	strncpy(_terrainEditor._textureName00, TERRAIN->_currentConfig._tile0FileName.c_str(), EDITOR_MAX_NAME);
+	strncpy(_terrainEditor._textureName01, TERRAIN->_currentConfig._tile1FileName.c_str(), EDITOR_MAX_NAME);
+	strncpy(_terrainEditor._textureName02, TERRAIN->_currentConfig._tile2FileName.c_str(), EDITOR_MAX_NAME);
+	strncpy(_terrainEditor._textureName03, TERRAIN->_currentConfig._tile3FileName.c_str(), EDITOR_MAX_NAME);
+
+	_terrainEditor._terrainConfig._tile0FileName = TERRAIN->_currentConfig._tile0FileName;
+	_terrainEditor._terrainConfig._tile1FileName = TERRAIN->_currentConfig._tile1FileName;
+	_terrainEditor._terrainConfig._tile2FileName = TERRAIN->_currentConfig._tile2FileName;
+	_terrainEditor._terrainConfig._tile3FileName = TERRAIN->_currentConfig._tile3FileName;
 }
 
 void Editor::Shutdown()
