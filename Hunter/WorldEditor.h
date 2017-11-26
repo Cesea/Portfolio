@@ -55,8 +55,17 @@ struct TerrainEditor
 	bool32 _smooth{false};
 	bool32 _flat{false};
 
-	float _brushRadius{2.0f};
+	float _brushInnerRadius{2.0f};
+	float _brushOutterRadius{4.0f};
+
 	float _brushIntensity{3.0f};
+
+	//채널은 r : 0, g : 1, b : 2, a : 3순으로 간다..
+	int32 _channel{ 0 };
+	bool32 _r{true};
+	bool32 _g{false};
+	bool32 _b{false};
+	bool32 _a{false};
 
 	float _countX{};
 	float _countZ{};

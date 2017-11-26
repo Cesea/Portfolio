@@ -116,7 +116,9 @@ void Editor::InTerrainEditMode()
 	{
 		ImguiIndent();
 
-		ImguiSlider("Brush Radius", &_terrainEditor._brushRadius, 4.0f, 10.0f, 0.1f);
+		//TODO : 브러쉬가 Inner, Outter Radius의 영향을 제대로 받게끔 고치자
+		ImguiSlider("Brush Inner Radius", &_terrainEditor._brushInnerRadius, 4.0f, 10.0f, 0.1f);
+		ImguiSlider("Brush Outter Radius", &_terrainEditor._brushOutterRadius, 4.0f, 10.0f, 0.1f);
 		ImguiSlider("Brush Intensity", &_terrainEditor._brushIntensity, 1.0f, 10.0f, 0.05f);
 
 		if (ImguiCheck("Grow", _terrainEditor._grow))
@@ -161,15 +163,17 @@ void Editor::InTerrainEditMode()
 		{
 			if (_terrainEditor._grow)
 			{
-				TERRAIN->AddHeightOnCursorPos(Vector2((float)_mx, (float)_my), _terrainEditor._brushRadius, _terrainEditor._brushIntensity);
+				TERRAIN->AddHeightOnCursorPos(Vector2((float)_mx, (float)_my), 
+					_terrainEditor._brushInnerRadius, _terrainEditor._brushIntensity);
 			}
 			else if (_terrainEditor._dig)
 			{
-				TERRAIN->AddHeightOnCursorPos(Vector2((float)_mx, (float)_my), _terrainEditor._brushRadius, -_terrainEditor._brushIntensity);
+				TERRAIN->AddHeightOnCursorPos(Vector2((float)_mx, (float)_my), 
+					_terrainEditor._brushInnerRadius, -_terrainEditor._brushIntensity);
 			}
 			else if (_terrainEditor._smooth)
 			{
-				TERRAIN->SmoothOnCursorPos(Vector2((float)_mx, (float)_my), _terrainEditor._brushRadius);
+				TERRAIN->SmoothOnCursorPos(Vector2((float)_mx, (float)_my), _terrainEditor._brushInnerRadius);
 			}
 			else if (_terrainEditor._flat)
 			{
@@ -191,13 +195,72 @@ void Editor::InTerrainEditMode()
 	if (_terrainEditor._editingTexture)
 	{
 		ImguiIndent();
+
+		ImguiLabel("Select Texture");
+#pragma region Texture Select
+		{
+			ImguiIndent();
+			if (ImguiCheck("Texture0", _terrainEditor._r))
+			{
+				_terrainEditor._r = !_terrainEditor._r;
+				if (_terrainEditor._r)
+				{
+					_terrainEditor._channel = 0;
+					_terrainEditor._g = false;
+					_terrainEditor._b = false;
+					_terrainEditor._a = false;
+				}
+			}
+			if (ImguiCheck("Texture1", _terrainEditor._g))
+			{
+				_terrainEditor._g = !_terrainEditor._g;
+				if (_terrainEditor._g)
+				{
+					_terrainEditor._channel = 1;
+					_terrainEditor._r = false;
+					_terrainEditor._b = false;
+					_terrainEditor._a = false;
+				}
+			}
+			if (ImguiCheck("Texture2", _terrainEditor._b))
+			{
+				_terrainEditor._b = !_terrainEditor._b;
+				if (_terrainEditor._b)
+				{
+					_terrainEditor._channel = 2;
+					_terrainEditor._r = false;
+					_terrainEditor._g = false;
+					_terrainEditor._a = false;
+				}
+			}
+			if (ImguiCheck("Texture3", _terrainEditor._a))
+			{
+				_terrainEditor._a = !_terrainEditor._a;
+				if (_terrainEditor._a)
+				{
+					_terrainEditor._channel = 3;
+					_terrainEditor._r = false;
+					_terrainEditor._g = false;
+					_terrainEditor._b = false;
+				}
+			}
+			ImguiUnindent();
+		}
+#pragma endregion
 		
+#pragma region Texture Load
 		ImguiLabel("Texture00");
 		{
 			ImguiIndent();
 			ImguiEdit(_terrainEditor._textureName00, 120);
 			if (ImguiButton("LoadTexture"))
 			{
+				if (_terrainEditor._textureName00 == TERRAIN->_currentConfig._tile0FileName)
+				{
+					ZeroMemory(_terrainEditor._textureName00, sizeof(char) * EDITOR_MAX_NAME);
+					strncpy(_terrainEditor._textureName00, "Texture is Same", EDITOR_MAX_NAME);
+					return;
+				}
 				video::TextureHandle loadedTexture = VIDEO->CreateTexture(_terrainEditor._textureName00,
 					_terrainEditor._textureName00);
 				if (loadedTexture.IsValid())
@@ -221,6 +284,12 @@ void Editor::InTerrainEditMode()
 			ImguiEdit(_terrainEditor._textureName01, 120);
 			if (ImguiButton("LoadTexture"))
 			{
+				if (_terrainEditor._textureName01 == TERRAIN->_currentConfig._tile1FileName)
+				{
+					ZeroMemory(_terrainEditor._textureName01, sizeof(char) * EDITOR_MAX_NAME);
+					strncpy(_terrainEditor._textureName01, "Texture is Same", EDITOR_MAX_NAME);
+					return;
+				}
 				video::TextureHandle loadedTexture = VIDEO->CreateTexture(_terrainEditor._textureName01,
 					_terrainEditor._textureName01);
 				if (loadedTexture.IsValid())
@@ -244,6 +313,12 @@ void Editor::InTerrainEditMode()
 			ImguiEdit(_terrainEditor._textureName02, 120);
 			if (ImguiButton("LoadTexture"))
 			{
+				if (_terrainEditor._textureName02 == TERRAIN->_currentConfig._tile2FileName)
+				{
+					ZeroMemory(_terrainEditor._textureName02, sizeof(char) * EDITOR_MAX_NAME);
+					strncpy(_terrainEditor._textureName02, "Texture is Same", EDITOR_MAX_NAME);
+					return;
+				}
 				video::TextureHandle loadedTexture = VIDEO->CreateTexture(_terrainEditor._textureName02,
 					_terrainEditor._textureName02);
 				if (loadedTexture.IsValid())
@@ -267,6 +342,12 @@ void Editor::InTerrainEditMode()
 			ImguiEdit(_terrainEditor._textureName03, 120);
 			if (ImguiButton("LoadTexture"))
 			{
+				if (_terrainEditor._textureName03 == TERRAIN->_currentConfig._tile3FileName)
+				{
+					ZeroMemory(_terrainEditor._textureName03, sizeof(char) * EDITOR_MAX_NAME);
+					strncpy(_terrainEditor._textureName03, "Texture is Same", EDITOR_MAX_NAME);
+					return;
+				}
 				video::TextureHandle loadedTexture = VIDEO->CreateTexture(_terrainEditor._textureName03,
 					_terrainEditor._textureName03);
 				if (loadedTexture.IsValid())
@@ -284,11 +365,15 @@ void Editor::InTerrainEditMode()
 			ImguiUnindent();
 		}
 
+#pragma endregion
+
 		//여기서 선택되어있는 텍스쳐를 그리는 작업을 실행하자...
 		if (_mouseLeftDown && 
 			!(_mx > 0  && _mx < EDITORSIZEX && _my > 0 && _my < EDITORSIZEX))
 		{
-
+			TERRAIN->DrawAlphaTextureOnCursorPos(Vector2((float)_mx, (float)_my),
+				_terrainEditor._brushInnerRadius, _terrainEditor._brushOutterRadius,
+				_terrainEditor._brushIntensity, video::TextureHandle(), _terrainEditor._channel);
 		}
 
 
@@ -447,7 +532,7 @@ void Editor::InObjectLocateMode()
 		resourceHandle.index = _objectLocator._currentStaticHandle.index;
 
 		_channel.Broadcast<GameObjectFactory::CreateObjectOnClickEvent>(
-			GameObjectFactory::CreateObjectOnClickEvent(objectType, resourceHandle, Vector2(_mx, _my)));
+			GameObjectFactory::CreateObjectOnClickEvent(objectType, resourceHandle, Vector2((float)_mx, (float)_my)));
 	}
 }
 

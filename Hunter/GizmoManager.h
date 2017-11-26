@@ -7,7 +7,7 @@
 class GizmoManager : public SingletonBase<GizmoManager>
 {
 private:
-	typedef struct GizmoVertex
+	struct GizmoVertex
 	{
 		Vector3 pos;
 		uint32 color;

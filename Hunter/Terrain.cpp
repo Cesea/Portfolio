@@ -67,7 +67,7 @@ bool Terrain::Create(const Terrain::TerrainConfig &config, bool32 inEditMode)
 	_pQuadTree = new QuadTree;
 	_pQuadTree->Init(_terrainVertices, _numVertexX, _sectionResolution);
 
-	//터레인 Texture 로딩
+	//터레인 Texture 로딩 ////////////////////////////////////
 	_effect = VIDEO->GetEffect("TerrainBase.fx");
 	//_materialHandle = VIDEO->CreateMaterial("TerrainMaterial");
 	if (_currentConfig._tile0FileName != config._tile0FileName)
@@ -80,7 +80,7 @@ bool Terrain::Create(const Terrain::TerrainConfig &config, bool32 inEditMode)
 	}
 	else if (!_tile0Handle.IsValid())
 	{
-
+		_tile0Handle = VIDEO->GetTexture("defaultDiffuse");
 	}
 
 	if (_currentConfig._tile1FileName != config._tile1FileName)
@@ -91,6 +91,10 @@ bool Terrain::Create(const Terrain::TerrainConfig &config, bool32 inEditMode)
 			_tile1Handle = loadedHandle;
 		}
 	}
+	else if (!_tile1Handle.IsValid())
+	{
+		_tile1Handle = VIDEO->GetTexture("defaultDiffuse");
+	}
 
 	if (_currentConfig._tile2FileName !=  config._tile2FileName)
 	{
@@ -100,13 +104,22 @@ bool Terrain::Create(const Terrain::TerrainConfig &config, bool32 inEditMode)
 			_tile2Handle = loadedHandle;
 		}
 	}
-	if (_currentConfig._tile2FileName !=  config._tile2FileName)
+	else if (!_tile2Handle.IsValid())
+	{
+		_tile2Handle = VIDEO->GetTexture("defaultDiffuse");
+	}
+
+	if (_currentConfig._tile3FileName !=  config._tile3FileName)
 	{
 		video::TextureHandle loadedHandle = VIDEO->CreateTexture(config._tile3FileName, config._tile3FileName);
 		if (loadedHandle.IsValid())
 		{
 			_tile3Handle = loadedHandle;
 		}
+	}
+	else if (!_tile3Handle.IsValid())
+	{
+		_tile3Handle = VIDEO->GetTexture("defaultDiffuse");
 	}
 
 	//만약 config에서 Splat 텍스쳐가 넘어왔다면
@@ -1299,5 +1312,8 @@ void Terrain::DrawAlphaTextureOnCursorPos(const Vector2 & cursorPos,
 				pStart[in++] = read;
 			}
 		}
+
+		pTexture->_ptr->UnlockRect(0);
+
 	}
 }

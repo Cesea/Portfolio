@@ -27,7 +27,7 @@ bool BaseScene::Init()
 	config._tile1FileName = "../resources/Textures/TerrainTexture02.jpg";
 	config._tile2FileName = "../resources/Textures/TerrainTexture03.png";
 	config._tile3FileName = "../resources/Textures/TerrainTexture04.png";
-	config._splatFileName = "../resources/Textures/Splat.png";
+	//config._splatFileName;
 
 	//config._cellScale = 1.0f;
 	//config._heightScale = 20.0f;

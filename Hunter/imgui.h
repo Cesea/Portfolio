@@ -1,6 +1,8 @@
 #ifndef IM_GUI_H
 #define IM_GUI_H
 
+#include "VideoResource.h"
+
 enum ImguiMouseButton 
 {
 	eImguiMButtonLeft = 0x01,
@@ -40,7 +42,7 @@ void ImguiLabel(const char* text);
 void ImguiValue(const char* text);
 bool ImguiSlider(const char* text, float* val, float vmin, float vmax, float vinc, bool enabled = true);
 
-//void ImguiDrawTexture(video::TextureHandle handle, int16 size);
+void ImguiDrawTexture(video::TextureHandle handle, int16 size);
 
 bool ImguiEdit(char *text, int32 width, bool enable = true);
 
@@ -56,6 +58,7 @@ enum ImguiCommandType
 	eCommandTriangle,
 	eCommandLine,
 	eCommandText,
+	eCommandTexture,
 	eCommandScissor,
 };
 
@@ -75,17 +78,20 @@ struct ImguiLine
 	int16 _x0, _y0, _x1, _y1, _r;
 };
 
-//struct ImguiTexture
-//{
-//	int16 _x, _y, _w, _h;
-//	video::TextureHandle _handle;
-//};
+struct ImguiTexture
+{
+	//ImguiTexture() {}
+	int16 _x, _y, _w, _h;
+	video::TextureHandle _handle{};
+};
 
 struct ImguiCommand 
 {
+	ImguiCommand() {}
 	int8 _type;
 	int8 _flags;
 	uint32 _color;
+
 	union 
 	{
 		ImguiLine _line;
