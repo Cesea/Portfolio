@@ -326,7 +326,7 @@ namespace video
 		COM_RELEASE(_ptr);
 	}
 
-	bool Texture::Create(const std::string fileName)
+	bool Texture::Create(const std::string &fileName)
 	{
 		D3DXIMAGE_INFO imageInfo;
 		if (FAILED(D3DXGetImageInfoFromFile(fileName.c_str(), &imageInfo)))
@@ -362,6 +362,16 @@ namespace video
 	void Texture::Destroy()
 	{
 		COM_RELEASE(_ptr);
+	}
+
+	bool Texture::Save(const std::string & fileName)
+	{
+		if (FAILED(D3DXSaveTextureToFile(fileName.c_str(), D3DXIFF_PNG, _ptr, nullptr)))
+		{
+			Console::Log("Texture Save failed\n");
+			return false;
+		}
+		return true;
 	}
 
 	bool FrameBuffer::Create(uint8 num, const TextureHandle * handles)

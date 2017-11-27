@@ -13,10 +13,12 @@ bool Terrain::Create(const Terrain::TerrainConfig &config, bool32 inEditMode)
 {
 	_inEditMode = inEditMode;
 
+	_currentConfig = config;
+
 	//가로세로 정점 수를 구한다.
 	//가로 세로 정점의 수는 TILE_CHUNK_DIM * tileExtent + 1과 같다..
-	_numVertexX = TERRAIN_CHUNK_DIM * config._xChunkCount + 1;		
-	_numVertexZ = TERRAIN_CHUNK_DIM * config._zChunkCount + 1;		
+	_numVertexX = TERRAIN_CHUNK_DIM * _currentConfig._xChunkCount + 1;		
+	_numVertexZ = TERRAIN_CHUNK_DIM * _currentConfig._zChunkCount + 1;		
 	_numTotalVertex = _numVertexX * _numVertexZ;		//총 정점 갯수
 
 	_numCellX = _numVertexX - 1;
@@ -45,12 +47,6 @@ bool Terrain::Create(const Terrain::TerrainConfig &config, bool32 inEditMode)
 	_sectionNumVertexX = _sectionNumCellX + 1;
 	_sectionNumVertexZ = _sectionNumCellZ + 1;
 
-	//Terrain config 복사
-	_currentConfig._xChunkCount = config._xChunkCount;
-	_currentConfig._zChunkCount = config._zChunkCount;
-	_currentConfig._textureMult = config._textureMult;
-	
-
 	if (!(CreateTerrain(config._textureMult)))
 	{
 		Destroy();
@@ -69,102 +65,8 @@ bool Terrain::Create(const Terrain::TerrainConfig &config, bool32 inEditMode)
 
 	//터레인 Texture 로딩 ////////////////////////////////////
 	_effect = VIDEO->GetEffect("TerrainBase.fx");
-	//_materialHandle = VIDEO->CreateMaterial("TerrainMaterial");
-	if (_currentConfig._tile0FileName != config._tile0FileName)
-	{
-		video::TextureHandle loadedHandle = VIDEO->CreateTexture(config._tile0FileName, config._tile0FileName);
-		if (loadedHandle.IsValid())
-		{
-			_tile0Handle = loadedHandle;
-		}
-	}
-	else if (!_tile0Handle.IsValid())
-	{
-		_tile0Handle = VIDEO->GetTexture("defaultDiffuse");
-	}
 
-	if (_currentConfig._tile1FileName != config._tile1FileName)
-	{
-		video::TextureHandle loadedHandle = VIDEO->CreateTexture(config._tile1FileName, config._tile1FileName);
-		if (loadedHandle.IsValid())
-		{
-			_tile1Handle = loadedHandle;
-		}
-	}
-	else if (!_tile1Handle.IsValid())
-	{
-		_tile1Handle = VIDEO->GetTexture("defaultDiffuse");
-	}
-
-	if (_currentConfig._tile2FileName !=  config._tile2FileName)
-	{
-		video::TextureHandle loadedHandle = VIDEO->CreateTexture(config._tile2FileName, config._tile2FileName);
-		if (loadedHandle.IsValid())
-		{
-			_tile2Handle = loadedHandle;
-		}
-	}
-	else if (!_tile2Handle.IsValid())
-	{
-		_tile2Handle = VIDEO->GetTexture("defaultDiffuse");
-	}
-
-	if (_currentConfig._tile3FileName !=  config._tile3FileName)
-	{
-		video::TextureHandle loadedHandle = VIDEO->CreateTexture(config._tile3FileName, config._tile3FileName);
-		if (loadedHandle.IsValid())
-		{
-			_tile3Handle = loadedHandle;
-		}
-	}
-	else if (!_tile3Handle.IsValid())
-	{
-		_tile3Handle = VIDEO->GetTexture("defaultDiffuse");
-	}
-
-	//만약 config에서 Splat 텍스쳐가 넘어왔다면
-	if (config._splatFileName.length() > 0)
-	{
-		_tileSplatHandle = VIDEO->CreateTexture(config._splatFileName);
-		if (!_tileSplatHandle.IsValid())
-		{
-			_tileSplatHandle = VIDEO->GetTexture("diffuseDefault");
-		}
-	}
-	//만약 config에서 Splat 텍스쳐가 넘어오지 않았다면, 새로운 텍스쳐를 생성하도록 한다...
-	//그리고 모든 값을 0x00000000로 채운다.
-	else
-	{
-		_tileSplatHandle = VIDEO->CreateTexture(TERRAIN_ALPHA_TEXTURE_SIZE, TERRAIN_ALPHA_TEXTURE_SIZE,
-			D3DFMT_A8R8G8B8, D3DPOOL_MANAGED);
-
-		video::Texture *pTexture = VIDEO->GetTexture(_tileSplatHandle);
-		D3DLOCKED_RECT lockRect{};
-		if (SUCCEEDED(pTexture->_ptr->LockRect(0, &lockRect, nullptr, 0)))
-		{
-			uint32 *pPixel = (uint32 *)lockRect.pBits;
-			for (int32 y = 0; y < TERRAIN_ALPHA_TEXTURE_SIZE; ++y)
-			{
-				for (int32 x = 0; x < TERRAIN_ALPHA_TEXTURE_SIZE; ++x)
-				{
-					*pPixel = 0x00000000;
-					pPixel++;
-				}
-			}
-			pTexture->_ptr->UnlockRect(0);
-		}
-		//알파 텍스쳐의 Lock 을 실패하였다...
-		else
-		{
-			Console::Log("Alpha Texture Lock failed\n");
-		}
-	}
-
-	_currentConfig._tile0FileName = config._tile0FileName;
-	_currentConfig._tile1FileName = config._tile1FileName;
-	_currentConfig._tile2FileName = config._tile2FileName;
-	_currentConfig._tile3FileName = config._tile3FileName;
-	_currentConfig._splatFileName = config._splatFileName;
+	LoadTextureFromConfig(_currentConfig);
 }
 
 void Terrain::RegisterEvents()
@@ -197,76 +99,101 @@ void Terrain::Destroy()
 	SAFE_DELETE_ARRAY(_chunkIndex);
 	SAFE_DELETE(_pQuadTree);
 }
-//터레인 파일의 구조..
-//'T''R' Magic Number TR
-//int32 : ChunkDim  터레인 청크의 크기
-//int32 : xExtent 터레인 청크 x갯수
-//int32 : zExtent 터레인 청크 z갯수
 
 void Terrain::SaveTerrain(const std::string & fileName)
 {
+	//로딩 경로에서 파일명만 제거하고 경로만 받는다.
+	std::string path;
+	std::string name;
+	int lastPathIndex = 0;
+
+	lastPathIndex = fileName.find_last_of('/');
+	if (lastPathIndex == -1)
+	{
+		lastPathIndex = fileName.find_last_of('\\');
+	}
+	//경로 구분이 있다면...
+	if (lastPathIndex != -1)
+	{
+		path = fileName.substr(0, lastPathIndex + 1);
+		name = fileName.substr(lastPathIndex + 1, fileName.length() - lastPathIndex);
+	}
+
 	DataPackage toSave;
 
-	TerrainFileHeader fileHeader;
-	fileHeader._m1 = 'T';
-	fileHeader._m2 = 'R';
+	char buffer[MAX_FILE_NAME];
+	ZeroMemory(buffer, sizeof(buffer));
 
-	fileHeader._chunkDim = TERRAIN_CHUNK_DIM;
+	sprintf(buffer, "%s", path.c_str());
+	strncat(buffer, "Splat.png", strlen("Splat.png"));
 
-	fileHeader._xExtent = _xChunkCount;
-	fileHeader._zExtent = _zChunkCount;
+	strncpy(_currentConfig._splatFileName, buffer, MAX_FILE_NAME);
+	//_currentConfig._splatFileName = 
 
-	toSave.Create(sizeof(TerrainFileHeader) + (sizeof(video::TerrainVertex) * _numTotalVertex));
+	toSave.Create(sizeof(Terrain::TerrainConfig) + (sizeof(video::TerrainVertex) * _numTotalVertex));
 
-	toSave.WriteAs<TerrainFileHeader>(fileHeader);
+	toSave.WriteAs<TerrainConfig>(_currentConfig);
 	for (int32 i = 0; i < _numTotalVertex; ++i)
 	{
 		video::TerrainVertex &vertex = _terrainVertices[i];
 		toSave.WriteAs<video::TerrainVertex>(vertex);
 	}
 	toSave.Save(fileName.c_str());
-
+	
+	VIDEO->SaveTexture(path + "TerrainSplat.png", _tileSplatHandle);
 }
 
 void Terrain::LoadTerrain(const std::string & fileName)
 {
 	DataPackage toLoad;
 
-	TerrainFileHeader fileHeader;
+	TerrainConfig config;
 
 	uint32 fileSize{ };
-	toLoad.OpenFile(fileName.c_str(), &fileSize);
-
-	toLoad.ReadAs<TerrainFileHeader>(&fileHeader);
-
-	if (fileHeader._m1 != 'T' || fileHeader._m2 != 'R' || 
-		fileHeader._chunkDim != TERRAIN_CHUNK_DIM)
+	if (!toLoad.OpenFile(fileName.c_str(), &fileSize))
 	{
+		Console::Log("There is no such file");
 		return;
 	}
-	TerrainConfig config{};
-	config._xChunkCount = fileHeader._xExtent;
-	config._zChunkCount = fileHeader._zExtent;
+	toLoad.ReadAs<TerrainConfig>(&config);
 
-	_numVertexX = TERRAIN_CHUNK_DIM * config._xChunkCount + 1;
-	_numVertexZ = TERRAIN_CHUNK_DIM * config._zChunkCount + 1;		
+	//기존의 자원들 해제
+	for (int32 i = 0; i < _xChunkCount * _zChunkCount; ++i)
+	{
+		VIDEO->DestroyVertexBuffer(_pChunks[i]._vHandle);
+		VIDEO->DestroyIndexBuffer(_pChunks[i]._iHandle);
+	}
+
+	SAFE_DELETE_ARRAY(_pChunks);
+
+	if (_tile0Handle.IsValid()) { VIDEO->DestroyTexture(_tile0Handle); }
+	if (_tile1Handle.IsValid()) { VIDEO->DestroyTexture(_tile1Handle); }
+	if (_tile2Handle.IsValid()) { VIDEO->DestroyTexture(_tile2Handle); }
+	if (_tile3Handle.IsValid()) { VIDEO->DestroyTexture(_tile3Handle); }
+	if (_tileSplatHandle.IsValid()) { VIDEO->DestroyTexture(_tileSplatHandle); }
+
+	SAFE_DELETE_ARRAY(_terrainVertices);
+	SAFE_DELETE(_pQuadTree);
+
+	//새로운 설정값 세팅
+	_currentConfig = config;
+
+	_numVertexX = TERRAIN_CHUNK_DIM * _currentConfig._xChunkCount + 1;		
+	_numVertexZ = TERRAIN_CHUNK_DIM * _currentConfig._zChunkCount + 1;		
 	_numTotalVertex = _numVertexX * _numVertexZ;		//총 정점 갯수
 
 	_numCellX = _numVertexX - 1;
 	_numCellZ = _numVertexZ - 1;
 	_totalCellNum = _numCellX * _numCellZ;
 
-	//터레인 크기
 	_terrainSizeX = _numCellX;
 	_terrainSizeZ = _numCellZ;
 
 	_terrainHalfSizeX = _terrainSizeX / 2;
 	_terrainHalfSizeZ = _terrainSizeZ / 2;
 
-	//총 삼각형수는
 	_numTotalFace = _totalCellNum * 2;
 
-	//Section 설정
 	_sectionResolution = TERRAIN_CHUNK_DIM;
 		
 	_xChunkCount = config._xChunkCount;
@@ -278,9 +205,7 @@ void Terrain::LoadTerrain(const std::string & fileName)
 	_sectionNumVertexX = _sectionNumCellX + 1;
 	_sectionNumVertexZ = _sectionNumCellZ + 1;
 
-	SAFE_DELETE_ARRAY(_terrainVertices);
-	SAFE_DELETE_ARRAY(_pChunks);
-
+	//여기서 저장되어있는 정점정보들을 가져온다
 	_terrainVertices = new video::TerrainVertex[_numTotalVertex];
 	for (int32 i = 0; i < _numTotalVertex; ++i)
 	{
@@ -289,91 +214,29 @@ void Terrain::LoadTerrain(const std::string & fileName)
 	toLoad.Free();
 
 	_pChunks = new TerrainChunk[_xChunkCount * _zChunkCount];
-	for (uint32 z = 0; z < _zChunkCount; ++z)
+
+	for (int32 z = 0; z < _zChunkCount; ++z)
 	{
-		for (uint32 x = 0; x < _xChunkCount; ++x)
+		for (int32 x = 0; x < _xChunkCount; ++x)
 		{
 			CreateTerrainChunk(x, z, _terrainVertices);
 		}
 	}
 
+	//터레인 범위
+	_terrainStartX = _terrainVertices[0]._pos.x;
+	_terrainStartZ = _terrainVertices[0]._pos.z;
+	_terrainEndX = _terrainVertices[_numTotalVertex - 1]._pos.x;
+	_terrainEndZ = _terrainVertices[_numTotalVertex - 1]._pos.z;
 
-	SAFE_DELETE(_pQuadTree);
-	_pQuadTree = new QuadTree();
-	_pQuadTree->Init(_terrainVertices, _numVertexX, TERRAIN_CHUNK_DIM);
+	//쿼드트리를 만든다.
+	_pQuadTree = new QuadTree;
+	_pQuadTree->Init(_terrainVertices, _numVertexX, _sectionResolution);
+
+
+	LoadTextureFromConfig(_currentConfig);
 
 }
-
-//void Terrain::FillRenderCommand(video::RenderView & renderView)
-//{
-//
-//	//video::IndexBuffer *pIndexBuffer = VIDEO->GetIndexBuffer(_iHandle);
-//	//uint8 *pData = nullptr;
-//	//pIndexBuffer->_ptr->Lock(0, 0, (void **)&pData, D3DLOCK_DISCARD);
-//	//_numTriangleToDraw = _pQuadTree->GenerateIndex(pData, renderView._pCamera->GetFrustum(), 
-//	//	renderView._pCamera->GetTransform()._position, _lodRatio);
-//	//pIndexBuffer->_ptr->Unlock();
-//
-//	if (_inEditMode)
-//	{
-//		video::RenderCommand &command = renderView.GetCommand();
-//		command._drawType = video::RenderCommand::DrawType::eStatic;
-//		command._primType = video::RenderCommand::PrimType::eTriangleList;
-//		Assert(_vHandle.IsValid());
-//		Assert(_iHandle.IsValid());
-//
-//		video::VertexBuffer *pVBuffer = VIDEO->GetVertexBuffer(_vHandle);
-//		void *pVertexData = nullptr;
-//		pVBuffer->_ptr->Lock(0, 0, (void **)&pVertexData, D3DLOCK_DISCARD);
-//		memcpy(pVertexData, _terrainVertices, sizeof(video::TerrainVertex) * _numTotalVertex);
-//		pVBuffer->_ptr->Unlock();
-//
-//		Assert(_terrainFaces);
-//		video::IndexBuffer *pIBuffer = VIDEO->GetIndexBuffer(_iHandle);
-//		void *pIndexData = nullptr;
-//		pIBuffer->_ptr->Lock(0, 0, (void **)&pIndexData, D3DLOCK_DISCARD);
-//		memcpy(pIndexData, _terrainFaces, sizeof(TerrainFace) * _numTotalFace);
-//		pIBuffer->_ptr->Unlock();
-//
-//		command._vHandle = _vHandle;
-//		command._iHandle = _iHandle;
-//		command._effectHandle = _effect;
-//		command._materialHandle = _materialHandle;
-//		command._numPrim = _numTriangleToDraw;
-//	}
-//	else
-//	{
-//		video::RenderCommand &command = renderView.GetCommand();
-//		command._drawType = video::RenderCommand::DrawType::eStatic;
-//		command._primType = video::RenderCommand::PrimType::eTriangleList;
-//		Assert(_vHandle.IsValid());
-//		Assert(_iHandle.IsValid());
-//		command._vHandle = _vHandle;
-//		command._iHandle = _iHandle;
-//		command._effectHandle = _effect;
-//		command._materialHandle = _materialHandle;
-//		command._numPrim = _numTriangleToDraw;
-//	}
-//
-//
-//	//for (int32 i = 0; i < _numSectionX * _numSectionZ; ++i)
-//	//{
-//	//	Terrain::TerrainSection &refSection = _pSections[i];
-//	//	if (renderView._pCamera->GetFrustum().IsSphereInFrustum(Vector3(refSection._centerX, 0.0f, refSection._centerZ), refSection._radius))
-//	//	{
-//	//		video::RenderCommand &command = renderView.GetCommand();
-//	//		command._drawType = video::RenderCommand::DrawType::eStatic;
-//	//		command._primType = video::RenderCommand::PrimType::eTriangleList;
-//	//		Assert(refSection._vHandle.IsValid());
-//	//		Assert(refSection._iHandle.IsValid());
-//	//		command._vHandle = refSection._vHandle;
-//	//		command._iHandle = refSection._iHandle;
-//	//		command._effectHandle = _effect;
-//	//		command._materialHandle = _materialHandle;
-//	//	}
-//	//}
-//}
-
 
 bool Terrain::IsIntersectRay(const Ray &ray, Vector3 *pOutHit)
 {
@@ -705,8 +568,6 @@ bool Terrain::CreateTerrain(int32 tileNum)
 			_terrainVertices[idx]._tileUV = tileUV;
 		}
 	}
-	//터레인 스무싱 
-	//SmoothTerrain(smooth);
 	// 정점 인덱스를 구한다.....
 	TerrainFace *terrainFaces = new TerrainFace[_numTotalFace];
 
@@ -815,7 +676,6 @@ bool Terrain::CreateTerrain(int32 tileNum)
 	SAFE_DELETE_ARRAY(normals);
 	SAFE_DELETE_ARRAY(tangents);
 	SAFE_DELETE_ARRAY(binormals);
-	SAFE_DELETE_ARRAY(uvs);
 
 	//에딧모드가 아닐때 index정보는 필요 없다
 	SAFE_DELETE_ARRAY(indices);
@@ -835,12 +695,11 @@ void Terrain::RebuildTerrain(const Terrain::TerrainConfig &config)
 
 	VIDEO->DestroyVertexDecl(_declHandle);
 
-	//if (_tile0Handle.IsValid()) { VIDEO->DestroyTexture(_tile0Handle); }
-	//if (_tile1Handle.IsValid()) { VIDEO->DestroyTexture(_tile1Handle); }
-	//if (_tile2Handle.IsValid()) { VIDEO->DestroyTexture(_tile2Handle); }
-	//if (_tile3Handle.IsValid()) { VIDEO->DestroyTexture(_tile3Handle); }
-	//if (_tileSplatHandle.IsValid()) { VIDEO->DestroyTexture(_tileSplatHandle); }
-
+	if (_tile0Handle.IsValid()) { VIDEO->DestroyTexture(_tile0Handle); }
+	if (_tile1Handle.IsValid()) { VIDEO->DestroyTexture(_tile1Handle); }
+	if (_tile2Handle.IsValid()) { VIDEO->DestroyTexture(_tile2Handle); }
+	if (_tile3Handle.IsValid()) { VIDEO->DestroyTexture(_tile3Handle); }
+	if (_tileSplatHandle.IsValid()) { VIDEO->DestroyTexture(_tileSplatHandle); }
 
 	SAFE_DELETE_ARRAY(_terrainVertices);
 	SAFE_DELETE_ARRAY(_chunkIndex);
@@ -863,6 +722,7 @@ bool Terrain::CreateTerrainChunk(int32 x, int32 z, const video::TerrainVertex * 
 	int32 sectionIndex = Index2D(x, z, _xChunkCount);
 
 	TerrainChunk &refSection = _pChunks[sectionIndex];
+	refSection._pVertices = pTerrainVertices;
 
 	refSection._chunkX = x;
 	refSection._chunkZ = z;
@@ -898,8 +758,6 @@ bool Terrain::CreateTerrainChunk(int32 x, int32 z, const video::TerrainVertex * 
 
 	refSection._relEndX = vertices.back()._pos.x;
 	refSection._relEndZ = vertices.back()._pos.z;
-
-	
 
 	if (_inEditMode)
 	{
@@ -1012,7 +870,6 @@ void Terrain::SmoothOnCursorPos(const Vector2 & cursorPos, float brushRadius)
 		int32 centerX = tilePos._chunkX * TERRAIN_CHUNK_DIM + tilePos._tileX;
 		int32 centerZ = tilePos._chunkZ * TERRAIN_CHUNK_DIM + tilePos._tileZ;
 
-
 		int32 minX, maxX, minZ, maxZ;
 		minX = centerX - radius - 3;
 		maxX = centerX + radius + 3;
@@ -1029,7 +886,6 @@ void Terrain::SmoothOnCursorPos(const Vector2 & cursorPos, float brushRadius)
 
 		RebuildSection(minX, maxX, minZ, maxZ);
 	}
-
 }
 
 void Terrain::SmoothTerrain(int32 passed)
@@ -1207,9 +1063,9 @@ void Terrain::RebuildSection(int32 minX, int32 maxX, int32 minZ, int32 maxZ)
 
 	counter = 0;
 	uint32 *indices = new uint32[triNum * 3];
-	for (int32 z = 0; z < numVertZ - 1; ++z)
+	for (int32 z = 0; z < numVertZ; ++z)
 	{
-		for (int32 x = 0; x < numVertX - 1; ++x)
+		for (int32 x = 0; x < numVertX; ++x)
 		{
 			int32 lt = x + z * numVertX;
 			int32 rt = (x + 1) + z * numVertX;
@@ -1243,10 +1099,6 @@ void Terrain::RebuildSection(int32 minX, int32 maxX, int32 minZ, int32 maxZ)
 			_terrainVertices[Index2D(x, z, _numVertexX)]._normal = normals[counter++];
 		}
 	}
-	//탄젠트 바이노말 계산
-	//ComputeTangentAndBinormal(tangents, binormals, poses, normals,
-	//	uvs, indices, _numTotalFace, _numTotalVertex);
-
 	SAFE_DELETE_ARRAY(vertices);
 	SAFE_DELETE_ARRAY(uvs);
 	SAFE_DELETE_ARRAY(normals);
@@ -1519,4 +1371,120 @@ void Terrain::DrawAlphaTextureOnCursorPos(const Vector2 & cursorPos,
 			pTexture->_ptr->UnlockRect(0);
 		}
 	}
+}
+
+//Terrain Texture loading Function
+void Terrain::LoadTextureFromConfig(const Terrain::TerrainConfig & config)
+{
+	video::TextureHandle loadedHandle = VIDEO->CreateTexture(config._tile0FileName, config._tile0FileName);
+	if (loadedHandle.IsValid())
+	{
+		_tile0Handle = loadedHandle;
+	}
+	else
+	{
+		_tile0Handle = VIDEO->GetTexture("defaultDiffuse");
+	}
+
+	loadedHandle = VIDEO->CreateTexture(config._tile1FileName, config._tile1FileName);
+	if (loadedHandle.IsValid())
+	{
+		_tile1Handle = loadedHandle;
+	}
+	else 
+	{
+		_tile1Handle = VIDEO->GetTexture("defaultDiffuse");
+	}
+
+	loadedHandle = VIDEO->CreateTexture(config._tile2FileName, config._tile2FileName);
+	if (loadedHandle.IsValid())
+	{
+		_tile2Handle = loadedHandle;
+	}
+	else 
+	{
+		_tile2Handle = VIDEO->GetTexture("defaultDiffuse");
+	}
+
+	loadedHandle = VIDEO->CreateTexture(config._tile3FileName, config._tile3FileName);
+	if (loadedHandle.IsValid())
+	{
+		_tile3Handle = loadedHandle;
+	}
+	else
+	{
+		_tile3Handle = VIDEO->GetTexture("defaultDiffuse");
+	}
+
+	bool splatLoaded = false;
+	//만약 config에서 Splat 텍스쳐가 넘어왔다면
+	if (strlen(config._splatFileName) > 0)
+	{
+		_tileSplatHandle = VIDEO->CreateTexture(config._splatFileName);
+		if (!_tileSplatHandle.IsValid())
+		{
+			_tileSplatHandle = VIDEO->GetTexture("diffuseDefault");
+		}
+		else
+		{
+			splatLoaded = true;
+		}
+	}
+
+	//만약 config에서 Splat 텍스쳐가 넘어오지 않았다면, 새로운 텍스쳐를 생성하도록 한다...
+	//그리고 모든 값을 0x00000000로 채운다.
+	if(!splatLoaded)
+	{
+		_tileSplatHandle = VIDEO->CreateTexture(TERRAIN_ALPHA_TEXTURE_SIZE, TERRAIN_ALPHA_TEXTURE_SIZE,
+			D3DFMT_A8R8G8B8, D3DPOOL_MANAGED);
+
+		video::Texture *pTexture = VIDEO->GetTexture(_tileSplatHandle);
+		D3DLOCKED_RECT lockRect{};
+		if (SUCCEEDED(pTexture->_ptr->LockRect(0, &lockRect, nullptr, 0)))
+		{
+			uint32 *pPixel = (uint32 *)lockRect.pBits;
+			for (int32 y = 0; y < TERRAIN_ALPHA_TEXTURE_SIZE; ++y)
+			{
+				for (int32 x = 0; x < TERRAIN_ALPHA_TEXTURE_SIZE; ++x)
+				{
+					*pPixel = 0x00000000;
+					pPixel++;
+				}
+			}
+			pTexture->_ptr->UnlockRect(0);
+		}
+		//알파 텍스쳐의 Lock 을 실패하였다...
+		else
+		{
+			Console::Log("Alpha Texture Lock failed\n");
+		}
+	}
+
+}
+
+Terrain::TerrainConfig::TerrainConfig(const TerrainConfig & other)
+{
+	this->_xChunkCount = other._xChunkCount;
+	this->_zChunkCount = other._zChunkCount;
+	this->_textureMult = other._textureMult;
+
+	strncpy(this->_tile0FileName, other._tile0FileName, MAX_FILE_NAME);
+	strncpy(this->_tile1FileName, other._tile1FileName, MAX_FILE_NAME);
+	strncpy(this->_tile2FileName, other._tile2FileName, MAX_FILE_NAME);
+	strncpy(this->_tile3FileName, other._tile3FileName, MAX_FILE_NAME);
+	strncpy(this->_splatFileName, other._splatFileName, MAX_FILE_NAME);
+}
+
+Terrain::TerrainConfig & Terrain::TerrainConfig::operator=(const TerrainConfig & other)
+{
+	this->_xChunkCount = other._xChunkCount;
+	this->_zChunkCount = other._zChunkCount;
+	this->_textureMult = other._textureMult;
+
+	strncpy(this->_tile0FileName, other._tile0FileName, MAX_FILE_NAME);
+	strncpy(this->_tile1FileName, other._tile1FileName, MAX_FILE_NAME);
+	strncpy(this->_tile2FileName, other._tile2FileName, MAX_FILE_NAME);
+	strncpy(this->_tile3FileName, other._tile3FileName, MAX_FILE_NAME);
+	strncpy(this->_splatFileName, other._splatFileName, MAX_FILE_NAME);
+	return *this;
 }

@@ -256,7 +256,7 @@ void Editor::InTerrainEditMode()
 				{
 					VIDEO->DestroyTexture(TERRAIN->_tile0Handle);
 					TERRAIN->_tile0Handle = loadedTexture;
-					TERRAIN->_currentConfig._tile0FileName = _terrainEditor._textureName00;
+					strncpy(TERRAIN->_currentConfig._tile0FileName, _terrainEditor._textureName00, EDITOR_MAX_NAME);
 				}
 				else
 				{
@@ -291,7 +291,7 @@ void Editor::InTerrainEditMode()
 				{
 					VIDEO->DestroyTexture(TERRAIN->_tile1Handle);
 					TERRAIN->_tile1Handle = loadedTexture;
-					TERRAIN->_currentConfig._tile1FileName = _terrainEditor._textureName01;
+					strncpy(TERRAIN->_currentConfig._tile1FileName, _terrainEditor._textureName01, EDITOR_MAX_NAME);
 				}
 				else
 				{
@@ -326,7 +326,7 @@ void Editor::InTerrainEditMode()
 				{
 					VIDEO->DestroyTexture(TERRAIN->_tile2Handle);
 					TERRAIN->_tile2Handle = loadedTexture;
-					TERRAIN->_currentConfig._tile2FileName = _terrainEditor._textureName02;
+					strncpy(TERRAIN->_currentConfig._tile2FileName, _terrainEditor._textureName02, EDITOR_MAX_NAME);
 				}
 				else
 				{
@@ -360,7 +360,7 @@ void Editor::InTerrainEditMode()
 				{
 					VIDEO->DestroyTexture(TERRAIN->_tile3Handle);
 					TERRAIN->_tile3Handle = loadedTexture;
-					TERRAIN->_currentConfig._tile3FileName = _terrainEditor._textureName03;
+					strncpy(TERRAIN->_currentConfig._tile3FileName, _terrainEditor._textureName03, EDITOR_MAX_NAME);
 				}
 				else
 				{
@@ -674,16 +674,17 @@ void Editor::UpdateInput(const InputManager & input)
 
 void Editor::Init()
 {
-	strncpy(_terrainEditor._textureName00, TERRAIN->_currentConfig._tile0FileName.c_str(), EDITOR_MAX_NAME);
-	strncpy(_terrainEditor._textureName01, TERRAIN->_currentConfig._tile1FileName.c_str(), EDITOR_MAX_NAME);
-	strncpy(_terrainEditor._textureName02, TERRAIN->_currentConfig._tile2FileName.c_str(), EDITOR_MAX_NAME);
-	strncpy(_terrainEditor._textureName03, TERRAIN->_currentConfig._tile3FileName.c_str(), EDITOR_MAX_NAME);
+	strncpy(_terrainEditor._textureName00, TERRAIN->_currentConfig._tile0FileName, EDITOR_MAX_NAME);
+	strncpy(_terrainEditor._textureName01, TERRAIN->_currentConfig._tile1FileName, EDITOR_MAX_NAME);
+	strncpy(_terrainEditor._textureName02, TERRAIN->_currentConfig._tile2FileName, EDITOR_MAX_NAME);
+	strncpy(_terrainEditor._textureName03, TERRAIN->_currentConfig._tile3FileName, EDITOR_MAX_NAME);
 
 	_terrainEditor._terrainConfig._textureMult = TERRAIN->_currentConfig._textureMult;
-	_terrainEditor._terrainConfig._tile0FileName = TERRAIN->_currentConfig._tile0FileName;
-	_terrainEditor._terrainConfig._tile1FileName = TERRAIN->_currentConfig._tile1FileName;
-	_terrainEditor._terrainConfig._tile2FileName = TERRAIN->_currentConfig._tile2FileName;
-	_terrainEditor._terrainConfig._tile3FileName = TERRAIN->_currentConfig._tile3FileName;
+
+	strncpy(_terrainEditor._terrainConfig._tile0FileName, TERRAIN->_currentConfig._tile0FileName, EDITOR_MAX_NAME);
+	strncpy(_terrainEditor._terrainConfig._tile1FileName, TERRAIN->_currentConfig._tile1FileName, EDITOR_MAX_NAME);
+	strncpy(_terrainEditor._terrainConfig._tile2FileName, TERRAIN->_currentConfig._tile2FileName, EDITOR_MAX_NAME);
+	strncpy(_terrainEditor._terrainConfig._tile3FileName, TERRAIN->_currentConfig._tile3FileName, EDITOR_MAX_NAME);
 }
 
 void Editor::Shutdown()

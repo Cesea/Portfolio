@@ -293,6 +293,12 @@ void ImguiBeginFrame(int32 mx, int32 my, uint8 mbut, int32 scroll, uint32 keyCod
 	gState._areaID = 1;
 	gState._widgetID = 1;
 
+	if (!(gState._mx > 0 && gState._mx < EDITORSIZEX &&
+		gState._my > 0 && gState._my < EDITORSIZEY))
+	{
+		gState._keyboardFocus = false;
+	}
+
 	ResetIMCommandQueue();
 }
 

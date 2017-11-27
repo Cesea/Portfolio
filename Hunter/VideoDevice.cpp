@@ -497,6 +497,11 @@ void video::VideoDevice::DestroyTexture(TextureHandle handle)
 	_textureHandlePool.Remove(handle);
 }
 
+void video::VideoDevice::SaveTexture(const std::string & fileName, video::TextureHandle handle)
+{
+	_textures[handle.index].Save(fileName);
+}
+
 EffectHandle video::VideoDevice::CreateEffect(const std::string &fileName, const std::string &name)
 {
 	EffectHandle result = _effectHandlePool.Create(name);

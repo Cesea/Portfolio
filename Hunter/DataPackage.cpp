@@ -12,12 +12,13 @@ DataPackage::~DataPackage()
 	Free();
 }
 
-void * DataPackage::Create(uint32 size)
+bool DataPackage::Create(uint32 size)
 {
 	_data = new uint8[size];
+	Assert(_data);
 	_pCurrent = _data;
 	_size = size;
-	return _data;
+	return true;
 }
 
 bool DataPackage::ReadInt8(int8 * pOut)
@@ -240,7 +241,7 @@ void DataPackage::Save(const char *fileName)
 	}
 }
 
-void *DataPackage::OpenFile(const char *fileName, uint32 * pOutSize)
+bool DataPackage::OpenFile(const char *fileName, uint32 * pOutSize)
 {
 	Free();
 	FILE *pFile;
@@ -264,6 +265,10 @@ void *DataPackage::OpenFile(const char *fileName, uint32 * pOutSize)
 
 		_pCurrent = _data;
 
+		return true;
 	}
-	return _data;
+	else
+	{
+		return false;
+	}
 }

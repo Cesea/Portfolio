@@ -9,7 +9,7 @@ public :
 	DataPackage();
 	~DataPackage();
 
-	void *Create(uint32 size);
+	bool Create(uint32 size);
 
 	bool ReadInt8(int8 *pOut);
 	bool ReadInt16(int16 *pOut);
@@ -46,7 +46,7 @@ public :
 
 	void Free();
 	void Save(const char *fileName);
-	void *OpenFile(const char *fileName, uint32 *pOutSize);
+	bool OpenFile(const char *fileName, uint32 *pOutSize);
 
 public :
 	uint8 *_data{};

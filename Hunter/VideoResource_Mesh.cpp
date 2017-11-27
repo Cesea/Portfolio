@@ -340,10 +340,9 @@ namespace video
 
 		//로딩 경로에서 파일명만 제거하고 경로만 받는다.
 		std::string path;
-		int lastPathIndex = 0;		//마지막 \ 의 위치
+		int lastPathIndex = 0;
 
-									//filePath.find_first_of( 'A' );		filePath 문자열에 'A' 가 들어있는 위치 리턴 ( 앞에서 부터 검색 )
-		lastPathIndex = fileName.find_last_of('/');		//뒤에서 부터 검색
+		lastPathIndex = fileName.find_last_of('/');
 		if (lastPathIndex == -1) 
 		{			
 			lastPathIndex = fileName.find_last_of('\\');	

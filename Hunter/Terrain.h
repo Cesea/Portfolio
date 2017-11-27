@@ -12,29 +12,14 @@ constexpr int32 TERRAIN_CHUNK_DIM = 64;
 
 constexpr int32 TERRAIN_ALPHA_TEXTURE_SIZE = 512;
 
+#define MAX_FILE_NAME 256
+
 //constexpr int32 TERRAIN_HORI_SIZE = 1024;
 //constexpr int32 TERRAIN_VERT_SIZE = 1024;
 //constexpr int32 TERRAIN_HORI_HALF_SIZE = TERRAIN_HORI_SIZE / 2;
 //constexpr int32 TERRAIN_VERT_HALF_SIZE = TERRAIN_VERT_SIZE / 2;
 //constexpr int32 TERRAIN_HORI_CHUNK_COUNT = TERRAIN_HORI_SIZE / TERRAIN_CHUNK_DIM;
 //constexpr int32 TERRAIN_VERT_CHUNK_COUNT = TERRAIN_VERT_SIZE / TERRAIN_CHUNK_DIM;
-
-
-//터레인 파일의 구조..
-//'T''R' Magic Number TR
-//int32 : ChunkDim  터레인 청크의 크기
-//int32 : xExtent 터레인 청크 x갯수
-//int32 : zExtent 터레인 청크 z갯수
-#pragma pack ( push, 2)
-struct TerrainFileHeader
-{
-	char _m1, _m2;
-	int32 _chunkDim;
-	int32 _xExtent;
-	int32 _zExtent;
-};
-
-#pragma pack pop
 
 //터레인 하나의 청크에 대한 위치이다
 struct TerrainChunkPos
@@ -69,16 +54,20 @@ class Terrain : public SingletonBase<Terrain>
 public:
 	struct TerrainConfig
 	{
+		TerrainConfig() {}
+		TerrainConfig(const TerrainConfig &other);
+		TerrainConfig &operator= (const TerrainConfig &other);
+
 		int32 _xChunkCount{};
 		int32 _zChunkCount{};
 
 		float _textureMult{};
 
-		std::string _tile0FileName{};
-		std::string _tile1FileName{};
-		std::string _tile2FileName{};
-		std::string _tile3FileName{};
-		std::string _splatFileName{};
+		char _tile0FileName[MAX_FILE_NAME]{0, };
+		char _tile1FileName[MAX_FILE_NAME]{0, };
+		char _tile2FileName[MAX_FILE_NAME]{0, };
+		char _tile3FileName[MAX_FILE_NAME]{0, };
+		char _splatFileName[MAX_FILE_NAME]{0, };
 	};
 
 	struct TerrainFace 
@@ -117,7 +106,7 @@ public:
 		bool32 _dirty{false};
 
 		//QuadTree* _pQuadTree{};  //쿼드 트리
-		video::TerrainVertex *_pVertices;
+		const video::TerrainVertex *_pVertices;
 
 		std::vector<Entity> _entities;
 	};
@@ -175,10 +164,11 @@ private:
 		float intensity, video::TextureHandle alphaHandle, int32 channel);
 
 
+	void LoadTextureFromConfig(const Terrain::TerrainConfig &config);
+
 	video::VertexDeclHandle _declHandle{};
 	//video::MaterialHandle _materialHandle{};
 	video::EffectHandle _effect{};
-
 
 private:
 
@@ -223,7 +213,6 @@ private:
 	//LOD비율
 	float _lodRatio{};
 
-	video::TextureHandle _heightMapHandle{};
 	video::TextureHandle _tile0Handle{};
 	video::TextureHandle _tile1Handle{};
 	video::TextureHandle _tile2Handle{};

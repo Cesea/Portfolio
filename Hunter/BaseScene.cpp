@@ -33,21 +33,15 @@ bool BaseScene::Init()
 
 	//터레인 로드
 	Terrain::TerrainConfig config;
-	config._xChunkCount = 4;
-	config._zChunkCount = 4;
-	config._tile0FileName = "../resources/Textures/TerrainTexture01.jpg";
-	config._tile1FileName = "../resources/Textures/TerrainTexture02.jpg";
-	config._tile2FileName = "../resources/Textures/TerrainTexture03.png";
-	config._tile3FileName = "../resources/Textures/TerrainTexture04.png";
-	//config._splatFileName;
+	config._xChunkCount = 2;
+	config._zChunkCount = 2;
+	strncpy(config._tile0FileName, "../resources/Terrain/TerrainTexture01.jpg", MAX_FILE_NAME);
+	strncpy(config._tile1FileName, "../resources/Terrain/TerrainTexture02.jpg", MAX_FILE_NAME);
+	strncpy(config._tile2FileName, "../resources/Terrain/TerrainTexture03.png", MAX_FILE_NAME);
+	strncpy(config._tile3FileName, "../resources/Terrain/TerrainTexture04.png", MAX_FILE_NAME);
 
-	//config._cellScale = 1.0f;
-	//config._heightScale = 20.0f;
-	config._textureMult = 300;
-	//config._lodRatio = 0.1f;
-	//config._sectionResolution = TERRAIN_CHUNK_DIM;
+	config._textureMult = 200;
 
-	//_pTerrain = new Terrain();
 	TERRAIN->SetScene(this);
 	TERRAIN->Create(config, true);
 

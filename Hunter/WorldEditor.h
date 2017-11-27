@@ -5,7 +5,7 @@ class IScene;
 class Entity;
 class Terrain;
 
-#define EDITOR_MAX_NAME 64
+#define EDITOR_MAX_NAME 128
 #define EDITOR_MAX_NAME_VAR 32
 
 struct TransformComponent;
@@ -59,7 +59,7 @@ struct TerrainEditor
 	float _brushInnerRadius{2.0f};
 	float _brushOutterRadius{4.0f};
 
-	float _brushIntensity{3.0f};
+	float _brushIntensity{1.0f};
 
 	//채널은 r : 0, g : 1, b : 2, a : 3순으로 간다..
 	int32 _channel{ 0 };
