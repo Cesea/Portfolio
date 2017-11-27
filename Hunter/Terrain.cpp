@@ -1045,7 +1045,7 @@ void Terrain::RebuildSection(int32 minX, int32 maxX, int32 minZ, int32 maxZ)
 	int32 numVertX = maxX - minX + 1;
 	int32 numVertZ = maxZ - minZ + 1;
 
-	int32 triNum = (numVertZ - 1) * (numVertZ - 1) * 2;
+	int32 triNum = (numVertX - 1) * (numVertZ - 1) * 2;
 
 	Vector3 *vertices = new Vector3[numVertX * numVertZ];
 	Vector2 *uvs = new Vector2[numVertX * numVertZ];
@@ -1063,9 +1063,9 @@ void Terrain::RebuildSection(int32 minX, int32 maxX, int32 minZ, int32 maxZ)
 
 	counter = 0;
 	uint32 *indices = new uint32[triNum * 3];
-	for (int32 z = 0; z < numVertZ; ++z)
+	for (int32 z = 0; z < numVertZ - 1; ++z)
 	{
-		for (int32 x = 0; x < numVertX; ++x)
+		for (int32 x = 0; x < numVertX - 1; ++x)
 		{
 			int32 lt = x + z * numVertX;
 			int32 rt = (x + 1) + z * numVertX;
@@ -1092,9 +1092,9 @@ void Terrain::RebuildSection(int32 minX, int32 maxX, int32 minZ, int32 maxZ)
 	ComputeTangentAndBinormal(tangents, binormals, vertices, normals, uvs, indices, triNum, numVertX * numVertZ);
 
 	counter = 0;
-	for (int32 z = minZ; z <= maxZ; ++z)
+	for (int32 z = minZ; z < maxZ; ++z)
 	{
-		for (int32 x = minX; x <= maxX; ++x)
+		for (int32 x = minX; x < maxX; ++x)
 		{
 			_terrainVertices[Index2D(x, z, _numVertexX)]._normal = normals[counter++];
 		}
@@ -1112,7 +1112,7 @@ void Terrain::SmoothSection(int32 minX, int32 maxX, int32 minZ, int32 maxZ)
 	int32 numVertX = maxX - minX + 1;
 	int32 numVertZ = maxZ - minZ + 1;
 
-	float* smooth = new float[_numTotalVertex];
+	float* smooth = new float[numVertX * numVertZ];
 
 	for (int32 z = minZ; z < maxZ; z++)
 	{
