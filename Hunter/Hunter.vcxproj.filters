@@ -225,6 +225,12 @@
     <ClCompile Include="TurtleStates.cpp">
       <Filter>Game\GameObject\Enemy\Turtle</Filter>
     </ClCompile>
+    <ClCompile Include="EnvironmentSphere.cpp">
+      <Filter>Game\GameUtils\Light</Filter>
+    </ClCompile>
+    <ClCompile Include="DataPackage.cpp">
+      <Filter>Sub\DataPackage</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -550,6 +556,12 @@
     <ClInclude Include="imguiRenderer.h">
       <Filter>GUI</Filter>
     </ClInclude>
+    <ClInclude Include="EnvironmentSphere.h">
+      <Filter>Game\GameUtils\Light</Filter>
+    </ClInclude>
+    <ClInclude Include="DataPackage.h">
+      <Filter>Sub\DataPackage</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Core">
@@ -704,6 +716,9 @@
     </Filter>
     <Filter Include="Game\GameObject\Enemy\Turtle">
       <UniqueIdentifier>{b66c83e9-946e-43df-a273-bbe371f59f11}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sub\DataPackage">
+      <UniqueIdentifier>{c30c9bf2-650a-461a-b648-77edb9234451}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

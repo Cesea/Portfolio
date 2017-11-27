@@ -29,7 +29,7 @@ public:
 	virtual void Release();
 	virtual const char *GetSceneName() { return "BaseScene"; }
 
-private:
+protected :
 	TransformSystem _transformSystem;
 	RenderSystem _renderSystem;
 	ScriptSystem _scriptSystem;

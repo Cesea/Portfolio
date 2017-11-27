@@ -129,7 +129,7 @@ public:
 	TerrainChunkPos ConvertWorldPosToChunkPos(const Vector3 &worldPos);
 	TerrainTilePos ConvertWorldPostoTilePos(const Vector3 &worldPos);
 
-	const Vector3 ConvertChunkPosToWorldPos(const TerrainChunkPos &chunkPos);
+	//const Vector3 ConvertChunkPosToWorldPos(const TerrainChunkPos &chunkPos);
 	const Vector3 ConvertTilePosToWorldPos(const TerrainTilePos &tilePos);
 
 private:

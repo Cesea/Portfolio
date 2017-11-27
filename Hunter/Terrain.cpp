@@ -470,6 +470,7 @@ void Terrain::Render(const Camera & camera)
 
 	//뷰 행렬셋팅
 	pEffect->SetMatrix("matViewProjection", camera.GetViewProjectionMatrix());
+	pEffect->SetVector("vEyePosition", Vector4(camera.GetEntity().GetComponent<TransformComponent>()._position, 1.0f));
 	pEffect->SetMatrix("baseDirectionalLight", _pCurrentScene->_pMainLight->GetLightMatrix());
 
 	//Texture 셋팅
@@ -478,8 +479,6 @@ void Terrain::Render(const Camera & camera)
 	pEffect->SetTexture("Terrain2_Tex", *VIDEO->GetTexture(_tile2Handle));
 	pEffect->SetTexture("Terrain3_Tex", *VIDEO->GetTexture(_tile3Handle));
 	pEffect->SetTexture("TerrainControl_Tex", *VIDEO->GetTexture(_tileSplatHandle));
-
-	pEffect->SetTechnique("Base");
 
 	if (_inEditMode)
 	{
@@ -527,7 +526,7 @@ void Terrain::Render(const Camera & camera)
 					{
 						pEffect->BeginPass(i);
 
-						gpDevice->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, 0,
+						HRESULT re = gpDevice->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, 0,
 							_sectionNumVertexX * _sectionNumVertexZ, 0, _sectionNumCellX * _sectionNumCellX * 2);
 
 						pEffect->EndPass();

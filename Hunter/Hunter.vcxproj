@@ -141,12 +141,14 @@
     <ClCompile Include="CollisionUtils.cpp" />
     <ClCompile Include="CommonUtils.cpp" />
     <ClCompile Include="Console.cpp" />
+    <ClCompile Include="DataPackage.cpp" />
     <ClCompile Include="DirectionalLight.cpp" />
     <ClCompile Include="Dragon.cpp" />
     <ClCompile Include="Enemy.cpp" />
     <ClCompile Include="Entity.cpp" />
     <ClCompile Include="EntityComponentStorage.cpp" />
     <ClCompile Include="EntityIDPool.cpp" />
+    <ClCompile Include="EnvironmentSphere.cpp" />
     <ClCompile Include="Filter.cpp" />
     <ClCompile Include="Frustum.cpp" />
     <ClCompile Include="GameCommand.cpp" />
@@ -227,6 +229,7 @@
     <ClInclude Include="Console.h" />
     <ClInclude Include="ContainerCheck.h" />
     <ClInclude Include="DataBase.h" />
+    <ClInclude Include="DataPackage.h" />
     <ClInclude Include="Delegate.h" />
     <ClInclude Include="DirectionalLight.h" />
     <ClInclude Include="Dragon.h" />
@@ -235,6 +238,7 @@
     <ClInclude Include="EntityComponentStorage.h" />
     <ClInclude Include="EntityComponentSystem.h" />
     <ClInclude Include="EntityIDPool.h" />
+    <ClInclude Include="EnvironmentSphere.h" />
     <ClInclude Include="Filter.h" />
     <ClInclude Include="Frustum.h" />
     <ClInclude Include="GameCommand.h" />

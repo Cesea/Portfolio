@@ -595,7 +595,6 @@ void Editor::InObjectEditMode()
 
 			ImguiLabel("Orientation");
 			{
-
 				Quaternion test;
 				Matrix rotation = _objectEditor._pTransform->_matFinal;
 				rotation._41 = 0;

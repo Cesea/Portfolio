@@ -19,6 +19,18 @@ bool BaseScene::Init()
 	InitPlayerAnimation();
 	InitSnakeAnimation();
 
+	DataPackage test;
+	test.Create(sizeof(float) * 3);
+	test.WriteAs<Vector3>(Vector3(1.0f, 2.0f, 3.0f));
+
+	test.Save("../test.txt");
+
+	DataPackage test2;
+	Vector3 vv;
+	test2.OpenFile("../test.txt", nullptr);
+	test2.ReadAs<Vector3>(&vv);
+
+
 	//터레인 로드
 	Terrain::TerrainConfig config;
 	config._xChunkCount = 4;

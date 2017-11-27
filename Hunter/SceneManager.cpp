@@ -17,6 +17,7 @@ bool SceneManager::Init()
 	//기본 베이스 씬 세팅
 	IScene *pScene = new BaseScene;
 	AddScene(pScene->GetSceneName(), pScene);
+
 	ChangeScene(pScene->GetSceneName());
 
 	GetChannel().Add<SceneChangeEvent, SceneManager>(*this);

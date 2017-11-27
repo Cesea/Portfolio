@@ -6,8 +6,8 @@ sampler DiffuseSampler = sampler_state
 	MagFilter = LINEAR;
 	MipFilter = LINEAR;
 
-	AddressU = Clamp;
-	AddressV = Clamp;
+	AddressU = Wrap;
+	AddressV = Wrap;
 };
 
 uniform extern texture NormalTexture;
@@ -18,8 +18,8 @@ sampler NormalSampler = sampler_state
 	MagFilter = LINEAR;
 	MipFilter = LINEAR;
 
-	AddressU = Clamp;
-	AddressV = Clamp;
+	AddressU = Wrap;
+	AddressV = Wrap;
 };
 
 uniform extern texture SpecularTexture;
@@ -30,11 +30,9 @@ sampler SpecularSampler = sampler_state
 	MagFilter = LINEAR;
 	MipFilter = LINEAR;
 
-	AddressU = Clamp;
-	AddressV = Clamp;
+	AddressU = Wrap;
+	AddressV = Wrap;
 };
-
-
 
 float4x4 matWorld : World;
 float4x4 matViewProjection : ViewProjection;
@@ -102,7 +100,6 @@ float4 ps_main(vs_output input) : COLOR
 	return diffuseColor;
 }
 
-
 //--------------------------------------------------------------//
 // Technique Section for Mesh
 //--------------------------------------------------------------//
@@ -112,6 +109,10 @@ technique Base
    {
       VertexShader = compile vs_3_0 vs_main();
       PixelShader = compile ps_3_0 ps_main();
+
+	  SeparateAlphaBlendEnable = true;
+	  SrcBlendAlpha = SrcAlpha;
+	  DestBlendAlpha = InvSrcAlpha;
    }
 }
 

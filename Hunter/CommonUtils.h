@@ -12,7 +12,7 @@
 #include "State.h"
 #include "StateMachine.h"
 
-
+#include "DataPackage.h"
 
 struct IntRect
 {

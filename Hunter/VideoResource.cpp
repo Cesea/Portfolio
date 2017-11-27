@@ -204,20 +204,17 @@ namespace video
 
 	void Effect::SetMatrix(LPCSTR name, const Matrix &matrix) const
 	{
-		HRESULT re = _ptr->SetMatrix(name, &matrix);
-		int a = 0;
+		_ptr->SetMatrix(name, &matrix);
 	}
 
 	void Effect::SetMatrices(LPCSTR name, const Matrix *matrices, uint32 numMatrices) const
 	{
-		HRESULT re = _ptr->SetMatrixArray(name, matrices, numMatrices);
-		int a = 0;
+		_ptr->SetMatrixArray(name, matrices, numMatrices);
 	}
 
 	void Effect::SetTexture(const std::string &name, const Texture &texture) const
 	{
-		HRESULT re = _ptr->SetTexture(name.c_str(), texture._ptr);
-		int a = 0;
+		_ptr->SetTexture(name.c_str(), texture._ptr);
 	}
 
 	void Effect::SetMaterial(const Material & material) const
@@ -243,6 +240,11 @@ namespace video
 	void Effect::SetVector(LPCSTR name, const Vector4 &value) const
 	{
 		_ptr->SetVector(name, &value);
+	}
+
+	void Effect::SetValue(LPCSTR name, void * value, size_t size)
+	{
+		_ptr->SetValue(name, value, size);
 	}
 
 	void Effect::CommitChanges() const
