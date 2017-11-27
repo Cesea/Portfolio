@@ -14,7 +14,7 @@ bool Snake::CreateFromWorld(World & world)
 {
 	_entity = world.CreateEntity();
 	TransformComponent &transComp = _entity.AddComponent<TransformComponent>();
-	//transComp.MovePositionWorld(0, 5.0f, 0);
+	transComp.MovePositionWorld(0, 10.0f, 0);
 
 	RenderComponent &renderComp = _entity.AddComponent<RenderComponent>();
 	renderComp._type = RenderComponent::Type::eSkinned;

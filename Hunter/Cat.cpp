@@ -1,104 +1,101 @@
 #include "stdafx.h"
-#include "Turtle.h"
-#include "TurtleStates.h"
+#include "Cat.h"
+#include "CatStates.h"
 
-Turtle::Turtle()
+Cat::Cat()
 {
 }
 
-
-Turtle::~Turtle()
+Cat::~Cat()
 {
 }
 
-bool Turtle::CreateFromWorld(World & world)
+bool Cat::CreateFromWorld(World & world)
 {
 	_entity = world.CreateEntity();
 	TransformComponent &transComp = _entity.AddComponent<TransformComponent>();
-	transComp.MovePositionWorld(0, 6.0f, 0);
+	transComp.MovePositionWorld(0, 7.0f, 0);
 
 	RenderComponent &renderComp = _entity.AddComponent<RenderComponent>();
 	renderComp._type = RenderComponent::Type::eSkinned;
-	renderComp._skinned = VIDEO->CreateAnimationInstance(VIDEO->GetSkinnedXMesh("Turtle"), "Animal" + std::to_string(0));
+	renderComp._skinned = VIDEO->CreateAnimationInstance(VIDEO->GetSkinnedXMesh("Cat"), "Anim" + std::to_string(0));
 
 	ScriptComponent &scriptComponent = _entity.AddComponent<ScriptComponent>();
-	scriptComponent.SetScript(MAKE_SCRIPT_DELEGATE(Turtle, Update, *this));
+	scriptComponent.SetScript(MAKE_SCRIPT_DELEGATE(Cat, Update, *this));
 
 	_pActionComp = &_entity.AddComponent<ActionComponent>();
 	_pActionComp->CreateFrom(renderComp._skinned);
-	_pActionComp->_pCallbackHandler = new TurtleCallbackHandler;
+	_pActionComp->_pCallbackHandler = new CatCallbackHandler;
 	_pActionComp->_pCallbackHandler->Init(this);
 	SetupCallbackAndCompression();
 
 	_pActionComp->MakeAnimationList();
-	_pActionComp->SetFirstAction(TURTLE_ANIM(TURTLE_ANIMATION_ENUM::TURTLE_STAND));
+	_pActionComp->SetFirstAction(CAT_ANIM(CAT_ANIMATION_ENUM::CAT_IDLE));
 
 	_entity.Activate();
 
-	
-	_pStateMachine = new TurtleStateMachine;
+	_pStateMachine = new CatStateMachine;
 	_pStateMachine->Init(this);
-	_pStateMachine->RegisterState(META_TYPE(TurtleIdleState)->Name(), new TurtleIdleState());
-	_pStateMachine->RegisterState(META_TYPE(TurtleMoveState)->Name(), new TurtleMoveState());
-	_pStateMachine->RegisterState(META_TYPE(TurtleBite1State)->Name(), new TurtleBite1State());
-	_pStateMachine->RegisterState(META_TYPE(TurtleBite2State)->Name(), new TurtleBite2State());
-	_pStateMachine->RegisterState(META_TYPE(TurtleFindState)->Name(), new TurtleFindState());
-	_pStateMachine->ChangeState(META_TYPE(TurtleBite1State)->Name());
-	_state = TURTLESTATE_STAND;
+	_pStateMachine->RegisterState(META_TYPE(CatIdleState)->Name(), new CatIdleState());
+	_pStateMachine->RegisterState(META_TYPE(CatMoveState)->Name(), new CatMoveState());
+	_pStateMachine->RegisterState(META_TYPE(CatAttackState)->Name(), new CatAttackState());
+	_pStateMachine->RegisterState(META_TYPE(CatAttack2State)->Name(), new CatAttack2State());
+	_pStateMachine->RegisterState(META_TYPE(CatAttack3State)->Name(), new CatAttack3State());
+	_pStateMachine->RegisterState(META_TYPE(CatAttack4State)->Name(), new CatAttack4State());
+	_pStateMachine->RegisterState(META_TYPE(CatAttack5State)->Name(), new CatAttack5State());
+	_pStateMachine->RegisterState(META_TYPE(CatStandState)->Name(), new CatStandState());
+	_pStateMachine->ChangeState(META_TYPE(CatIdleState)->Name());
 
-	_entity.Activate();
-
-
-	_speed = 1.0f;
-	_rotateSpeed = D3DX_PI / 256;
+	_speed = 5.0f;
+	_rotateSpeed = D3DX_PI / 64;
 	_patrolIndex = 0;
-	_moveSegment.push_back(Vector3(5.0f, 6.0f, 5.0f));
-	_moveSegment.push_back(Vector3(-5.0f, 6.0f, 5.0f));
-	_moveSegment.push_back(Vector3(-5.0f, 6.0f, -5.0f));
+	_moveSegment.push_back(Vector3(5.0f, 7.0f, 5.0f));
+	_moveSegment.push_back(Vector3(-5.0f, 7.0f, 5.0f));
+	_moveSegment.push_back(Vector3(-5.0f, 7.0f, -5.0f));
+
 	_delayTime = 180.0f;
 	_delayCount = _delayTime;
 
-	_findDistance = 1.0f;
+	_findDistance = 5.0f;
 	_findRadian = D3DX_PI / 3;
-	_findStareDistance = 3.0f;
+	_findStareDistance = 20.0f;
 	_roarTime = 180;
 	_roarCount = _roarTime;
 
 	_battle = false;
 
-	_playerPos = Vector3(-5.0f, 6.0f, 5.0f);
+	_playerPos = Vector3(5.0f, 7.0f, 5.0f);
 
 	_atkRange = 0.5f;
-	_atkTime = 90;
+	_atkTime = 70;
 	_atkCount = _atkTime;
 
-	_standTime = 84;
+	_standTime = 70;
 	_standCount = _standTime;
 	return true;
 }
 
-void Turtle::Update(float deltaTime)
+void Cat::Update(float deltaTime)
 {
 	_pStateMachine->Update(deltaTime, _currentCommand);
 	_pStateMachine->Update(deltaTime, _currentCommand);
 	TransformComponent &transComp = _entity.GetComponent<TransformComponent>();
-
 	switch (_state)
 	{
-	case TURTLESTATE_STAND:
+	case CATSTATE_IDLE:
 		_delayCount -= 1;
 		if (_delayCount <= 0.0f)
 		{
 			_delayCount = _delayTime;
-			_state = TURTLESTATE_WALK;
-			_pStateMachine->ChangeState(META_TYPE(TurtleMoveState)->Name());
+			_state = CATSTATE_PATROL;
+			_pStateMachine->ChangeState(META_TYPE(CatMoveState)->Name());
 		}
 		break;
-	case TURTLESTATE_WALK:
+	case CATSTATE_PATROL:
 		if (_moveSegment.empty())
 		{
-			_pStateMachine->ChangeState(META_TYPE(TurtleIdleState)->Name());
-			_state = TURTLESTATE_STAND;
+			_pStateMachine->ChangeState(META_TYPE(CatStandState)->Name());
+			_state = CATSTATE_IDLE;
 		}
 		else
 		{
@@ -123,8 +120,8 @@ void Turtle::Update(float deltaTime)
 				_patrolIndex++;
 				if (_patrolIndex > _moveSegment.size() - 1) _patrolIndex = 0;
 				//IDLE 애니메이션 실행
-				_pStateMachine->ChangeState(META_TYPE(TurtleIdleState)->Name());
-				_state = TURTLESTATE_STAND;
+				_pStateMachine->ChangeState(META_TYPE(CatStandState)->Name());
+				_state = CATSTATE_IDLE;
 			}
 			//아니면 이동속도만큼 이동
 			else
@@ -134,25 +131,25 @@ void Turtle::Update(float deltaTime)
 
 		}
 		break;
-	case TURTLESTATE_FIND:
+	case CATSTATE_FIND:
 		//roar가 끝나면 플레이어를 추적하는 RUN으로
 		_roarCount -= 1;
 		if (_roarCount < 0)
 		{
 			_roarCount = _roarTime;
-			_state = TURTLESTATE_TRACE;
-			_pStateMachine->ChangeState(META_TYPE(TurtleMoveState)->Name());
+			_state = CATSTATE_RUN;
+			_pStateMachine->ChangeState(META_TYPE(CatMoveState)->Name());
 		}
 		break;
-	case TURTLESTATE_TRACE:
+	case CATSTATE_RUN:
 	{
 		Vector3 direction = _playerPos - transComp.GetWorldPosition();
 		float distance = Vec3Length(&direction);
 		Vec3Normalize(&direction, &direction);
 		if (distance < _atkRange)
 		{
-			_state = TURTLESTATE_ATK1;
-			_pStateMachine->ChangeState(META_TYPE(TurtleBite1State)->Name());
+			_state = CATSTATE_ATK1;
+			_pStateMachine->ChangeState(META_TYPE(CatAttackState)->Name());
 		}
 		else
 		{
@@ -160,7 +157,7 @@ void Turtle::Update(float deltaTime)
 		}
 	}
 	break;
-	case TURTLESTATE_ATK1:
+	case CATSTATE_ATK1:
 		_atkCount--;
 		if (_atkCount < 0)
 		{
@@ -171,21 +168,20 @@ void Turtle::Update(float deltaTime)
 			Vec3Normalize(&direction, &direction);
 			if (distance < _atkRange)
 			{
-				_state = TURTLESTATE_ATK2;
-				_pStateMachine->ChangeState(META_TYPE(TurtleBite2State)->Name());
-				_playerPos = Vector3(RandFloat(-5.0, 5.0), 5.0f, RandFloat(-5.0, 5.0));
+				_state = CATSTATE_ATK3;
+				_pStateMachine->ChangeState(META_TYPE(CatAttack2State)->Name());
 			}
 			//공격범위를 벗어났다?
 			else
 			{
 				//배틀을 멈추고 기본자세 (다시추적시작)
 				_battle = false;
-				_state = TURTLESTATE_STAND;
-				_pStateMachine->ChangeState(META_TYPE(TurtleIdleState)->Name());
+				_state = CATSTATE_IDLE;
+				_pStateMachine->ChangeState(META_TYPE(CatStandState)->Name());
 			}
 		}
 		break;
-	case TURTLESTATE_ATK2:
+	case CATSTATE_ATK2:
 		_atkCount--;
 		if (_atkCount < 0)
 		{
@@ -196,17 +192,77 @@ void Turtle::Update(float deltaTime)
 			Vec3Normalize(&direction, &direction);
 			if (distance < _atkRange)
 			{
-				_state = TURTLESTATE_ATK1;
-				_pStateMachine->ChangeState(META_TYPE(TurtleBite1State)->Name());
+				_state = CATSTATE_ATK3;
+				_pStateMachine->ChangeState(META_TYPE(CatAttack3State)->Name());
 			}
 			//공격범위를 벗어났다?
 			else
 			{
 				//배틀을 멈추고 기본자세 (다시추적시작)
 				_battle = false;
-				_state = TURTLESTATE_STAND;
-				_pStateMachine->ChangeState(META_TYPE(TurtleIdleState)->Name());
+				_state = CATSTATE_IDLE;
+				_pStateMachine->ChangeState(META_TYPE(CatStandState)->Name());
 			}
+		}
+		break;
+	case CATSTATE_ATK3:
+		_atkCount--;
+		if (_atkCount < 0)
+		{
+			_atkCount = _atkTime;
+			//공격을 마쳤으면 다시한번검사
+			Vector3 direction = _playerPos - transComp.GetWorldPosition();
+			float distance = Vec3Length(&direction);
+			Vec3Normalize(&direction, &direction);
+			if (distance < _atkRange)
+			{
+				_state = CATSTATE_ATK5;
+				_pStateMachine->ChangeState(META_TYPE(CatAttack5State)->Name());
+			}
+			//공격범위를 벗어났다?
+			else
+			{
+				//배틀을 멈추고 기본자세 (다시추적시작)
+				_battle = false;
+				_state = CATSTATE_IDLE;
+				_pStateMachine->ChangeState(META_TYPE(CatStandState)->Name());
+			}
+		}
+		break;
+	case CATSTATE_ATK4:
+		break;
+	case CATSTATE_ATK5:
+		_atkCount--;
+		if (_atkCount < 0)
+		{
+			_atkCount = _atkTime;
+			//공격을 마쳤으면 다시한번검사
+			Vector3 direction = _playerPos - transComp.GetWorldPosition();
+			float distance = Vec3Length(&direction);
+			Vec3Normalize(&direction, &direction);
+			if (distance < _atkRange)
+			{
+				_state = CATSTATE_ATK1;
+				_pStateMachine->ChangeState(META_TYPE(CatAttackState)->Name());
+				_playerPos = Vector3(RandFloat(-5.0, 5.0), 7.0f, RandFloat(-5.0, 5.0));
+			}
+			//공격범위를 벗어났다?
+			else
+			{
+				//배틀을 멈추고 기본자세 (다시추적시작)
+				_battle = false;
+				_state = CATSTATE_IDLE;
+				_pStateMachine->ChangeState(META_TYPE(CatStandState)->Name());
+			}
+		}
+		break;
+	case CATSTATE_STAND:
+		_standCount--;
+		if (_standCount < 0)
+		{
+			_standCount = _standTime;
+			_state = CATSTATE_PATROL;
+			_pStateMachine->ChangeState(META_TYPE(CatMoveState)->Name());
 		}
 		break;
 	}
@@ -217,17 +273,16 @@ void Turtle::Update(float deltaTime)
 		{
 			//찾으면 FIND가 되며 battle상태가 됌
 			_battle = true;
-			_state = TURTLESTATE_FIND;
-			_pStateMachine->ChangeState(META_TYPE(TurtleFindState)->Name());
+			_state = CATSTATE_FIND;
+			_pStateMachine->ChangeState(META_TYPE(CatIdleState)->Name());
 			Vector3 distance = _playerPos - transComp.GetWorldPosition();
 			Vec3Normalize(&distance, &distance);
 			transComp.LookDirection(-distance, D3DX_PI * 2);
 		}
 	}
-
 }
 
-void Turtle::SetupCallbackAndCompression()
+void Cat::SetupCallbackAndCompression()
 {
 	ActionComponent &refActionComp = _entity.GetComponent<ActionComponent>();
 	TransformComponent &refTransform = _entity.GetComponent<TransformComponent>();
@@ -236,9 +291,9 @@ void Turtle::SetupCallbackAndCompression()
 	uint32 numAnimationSet = pController->GetNumAnimationSets();
 	ID3DXKeyframedAnimationSet *anim0;
 
-	pController->GetAnimationSetByName(TurtleAnimationString[TURTLE_ANIMATION_ENUM::TURTLE_STAND], (ID3DXAnimationSet **)&anim0);
+	pController->GetAnimationSetByName(CatAnimationString[CAT_ANIMATION_ENUM::CAT_IDLE], (ID3DXAnimationSet **)&anim0);
 
-	_callbackData._animtionEnum = (TURTLE_ANIMATION_ENUM *)&_animationEnum;
+	_callbackData._animtionEnum = (CAT_ANIMATION_ENUM *)&_animationEnum;
 
 	D3DXKEY_CALLBACK warSwingLeftKeys;
 	warSwingLeftKeys.Time = anim0->GetPeriod() / 1.0f * anim0->GetSourceTicksPerSecond();
@@ -247,12 +302,12 @@ void Turtle::SetupCallbackAndCompression()
 	AddCallbackKeysAndCompress(pController, anim0, 1, &warSwingLeftKeys, D3DXCOMPRESS_DEFAULT, 0.1f);
 }
 
-void Turtle::QueueAction(const Action & action)
+void Cat::QueueAction(const Action & action)
 {
 	_pActionComp->_actionQueue.PushAction(action);
 }
 
-bool Turtle::findPlayer(Vector3 forward, Vector3 playerPos, Vector3 myPos, float range1, float range2, float findRadian)
+bool Cat::findPlayer(Vector3 forward, Vector3 playerPos, Vector3 myPos, float range1, float range2, float findRadian)
 {
 	Vector3 toPlayer = playerPos - myPos;
 	float distance = Vec3Length(&toPlayer);

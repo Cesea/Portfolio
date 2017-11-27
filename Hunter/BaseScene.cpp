@@ -18,7 +18,9 @@ bool BaseScene::Init()
 
 	InitPlayerAnimation();
 	InitSnakeAnimation();
-
+	InitTurtleAnimation();
+	InitBatAnimation();
+	InitCatAnimation();
 	//터레인 로드
 	Terrain::TerrainConfig config;
 	config._xChunkCount = 4;
@@ -49,6 +51,19 @@ bool BaseScene::Init()
 	MatrixScaling(&correctionMat, 1.15f, 1.15f, 1.15f);
 	video::SkinnedXMeshHandle snakeMesh = VIDEO->CreateSkinnedXMesh(
 		"../resources/Models/Snake/Snake_Red.X", &correctionMat, "Snake");
+
+	MatrixScaling(&correctionMat, 1.15f, 1.15f, 1.15f);
+	video::SkinnedXMeshHandle turtleMesh = VIDEO->CreateSkinnedXMesh(
+		"../resources/Models/DragonTurtle/DragonTurtle_Black.X", &correctionMat, "Turtle");
+
+	MatrixScaling(&correctionMat, 1.0f, 1.0f, 1.0f);
+	video::SkinnedXMeshHandle batMesh = VIDEO->CreateSkinnedXMesh(
+		"../resources/Models/DragonBat/DragonBat_Black.X", &correctionMat, "Bat");
+
+
+	MatrixScaling(&correctionMat, 1.15f, 1.15f, 1.15f);
+	video::SkinnedXMeshHandle catMesh = VIDEO->CreateSkinnedXMesh(
+		"../resources/Models/DevilCat/DevilCat.X", &correctionMat, "Cat");
 
 	MatrixScaling(&correctionMat, 1.0f, 1.0f, 1.0f);
 	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Rock/Rock1_A.X", &correctionMat, "Rock01");
@@ -100,6 +115,9 @@ bool BaseScene::Init()
 
 	//_player.CreateFromWorld(_world);
 	//_snake.CreateFromWorld(_world);
+	_turtle.CreateFromWorld(_world);
+	//_bat.CreateFromWorld(_world);
+	_cat.CreateFromWorld(_world);
 
 	//에디터 생성
 	imguiRenderInit();

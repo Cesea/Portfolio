@@ -1,12 +1,12 @@
 #include "State.h"
 #include "StateMachine.h"
 
-#include "Turtle.h"
+#include "Cat.h"
 
-class TurtleState;
-class TurtleStateMachine;
+class CatState;
+class CatStateMachine;
 
-class TurtleStateMachine : public StateMachine<Turtle>
+class CatStateMachine : public StateMachine<Cat>
 {
 	friend class PlayerState;
 public:
@@ -23,10 +23,10 @@ public:
 protected:
 };
 
-class TurtleState : public State<Turtle>
+class CatState : public State<Cat>
 {
 public:
-	virtual bool Init(StateMachine<Turtle> *pParent);
+	virtual bool Init(StateMachine<Cat> *pParent);
 	virtual void Release();
 	virtual void OnEnter() = 0;
 	virtual void Update(float deltaTime, const GameCommand &command) = 0;
@@ -35,48 +35,81 @@ public:
 protected:
 };
 
-class TurtleIdleState : public TurtleState
+class CatIdleState : public CatState
 {
 public:
-	DECLARE_META(TurtleIdleState);
+	DECLARE_META(CatIdleState);
 
 	virtual void OnEnter() override;
 	virtual void Update(float deltaTime, const GameCommand &command) override;
 	virtual void OnExit() override;
 };
 
-class TurtleMoveState : public TurtleState
+class CatMoveState : public CatState
 {
 public:
-	DECLARE_META(TurtleMoveState);
+	DECLARE_META(CatMoveState);
 
 	virtual void OnEnter() override;
 	virtual void Update(float deltaTime, const GameCommand &command) override;
 	virtual void OnExit() override;
 };
 
-class TurtleBite1State : public TurtleState
+
+class CatAttackState : public CatState
 {
 public:
-	DECLARE_META(TurtleBite1State);
+	DECLARE_META(CatAttackState);
 
 	virtual void OnEnter() override;
 	virtual void Update(float deltaTime, const GameCommand &command) override;
 	virtual void OnExit() override;
 };
-class TurtleBite2State : public TurtleState
+
+class CatAttack2State : public CatState
 {
 public:
-	DECLARE_META(TurtleBite2State);
+	DECLARE_META(CatAttack2State);
 
 	virtual void OnEnter() override;
 	virtual void Update(float deltaTime, const GameCommand &command) override;
 	virtual void OnExit() override;
 };
-class TurtleFindState : public TurtleState
+
+class CatAttack3State : public CatState
 {
 public:
-	DECLARE_META(TurtleFindState);
+	DECLARE_META(CatAttack3State);
+
+	virtual void OnEnter() override;
+	virtual void Update(float deltaTime, const GameCommand &command) override;
+	virtual void OnExit() override;
+};
+
+class CatAttack4State : public CatState
+{
+public:
+	DECLARE_META(CatAttack4State);
+
+	virtual void OnEnter() override;
+	virtual void Update(float deltaTime, const GameCommand &command) override;
+	virtual void OnExit() override;
+};
+
+class CatAttack5State : public CatState
+{
+public:
+	DECLARE_META(CatAttack5State);
+
+	virtual void OnEnter() override;
+	virtual void Update(float deltaTime, const GameCommand &command) override;
+	virtual void OnExit() override;
+};
+
+class CatStandState : public CatState
+{
+public:
+	DECLARE_META(CatStandState);
 
 	virtual void OnEnter() override;
 	virtual void Update(float deltaTime, const GameCommand &command) override;

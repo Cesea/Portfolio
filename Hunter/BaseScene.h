@@ -12,7 +12,9 @@
 #include "WorldEditor.h"
 #include "Player.h"
 #include "Snake.h"
-
+#include "Turtle.h"
+#include "bat.h"
+#include "Cat.h"
 class BaseScene : public IScene
 {
 	friend class Terrain;
@@ -40,8 +42,9 @@ private:
 
 	Editor *_editor{};
 
-	//Player _player;
-	//Snake _snake;
+	Turtle _turtle;
+	Bat _bat;
+	Cat _cat;
 public:
 
 	void Handle(const Editor::GetObjectFromSceneEvent &event);

@@ -38,6 +38,24 @@ class Turtle :
 {
 	friend class TurtleStateMachine;
 	friend class TurtleCallbackHandler;
+private:
+	enum TURTLESTATE
+	{
+		TURTLESTATE_ATK1,
+		TURTLESTATE_ATK2,
+		TURTLESTATE_BREATH_FIRE,
+		TURTLESTATE_DEATH,
+		TURTLESTATE_EARTHQUAKE,
+		TURTLESTATE_HIT1,
+		TURTLESTATE_HIT2,
+		TURTLESTATE_ROAR,
+		TURTLESTATE_SPIT,
+		TURTLESTATE_STAND,
+		TURTLESTATE_WALK,
+		TURTLESTATE_FIND,
+		TURTLESTATE_TRACE
+	};
+	TURTLESTATE _state;
 public:
 	Turtle();
 	virtual ~Turtle();
@@ -57,5 +75,7 @@ protected:
 	ActionComponent *_pActionComp{};
 
 	void QueueAction(const Action &action);
+
+	bool Turtle::findPlayer(Vector3 forward, Vector3 playerPos, Vector3 myPos, float range1, float range2, float findRadian);
 };
 

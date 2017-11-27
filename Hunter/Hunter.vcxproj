@@ -136,7 +136,13 @@
     <ClCompile Include="BaseLight.cpp" />
     <ClCompile Include="BaseScene.cpp" />
     <ClCompile Include="BaseSystem.cpp" />
+    <ClCompile Include="bat.cpp" />
+    <ClCompile Include="batAnimationString.cpp" />
+    <ClCompile Include="batStates.cpp" />
     <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="Cat.cpp" />
+    <ClCompile Include="CatAnimationString.cpp" />
+    <ClCompile Include="CatStates.cpp" />
     <ClCompile Include="CollisionComponent.cpp" />
     <ClCompile Include="CollisionUtils.cpp" />
     <ClCompile Include="CommonUtils.cpp" />
@@ -218,7 +224,13 @@
     <ClInclude Include="BaseLight.h" />
     <ClInclude Include="BaseScene.h" />
     <ClInclude Include="BaseSystem.h" />
+    <ClInclude Include="bat.h" />
+    <ClInclude Include="batAnimationString.h" />
+    <ClInclude Include="batStates.h" />
     <ClInclude Include="Camera.h" />
+    <ClInclude Include="Cat.h" />
+    <ClInclude Include="CatAnimationString.h" />
+    <ClInclude Include="CatStates.h" />
     <ClInclude Include="ClassTypeID.h" />
     <ClInclude Include="CollisionUtils.h" />
     <ClInclude Include="Color4F.h" />
