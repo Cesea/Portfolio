@@ -41,43 +41,43 @@ void PlayerCombatState::OnEnter()
 {
 	EventChannel channel;
 
-	_pParent->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWarCombatMode));
+	//_pParent->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWarCombatMode));
 }
 
 void PlayerCombatState::Update(float deltaTime, const GameCommand &command)
 {
-	switch (command._type)
-	{
-	case GAMECOMMAND_NONE:
-	{
-	}break;
-	case GAMECOMMAND_MOVE:
-	{
-	}break;
-	case GAMECOMMAND_ACTION:
-	{
-		switch (command._behavior._type)
-		{
-			case BEHAVIOR_ATTACK:
-			{
-				Attack();
-				_pParent->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWarSwingLeft));
-			}break;
-			case BEHAVIOR_SPECIAL_ATTACK:
-			{
-			}break;
-			case BEHAVIOR_SKILL:
-			{
-			}break;
-			case BEHAVIOR_BLOCK:
-			{
-			}break;
-			case BEHAVIOR_INTERACT:
-			{
-			}break;
-		}
-	}break;
-	}
+	//switch (command._type)
+	//{
+	//case GAMECOMMAND_NONE:
+	//{
+	//}break;
+	//case GAMECOMMAND_MOVE:
+	//{
+	//}break;
+	//case GAMECOMMAND_ACTION:
+	//{
+	//	switch (command._behavior._type)
+	//	{
+	//		case BEHAVIOR_ATTACK:
+	//		{
+	//			Attack();
+	//			_pParent->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWarSwingLeft));
+	//		}break;
+	//		case BEHAVIOR_SPECIAL_ATTACK:
+	//		{
+	//		}break;
+	//		case BEHAVIOR_SKILL:
+	//		{
+	//		}break;
+	//		case BEHAVIOR_BLOCK:
+	//		{
+	//		}break;
+	//		case BEHAVIOR_INTERACT:
+	//		{
+	//		}break;
+	//	}
+	//}break;
+	//}
 }
 
 void PlayerCombatState::OnExit()
@@ -89,53 +89,35 @@ void PlayerCombatState::Attack()
 {
 }
 
-//void PlayerCombatState::Handle(const Player::AttackEvent & event)
-//{
-//	//_pParent->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWarSwingLeft));
-//	_pParent->ChangeState(META_TYPE(PlayerAttackState)->Name());
-//	_toStanceTimer.Restart(2.0f);
-//}
-//
-//void PlayerCombatState::Handle(const Player::MoveEvent & event)
-//{
-//	_pParent->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWarMovingLeft));
-//	_toStanceTimer.Restart(2.0f);
-//}
-
 //Player Move State///////////////////////////////////////////////////////////
 void PlayerMoveState::OnEnter()
 {
-	EventChannel channel;
-
-	_toStanceTimer.Restart(1.0f);
-	_pParent->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWalk));
 }
 
 void PlayerMoveState::Update(float deltaTime, const GameCommand &command)
 {
-	if (_toStanceTimer.Tick(deltaTime))
-	{
-		_pParent->ChangeState(META_TYPE(PlayerStanceState)->Name());
-	}
+	//if (_toStanceTimer.Tick(deltaTime))
+	//{
+	//	_pParent->ChangeState(META_TYPE(PlayerStanceState)->Name());
+	//}
 
-	if (command._type == GAMECOMMAND_MOVE)
-	{
-		if (command._movement._horizontal == HORIZONTAL_MOVEMENT_LEFT)
-		{
-		}
-		else if (command._movement._horizontal == HORIZONTAL_MOVEMENT_RIGHT)
-		{
+	//if (command._type == GAMECOMMAND_MOVE)
+	//{
+	//	if (command._movement._horizontal == HORIZONTAL_MOVEMENT_LEFT)
+	//	{
+	//	}
+	//	else if (command._movement._horizontal == HORIZONTAL_MOVEMENT_RIGHT)
+	//	{
 
-		}
+	//	}
 
-		if (command._movement._horizontal == HORIZONTAL_MOVEMENT_LEFT)
-		{
-		}
-		else if (command._movement._horizontal == HORIZONTAL_MOVEMENT_RIGHT)
-		{
-		}
-	}
-
+	//	if (command._movement._horizontal == HORIZONTAL_MOVEMENT_LEFT)
+	//	{
+	//	}
+	//	else if (command._movement._horizontal == HORIZONTAL_MOVEMENT_RIGHT)
+	//	{
+	//	}
+	//}
 }
 
 void PlayerMoveState::OnExit()
@@ -151,38 +133,38 @@ void PlayerStanceState::OnEnter()
 
 void PlayerStanceState::Update(float deltaTime, const GameCommand &command)
 {
-	switch (command._type)
-	{
-		case GAMECOMMAND_NONE:
-		{
-		}break;
-		case GAMECOMMAND_MOVE:
-		{
-			_pParent->ChangeState(META_TYPE(PlayerMoveState)->Name());
-		}break;
-		case GAMECOMMAND_ACTION:
-		{
-			switch (command._behavior._type)
-			{
-			case BEHAVIOR_NONE:
-			{
-			}break;
-			case BEHAVIOR_ATTACK:
-			{
-				_pParent->ChangeState(META_TYPE(PlayerCombatState)->Name());
-			}break;
-			case BEHAVIOR_INTERACT:
-			{
-			}break;
-			}
-		}break;
-		case GAMECOMMAND_JUMP:
-		{
-		}break;
-		case GAMECOMMAND_INTERACT:
-		{
-		}break;
-	}
+	//switch (command._type)
+	//{
+	//	case GAMECOMMAND_NONE:
+	//	{
+	//	}break;
+	//	case GAMECOMMAND_MOVE:
+	//	{
+	//		_pParent->ChangeState(META_TYPE(PlayerMoveState)->Name());
+	//	}break;
+	//	case GAMECOMMAND_ACTION:
+	//	{
+	//		switch (command._behavior._type)
+	//		{
+	//		case BEHAVIOR_NONE:
+	//		{
+	//		}break;
+	//		case BEHAVIOR_ATTACK:
+	//		{
+	//			_pParent->ChangeState(META_TYPE(PlayerCombatState)->Name());
+	//		}break;
+	//		case BEHAVIOR_INTERACT:
+	//		{
+	//		}break;
+	//		}
+	//	}break;
+	//	case GAMECOMMAND_JUMP:
+	//	{
+	//	}break;
+	//	case GAMECOMMAND_INTERACT:
+	//	{
+	//	}break;
+	//}
 }
 
 void PlayerStanceState::OnExit()

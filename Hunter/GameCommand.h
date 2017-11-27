@@ -21,6 +21,14 @@ struct Movement
 	HORIZONTAL_MOVEMENT_TYPE _horizontal;
 };
 
+bool IsMovementNone(Movement &movement);
+
+void MovementStop(Movement &movement);
+void MovementLeft(Movement &movement);
+void MovementRight(Movement &movement);
+void MovementUp(Movement &movement);
+void MovementDown(Movement &movement);
+
 enum BEHAVIOR_TYPE
 {
 	BEHAVIOR_NONE,

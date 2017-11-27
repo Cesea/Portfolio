@@ -77,7 +77,7 @@ void InitPlayerAnimation()
 	PLAYER_ANIM_DEFINE(eWarDying, false, false, true, 1.0f, 0.2f, 0.2f);
 	PLAYER_ANIM_DEFINE(eWarBackwards, false, true, false, 1.0f, 0.2f, 0.2f);
 	PLAYER_ANIM_DEFINE(eWarBelowHighSwing, true, true, false, 1.0f, 0.2f, 0.2f);
-	PLAYER_ANIM_DEFINE(eWarCharging, true, true, false, 1.0f, 0.2f, 0.2f);
+	PLAYER_ANIM_DEFINE(eWarCharging, false, false, false, 1.0f, 0.2f, 0.2f);
 	PLAYER_ANIM_DEFINE(eWarDodgeToLeft, true, true, false, 1.0f, 0.2f, 0.2f);
 	PLAYER_ANIM_DEFINE(eWarDodgeToRight, true, true, false, 1.0f, 0.2f, 0.2f);
 	PLAYER_ANIM_DEFINE(eWarMovingLeft, false, false, false, 1.0f, 0.2f, 0.2f);
@@ -87,7 +87,7 @@ void InitPlayerAnimation()
 	PLAYER_ANIM_DEFINE(eWarRunSwingLeft, true, true, false, 1.0f, 0.2f, 0.2f);
 	PLAYER_ANIM_DEFINE(eWarRunSwingRight, true, true, false, 1.0f, 0.2f, 0.2f);
 	PLAYER_ANIM_DEFINE(eWarRunSwingUpDown, true, true, false, 1.0f, 0.2f, 0.2f);
-	PLAYER_ANIM_DEFINE(eWarShieldBlock, true, true, false, 1.0f, 0.2f, 0.2f); //??
+	PLAYER_ANIM_DEFINE(eWarShieldBlock, true, true, true, 1.0f, 0.2f, 0.2f); //??
 	PLAYER_ANIM_DEFINE(eWarShieldBlow, true, true, false, 1.0f, 0.2f, 0.2f);
 	PLAYER_ANIM_DEFINE(eWarSpecialAttackA, true, true, false, 1.0f, 0.2f, 0.2f);
 	PLAYER_ANIM_DEFINE(eWarSpecialAttackB, true, true, false, 1.0f, 0.2f, 0.2f);

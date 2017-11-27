@@ -121,7 +121,7 @@ static const char *PlayerAnimationString[] =
 	{"hero_War_shield_blow"},
 	{"hero_War_special_attack_A"},
 	{"hero_War_special_attack_B"},
-	{"hero_war_swing_high_straight_do"},
+	{"hero_War_swing_high_straight_do"},
 	{"hero_War_swing_left"},
 	{"hero_War_swing_right"},
 	{"hero_War_taking_hit"},

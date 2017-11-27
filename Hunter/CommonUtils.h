@@ -30,7 +30,8 @@ struct IntRect
 struct StopWatch
 {
 	bool Tick(float deltaTime);
-	void Restart(float targetTime);
+	void Restart();
+	void Reset(float targetTime);
 	float _currentTime{};
 	float _targetTime{};
 

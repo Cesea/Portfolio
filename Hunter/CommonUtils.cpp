@@ -106,8 +106,13 @@ bool StopWatch::Tick(float deltaTime)
 	return false;
 }
 
-void StopWatch::Restart(float targetTime)
+void StopWatch::Reset(float targetTime)
 {
 	_currentTime = 0.0f;
 	_targetTime = targetTime;
+}
+
+void StopWatch::Restart()
+{
+	_currentTime = 0;
 }
