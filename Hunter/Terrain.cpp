@@ -203,14 +203,105 @@ void Terrain::Destroy()
 //int32 : xExtent 터레인 청크 x갯수
 //int32 : zExtent 터레인 청크 z갯수
 
-
 void Terrain::SaveTerrain(const std::string & fileName)
 {
-	
+	DataPackage toSave;
+
+	TerrainFileHeader fileHeader;
+	fileHeader._m1 = 'T';
+	fileHeader._m2 = 'R';
+
+	fileHeader._chunkDim = TERRAIN_CHUNK_DIM;
+
+	fileHeader._xExtent = _xChunkCount;
+	fileHeader._zExtent = _zChunkCount;
+
+	toSave.Create(sizeof(TerrainFileHeader) + (sizeof(video::TerrainVertex) * _numTotalVertex));
+
+	toSave.WriteAs<TerrainFileHeader>(fileHeader);
+	for (int32 i = 0; i < _numTotalVertex; ++i)
+	{
+		video::TerrainVertex &vertex = _terrainVertices[i];
+		toSave.WriteAs<video::TerrainVertex>(vertex);
+	}
+	toSave.Save(fileName.c_str());
+
 }
 
 void Terrain::LoadTerrain(const std::string & fileName)
 {
+	DataPackage toLoad;
+
+	TerrainFileHeader fileHeader;
+
+	uint32 fileSize{ };
+	toLoad.OpenFile(fileName.c_str(), &fileSize);
+
+	toLoad.ReadAs<TerrainFileHeader>(&fileHeader);
+
+	if (fileHeader._m1 != 'T' || fileHeader._m2 != 'R' || 
+		fileHeader._chunkDim != TERRAIN_CHUNK_DIM)
+	{
+		return;
+	}
+	TerrainConfig config{};
+	config._xChunkCount = fileHeader._xExtent;
+	config._zChunkCount = fileHeader._zExtent;
+
+	_numVertexX = TERRAIN_CHUNK_DIM * config._xChunkCount + 1;
+	_numVertexZ = TERRAIN_CHUNK_DIM * config._zChunkCount + 1;		
+	_numTotalVertex = _numVertexX * _numVertexZ;		//총 정점 갯수
+
+	_numCellX = _numVertexX - 1;
+	_numCellZ = _numVertexZ - 1;
+	_totalCellNum = _numCellX * _numCellZ;
+
+	//터레인 크기
+	_terrainSizeX = _numCellX;
+	_terrainSizeZ = _numCellZ;
+
+	_terrainHalfSizeX = _terrainSizeX / 2;
+	_terrainHalfSizeZ = _terrainSizeZ / 2;
+
+	//총 삼각형수는
+	_numTotalFace = _totalCellNum * 2;
+
+	//Section 설정
+	_sectionResolution = TERRAIN_CHUNK_DIM;
+		
+	_xChunkCount = config._xChunkCount;
+	_zChunkCount = config._zChunkCount;
+
+	_sectionNumCellX = _sectionResolution;
+	_sectionNumCellZ = _sectionResolution;
+
+	_sectionNumVertexX = _sectionNumCellX + 1;
+	_sectionNumVertexZ = _sectionNumCellZ + 1;
+
+	SAFE_DELETE_ARRAY(_terrainVertices);
+	SAFE_DELETE_ARRAY(_pChunks);
+
+	_terrainVertices = new video::TerrainVertex[_numTotalVertex];
+	for (int32 i = 0; i < _numTotalVertex; ++i)
+	{
+		toLoad.ReadAs<video::TerrainVertex>(&_terrainVertices[i]);
+	}
+	toLoad.Free();
+
+	_pChunks = new TerrainChunk[_xChunkCount * _zChunkCount];
+	for (uint32 z = 0; z < _zChunkCount; ++z)
+	{
+		for (uint32 x = 0; x < _xChunkCount; ++x)
+		{
+			CreateTerrainChunk(x, z, _terrainVertices);
+		}
+	}
+
+
+	SAFE_DELETE(_pQuadTree);
+	_pQuadTree = new QuadTree();
+	_pQuadTree->Init(_terrainVertices, _numVertexX, TERRAIN_CHUNK_DIM);
+
 }
 
 //void Terrain::FillRenderCommand(video::RenderView & renderView)
@@ -716,7 +807,7 @@ bool Terrain::CreateTerrain(int32 tileNum)
 	{
 		for (uint32 x = 0; x < _xChunkCount; ++x)
 		{
-			CreateTerrainSection(x, z, _terrainVertices);
+			CreateTerrainChunk(x, z, _terrainVertices);
 		}
 	}
 
@@ -744,11 +835,11 @@ void Terrain::RebuildTerrain(const Terrain::TerrainConfig &config)
 
 	VIDEO->DestroyVertexDecl(_declHandle);
 
-	if (_tile0Handle.IsValid()) { VIDEO->DestroyTexture(_tile0Handle); }
-	if (_tile1Handle.IsValid()) { VIDEO->DestroyTexture(_tile1Handle); }
-	if (_tile2Handle.IsValid()) { VIDEO->DestroyTexture(_tile2Handle); }
-	if (_tile3Handle.IsValid()) { VIDEO->DestroyTexture(_tile3Handle); }
-	if (_tileSplatHandle.IsValid()) { VIDEO->DestroyTexture(_tileSplatHandle); }
+	//if (_tile0Handle.IsValid()) { VIDEO->DestroyTexture(_tile0Handle); }
+	//if (_tile1Handle.IsValid()) { VIDEO->DestroyTexture(_tile1Handle); }
+	//if (_tile2Handle.IsValid()) { VIDEO->DestroyTexture(_tile2Handle); }
+	//if (_tile3Handle.IsValid()) { VIDEO->DestroyTexture(_tile3Handle); }
+	//if (_tileSplatHandle.IsValid()) { VIDEO->DestroyTexture(_tileSplatHandle); }
 
 
 	SAFE_DELETE_ARRAY(_terrainVertices);
@@ -767,7 +858,7 @@ void Terrain::ReCreateQuadTree()
 }
 
 
-bool Terrain::CreateTerrainSection(int32 x, int32 z, const video::TerrainVertex * pTerrainVertices)
+bool Terrain::CreateTerrainChunk(int32 x, int32 z, const video::TerrainVertex * pTerrainVertices)
 {
 	int32 sectionIndex = Index2D(x, z, _xChunkCount);
 

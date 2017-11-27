@@ -235,6 +235,8 @@ void DataPackage::Save(const char *fileName)
 	{
 		fwrite(_data, _size, 1, pFile);
 		fclose(pFile);
+
+		Free();
 	}
 }
 

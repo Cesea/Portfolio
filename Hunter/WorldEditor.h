@@ -49,6 +49,7 @@ struct TerrainEditor
 	bool32 _editingExtent;
 	bool32 _editingHeight;
 	bool32 _editingTexture;
+	bool32 _saveTerrain;
 
 	bool32 _grow{true};
 	bool32 _dig{false};

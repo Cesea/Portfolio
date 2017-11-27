@@ -19,6 +19,23 @@ constexpr int32 TERRAIN_ALPHA_TEXTURE_SIZE = 512;
 //constexpr int32 TERRAIN_HORI_CHUNK_COUNT = TERRAIN_HORI_SIZE / TERRAIN_CHUNK_DIM;
 //constexpr int32 TERRAIN_VERT_CHUNK_COUNT = TERRAIN_VERT_SIZE / TERRAIN_CHUNK_DIM;
 
+
+//터레인 파일의 구조..
+//'T''R' Magic Number TR
+//int32 : ChunkDim  터레인 청크의 크기
+//int32 : xExtent 터레인 청크 x갯수
+//int32 : zExtent 터레인 청크 z갯수
+#pragma pack ( push, 2)
+struct TerrainFileHeader
+{
+	char _m1, _m2;
+	int32 _chunkDim;
+	int32 _xExtent;
+	int32 _zExtent;
+};
+
+#pragma pack pop
+
 //터레인 하나의 청크에 대한 위치이다
 struct TerrainChunkPos
 {
@@ -56,6 +73,7 @@ public:
 		int32 _zChunkCount{};
 
 		float _textureMult{};
+
 		std::string _tile0FileName{};
 		std::string _tile1FileName{};
 		std::string _tile2FileName{};
@@ -141,7 +159,7 @@ private:
 	void RebuildTerrain(const Terrain::TerrainConfig &config);
 	void ReCreateQuadTree();
 
-	bool CreateTerrainSection(int32 x, int32 z, const video::TerrainVertex *pTerrainVertices);
+	bool CreateTerrainChunk(int32 x, int32 z, const video::TerrainVertex *pTerrainVertices);
 
 	void AddHeightOnCursorPos(const Vector2 &cursorPos, float innerRadius, float outterRadius, float intensity);
 	void SmoothOnCursorPos(const Vector2 &cursorPos, float brushRadius);

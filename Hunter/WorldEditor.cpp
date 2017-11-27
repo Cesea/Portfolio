@@ -61,6 +61,7 @@ void Editor::InTerrainEditMode()
 		{
 			_terrainEditor._editingHeight = false;
 			_terrainEditor._editingTexture = false;
+			_terrainEditor._saveTerrain = false;
 		}
 	}
 	if (_terrainEditor._editingExtent)
@@ -87,6 +88,7 @@ void Editor::InTerrainEditMode()
 		{
 			_terrainEditor._editingExtent = false;
 			_terrainEditor._editingTexture = false;
+			_terrainEditor._saveTerrain = false;
 		}
 	}
 	if (_terrainEditor._editingHeight)
@@ -168,6 +170,7 @@ void Editor::InTerrainEditMode()
 		{
 			_terrainEditor._editingExtent = false;
 			_terrainEditor._editingHeight = false;
+			_terrainEditor._saveTerrain = false;
 		}
 	}
 	if (_terrainEditor._editingTexture)
@@ -381,22 +384,35 @@ void Editor::InTerrainEditMode()
 		ImguiUnindent();
 	}
 
-	ImguiLabel("File Name");
-	ImguiIndent();
+	if (ImguiCollapse("Save Terrain", nullptr, _terrainEditor._saveTerrain))
 	{
-		ImguiEdit(_terrainEditor._fileName, 120);
-		if (ImguiButton("Save Terrain"))
+		_terrainEditor._saveTerrain = !_terrainEditor._saveTerrain;
+		if (_terrainEditor._editingTexture)
 		{
-			TERRAIN->SaveTerrain(_terrainEditor._fileName);
-		}
-
-		if (ImguiButton("Load Terrain"))
-		{
-			TERRAIN->LoadTerrain(_terrainEditor._fileName);
+			_terrainEditor._editingExtent = false;
+			_terrainEditor._editingHeight = false;
+			_terrainEditor._editingTexture = false;
 		}
 	}
-	ImguiUnindent();
+	if (_terrainEditor._saveTerrain)
+	{
+		ImguiLabel("File Name");
+		ImguiIndent();
+		{
+			ImguiEdit(_terrainEditor._fileName, 120);
+			if (ImguiButton("Save Terrain"))
+			{
+				TERRAIN->SaveTerrain(_terrainEditor._fileName);
+			}
 
+			if (ImguiButton("Load Terrain"))
+			{
+				TERRAIN->LoadTerrain(_terrainEditor._fileName);
+			}
+		}
+		ImguiUnindent();
+
+	}
 	ImguiUnindent();
 }
 
@@ -663,6 +679,7 @@ void Editor::Init()
 	strncpy(_terrainEditor._textureName02, TERRAIN->_currentConfig._tile2FileName.c_str(), EDITOR_MAX_NAME);
 	strncpy(_terrainEditor._textureName03, TERRAIN->_currentConfig._tile3FileName.c_str(), EDITOR_MAX_NAME);
 
+	_terrainEditor._terrainConfig._textureMult = TERRAIN->_currentConfig._textureMult;
 	_terrainEditor._terrainConfig._tile0FileName = TERRAIN->_currentConfig._tile0FileName;
 	_terrainEditor._terrainConfig._tile1FileName = TERRAIN->_currentConfig._tile1FileName;
 	_terrainEditor._terrainConfig._tile2FileName = TERRAIN->_currentConfig._tile2FileName;

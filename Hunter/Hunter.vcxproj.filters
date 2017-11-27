@@ -720,6 +720,12 @@
     <Filter Include="Sub\DataPackage">
       <UniqueIdentifier>{c30c9bf2-650a-461a-b648-77edb9234451}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Game\GameScene\MapToolScene">
+      <UniqueIdentifier>{828ec6ff-5a55-4cc3-91e4-b7cce9161e1e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\GameScene\GameScene">
+      <UniqueIdentifier>{3827aa8d-38e8-448d-97be-40f55f3de73c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Hunter.rc" />
