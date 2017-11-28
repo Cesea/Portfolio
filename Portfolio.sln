@@ -1,11 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.27004.2008
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Hunter", "Hunter\Hunter.vcxproj", "{07A1E496-4F6E-4D7F-BBD2-7321376C6800}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FBXConverter", "FBXConverter\FBXConverter.vcxproj", "{2FA2E4F1-1A13-462F-86A7-3C623A56C6A5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -23,16 +21,11 @@ Global
 		{07A1E496-4F6E-4D7F-BBD2-7321376C6800}.Release|x64.Build.0 = Release|x64
 		{07A1E496-4F6E-4D7F-BBD2-7321376C6800}.Release|x86.ActiveCfg = Release|Win32
 		{07A1E496-4F6E-4D7F-BBD2-7321376C6800}.Release|x86.Build.0 = Release|Win32
-		{2FA2E4F1-1A13-462F-86A7-3C623A56C6A5}.Debug|x64.ActiveCfg = Debug|x64
-		{2FA2E4F1-1A13-462F-86A7-3C623A56C6A5}.Debug|x64.Build.0 = Debug|x64
-		{2FA2E4F1-1A13-462F-86A7-3C623A56C6A5}.Debug|x86.ActiveCfg = Debug|Win32
-		{2FA2E4F1-1A13-462F-86A7-3C623A56C6A5}.Debug|x86.Build.0 = Debug|Win32
-		{2FA2E4F1-1A13-462F-86A7-3C623A56C6A5}.Release|x64.ActiveCfg = Release|x64
-		{2FA2E4F1-1A13-462F-86A7-3C623A56C6A5}.Release|x64.Build.0 = Release|x64
-		{2FA2E4F1-1A13-462F-86A7-3C623A56C6A5}.Release|x86.ActiveCfg = Release|Win32
-		{2FA2E4F1-1A13-462F-86A7-3C623A56C6A5}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {BC718E5B-A125-4128-9B29-0EFB5312E0EB}
 	EndGlobalSection
 EndGlobal
