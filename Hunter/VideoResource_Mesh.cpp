@@ -976,6 +976,7 @@ namespace video
 			return false;
 		}
 
+		_skinnedMeshHandle = handle;
 		_pSkinnedMesh = VIDEO->GetSkinnedXMesh(handle);
 		Assert(_pSkinnedMesh);
 

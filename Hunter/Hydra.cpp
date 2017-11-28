@@ -19,6 +19,7 @@ bool Hydra::CreateFromWorld(World & world)
 	RenderComponent &renderComp = _entity.AddComponent<RenderComponent>();
 	renderComp._type = RenderComponent::Type::eSkinned;
 	renderComp._skinned = VIDEO->CreateAnimationInstance(VIDEO->GetSkinnedXMesh("Hydra"), "Anim" + std::to_string(0));
+	renderComp._arche = ARCHE_HYDRA;
 
 	ScriptComponent &scriptComponent = _entity.AddComponent<ScriptComponent>();
 	scriptComponent.SetScript(MAKE_SCRIPT_DELEGATE(Hydra, Update, *this));

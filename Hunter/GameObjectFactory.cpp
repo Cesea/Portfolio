@@ -31,6 +31,7 @@ void GameObjectFactory::CreateObject(ARCHE_TYPE type, ResourceHandle handle, con
 		transform._position = position;
 		RenderComponent &render = entity.AddComponent<RenderComponent>();
 		render._type = RenderComponent::Type::eStatic;
+		render._arche = ARCHE_ROCK;
 
 		TERRAIN->AddEntityToSection(entity, position);
 
@@ -62,6 +63,7 @@ void GameObjectFactory::CreateObject(ARCHE_TYPE type, ResourceHandle handle, con
 
 		RenderComponent &render = entity.AddComponent<RenderComponent>();
 		render._type = RenderComponent::Type::eStatic;
+		render._arche = ARCHE_TREE;
 
 		video::StaticXMeshHandle meshHandle;
 		meshHandle.count = handle.count;
@@ -90,6 +92,7 @@ void GameObjectFactory::CreateObject(ARCHE_TYPE type, ResourceHandle handle, con
 
 		RenderComponent &render = entity.AddComponent<RenderComponent>();
 		render._type = RenderComponent::Type::eStatic;
+		render._arche = ARCHE_GRASS;
 
 		video::StaticXMeshHandle meshHandle;
 		meshHandle.count = handle.count;
@@ -106,9 +109,6 @@ void GameObjectFactory::CreateObject(ARCHE_TYPE type, ResourceHandle handle, con
 		collision._locked = true;
 
 		entity.Activate();
-	}break;
-	case ARCHE_DRAGON :
-	{
 	}break;
 	case ARCHE_HERO :
 	{
@@ -127,6 +127,10 @@ void GameObjectFactory::CreateObject(ARCHE_TYPE type, ResourceHandle handle, con
 	}break;
 
 	}
+}
+
+void GameObjectFactory::CreateObject(ARCHE_TYPE type, char * name, const Vector3 & position)
+{
 }
 
 //void GameObjectFactory::Handle(const CreateObjectEvent & event)

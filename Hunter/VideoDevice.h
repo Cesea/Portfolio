@@ -56,6 +56,7 @@ namespace video
 		VertexBufferHandle GetVertexBufferFromXMesh(ID3DXMesh *pMesh, const std::string &name = "");
 		VertexBufferHandle GetVertexBuffer(const std::string &name);
 		VertexBuffer *GetVertexBuffer(VertexBufferHandle handle);
+		const std::string &GetVertexBufferName(VertexBufferHandle handle);
 		void DestroyVertexBuffer(VertexBufferHandle handle);
 		//uint8 *UpdateVertexBuffer(VertexBufferHandle handle, Memory *memory);
 
@@ -64,6 +65,7 @@ namespace video
 		IndexBufferHandle GetIndexBufferFromXMesh(ID3DXMesh *pMesh, const std::string &name = "");
 		IndexBufferHandle GetIndexBuffer(const std::string &name);
 		IndexBuffer *GetIndexBuffer(IndexBufferHandle handle);
+		const std::string &GetIndexBufferName(IndexBufferHandle handle);
 		void DestroyIndexBuffer(IndexBufferHandle handle);
 		//uint8 *UpdateIndexBuffer(IndexBufferHandle handle, Memory *memory);
 
@@ -71,6 +73,7 @@ namespace video
 		VertexDeclHandle CreateVertexDecl(const VertexDecl *decl, const std::string &name = "");
 		VertexDeclHandle GetVertexDecl(const std::string &name);
 		VertexDecl *GetVertexDecl(VertexDeclHandle handle);
+		const std::string &GetVertexDeclName(VertexDeclHandle handle);
 		void DestroyVertexDecl(VertexDeclHandle handle);
 
 		//咆胶媚 积己
@@ -81,52 +84,61 @@ namespace video
 			const std::string &name = "");
 		TextureHandle GetTexture(const std::string &name);
 		Texture *GetTexture(TextureHandle handle);
+		const std::string &GetTextureName(TextureHandle handle);
 		void DestroyTexture(TextureHandle handle);
-
 		void SaveTexture(const std::string &fileName, video::TextureHandle handle);
-
 
 		//捞棋飘 积己
 		EffectHandle CreateEffect(const std::string &fileName, const std::string &name = "");
 		EffectHandle GetEffect(const std::string &name);
 		Effect *GetEffect(EffectHandle handle);
+		const std::string &GetEffectName(EffectHandle handle);
 		void DestroyEffect(EffectHandle handle);
 
 		//坊歹 轰 积己
 		RenderViewHandle CreateRenderView(const std::string &name = "");
 		RenderViewHandle GetRenderView(const std::string &name);
 		RenderView *GetRenderView(RenderViewHandle handle);
+		const std::string &GetRenderViewName(RenderViewHandle handle);
 		void DestroyRenderView(RenderViewHandle handle);
 		
 		MaterialHandle CreateMaterial(const std::string &name = "");
 		MaterialHandle GetMaterial(const std::string &name);
 		Material *GetMaterial(MaterialHandle handle);
 		void DestroyMaterial(MaterialHandle handle);
+		const std::string &GetMaterialName(MaterialHandle handle);
 		void MaterialAddTexture(MaterialHandle material, uint32 textureSlot, TextureHandle texture);
 
 		StaticXMeshHandle CreateStaticXMesh(const std::string fileName, const Matrix *pCorrection, const std::string &name);
 		StaticXMeshHandle GetStaticXMesh(const std::string &name);
 		StaticXMesh *GetStaticXMesh(StaticXMeshHandle handle);
+		const std::string &GetStaticXMeshName(StaticXMeshHandle handle);
 		void  DestroyStaticXMesh(StaticXMeshHandle handle);
 
-		SkinnedXMeshHandle CreateSkinnedXMesh(const std::string fileName, const Matrix *pCorrection, const std::string &name);
+		SkinnedXMeshHandle CreateSkinnedXMesh(const std::string fileName, const Matrix *pCorrection, 
+			const std::string &name);
 		SkinnedXMeshHandle GetSkinnedXMesh(const std::string &name);
 		SkinnedXMesh *GetSkinnedXMesh(SkinnedXMeshHandle handle);
+		const std::string &GetSkinnedXMeshName(SkinnedXMeshHandle handle);
 		void DestroySkinnedMesh(SkinnedXMeshHandle handle);
 
 		AnimationInstanceHandle CreateAnimationInstance(SkinnedXMeshHandle xMesh, const std::string &name);
 		AnimationInstanceHandle GetAnimationInstance(const std::string &name);
 		AnimationInstance *GetAnimationInstance(AnimationInstanceHandle handle);
+		const std::string &GetAnimationInstanceName(AnimationInstanceHandle handle);
 		void DestroyAnimationInstance(AnimationInstanceHandle handle);
 
 		//Font Functions
 		FontHandle CreateFont(const D3DXFONT_DESC &fontDesc, const std::string &name);
 		FontHandle GetFont(const std::string &name);
 		Font *GetFont(FontHandle handle);
+		const std::string &GetFontName(FontHandle handle);
 		void DestroyFont(FontHandle handle);
 		void DrawFont(FontHandle handle, const std::string &str, int32 x, int32 y, uint32 color);
-		void DrawFontShadow(FontHandle handle, const std::string &str, int32 x, int32 y, uint32 color, uint32 shadow = 0xff000000);
-		void GetBoundingRect(FontHandle handle, const std::string &str, int32 x, int32 y, RECT *pOutRect);
+		void DrawFontShadow(FontHandle handle, const std::string &str, 
+			int32 x, int32 y, uint32 color, uint32 shadow = 0xff000000);
+		void GetBoundingRect(FontHandle handle, const std::string &str, 
+			int32 x, int32 y, RECT *pOutRect);
 
 	private:
 		//Private Functions

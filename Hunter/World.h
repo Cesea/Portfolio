@@ -51,6 +51,8 @@ public:
 	template <typename TSystem>
 	bool32 DoesSystemExist(const TSystem& system) const;
 
+	bool SaveEntitiesInWorld(const std::string &fileName);
+
 	void RemoveAllSystems();
 
 	Entity CreateEntity();

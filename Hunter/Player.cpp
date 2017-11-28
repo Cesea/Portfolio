@@ -28,7 +28,9 @@ bool Player::CreateFromWorld(World & world)
 
 	RenderComponent &renderComp = _entity.AddComponent<RenderComponent>();
 	renderComp._type = RenderComponent::Type::eSkinned;
-	renderComp._skinned = VIDEO->CreateAnimationInstance(VIDEO->GetSkinnedXMesh("Knight"), "Anim" + std::to_string(0));
+	renderComp._skinned = VIDEO->CreateAnimationInstance(
+		VIDEO->GetSkinnedXMesh("Knight"), "Anim" + std::to_string(0));
+	renderComp._arche = ARCHE_HERO;
 
 	video::AnimationInstance *pAnimation = VIDEO->GetAnimationInstance(renderComp._skinned);
 

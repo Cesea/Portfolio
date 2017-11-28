@@ -11,11 +11,11 @@ typedef Delegate<void, float> ScriptUpdateFunction;
 
 struct ScriptComponent : public Component
 {
-
 	ScriptComponent() {}
 	virtual ~ScriptComponent() {}
 
 	void SetScript(const ScriptUpdateFunction &updateFunction);
+
 	ScriptUpdateFunction _updateFunction;
 };
 

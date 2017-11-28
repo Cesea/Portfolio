@@ -21,6 +21,8 @@ public:
 	void Resize(uint32 amount);
 	void Clear();
 
+	uint32 GetNextID() const;
+
 	const Entity::ID BuildHandle(uint32 index, uint32 count) const;
 
 private:

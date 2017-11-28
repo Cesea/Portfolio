@@ -19,6 +19,7 @@ bool Snake::CreateFromWorld(World & world)
 	RenderComponent &renderComp = _entity.AddComponent<RenderComponent>();
 	renderComp._type = RenderComponent::Type::eSkinned;
 	renderComp._skinned = VIDEO->CreateAnimationInstance(VIDEO->GetSkinnedXMesh("Snake"), "Anim" + std::to_string(0));
+	renderComp._arche = ARCHE_SNAKE;
 
 	video::AnimationInstance *pAnimation = VIDEO->GetAnimationInstance(renderComp._skinned);
 

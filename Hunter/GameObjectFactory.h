@@ -8,14 +8,29 @@ class IScene;
 
 enum ARCHE_TYPE
 {
+	ARCHE_NONE,
 	ARCHE_HERO,
 	ARCHE_ROCK,
 	ARCHE_GRASS,
 	ARCHE_TREE,
+	ARCHE_MUSHROOM,
 	ARCHE_SNAKE,
+	ARCHE_CAT,
+	ARCHE_BAT,
 	ARCHE_TURTLE,
+	ARCHE_HYDRA,
 	ARCHE_DRAGON,
+	ARCHE_COUNT,
 };
+
+struct EntitySaveInfo
+{
+	ARCHE_TYPE _archeType{};
+	char _resourceName[MAX_FILE_NAME];
+	Vector3 _position;
+	//Quaternion _orientation;
+};
+
 
 class GameObjectFactory : public SingletonBase<GameObjectFactory>
 {
@@ -35,6 +50,7 @@ private :
 	void UnRegisterEvent();
 
 	void CreateObject(ARCHE_TYPE type, ResourceHandle handle, const Vector3 &position);
+	void CreateObject(ARCHE_TYPE type, char *name, const Vector3 &position);
 
 	//ResourceHandlePool<TreeHandle> _treeHandlePool;
 

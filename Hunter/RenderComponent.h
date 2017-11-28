@@ -28,8 +28,9 @@ public:
 		video::AnimationInstanceHandle _skinned;
 	};
 
-	video::MaterialHandle _material;
+	//video::MaterialHandle _material;
 	video::EffectHandle _effect;
+	ARCHE_TYPE _arche{};
 };
 
 #endif

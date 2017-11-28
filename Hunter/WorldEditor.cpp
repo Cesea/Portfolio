@@ -59,7 +59,7 @@ void Editor::InTerrainEditMode()
 		{
 			_terrainEditor._editingHeight = false;
 			_terrainEditor._editingTexture = false;
-			_terrainEditor._saveTerrain = false;
+			_terrainEditor._saveSceneInfo = false;
 		}
 	}
 	if (_terrainEditor._editingExtent)
@@ -86,7 +86,7 @@ void Editor::InTerrainEditMode()
 		{
 			_terrainEditor._editingExtent = false;
 			_terrainEditor._editingTexture = false;
-			_terrainEditor._saveTerrain = false;
+			_terrainEditor._saveSceneInfo = false;
 		}
 	}
 	if (_terrainEditor._editingHeight)
@@ -168,7 +168,7 @@ void Editor::InTerrainEditMode()
 		{
 			_terrainEditor._editingExtent = false;
 			_terrainEditor._editingHeight = false;
-			_terrainEditor._saveTerrain = false;
+			_terrainEditor._saveSceneInfo = false;
 		}
 	}
 	if (_terrainEditor._editingTexture)
@@ -382,9 +382,9 @@ void Editor::InTerrainEditMode()
 		ImguiUnindent();
 	}
 
-	if (ImguiCollapse("Save Terrain", nullptr, _terrainEditor._saveTerrain))
+	if (ImguiCollapse("Save Terrain", nullptr, _terrainEditor._saveSceneInfo))
 	{
-		_terrainEditor._saveTerrain = !_terrainEditor._saveTerrain;
+		_terrainEditor._saveSceneInfo = !_terrainEditor._saveSceneInfo;
 		if (_terrainEditor._editingTexture)
 		{
 			_terrainEditor._editingExtent = false;
@@ -392,7 +392,7 @@ void Editor::InTerrainEditMode()
 			_terrainEditor._editingTexture = false;
 		}
 	}
-	if (_terrainEditor._saveTerrain)
+	if (_terrainEditor._saveSceneInfo)
 	{
 		ImguiLabel("File Name");
 		ImguiIndent();
@@ -401,6 +401,7 @@ void Editor::InTerrainEditMode()
 			if (ImguiButton("Save Terrain"))
 			{
 				TERRAIN->SaveTerrain(_terrainEditor._fileName);
+				TERRAIN->_pCurrentScene->_world.SaveEntitiesInWorld("../resources/Test.ed");
 			}
 
 			if (ImguiButton("Load Terrain"))

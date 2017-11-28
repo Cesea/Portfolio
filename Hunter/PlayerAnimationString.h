@@ -76,7 +76,7 @@ enum PlayerAnimationEnum
 	eSitDown,
 	eSitting,
 	eWalk,
-	COUNT
+	PLAYER_ANIMATION_COUNT
 };
 
 template <int32 Anim>
