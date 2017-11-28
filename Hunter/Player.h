@@ -17,24 +17,6 @@ class PlayerCallbackHandler : public GameObjectAnimationCallbackHandler
 public :
 	bool Init(Player *pPlayer) { _pPlayer = pPlayer; }
 	HRESULT CALLBACK HandleCallback(THIS_ UINT Track, LPVOID pCallbackData);
-    {
-        PlayerCallbackData* pData = ( PlayerCallbackData* )pCallbackData;
-		if (nullptr == pData)
-		{
-            return S_OK;
-		}
-
-		switch (*pData->_animtionEnum)
-		{
-		case PlayerAnimationEnum::eWarSwingLeft :
-		{
-			int a = 0;
-		}break;
-
-		}
-        return S_OK;
-    }
-
 private :
 	Player *_pPlayer{};
 };

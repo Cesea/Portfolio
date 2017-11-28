@@ -100,15 +100,18 @@ float4 ps_main(vs_output input) : COLOR
 	return diffuseColor;
 }
 
-//--------------------------------------------------------------//
-// Technique Section for Mesh
-//--------------------------------------------------------------//
 technique Base
 {
    pass Pass_0
    {
       VertexShader = compile vs_3_0 vs_main();
       PixelShader = compile ps_3_0 ps_main();
+
+	  AlphaRef = 200;
+	  AlphaFunc = GreaterEqual;
+	  AlphaTestEnable = true;
+
+	  CullMode = None;
    }
 }
 

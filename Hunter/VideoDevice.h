@@ -119,7 +119,6 @@ namespace video
 		AnimationInstance *GetAnimationInstance(AnimationInstanceHandle handle);
 		void DestroyAnimationInstance(AnimationInstanceHandle handle);
 
-
 		//Font Functions
 		FontHandle CreateFont(const D3DXFONT_DESC &fontDesc, const std::string &name);
 		FontHandle GetFont(const std::string &name);

@@ -40,6 +40,8 @@ protected :
 
 	Editor *_editor{};
 
+	EnvironmentSphere *_pEnvironmentSphere{};
+
 	//Player _player;
 	//Snake _snake;
 public:

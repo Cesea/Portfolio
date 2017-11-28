@@ -297,6 +297,11 @@ void video::VideoDevice::LoadDefaultEffects()
 	VIDEO->CreateEffect("../resources/Shaders/SkinnedMesh.fx", "SkinnedMesh.fx");
 	VIDEO->CreateEffect("../resources/Shaders/terrainBase.fx", "TerrainBase.fx");
 
+	
+	VIDEO->CreateEffect("../resources/Shaders/EnvironmentSphere.fx", "EnvironmentSphere.fx");
+	VIDEO->CreateEffect("../resources/Shaders/TreeShader.fx", "TreeShader.fx");
+
+
 }
 
 RenderView *video::VideoDevice::GetRenderView(RenderViewHandle handle)
@@ -476,6 +481,7 @@ TextureHandle video::VideoDevice::CreateTexture(int32 width, int32 height,
 	}
 	return result;
 }
+
 
 TextureHandle video::VideoDevice::GetTexture(const std::string & name)
 {

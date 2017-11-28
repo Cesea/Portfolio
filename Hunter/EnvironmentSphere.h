@@ -15,8 +15,10 @@ public :
 	void Render(const Camera &camera);
 
 private :
-	video::TextureHandle _texture;
-	video::EffectHandle _effect;
+	IDirect3DCubeTexture9 *_pTexture;
+
+	video::Effect *_pEffect{};
+	video::EffectHandle _effectHandle;
 	ID3DXMesh *_pMesh{};
 
 };

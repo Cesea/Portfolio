@@ -441,5 +441,23 @@ void Player::QueueAction(const Action & action)
 
 HRESULT PlayerCallbackHandler::HandleCallback(UINT Track, LPVOID pCallbackData)
 {
-	return E_NOTIMPL;
+    {
+        PlayerCallbackData* pData = ( PlayerCallbackData* )pCallbackData;
+		if (nullptr == pData)
+		{
+            return S_OK;
+		}
+
+		switch (*pData->_animtionEnum)
+		{
+		case PlayerAnimationEnum::eWarSwingLeft :
+		{
+			int a = 0;
+		}break;
+
+		}
+        return S_OK;
+    }
+
+
 }

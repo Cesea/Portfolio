@@ -19,18 +19,6 @@ bool BaseScene::Init()
 	InitPlayerAnimation();
 	InitSnakeAnimation();
 
-	DataPackage test;
-	test.Create(sizeof(float) * 3);
-	test.WriteAs<Vector3>(Vector3(1.0f, 2.0f, 3.0f));
-
-	test.Save("../test.txt");
-
-	DataPackage test2;
-	Vector3 vv;
-	test2.OpenFile("../test.txt", nullptr);
-	test2.ReadAs<Vector3>(&vv);
-
-
 	//터레인 로드
 	Terrain::TerrainConfig config;
 	config._xChunkCount = 2;
@@ -95,8 +83,8 @@ bool BaseScene::Init()
 	_pMainLight->SetWorldPosition(Vector3(0.0f, 5.0f, 5.0f));
 	_pMainLight->SetTarget(Vector3(0.0f, 0.0f, 0.0f));
 
-	//_channel.Broadcast<GameObjectFactory::CreateObjectOnLocationEvent>(
-	//	GameObjectFactory::CreateObjectOnLocationEvent(ARCHE_HERO, ResourceHandle(), Vector3(0.0f, 0.0f, 0.0f)));
+	_pEnvironmentSphere = new EnvironmentSphere;
+	_pEnvironmentSphere->Create("../resources/Textures/grassenvmap1024.dds");
 
 	_channel.Broadcast<GameObjectFactory::CreateObjectOnLocationEvent>(
 		GameObjectFactory::CreateObjectOnLocationEvent(ARCHE_SNAKE, ResourceHandle(), Vector3(0.0f, 5.0f, 0.0f)));
@@ -154,6 +142,8 @@ bool BaseScene::Render()
 
 	gpDevice->Clear(0, nullptr, D3DCLEAR_TARGET | D3DCLEAR_STENCIL | D3DCLEAR_ZBUFFER, 0xff303040, 1.0f, 0);
 	gpDevice->BeginScene();
+
+	_pEnvironmentSphere->Render(_camera);
 	
 	GIZMOMANAGER->WorldGrid(1.0f, 20);
 
