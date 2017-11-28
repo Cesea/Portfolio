@@ -12,7 +12,10 @@
 #include "WorldEditor.h"
 #include "Player.h"
 #include "Snake.h"
-
+#include "Turtle.h"
+#include "bat.h"
+#include "Cat.h"
+#include "Hydra.h"
 class BaseScene : public IScene
 {
 	friend class Terrain;
@@ -40,9 +43,13 @@ protected :
 
 	Editor *_editor{};
 
-	EnvironmentSphere *_pEnvironmentSphere{};
 
-public:
+	Turtle _turtle;
+	Bat _bat;
+	Cat _cat;
+	Hydra _hydra;
+
+	EnvironmentSphere *_pEnvironmentSphere{};
 
 };
 

@@ -205,22 +205,49 @@
       <Filter>Game\GameObject\Enemy\spawn</Filter>
     </ClCompile>
     <ClCompile Include="Snake.cpp">
-      <Filter>Game\GameObject\Enemy\Snake</Filter>
+      <Filter>Game\GameObject\Enemy\Enemy\Snake</Filter>
     </ClCompile>
     <ClCompile Include="SnakeAnimationString.cpp">
-      <Filter>Game\GameObject\Enemy\Snake</Filter>
+      <Filter>Game\GameObject\Enemy\Enemy\Snake</Filter>
     </ClCompile>
     <ClCompile Include="SnakeStates.cpp">
-      <Filter>Game\GameObject\Enemy\Snake</Filter>
+      <Filter>Game\GameObject\Enemy\Enemy\Snake</Filter>
     </ClCompile>
     <ClCompile Include="Turtle.cpp">
-      <Filter>Game\GameObject\Enemy\Turtle</Filter>
+      <Filter>Game\GameObject\Enemy\Enemy\Turtle</Filter>
     </ClCompile>
     <ClCompile Include="TurtleAnimationString.cpp">
-      <Filter>Game\GameObject\Enemy\Turtle</Filter>
+      <Filter>Game\GameObject\Enemy\Enemy\Turtle</Filter>
     </ClCompile>
     <ClCompile Include="TurtleStates.cpp">
-      <Filter>Game\GameObject\Enemy\Turtle</Filter>
+      <Filter>Game\GameObject\Enemy\Enemy\Turtle</Filter>
+    </ClCompile>
+    <ClCompile Include="bat.cpp">
+      <Filter>Game\GameObject\Enemy\Enemy\Bat</Filter>
+    </ClCompile>
+    <ClCompile Include="batAnimationString.cpp">
+      <Filter>Game\GameObject\Enemy\Enemy\Bat</Filter>
+    </ClCompile>
+    <ClCompile Include="batStates.cpp">
+      <Filter>Game\GameObject\Enemy\Enemy\Bat</Filter>
+    </ClCompile>
+    <ClCompile Include="Cat.cpp">
+      <Filter>Game\GameObject\Enemy\Enemy\Cat</Filter>
+    </ClCompile>
+    <ClCompile Include="CatAnimationString.cpp">
+      <Filter>Game\GameObject\Enemy\Enemy\Cat</Filter>
+    </ClCompile>
+    <ClCompile Include="CatStates.cpp">
+      <Filter>Game\GameObject\Enemy\Enemy\Cat</Filter>
+    </ClCompile>
+    <ClCompile Include="Hydra.cpp">
+      <Filter>Game\GameObject\Enemy\Enemy\Hydra</Filter>
+    </ClCompile>
+    <ClCompile Include="HydraAnimationString.cpp">
+      <Filter>Game\GameObject\Enemy\Enemy\Hydra</Filter>
+    </ClCompile>
+    <ClCompile Include="HydraStates.cpp">
+      <Filter>Game\GameObject\Enemy\Enemy\Hydra</Filter>
     </ClCompile>
     <ClCompile Include="EnvironmentSphere.cpp">
       <Filter>Game\GameUtils\Light</Filter>
@@ -533,25 +560,25 @@
       <Filter>Game\GameObject</Filter>
     </ClInclude>
     <ClInclude Include="Snake.h">
-      <Filter>Game\GameObject\Enemy\Snake</Filter>
+      <Filter>Game\GameObject\Enemy\Enemy\Snake</Filter>
     </ClInclude>
     <ClInclude Include="SnakeAnimationString.h">
-      <Filter>Game\GameObject\Enemy\Snake</Filter>
+      <Filter>Game\GameObject\Enemy\Enemy\Snake</Filter>
     </ClInclude>
     <ClInclude Include="SnakeStates.h">
-      <Filter>Game\GameObject\Enemy\Snake</Filter>
+      <Filter>Game\GameObject\Enemy\Enemy\Snake</Filter>
     </ClInclude>
     <ClInclude Include="Lights.h">
       <Filter>Game\GameUtils\Light</Filter>
     </ClInclude>
     <ClInclude Include="Turtle.h">
-      <Filter>Game\GameObject\Enemy\Turtle</Filter>
+      <Filter>Game\GameObject\Enemy\Enemy\Turtle</Filter>
     </ClInclude>
     <ClInclude Include="TurtleAnimationString.h">
-      <Filter>Game\GameObject\Enemy\Turtle</Filter>
+      <Filter>Game\GameObject\Enemy\Enemy\Turtle</Filter>
     </ClInclude>
     <ClInclude Include="TurtleStates.h">
-      <Filter>Game\GameObject\Enemy\Turtle</Filter>
+      <Filter>Game\GameObject\Enemy\Enemy\Turtle</Filter>
     </ClInclude>
     <ClInclude Include="imguiRenderer.h">
       <Filter>GUI</Filter>
@@ -720,29 +747,15 @@
     <Filter Include="Game\GameComponent\ParticleComponent">
       <UniqueIdentifier>{f177f821-793e-4350-bd39-9c7dd41881b3}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Game\GameObject\Enemy\Snake">
+    <Filter Include="Game\GameObject\Enemy\Enemy">
+      <UniqueIdentifier>{a3a06add-ce8c-44aa-91fe-07801af13077}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\GameObject\Enemy\Enemy\Snake">
       <UniqueIdentifier>{89a2740d-465d-4b2d-ae00-0a66d64981ea}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Game\GameObject\Enemy\Turtle">
+    <Filter Include="Game\GameObject\Enemy\Enemy\Turtle">
       <UniqueIdentifier>{b66c83e9-946e-43df-a273-bbe371f59f11}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Sub\DataPackage">
-      <UniqueIdentifier>{c30c9bf2-650a-461a-b648-77edb9234451}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Game\GameScene\MapToolScene">
-      <UniqueIdentifier>{828ec6ff-5a55-4cc3-91e4-b7cce9161e1e}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Game\GameScene\GameScene">
-      <UniqueIdentifier>{3827aa8d-38e8-448d-97be-40f55f3de73c}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Game\GameScene\MenuScene">
-      <UniqueIdentifier>{9bc84eaa-0275-440d-a442-728e1579fedb}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Game\GameScene\LoadingScene">
-      <UniqueIdentifier>{5f6e3b7c-d075-4213-b3ab-eeee36d68787}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Managers\GameObjectFactory">
-      <UniqueIdentifier>{0ea18574-2eb4-44c6-b2bf-9477b2bb756b}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
