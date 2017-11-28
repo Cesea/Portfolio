@@ -61,7 +61,7 @@ bool BaseScene::Init()
 
 	MatrixScaling(&correctionMat, 1.0f, 1.0f, 1.0f);
 	video::SkinnedXMeshHandle HydraMesh = VIDEO->CreateSkinnedXMesh(
-		"../resources/Models/Hydra/Hydra_Gold.X", &correctionMat, "Hydra");
+		"../resources/Models/DragonBoss/DragonBoss.X", &correctionMat, "Hydra");
 
 	MatrixScaling(&correctionMat, 1.0f, 1.0f, 1.0f);
 	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Rock/Rock1_A.X", &correctionMat, "Rock01");
@@ -116,7 +116,7 @@ bool BaseScene::Init()
 	_turtle.CreateFromWorld(_world);
 	//_bat.CreateFromWorld(_world);
 	_cat.CreateFromWorld(_world);
-	//_hydra.CreateFromWorld(_world);
+	_hydra.CreateFromWorld(_world);
 
 	imguiRenderInit();
 	_editor = new Editor;

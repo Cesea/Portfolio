@@ -70,6 +70,7 @@ void RenderSystem::Render(const Camera &camera)
 			pAnimation->_pSkinnedMesh->Update(&refTransformComponent.GetFinalMatrix());
 			pAnimation->_pSkinnedMesh->Render(refTransformComponent);
 
+			//TODO : Fix this
 //#if defined (DEBUG) || defined (_DEBUG)
 //			CollisionComponent &refCollisionComp = entities[i].GetComponent<CollisionComponent>();
 //			refCollisionComp.RenderBoxGizmo(refTransformComponent);

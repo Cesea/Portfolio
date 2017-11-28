@@ -1,6 +1,8 @@
 ﻿#include "stdafx.h"
 #include "VideoResource_Mesh.h"
 
+#define DEFAULT_MATRIX_PALETTE_SIZE (45)
+
 namespace video
 {
 	EffectHandle StaticXMesh::_sEffectHandle;
@@ -1212,12 +1214,17 @@ STDMETHODIMP BoneHierachy::CreateMeshContainer(LPCSTR Name, CONST D3DXMESHDATA *
 		}
 
 		////Effect 에서 사용되는 행렬 팔래트 쵀대 수를 얻는다.
-		//UINT iPaletteSize = 0;
-		//m_pSkinnedMesh->m_pSkinnedEffect->GetInt("MATRIX_PALETTE_SIZE", (INT*)&iPaletteSize);
+		//uint ipalettesize = 0;
+		//_pSkinnedMesh->m_pSkinnedEffect->GetInt("MATRIX_PALETTE_SIZE", (INT*)&iPaletteSize);
 
 		//기본적으로 적용되는 본수 만큼 팔래트를 할당하는데 Effect 의 최대 MATRIX_PALETTE_SIZE 보다 적용되는 본의 
 		//수가 많다면 팔래트 수는 Effect MATRIX_PALETTE_SIZE 수로 고정 한다.
 		boneMesh->NumPaletteEntries = boneMesh->pSkinInfo->GetNumBones();
+
+		if (boneMesh->NumPaletteEntries > DEFAULT_MATRIX_PALETTE_SIZE)
+		{
+			boneMesh->NumPaletteEntries = DEFAULT_MATRIX_PALETTE_SIZE;
+		}
 
 		//위의 작업에이어 Mesh에  적용되는 bone의 수가 Effect 에서 지원되는 MATRIX_PALETTE_SIZE 수보다 많은 경우
 		//boneMesh->NumPaletteEntries 수에 맞추어서 Mesh 의 SubSet 을 나눌 필요가 있다.
