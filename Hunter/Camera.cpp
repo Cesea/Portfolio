@@ -22,11 +22,7 @@ Camera::Camera()
 	_moveSpeed = 1.0f;
 	_rotationSpeed = 1.0f;
 
-	EventChannel channel;
-	channel.Add<InputManager::KeyDownEvent, Camera>(*this);
-	channel.Add<InputManager::MousePressedEvent, Camera>(*this);
-	channel.Add<InputManager::MouseReleasedEvent, Camera>(*this);
-	channel.Add<InputManager::MouseMoveEvent, Camera>(*this);
+	
 }
 
 Camera::~Camera()
@@ -35,6 +31,12 @@ Camera::~Camera()
 
 void Camera::CreateFromWorld(World & world)
 {
+	EventChannel channel;
+	channel.Add<InputManager::KeyDownEvent, Camera>(*this);
+	channel.Add<InputManager::MousePressedEvent, Camera>(*this);
+	channel.Add<InputManager::MouseReleasedEvent, Camera>(*this);
+	channel.Add<InputManager::MouseMoveEvent, Camera>(*this);
+
 	_entity = world.CreateEntity();
 	_entity.AddComponent<TransformComponent>();
 

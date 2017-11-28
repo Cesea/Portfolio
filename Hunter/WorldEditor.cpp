@@ -1,8 +1,6 @@
 #include "stdafx.h"
 #include "WorldEditor.h"
 
-//#include "BaseScene.h"
-
 bool32 gEditorOn = false;
 
 Editor::Editor()

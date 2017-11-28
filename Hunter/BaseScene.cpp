@@ -6,7 +6,6 @@ using namespace video;
 
 bool BaseScene::Init()
 {
-
 	bool result = true;
 
 	GAMEOBJECTFACTORY->SetCurrentScene(this);
@@ -119,8 +118,6 @@ bool BaseScene::Init()
 	_hydra.CreateFromWorld(_world);
 
 	imguiRenderInit();
-	_editor = new Editor;
-	_editor->Init();
 
 	return result;
 
@@ -129,8 +126,6 @@ bool BaseScene::Init()
 bool BaseScene::Update(float deltaTime, const InputManager &input)
 {
 	bool result = true;
-
-	_editor->Edit(RefVariant(), input);
 
 	_world.Refresh();
 

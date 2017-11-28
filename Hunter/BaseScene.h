@@ -9,13 +9,13 @@
 
 #include "TransformSystem.h"
 
-#include "WorldEditor.h"
 #include "Player.h"
 #include "Snake.h"
 #include "Turtle.h"
 #include "bat.h"
 #include "Cat.h"
 #include "Hydra.h"
+
 class BaseScene : public IScene
 {
 	friend class Terrain;
@@ -41,7 +41,6 @@ protected :
 
 	EventChannel _channel;
 
-	Editor *_editor{};
 
 	Turtle _turtle;
 	Bat _bat;
