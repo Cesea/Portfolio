@@ -165,6 +165,7 @@
     <ClCompile Include="HydraStates.cpp" />
     <ClCompile Include="imgui.cpp" />
     <ClCompile Include="imguiRenderer.cpp" />
+    <ClCompile Include="LoadTestScene.cpp" />
     <ClCompile Include="MapToolScene.cpp" />
     <ClCompile Include="MathUtils.cpp" />
     <ClCompile Include="Matrix.cpp" />
@@ -268,6 +269,7 @@
     <ClInclude Include="Allocators.h" />
     <ClInclude Include="imguiRenderer.h" />
     <ClInclude Include="Lights.h" />
+    <ClInclude Include="LoadTestScene.h" />
     <ClInclude Include="MapToolScene.h" />
     <ClInclude Include="Math.h" />
     <ClInclude Include="MathUtils.h" />

@@ -5,7 +5,23 @@ bool MapToolScene::Init()
 {
 	bool result = true;
 	_channel.Add<Editor::GetObjectFromSceneEvent, MapToolScene>(*this);
-	//RegisterEvents();
+
+	DataPackage dataPackage;
+	uint32 fileSize{};
+	dataPackage.OpenFile("../resources/Test.ed", &fileSize);
+	int32 numEntityToCreate;
+	dataPackage.ReadAs<int32>(&numEntityToCreate);
+
+	EntitySaveInfo entitySaveInfo;
+	ZeroMemory(&entitySaveInfo, sizeof(EntitySaveInfo));
+	for (int32 i = 0; i < numEntityToCreate; ++i)
+	{
+		dataPackage.ReadAs<EntitySaveInfo>(&entitySaveInfo);
+
+		int a = 0;
+
+	}
+
 
 	GAMEOBJECTFACTORY->SetCurrentScene(this);
 

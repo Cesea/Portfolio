@@ -1,10 +1,10 @@
 #include "stdafx.h"
-#include "GameScene.h"
+#include "LoadTestScene.h"
 
-bool GameScene::Init()
+bool LoadTestScene::Init()
 {
 	bool result = true;
-	_channel.Add<Editor::GetObjectFromSceneEvent, GameScene>(*this);
+	//_channel.Add<Editor::GetObjectFromSceneEvent, GameScene>(*this);
 	//RegisterEvents();
 
 	GAMEOBJECTFACTORY->SetCurrentScene(this);
@@ -96,7 +96,7 @@ bool GameScene::Init()
 	return result;
 }
 
-bool GameScene::Update(float deltaTime, const InputManager & input)
+bool LoadTestScene::Update(float deltaTime, const InputManager & input)
 {
 	bool result = true;
 
@@ -126,7 +126,7 @@ bool GameScene::Update(float deltaTime, const InputManager & input)
 	return result;
 }
 
-bool GameScene::Render()
+bool LoadTestScene::Render()
 {
 	video::StaticXMesh::SetCamera(_camera);
 	video::StaticXMesh::SetBaseLight(_pMainLight);
@@ -152,7 +152,7 @@ bool GameScene::Render()
 	return true;
 }
 
-void GameScene::Release()
+void LoadTestScene::Release()
 {
 	for (auto object : _gameObjects)
 	{
@@ -161,30 +161,4 @@ void GameScene::Release()
 	_gameObjects.clear();
 
 	_world.Clear();
-}
-
-void GameScene::Handle(const Editor::GetObjectFromSceneEvent & event)
-{
-	Vector3 position;
-	Vector3 terrainHitPos;
-	Ray ray;
-	_camera.ComputeRay(event._cursorPos, &ray);
-	std::vector<Entity> collidingEntity{};
-	std::vector<float> collidingDistance;
-
-	_collisionSystem.QueryRayEntityHit(ray, &collidingEntity, &collidingDistance);
-	if (collidingEntity.size() > 0)
-	{
-		float minDistance = 9999.0f;
-		int32 minIndex = 0;
-		for (int32 i = 0; i < collidingDistance.size(); ++i)
-		{
-			if (collidingDistance[i] < minDistance)
-			{
-				minDistance = collidingDistance[i];
-				minIndex = i;
-			}
-		}
-		_editor->SetEdittingEntity(collidingEntity[minIndex]);
-	}
 }

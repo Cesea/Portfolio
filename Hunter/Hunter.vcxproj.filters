@@ -255,6 +255,9 @@
     <ClCompile Include="GameScene.cpp">
       <Filter>Game\GameScenes\GameScene</Filter>
     </ClCompile>
+    <ClCompile Include="LoadTestScene.cpp">
+      <Filter>Game\GameScenes\LoadTestScene</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GameObjects.h" />
@@ -601,6 +604,9 @@
     <ClInclude Include="GameScene.h">
       <Filter>Game\GameScenes\GameScene</Filter>
     </ClInclude>
+    <ClInclude Include="LoadTestScene.h">
+      <Filter>Game\GameScenes\LoadTestScene</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Hunter.rc" />
@@ -755,6 +761,9 @@
     </Filter>
     <Filter Include="Game\GameObjects\Hydra">
       <UniqueIdentifier>{8dba6765-7a19-4924-ac01-9d7a785be573}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\GameScenes\LoadTestScene">
+      <UniqueIdentifier>{17a26401-4d75-4699-bcfb-68cb987adf40}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>
