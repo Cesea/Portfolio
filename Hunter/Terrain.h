@@ -3,7 +3,7 @@
 
 #include "SingletonBase.h"
 
-class BaseScene;
+class IScene;
 class QuadTree;
 
 constexpr int32 TERRAIN_SHOW_EXTENT = 2;
@@ -114,7 +114,7 @@ public:
 	Terrain() {}
 	~Terrain();
 
-	void SetScene(BaseScene *pScene) { _pCurrentScene = pScene; }
+	void SetScene(IScene *pScene) { _pCurrentScene = pScene; }
 	bool Create(const Terrain::TerrainConfig &config, bool32 inEditMode);
 
 	void RegisterEvents();
@@ -223,7 +223,7 @@ private:
 	TerrainFace *_chunkIndex{};
 
 	QuadTree* _pQuadTree{};  //Äõµå Æ®¸®
-	BaseScene *_pCurrentScene;
+	IScene *_pCurrentScene;
 
 	TerrainChunk *_pChunks{};
 

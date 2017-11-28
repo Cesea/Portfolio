@@ -156,6 +156,7 @@
     <ClCompile Include="GizmoManager.cpp" />
     <ClCompile Include="imgui.cpp" />
     <ClCompile Include="imguiRenderer.cpp" />
+    <ClCompile Include="MapToolScene.cpp" />
     <ClCompile Include="MathUtils.cpp" />
     <ClCompile Include="Matrix.cpp" />
     <ClCompile Include="ColiisionSystem.cpp" />
@@ -252,6 +253,7 @@
     <ClInclude Include="Allocators.h" />
     <ClInclude Include="imguiRenderer.h" />
     <ClInclude Include="Lights.h" />
+    <ClInclude Include="MapToolScene.h" />
     <ClInclude Include="Math.h" />
     <ClInclude Include="MathUtils.h" />
     <ClInclude Include="Matrix.h" />

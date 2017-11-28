@@ -231,6 +231,9 @@
     <ClCompile Include="DataPackage.cpp">
       <Filter>Sub\DataPackage</Filter>
     </ClCompile>
+    <ClCompile Include="MapToolScene.cpp">
+      <Filter>Game\GameScene\MapToolScene</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -562,6 +565,9 @@
     <ClInclude Include="DataPackage.h">
       <Filter>Sub\DataPackage</Filter>
     </ClInclude>
+    <ClInclude Include="MapToolScene.h">
+      <Filter>Game\GameScene\MapToolScene</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Core">
@@ -725,6 +731,12 @@
     </Filter>
     <Filter Include="Game\GameScene\GameScene">
       <UniqueIdentifier>{3827aa8d-38e8-448d-97be-40f55f3de73c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\GameScene\MenuScene">
+      <UniqueIdentifier>{9bc84eaa-0275-440d-a442-728e1579fedb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\GameScene\LoadingScene">
+      <UniqueIdentifier>{5f6e3b7c-d075-4213-b3ab-eeee36d68787}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
