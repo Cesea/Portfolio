@@ -1,5 +1,5 @@
 #ifndef WORLD_EDITOR_H
-#define WORLD_EDTIOR_H
+#define WORLD_EDITOR_H
 
 class IScene;
 class Entity;

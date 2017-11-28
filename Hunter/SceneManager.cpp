@@ -1,8 +1,11 @@
 #include "stdafx.h"
 #include "SceneManager.h"
 
+#include "WorldEditor.h"
+
 #include "BaseScene.h"
 #include "MapToolScene.h"
+#include "GameScene.h"
 
 SceneManager::SceneManager()
 {
@@ -22,7 +25,10 @@ bool SceneManager::Init()
 	pScene = new BaseScene;
 	AddScene(pScene->GetSceneName(), pScene);
 
-	ChangeScene("MapToolScene");
+	pScene = new GameScene;
+	AddScene(pScene->GetSceneName(), pScene);
+
+	ChangeScene("GameScene");
 
 	GetChannel().Add<SceneChangeEvent, SceneManager>(*this);
 

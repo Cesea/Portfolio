@@ -252,6 +252,9 @@
     <ClCompile Include="HydraStates.cpp">
       <Filter>Game\GameObjects\Hydra</Filter>
     </ClCompile>
+    <ClCompile Include="GameScene.cpp">
+      <Filter>Game\GameScenes\GameScene</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GameObjects.h" />
@@ -594,6 +597,9 @@
     </ClInclude>
     <ClInclude Include="HydraStates.h">
       <Filter>Game\GameObjects\Hydra</Filter>
+    </ClInclude>
+    <ClInclude Include="GameScene.h">
+      <Filter>Game\GameScenes\GameScene</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -158,6 +158,7 @@
     <ClCompile Include="Frustum.cpp" />
     <ClCompile Include="GameCommand.cpp" />
     <ClCompile Include="GameObjectFactory.cpp" />
+    <ClCompile Include="GameScene.cpp" />
     <ClCompile Include="GizmoManager.cpp" />
     <ClCompile Include="Hydra.cpp" />
     <ClCompile Include="HydraAnimationString.cpp" />
@@ -256,6 +257,7 @@
     <ClInclude Include="GameObjectFactory.h" />
     <ClInclude Include="GameObjectHandle.h" />
     <ClInclude Include="GameObjects.h" />
+    <ClInclude Include="GameScene.h" />
     <ClInclude Include="GameSystems.h" />
     <ClInclude Include="GameUtils.h" />
     <ClInclude Include="GizmoManager.h" />
