@@ -39,14 +39,12 @@ public:
 
 	const Frustum &GetFrustum() const { return _frustum; }
 
-
 	void Handle(const InputManager::KeyDownEvent &event);
 	void Handle(const InputManager::MousePressedEvent &event);
 	void Handle(const InputManager::MouseReleasedEvent &event);
 	void Handle(const InputManager::MouseMoveEvent &event);
 
 	const Entity &GetEntity() const { return _entity; }
-
 protected:
 
 	Entity _entity;

@@ -1,26 +1,25 @@
 #ifndef PLAYER_ANIMATION_STRING_H
 #define PLAYER_ANIMATION_STRING_H
 
-
 #define PLAYER_ANIM_DECLARE(Name) \
-	template <> \
-	struct PlayerAnimationAction<Name> \
-	{ \
-		static Action _action; \
-	}; \
+   template <> \
+   struct PlayerAnimationAction<Name> \
+   { \
+      static Action _action; \
+   }; \
 
 #define PLAYER_ANIM_LINK(Name) \
-	Action PlayerAnimationAction<Name>::_action;
+   Action PlayerAnimationAction<Name>::_action;
 
 #define PLAYER_ANIM_DEFINE(Name, Blocking, PlayOnce, Stop, PlaySpeed, CrossFadeTime, OutCrossFadeTime)  \
-	PlayerAnimationAction<Name>::_action._blocking = Blocking; \
-	PlayerAnimationAction<Name>::_action._playOnce = PlayOnce; \
-	PlayerAnimationAction<Name>::_action._stop = Stop; \
-	PlayerAnimationAction<Name>::_action._playSpeed = PlaySpeed; \
-	PlayerAnimationAction<Name>::_action._crossFadeTime = CrossFadeTime; \
-	PlayerAnimationAction<Name>::_action._outCrossFadeTime = OutCrossFadeTime; \
-	strncpy(PlayerAnimationAction<Name>::_action._name, PlayerAnimationString[PlayerAnimationEnum::Name], strlen(PlayerAnimationString[PlayerAnimationEnum::Name])); \
-	PlayerAnimationAction<Name>::_action._name; 
+   PlayerAnimationAction<Name>::_action._blocking = Blocking; \
+   PlayerAnimationAction<Name>::_action._playOnce = PlayOnce; \
+   PlayerAnimationAction<Name>::_action._stop = Stop; \
+   PlayerAnimationAction<Name>::_action._playSpeed = PlaySpeed; \
+   PlayerAnimationAction<Name>::_action._crossFadeTime = CrossFadeTime; \
+   PlayerAnimationAction<Name>::_action._outCrossFadeTime = OutCrossFadeTime; \
+   strncpy(PlayerAnimationAction<Name>::_action._name, PlayerAnimationString[PlayerAnimationEnum::Name], strlen(PlayerAnimationString[PlayerAnimationEnum::Name])); \
+   PlayerAnimationAction<Name>::_action._name; 
 
 #define PLAYER_ANIM( Name ) PlayerAnimationAction<Name>::_action
 
@@ -28,113 +27,123 @@ void InitPlayerAnimation();
 
 enum PlayerAnimationEnum
 {
-	eWarRetreat = 0,
-	eWalkingBack,
-	eClimbingLadder,
-	eCrouching,
-	eDrinking,
-	eEating,
-	eExplanation,
-	eJumpRunning,
-	eRun,
-	eSayNo,
-	eSneaking,
-	eStandingFree,
-	eSwimming,
-	eTalking,
-	eWarThrowingAxe,
-	eWarThrowingSpear,
-	eWarCombatMode,
-	eWarDying,
-	eWarBackwards,
-	eWarBelowHighSwing,
-	eWarCharging,
-	eWarDodgeToLeft,
-	eWarDodgeToRight,
-	eWarMovingLeft,
-	eWarMovingRight,
-	eWarParryFromStraightDown,
-	eWarParryFront,
-	eWarRunSwingLeft,
-	eWarRunSwingRight,
-	eWarRunSwingUpDown,
-	eWarShieldBlock,
-	eWarShieldBlow,
-	eWarSpecialAttackA,
-	eWarSpecialAttackB,
-	eWarSwingHighStraigtDown,
-	eWarSwingLeft,
-	eWarSwingRight,
-	eWarTakingHit,
-	eWarThrustMid,
-	eBoring,
-	eCameUp,
-	eLookingAround,
-	eMakingItem,
-	ePickObject,
-	eSalute,
-	eSitDown,
-	eSitting,
-	eWalk,
-	PLAYER_ANIMATION_COUNT
+   eWarRetreat = 0,
+   eWalkingBack,
+   eClimbingLadder,
+   eCrouching,
+   eDrinking,
+   eEating,
+   eExplanation,
+   eJumpRunning,
+   eRun,
+   eSayNo,
+   eSneaking,
+   eStandingFree,
+   eSwimming,
+   eTalking,
+   eWarThrowingAxe,
+   eWarThrowingSpear,
+   eWarCombatMode,
+   eWarDying,
+   eWarBackwards,
+   eWarBelowHighSwing,
+   eWarCharging,
+   eWarDodgeToLeft,
+   eWarDodgeToRight,
+   eWarMovingLeft,
+   eWarMovingRight,
+   eWarParryFromStraightDown,
+   eWarParryFront,
+   eWarRunSwingLeft,
+   eWarRunSwingRight,
+   eWarRunSwingUpDown,
+   eWarShieldBlock,
+   eWarShieldBlow,
+   eWarSpecialAttackA,
+   eWarSpecialAttackB,
+   eWarSwingHighStraigtDown,
+   eWarSwingLeft,
+   eWarSwingRight,
+   eWarTakingHit,
+   eWarThrustMid,
+   eBoring,
+   eCameUp,
+   eLookingAround,
+   eMakingItem,
+   ePickObject,
+   eSalute,
+   eSitDown,
+   eSitting,
+   eWalk,
+   eStrafeLeft,
+   eStrafeRight,
+   eThrust,
+   eSwingRight,
+   eSwingLeft,
+   COUNT
 };
 
 template <int32 Anim>
 struct PlayerAnimationAction
 {
-	//static const Action _action;
+   //static const Action _action;
 };
 
 static const char *PlayerAnimationString[] = 
 {
-	{"Hero_War_retreat"},
-	{ "Hero_walking_back"},
-	{ "hero_Climbing_ladder"},
-	{ "hero_Crouching"},
-	{ "hero_Drinking"},
-	{ "hero_Eating"},
-	{ "hero_Explanation"},
-	{ "hero_Jump_runing"},
-	{ "hero_Run"},
-	{"hero_Say_No"},
-	{"hero_Sneaking"},
-	{"hero_Standing_Free"},
-	{"hero_Swimming"},
-	{"hero_Talking"},
-	{"hero_ThrowingAxe_throwing"},
-	{"hero_ThrowingSpear_throwing"},
-	{"hero_War_COMBAT_MODE"},
-	{"hero_War_Dying"},
-	{"hero_War_backwards"},
-	{"hero_War_below_high_swing"},
-	{"hero_War_charging"},
-	{"hero_War_dodge_to_left"},
-	{"hero_War_dodge_to_right"},
-	{"hero_War_moving_left"},
-	{"hero_War_moving_right"},
-	{"hero_War_parry_from_stright_dow"},
-	{"hero_War_parry_front"},
-	{"hero_War_run_swing_left"},
-	{"hero_War_run_swing_right"},
-	{"hero_War_run_swing_up_down"},
-	{"hero_War_shield_block"},
-	{"hero_War_shield_blow"},
-	{"hero_War_special_attack_A"},
-	{"hero_War_special_attack_B"},
-	{"hero_War_swing_high_straight_do"},
-	{"hero_War_swing_left"},
-	{"hero_War_swing_right"},
-	{"hero_War_taking_hit"},
-	{"hero_War_thrust_mid"},
-	{"hero_boring"},
-	{"hero_came_up"},
-	{"hero_looking_around"},
-	{"hero_making_item"},
-	{"hero_pick_object"},
-	{"hero_salute"},
-	{"hero_sit_down"},
-	{"hero_sitting"},
-	{"hero_walk"}
+   {"hero_War_retreat"},
+   {"hero_walking_back"},
+   {"hero_Climbing_ladder"},
+   {"hero_Crouching"},
+   {"hero_Drinking"},
+   {"hero_Eating"},
+   {"hero_Explanation"},
+   {"hero_Jump_runing"},
+   {"hero_Run"},
+   {"hero_Say_No"},
+   {"hero_Sneaking"},
+   {"hero_Standing_Free"},
+   {"hero_Swimming"},
+   {"hero_Talking"},
+   {"hero_ThrowingAxe_throwing"},
+   {"hero_ThrowingSpear_throwing"},
+   {"hero_War_COMBAT_MODE"},
+   {"hero_War_Dying"},
+   {"hero_War_backwards"},
+   {"hero_War_below_high_swing"},
+   {"hero_War_charging"},
+   {"hero_War_dodge_to_left"},
+   {"hero_War_dodge_to_right"},
+   {"hero_War_moving_left"},
+   {"hero_War_moving_right"},
+   {"hero_War_parry_from_stright_dow"},
+   {"hero_War_parry_front"},
+   {"hero_War_run_swing_left"},
+   {"hero_War_run_swing_right"},
+   {"hero_War_run_swing_up_down"},
+   {"hero_War_shield_block"},
+   {"hero_War_shield_blow"},
+   {"hero_War_special_attack_A"},
+   {"hero_War_special_attack_B"},
+   {"hero_War_swing_high_straight_do"},
+   {"hero_War_swing_left"},
+   {"hero_War_swing_right"},
+   {"hero_War_taking_hit"},
+   {"hero_War_thrust_mid"},
+   {"hero_boring"},
+   {"hero_came_up"},
+   {"hero_looking_around"},
+   {"hero_making_item"},
+   {"hero_pick_object"},
+   {"hero_salute"},
+   {"hero_sit_down"},
+   {"hero_sitting"},
+   {"hero_walk"},
+   {"hero_strafe_left"},
+   {"hero_strafe_right"},
+   { "hero_walk_trust" },
+   { "hero_walk_right_swing" },
+   { "hero_walk_left_swing" }
 };
 
 PLAYER_ANIM_DECLARE(eWarRetreat);
@@ -185,5 +194,10 @@ PLAYER_ANIM_DECLARE(eSalute);
 PLAYER_ANIM_DECLARE(eSitDown);
 PLAYER_ANIM_DECLARE(eSitting);
 PLAYER_ANIM_DECLARE(eWalk);
+PLAYER_ANIM_DECLARE(eStrafeLeft);
+PLAYER_ANIM_DECLARE(eStrafeRight);
+PLAYER_ANIM_DECLARE(eThrust);
+PLAYER_ANIM_DECLARE(eSwingLeft);
+PLAYER_ANIM_DECLARE(eSwingRight);
 
 #endif
