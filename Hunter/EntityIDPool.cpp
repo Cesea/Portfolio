@@ -73,6 +73,11 @@ void EntityIDPool::Clear()
 	_nextID = 0;
 }
 
+uint32 EntityIDPool::GetNextID() const
+{
+	return _nextID;
+}
+
 const Entity::ID EntityIDPool::BuildHandle(uint32 index, uint32 count) const
 {
 	Entity::ID result(index, count);

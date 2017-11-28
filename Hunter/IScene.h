@@ -10,6 +10,7 @@ class IScene
 {
 public :
 	friend class GameObjectFactory;
+	friend class Editor;
 	friend class Terrain;
 
 	IScene()

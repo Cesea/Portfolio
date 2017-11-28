@@ -31,6 +31,7 @@ void GameObjectFactory::CreateObject(ARCHE_TYPE type, ResourceHandle handle, con
 		transform._position = position;
 		RenderComponent &render = entity.AddComponent<RenderComponent>();
 		render._type = RenderComponent::Type::eStatic;
+		render._arche = ARCHE_ROCK;
 
 		TERRAIN->AddEntityToSection(entity, position);
 
@@ -46,6 +47,7 @@ void GameObjectFactory::CreateObject(ARCHE_TYPE type, ResourceHandle handle, con
 		collision._boundingBox.Init(pMesh->_meshBoundInfo._min, pMesh->_meshBoundInfo._max);
 		collision._boundingSphere._localCenter = pMesh->_meshBoundInfo._center;
 		collision._boundingSphere._radius = pMesh->_meshBoundInfo._radius;
+		collision._locked = true;
 
 		entity.Activate();
 
@@ -61,6 +63,7 @@ void GameObjectFactory::CreateObject(ARCHE_TYPE type, ResourceHandle handle, con
 
 		RenderComponent &render = entity.AddComponent<RenderComponent>();
 		render._type = RenderComponent::Type::eStatic;
+		render._arche = ARCHE_TREE;
 
 		video::StaticXMeshHandle meshHandle;
 		meshHandle.count = handle.count;
@@ -74,6 +77,7 @@ void GameObjectFactory::CreateObject(ARCHE_TYPE type, ResourceHandle handle, con
 		collision._boundingBox.Init(pMesh->_meshBoundInfo._min, pMesh->_meshBoundInfo._max);
 		collision._boundingSphere._localCenter = pMesh->_meshBoundInfo._center;
 		collision._boundingSphere._radius = pMesh->_meshBoundInfo._radius;
+		collision._locked = true;
 
 		entity.Activate();
 	}break;
@@ -88,6 +92,7 @@ void GameObjectFactory::CreateObject(ARCHE_TYPE type, ResourceHandle handle, con
 
 		RenderComponent &render = entity.AddComponent<RenderComponent>();
 		render._type = RenderComponent::Type::eStatic;
+		render._arche = ARCHE_GRASS;
 
 		video::StaticXMeshHandle meshHandle;
 		meshHandle.count = handle.count;
@@ -101,19 +106,15 @@ void GameObjectFactory::CreateObject(ARCHE_TYPE type, ResourceHandle handle, con
 		collision._boundingBox.Init(pMesh->_meshBoundInfo._min, pMesh->_meshBoundInfo._max);
 		collision._boundingSphere._localCenter = pMesh->_meshBoundInfo._center;
 		collision._boundingSphere._radius = pMesh->_meshBoundInfo._radius;
+		collision._locked = true;
 
 		entity.Activate();
-	}break;
-	case ARCHE_DRAGON :
-	{
 	}break;
 	case ARCHE_HERO :
 	{
 		_pCurrentScene->_gameObjects.push_back(new Player());
 		BaseGameObject *pBack = _pCurrentScene->_gameObjects.back();
 		pBack->CreateFromWorld(_pCurrentScene->_world);
-		TransformComponent &refTransform = pBack->_entity.GetComponent<TransformComponent>();
-		//refTransform._position = position;
 	}break;
 	case ARCHE_SNAKE :
 	{
@@ -123,10 +124,13 @@ void GameObjectFactory::CreateObject(ARCHE_TYPE type, ResourceHandle handle, con
 		TransformComponent &refTransform = pBack->_entity.GetComponent<TransformComponent>();
 		refTransform._position = position;
 
-		int a = 0;
 	}break;
 
 	}
+}
+
+void GameObjectFactory::CreateObject(ARCHE_TYPE type, char * name, const Vector3 & position)
+{
 }
 
 //void GameObjectFactory::Handle(const CreateObjectEvent & event)

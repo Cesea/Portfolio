@@ -1279,6 +1279,10 @@ void Terrain::AddHeightGausian(int32 minX, int32 maxX, int32 minZ, int32 maxZ, f
 	SAFE_DELETE_ARRAY(smooth);
 }
 
+void Terrain::AddHeightBlock(int32 minX, int32 maxX, int32 minZ, int32 maxZ, float mult)
+{
+}
+
 void Terrain::DrawAlphaTextureOnCursorPos(const Vector2 & cursorPos,
 	float innerRadius, float outterRadius, float intensity, video::TextureHandle alphaHandle, int32 channel)
 {

@@ -143,7 +143,6 @@ namespace video
 
 		void CalculateTotalBoundInfo(Bone *pRoot);
 
-
 		Matrix _matCorrection;
 
 		Bone *_pRootBone{};
@@ -163,6 +162,7 @@ namespace video
 		void Destroy();
 
 		SkinnedXMesh *_pSkinnedMesh{};
+		video::SkinnedXMeshHandle _skinnedMeshHandle{};
 
 		ID3DXAnimationController *_pAnimationController{};
 	};

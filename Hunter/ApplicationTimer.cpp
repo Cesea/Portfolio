@@ -31,7 +31,7 @@ void ApplicationTimer::Tick()
 
 	int64 timeToSleep = _targetFramePerMS - _currentDeltaMS;
 
-	Console::Log("%d\n", (int32)timeToSleep);
+	//Console::Log("%d\n", (int32)timeToSleep);
 	if (timeToSleep > 0)
 	{
 		Sleep(timeToSleep);

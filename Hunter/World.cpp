@@ -14,6 +14,7 @@ World::World(std::size_t entityPoolSize)
 {
 }
 
+
 void World::RemoveAllSystems()
 {
 	_systems.clear();
@@ -232,4 +233,74 @@ void World::RemoveSystem(TypeID systemTypeID)
 bool World::DoesSystemExist(TypeID systemTypeID) const
 {
 	return _systems.find(systemTypeID) != _systems.end();
+}
+
+
+//Scene Entity Description file Format
+//int32 : numEntitySaved
+//for (numEntitySaved)
+//{
+//		EntitySaveInfo : saveInfo
+//}
+bool World::SaveEntitiesInWorld(const std::string & fileName)
+{
+	DataPackage package;
+
+	int32 numEntityToSave = 0;
+	for (uint32 i = 0; i < _entityCache.alive.size(); ++i)
+	{
+		Entity entity = _entityCache.alive[i];
+		if (entity.HasComponent<RenderComponent>())
+		{
+			numEntityToSave++;
+		}
+	}
+	package.Create(sizeof(int32) + (sizeof(EntitySaveInfo) * numEntityToSave) );
+	package.WriteInt32(numEntityToSave);
+
+	EntitySaveInfo saveInfo;
+	ZeroMemory(&saveInfo, sizeof(EntitySaveInfo));
+
+	std::string resourceName;
+
+	for (uint32 i = 0; i < _entityCache.alive.size(); ++i)
+	{
+		Entity entity = _entityCache.alive[i];
+
+		if (entity.HasComponent<RenderComponent>())
+		{
+			RenderComponent &refRender = entity.GetComponent<RenderComponent>();
+			saveInfo._archeType = refRender._arche;
+			switch (refRender._type)
+			{
+			case RenderComponent::Type::eBuffer:
+			{
+				//버퍼로 저장을 하면 안돌아 갈거다.......
+				Assert(false);
+			}break;
+			case RenderComponent::Type::eStatic:
+			{
+				resourceName = VIDEO->GetStaticXMeshName(refRender._static);
+				Assert(resourceName.length() < MAX_FILE_NAME);
+				strncpy(saveInfo._resourceName, resourceName.c_str(), resourceName.length());
+			}break;
+			case RenderComponent::Type::eSkinned:
+			{
+				video::AnimationInstance *pAnimation = VIDEO->GetAnimationInstance(refRender._skinned);
+				resourceName = VIDEO->GetSkinnedXMeshName(pAnimation->_skinnedMeshHandle);
+				Assert(resourceName.length() < MAX_FILE_NAME);
+				strncpy(saveInfo._resourceName, resourceName.c_str(), resourceName.length());
+			}break;
+			}
+			saveInfo._resourceName;
+			saveInfo._position = entity.GetComponent<TransformComponent>()._position;
+
+			package.WriteAs<EntitySaveInfo>(saveInfo);
+
+			ZeroMemory(&saveInfo, sizeof(EntitySaveInfo));
+		}
+	}
+
+	package.Save(fileName.c_str());
+	return true;
 }

@@ -1,27 +1,11 @@
 #include "stdafx.h"
-#include "MapToolScene.h"
+#include "GameScene.h"
 
-bool MapToolScene::Init()
+bool GameScene::Init()
 {
 	bool result = true;
-	_channel.Add<Editor::GetObjectFromSceneEvent, MapToolScene>(*this);
-
-	DataPackage dataPackage;
-	uint32 fileSize{};
-	dataPackage.OpenFile("../resources/Test.ed", &fileSize);
-	int32 numEntityToCreate;
-	dataPackage.ReadAs<int32>(&numEntityToCreate);
-
-	EntitySaveInfo entitySaveInfo;
-	ZeroMemory(&entitySaveInfo, sizeof(EntitySaveInfo));
-	for (int32 i = 0; i < numEntityToCreate; ++i)
-	{
-		dataPackage.ReadAs<EntitySaveInfo>(&entitySaveInfo);
-
-		int a = 0;
-
-	}
-
+	_channel.Add<Editor::GetObjectFromSceneEvent, GameScene>(*this);
+	//RegisterEvents();
 
 	GAMEOBJECTFACTORY->SetCurrentScene(this);
 
@@ -112,7 +96,7 @@ bool MapToolScene::Init()
 	return result;
 }
 
-bool MapToolScene::Update(float deltaTime, const InputManager & input)
+bool GameScene::Update(float deltaTime, const InputManager & input)
 {
 	bool result = true;
 
@@ -142,7 +126,7 @@ bool MapToolScene::Update(float deltaTime, const InputManager & input)
 	return result;
 }
 
-bool MapToolScene::Render()
+bool GameScene::Render()
 {
 	video::StaticXMesh::SetCamera(_camera);
 	video::StaticXMesh::SetBaseLight(_pMainLight);
@@ -168,7 +152,7 @@ bool MapToolScene::Render()
 	return true;
 }
 
-void MapToolScene::Release()
+void GameScene::Release()
 {
 	for (auto object : _gameObjects)
 	{
@@ -179,7 +163,7 @@ void MapToolScene::Release()
 	_world.Clear();
 }
 
-void MapToolScene::Handle(const Editor::GetObjectFromSceneEvent & event)
+void GameScene::Handle(const Editor::GetObjectFromSceneEvent & event)
 {
 	Vector3 position;
 	Vector3 terrainHitPos;

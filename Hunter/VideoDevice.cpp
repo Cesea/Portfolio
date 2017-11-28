@@ -313,6 +313,11 @@ RenderView *video::VideoDevice::GetRenderView(RenderViewHandle handle)
 	return nullptr;
 }
 
+const std::string & video::VideoDevice::GetRenderViewName(RenderViewHandle handle)
+{
+	return _renderViewHandlePool.GetName(handle);
+}
+
 VertexBufferHandle video::VideoDevice::CreateVertexBuffer(Memory * memory, VertexDeclHandle declHandle, const std::string & name)
 {
 	VertexBufferHandle result = _vertexBufferPool.Create(name);
@@ -377,6 +382,11 @@ VertexBuffer * video::VideoDevice::GetVertexBuffer(VertexBufferHandle handle)
 	return nullptr;
 }
 
+const std::string & video::VideoDevice::GetVertexBufferName(VertexBufferHandle handle)
+{
+	return _vertexBufferPool.GetName(handle);
+}
+
 void video::VideoDevice::DestroyVertexBuffer(VertexBufferHandle handle)
 {
 	_vertexBuffers[handle.index].Destroy();
@@ -427,6 +437,11 @@ IndexBuffer * video::VideoDevice::GetIndexBuffer(IndexBufferHandle handle)
 	return nullptr;
 }
 
+const std::string & video::VideoDevice::GetIndexBufferName(IndexBufferHandle handle)
+{
+	return _indexBufferPool.GetName(handle);
+}
+
 void video::VideoDevice::DestroyIndexBuffer(IndexBufferHandle handle)
 {
 	_indexBuffers[handle.index].Destroy();
@@ -449,6 +464,11 @@ VertexDecl * video::VideoDevice::GetVertexDecl(VertexDeclHandle handle)
 {
 	Assert(handle.IsValid());
 	return &_vertexDecls[handle.index];
+}
+
+const std::string & video::VideoDevice::GetVertexDeclName(VertexDeclHandle handle)
+{
+	return _vertexDeclHandlePool.GetName(handle);
 }
 
 void video::VideoDevice::DestroyVertexDecl(VertexDeclHandle handle)
@@ -497,6 +517,11 @@ Texture * video::VideoDevice::GetTexture(TextureHandle handle)
 	return nullptr;
 }
 
+const std::string & video::VideoDevice::GetTextureName(TextureHandle handle)
+{
+	return _textureHandlePool.GetName(handle);
+}
+
 void video::VideoDevice::DestroyTexture(TextureHandle handle)
 {
 	_textures[handle.index].Destroy();
@@ -530,6 +555,11 @@ Effect * video::VideoDevice::GetEffect(EffectHandle handle)
 		return &_effects[handle.index];
 	}
 	return nullptr;
+}
+
+const std::string & video::VideoDevice::GetEffectName(EffectHandle handle)
+{
+	return _effectHandlePool.GetName(handle);
 }
 
 void video::VideoDevice::DestroyEffect(EffectHandle handle)
@@ -583,6 +613,11 @@ void video::VideoDevice::DestroyMaterial(MaterialHandle handle)
 	_materialHandlePool.Remove(handle);
 }
 
+const std::string & video::VideoDevice::GetMaterialName(MaterialHandle handle)
+{
+	return _materialHandlePool.GetName(handle);
+}
+
 void video::VideoDevice::MaterialAddTexture(MaterialHandle material, uint32 textureSlot, TextureHandle texture)
 {
 	_materials[material.index].AddTexture(textureSlot, texture);
@@ -611,6 +646,11 @@ StaticXMesh *video::VideoDevice::GetStaticXMesh(StaticXMeshHandle handle)
 		return &_staticMeshes[handle.index];
 	}
 	return nullptr;
+}
+
+const std::string & video::VideoDevice::GetStaticXMeshName(StaticXMeshHandle handle)
+{
+	return _staticXMeshHandlePool.GetName(handle);
 }
 
 void video::VideoDevice::DestroyStaticXMesh(StaticXMeshHandle handle)
@@ -642,6 +682,11 @@ SkinnedXMesh * video::VideoDevice::GetSkinnedXMesh(SkinnedXMeshHandle handle)
 		return &_skinnedMeshes[handle.index];
 	}
 	return nullptr;
+}
+
+const std::string & video::VideoDevice::GetSkinnedXMeshName(SkinnedXMeshHandle handle)
+{
+	return _skinnedXMeshHandlePool.GetName(handle);
 }
 
 void video::VideoDevice::DestroySkinnedMesh(SkinnedXMeshHandle handle)
@@ -678,6 +723,11 @@ AnimationInstance * video::VideoDevice::GetAnimationInstance(AnimationInstanceHa
 	return nullptr;
 }
 
+const std::string & video::VideoDevice::GetAnimationInstanceName(AnimationInstanceHandle handle)
+{
+	return _animationInstanceHandlePool.GetName(handle);
+}
+
 void video::VideoDevice::DestroyAnimationInstance(AnimationInstanceHandle handle)
 {
 	if (handle.IsValid())
@@ -710,6 +760,11 @@ Font * video::VideoDevice::GetFont(FontHandle handle)
 		return &_fonts[handle.index];
 	}
 	return nullptr;
+}
+
+const std::string & video::VideoDevice::GetFontName(FontHandle handle)
+{
+	return _fontHandlePool.GetName(handle);
 }
 
 void video::VideoDevice::DestroyFont(FontHandle handle)

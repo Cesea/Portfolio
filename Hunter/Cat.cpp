@@ -18,7 +18,9 @@ bool Cat::CreateFromWorld(World & world)
 
 	RenderComponent &renderComp = _entity.AddComponent<RenderComponent>();
 	renderComp._type = RenderComponent::Type::eSkinned;
-	renderComp._skinned = VIDEO->CreateAnimationInstance(VIDEO->GetSkinnedXMesh("Cat"), "Anim" + std::to_string(0));
+	renderComp._skinned = VIDEO->CreateAnimationInstance(
+		VIDEO->GetSkinnedXMesh("Cat"), "Anim" + std::to_string(0));
+	renderComp._arche = ARCHE_CAT;
 
 	ScriptComponent &scriptComponent = _entity.AddComponent<ScriptComponent>();
 	scriptComponent.SetScript(MAKE_SCRIPT_DELEGATE(Cat, Update, *this));

@@ -23,6 +23,10 @@ struct AABB
 
 	}
 };
+
+void TransformAABB(AABB *pOutAABB, const TransformComponent &transform);
+
+
 struct Sphere
 {
 	Vector3 _center;

@@ -19,6 +19,7 @@ bool Bat::CreateFromWorld(World & world)
 	RenderComponent &renderComp = _entity.AddComponent<RenderComponent>();
 	renderComp._type = RenderComponent::Type::eSkinned;
 	renderComp._skinned = VIDEO->CreateAnimationInstance(VIDEO->GetSkinnedXMesh("Bat"), "Anim" + std::to_string(0));
+	renderComp._arche = ARCHE_BAT;
 
 	ScriptComponent &scriptComponent = _entity.AddComponent<ScriptComponent>();
 	scriptComponent.SetScript(MAKE_SCRIPT_DELEGATE(Bat, Update, *this));
