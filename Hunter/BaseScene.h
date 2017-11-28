@@ -43,7 +43,6 @@ protected :
 
 	Editor *_editor{};
 
-
 	Turtle _turtle;
 	Bat _bat;
 	Cat _cat;

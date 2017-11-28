@@ -14,34 +14,6 @@ struct ScriptComponent;
 struct CollisionComponent;
 struct ActionComponent;
 
-//class Gizmo
-//{
-//public :
-//	enum Type
-//	{
-//		eTranslation = 0,
-//		eRotation,
-//		eScaling,
-//	};
-//	void Init();
-//	void ChangeMode(Gizmo::Type type);
-//
-//	video::StaticXMeshHandle _x;
-//	video::StaticXMeshHandle _t;
-//	video::StaticXMeshHandle _z;
-//};
-//
-//class Brush
-//{
-//public :
-//	void Init();
-//
-//	Vector3 _position;
-//
-//	video::VertexBufferHandle _vHandle;
-//	video::MaterialHandle _mHandle;
-//};
-
 struct TerrainEditor
 {
 	void Reset();
@@ -134,7 +106,6 @@ struct ObjectEditor
 	Quaternion _yRotation;
 	Quaternion _zRotation;
 };
-
 
 class Editor
 {

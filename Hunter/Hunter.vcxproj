@@ -149,7 +149,6 @@
     <ClCompile Include="Console.cpp" />
     <ClCompile Include="DataPackage.cpp" />
     <ClCompile Include="DirectionalLight.cpp" />
-    <ClCompile Include="Dragon.cpp" />
     <ClCompile Include="Enemy.cpp" />
     <ClCompile Include="Entity.cpp" />
     <ClCompile Include="EntityComponentStorage.cpp" />
@@ -160,6 +159,9 @@
     <ClCompile Include="GameCommand.cpp" />
     <ClCompile Include="GameObjectFactory.cpp" />
     <ClCompile Include="GizmoManager.cpp" />
+    <ClCompile Include="Hydra.cpp" />
+    <ClCompile Include="HydraAnimationString.cpp" />
+    <ClCompile Include="HydraStates.cpp" />
     <ClCompile Include="imgui.cpp" />
     <ClCompile Include="imguiRenderer.cpp" />
     <ClCompile Include="MapToolScene.cpp" />
@@ -183,8 +185,6 @@
     <ClCompile Include="Snake.cpp" />
     <ClCompile Include="SnakeAnimationString.cpp" />
     <ClCompile Include="SnakeStates.cpp" />
-    <ClCompile Include="spawn.cpp" />
-    <ClCompile Include="spawnManager.cpp" />
     <ClCompile Include="SpriteManager.cpp" />
     <ClCompile Include="Terrain.cpp" />
     <ClCompile Include="TextSerializer.cpp" />
@@ -236,16 +236,13 @@
     <ClInclude Include="ClassTypeID.h" />
     <ClInclude Include="CollisionUtils.h" />
     <ClInclude Include="Color4F.h" />
-    <ClInclude Include="CombatManager.h" />
     <ClInclude Include="CommonUtils.h" />
     <ClInclude Include="Component.h" />
     <ClInclude Include="Console.h" />
     <ClInclude Include="ContainerCheck.h" />
-    <ClInclude Include="DataBase.h" />
     <ClInclude Include="DataPackage.h" />
     <ClInclude Include="Delegate.h" />
     <ClInclude Include="DirectionalLight.h" />
-    <ClInclude Include="Dragon.h" />
     <ClInclude Include="Enemy.h" />
     <ClInclude Include="Entity.h" />
     <ClInclude Include="EntityComponentStorage.h" />
@@ -262,6 +259,9 @@
     <ClInclude Include="GameSystems.h" />
     <ClInclude Include="GameUtils.h" />
     <ClInclude Include="GizmoManager.h" />
+    <ClInclude Include="Hydra.h" />
+    <ClInclude Include="HydraAnimationString.h" />
+    <ClInclude Include="HydraStates.h" />
     <ClInclude Include="imgui.h" />
     <ClInclude Include="Allocators.h" />
     <ClInclude Include="imguiRenderer.h" />
@@ -292,8 +292,6 @@
     <ClInclude Include="Snake.h" />
     <ClInclude Include="SnakeAnimationString.h" />
     <ClInclude Include="SnakeStates.h" />
-    <ClInclude Include="spawn.h" />
-    <ClInclude Include="spawnManager.h" />
     <ClInclude Include="SpriteManager.h" />
     <ClInclude Include="State.h" />
     <ClInclude Include="StateMachine.h" />

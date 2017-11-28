@@ -2,18 +2,90 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="Engine.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
     <ClCompile Include="stdafx.cpp" />
-    <ClCompile Include="Console.cpp">
-      <Filter>Core</Filter>
+    <ClCompile Include="Allocators.cpp">
+      <Filter>Core\Memory</Filter>
+    </ClCompile>
+    <ClCompile Include="ApplicationTimer.cpp">
+      <Filter>Core\Timer</Filter>
+    </ClCompile>
+    <ClCompile Include="BaseLight.cpp">
+      <Filter>Game\Lights</Filter>
+    </ClCompile>
+    <ClCompile Include="bat.cpp">
+      <Filter>Game\GameObjects\Bat</Filter>
+    </ClCompile>
+    <ClCompile Include="batAnimationString.cpp">
+      <Filter>Game\GameObjects\Bat</Filter>
+    </ClCompile>
+    <ClCompile Include="batStates.cpp">
+      <Filter>Game\GameObjects\Bat</Filter>
+    </ClCompile>
+    <ClCompile Include="Cat.cpp">
+      <Filter>Game\GameObjects\Cat</Filter>
+    </ClCompile>
+    <ClCompile Include="CatAnimationString.cpp">
+      <Filter>Game\GameObjects\Cat</Filter>
+    </ClCompile>
+    <ClCompile Include="CatStates.cpp">
+      <Filter>Game\GameObjects\Cat</Filter>
     </ClCompile>
     <ClCompile Include="CommonUtils.cpp">
       <Filter>Sub</Filter>
     </ClCompile>
-    <ClCompile Include="Meta.cpp">
-      <Filter>Sub\Reflection</Filter>
+    <ClCompile Include="Console.cpp">
+      <Filter>Sub</Filter>
+    </ClCompile>
+    <ClCompile Include="DataPackage.cpp">
+      <Filter>Sub</Filter>
+    </ClCompile>
+    <ClCompile Include="DirectionalLight.cpp">
+      <Filter>Game\Lights</Filter>
+    </ClCompile>
+    <ClCompile Include="Enemy.cpp">
+      <Filter>Game\GameObjects</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Entity.cpp">
+      <Filter>ECS</Filter>
+    </ClCompile>
+    <ClCompile Include="EntityComponentStorage.cpp">
+      <Filter>ECS</Filter>
+    </ClCompile>
+    <ClCompile Include="EntityIDPool.cpp">
+      <Filter>ECS</Filter>
+    </ClCompile>
+    <ClCompile Include="Vector2.cpp">
+      <Filter>Math</Filter>
+    </ClCompile>
+    <ClCompile Include="Vector3.cpp">
+      <Filter>Math</Filter>
+    </ClCompile>
+    <ClCompile Include="Vector4.cpp">
+      <Filter>Math</Filter>
+    </ClCompile>
+    <ClCompile Include="EnvironmentSphere.cpp">
+      <Filter>Game\Lights</Filter>
+    </ClCompile>
+    <ClCompile Include="GameObjectFactory.cpp">
+      <Filter>Managers\GameObjectFactory</Filter>
+    </ClCompile>
+    <ClCompile Include="MathUtils.cpp">
+      <Filter>Math</Filter>
+    </ClCompile>
+    <ClCompile Include="Matrix.cpp">
+      <Filter>Math</Filter>
+    </ClCompile>
+    <ClCompile Include="Plane.cpp">
+      <Filter>Math</Filter>
+    </ClCompile>
+    <ClCompile Include="Quaternion.cpp">
+      <Filter>Math</Filter>
+    </ClCompile>
+    <ClCompile Include="RefVariant.cpp">
+      <Filter>Sub\Reflection\Variant</Filter>
     </ClCompile>
     <ClCompile Include="Variant.cpp">
       <Filter>Sub\Reflection\Variant</Filter>
@@ -21,253 +93,250 @@
     <ClCompile Include="VariantBase.cpp">
       <Filter>Sub\Reflection\Variant</Filter>
     </ClCompile>
-    <ClCompile Include="RefVariant.cpp">
-      <Filter>Sub\Reflection\Variant</Filter>
-    </ClCompile>
-    <ClCompile Include="tinyxml2.cpp">
-      <Filter>Sub\tinyxml</Filter>
-    </ClCompile>
-    <ClCompile Include="TextSerializer.cpp">
-      <Filter>Sub\Reflection\Serializer</Filter>
-    </ClCompile>
-    <ClCompile Include="XMLManager.cpp">
-      <Filter>Managers</Filter>
-    </ClCompile>
-    <ClCompile Include="XmlSerializer.cpp">
-      <Filter>Sub\Reflection\Serializer</Filter>
-    </ClCompile>
-    <ClCompile Include="Vector3.cpp">
-      <Filter>Math</Filter>
-    </ClCompile>
-    <ClCompile Include="Vector2.cpp">
-      <Filter>Math</Filter>
-    </ClCompile>
-    <ClCompile Include="Matrix.cpp">
-      <Filter>Math</Filter>
-    </ClCompile>
-    <ClCompile Include="Vector4.cpp">
-      <Filter>Math</Filter>
-    </ClCompile>
-    <ClCompile Include="Quaternion.cpp">
-      <Filter>Math</Filter>
-    </ClCompile>
-    <ClCompile Include="Plane.cpp">
-      <Filter>Math</Filter>
-    </ClCompile>
-    <ClCompile Include="ApplicationTimer.cpp">
-      <Filter>Core\Timers</Filter>
-    </ClCompile>
-    <ClCompile Include="Ray.cpp">
-      <Filter>Math</Filter>
-    </ClCompile>
-    <ClCompile Include="SceneManager.cpp">
-      <Filter>Core\SubSystem\SceneeManager</Filter>
-    </ClCompile>
-    <ClCompile Include="InputManager.cpp">
-      <Filter>Core\SubSystem\InputManager</Filter>
-    </ClCompile>
-    <ClCompile Include="Entity.cpp">
-      <Filter>Core\ECS\Entity</Filter>
-    </ClCompile>
-    <ClCompile Include="World.cpp">
-      <Filter>Core\ECS</Filter>
-    </ClCompile>
-    <ClCompile Include="EntityIDPool.cpp">
-      <Filter>Core\ECS\Entity</Filter>
-    </ClCompile>
-    <ClCompile Include="Filter.cpp">
-      <Filter>Core\ECS</Filter>
-    </ClCompile>
-    <ClCompile Include="EntityComponentStorage.cpp">
-      <Filter>Core\ECS\Entity</Filter>
-    </ClCompile>
-    <ClCompile Include="BaseSystem.cpp">
-      <Filter>Core\ECS\System</Filter>
-    </ClCompile>
-    <ClCompile Include="Allocators.cpp">
-      <Filter>Core\Memory</Filter>
-    </ClCompile>
-    <ClCompile Include="ColiisionSystem.cpp">
-      <Filter>Game\GameSystem\CollisionSystem</Filter>
-    </ClCompile>
-    <ClCompile Include="RenderSystem.cpp">
-      <Filter>Game\GameSystem\RenderSystem</Filter>
-    </ClCompile>
-    <ClCompile Include="TransformSystem.cpp">
-      <Filter>Game\GameSystem\TransformSystem</Filter>
-    </ClCompile>
-    <ClCompile Include="CollisionUtils.cpp">
-      <Filter>Game\GameSystem\CollisionSystem</Filter>
-    </ClCompile>
-    <ClCompile Include="VideoDevice.cpp">
-      <Filter>Core\SubSystem\VideoDevice</Filter>
-    </ClCompile>
-    <ClCompile Include="VideoResource.cpp">
-      <Filter>Core\SubSystem\VideoDevice</Filter>
-    </ClCompile>
-    <ClCompile Include="Camera.cpp">
-      <Filter>Game\GameUtils\Camera</Filter>
-    </ClCompile>
-    <ClCompile Include="Frustum.cpp">
-      <Filter>Game\GameUtils\Camera</Filter>
-    </ClCompile>
-    <ClCompile Include="MathUtils.cpp">
-      <Filter>Math</Filter>
-    </ClCompile>
-    <ClCompile Include="VideoVertexFormat.cpp">
-      <Filter>Core\SubSystem\VideoDevice</Filter>
-    </ClCompile>
-    <ClCompile Include="CollisionComponent.cpp">
-      <Filter>Game\GameComponent\CollisionComponent</Filter>
-    </ClCompile>
-    <ClCompile Include="RenderComponent.cpp">
-      <Filter>Game\GameComponent\RenderComponent</Filter>
-    </ClCompile>
-    <ClCompile Include="TransformComponent.cpp">
-      <Filter>Game\GameComponent\TransfromComponent</Filter>
-    </ClCompile>
-    <ClCompile Include="VideoResource_Mesh.cpp">
-      <Filter>Core\SubSystem\VideoDevice</Filter>
-    </ClCompile>
-    <ClCompile Include="QuadTree.cpp">
-      <Filter>Game\GameUtils\Terrain</Filter>
-    </ClCompile>
-    <ClCompile Include="Terrain.cpp">
-      <Filter>Game\GameUtils\Terrain</Filter>
-    </ClCompile>
-    <ClCompile Include="BaseScene.cpp">
-      <Filter>Game\GameScene</Filter>
-    </ClCompile>
     <ClCompile Include="imgui.cpp">
-      <Filter>GUI</Filter>
+      <Filter>Sub\imgui</Filter>
     </ClCompile>
     <ClCompile Include="imguiRenderer.cpp">
-      <Filter>GUI</Filter>
+      <Filter>Sub\imgui</Filter>
     </ClCompile>
-    <ClCompile Include="WorldEditor.cpp">
-      <Filter>Game\WorldEditor</Filter>
-    </ClCompile>
-    <ClCompile Include="ScriptComponent.cpp">
-      <Filter>Game\GameComponent\ScriptComponent</Filter>
-    </ClCompile>
-    <ClCompile Include="ScriptSystem.cpp">
-      <Filter>Game\GameSystem\ScriptSystem</Filter>
-    </ClCompile>
-    <ClCompile Include="Enemy.cpp">
-      <Filter>Game\GameObject\Enemy</Filter>
-    </ClCompile>
-    <ClCompile Include="Dragon.cpp">
-      <Filter>Game\GameObject\Enemy\script</Filter>
-    </ClCompile>
-    <ClCompile Include="spawnManager.cpp">
-      <Filter>Game\GameObject\Enemy\spawn</Filter>
-    </ClCompile>
-    <ClCompile Include="ActionSystem.cpp">
-      <Filter>Game\GameSystem\ActionSystem</Filter>
-    </ClCompile>
-    <ClCompile Include="ActionComponent.cpp">
-      <Filter>Game\GameComponent\ActionComponent</Filter>
-    </ClCompile>
-    <ClCompile Include="Player.cpp">
-      <Filter>Game\GameObject\Player</Filter>
-    </ClCompile>
-    <ClCompile Include="PlayerStates.cpp">
-      <Filter>Game\GameObject\Player</Filter>
-    </ClCompile>
-    <ClCompile Include="GameCommand.cpp">
-      <Filter>Game\GameUtils\GameCommand</Filter>
-    </ClCompile>
-    <ClCompile Include="PlayerAnimationString.cpp">
-      <Filter>Game\GameObject\Player</Filter>
+    <ClCompile Include="InputManager.cpp">
+      <Filter>Core\InputManager</Filter>
     </ClCompile>
     <ClCompile Include="GizmoManager.cpp">
       <Filter>Managers</Filter>
     </ClCompile>
+    <ClCompile Include="Player.cpp">
+      <Filter>Game\GameObjects\Player</Filter>
+    </ClCompile>
+    <ClCompile Include="PlayerAnimationString.cpp">
+      <Filter>Game\GameObjects\Player</Filter>
+    </ClCompile>
+    <ClCompile Include="PlayerStates.cpp">
+      <Filter>Game\GameObjects\Player</Filter>
+    </ClCompile>
+    <ClCompile Include="Meta.cpp">
+      <Filter>Sub\Reflection</Filter>
+    </ClCompile>
+    <ClCompile Include="Ray.cpp">
+      <Filter>Math</Filter>
+    </ClCompile>
     <ClCompile Include="SpriteManager.cpp">
       <Filter>Managers</Filter>
     </ClCompile>
-    <ClCompile Include="BaseLight.cpp">
-      <Filter>Game\GameUtils\Light</Filter>
-    </ClCompile>
-    <ClCompile Include="DirectionalLight.cpp">
-      <Filter>Game\GameUtils\Light</Filter>
-    </ClCompile>
     <ClCompile Include="PointLight.cpp">
-      <Filter>Game\GameUtils\Light</Filter>
-    </ClCompile>
-    <ClCompile Include="ParticleComponent.cpp">
-      <Filter>Game\GameComponent\ParticleComponent</Filter>
-    </ClCompile>
-    <ClCompile Include="Particle.cpp">
-      <Filter>Game\GameUtils</Filter>
-    </ClCompile>
-    <ClCompile Include="spawn.cpp">
-      <Filter>Game\GameObject\Enemy\spawn</Filter>
+      <Filter>Game\Lights</Filter>
     </ClCompile>
     <ClCompile Include="Snake.cpp">
-      <Filter>Game\GameObject\Enemy\Enemy\Snake</Filter>
+      <Filter>Game\GameObjects\Snake</Filter>
     </ClCompile>
     <ClCompile Include="SnakeAnimationString.cpp">
-      <Filter>Game\GameObject\Enemy\Enemy\Snake</Filter>
+      <Filter>Game\GameObjects\Snake</Filter>
     </ClCompile>
     <ClCompile Include="SnakeStates.cpp">
-      <Filter>Game\GameObject\Enemy\Enemy\Snake</Filter>
+      <Filter>Game\GameObjects\Snake</Filter>
+    </ClCompile>
+    <ClCompile Include="SceneManager.cpp">
+      <Filter>Core\SceneManager</Filter>
+    </ClCompile>
+    <ClCompile Include="VideoDevice.cpp">
+      <Filter>Core\VideoDevice</Filter>
+    </ClCompile>
+    <ClCompile Include="VideoResource.cpp">
+      <Filter>Core\VideoDevice</Filter>
+    </ClCompile>
+    <ClCompile Include="VideoResource_Mesh.cpp">
+      <Filter>Core\VideoDevice</Filter>
+    </ClCompile>
+    <ClCompile Include="VideoVertexFormat.cpp">
+      <Filter>Core\VideoDevice</Filter>
+    </ClCompile>
+    <ClCompile Include="World.cpp">
+      <Filter>ECS</Filter>
+    </ClCompile>
+    <ClCompile Include="BaseSystem.cpp">
+      <Filter>ECS\System</Filter>
+    </ClCompile>
+    <ClCompile Include="Filter.cpp">
+      <Filter>ECS\System</Filter>
     </ClCompile>
     <ClCompile Include="Turtle.cpp">
-      <Filter>Game\GameObject\Enemy\Enemy\Turtle</Filter>
+      <Filter>Game\GameObjects\Turtle</Filter>
     </ClCompile>
     <ClCompile Include="TurtleAnimationString.cpp">
-      <Filter>Game\GameObject\Enemy\Enemy\Turtle</Filter>
+      <Filter>Game\GameObjects\Turtle</Filter>
     </ClCompile>
     <ClCompile Include="TurtleStates.cpp">
-      <Filter>Game\GameObject\Enemy\Enemy\Turtle</Filter>
+      <Filter>Game\GameObjects\Turtle</Filter>
     </ClCompile>
-    <ClCompile Include="bat.cpp">
-      <Filter>Game\GameObject\Enemy\Enemy\Bat</Filter>
+    <ClCompile Include="GameCommand.cpp">
+      <Filter>Game\GameCommands</Filter>
     </ClCompile>
-    <ClCompile Include="batAnimationString.cpp">
-      <Filter>Game\GameObject\Enemy\Enemy\Bat</Filter>
+    <ClCompile Include="QuadTree.cpp">
+      <Filter>Game\Utils</Filter>
     </ClCompile>
-    <ClCompile Include="batStates.cpp">
-      <Filter>Game\GameObject\Enemy\Enemy\Bat</Filter>
+    <ClCompile Include="Terrain.cpp">
+      <Filter>Game\Utils</Filter>
     </ClCompile>
-    <ClCompile Include="Cat.cpp">
-      <Filter>Game\GameObject\Enemy\Enemy\Cat</Filter>
+    <ClCompile Include="Camera.cpp">
+      <Filter>Game\Utils</Filter>
     </ClCompile>
-    <ClCompile Include="CatAnimationString.cpp">
-      <Filter>Game\GameObject\Enemy\Enemy\Cat</Filter>
+    <ClCompile Include="Frustum.cpp">
+      <Filter>Game\Utils</Filter>
     </ClCompile>
-    <ClCompile Include="CatStates.cpp">
-      <Filter>Game\GameObject\Enemy\Enemy\Cat</Filter>
+    <ClCompile Include="TextSerializer.cpp">
+      <Filter>Sub\Reflection\Serialization</Filter>
     </ClCompile>
-    <ClCompile Include="Hydra.cpp">
-      <Filter>Game\GameObject\Enemy\Enemy\Hydra</Filter>
+    <ClCompile Include="XmlSerializer.cpp">
+      <Filter>Sub\Reflection\Serialization</Filter>
     </ClCompile>
-    <ClCompile Include="HydraAnimationString.cpp">
-      <Filter>Game\GameObject\Enemy\Enemy\Hydra</Filter>
+    <ClCompile Include="XMLManager.cpp">
+      <Filter>Managers</Filter>
     </ClCompile>
-    <ClCompile Include="HydraStates.cpp">
-      <Filter>Game\GameObject\Enemy\Enemy\Hydra</Filter>
+    <ClCompile Include="WorldEditor.cpp">
+      <Filter>Game\Editor</Filter>
     </ClCompile>
-    <ClCompile Include="EnvironmentSphere.cpp">
-      <Filter>Game\GameUtils\Light</Filter>
+    <ClCompile Include="tinyxml2.cpp">
+      <Filter>Sub</Filter>
     </ClCompile>
-    <ClCompile Include="DataPackage.cpp">
-      <Filter>Sub\DataPackage</Filter>
+    <ClCompile Include="ActionComponent.cpp">
+      <Filter>Game\GameComponents\ActionComponent</Filter>
+    </ClCompile>
+    <ClCompile Include="CollisionComponent.cpp">
+      <Filter>Game\GameComponents\CollisionComponent</Filter>
+    </ClCompile>
+    <ClCompile Include="Particle.cpp">
+      <Filter>Game\GameComponents\ParticleComponent</Filter>
+    </ClCompile>
+    <ClCompile Include="ParticleComponent.cpp">
+      <Filter>Game\GameComponents\ParticleComponent</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderComponent.cpp">
+      <Filter>Game\GameComponents\RenderComponent</Filter>
+    </ClCompile>
+    <ClCompile Include="ScriptComponent.cpp">
+      <Filter>Game\GameComponents\ScriptComponent</Filter>
+    </ClCompile>
+    <ClCompile Include="TransformComponent.cpp">
+      <Filter>Game\GameComponents\TransformComponent</Filter>
+    </ClCompile>
+    <ClCompile Include="ActionSystem.cpp">
+      <Filter>Game\GameSystems\ActionSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="ColiisionSystem.cpp">
+      <Filter>Game\GameSystems\CollisionSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="CollisionUtils.cpp">
+      <Filter>Game\GameSystems\CollisionSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderSystem.cpp">
+      <Filter>Game\GameSystems\RenderSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="ScriptSystem.cpp">
+      <Filter>Game\GameSystems\ScriptSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="TransformSystem.cpp">
+      <Filter>Game\GameSystems\TransformSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="BaseScene.cpp">
+      <Filter>Game\GameScenes\BaseScene</Filter>
     </ClCompile>
     <ClCompile Include="MapToolScene.cpp">
-      <Filter>Game\GameScene\MapToolScene</Filter>
+      <Filter>Game\GameScenes\MapToolScene</Filter>
     </ClCompile>
-    <ClCompile Include="GameObjectFactory.cpp">
-      <Filter>Managers\GameObjectFactory</Filter>
+    <ClCompile Include="Hydra.cpp">
+      <Filter>Game\GameObjects\Hydra</Filter>
+    </ClCompile>
+    <ClCompile Include="HydraAnimationString.cpp">
+      <Filter>Game\GameObjects\Hydra</Filter>
+    </ClCompile>
+    <ClCompile Include="HydraStates.cpp">
+      <Filter>Game\GameObjects\Hydra</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="GameObjects.h" />
+    <ClInclude Include="Lights.h" />
+    <ClInclude Include="resource.h" />
     <ClInclude Include="stdafx.h" />
-    <ClInclude Include="EventBridge.h">
-      <Filter>Sub\Event</Filter>
+    <ClInclude Include="Allocators.h">
+      <Filter>Core\Memory</Filter>
+    </ClInclude>
+    <ClInclude Include="ApplicationTimer.h">
+      <Filter>Core\Timer</Filter>
+    </ClInclude>
+    <ClInclude Include="BaseGameObject.h">
+      <Filter>Game\GameObjects</Filter>
+    </ClInclude>
+    <ClInclude Include="BaseLight.h">
+      <Filter>Game\Lights</Filter>
+    </ClInclude>
+    <ClInclude Include="bat.h">
+      <Filter>Game\GameObjects\Bat</Filter>
+    </ClInclude>
+    <ClInclude Include="batAnimationString.h">
+      <Filter>Game\GameObjects\Bat</Filter>
+    </ClInclude>
+    <ClInclude Include="batStates.h">
+      <Filter>Game\GameObjects\Bat</Filter>
+    </ClInclude>
+    <ClInclude Include="Cat.h">
+      <Filter>Game\GameObjects\Cat</Filter>
+    </ClInclude>
+    <ClInclude Include="CatAnimationString.h">
+      <Filter>Game\GameObjects\Cat</Filter>
+    </ClInclude>
+    <ClInclude Include="CatStates.h">
+      <Filter>Game\GameObjects\Cat</Filter>
+    </ClInclude>
+    <ClInclude Include="ClassTypeID.h">
+      <Filter>Sub</Filter>
+    </ClInclude>
+    <ClInclude Include="Color4F.h">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="CommonUtils.h">
+      <Filter>Sub</Filter>
+    </ClInclude>
+    <ClInclude Include="Console.h">
+      <Filter>Sub</Filter>
+    </ClInclude>
+    <ClInclude Include="DataPackage.h">
+      <Filter>Sub</Filter>
+    </ClInclude>
+    <ClInclude Include="DirectionalLight.h">
+      <Filter>Game\Lights</Filter>
+    </ClInclude>
+    <ClInclude Include="Enemy.h">
+      <Filter>Game\GameObjects</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Entity.h">
+      <Filter>ECS</Filter>
+    </ClInclude>
+    <ClInclude Include="EntityComponentSystem.h">
+      <Filter>ECS</Filter>
+    </ClInclude>
+    <ClInclude Include="EntityComponentStorage.h">
+      <Filter>ECS</Filter>
+    </ClInclude>
+    <ClInclude Include="EntityIDPool.h">
+      <Filter>ECS</Filter>
+    </ClInclude>
+    <ClInclude Include="Vector2.h">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Vector3.h">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Vector4.h">
+      <Filter>Math</Filter>
     </ClInclude>
     <ClInclude Include="EventChannel.h">
+      <Filter>Sub\Event</Filter>
+    </ClInclude>
+    <ClInclude Include="EventBridge.h">
       <Filter>Sub\Event</Filter>
     </ClInclude>
     <ClInclude Include="EventHandler.h">
@@ -279,26 +348,29 @@
     <ClInclude Include="EventQueue.h">
       <Filter>Sub\Event</Filter>
     </ClInclude>
-    <ClInclude Include="Typedefs.h">
-      <Filter>Sub</Filter>
+    <ClInclude Include="EnvironmentSphere.h">
+      <Filter>Game\Lights</Filter>
     </ClInclude>
-    <ClInclude Include="Console.h">
-      <Filter>Core</Filter>
+    <ClInclude Include="GameObjectHandle.h">
+      <Filter>Managers\GameObjectFactory</Filter>
     </ClInclude>
-    <ClInclude Include="CommonUtils.h">
-      <Filter>Sub</Filter>
+    <ClInclude Include="GameObjectFactory.h">
+      <Filter>Managers\GameObjectFactory</Filter>
     </ClInclude>
-    <ClInclude Include="IScene.h">
-      <Filter>Game\GameScene</Filter>
+    <ClInclude Include="MathUtils.h">
+      <Filter>Math</Filter>
     </ClInclude>
-    <ClInclude Include="XMLManager.h">
-      <Filter>Managers</Filter>
+    <ClInclude Include="Math.h">
+      <Filter>Math</Filter>
     </ClInclude>
-    <ClInclude Include="SingletonBase.h">
-      <Filter>Managers</Filter>
+    <ClInclude Include="Matrix.h">
+      <Filter>Math</Filter>
     </ClInclude>
-    <ClInclude Include="Meta.h">
-      <Filter>Sub\Reflection</Filter>
+    <ClInclude Include="Plane.h">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Quaternion.h">
+      <Filter>Math</Filter>
     </ClInclude>
     <ClInclude Include="Reflection.h">
       <Filter>Sub\Reflection</Filter>
@@ -306,207 +378,158 @@
     <ClInclude Include="RemQual.h">
       <Filter>Sub\Reflection</Filter>
     </ClInclude>
+    <ClInclude Include="System.h">
+      <Filter>ECS</Filter>
+    </ClInclude>
+    <ClInclude Include="RefVariant.h">
+      <Filter>Sub\Reflection\Variant</Filter>
+    </ClInclude>
     <ClInclude Include="Variant.h">
       <Filter>Sub\Reflection\Variant</Filter>
     </ClInclude>
     <ClInclude Include="VariantBase.h">
       <Filter>Sub\Reflection\Variant</Filter>
     </ClInclude>
-    <ClInclude Include="RefVariant.h">
-      <Filter>Sub\Reflection\Variant</Filter>
+    <ClInclude Include="imgui.h">
+      <Filter>Sub\imgui</Filter>
     </ClInclude>
-    <ClInclude Include="tinyxml2.h">
-      <Filter>Sub\tinyxml</Filter>
+    <ClInclude Include="imguiRenderer.h">
+      <Filter>Sub\imgui</Filter>
     </ClInclude>
-    <ClInclude Include="TextSerializer.h">
-      <Filter>Sub\Reflection\Serializer</Filter>
+    <ClInclude Include="InputManager.h">
+      <Filter>Core\InputManager</Filter>
     </ClInclude>
-    <ClInclude Include="XmlSerializer.h">
-      <Filter>Sub\Reflection\Serializer</Filter>
+    <ClInclude Include="GizmoManager.h">
+      <Filter>Managers</Filter>
     </ClInclude>
-    <ClInclude Include="Vector3.h">
-      <Filter>Math</Filter>
+    <ClInclude Include="Player.h">
+      <Filter>Game\GameObjects\Player</Filter>
     </ClInclude>
-    <ClInclude Include="Math.h">
-      <Filter>Math</Filter>
+    <ClInclude Include="PlayerAnimationString.h">
+      <Filter>Game\GameObjects\Player</Filter>
     </ClInclude>
-    <ClInclude Include="Vector2.h">
-      <Filter>Math</Filter>
+    <ClInclude Include="PlayerStates.h">
+      <Filter>Game\GameObjects\Player</Filter>
     </ClInclude>
-    <ClInclude Include="Color4F.h">
-      <Filter>Math</Filter>
-    </ClInclude>
-    <ClInclude Include="Vector4.h">
-      <Filter>Math</Filter>
-    </ClInclude>
-    <ClInclude Include="Matrix.h">
-      <Filter>Math</Filter>
-    </ClInclude>
-    <ClInclude Include="Quaternion.h">
-      <Filter>Math</Filter>
-    </ClInclude>
-    <ClInclude Include="Plane.h">
-      <Filter>Math</Filter>
-    </ClInclude>
-    <ClInclude Include="ApplicationTimer.h">
-      <Filter>Core\Timers</Filter>
+    <ClInclude Include="Meta.h">
+      <Filter>Sub\Reflection</Filter>
     </ClInclude>
     <ClInclude Include="Ray.h">
       <Filter>Math</Filter>
     </ClInclude>
-    <ClInclude Include="Engine.h">
-      <Filter>Core</Filter>
+    <ClInclude Include="SpriteManager.h">
+      <Filter>Managers</Filter>
     </ClInclude>
-    <ClInclude Include="GameUtils.h">
-      <Filter>Game\GameUtils</Filter>
+    <ClInclude Include="PointLight.h">
+      <Filter>Game\Lights</Filter>
     </ClInclude>
-    <ClInclude Include="Terrain.h">
-      <Filter>Game\GameUtils\Terrain</Filter>
+    <ClInclude Include="Snake.h">
+      <Filter>Game\GameObjects\Snake</Filter>
     </ClInclude>
-    <ClInclude Include="WorldEditor.h">
-      <Filter>Game\WorldEditor</Filter>
+    <ClInclude Include="SnakeAnimationString.h">
+      <Filter>Game\GameObjects\Snake</Filter>
+    </ClInclude>
+    <ClInclude Include="SnakeStates.h">
+      <Filter>Game\GameObjects\Snake</Filter>
     </ClInclude>
     <ClInclude Include="SceneManager.h">
-      <Filter>Core\SubSystem\SceneeManager</Filter>
+      <Filter>Core\SceneManager</Filter>
     </ClInclude>
-    <ClInclude Include="InputManager.h">
-      <Filter>Core\SubSystem\InputManager</Filter>
+    <ClInclude Include="SceneChangeEffect.h">
+      <Filter>Core\SceneManager</Filter>
     </ClInclude>
-    <ClInclude Include="BaseSystem.h">
-      <Filter>Core\ECS\System</Filter>
+    <ClInclude Include="VideoDefines.h">
+      <Filter>Core\VideoDevice</Filter>
     </ClInclude>
-    <ClInclude Include="Entity.h">
-      <Filter>Core\ECS\Entity</Filter>
+    <ClInclude Include="VideoDevice.h">
+      <Filter>Core\VideoDevice</Filter>
     </ClInclude>
-    <ClInclude Include="Filter.h">
-      <Filter>Core\ECS</Filter>
+    <ClInclude Include="VideoResource.h">
+      <Filter>Core\VideoDevice</Filter>
     </ClInclude>
-    <ClInclude Include="Component.h">
-      <Filter>Core\ECS\Component</Filter>
+    <ClInclude Include="VideoResource_Mesh.h">
+      <Filter>Core\VideoDevice</Filter>
+    </ClInclude>
+    <ClInclude Include="VideoResourceHandles.h">
+      <Filter>Core\VideoDevice</Filter>
+    </ClInclude>
+    <ClInclude Include="VideoVertexFormat.h">
+      <Filter>Core\VideoDevice</Filter>
     </ClInclude>
     <ClInclude Include="World.h">
-      <Filter>Core\ECS</Filter>
+      <Filter>ECS</Filter>
     </ClInclude>
-    <ClInclude Include="System.h">
-      <Filter>Core\ECS\System</Filter>
+    <ClInclude Include="Component.h">
+      <Filter>ECS\Components</Filter>
     </ClInclude>
-    <ClInclude Include="EntityIDPool.h">
-      <Filter>Core\ECS\Entity</Filter>
+    <ClInclude Include="BaseSystem.h">
+      <Filter>ECS\System</Filter>
     </ClInclude>
-    <ClInclude Include="EntityComponentStorage.h">
-      <Filter>Core\ECS\Entity</Filter>
+    <ClInclude Include="Filter.h">
+      <Filter>ECS\System</Filter>
     </ClInclude>
     <ClInclude Include="ContainerCheck.h">
-      <Filter>Core\ECS</Filter>
+      <Filter>ECS\System</Filter>
     </ClInclude>
-    <ClInclude Include="EntityComponentSystem.h">
-      <Filter>Core\ECS</Filter>
+    <ClInclude Include="SingletonBase.h">
+      <Filter>Managers</Filter>
     </ClInclude>
-    <ClInclude Include="ClassTypeID.h">
-      <Filter>Core\ECS\System</Filter>
+    <ClInclude Include="Turtle.h">
+      <Filter>Game\GameObjects\Turtle</Filter>
     </ClInclude>
-    <ClInclude Include="TypeTraits.h">
+    <ClInclude Include="TurtleAnimationString.h">
+      <Filter>Game\GameObjects\Turtle</Filter>
+    </ClInclude>
+    <ClInclude Include="TurtleStates.h">
+      <Filter>Game\GameObjects\Turtle</Filter>
+    </ClInclude>
+    <ClInclude Include="GameComponent.h">
+      <Filter>Game\GameComponents</Filter>
+    </ClInclude>
+    <ClInclude Include="GameSystems.h">
+      <Filter>Game\GameSystems</Filter>
+    </ClInclude>
+    <ClInclude Include="GameCommand.h">
+      <Filter>Game\GameCommands</Filter>
+    </ClInclude>
+    <ClInclude Include="QuadTree.h">
+      <Filter>Game\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="Terrain.h">
+      <Filter>Game\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="Camera.h">
+      <Filter>Game\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="Frustum.h">
+      <Filter>Game\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="TextSerializer.h">
+      <Filter>Sub\Reflection\Serialization</Filter>
+    </ClInclude>
+    <ClInclude Include="XmlSerializer.h">
+      <Filter>Sub\Reflection\Serialization</Filter>
+    </ClInclude>
+    <ClInclude Include="XMLManager.h">
+      <Filter>Managers</Filter>
+    </ClInclude>
+    <ClInclude Include="GameUtils.h">
+      <Filter>Game\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="WorldEditor.h">
+      <Filter>Game\Editor</Filter>
+    </ClInclude>
+    <ClInclude Include="tinyxml2.h">
       <Filter>Sub</Filter>
+    </ClInclude>
+    <ClInclude Include="IScene.h">
+      <Filter>Game\GameScenes</Filter>
     </ClInclude>
     <ClInclude Include="Memory.h">
       <Filter>Core\Memory</Filter>
     </ClInclude>
-    <ClInclude Include="Allocators.h">
-      <Filter>Core\Memory</Filter>
-    </ClInclude>
-    <ClInclude Include="DataBase.h">
-      <Filter>Core\SubSystem\DataBase</Filter>
-    </ClInclude>
-    <ClInclude Include="CollisionSystem.h">
-      <Filter>Game\GameSystem\CollisionSystem</Filter>
-    </ClInclude>
-    <ClInclude Include="TransformSystem.h">
-      <Filter>Game\GameSystem\TransformSystem</Filter>
-    </ClInclude>
-    <ClInclude Include="CollisionUtils.h">
-      <Filter>Game\GameSystem\CollisionSystem</Filter>
-    </ClInclude>
-    <ClInclude Include="SceneChangeEffect.h">
-      <Filter>Core\SubSystem\SceneeManager</Filter>
-    </ClInclude>
-    <ClInclude Include="VideoDevice.h">
-      <Filter>Core\SubSystem\VideoDevice</Filter>
-    </ClInclude>
-    <ClInclude Include="VideoResource.h">
-      <Filter>Core\SubSystem\VideoDevice</Filter>
-    </ClInclude>
-    <ClInclude Include="VideoDefines.h">
-      <Filter>Core\SubSystem\VideoDevice</Filter>
-    </ClInclude>
-    <ClInclude Include="VideoResourceHandles.h">
-      <Filter>Core\SubSystem\VideoDevice</Filter>
-    </ClInclude>
-    <ClInclude Include="Camera.h">
-      <Filter>Game\GameUtils\Camera</Filter>
-    </ClInclude>
-    <ClInclude Include="Frustum.h">
-      <Filter>Game\GameUtils\Camera</Filter>
-    </ClInclude>
-    <ClInclude Include="MathUtils.h">
-      <Filter>Math</Filter>
-    </ClInclude>
-    <ClInclude Include="VideoVertexFormat.h">
-      <Filter>Core\SubSystem\VideoDevice</Filter>
-    </ClInclude>
-    <ClInclude Include="GameSystems.h">
-      <Filter>Game\GameSystem</Filter>
-    </ClInclude>
-    <ClInclude Include="RenderSystem.h">
-      <Filter>Game\GameSystem\RenderSystem</Filter>
-    </ClInclude>
-    <ClInclude Include="GameComponent.h">
-      <Filter>Game\GameComponent</Filter>
-    </ClInclude>
-    <ClInclude Include="CollisionComponent.h">
-      <Filter>Game\GameComponent\CollisionComponent</Filter>
-    </ClInclude>
-    <ClInclude Include="RenderComponent.h">
-      <Filter>Game\GameComponent\RenderComponent</Filter>
-    </ClInclude>
-    <ClInclude Include="TransformComponent.h">
-      <Filter>Game\GameComponent\TransfromComponent</Filter>
-    </ClInclude>
-    <ClInclude Include="VideoResource_Mesh.h">
-      <Filter>Core\SubSystem\VideoDevice</Filter>
-    </ClInclude>
-    <ClInclude Include="QuadTree.h">
-      <Filter>Game\GameUtils\Terrain</Filter>
-    </ClInclude>
-    <ClInclude Include="BaseScene.h">
-      <Filter>Game\GameScene</Filter>
-    </ClInclude>
-    <ClInclude Include="imgui.h">
-      <Filter>GUI</Filter>
-    </ClInclude>
-    <ClInclude Include="ScriptComponent.h">
-      <Filter>Game\GameComponent\ScriptComponent</Filter>
-    </ClInclude>
-    <ClInclude Include="ScriptSystem.h">
-      <Filter>Game\GameSystem\ScriptSystem</Filter>
-    </ClInclude>
     <ClInclude Include="Delegate.h">
-      <Filter>Sub</Filter>
-    </ClInclude>
-    <ClInclude Include="Enemy.h">
-      <Filter>Game\GameObject\Enemy</Filter>
-    </ClInclude>
-    <ClInclude Include="resource.h" />
-    <ClInclude Include="Dragon.h">
-      <Filter>Game\GameObject\Enemy\script</Filter>
-    </ClInclude>
-    <ClInclude Include="spawnManager.h">
-      <Filter>Game\GameObject\Enemy\spawn</Filter>
-    </ClInclude>
-    <ClInclude Include="ActionComponent.h">
-      <Filter>Game\GameComponent\ActionComponent</Filter>
-    </ClInclude>
-    <ClInclude Include="ActionSystem.h">
-      <Filter>Game\GameSystem\ActionSystem</Filter>
+      <Filter>Sub\Dlelegate</Filter>
     </ClInclude>
     <ClInclude Include="State.h">
       <Filter>Sub\StateMachine</Filter>
@@ -514,251 +537,218 @@
     <ClInclude Include="StateMachine.h">
       <Filter>Sub\StateMachine</Filter>
     </ClInclude>
-    <ClInclude Include="Player.h">
-      <Filter>Game\GameObject\Player</Filter>
+    <ClInclude Include="Typedefs.h" />
+    <ClInclude Include="TypeTraits.h">
+      <Filter>Sub</Filter>
     </ClInclude>
-    <ClInclude Include="PlayerAnimationString.h">
-      <Filter>Game\GameObject\Player</Filter>
+    <ClInclude Include="ActionComponent.h">
+      <Filter>Game\GameComponents\ActionComponent</Filter>
     </ClInclude>
-    <ClInclude Include="GameCommand.h">
-      <Filter>Game\GameUtils\GameCommand</Filter>
-    </ClInclude>
-    <ClInclude Include="PlayerStates.h">
-      <Filter>Game\GameObject\Player</Filter>
-    </ClInclude>
-    <ClInclude Include="CombatManager.h">
-      <Filter>Game\GameManager</Filter>
-    </ClInclude>
-    <ClInclude Include="GizmoManager.h">
-      <Filter>Managers</Filter>
-    </ClInclude>
-    <ClInclude Include="SpriteManager.h">
-      <Filter>Managers</Filter>
-    </ClInclude>
-    <ClInclude Include="BaseLight.h">
-      <Filter>Game\GameUtils\Light</Filter>
-    </ClInclude>
-    <ClInclude Include="DirectionalLight.h">
-      <Filter>Game\GameUtils\Light</Filter>
-    </ClInclude>
-    <ClInclude Include="PointLight.h">
-      <Filter>Game\GameUtils\Light</Filter>
-    </ClInclude>
-    <ClInclude Include="ParticleComponent.h">
-      <Filter>Game\GameComponent\ParticleComponent</Filter>
+    <ClInclude Include="CollisionComponent.h">
+      <Filter>Game\GameComponents\CollisionComponent</Filter>
     </ClInclude>
     <ClInclude Include="Particle.h">
-      <Filter>Game\GameUtils</Filter>
+      <Filter>Game\GameComponents\ParticleComponent</Filter>
     </ClInclude>
-    <ClInclude Include="spawn.h">
-      <Filter>Game\GameObject\Enemy\spawn</Filter>
+    <ClInclude Include="ParticleComponent.h">
+      <Filter>Game\GameComponents\ParticleComponent</Filter>
     </ClInclude>
-    <ClInclude Include="GameObjects.h">
-      <Filter>Game\GameObject</Filter>
+    <ClInclude Include="RenderComponent.h">
+      <Filter>Game\GameComponents\RenderComponent</Filter>
     </ClInclude>
-    <ClInclude Include="BaseGameObject.h">
-      <Filter>Game\GameObject</Filter>
+    <ClInclude Include="ScriptComponent.h">
+      <Filter>Game\GameComponents\ScriptComponent</Filter>
     </ClInclude>
-    <ClInclude Include="Snake.h">
-      <Filter>Game\GameObject\Enemy\Enemy\Snake</Filter>
+    <ClInclude Include="TransformComponent.h">
+      <Filter>Game\GameComponents\TransformComponent</Filter>
     </ClInclude>
-    <ClInclude Include="SnakeAnimationString.h">
-      <Filter>Game\GameObject\Enemy\Enemy\Snake</Filter>
+    <ClInclude Include="ActionSystem.h">
+      <Filter>Game\GameSystems\ActionSystem</Filter>
     </ClInclude>
-    <ClInclude Include="SnakeStates.h">
-      <Filter>Game\GameObject\Enemy\Enemy\Snake</Filter>
+    <ClInclude Include="CollisionSystem.h">
+      <Filter>Game\GameSystems\CollisionSystem</Filter>
     </ClInclude>
-    <ClInclude Include="Lights.h">
-      <Filter>Game\GameUtils\Light</Filter>
+    <ClInclude Include="CollisionUtils.h">
+      <Filter>Game\GameSystems\CollisionSystem</Filter>
     </ClInclude>
-    <ClInclude Include="Turtle.h">
-      <Filter>Game\GameObject\Enemy\Enemy\Turtle</Filter>
+    <ClInclude Include="RenderSystem.h">
+      <Filter>Game\GameSystems\RenderSystem</Filter>
     </ClInclude>
-    <ClInclude Include="TurtleAnimationString.h">
-      <Filter>Game\GameObject\Enemy\Enemy\Turtle</Filter>
+    <ClInclude Include="ScriptSystem.h">
+      <Filter>Game\GameSystems\ScriptSystem</Filter>
     </ClInclude>
-    <ClInclude Include="TurtleStates.h">
-      <Filter>Game\GameObject\Enemy\Enemy\Turtle</Filter>
+    <ClInclude Include="TransformSystem.h">
+      <Filter>Game\GameSystems\TransformSystem</Filter>
     </ClInclude>
-    <ClInclude Include="imguiRenderer.h">
-      <Filter>GUI</Filter>
-    </ClInclude>
-    <ClInclude Include="EnvironmentSphere.h">
-      <Filter>Game\GameUtils\Light</Filter>
-    </ClInclude>
-    <ClInclude Include="DataPackage.h">
-      <Filter>Sub\DataPackage</Filter>
+    <ClInclude Include="BaseScene.h">
+      <Filter>Game\GameScenes\BaseScene</Filter>
     </ClInclude>
     <ClInclude Include="MapToolScene.h">
-      <Filter>Game\GameScene\MapToolScene</Filter>
+      <Filter>Game\GameScenes\MapToolScene</Filter>
     </ClInclude>
-    <ClInclude Include="GameObjectFactory.h">
-      <Filter>Managers\GameObjectFactory</Filter>
+    <ClInclude Include="Hydra.h">
+      <Filter>Game\GameObjects\Hydra</Filter>
     </ClInclude>
-    <ClInclude Include="GameObjectHandle.h">
-      <Filter>Managers\GameObjectFactory</Filter>
+    <ClInclude Include="HydraAnimationString.h">
+      <Filter>Game\GameObjects\Hydra</Filter>
     </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <Filter Include="Core">
-      <UniqueIdentifier>{8a4674c1-2988-40bc-b6cc-2b8ff5e7456c}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="GUI">
-      <UniqueIdentifier>{bcfbf6b7-ef54-46c1-aa3f-e16c655fd70b}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Managers">
-      <UniqueIdentifier>{dd9be55d-6b15-4a92-868d-f0f884e2091e}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Sub">
-      <UniqueIdentifier>{f0b23895-3d21-4c5e-b58d-d8cf44373094}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Sub\Reflection">
-      <UniqueIdentifier>{6bbf2e31-ddbb-464f-bfbd-9c2453eb1087}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Sub\Reflection\Variant">
-      <UniqueIdentifier>{3af32ef6-17c4-400d-8ff3-d80d939f2a13}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Sub\Reflection\Serializer">
-      <UniqueIdentifier>{2cf05dec-cddf-4188-966c-de4593d6d7f8}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Sub\tinyxml">
-      <UniqueIdentifier>{291f8bb9-9ec3-41d4-a4a9-846cb98317e4}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Core\Timers">
-      <UniqueIdentifier>{1a498917-4bd0-45a4-8cdb-28af30c3deb7}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Core\SubSystem">
-      <UniqueIdentifier>{e5f48745-5d7e-4565-bd8e-8884a513ad53}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Core\SubSystem\VideoDevice">
-      <UniqueIdentifier>{05262f6f-8893-4a0a-b28e-843ce048c3cb}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Core\Memory">
-      <UniqueIdentifier>{98c93bb1-bc13-429c-8171-1e95e47a1893}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Core\SubSystem\SceneeManager">
-      <UniqueIdentifier>{7f27f576-2e1f-4782-9b40-a2e0bbfeb180}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Core\SubSystem\InputManager">
-      <UniqueIdentifier>{f1cfac8a-df1c-4e77-a1c0-7b9851f84811}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Sub\Event">
-      <UniqueIdentifier>{bbbb774f-e8d3-496c-b00f-420486f5d176}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Core\SubSystem\DataBase">
-      <UniqueIdentifier>{04c70aa2-d19a-4fe2-b716-14917758bb68}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Core\ECS">
-      <UniqueIdentifier>{b95cc362-b92e-4594-9f7e-f616decbab66}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Core\ECS\Component">
-      <UniqueIdentifier>{4612874c-6698-4368-8047-8d8ef737e672}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Core\ECS\Entity">
-      <UniqueIdentifier>{a7343b1c-dd07-47ed-95e0-d2c5a6a63021}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Core\ECS\System">
-      <UniqueIdentifier>{73e7c0f0-6155-478f-bc21-3ff3236126e8}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Game">
-      <UniqueIdentifier>{ccb6b439-1fce-4344-9649-1f6d55627f0e}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Game\GameComponent">
-      <UniqueIdentifier>{65ee613f-7f85-4217-9267-1fdc8aebf75e}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Game\GameSystem">
-      <UniqueIdentifier>{d7142de2-c937-4586-a206-5c7d6e472e49}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Game\GameSystem\CollisionSystem">
-      <UniqueIdentifier>{3c44ec6d-ab6d-4798-af60-0326aa391024}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Game\GameSystem\RenderSystem">
-      <UniqueIdentifier>{1761486d-4c7d-4da8-a16c-8f00c672cb74}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Game\GameSystem\TransformSystem">
-      <UniqueIdentifier>{cc7732c0-c4e6-44ef-8c20-c09d11e7a848}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Game\GameScene">
-      <UniqueIdentifier>{8c9cd546-7171-45e7-b49f-873d7745382f}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Game\GameUtils">
-      <UniqueIdentifier>{563f8004-6a59-40ad-a91c-8b90fd7fda6e}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Game\GameUtils\Terrain">
-      <UniqueIdentifier>{753fe9ca-8a91-47dd-af3d-e4e9932dbc8b}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Game\GameUtils\Camera">
-      <UniqueIdentifier>{276b7112-dd8a-413b-9624-b56d5e5e91b8}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Game\GameComponent\CollisionComponent">
-      <UniqueIdentifier>{1f11db7f-2aa1-4a9a-81ab-03b8b476aca2}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Game\GameComponent\TransfromComponent">
-      <UniqueIdentifier>{2fb70df9-3f23-48a0-9663-092d7ddb399f}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Game\WorldEditor">
-      <UniqueIdentifier>{35c933a0-76c2-436d-aefd-0f91891567df}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Math">
-      <UniqueIdentifier>{a3fc95b4-5fb1-4f8f-8f65-d94a2c21622d}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Game\GameComponent\ScriptComponent">
-      <UniqueIdentifier>{bd8ca497-b961-45e9-a015-381a2b6cb734}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Game\GameSystem\ScriptSystem">
-      <UniqueIdentifier>{00b94380-2d5a-414d-ae33-03169cba4084}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Game\GameComponent\ActionComponent">
-      <UniqueIdentifier>{39f5f783-17f8-4853-99f2-cd47d44969cd}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Game\GameSystem\ActionSystem">
-      <UniqueIdentifier>{dd3e75b1-7032-4010-9484-d20e8c7db150}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Game\GameObject">
-      <UniqueIdentifier>{1522c39a-8489-4679-b87b-978e2a93d64b}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Game\GameObject\Enemy">
-      <UniqueIdentifier>{893eb939-e5e3-4135-b266-7b9d5a97aac7}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Game\GameObject\Enemy\spawn">
-      <UniqueIdentifier>{48ab3ce0-5cc8-4bd6-83a9-2a6af2b100d3}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Game\GameObject\Enemy\script">
-      <UniqueIdentifier>{d0e7f8a4-65cc-4621-9885-04735fb50bb4}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Game\GameComponent\RenderComponent">
-      <UniqueIdentifier>{41f7ad9e-814b-41a9-9d48-8945cea0acbc}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Sub\StateMachine">
-      <UniqueIdentifier>{03a31a36-575e-41fb-83b9-1e21b39eca4a}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Game\GameObject\Player">
-      <UniqueIdentifier>{8ae39ce4-3eee-409c-9264-da8bd4e7ac36}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Game\GameUtils\GameCommand">
-      <UniqueIdentifier>{c610a143-4bbe-4f78-94fe-cc759e7141e2}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Game\GameManager">
-      <UniqueIdentifier>{270c9003-5fb1-488a-b4d6-faf623868371}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Game\GameUtils\Light">
-      <UniqueIdentifier>{24fd2b98-dcb3-488a-b8cf-2d5152558813}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Game\GameComponent\ParticleComponent">
-      <UniqueIdentifier>{f177f821-793e-4350-bd39-9c7dd41881b3}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Game\GameObject\Enemy\Enemy">
-      <UniqueIdentifier>{a3a06add-ce8c-44aa-91fe-07801af13077}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Game\GameObject\Enemy\Enemy\Snake">
-      <UniqueIdentifier>{89a2740d-465d-4b2d-ae00-0a66d64981ea}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Game\GameObject\Enemy\Enemy\Turtle">
-      <UniqueIdentifier>{b66c83e9-946e-43df-a273-bbe371f59f11}</UniqueIdentifier>
-    </Filter>
-    </Filter>
+    <ClInclude Include="HydraStates.h">
+      <Filter>Game\GameObjects\Hydra</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Hunter.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Core">
+      <UniqueIdentifier>{e673c69d-f072-4eff-a3cf-dbb250585f72}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\InputManager">
+      <UniqueIdentifier>{a0332eb2-715e-4f57-8e6d-caa9c3adde31}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\VideoDevice">
+      <UniqueIdentifier>{3260afb9-b98d-4730-896d-1b6b3e01d8b0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Timer">
+      <UniqueIdentifier>{735dfdea-7fea-4781-aba5-c67d473bd014}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\SceneManager">
+      <UniqueIdentifier>{a9f0b3d0-7f6b-48f5-8a00-da5a9da7dc5b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Managers">
+      <UniqueIdentifier>{123156f9-aa41-4c2f-aa1e-62e50db4f97f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game">
+      <UniqueIdentifier>{2290b8c4-58e9-4a5b-8eb7-195ec18c8bb7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\GameObjects">
+      <UniqueIdentifier>{c9dde260-0013-4a4e-ba68-f6ed39fc99ab}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\GameComponents">
+      <UniqueIdentifier>{9bb60c38-03fa-4c69-8743-9480d910567d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\GameSystems">
+      <UniqueIdentifier>{7b4011b7-4d8d-46ed-9efe-74ab74aeee5a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Memory">
+      <UniqueIdentifier>{2667fd4e-c64c-4c05-8c9e-039a7e909ee0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\Lights">
+      <UniqueIdentifier>{19cf0c71-0d7d-487b-b2c5-bd2b2aad4484}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\GameObjects\Bat">
+      <UniqueIdentifier>{45394509-6bab-4039-9ffe-121205fba1a9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\GameObjects\Cat">
+      <UniqueIdentifier>{4318e26f-ec4f-4e89-b86a-47f52372bf5b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sub">
+      <UniqueIdentifier>{451db5d9-43e8-492f-a65d-1fd577a8d150}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Math">
+      <UniqueIdentifier>{7e9ca3ef-b71a-414c-997b-17c94848e195}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ECS">
+      <UniqueIdentifier>{edd19765-d07c-4983-9bbd-23cafc0cdfd1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sub\Event">
+      <UniqueIdentifier>{a01160ee-c5fa-48b9-9d0d-2a2f56097c8a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Managers\GameObjectFactory">
+      <UniqueIdentifier>{d76290f1-7d92-40ec-89bc-aaa83882c996}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sub\Reflection">
+      <UniqueIdentifier>{08d52cf6-87d8-40e6-8a73-ac21e0b69ccf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sub\Reflection\Variant">
+      <UniqueIdentifier>{659f1115-c450-40a5-a033-b9a3b5f99576}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sub\imgui">
+      <UniqueIdentifier>{d6702c00-62ba-470e-b0bd-a8afae0fd804}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\GameObjects\Player">
+      <UniqueIdentifier>{2ba69d6c-6f79-43a5-a840-a5a97e665087}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\GameObjects\Snake">
+      <UniqueIdentifier>{341c50bd-498d-4aae-9abe-4f6ef11c3054}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ECS\Components">
+      <UniqueIdentifier>{4486064e-c841-47e0-a65b-c9738bc6475c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ECS\System">
+      <UniqueIdentifier>{ac9f7165-d9d0-4f96-987e-1ad651032883}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\GameObjects\Turtle">
+      <UniqueIdentifier>{8d3494b1-e156-4fbb-a0df-20004bf001ca}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\GameCommands">
+      <UniqueIdentifier>{18a5ce47-7905-42d7-9b1d-20e155713293}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\Utils">
+      <UniqueIdentifier>{ef5e44ef-2739-4ea6-b70e-e0b3e17b8d17}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sub\Reflection\Serialization">
+      <UniqueIdentifier>{c9a563c9-bea7-4c9c-9833-9b59cd3f0e3e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\Editor">
+      <UniqueIdentifier>{fecc51be-6334-4de3-a2b9-13fc0854d534}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\GameScenes">
+      <UniqueIdentifier>{cfbae037-1309-4aff-aa1b-16183ced9e0f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\GameScenes\MapToolScene">
+      <UniqueIdentifier>{96689cec-aa77-4b9a-acb0-39ce381becac}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\GameScenes\BaseScene">
+      <UniqueIdentifier>{adda8028-c28e-4720-b75d-2c2aae4e1b3a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sub\Dlelegate">
+      <UniqueIdentifier>{a0fa6769-5acf-42cc-9648-79a4e1c13837}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sub\StateMachine">
+      <UniqueIdentifier>{6323c2d2-9b71-446c-99bb-c0e0ada463ad}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\GameComponents\ActionComponent">
+      <UniqueIdentifier>{d8312137-a4a6-4a6a-9f6f-b7a803b0ce80}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\GameComponents\CollisionComponent">
+      <UniqueIdentifier>{e28cadf9-4854-482a-8a28-231276c64ad9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\GameComponents\ParticleComponent">
+      <UniqueIdentifier>{06ab8f65-96ca-4891-80ad-0a02c106a9d5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\GameComponents\RenderComponent">
+      <UniqueIdentifier>{6e3bb938-c880-4482-a7c5-ccbaf2fc2e96}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\GameComponents\ScriptComponent">
+      <UniqueIdentifier>{fac964d4-98df-4da8-98b5-c82d6be0433f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\GameComponents\TransformComponent">
+      <UniqueIdentifier>{1ac89bf3-35ec-4cb2-81d2-da9aea659387}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\GameSystems\ActionSystem">
+      <UniqueIdentifier>{3d1ff894-bdc0-4a31-9352-99d9cca889b8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\GameSystems\CollisionSystem">
+      <UniqueIdentifier>{519e730f-6ec2-4a2e-af8f-1712dab3d1a6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\GameSystems\RenderSystem">
+      <UniqueIdentifier>{f583a736-3780-4d11-945a-cdb2a906be15}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\GameSystems\ScriptSystem">
+      <UniqueIdentifier>{1a0c310f-831c-45cf-9175-834b66a45cd9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\GameSystems\TransformSystem">
+      <UniqueIdentifier>{9b5cb8a1-0ff3-4d80-b327-297416fc5ab8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\GameScenes\GameScene">
+      <UniqueIdentifier>{e5cb61c6-f7d2-4895-8f96-74274a3ca6f4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\GameScenes\MenuScene">
+      <UniqueIdentifier>{c30dc906-cde2-4bab-b872-b793d7fae627}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\GameObjects\Hydra">
+      <UniqueIdentifier>{8dba6765-7a19-4924-ac01-9d7a785be573}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
 </Project>

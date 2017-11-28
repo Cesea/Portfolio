@@ -1,7 +1,8 @@
 #include "stdafx.h"
 #include "SceneManager.h"
 
-#include "MapToolScene.h"
+#include "BaseScene.h"
+//#include "MapToolScene.h"
 
 SceneManager::SceneManager()
 {
@@ -15,7 +16,10 @@ SceneManager::~SceneManager()
 bool SceneManager::Init()
 {
 	//기본 베이스 씬 세팅
-	IScene *pScene = new MapToolScene;
+	//IScene *pScene = new MapToolScene;
+	//AddScene(pScene->GetSceneName(), pScene);
+
+	IScene *pScene = new BaseScene;
 	AddScene(pScene->GetSceneName(), pScene);
 
 	ChangeScene(pScene->GetSceneName());
