@@ -246,6 +246,15 @@
     <ClCompile Include="CatStates.cpp">
       <Filter>Game\GameObject\Enemy\Enemy\Cat</Filter>
     </ClCompile>
+    <ClCompile Include="Hydra.cpp">
+      <Filter>Game\GameObject\Enemy\Enemy\Hydra</Filter>
+    </ClCompile>
+    <ClCompile Include="HydraAnimationString.cpp">
+      <Filter>Game\GameObject\Enemy\Enemy\Hydra</Filter>
+    </ClCompile>
+    <ClCompile Include="HydraStates.cpp">
+      <Filter>Game\GameObject\Enemy\Enemy\Hydra</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -592,6 +601,15 @@
     <ClInclude Include="CatStates.h">
       <Filter>Game\GameObject\Enemy\Enemy\Cat</Filter>
     </ClInclude>
+    <ClInclude Include="Hydra.h">
+      <Filter>Game\GameObject\Enemy\Enemy\Hydra</Filter>
+    </ClInclude>
+    <ClInclude Include="HydraAnimationString.h">
+      <Filter>Game\GameObject\Enemy\Enemy\Hydra</Filter>
+    </ClInclude>
+    <ClInclude Include="HydraStates.h">
+      <Filter>Game\GameObject\Enemy\Enemy\Hydra</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Core">
@@ -755,6 +773,9 @@
     </Filter>
     <Filter Include="Game\GameObject\Enemy\Enemy\Cat">
       <UniqueIdentifier>{3685117c-0e9e-4d63-9d52-6e7cef4e8e10}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\GameObject\Enemy\Enemy\Hydra">
+      <UniqueIdentifier>{e2448ab7-4034-4889-bbf7-a9f64fdcc81e}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

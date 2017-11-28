@@ -15,6 +15,7 @@
 #include "Turtle.h"
 #include "bat.h"
 #include "Cat.h"
+#include "Hydra.h"
 class BaseScene : public IScene
 {
 	friend class Terrain;
@@ -45,6 +46,7 @@ private:
 	Turtle _turtle;
 	Bat _bat;
 	Cat _cat;
+	Hydra _hydra;
 public:
 
 	void Handle(const Editor::GetObjectFromSceneEvent &event);

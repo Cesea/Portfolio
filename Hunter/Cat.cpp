@@ -78,7 +78,6 @@ bool Cat::CreateFromWorld(World & world)
 void Cat::Update(float deltaTime)
 {
 	_pStateMachine->Update(deltaTime, _currentCommand);
-	_pStateMachine->Update(deltaTime, _currentCommand);
 	TransformComponent &transComp = _entity.GetComponent<TransformComponent>();
 	switch (_state)
 	{

@@ -21,6 +21,7 @@ bool BaseScene::Init()
 	InitTurtleAnimation();
 	InitBatAnimation();
 	InitCatAnimation();
+	InitHydraAnimation();
 	//터레인 로드
 	Terrain::TerrainConfig config;
 	config._xChunkCount = 4;
@@ -64,6 +65,10 @@ bool BaseScene::Init()
 	MatrixScaling(&correctionMat, 1.15f, 1.15f, 1.15f);
 	video::SkinnedXMeshHandle catMesh = VIDEO->CreateSkinnedXMesh(
 		"../resources/Models/DevilCat/DevilCat.X", &correctionMat, "Cat");
+
+	MatrixScaling(&correctionMat, 1.15f, 1.15f, 1.15f);
+	video::SkinnedXMeshHandle HydraMesh = VIDEO->CreateSkinnedXMesh(
+		"../resources/Models/Hydra/Hydra_Gold.X", &correctionMat, "Hydra");
 
 	MatrixScaling(&correctionMat, 1.0f, 1.0f, 1.0f);
 	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Rock/Rock1_A.X", &correctionMat, "Rock01");
@@ -118,6 +123,7 @@ bool BaseScene::Init()
 	_turtle.CreateFromWorld(_world);
 	//_bat.CreateFromWorld(_world);
 	_cat.CreateFromWorld(_world);
+	//_hydra.CreateFromWorld(_world);
 
 	//에디터 생성
 	imguiRenderInit();

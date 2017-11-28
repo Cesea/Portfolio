@@ -159,6 +159,9 @@
     <ClCompile Include="GameObjectFactory.cpp" />
     <ClCompile Include="GizmoManager.cpp" />
     <ClCompile Include="Hash.cpp" />
+    <ClCompile Include="Hydra.cpp" />
+    <ClCompile Include="HydraAnimationString.cpp" />
+    <ClCompile Include="HydraStates.cpp" />
     <ClCompile Include="imgui.cpp" />
     <ClCompile Include="imguiRenderer.cpp" />
     <ClCompile Include="MathUtils.cpp" />
@@ -258,6 +261,9 @@
     <ClInclude Include="GameUtils.h" />
     <ClInclude Include="GizmoManager.h" />
     <ClInclude Include="Hash.h" />
+    <ClInclude Include="Hydra.h" />
+    <ClInclude Include="HydraAnimationString.h" />
+    <ClInclude Include="HydraStates.h" />
     <ClInclude Include="imgui.h" />
     <ClInclude Include="Allocators.h" />
     <ClInclude Include="imguiRenderer.h" />
