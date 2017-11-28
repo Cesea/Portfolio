@@ -35,9 +35,8 @@ bool MapToolScene::Init()
 	MatrixScaling(&correctionMat, 0.01f, 0.01f, 0.01f);
 	video::SkinnedXMeshHandle knight  = VIDEO->CreateSkinnedXMesh(
 		"../resources/Models/Knight/Knight.X", &correctionMat, "Knight");
-	video::AnimationInstanceHandle ainmHandle = VIDEO->CreateAnimationInstance(knight, "Knight0");
 
-	MatrixScaling(&correctionMat, 1.15f, 1.15f, 1.15f);
+	MatrixScaling(&correctionMat, 1.0f, 1.0f, 1.0f);
 	video::SkinnedXMeshHandle snakeMesh = VIDEO->CreateSkinnedXMesh(
 		"../resources/Models/Snake/Snake_Red.X", &correctionMat, "Snake");
 

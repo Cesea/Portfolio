@@ -30,6 +30,14 @@ bool Player::CreateFromWorld(World & world)
 	renderComp._type = RenderComponent::Type::eSkinned;
 	renderComp._skinned = VIDEO->CreateAnimationInstance(VIDEO->GetSkinnedXMesh("Knight"), "Anim" + std::to_string(0));
 
+	video::AnimationInstance *pAnimation = VIDEO->GetAnimationInstance(renderComp._skinned);
+
+	CollisionComponent &collision = _entity.AddComponent<CollisionComponent>();
+	collision._boundingBox.Init(pAnimation->_pSkinnedMesh->_boundInfo._min,
+		pAnimation->_pSkinnedMesh->_boundInfo._max);
+	collision._boundingSphere._localCenter = pAnimation->_pSkinnedMesh->_boundInfo._center;
+	collision._boundingSphere._radius = pAnimation->_pSkinnedMesh->_boundInfo._radius;
+
 	ScriptComponent &scriptComponent = _entity.AddComponent<ScriptComponent>();
 	scriptComponent.SetScript(MAKE_SCRIPT_DELEGATE(Player, Update, *this));
 
@@ -162,6 +170,31 @@ void Player::Update(float deltaTime)
 			moveToStance = _moveToStanceTimer.Tick(deltaTime);
 		}
 
+		Vector3 moveDelta{};
+		Vector3 currentPos = transComp._position;
+		//Vector3 forward = transComp.GetForward();
+		if (_currentMovement._vertical == VERTICAL_MOVEMENT_UP)
+		{
+			moveDelta.z += _speed;
+		}
+		else if (_currentMovement._vertical == VERTICAL_MOVEMENT_DOWN)
+		{
+			moveDelta.z -= _speed;
+		}
+		else if (_currentMovement._horizontal == HORIZONTAL_MOVEMENT_LEFT)
+		{
+			moveDelta.x -= _speed;
+		}
+		else if (_currentMovement._horizontal == HORIZONTAL_MOVEMENT_RIGHT)
+		{
+			moveDelta.x += _speed;
+		}
+		currentPos += moveDelta * deltaTime;
+
+		currentPos.y = TERRAIN->GetHeight(currentPos.x, currentPos.z);
+
+		transComp.SetWorldPosition(currentPos);
+
 		//공격 모드가 아닐때
 		if (false == _inCombat)
 		{
@@ -287,11 +320,6 @@ void Player::Update(float deltaTime)
 			}
 		}
 	} break;
-
-	//case Player::PLAYER_STATE_RUN:
-	//{
-	//	bool moveToStance = _moveToStanceTimer.Tick(deltaTime);
-	//} break;
 
 	case Player::PLAYERSTATE_ATTACK:
 	{

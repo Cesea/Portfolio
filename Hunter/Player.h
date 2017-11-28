@@ -46,6 +46,7 @@ private :
 		PLAYER_STATE_RUN,
 		PLAYERSTATE_ATTACK,
 		PLAYERSTATE_BLOCK,
+		PLAYERSTATE_MOVEATTACK,
 	};
 	PLAYERSTATE _state;
 	bool32 _inCombat{};
@@ -62,7 +63,7 @@ private :
 
 private :
 	EventChannel _channel;
-	float _speed{20.0f};
+	float _speed{2.0f};
 
 	StopWatch _combatToPeaceTimer;
 

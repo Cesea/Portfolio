@@ -672,9 +672,9 @@ namespace video
 		//본 매트릭스 포인터 생성
 		InitBoneMatrixPointer((Bone*)_pRootBone);
 
-		CalculateTotalBoundInfo(_pRootBone);
+		UpdateMatrices(_pRootBone, &_matCorrection);
 
-		int a = 0;
+		CalculateTotalBoundInfo(_pRootBone);
 	}
 
 	void SkinnedXMesh::Destroy()
@@ -925,6 +925,14 @@ namespace video
 		if (pBone->pMeshContainer)
 		{
 			BoneMesh *pMesh = (BoneMesh *)pBone->pMeshContainer;
+
+			Vec3TransformCoord(&pMesh->_boundInfo._min, 
+				&pMesh->_boundInfo._min, 
+				&pBone->CombinedTransformationMatrix);
+
+			Vec3TransformCoord(&pMesh->_boundInfo._max, 
+				&pMesh->_boundInfo._max, 
+				&pBone->CombinedTransformationMatrix);
 
 			//정점 최소 값갱신
 			if (_boundInfo._min.x > pMesh->_boundInfo._min.x)		_boundInfo._min.x = pMesh->_boundInfo._min.x;

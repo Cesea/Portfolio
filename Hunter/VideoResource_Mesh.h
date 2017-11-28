@@ -143,6 +143,7 @@ namespace video
 
 		void CalculateTotalBoundInfo(Bone *pRoot);
 
+
 		Matrix _matCorrection;
 
 		Bone *_pRootBone{};

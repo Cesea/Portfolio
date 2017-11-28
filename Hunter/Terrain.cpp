@@ -822,32 +822,17 @@ void Terrain::AddHeightOnCursorPos(const Vector2 &cursorPos, float innerRadius, 
 		int32 centerZ = tilePos._chunkZ * TERRAIN_CHUNK_DIM + tilePos._tileZ;
 
 		int32 minX, minZ, maxX, maxZ;
-		minX = centerX - radius - 1;
-		maxX = centerX + radius + 1;
-		minZ = centerZ - radius - 1;
-		maxZ = centerZ + radius + 1;
+		minX = centerX - radius;
+		maxX = centerX + radius;
+		minZ = centerZ - radius;
+		maxZ = centerZ + radius;
 
 		ClampInt(minX, 0, _numVertexX - 1);
 		ClampInt(maxX, 0, _numVertexX - 1);
 		ClampInt(minZ, 0, _numVertexZ - 1);
 		ClampInt(maxZ, 0, _numVertexZ - 1);
-		AddHeightGausian(minX, maxX, minZ, maxZ, intensity);
 
-		//for (int32 z = -radius; z <= radius; ++z)
-		//{
-		//	for (int32 x = -radius; x <= radius; ++x)
-		//	{
-		//		int32 editX = centerX + x;
-		//		int32 editZ = centerZ + z;
-		//		
-		//		float radialPower = (float)(radius - absInt(x)) * (radius - absInt(z)) / (brushRadius * brushRadius);
-		//		ClampInt(editX, 0, _numVertexX - 1);
-		//		ClampInt(editZ, 0, _numVertexZ - 1);
-		//		_terrainVertices[Index2D(editX, editZ, _numVertexX)]._pos.y += intensity * radialPower * 0.02f;
-		//		//ClampFloat(_terrainVertices[Index2D(editX, editZ, _numVertexX)]._pos.y, 0.0f, 10.0f);
-		//	}
-		//}
-		//normal, binormal, tangent의 계산은 radius보다 1씩 범위를 넓혀서 계산한다
+		AddHeightGausian(minX, maxX, minZ, maxZ, intensity);
 
 		RebuildSection(minX, maxX, minZ, maxZ);
 
@@ -1040,6 +1025,7 @@ void Terrain::TerrainChunk::InvalidateEntities()
 	}
 }
 
+//Rebuild Seciton은 인자로 들어온 min, max의 범위를 1씩 증가시켜서 내부 처리를 진행한다.
 void Terrain::RebuildSection(int32 minX, int32 maxX, int32 minZ, int32 maxZ)
 {
 	int32 numVertX = maxX - minX + 1;
@@ -1114,6 +1100,7 @@ void Terrain::SmoothSection(int32 minX, int32 maxX, int32 minZ, int32 maxZ)
 
 	float* smooth = new float[numVertX * numVertZ];
 
+	int32 counter = 0;
 	for (int32 z = minZ; z < maxZ; z++)
 	{
 		for (int32 x = minX; x < maxX; x++)
@@ -1173,16 +1160,17 @@ void Terrain::SmoothSection(int32 minX, int32 maxX, int32 minZ, int32 maxZ)
 				adjacentSections++;
 			}
 
-			smooth[(z * _numVertexX) + x] = ( _terrainVertices[(z * _numVertexX) + x]._pos.y + (totalSections / adjacentSections)) * 0.5f;
+			smooth[counter++] = ( _terrainVertices[(z * _numVertexX) + x]._pos.y + (totalSections / adjacentSections)) * 0.5f;
 		}
 	}
+	counter = 0;
 
 	//위에서 계산된 y 스무싱 적용
 	for (int32 z = minZ; z < maxZ; z++)
 	{
 		for (int32 x = minX; x < maxX; x++)
 		{
-			_terrainVertices[Index2D(x, z, _numVertexX)]._pos.y = smooth[Index2D(x, z, _numVertexX)];
+			_terrainVertices[Index2D(x, z, _numVertexX)]._pos.y = smooth[counter++];
 
 		}
 	}
