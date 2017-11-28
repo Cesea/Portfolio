@@ -3,12 +3,16 @@
 
 #include "SingletonBase.h"
 
-class BaseScene;
+class IScene;
 class QuadTree;
 
 constexpr int32 TERRAIN_SHOW_EXTENT = 2;
 
 constexpr int32 TERRAIN_CHUNK_DIM = 64;
+
+constexpr int32 TERRAIN_ALPHA_TEXTURE_SIZE = 512;
+
+#define MAX_FILE_NAME 256
 
 //constexpr int32 TERRAIN_HORI_SIZE = 1024;
 //constexpr int32 TERRAIN_VERT_SIZE = 1024;
@@ -27,12 +31,12 @@ struct TerrainChunkPos
 	float _relZ{};
 };
 
+
 //청크 안에서
 struct TerrainTilePos
 {
 	int32 _chunkX;
 	int32 _chunkZ;
-
 
 	int32 _tileX{};
 	int32 _tileZ{};
@@ -41,7 +45,16 @@ struct TerrainTilePos
 	float _relZ{};
 };
 
+struct TerrainGrid
+{
+	int32 _chunkX{};
+	int32 _chunkZ{};
 
+	int32 _gridX{};
+	int32 _gridZ{};
+
+	std::vector<ResourceHandle> _objects;
+};
 
 class Terrain : public SingletonBase<Terrain>
 {
@@ -50,15 +63,20 @@ class Terrain : public SingletonBase<Terrain>
 public:
 	struct TerrainConfig
 	{
+		TerrainConfig() {}
+		TerrainConfig(const TerrainConfig &other);
+		TerrainConfig &operator= (const TerrainConfig &other);
+
 		int32 _xChunkCount{};
 		int32 _zChunkCount{};
 
 		float _textureMult{};
-		std::string _tile0FileName{};
-		std::string _tile1FileName{};
-		std::string _tile2FileName{};
-		std::string _tile3FileName{};
-		std::string _splatFileName{};
+
+		char _tile0FileName[MAX_FILE_NAME]{0, };
+		char _tile1FileName[MAX_FILE_NAME]{0, };
+		char _tile2FileName[MAX_FILE_NAME]{0, };
+		char _tile3FileName[MAX_FILE_NAME]{0, };
+		char _splatFileName[MAX_FILE_NAME]{0, };
 	};
 
 	struct TerrainFace 
@@ -97,7 +115,7 @@ public:
 		bool32 _dirty{false};
 
 		//QuadTree* _pQuadTree{};  //쿼드 트리
-		video::TerrainVertex *_pVertices;
+		const video::TerrainVertex *_pVertices;
 
 		std::vector<Entity> _entities;
 	};
@@ -105,7 +123,7 @@ public:
 	Terrain() {}
 	~Terrain();
 
-	void SetScene(BaseScene *pScene) { _pCurrentScene = pScene; }
+	void SetScene(IScene *pScene) { _pCurrentScene = pScene; }
 	bool Create(const Terrain::TerrainConfig &config, bool32 inEditMode);
 
 	void RegisterEvents();
@@ -127,31 +145,39 @@ public:
 	TerrainChunkPos ConvertWorldPosToChunkPos(const Vector3 &worldPos);
 	TerrainTilePos ConvertWorldPostoTilePos(const Vector3 &worldPos);
 
-	const Vector3 ConvertChunkPosToWorldPos(const TerrainChunkPos &chunkPos);
+	//const Vector3 ConvertChunkPosToWorldPos(const TerrainChunkPos &chunkPos);
 	const Vector3 ConvertTilePosToWorldPos(const TerrainTilePos &tilePos);
 
 private:
-	bool CreateInGame(const Terrain::TerrainConfig &config);
-	bool CreateEdit(const Terrain::TerrainConfig &config);
+	//bool CreateInGame(const Terrain::TerrainConfig &config);
+	//bool CreateEdit(const Terrain::TerrainConfig &config);
 
 	bool CreateTerrain(int32 tileNum);
 	//Editor Only
 	void RebuildTerrain(const Terrain::TerrainConfig &config);
 	void ReCreateQuadTree();
 
-	bool CreateTerrainSection(int32 x, int32 z, const video::TerrainVertex *pTerrainVertices);
+	bool CreateTerrainChunk(int32 x, int32 z, const video::TerrainVertex *pTerrainVertices);
 
-	void AddHeightOnCursorPos(const Vector2 &cursorPos, float brushRadius, float intensity);
+	void AddHeightOnCursorPos(const Vector2 &cursorPos, float innerRadius, float outterRadius, float intensity);
 	void SmoothOnCursorPos(const Vector2 &cursorPos, float brushRadius);
 	void SmoothTerrain(int32 passed);
 
+	void AddHeightGausian(int32 minX, int32 maxX, int32 minZ, int32 maxZ, float mult);
+
 	void RebuildSection(int32 minX, int32 maxX, int32 minZ, int32 maxZ);
+
 	void SmoothSection(int32 minX, int32 maxX, int32 minZ, int32 maxZ);
+
+	void DrawAlphaTextureOnCursorPos(const Vector2 & cursorPos, float innerRadius, float outterRadius, 
+		float intensity, video::TextureHandle alphaHandle, int32 channel);
+
+
+	void LoadTextureFromConfig(const Terrain::TerrainConfig &config);
 
 	video::VertexDeclHandle _declHandle{};
 	//video::MaterialHandle _materialHandle{};
 	video::EffectHandle _effect{};
-
 
 private:
 
@@ -196,7 +222,6 @@ private:
 	//LOD비율
 	float _lodRatio{};
 
-	video::TextureHandle _heightMapHandle{};
 	video::TextureHandle _tile0Handle{};
 	video::TextureHandle _tile1Handle{};
 	video::TextureHandle _tile2Handle{};
@@ -207,7 +232,7 @@ private:
 	TerrainFace *_chunkIndex{};
 
 	QuadTree* _pQuadTree{};  //쿼드 트리
-	BaseScene *_pCurrentScene;
+	IScene *_pCurrentScene;
 
 	TerrainChunk *_pChunks{};
 

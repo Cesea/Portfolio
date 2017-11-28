@@ -74,10 +74,17 @@ namespace video
 		void DestroyVertexDecl(VertexDeclHandle handle);
 
 		//텍스쳐 생성
+		//파일로부터 텍스쳐를 생성한다.
 		TextureHandle CreateTexture(const std::string &fileName, const std::string &name = "");
+		//주어진 인자로부터 빈 텍스쳐를 생성한다.
+		TextureHandle CreateTexture(int32 width, int32 height, D3DFORMAT format, D3DPOOL pool, 
+			const std::string &name = "");
 		TextureHandle GetTexture(const std::string &name);
 		Texture *GetTexture(TextureHandle handle);
 		void DestroyTexture(TextureHandle handle);
+
+		void SaveTexture(const std::string &fileName, video::TextureHandle handle);
+
 
 		//이펙트 생성
 		EffectHandle CreateEffect(const std::string &fileName, const std::string &name = "");
@@ -111,7 +118,6 @@ namespace video
 		AnimationInstanceHandle GetAnimationInstance(const std::string &name);
 		AnimationInstance *GetAnimationInstance(AnimationInstanceHandle handle);
 		void DestroyAnimationInstance(AnimationInstanceHandle handle);
-
 
 		//Font Functions
 		FontHandle CreateFont(const D3DXFONT_DESC &fontDesc, const std::string &name);

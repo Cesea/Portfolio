@@ -70,6 +70,7 @@ void ActionComponent::UpdateAnimation(float deltaTime)
 				else
 				{
 					this->Stop();
+					_blocking = false;
 				}
 			}
 			else if (_actionQueue.HasAction())
@@ -297,7 +298,7 @@ Action::Action()
 }
 
 Action::Action(const Action & other)
-	: _blocking(other._blocking), _playSpeed(other._playSpeed), _stop(false),
+	: _blocking(other._blocking), _playSpeed(other._playSpeed), _stop(other._stop),
 	_crossFadeTime(other._crossFadeTime), _outCrossFadeTime(other._outCrossFadeTime), _playOnce(other._playOnce)
 {
 	strncpy(_name, other._name, sizeof(char) * ACTION_MAX_NAME);
@@ -306,7 +307,7 @@ Action::Action(const Action & other)
 Action & Action::operator=(const Action & other)
 {
 	strncpy(_name, other._name, sizeof(char) * ACTION_MAX_NAME);
-	_stop = false;
+	_stop = other._stop;
 	_blocking = other._blocking;
 	_playSpeed = other._playSpeed;
 	_crossFadeTime = other._crossFadeTime;

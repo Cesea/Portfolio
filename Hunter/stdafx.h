@@ -55,7 +55,7 @@
 #define EDITORX (0)
 #define EDITORY (0)
 #define EDITORSIZEX (400)
-#define EDITORSIZEY (800)
+#define EDITORSIZEY (900)
 
 
 #include "Typedefs.h"

@@ -113,7 +113,7 @@ void GameObjectFactory::CreateObject(ARCHE_TYPE type, ResourceHandle handle, con
 		BaseGameObject *pBack = _pCurrentScene->_gameObjects.back();
 		pBack->CreateFromWorld(_pCurrentScene->_world);
 		TransformComponent &refTransform = pBack->_entity.GetComponent<TransformComponent>();
-		refTransform._position = position;
+		//refTransform._position = position;
 	}break;
 	case ARCHE_SNAKE :
 	{

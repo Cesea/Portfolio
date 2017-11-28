@@ -2,6 +2,7 @@
 #define GAME_OBJECT_FACTORY_H
 
 #include "SingletonBase.h"
+#include "GameObjectHandle.h"
 
 class IScene;
 
@@ -35,18 +36,9 @@ private :
 
 	void CreateObject(ARCHE_TYPE type, ResourceHandle handle, const Vector3 &position);
 
-public :
-	//struct CreateObjectEvent
-	//{
-	//	CreateObjectEvent(ArcheType type, const Vector3 &position)
-	//		:_type(type), _position(position)
-	//	{
-	//	}
+	//ResourceHandlePool<TreeHandle> _treeHandlePool;
 
-	//	ArcheType _type;
-	//	Vector3 _position;
-	//};
-	//void Handle(const CreateObjectEvent &event);
+public :
 
 	struct CreateObjectOnClickEvent
 	{

@@ -172,8 +172,11 @@ namespace video
 	//Texture
 	struct Texture
 	{
-		bool Create(const std::string fileName);
+		bool Create(const std::string &fileName);
+		bool Create(int32 width, int32 height, D3DFORMAT fmt, D3DPOOL pool);
 		void Destroy();
+
+		bool Save(const std::string &fileName);
 
 		IDirect3DTexture9 *_ptr{};
 		D3DFORMAT _format{};

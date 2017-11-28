@@ -340,10 +340,9 @@ namespace video
 
 		//로딩 경로에서 파일명만 제거하고 경로만 받는다.
 		std::string path;
-		int lastPathIndex = 0;		//마지막 \ 의 위치
+		int lastPathIndex = 0;
 
-									//filePath.find_first_of( 'A' );		filePath 문자열에 'A' 가 들어있는 위치 리턴 ( 앞에서 부터 검색 )
-		lastPathIndex = fileName.find_last_of('/');		//뒤에서 부터 검색
+		lastPathIndex = fileName.find_last_of('/');
 		if (lastPathIndex == -1) 
 		{			
 			lastPathIndex = fileName.find_last_of('\\');	
@@ -673,6 +672,9 @@ namespace video
 		//본 매트릭스 포인터 생성
 		InitBoneMatrixPointer((Bone*)_pRootBone);
 
+		UpdateMatrices(_pRootBone, &_matCorrection);
+
+		CalculateTotalBoundInfo(_pRootBone);
 	}
 
 	void SkinnedXMesh::Destroy()
@@ -913,6 +915,55 @@ namespace video
 		}
 	}
 
+	void SkinnedXMesh::CalculateTotalBoundInfo(Bone *pBone)
+	{
+		if (nullptr == pBone)
+		{
+			return;
+		}
+
+		if (pBone->pMeshContainer)
+		{
+			BoneMesh *pMesh = (BoneMesh *)pBone->pMeshContainer;
+
+			Vec3TransformCoord(&pMesh->_boundInfo._min, 
+				&pMesh->_boundInfo._min, 
+				&pBone->CombinedTransformationMatrix);
+
+			Vec3TransformCoord(&pMesh->_boundInfo._max, 
+				&pMesh->_boundInfo._max, 
+				&pBone->CombinedTransformationMatrix);
+
+			//정점 최소 값갱신
+			if (_boundInfo._min.x > pMesh->_boundInfo._min.x)		_boundInfo._min.x = pMesh->_boundInfo._min.x;
+			if (_boundInfo._min.y > pMesh->_boundInfo._min.y)		_boundInfo._min.y = pMesh->_boundInfo._min.y;
+			if (_boundInfo._min.z > pMesh->_boundInfo._min.z)		_boundInfo._min.z = pMesh->_boundInfo._min.z;
+
+			//정점 최대 값갱신
+			if (_boundInfo._max.x < pMesh->_boundInfo._max.x)		_boundInfo._max.x = pMesh->_boundInfo._max.x;
+			if (_boundInfo._max.y < pMesh->_boundInfo._max.y)		_boundInfo._max.y = pMesh->_boundInfo._max.y;
+			if (_boundInfo._max.z < pMesh->_boundInfo._max.z)		_boundInfo._max.z = pMesh->_boundInfo._max.z;
+
+			//Bound 추가 계산
+			_boundInfo._center = (_boundInfo._min + _boundInfo._max) * 0.5f;
+
+			_boundInfo._size = Vector3(_boundInfo._max.x - _boundInfo._min.x, 
+				_boundInfo._max.y - _boundInfo._min.y, 
+				_boundInfo._max.z - _boundInfo._min.z);
+
+			_boundInfo._halfSize = _boundInfo._size * 0.5f;
+			_boundInfo._radius = D3DXVec3Length(&(_boundInfo._center - _boundInfo._min));
+		}
+
+		if (pBone->pFrameSibling)
+		{
+			CalculateTotalBoundInfo((Bone *)pBone->pFrameSibling);
+		}
+		if (pBone->pFrameFirstChild)
+		{
+			CalculateTotalBoundInfo((Bone *)pBone->pFrameFirstChild);
+		}
+	}
 	
 
 	//Skinned Animation ////////////////////////////////////////////////////////
@@ -972,17 +1023,6 @@ STDMETHODIMP BoneHierachy::CreateFrame(LPCSTR Name, LPD3DXFRAME * ppNewFrame)
 
 	//리턴값에 새로운 본 주소 대입
 	*ppNewFrame = newBone;
-
-	//테스트용 본들 추가...
-	//if (nullptr != Name)
-	//{
-	//	auto found = this->_pSkinnedMesh->_boneTable.find((*ppNewFrame)->Name);
-	//	if (found == this->_pSkinnedMesh->_boneTable.end())
-	//	{
-	//		this->_pSkinnedMesh->_boneTable.insert(std::make_pair(std::string(Name), (Bone *)*ppNewFrame));
-	//	}
-	//}
-
 	return S_OK;
 }
 
@@ -1209,7 +1249,6 @@ STDMETHODIMP BoneHierachy::CreateMeshContainer(LPCSTR Name, CONST D3DXMESHDATA *
 		}
 	}
 	*ppNewMeshContainer = boneMesh;
-
 
 	
 	SAFE_RELEASE(d3dDevice);

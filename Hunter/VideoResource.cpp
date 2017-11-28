@@ -204,20 +204,17 @@ namespace video
 
 	void Effect::SetMatrix(LPCSTR name, const Matrix &matrix) const
 	{
-		HRESULT re = _ptr->SetMatrix(name, &matrix);
-		int a = 0;
+		_ptr->SetMatrix(name, &matrix);
 	}
 
 	void Effect::SetMatrices(LPCSTR name, const Matrix *matrices, uint32 numMatrices) const
 	{
-		HRESULT re = _ptr->SetMatrixArray(name, matrices, numMatrices);
-		int a = 0;
+		_ptr->SetMatrixArray(name, matrices, numMatrices);
 	}
 
 	void Effect::SetTexture(const std::string &name, const Texture &texture) const
 	{
-		HRESULT re = _ptr->SetTexture(name.c_str(), texture._ptr);
-		int a = 0;
+		_ptr->SetTexture(name.c_str(), texture._ptr);
 	}
 
 	void Effect::SetMaterial(const Material & material) const
@@ -243,6 +240,11 @@ namespace video
 	void Effect::SetVector(LPCSTR name, const Vector4 &value) const
 	{
 		_ptr->SetVector(name, &value);
+	}
+
+	void Effect::SetValue(LPCSTR name, void * value, size_t size)
+	{
+		_ptr->SetValue(name, value, size);
 	}
 
 	void Effect::CommitChanges() const
@@ -324,7 +326,7 @@ namespace video
 		COM_RELEASE(_ptr);
 	}
 
-	bool Texture::Create(const std::string fileName)
+	bool Texture::Create(const std::string &fileName)
 	{
 		D3DXIMAGE_INFO imageInfo;
 		if (FAILED(D3DXGetImageInfoFromFile(fileName.c_str(), &imageInfo)))
@@ -344,9 +346,32 @@ namespace video
 		return true;
 	}
 
+	bool Texture::Create(int32 width, int32 height, D3DFORMAT fmt, D3DPOOL pool)
+	{
+		if (FAILED(D3DXCreateTexture(gpDevice, width, height, 1, 0, fmt, pool, &_ptr)))
+		{
+			Console::Log("Texture Creation failed\n");
+			return false;
+		}
+		_width = width;
+		_height = height;
+		_format = fmt;
+		return true;
+	}
+
 	void Texture::Destroy()
 	{
 		COM_RELEASE(_ptr);
+	}
+
+	bool Texture::Save(const std::string & fileName)
+	{
+		if (FAILED(D3DXSaveTextureToFile(fileName.c_str(), D3DXIFF_PNG, _ptr, nullptr)))
+		{
+			Console::Log("Texture Save failed\n");
+			return false;
+		}
+		return true;
 	}
 
 	bool FrameBuffer::Create(uint8 num, const TextureHandle * handles)

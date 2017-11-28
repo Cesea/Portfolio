@@ -99,9 +99,6 @@
     <ClCompile Include="CollisionUtils.cpp">
       <Filter>Game\GameSystem\CollisionSystem</Filter>
     </ClCompile>
-    <ClCompile Include="Hash.cpp">
-      <Filter>Sub</Filter>
-    </ClCompile>
     <ClCompile Include="VideoDevice.cpp">
       <Filter>Core\SubSystem\VideoDevice</Filter>
     </ClCompile>
@@ -198,9 +195,6 @@
     <ClCompile Include="PointLight.cpp">
       <Filter>Game\GameUtils\Light</Filter>
     </ClCompile>
-    <ClCompile Include="GameObjectFactory.cpp">
-      <Filter>Managers</Filter>
-    </ClCompile>
     <ClCompile Include="ParticleComponent.cpp">
       <Filter>Game\GameComponent\ParticleComponent</Filter>
     </ClCompile>
@@ -254,6 +248,18 @@
     </ClCompile>
     <ClCompile Include="HydraStates.cpp">
       <Filter>Game\GameObject\Enemy\Enemy\Hydra</Filter>
+    </ClCompile>
+    <ClCompile Include="EnvironmentSphere.cpp">
+      <Filter>Game\GameUtils\Light</Filter>
+    </ClCompile>
+    <ClCompile Include="DataPackage.cpp">
+      <Filter>Sub\DataPackage</Filter>
+    </ClCompile>
+    <ClCompile Include="MapToolScene.cpp">
+      <Filter>Game\GameScene\MapToolScene</Filter>
+    </ClCompile>
+    <ClCompile Include="GameObjectFactory.cpp">
+      <Filter>Managers\GameObjectFactory</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -423,9 +429,6 @@
     <ClInclude Include="SceneChangeEffect.h">
       <Filter>Core\SubSystem\SceneeManager</Filter>
     </ClInclude>
-    <ClInclude Include="Hash.h">
-      <Filter>Sub</Filter>
-    </ClInclude>
     <ClInclude Include="VideoDevice.h">
       <Filter>Core\SubSystem\VideoDevice</Filter>
     </ClInclude>
@@ -541,9 +544,6 @@
     <ClInclude Include="PointLight.h">
       <Filter>Game\GameUtils\Light</Filter>
     </ClInclude>
-    <ClInclude Include="GameObjectFactory.h">
-      <Filter>Managers</Filter>
-    </ClInclude>
     <ClInclude Include="ParticleComponent.h">
       <Filter>Game\GameComponent\ParticleComponent</Filter>
     </ClInclude>
@@ -583,32 +583,20 @@
     <ClInclude Include="imguiRenderer.h">
       <Filter>GUI</Filter>
     </ClInclude>
-    <ClInclude Include="bat.h">
-      <Filter>Game\GameObject\Enemy\Enemy\Bat</Filter>
+    <ClInclude Include="EnvironmentSphere.h">
+      <Filter>Game\GameUtils\Light</Filter>
     </ClInclude>
-    <ClInclude Include="batAnimationString.h">
-      <Filter>Game\GameObject\Enemy\Enemy\Bat</Filter>
+    <ClInclude Include="DataPackage.h">
+      <Filter>Sub\DataPackage</Filter>
     </ClInclude>
-    <ClInclude Include="batStates.h">
-      <Filter>Game\GameObject\Enemy\Enemy\Bat</Filter>
+    <ClInclude Include="MapToolScene.h">
+      <Filter>Game\GameScene\MapToolScene</Filter>
     </ClInclude>
-    <ClInclude Include="Cat.h">
-      <Filter>Game\GameObject\Enemy\Enemy\Cat</Filter>
+    <ClInclude Include="GameObjectFactory.h">
+      <Filter>Managers\GameObjectFactory</Filter>
     </ClInclude>
-    <ClInclude Include="CatAnimationString.h">
-      <Filter>Game\GameObject\Enemy\Enemy\Cat</Filter>
-    </ClInclude>
-    <ClInclude Include="CatStates.h">
-      <Filter>Game\GameObject\Enemy\Enemy\Cat</Filter>
-    </ClInclude>
-    <ClInclude Include="Hydra.h">
-      <Filter>Game\GameObject\Enemy\Enemy\Hydra</Filter>
-    </ClInclude>
-    <ClInclude Include="HydraAnimationString.h">
-      <Filter>Game\GameObject\Enemy\Enemy\Hydra</Filter>
-    </ClInclude>
-    <ClInclude Include="HydraStates.h">
-      <Filter>Game\GameObject\Enemy\Enemy\Hydra</Filter>
+    <ClInclude Include="GameObjectHandle.h">
+      <Filter>Managers\GameObjectFactory</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -768,14 +756,6 @@
     <Filter Include="Game\GameObject\Enemy\Enemy\Turtle">
       <UniqueIdentifier>{b66c83e9-946e-43df-a273-bbe371f59f11}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Game\GameObject\Enemy\Enemy\Bat">
-      <UniqueIdentifier>{fe27fad6-6438-431a-bc13-2b39fe8af680}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Game\GameObject\Enemy\Enemy\Cat">
-      <UniqueIdentifier>{3685117c-0e9e-4d63-9d52-6e7cef4e8e10}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Game\GameObject\Enemy\Enemy\Hydra">
-      <UniqueIdentifier>{e2448ab7-4034-4889-bbf7-a9f64fdcc81e}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

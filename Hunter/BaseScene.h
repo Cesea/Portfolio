@@ -32,7 +32,7 @@ public:
 	virtual void Release();
 	virtual const char *GetSceneName() { return "BaseScene"; }
 
-private:
+protected :
 	TransformSystem _transformSystem;
 	RenderSystem _renderSystem;
 	ScriptSystem _scriptSystem;
@@ -43,13 +43,14 @@ private:
 
 	Editor *_editor{};
 
+
 	Turtle _turtle;
 	Bat _bat;
 	Cat _cat;
 	Hydra _hydra;
-public:
 
-	void Handle(const Editor::GetObjectFromSceneEvent &event);
+	EnvironmentSphere *_pEnvironmentSphere{};
+
 };
 
 #endif

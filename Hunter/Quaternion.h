@@ -70,21 +70,17 @@ inline Quaternion* QuaternionConjugate(Quaternion *pOut, const Quaternion *pQ)
 	return (Quaternion *)D3DXQuaternionConjugate(pOut, pQ);
 }
 
-
-
 // Compute a quaternin's axis and angle of rotation. Expects unit quaternions.
-inline void QuaternionToAxisAngle(const Quaternion *pQ, D3DXVECTOR3 *pAxis, float *pAngle) 
+inline void QuaternionToAxisAngle(const Quaternion *pQ, Vector3 *pAxis, float *pAngle) 
 {
 	D3DXQuaternionToAxisAngle(pQ, pAxis, pAngle);
 }
-
 
 // Build a quaternion from a rotation matrix.
 inline Quaternion* QuaternionRotationMatrix(Quaternion *pOut, const Matrix *pM) 
 {
 	return (Quaternion *)D3DXQuaternionRotationMatrix(pOut, (D3DXMATRIX *)pM);
 }
-
 
 // Rotation about arbitrary axis.
 inline Quaternion* QuaternionRotationAxis(Quaternion *pOut, const Vector3 *pV, float angle) 
@@ -162,4 +158,5 @@ inline Quaternion* QuaternionBaryCentric(Quaternion *pOut, const Quaternion *pQ1
 {
 	return (Quaternion *)D3DXQuaternionBaryCentric(pOut, pQ1, pQ2, pQ3, f, g);
 }
+
 #endif

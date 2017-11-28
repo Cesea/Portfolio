@@ -23,10 +23,8 @@ public :
 		//{
   //          return S_OK;
 		//}
-
 		//switch (*pData->_animtionEnum)
 		//{
-
 		//}
         return S_OK;
     }

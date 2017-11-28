@@ -295,7 +295,12 @@ void video::VideoDevice::LoadDefaultEffects()
 {
 	VIDEO->CreateEffect("../resources/Shaders/StaticMesh.fx", "StaticMesh.fx");
 	VIDEO->CreateEffect("../resources/Shaders/SkinnedMesh.fx", "SkinnedMesh.fx");
-	VIDEO->CreateEffect("../resources/Shaders/TerrainBase.fx", "TerrainBase.fx");
+	VIDEO->CreateEffect("../resources/Shaders/terrainBase.fx", "TerrainBase.fx");
+
+	
+	VIDEO->CreateEffect("../resources/Shaders/EnvironmentSphere.fx", "EnvironmentSphere.fx");
+	VIDEO->CreateEffect("../resources/Shaders/TreeShader.fx", "TreeShader.fx");
+
 
 }
 
@@ -464,6 +469,20 @@ TextureHandle video::VideoDevice::CreateTexture(const std::string &fileName, con
 	return result;
 }
 
+TextureHandle video::VideoDevice::CreateTexture(int32 width, int32 height, 
+	D3DFORMAT format, D3DPOOL pool, const std::string &name)
+{
+	TextureHandle result = _textureHandlePool.Create(name);
+	if (!_textures[result.index].Create(width, height, format, pool))
+	{
+		//텍스쳐의 생성에 실패했다면 만든 핸들은 지우고 빈 핸들을 반환한다
+		_textureHandlePool.Remove(result);
+		return TextureHandle();
+	}
+	return result;
+}
+
+
 TextureHandle video::VideoDevice::GetTexture(const std::string & name)
 {
 	return _textureHandlePool.Get(name);
@@ -482,6 +501,11 @@ void video::VideoDevice::DestroyTexture(TextureHandle handle)
 {
 	_textures[handle.index].Destroy();
 	_textureHandlePool.Remove(handle);
+}
+
+void video::VideoDevice::SaveTexture(const std::string & fileName, video::TextureHandle handle)
+{
+	_textures[handle.index].Save(fileName);
 }
 
 EffectHandle video::VideoDevice::CreateEffect(const std::string &fileName, const std::string &name)

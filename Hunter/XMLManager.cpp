@@ -127,7 +127,7 @@ void DumpToStdOut(const tinyxml2::XMLAttribute *pAttribute, uint32 indent = 0)
 		attri != 0;
 		(const tinyxml2::XMLAttribute *)attri = attri->Next())
 	{
-		for (int32 i = 0; i < indent; ++i)
+		for (uint32 i = 0; i < indent; ++i)
 		{
 			printf("%s\n", attri->Value());
 		}
@@ -148,7 +148,7 @@ void DumpToStdOut(const tinyxml2::XMLNode *pParent, uint32 indent = 0)
 	const tinyxml2::XMLText *pText;
 	for (child = pParent->FirstChild(); child != 0; child = (tinyxml2::XMLNode *)child->NextSibling())
 	{
-		for (int i = 0; i < indent; ++i)
+		for (uint32 i = 0; i < indent; ++i)
 		{
 			printf("	");
 		}

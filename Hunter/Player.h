@@ -16,25 +16,7 @@ class PlayerCallbackHandler : public GameObjectAnimationCallbackHandler
 {
 public :
 	bool Init(Player *pPlayer) { _pPlayer = pPlayer; }
-    HRESULT CALLBACK HandleCallback( THIS_ UINT Track, LPVOID pCallbackData )
-    {
-        PlayerCallbackData* pData = ( PlayerCallbackData* )pCallbackData;
-		if (nullptr == pData)
-		{
-            return S_OK;
-		}
-
-		switch (*pData->_animtionEnum)
-		{
-		case PlayerAnimationEnum::eWarSwingLeft :
-		{
-			int a = 0;
-		}break;
-
-		}
-        return S_OK;
-    }
-
+	HRESULT CALLBACK HandleCallback(THIS_ UINT Track, LPVOID pCallbackData);
 private :
 	Player *_pPlayer{};
 };
@@ -57,6 +39,19 @@ public :
 	void Handle(const InputManager::KeyDownEvent &event);
 
 private :
+	enum PLAYERSTATE
+	{
+		PLAYERSTATE_STANCE,
+		PLAYERSTATE_MOVE,
+		PLAYER_STATE_RUN,
+		PLAYERSTATE_ATTACK,
+		PLAYERSTATE_BLOCK,
+		PLAYERSTATE_MOVEATTACK,
+	};
+	PLAYERSTATE _state;
+	bool32 _inCombat{};
+
+
 	void SetupCallbackAndCompression();
 	PlayerCallbackData _callbackData;
 	PlayerStateMachine *_pStateMachine;
@@ -64,12 +59,20 @@ private :
 	ActionComponent *_pActionComp{};
 	void QueueAction(const Action &action);
 
-	//TerrainChunkPos _chunkPos;
 	TerrainTilePos _tilePos;
 
 private :
 	EventChannel _channel;
-	float _speed{20.0f};
+	float _speed{2.0f};
+
+	StopWatch _combatToPeaceTimer;
+
+	StopWatch _moveToStanceTimer;
+	Movement _currentMovement;
+
+	StopWatch _attackToStanceTimer;
+	int32 _comboCount{};
+
 public :
 
 	struct PlayerPositionEvent

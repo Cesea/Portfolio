@@ -36,3 +36,38 @@ GameCommand & GameCommand::operator=(const GameCommand & other)
 
 	return *this;
 }
+
+bool IsMovementNone(Movement & movement)
+{
+	return (movement._horizontal == HORIZONTAL_MOVEMENT_NONE) && (movement._vertical == VERTICAL_MOVEMENT_NONE);
+}
+
+void MovementStop(Movement & movement)
+{
+	movement._vertical = VERTICAL_MOVEMENT_NONE;
+	movement._horizontal = HORIZONTAL_MOVEMENT_NONE;
+}
+
+void MovementLeft(Movement & movement)
+{
+	movement._vertical = VERTICAL_MOVEMENT_NONE;
+	movement._horizontal = HORIZONTAL_MOVEMENT_LEFT;
+}
+
+void MovementRight(Movement & movement)
+{
+	movement._vertical = VERTICAL_MOVEMENT_NONE;
+	movement._horizontal = HORIZONTAL_MOVEMENT_RIGHT;
+}
+
+void MovementUp(Movement & movement)
+{
+	movement._vertical = VERTICAL_MOVEMENT_UP;
+	movement._horizontal = HORIZONTAL_MOVEMENT_NONE;
+}
+
+void MovementDown(Movement & movement)
+{
+	movement._vertical = VERTICAL_MOVEMENT_DOWN;
+	movement._horizontal = HORIZONTAL_MOVEMENT_NONE;
+}

@@ -5,7 +5,7 @@ class IScene;
 class Entity;
 class Terrain;
 
-#define EDITOR_MAX_NAME 64
+#define EDITOR_MAX_NAME 128
 #define EDITOR_MAX_NAME_VAR 32
 
 struct TransformComponent;
@@ -49,23 +49,33 @@ struct TerrainEditor
 	bool32 _editingExtent;
 	bool32 _editingHeight;
 	bool32 _editingTexture;
+	bool32 _saveTerrain;
 
 	bool32 _grow{true};
 	bool32 _dig{false};
 	bool32 _smooth{false};
 	bool32 _flat{false};
 
-	float _brushRadius{2.0f};
-	float _brushIntensity{3.0f};
+	float _brushInnerRadius{2.0f};
+	float _brushOutterRadius{4.0f};
+
+	float _brushIntensity{1.0f};
+
+	//채널은 r : 0, g : 1, b : 2, a : 3순으로 간다..
+	int32 _channel{ 0 };
+	bool32 _r{true};
+	bool32 _g{false};
+	bool32 _b{false};
+	bool32 _a{false};
 
 	float _countX{};
 	float _countZ{};
 	Terrain::TerrainConfig _terrainConfig{};
 
+	char _textureName00[EDITOR_MAX_NAME]{0, };
 	char _textureName01[EDITOR_MAX_NAME]{0, };
 	char _textureName02[EDITOR_MAX_NAME]{0, };
 	char _textureName03[EDITOR_MAX_NAME]{0, };
-	char _textureName04[EDITOR_MAX_NAME]{0, };
 
 	char _fileName[EDITOR_MAX_NAME];
 };
@@ -104,6 +114,10 @@ struct ObjectEditor
 		_pScript = nullptr;
 		_pCollision = nullptr;
 		_pAction = nullptr;
+
+		QuaternionIdentity(&_xRotation);
+		QuaternionIdentity(&_yRotation);
+		QuaternionIdentity(&_zRotation);
 	}
 
 	void OnNewSelection(Entity entity);
@@ -115,6 +129,10 @@ struct ObjectEditor
 	ActionComponent *_pAction{};
 
 	Entity _selectingEntity{ };
+
+	Quaternion _xRotation;
+	Quaternion _yRotation;
+	Quaternion _zRotation;
 };
 
 
@@ -122,10 +140,10 @@ class Editor
 {
 public :
 	Editor();
-	virtual ~Editor();
+	~Editor();
 
-	virtual void Init();
-	virtual void Shutdown();
+	void Init();
+	void Shutdown();
 
 	struct GetObjectFromSceneEvent
 	{
