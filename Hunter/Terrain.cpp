@@ -1028,24 +1028,33 @@ void Terrain::TerrainChunk::InvalidateEntities()
 //Rebuild Seciton은 인자로 들어온 min, max의 범위를 1씩 증가시켜서 내부 처리를 진행한다.
 void Terrain::RebuildSection(int32 minX, int32 maxX, int32 minZ, int32 maxZ)
 {
-	int32 numVertX = maxX - minX + 1;
-	int32 numVertZ = maxZ - minZ + 1;
+	int32 localMinX = minX - 1;
+	int32 localMaxX = maxX + 1;
+	int32 localMinZ = minZ - 1;
+	int32 localMaxZ = maxZ + 1;
+
+	ClampInt(localMinX, 0, _numVertexX - 1);
+	ClampInt(localMaxX, 0, _numVertexX - 1);
+	ClampInt(localMinZ, 0, _numVertexZ - 1);
+	ClampInt(localMaxZ, 0, _numVertexZ - 1);
+	
+	int32 numVertX = localMaxX - localMinX + 1;
+	int32 numVertZ = localMaxZ - localMinZ + 1;
 
 	int32 triNum = (numVertX - 1) * (numVertZ - 1) * 2;
 
 	Vector3 *vertices = new Vector3[numVertX * numVertZ];
 	Vector2 *uvs = new Vector2[numVertX * numVertZ];
-	int32 counter = 0;
 
-	for (int32 z = minZ; z <= maxZ; ++z)
+	int32 counter = 0;
+	for (int32 z = localMinZ; z <= localMaxZ; ++z)
 	{
-		for (int32 x = minX; x <= maxX; ++x)
+		for (int32 x = localMinX; x <= localMaxX; ++x)
 		{
 			vertices[counter] = _terrainVertices[Index2D(x, z, _numVertexX)]._pos;
-			uvs[counter++] = _terrainVertices[Index2D(x, z, _numVertexX)]._baseUV;;
+			uvs[counter++] = _terrainVertices[Index2D(x, z, _numVertexX)]._baseUV;
 		}
 	}
-	//SmoothTerrain(1);
 
 	counter = 0;
 	uint32 *indices = new uint32[triNum * 3];
@@ -1078,9 +1087,9 @@ void Terrain::RebuildSection(int32 minX, int32 maxX, int32 minZ, int32 maxZ)
 	ComputeTangentAndBinormal(tangents, binormals, vertices, normals, uvs, indices, triNum, numVertX * numVertZ);
 
 	counter = 0;
-	for (int32 z = minZ; z < maxZ; ++z)
+	for (int32 z = localMinZ; z < localMaxZ; ++z)
 	{
-		for (int32 x = minX; x < maxX; ++x)
+		for (int32 x = localMinX; x < localMaxX; ++x)
 		{
 			_terrainVertices[Index2D(x, z, _numVertexX)]._normal = normals[counter++];
 		}
