@@ -245,6 +245,7 @@
     <ClInclude Include="GameCommand.h" />
     <ClInclude Include="GameComponent.h" />
     <ClInclude Include="GameObjectFactory.h" />
+    <ClInclude Include="GameObjectHandle.h" />
     <ClInclude Include="GameObjects.h" />
     <ClInclude Include="GameSystems.h" />
     <ClInclude Include="GameUtils.h" />

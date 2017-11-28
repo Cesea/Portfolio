@@ -31,12 +31,12 @@ struct TerrainChunkPos
 	float _relZ{};
 };
 
+
 //청크 안에서
 struct TerrainTilePos
 {
 	int32 _chunkX;
 	int32 _chunkZ;
-
 
 	int32 _tileX{};
 	int32 _tileZ{};
@@ -45,7 +45,16 @@ struct TerrainTilePos
 	float _relZ{};
 };
 
+struct TerrainGrid
+{
+	int32 _chunkX{};
+	int32 _chunkZ{};
 
+	int32 _gridX{};
+	int32 _gridZ{};
+
+	std::vector<ResourceHandle> _objects;
+};
 
 class Terrain : public SingletonBase<Terrain>
 {

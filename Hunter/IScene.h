@@ -6,8 +6,6 @@
 #include "Camera.h"
 #include "BaseGameObject.h"
 
-
-
 class IScene
 {
 public :

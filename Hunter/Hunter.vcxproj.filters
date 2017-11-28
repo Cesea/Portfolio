@@ -195,9 +195,6 @@
     <ClCompile Include="PointLight.cpp">
       <Filter>Game\GameUtils\Light</Filter>
     </ClCompile>
-    <ClCompile Include="GameObjectFactory.cpp">
-      <Filter>Managers</Filter>
-    </ClCompile>
     <ClCompile Include="ParticleComponent.cpp">
       <Filter>Game\GameComponent\ParticleComponent</Filter>
     </ClCompile>
@@ -233,6 +230,9 @@
     </ClCompile>
     <ClCompile Include="MapToolScene.cpp">
       <Filter>Game\GameScene\MapToolScene</Filter>
+    </ClCompile>
+    <ClCompile Include="GameObjectFactory.cpp">
+      <Filter>Managers\GameObjectFactory</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -517,9 +517,6 @@
     <ClInclude Include="PointLight.h">
       <Filter>Game\GameUtils\Light</Filter>
     </ClInclude>
-    <ClInclude Include="GameObjectFactory.h">
-      <Filter>Managers</Filter>
-    </ClInclude>
     <ClInclude Include="ParticleComponent.h">
       <Filter>Game\GameComponent\ParticleComponent</Filter>
     </ClInclude>
@@ -567,6 +564,12 @@
     </ClInclude>
     <ClInclude Include="MapToolScene.h">
       <Filter>Game\GameScene\MapToolScene</Filter>
+    </ClInclude>
+    <ClInclude Include="GameObjectFactory.h">
+      <Filter>Managers\GameObjectFactory</Filter>
+    </ClInclude>
+    <ClInclude Include="GameObjectHandle.h">
+      <Filter>Managers\GameObjectFactory</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -737,6 +740,9 @@
     </Filter>
     <Filter Include="Game\GameScene\LoadingScene">
       <UniqueIdentifier>{5f6e3b7c-d075-4213-b3ab-eeee36d68787}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Managers\GameObjectFactory">
+      <UniqueIdentifier>{0ea18574-2eb4-44c6-b2bf-9477b2bb756b}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
