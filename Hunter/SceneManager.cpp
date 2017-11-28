@@ -18,7 +18,7 @@ SceneManager::~SceneManager()
 
 bool SceneManager::Init()
 {
-	//±âº» º£ÀÌ½º ¾À ¼¼ÆÃ
+	//ê¸°ë³¸ ë² ì´ìŠ¤ ì”¬ ì„¸íŒ…
 	IScene *pScene = new MapToolScene;
 	AddScene(pScene->GetSceneName(), pScene);
 
@@ -78,7 +78,7 @@ void SceneManager::AddScene(const std::string &sceneName, IScene *pScene)
 		return;
 	}
 	auto find = _scenes.find(sceneName);
-	//¾ø´Ù¸é
+	//ì—†ë‹¤ë©´
 	if (find == _scenes.end())
 	{
 		_scenes.insert(std::make_pair(sceneName, pScene));

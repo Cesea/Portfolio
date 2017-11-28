@@ -40,6 +40,23 @@ class Hydra : public Enemy
 	friend class HydraStateMachine;
 	friend class HydraCallbackHandler;
 private:
+	enum HYDRASTATE
+	{
+		HYDRASTATE_IDLE,
+		HYDRASTATE_PATROL,
+		HYDRASTATE_RUN,
+		HYDRASTATE_FIND,
+		HYDRASTATE_ATK1,
+		HYDRASTATE_ATK2,
+		HYDRASTATE_ATK3,
+		HYDRASTATE_BREATH1,
+		HYDRASTATE_BREATH2,
+		HYDRASTATE_BREATH3,
+		HYDRASTATE_STAND,
+		HYDRASTATE_HIT,
+		HYDRASTATE_DEATH
+	};
+	HYDRASTATE _state;
 public:
 	Hydra();
 	virtual ~Hydra();

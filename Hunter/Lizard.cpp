@@ -1,56 +1,59 @@
 #include "stdafx.h"
-#include "Hydra.h"
-#include "HydraStates.h"
+#include "Lizard.h"
+#include "LizardStates.h"
 
-Hydra::Hydra()
+Lizard::Lizard()
 {
 }
 
-Hydra::~Hydra()
+Lizard::~Lizard()
 {
 }
 
-bool Hydra::CreateFromWorld(World & world)
+bool Lizard::CreateFromWorld(World & world)
 {
 	_entity = world.CreateEntity();
 	TransformComponent &transComp = _entity.AddComponent<TransformComponent>();
-	transComp.MovePositionWorld(0, 8.0f, 0);
+	transComp.MovePositionWorld(0, 12.0f, 0);
 
 	RenderComponent &renderComp = _entity.AddComponent<RenderComponent>();
 	renderComp._type = RenderComponent::Type::eSkinned;
-	renderComp._skinned = VIDEO->CreateAnimationInstance(VIDEO->GetSkinnedXMesh("Hydra"), "Anim" + std::to_string(0));
-	renderComp._arche = ARCHE_HYDRA;
+	renderComp._skinned = VIDEO->CreateAnimationInstance(VIDEO->GetSkinnedXMesh("Lizard"), "Anim" + std::to_string(0));
 
 	ScriptComponent &scriptComponent = _entity.AddComponent<ScriptComponent>();
-	scriptComponent.SetScript(MAKE_SCRIPT_DELEGATE(Hydra, Update, *this));
+	scriptComponent.SetScript(MAKE_SCRIPT_DELEGATE(Lizard, Update, *this));
 
 	_pActionComp = &_entity.AddComponent<ActionComponent>();
 	_pActionComp->CreateFrom(renderComp._skinned);
-	_pActionComp->_pCallbackHandler = new HydraCallbackHandler;
+	_pActionComp->_pCallbackHandler = new LizardCallbackHandler;
 	_pActionComp->_pCallbackHandler->Init(this);
 	SetupCallbackAndCompression();
 
 	_pActionComp->MakeAnimationList();
-	_pActionComp->SetFirstAction(HYDRA_ANIM(HYDRA_ANIMATION_ENUM::HYDRA_IDLE));
+	_pActionComp->SetFirstAction(LIZARD_ANIM(LIZARD_ANIMATION_ENUM::LIZARD_IDLE));
 
 	_entity.Activate();
 
-	_pStateMachine = new HydraStateMachine;
+	_pStateMachine = new LizardStateMachine;
 	_pStateMachine->Init(this);
-	_pStateMachine->RegisterState(META_TYPE(HydraIdleState)->Name(), new HydraIdleState());
-	_pStateMachine->RegisterState(META_TYPE(HydraMoveState)->Name(), new HydraMoveState());
-	_pStateMachine->RegisterState(META_TYPE(HydraStandState)->Name(), new HydraStandState());
-	_pStateMachine->RegisterState(META_TYPE(HydraAttackState)->Name(), new HydraAttackState());
-	_pStateMachine->RegisterState(META_TYPE(HydraAttack2State)->Name(), new HydraAttack2State());
-	_pStateMachine->RegisterState(META_TYPE(HydraAttack3State)->Name(), new HydraAttack3State());
-	_pStateMachine->ChangeState(META_TYPE(HydraStandState)->Name());
+	_pStateMachine->RegisterState(META_TYPE(LizardIdleState)->Name(), new LizardIdleState());
+	_pStateMachine->RegisterState(META_TYPE(LizardMoveState)->Name(), new LizardMoveState());
+	_pStateMachine->RegisterState(META_TYPE(LizardMove2State)->Name(), new LizardMove2State());
+	_pStateMachine->RegisterState(META_TYPE(LizardAttackState)->Name(), new LizardAttackState());
+	_pStateMachine->RegisterState(META_TYPE(LizardAttack2State)->Name(), new LizardAttack2State());
+	_pStateMachine->RegisterState(META_TYPE(LizardAttack3State)->Name(), new LizardAttack3State());
+	_pStateMachine->RegisterState(META_TYPE(LizardFindState)->Name(), new LizardFindState());
+	_pStateMachine->RegisterState(META_TYPE(LizardStandState)->Name(), new LizardStandState());
+	_pStateMachine->ChangeState(META_TYPE(LizardIdleState)->Name());
 
-	_speed = 2.0f;
-	_rotateSpeed = D3DX_PI / 256;
+	_state = LIZARDSTATE_IDLE;
+
+	_speed = 3.0f;
+	_rotateSpeed = D3DX_PI / 64;
 	_patrolIndex = 0;
-	_moveSegment.push_back(Vector3(5.0f, 8.0f, 5.0f));
-	_moveSegment.push_back(Vector3(-5.0f, 8.0f, 5.0f));
-	_moveSegment.push_back(Vector3(-5.0f, 8.0f, -5.0f));
+	_moveSegment.push_back(Vector3(5.0f, 12.0f, 5.0f));
+	_moveSegment.push_back(Vector3(-5.0f, 12.0f, 5.0f));
+	_moveSegment.push_back(Vector3(-5.0f, 12.0f, -5.0f));
 
 	_delayTime = 180.0f;
 	_delayCount = _delayTime;
@@ -63,37 +66,38 @@ bool Hydra::CreateFromWorld(World & world)
 
 	_battle = false;
 
-	_playerPos = Vector3(5.0f, 8.0f, 5.0f);
+	_playerPos = Vector3(5.0f, 12.0f, 5.0f);
 
 	_atkRange = 0.5f;
-	_atkTime = 60;
+	_atkTime = 80;
 	_atkCount = _atkTime;
 
 	_standTime = 90;
 	_standCount = _standTime;
+
 	return true;
 }
 
-void Hydra::Update(float deltaTime)
+void Lizard::Update(float deltaTime)
 {
 	_pStateMachine->Update(deltaTime, _currentCommand);
 	TransformComponent &transComp = _entity.GetComponent<TransformComponent>();
 	switch (_state)
 	{
-	case HYDRASTATE_IDLE:
+	case LIZARDSTATE_IDLE:
 		_delayCount -= 1;
 		if (_delayCount <= 0.0f)
 		{
 			_delayCount = _delayTime;
-			_state = HYDRASTATE_PATROL;
-			_pStateMachine->ChangeState(META_TYPE(HydraMoveState)->Name());
+			_state = LIZARDSTATE_PATROL;
+			_pStateMachine->ChangeState(META_TYPE(LizardMoveState)->Name());
 		}
 		break;
-	case HYDRASTATE_PATROL:
+	case LIZARDSTATE_PATROL:
 		if (_moveSegment.empty())
 		{
-			_pStateMachine->ChangeState(META_TYPE(HydraStandState)->Name());
-			_state = HYDRASTATE_IDLE;
+			_pStateMachine->ChangeState(META_TYPE(LizardStandState)->Name());
+			_state = LIZARDSTATE_IDLE;
 		}
 		else
 		{
@@ -118,8 +122,8 @@ void Hydra::Update(float deltaTime)
 				_patrolIndex++;
 				if (_patrolIndex > _moveSegment.size() - 1) _patrolIndex = 0;
 				//IDLE 애니메이션 실행
-				_pStateMachine->ChangeState(META_TYPE(HydraStandState)->Name());
-				_state = HYDRASTATE_IDLE;
+				_pStateMachine->ChangeState(META_TYPE(LizardStandState)->Name());
+				_state = LIZARDSTATE_IDLE;
 			}
 			//아니면 이동속도만큼 이동
 			else
@@ -129,33 +133,33 @@ void Hydra::Update(float deltaTime)
 
 		}
 		break;
-	case HYDRASTATE_FIND:
+	case LIZARDSTATE_FIND:
 		//roar가 끝나면 플레이어를 추적하는 RUN으로
 		_roarCount -= 1;
 		if (_roarCount < 0)
 		{
 			_roarCount = _roarTime;
-			_state = HYDRASTATE_RUN;
-			_pStateMachine->ChangeState(META_TYPE(HydraMoveState)->Name());
+			_state = LIZARDSTATE_RUN;
+			_pStateMachine->ChangeState(META_TYPE(LizardMove2State)->Name());
 		}
 		break;
-	case HYDRASTATE_RUN:
+	case LIZARDSTATE_RUN:
 	{
 		Vector3 direction = _playerPos - transComp.GetWorldPosition();
 		float distance = Vec3Length(&direction);
 		Vec3Normalize(&direction, &direction);
 		if (distance < _atkRange)
 		{
-			_state = HYDRASTATE_ATK1;
-			_pStateMachine->ChangeState(META_TYPE(HydraAttackState)->Name());
+			_state = LIZARDSTATE_ATK1;
+			_pStateMachine->ChangeState(META_TYPE(LizardAttackState)->Name());
 		}
 		else
 		{
-			transComp.SetWorldPosition(transComp.GetWorldPosition() + direction * _speed * deltaTime * 2);
+			transComp.SetWorldPosition(transComp.GetWorldPosition() + direction * _speed * deltaTime * 3);
 		}
 	}
 	break;
-	case HYDRASTATE_ATK1:
+	case LIZARDSTATE_ATK1:
 		_atkCount--;
 		if (_atkCount < 0)
 		{
@@ -166,20 +170,20 @@ void Hydra::Update(float deltaTime)
 			Vec3Normalize(&direction, &direction);
 			if (distance < _atkRange)
 			{
-				_state = HYDRASTATE_ATK2;
-				_pStateMachine->ChangeState(META_TYPE(HydraAttack2State)->Name());
+				_state = LIZARDSTATE_ATK2;
+				_pStateMachine->ChangeState(META_TYPE(LizardAttack2State)->Name());
 			}
 			//공격범위를 벗어났다?
 			else
 			{
 				//배틀을 멈추고 기본자세 (다시추적시작)
 				_battle = false;
-				_state = HYDRASTATE_IDLE;
-				_pStateMachine->ChangeState(META_TYPE(HydraStandState)->Name());
+				_state = LIZARDSTATE_IDLE;
+				_pStateMachine->ChangeState(META_TYPE(LizardStandState)->Name());
 			}
 		}
 		break;
-	case HYDRASTATE_ATK2:
+	case LIZARDSTATE_ATK2:
 		_atkCount--;
 		if (_atkCount < 0)
 		{
@@ -190,21 +194,21 @@ void Hydra::Update(float deltaTime)
 			Vec3Normalize(&direction, &direction);
 			if (distance < _atkRange)
 			{
-				_state = HYDRASTATE_ATK3;
-				_pStateMachine->ChangeState(META_TYPE(HydraAttack3State)->Name());
-				_playerPos = Vector3(RandFloat(-5.0, 5.0), 8.0f, RandFloat(-5.0, 5.0));
+				_state = LIZARDSTATE_ATK3;
+				_pStateMachine->ChangeState(META_TYPE(LizardAttack3State)->Name());
+				_playerPos = Vector3(RandFloat(-5.0, 5.0), 12.0f, RandFloat(-5.0, 5.0));
 			}
 			//공격범위를 벗어났다?
 			else
 			{
 				//배틀을 멈추고 기본자세 (다시추적시작)
 				_battle = false;
-				_state = HYDRASTATE_IDLE;
-				_pStateMachine->ChangeState(META_TYPE(HydraStandState)->Name());
+				_state = LIZARDSTATE_IDLE;
+				_pStateMachine->ChangeState(META_TYPE(LizardStandState)->Name());
 			}
 		}
 		break;
-	case HYDRASTATE_ATK3:
+	case LIZARDSTATE_ATK3:
 		_atkCount--;
 		if (_atkCount < 0)
 		{
@@ -215,26 +219,26 @@ void Hydra::Update(float deltaTime)
 			Vec3Normalize(&direction, &direction);
 			if (distance < _atkRange)
 			{
-				_state = HYDRASTATE_ATK1;
-				_pStateMachine->ChangeState(META_TYPE(HydraAttackState)->Name());
+				_state = LIZARDSTATE_ATK1;
+				_pStateMachine->ChangeState(META_TYPE(LizardAttackState)->Name());
 			}
 			//공격범위를 벗어났다?
 			else
 			{
 				//배틀을 멈추고 기본자세 (다시추적시작)
 				_battle = false;
-				_state = HYDRASTATE_IDLE;
-				_pStateMachine->ChangeState(META_TYPE(HydraStandState)->Name());
+				_state = LIZARDSTATE_IDLE;
+				_pStateMachine->ChangeState(META_TYPE(LizardStandState)->Name());
 			}
 		}
 		break;
-	case HYDRASTATE_STAND:
+	case LIZARDSTATE_STAND:
 		_standCount--;
 		if (_standCount < 0)
 		{
 			_standCount = _standTime;
-			_state = HYDRASTATE_PATROL;
-			_pStateMachine->ChangeState(META_TYPE(HydraMoveState)->Name());
+			_state = LIZARDSTATE_PATROL;
+			_pStateMachine->ChangeState(META_TYPE(LizardMoveState)->Name());
 		}
 		break;
 	}
@@ -245,8 +249,8 @@ void Hydra::Update(float deltaTime)
 		{
 			//찾으면 FIND가 되며 battle상태가 됌
 			_battle = true;
-			_state = HYDRASTATE_FIND;
-			_pStateMachine->ChangeState(META_TYPE(HydraIdleState)->Name());
+			_state = LIZARDSTATE_FIND;
+			_pStateMachine->ChangeState(META_TYPE(LizardFindState)->Name());
 			Vector3 distance = _playerPos - transComp.GetWorldPosition();
 			Vec3Normalize(&distance, &distance);
 			transComp.LookDirection(-distance, D3DX_PI * 2);
@@ -254,7 +258,7 @@ void Hydra::Update(float deltaTime)
 	}
 }
 
-void Hydra::SetupCallbackAndCompression()
+void Lizard::SetupCallbackAndCompression()
 {
 	ActionComponent &refActionComp = _entity.GetComponent<ActionComponent>();
 	TransformComponent &refTransform = _entity.GetComponent<TransformComponent>();
@@ -263,9 +267,9 @@ void Hydra::SetupCallbackAndCompression()
 	uint32 numAnimationSet = pController->GetNumAnimationSets();
 	ID3DXKeyframedAnimationSet *anim0;
 
-	pController->GetAnimationSetByName(HydraAnimationString[HYDRA_ANIMATION_ENUM::HYDRA_IDLE], (ID3DXAnimationSet **)&anim0);
+	pController->GetAnimationSetByName(LizardAnimationString[LIZARD_ANIMATION_ENUM::LIZARD_IDLE], (ID3DXAnimationSet **)&anim0);
 
-	_callbackData._animtionEnum = (HYDRA_ANIMATION_ENUM *)&_animationEnum;
+	_callbackData._animtionEnum = (LIZARD_ANIMATION_ENUM *)&_animationEnum;
 
 	D3DXKEY_CALLBACK warSwingLeftKeys;
 	warSwingLeftKeys.Time = anim0->GetPeriod() / 1.0f * anim0->GetSourceTicksPerSecond();
@@ -274,13 +278,12 @@ void Hydra::SetupCallbackAndCompression()
 	AddCallbackKeysAndCompress(pController, anim0, 1, &warSwingLeftKeys, D3DXCOMPRESS_DEFAULT, 0.1f);
 }
 
-void Hydra::QueueAction(const Action & action)
+void Lizard::QueueAction(const Action & action)
 {
 	_pActionComp->_actionQueue.PushAction(action);
-
 }
 
-bool Hydra::findPlayer(Vector3 forward, Vector3 playerPos, Vector3 myPos, float range1, float range2, float findRadian)
+bool Lizard::findPlayer(Vector3 forward, Vector3 playerPos, Vector3 myPos, float range1, float range2, float findRadian)
 {
 	Vector3 toPlayer = playerPos - myPos;
 	float distance = Vec3Length(&toPlayer);

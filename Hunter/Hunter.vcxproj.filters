@@ -252,11 +252,14 @@
     <ClCompile Include="HydraStates.cpp">
       <Filter>Game\GameObjects\Hydra</Filter>
     </ClCompile>
-    <ClCompile Include="GameScene.cpp">
-      <Filter>Game\GameScenes\GameScene</Filter>
+    <ClCompile Include="Lizard.cpp">
+      <Filter>Game\GameObjects\Lizard</Filter>
     </ClCompile>
-    <ClCompile Include="LoadTestScene.cpp">
-      <Filter>Game\GameScenes\LoadTestScene</Filter>
+    <ClCompile Include="LizardAnimationString.cpp">
+      <Filter>Game\GameObjects\Lizard</Filter>
+    </ClCompile>
+    <ClCompile Include="LizardStates.cpp">
+      <Filter>Game\GameObjects\Lizard</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -601,11 +604,14 @@
     <ClInclude Include="HydraStates.h">
       <Filter>Game\GameObjects\Hydra</Filter>
     </ClInclude>
-    <ClInclude Include="GameScene.h">
-      <Filter>Game\GameScenes\GameScene</Filter>
+    <ClInclude Include="Lizard.h">
+      <Filter>Game\GameObjects\Lizard</Filter>
     </ClInclude>
-    <ClInclude Include="LoadTestScene.h">
-      <Filter>Game\GameScenes\LoadTestScene</Filter>
+    <ClInclude Include="LizardAnimationString.h">
+      <Filter>Game\GameObjects\Lizard</Filter>
+    </ClInclude>
+    <ClInclude Include="LizardStates.h">
+      <Filter>Game\GameObjects\Lizard</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -762,8 +768,8 @@
     <Filter Include="Game\GameObjects\Hydra">
       <UniqueIdentifier>{8dba6765-7a19-4924-ac01-9d7a785be573}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Game\GameScenes\LoadTestScene">
-      <UniqueIdentifier>{17a26401-4d75-4699-bcfb-68cb987adf40}</UniqueIdentifier>
+    <Filter Include="Game\GameObjects\Lizard">
+      <UniqueIdentifier>{fefbf3c0-13f9-403e-ab47-3ac47b5cb429}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

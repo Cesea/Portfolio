@@ -20,7 +20,7 @@ bool BaseScene::Init()
 	InitBatAnimation();
 	InitCatAnimation();
 	InitHydraAnimation();
-
+	InitLizardAnimation();
 	Terrain::TerrainConfig config;
 	config._xChunkCount = 2;
 	config._zChunkCount = 2;
@@ -60,7 +60,11 @@ bool BaseScene::Init()
 
 	MatrixScaling(&correctionMat, 1.0f, 1.0f, 1.0f);
 	video::SkinnedXMeshHandle HydraMesh = VIDEO->CreateSkinnedXMesh(
-		"../resources/Models/DragonBoss/DragonBoss.X", &correctionMat, "Hydra");
+		"../resources/Models/Hydra/Hydra_Red.X", &correctionMat, "Hydra");
+
+	MatrixScaling(&correctionMat, 1.0f, 1.0f, 1.0f);
+	video::SkinnedXMeshHandle LizardMesh = VIDEO->CreateSkinnedXMesh(
+		"../resources/Models/Lizard/Lizard.X", &correctionMat, "Lizard");
 
 	MatrixScaling(&correctionMat, 1.0f, 1.0f, 1.0f);
 	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Rock/Rock1_A.X", &correctionMat, "Rock01");
@@ -113,10 +117,10 @@ bool BaseScene::Init()
 	//_player.CreateFromWorld(_world);
 	//_snake.CreateFromWorld(_world);
 	_turtle.CreateFromWorld(_world);
-	//_bat.CreateFromWorld(_world);
+	_bat.CreateFromWorld(_world);
 	_cat.CreateFromWorld(_world);
 	_hydra.CreateFromWorld(_world);
-
+	_lizard.CreateFromWorld(_world);
 	imguiRenderInit();
 
 	return result;

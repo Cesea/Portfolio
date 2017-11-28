@@ -37,7 +37,12 @@ protected:
 	//atk
 	float _atkRange;
 	int _atkTime;
+	int _atkTime2;
+	int _atkTime3;
+	int _atkTime4;
+	int _atkTime5;
 	int _atkCount;
+	//pluAtk
 	//stand
 	int _standTime;
 	int _standCount;

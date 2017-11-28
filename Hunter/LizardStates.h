@@ -1,12 +1,12 @@
 #include "State.h"
 #include "StateMachine.h"
 
-#include "bat.h"
+#include "Lizard.h"
 
-class BatState;
-class BatStateMachine;
+class LizardState;
+class LizardStateMachine;
 
-class BatStateMachine : public StateMachine<Bat>
+class LizardStateMachine : public StateMachine<Lizard>
 {
 	friend class PlayerState;
 public:
@@ -23,10 +23,10 @@ public:
 protected:
 };
 
-class BatState : public State<Bat>
+class LizardState : public State<Lizard>
 {
 public:
-	virtual bool Init(StateMachine<Bat> *pParent);
+	virtual bool Init(StateMachine<Lizard> *pParent);
 	virtual void Release();
 	virtual void OnEnter() = 0;
 	virtual void Update(float deltaTime, const GameCommand &command) = 0;
@@ -35,60 +35,80 @@ public:
 protected:
 };
 
-class BatIdleState : public BatState
+class LizardIdleState : public LizardState
 {
 public:
-	DECLARE_META(BatIdleState);
+	DECLARE_META(LizardIdleState);
 
 	virtual void OnEnter() override;
 	virtual void Update(float deltaTime, const GameCommand &command) override;
 	virtual void OnExit() override;
 };
 
-class BatMoveState : public BatState
+class LizardMoveState : public LizardState
 {
 public:
-	DECLARE_META(BatMoveState);
+	DECLARE_META(LizardMoveState);
 
 	virtual void OnEnter() override;
 	virtual void Update(float deltaTime, const GameCommand &command) override;
 	virtual void OnExit() override;
 };
 
-class BatAttackState : public BatState
+class LizardMove2State : public LizardState
 {
 public:
-	DECLARE_META(BatAttackState);
+	DECLARE_META(LizardMove2State);
 
 	virtual void OnEnter() override;
 	virtual void Update(float deltaTime, const GameCommand &command) override;
 	virtual void OnExit() override;
 };
 
-class BatAttack2State : public BatState
+class LizardAttackState : public LizardState
 {
 public:
-	DECLARE_META(BatAttack2State);
+	DECLARE_META(LizardAttackState);
 
 	virtual void OnEnter() override;
 	virtual void Update(float deltaTime, const GameCommand &command) override;
 	virtual void OnExit() override;
 };
 
-class BatAttack3State : public BatState
+class LizardAttack2State : public LizardState
 {
 public:
-	DECLARE_META(BatAttack3State);
+	DECLARE_META(LizardAttack2State);
 
 	virtual void OnEnter() override;
 	virtual void Update(float deltaTime, const GameCommand &command) override;
 	virtual void OnExit() override;
 };
 
-class BatFindState : public BatState
+class LizardAttack3State : public LizardState
 {
 public:
-	DECLARE_META(BatFindState);
+	DECLARE_META(LizardAttack3State);
+
+	virtual void OnEnter() override;
+	virtual void Update(float deltaTime, const GameCommand &command) override;
+	virtual void OnExit() override;
+};
+
+class LizardFindState : public LizardState
+{
+public:
+	DECLARE_META(LizardFindState);
+
+	virtual void OnEnter() override;
+	virtual void Update(float deltaTime, const GameCommand &command) override;
+	virtual void OnExit() override;
+};
+
+class LizardStandState : public LizardState
+{
+public:
+	DECLARE_META(LizardStandState);
 
 	virtual void OnEnter() override;
 	virtual void Update(float deltaTime, const GameCommand &command) override;
