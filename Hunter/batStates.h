@@ -54,3 +54,43 @@ public:
 	virtual void Update(float deltaTime, const GameCommand &command) override;
 	virtual void OnExit() override;
 };
+
+class BatAttackState : public BatState
+{
+public:
+	DECLARE_META(BatAttackState);
+
+	virtual void OnEnter() override;
+	virtual void Update(float deltaTime, const GameCommand &command) override;
+	virtual void OnExit() override;
+};
+
+class BatAttack2State : public BatState
+{
+public:
+	DECLARE_META(BatAttack2State);
+
+	virtual void OnEnter() override;
+	virtual void Update(float deltaTime, const GameCommand &command) override;
+	virtual void OnExit() override;
+};
+
+class BatAttack3State : public BatState
+{
+public:
+	DECLARE_META(BatAttack3State);
+
+	virtual void OnEnter() override;
+	virtual void Update(float deltaTime, const GameCommand &command) override;
+	virtual void OnExit() override;
+};
+
+class BatFindState : public BatState
+{
+public:
+	DECLARE_META(BatFindState);
+
+	virtual void OnEnter() override;
+	virtual void Update(float deltaTime, const GameCommand &command) override;
+	virtual void OnExit() override;
+};

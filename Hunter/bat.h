@@ -39,7 +39,21 @@ class Bat : public Enemy
 {
 	friend class BatStateMachine;
 	friend class BatCallbackHandler;
+private:
+	enum BATSTATE
+	{
+		BATSTATE_IDLE,
+		BATSTATE_PATROL,
+		BATSTATE_FIND,
+		BATSTATE_RUN,
+		BATSTATE_ATK1,
+		BATSTATE_ATK2,
+		BATSTATE_ATK3,
+		BATSTATE_DEATH,
+		BATSTATE_HURT
+	};
 
+	BATSTATE _state;
 public:
 	Bat();
 	virtual ~Bat();

@@ -22,7 +22,7 @@ bool SceneManager::Init()
 	pScene = new BaseScene;
 	AddScene(pScene->GetSceneName(), pScene);
 
-	ChangeScene("MapToolScene");
+	ChangeScene("BaseScene");
 
 	GetChannel().Add<SceneChangeEvent, SceneManager>(*this);
 

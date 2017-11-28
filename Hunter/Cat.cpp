@@ -167,7 +167,7 @@ void Cat::Update(float deltaTime)
 			Vec3Normalize(&direction, &direction);
 			if (distance < _atkRange)
 			{
-				_state = CATSTATE_ATK3;
+				_state = CATSTATE_ATK2;
 				_pStateMachine->ChangeState(META_TYPE(CatAttack2State)->Name());
 			}
 			//°ø°Ý¹üÀ§¸¦ ¹þ¾î³µ´Ù?
