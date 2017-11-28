@@ -15,7 +15,7 @@
 #include "bat.h"
 #include "Cat.h"
 #include "Hydra.h"
-
+#include "Lizard.h"
 class BaseScene : public IScene
 {
 	friend class Terrain;
@@ -46,7 +46,7 @@ protected :
 	Bat _bat;
 	Cat _cat;
 	Hydra _hydra;
-
+	Lizard _lizard;
 	EnvironmentSphere *_pEnvironmentSphere{};
 
 };
