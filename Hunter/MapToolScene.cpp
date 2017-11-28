@@ -88,9 +88,6 @@ bool MapToolScene::Init()
 	_channel.Broadcast<GameObjectFactory::CreateObjectOnLocationEvent>(
 		GameObjectFactory::CreateObjectOnLocationEvent(ARCHE_HERO, ResourceHandle(), Vector3(0.0f, 0.0f, 0.0f)));
 
-	//_player.CreateFromWorld(_world);
-	//_snake.CreateFromWorld(_world);
-
 	//에디터 생성
 	imguiRenderInit();
 	_editor = new Editor;
@@ -113,6 +110,7 @@ bool MapToolScene::Update(float deltaTime, const InputManager & input)
 	_transformSystem.PreUpdate(deltaTime);
 
 	//Collision Check
+	_collisionSystem.Update(deltaTime, 4.0f);
 	//_transformSystem.PostUpdate(deltaTime);
 	_actionSystem.Update(deltaTime);
 
@@ -147,7 +145,6 @@ bool MapToolScene::Render()
 	_renderSystem.Render(_camera);
 
 	imguiRenderDraw();
-
 
 	gpDevice->EndScene();
 	gpDevice->Present(nullptr, nullptr, NULL, nullptr);

@@ -52,15 +52,16 @@ struct CollisionComponent : public Component
 	enum COLLISION_TYPE
 	{
 		COLLISION_TYPE_BOX,
-		COLLISION_TYPE_SPHERE
+		COLLISION_TYPE_SPHERE,
+		COLLISION_TYPE_OBB
 	};
 
-	COLLISION_TYPE _type;
+	COLLISION_TYPE _type{};
 	BoundingSphere _boundingSphere;
 	BoundingBox _boundingBox;
 
-	bool _isTrigger;
-	bool _locked;
+	bool _isTrigger{};
+	bool _locked{};
 
 	//디버그용 함수들...
 	void GetWorldCenterRadius(const TransformComponent &transform, Vector3 *pOutCenter, float *pOutRadius);

@@ -164,6 +164,7 @@ private:
 	void SmoothTerrain(int32 passed);
 
 	void AddHeightGausian(int32 minX, int32 maxX, int32 minZ, int32 maxZ, float mult);
+	void AddHeightBlock(int32 minX, int32 maxX, int32 minZ, int32 maxZ, float mult);
 
 	void RebuildSection(int32 minX, int32 maxX, int32 minZ, int32 maxZ);
 
@@ -171,7 +172,6 @@ private:
 
 	void DrawAlphaTextureOnCursorPos(const Vector2 & cursorPos, float innerRadius, float outterRadius, 
 		float intensity, video::TextureHandle alphaHandle, int32 channel);
-
 
 	void LoadTextureFromConfig(const Terrain::TerrainConfig &config);
 

@@ -435,7 +435,8 @@ bool IsBlocking(TransformComponent * pTransA, CollisionComponent::BoundingBox * 
 
 }
 
-bool IsRayHitBound(const Ray & ray, const CollisionComponent::BoundingSphere & boundingSphere, 
+
+bool IsRayHitBound(const Ray & ray, const CollisionComponent::BoundingSphere & boundingSphere,
 	const TransformComponent & transform, Vector3 * pOutHitPos, Vector3 * pOutHitNormal)
 {
 	Matrix matWorld = transform.GetFinalMatrix();
@@ -660,7 +661,8 @@ bool Collision_SphereToPlane(const Vector3 & planeNormal, float planeDistance, c
 
 bool Collision_AABBToAABB(const Vector3 & minPoint1, const Vector3 & maxPoint1, const Vector3 & minPoint2, const Vector3 & maxPoint2)
 {
-	if ((minPoint1.x <= maxPoint2.x&&maxPoint1.x >= minPoint2.x) && (minPoint1.y <= maxPoint2.y&&maxPoint1.y >= minPoint2.y) &&
+	if ((minPoint1.x <= maxPoint2.x&&maxPoint1.x >= minPoint2.x) && 
+		(minPoint1.y <= maxPoint2.y&&maxPoint1.y >= minPoint2.y) &&
 		(minPoint1.z <= maxPoint2.z&&maxPoint1.z >= minPoint2.z))
 	{
 		return true;
@@ -1056,4 +1058,14 @@ bool Collision_RayToOBB(const Vector3 & rayPos, const Vector3 & rayDir, const Ve
 	//최소가 최대보다 크다면? 충돌하지 않았다
 	if (FinalMin > FinalMax)return false;
 
-	return true;}
+	return true;
+}
+
+//박치수가 만든것....
+void TransformAABB(AABB *pOutAABB, const TransformComponent &transform)
+{
+	Assert(pOutAABB);
+
+	Vec3TransformCoord(&pOutAABB->_min, &pOutAABB->_min, &transform.GetFinalMatrix());
+	Vec3TransformCoord(&pOutAABB->_max, &pOutAABB->_max, &transform.GetFinalMatrix());
+}
