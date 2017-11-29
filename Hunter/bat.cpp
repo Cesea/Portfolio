@@ -311,6 +311,7 @@ void Bat::Update(float deltaTime)
 			_atkCount = _atkTime;
 		}
 	}
+	transComp.SetWorldPosition(transComp.GetWorldPosition().x, TERRAIN->GetHeight(transComp.GetWorldPosition().x, transComp.GetWorldPosition().z), transComp.GetWorldPosition().z);
 }
 
 void Bat::Handle(const CollisionSystem::ActorTriggerEvent & event)
@@ -341,6 +342,7 @@ void Bat::Handle(const CollisionSystem::ActorTriggerEvent & event)
 	case CollisionComponent::TRIGGER_TYPE_DEFAULT:
 		break;
 	}
+
 }
 
 void Bat::SetupCallbackAndCompression()

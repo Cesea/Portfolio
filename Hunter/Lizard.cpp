@@ -318,6 +318,7 @@ void Lizard::Update(float deltaTime)
 			transComp.LookDirection(-distance, D3DX_PI * 2);
 		}
 	}
+	transComp.SetWorldPosition(transComp.GetWorldPosition().x, TERRAIN->GetHeight(transComp.GetWorldPosition().x, transComp.GetWorldPosition().z), transComp.GetWorldPosition().z);
 }
 
 void Lizard::Handle(const CollisionSystem::ActorTriggerEvent & event)

@@ -295,7 +295,7 @@ void Snake::Update(float deltaTime)
 		}
 	}
 
-
+	transComp.SetWorldPosition(transComp.GetWorldPosition().x, TERRAIN->GetHeight(transComp.GetWorldPosition().x, transComp.GetWorldPosition().z), transComp.GetWorldPosition().z); 
 }
 
 void Snake::Handle(const CollisionSystem::ActorTriggerEvent & event)
