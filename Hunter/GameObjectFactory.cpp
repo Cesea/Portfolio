@@ -1,9 +1,7 @@
 #include "stdafx.h"
 #include "GameObjectFactory.h"
 
-#include "Player.h"
-#include "Snake.h"
-
+#include "GameObjects.h"
 //#include "World.h"
 
 void GameObjectFactory::Init()
@@ -110,22 +108,67 @@ void GameObjectFactory::CreateObject(ARCHE_TYPE type, ResourceHandle handle, con
 
 		entity.Activate();
 	}break;
+
 	case ARCHE_HERO :
 	{
 		_pCurrentScene->_gameObjects.push_back(new Player());
 		BaseGameObject *pBack = _pCurrentScene->_gameObjects.back();
 		pBack->CreateFromWorld(_pCurrentScene->_world);
 	}break;
-	case ARCHE_SNAKE :
+
+	case ARCHE_BAT :
+	{
+		_pCurrentScene->_gameObjects.push_back(new Bat());
+		BaseGameObject *pBack = _pCurrentScene->_gameObjects.back();
+		pBack->CreateFromWorld(_pCurrentScene->_world);
+		TransformComponent &refTransform = pBack->_entity.GetComponent<TransformComponent>();
+		refTransform._position = position;
+	}break;
+
+	case ARCHE_CAT :
+	{
+		_pCurrentScene->_gameObjects.push_back(new Cat());
+		BaseGameObject *pBack = _pCurrentScene->_gameObjects.back();
+		pBack->CreateFromWorld(_pCurrentScene->_world);
+		TransformComponent &refTransform = pBack->_entity.GetComponent<TransformComponent>();
+		refTransform._position = position;
+	}break;
+
+	case ARCHE_LIZARD:
+	{
+		_pCurrentScene->_gameObjects.push_back(new Lizard());
+		BaseGameObject *pBack = _pCurrentScene->_gameObjects.back();
+		pBack->CreateFromWorld(_pCurrentScene->_world);
+		TransformComponent &refTransform = pBack->_entity.GetComponent<TransformComponent>();
+		refTransform._position = position;
+	}break;
+
+	case ARCHE_SNAKE:
 	{
 		_pCurrentScene->_gameObjects.push_back(new Snake());
 		BaseGameObject *pBack = _pCurrentScene->_gameObjects.back();
 		pBack->CreateFromWorld(_pCurrentScene->_world);
 		TransformComponent &refTransform = pBack->_entity.GetComponent<TransformComponent>();
 		refTransform._position = position;
-
 	}break;
 
+	case ARCHE_TURTLE :
+	{
+		_pCurrentScene->_gameObjects.push_back(new Turtle());
+		BaseGameObject *pBack = _pCurrentScene->_gameObjects.back();
+		pBack->CreateFromWorld(_pCurrentScene->_world);
+		TransformComponent &refTransform = pBack->_entity.GetComponent<TransformComponent>();
+		refTransform._position = position;
+	}break;
+
+	case ARCHE_HYDRA :
+	{
+		_pCurrentScene->_gameObjects.push_back(new Hydra());
+		BaseGameObject *pBack = _pCurrentScene->_gameObjects.back();
+		pBack->CreateFromWorld(_pCurrentScene->_world);
+		TransformComponent &refTransform = pBack->_entity.GetComponent<TransformComponent>();
+		refTransform._position = position;
+	}break;
 	}
 }
 

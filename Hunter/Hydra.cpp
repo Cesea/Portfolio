@@ -16,10 +16,20 @@ bool Hydra::CreateFromWorld(World & world)
 	TransformComponent &transComp = _entity.AddComponent<TransformComponent>();
 	transComp.MovePositionWorld(0, 8.0f, 0);
 
+	static int32 animCount = 0;
 	RenderComponent &renderComp = _entity.AddComponent<RenderComponent>();
 	renderComp._type = RenderComponent::Type::eSkinned;
-	renderComp._skinned = VIDEO->CreateAnimationInstance(VIDEO->GetSkinnedXMesh("Hydra"), "Anim" + std::to_string(0));
+	renderComp._skinned = VIDEO->CreateAnimationInstance(VIDEO->GetSkinnedXMesh("Hydra"), 
+		"Hydra_" + std::to_string(animCount));
 	renderComp._arche = ARCHE_HYDRA;
+
+	video::AnimationInstance *pAnimation = VIDEO->GetAnimationInstance(renderComp._skinned);
+
+	CollisionComponent &collision = _entity.AddComponent<CollisionComponent>();
+	collision._boundingBox.Init(pAnimation->_pSkinnedMesh->_boundInfo._min,
+		pAnimation->_pSkinnedMesh->_boundInfo._max);
+	collision._boundingSphere._localCenter = pAnimation->_pSkinnedMesh->_boundInfo._center;
+	collision._boundingSphere._radius = pAnimation->_pSkinnedMesh->_boundInfo._radius;
 
 	ScriptComponent &scriptComponent = _entity.AddComponent<ScriptComponent>();
 	scriptComponent.SetScript(MAKE_SCRIPT_DELEGATE(Hydra, Update, *this));

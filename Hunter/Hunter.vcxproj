@@ -158,6 +158,7 @@
     <ClCompile Include="Frustum.cpp" />
     <ClCompile Include="GameCommand.cpp" />
     <ClCompile Include="GameObjectFactory.cpp" />
+    <ClCompile Include="GameObjects.cpp" />
     <ClCompile Include="GameScene.cpp" />
     <ClCompile Include="GizmoManager.cpp" />
     <ClCompile Include="Hydra.cpp" />

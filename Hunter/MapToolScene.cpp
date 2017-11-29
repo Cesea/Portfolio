@@ -18,10 +18,7 @@ bool MapToolScene::Init()
 	{
 		dataPackage.ReadAs<EntitySaveInfo>(&entitySaveInfo);
 
-		int a = 0;
-
 	}
-
 
 	GAMEOBJECTFACTORY->SetCurrentScene(this);
 
@@ -29,8 +26,7 @@ bool MapToolScene::Init()
 	video::SkinnedXMesh::_sStaticEffectHandle = VIDEO->GetEffect("StaticMesh.fx");
 	video::SkinnedXMesh::_sSkinnedEffectHandle = VIDEO->GetEffect("SkinnedMesh.fx");
 
-	InitPlayerAnimation();
-	InitSnakeAnimation();
+	InitAnimations();
 
 	//터레인 로드
 	Terrain::TerrainConfig config;
@@ -55,6 +51,26 @@ bool MapToolScene::Init()
 	MatrixScaling(&correctionMat, 1.0f, 1.0f, 1.0f);
 	video::SkinnedXMeshHandle snakeMesh = VIDEO->CreateSkinnedXMesh(
 		"../resources/Models/Snake/Snake_Red.X", &correctionMat, "Snake");
+
+	MatrixScaling(&correctionMat, 1.0f, 1.0f, 1.0f);
+	video::SkinnedXMeshHandle turtleMesh = VIDEO->CreateSkinnedXMesh(
+		"../resources/Models/DragonTurtle/DragonTurtle_Black.X", &correctionMat, "Turtle");
+
+	MatrixScaling(&correctionMat, 1.0f, 1.0f, 1.0f);
+	video::SkinnedXMeshHandle batMesh = VIDEO->CreateSkinnedXMesh(
+		"../resources/Models/DragonBat/DragonBat_Black.X", &correctionMat, "Bat");
+
+	MatrixScaling(&correctionMat, 1.0f, 1.0f, 1.0f);
+	video::SkinnedXMeshHandle catMesh = VIDEO->CreateSkinnedXMesh(
+		"../resources/Models/DevilCat/DevilCat.X", &correctionMat, "Cat");
+
+	MatrixScaling(&correctionMat, 1.0f, 1.0f, 1.0f);
+	video::SkinnedXMeshHandle HydraMesh = VIDEO->CreateSkinnedXMesh(
+		"../resources/Models/Hydra/Hydra_Red.X", &correctionMat, "Hydra");
+
+	MatrixScaling(&correctionMat, 1.0f, 1.0f, 1.0f);
+	video::SkinnedXMeshHandle LizardMesh = VIDEO->CreateSkinnedXMesh(
+		"../resources/Models/Lizard/Lizard.X", &correctionMat, "Lizard");
 
 	MatrixScaling(&correctionMat, 1.0f, 1.0f, 1.0f);
 	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Rock/Rock1_A.X", &correctionMat, "Rock01");
@@ -100,6 +116,12 @@ bool MapToolScene::Init()
 
 	_channel.Broadcast<GameObjectFactory::CreateObjectOnLocationEvent>(
 		GameObjectFactory::CreateObjectOnLocationEvent(ARCHE_SNAKE, ResourceHandle(), Vector3(0.0f, 5.0f, 0.0f)));
+
+	_channel.Broadcast<GameObjectFactory::CreateObjectOnLocationEvent>(
+		GameObjectFactory::CreateObjectOnLocationEvent(ARCHE_CAT, ResourceHandle(), Vector3(0.0f, 7.0f, 0.0f)));
+
+	_channel.Broadcast<GameObjectFactory::CreateObjectOnLocationEvent>(
+		GameObjectFactory::CreateObjectOnLocationEvent(ARCHE_HYDRA, ResourceHandle(), Vector3(0.0f, 9.0f, 0.0f)));
 
 	_channel.Broadcast<GameObjectFactory::CreateObjectOnLocationEvent>(
 		GameObjectFactory::CreateObjectOnLocationEvent(ARCHE_HERO, ResourceHandle(), Vector3(0.0f, 0.0f, 0.0f)));
