@@ -14,7 +14,7 @@ bool Hydra::CreateFromWorld(World & world)
 {
 	_entity = world.CreateEntity();
 	TransformComponent &transComp = _entity.AddComponent<TransformComponent>();
-	transComp.MovePositionWorld(0, 8.0f, 0);
+	transComp.MovePositionWorld(0, 0.0f, 0);
 
 	static int32 animCount = 0;
 	RenderComponent &renderComp = _entity.AddComponent<RenderComponent>();
@@ -64,9 +64,9 @@ bool Hydra::CreateFromWorld(World & world)
 	_speed = 2.0f;
 	_rotateSpeed = D3DX_PI / 256;
 	_patrolIndex = 0;
-	_moveSegment.push_back(Vector3(5.0f, 8.0f, 5.0f));
-	_moveSegment.push_back(Vector3(-5.0f, 8.0f, 5.0f));
-	_moveSegment.push_back(Vector3(-5.0f, 8.0f, -5.0f));
+	_moveSegment.push_back(Vector3(5.0f,TERRAIN->GetHeight(5.0f,5.0f), 5.0f));
+	_moveSegment.push_back(Vector3(-5.0f, TERRAIN->GetHeight(5.0f, 5.0f), 5.0f));
+	_moveSegment.push_back(Vector3(-5.0f, TERRAIN->GetHeight(5.0f, 5.0f), -5.0f));
 
 	_delayTime = 180.0f;
 	_delayCount = _delayTime;
@@ -78,8 +78,6 @@ bool Hydra::CreateFromWorld(World & world)
 	_roarCount = _roarTime;
 
 	_battle = false;
-
-	_playerPos = Vector3(5.0f, 8.0f, 5.0f);
 
 	_atkRange = 0.5f;
 	_atkTime = 60;
@@ -96,6 +94,7 @@ bool Hydra::CreateFromWorld(World & world)
 	//이벤트 등록
 	EventChannel channel;
 	channel.Add<CollisionSystem::ActorTriggerEvent, Hydra>(*this);
+	setEvent();
 
 	return true;
 }
@@ -218,7 +217,7 @@ void Hydra::Update(float deltaTime)
 			{
 				_state = HYDRASTATE_ATK3;
 				_pStateMachine->ChangeState(META_TYPE(HydraAttack3State)->Name());
-				_playerPos = Vector3(RandFloat(-5.0, 5.0), 8.0f, RandFloat(-5.0, 5.0));
+				//_playerPos = Vector3(RandFloat(-5.0, 5.0), 8.0f, RandFloat(-5.0, 5.0));
 			}
 			//공격범위를 벗어났다?
 			else

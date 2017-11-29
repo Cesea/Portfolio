@@ -99,6 +99,7 @@ bool Lizard::CreateFromWorld(World & world)
 	//이벤트 등록
 	EventChannel channel;
 	channel.Add<CollisionSystem::ActorTriggerEvent, Lizard>(*this);
+	setEvent();
 	return true;
 }
 

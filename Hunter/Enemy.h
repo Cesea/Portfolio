@@ -51,7 +51,12 @@ protected:
 	//hurt
 	int _hurtTime;
 	int _hurtCount;
-	//쓰레기
+	//플레이어 정보
+public:
     Vector3 _playerPos;
-	public:
+	Vector3 _playerForward;
+	Player::PLAYERSTATE _playerState;
+
+	void setEvent();
+	void Handle(const Player::PlayerImformationEvent & event);
 };

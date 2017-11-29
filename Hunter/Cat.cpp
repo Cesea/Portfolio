@@ -100,7 +100,7 @@ bool Cat::CreateFromWorld(World & world)
 	//이벤트 등록
 	EventChannel channel;
 	channel.Add<CollisionSystem::ActorTriggerEvent, Cat>(*this);
-
+	setEvent();
 	return true;
 }
 

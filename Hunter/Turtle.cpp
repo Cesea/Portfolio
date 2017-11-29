@@ -99,6 +99,7 @@ bool Turtle::CreateFromWorld(World & world)
 	//이벤트 등록
 	EventChannel channel;
 	channel.Add<CollisionSystem::ActorTriggerEvent, Turtle>(*this);
+	setEvent();
 	return true;
 }
 

@@ -100,6 +100,7 @@ bool Bat::CreateFromWorld(World & world)
 	//이벤트 등록
 	EventChannel channel;
 	channel.Add<CollisionSystem::ActorTriggerEvent, Bat>(*this);
+	setEvent();
 	return true;
 }
 

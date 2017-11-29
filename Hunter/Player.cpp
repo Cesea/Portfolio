@@ -468,6 +468,8 @@ void Player::Update(float deltaTime)
    }
 
    _currentCommand.Reset();
+
+   _channel.Broadcast<PlayerImformationEvent>(PlayerImformationEvent(transComp.GetWorldPosition(), _state, transComp.GetForward()));
 }
 
 void Player::SetupCallbackAndCompression()

@@ -97,6 +97,7 @@ bool Snake::CreateFromWorld(World & world)
 	//이벤트 등록
 	EventChannel channel;
 	channel.Add<CollisionSystem::ActorTriggerEvent, Snake>(*this);
+	setEvent();
 	return true;
 }
 
