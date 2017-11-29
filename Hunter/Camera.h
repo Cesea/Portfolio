@@ -19,7 +19,7 @@ enum cameraState
 class Camera
 {
 public:
-	cameraState _cameraState;
+	cameraState _cameraState{};
 
 	float _curDist;
 
@@ -32,7 +32,9 @@ public:
 
 	void CreateFromWorld(World &world);
 
-	void PreUpdateMatrix();
+	void MoveAndRotate(const InputManager &input);
+
+	//void PreUpdateMatrix();
 	void UpdateMatrix();
 	void UpdateCamToDevice();
 	void UpdateFrustum();
@@ -56,11 +58,6 @@ public:
 
 	const Frustum &GetFrustum() const { return _frustum; }
 
-	void Handle(const InputManager::KeyDownEvent &event);
-	void Handle(const InputManager::MousePressedEvent &event);
-	void Handle(const InputManager::MouseReleasedEvent &event);
-	void Handle(const InputManager::MouseMoveEvent &event);
-
 	const Entity &GetEntity() const { return _entity; }
 
 private:
@@ -81,8 +78,6 @@ protected:
 
 	float _verticalAngle{};
 	float _horizontalAngle{};
-
-	Vector3 _toMove;
 
 	Frustum _frustum;
 	BaseGameObject *_pTargetObject{};

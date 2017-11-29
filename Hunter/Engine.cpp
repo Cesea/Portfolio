@@ -167,8 +167,8 @@ bool Engine::InitializePlatform(HINSTANCE instanceHandle)
 		return false;
 	}
 
-	RECT clipRect;
-	GetClientRect(_windowHandle, &clipRect);
+	SetCapture(_windowHandle);
+	//SetCursorPos(WINSTARTX + WINSIZEX / 2, WINSTARTY + WINSIZEY / 2);
 
 	gWindowHandle = _windowHandle;
 

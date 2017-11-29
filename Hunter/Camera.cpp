@@ -32,35 +32,173 @@ Camera::Camera()
 
 Camera::~Camera()
 {
-	//if(플레이어를 따라가는 모드일때)
-	//{
-	//	TransformComponent &targetTransform = _pTargetObject->_entity.GetComponent<TransformComponent>();
-	//}
 }
 
 void Camera::CreateFromWorld(World & world)
 {
-	EventChannel channel;
-	channel.Add<InputManager::KeyDownEvent, Camera>(*this);
-	channel.Add<InputManager::MousePressedEvent, Camera>(*this);
-	channel.Add<InputManager::MouseReleasedEvent, Camera>(*this);
-	channel.Add<InputManager::MouseMoveEvent, Camera>(*this);
-
 	_entity = world.CreateEntity();
 	_entity.AddComponent<TransformComponent>();
-
-
+	
 	_entity.Activate();
 }
 
-void Camera::PreUpdateMatrix()
+void Camera::MoveAndRotate(const InputManager & input)
 {
-	//이동값이 남아있다면 움직여라
-	if (!_toMove.IsZero())
+	float deltaTime = APPTIMER->GetTargetTime();
+
+	TransformComponent &refTransform = _entity.GetComponent<TransformComponent>();
+
+	Vector3 forward = refTransform.GetForward();
+	Vector3 right= refTransform.GetRight();
+	Vector3 up = refTransform.GetUp();
+
+	Vector3 diff = Vector3(0.0f, 0.0f, 0.0f);
+
+	if (input.keyboard.IsPressed('1'))
 	{
-		_entity.GetComponent<TransformComponent>().MovePositionSelf(_toMove);
-		_toMove = Vector3(0.0f, 0.0f, 0.0f);
+		_cameraState = cCreativeMode;
+		//ShowCursor(true);
 	}
+	if (input.keyboard.IsPressed('2'))
+	{
+		_cameraState = cNormal;
+
+		//ShowCursor(false);
+	}
+	if (input.keyboard.IsPressed('3'))
+	{
+		
+	}
+
+	//move forward
+	switch (_cameraState)
+	{
+	case cCreativeMode:
+	{
+		if (input.keyboard.IsDown('W'))
+		{
+			diff += forward * _moveSpeed * deltaTime;
+		}
+		else if (input.keyboard.IsDown('S'))
+		{
+			diff -= forward * _moveSpeed * deltaTime;
+		}
+		if (input.keyboard.IsDown('A'))
+		{
+			diff -= right * _moveSpeed * deltaTime;
+		}
+		else if (input.keyboard.IsDown('D'))
+		{
+			diff += right * _moveSpeed * deltaTime;
+		}
+		if (input.keyboard.IsDown('Q'))
+		{
+			diff += up * _moveSpeed * deltaTime;
+		}
+		else if (input.keyboard.IsDown('E'))
+		{
+			diff -= up * _moveSpeed * deltaTime;
+		}
+
+		float length = Vec3Length(&diff);
+		if (!FloatZero(length))
+		{
+			diff /= length;
+		}
+
+	} break;
+
+	case cNormal:
+	{
+
+	} break;
+	}
+
+	refTransform.MovePositionWorld(diff);
+
+	//Mouse Pressed////////////////////////////////////////////
+	switch (_cameraState)
+	{
+	case cCreativeMode:
+		if (input.mouse.IsPressed(MOUSE_BUTTON_RIGHT))
+		{
+			_rotating = true;
+			//SetCursorPos(WINSTARTX +  WINSIZEX / 2, WINSIZEY / 2);
+		}
+		break;
+	}
+	//Mouse Released/////////////////////////////////////////
+	switch (_cameraState)
+	{
+	case cCreativeMode:
+		if (input.mouse.IsReleased(MOUSE_BUTTON_RIGHT))
+		{
+			_rotating = false;
+		}
+		break;
+	case cNormal:
+
+		break;
+	}
+	
+	//Mouse Move//////////////////////////////////////////////
+	switch (_cameraState)
+	{
+	case cCreativeMode:
+		if (_rotating)
+		{
+			float deltaTime = APPTIMER->GetTargetTime();
+
+			int32 deltaX = input.mouse.GetMouseDelta().x;
+			int32 deltaY = input.mouse.GetMouseDelta().y;
+
+			if (deltaX != 0)
+			{
+				_horizontalAngle += _rotationSpeed * deltaTime * (float)deltaX;
+			}
+
+			if (deltaY != 0)
+			{
+				_verticalAngle += _rotationSpeed * deltaTime * (float)deltaY;
+			}
+
+			ClampFloat(_verticalAngle, MIN_VERT_ANGLE, MAX_VERT_ANGLE);
+
+			refTransform.SetRotateWorld(_verticalAngle * ONE_RAD, _horizontalAngle * ONE_RAD, 0.0f);
+
+			//SetCursorPos(WINSIZEX / 2, WINSIZEY / 2);
+		}
+		break;
+	case cNormal:
+
+		float deltaTime = APPTIMER->GetTargetTime();
+
+		int32 deltaX = input.mouse.GetMouseDelta().x;
+		int32 deltaY = input.mouse.GetMouseDelta().y;
+
+		if (deltaX != 0)
+		{
+			_horizontalAngle += _rotationSpeed * deltaTime * (float)deltaX;
+		}
+
+		if (deltaY != 0)
+		{
+			_verticalAngle += _rotationSpeed * deltaTime * (float)deltaY;
+		}
+
+
+		ClampFloat(_verticalAngle, MIN_VERT_ANGLE, MAX_VERT_ANGLE);
+
+		refTransform.SetRotateWorld(_verticalAngle * ONE_RAD, _horizontalAngle * ONE_RAD, 0.0f);
+
+		/*if (_cameraState == cNormal)
+		{
+			SetCursorPos(WINSTARTX + (WINSIZEX * 0.5), WINSTARTY + (WINSIZEY * 0.5));
+		}*/
+
+		break;
+	}
+
 }
 
 void Camera::UpdateMatrix()
@@ -174,155 +312,6 @@ bool Camera::GetWorldPosToScreenPos(const Vector3 & worldPos, Vector2 * pOutScre
 	return true;
 }
 
-void Camera::Handle(const InputManager::KeyDownEvent & event)
-{
-	Vector3 diff = Vector3(0.0f, 0.0f, 0.0f);
-	float deltaTime = APPTIMER->GetTargetTime();
-
-	if (event.code == '1')
-	{
-		_cameraState = cCreativeMode;
-		//ShowCursor(true);
-	}
-	if (event.code == '2')
-	{
-		_cameraState = cNormal;
-
-		
-
-		//ShowCursor(false);
-	}
-	if (event.code == '3')
-	{
-		
-	}
-
-	//move forward
-	switch (_cameraState)
-	{
-	case cCreativeMode:
-		if (event.code == 'W')
-		{
-			_toMove.z += _moveSpeed * deltaTime;
-		}
-		else if (event.code == 'S')
-		{
-			_toMove.z -= _moveSpeed * deltaTime;
-		}
-		else if (event.code == 'A')
-		{
-			_toMove.x -= _moveSpeed * deltaTime;
-		}
-		else if (event.code == 'D')
-		{
-			_toMove.x += _moveSpeed * deltaTime;
-		}
-		else if (event.code == 'Q')
-		{
-			_toMove.y += _moveSpeed * deltaTime;
-		}
-		else if (event.code == 'E')
-		{
-			_toMove.y -= _moveSpeed * deltaTime;
-		}
-		break;
-	case cNormal:
-
-		break;
-	}
-	
-
-
-}
-
-void Camera::Handle(const InputManager::MousePressedEvent & event)
-{
-	switch (_cameraState)
-	{
-	case cCreativeMode:
-		if (event.code == MOUSE_BUTTON_RIGHT)
-		{
-			_rotating = true;
-		}
-		break;
-	}
-	
-}
-
-void Camera::Handle(const InputManager::MouseReleasedEvent & event)
-{
-	switch (_cameraState)
-	{
-	case cCreativeMode:
-		if (event.code == MOUSE_BUTTON_RIGHT)
-		{
-			_rotating = false;
-		}
-		break;
-	case cNormal:
-
-		break;
-	}
-}
-
-void Camera::Handle(const InputManager::MouseMoveEvent & event)
-{
-	switch (_cameraState)
-	{
-	case cCreativeMode:
-		if (_rotating)
-		{
-			float deltaTime = APPTIMER->GetTargetTime();
-
-			int32 deltaX = event.current.x - event.old.x;
-			int32 deltaY = event.current.y - event.old.y;
-
-			if (deltaX != 0)
-			{
-				_horizontalAngle += _rotationSpeed * deltaTime * (float)deltaX;
-			}
-
-			if (deltaY != 0)
-			{
-				_verticalAngle += _rotationSpeed * deltaTime * (float)deltaY;
-			}
-
-			ClampFloat(_verticalAngle, MIN_VERT_ANGLE, MAX_VERT_ANGLE);
-
-			_entity.GetComponent<TransformComponent>().SetRotateWorld(_verticalAngle * ONE_RAD, _horizontalAngle * ONE_RAD, 0.0f);
-
-		}
-		break;
-	case cNormal:
-
-		float deltaTime = APPTIMER->GetTargetTime();
-
-		int32 deltaX = event.current.x - event.old.x;
-		int32 deltaY = event.current.y - event.old.y;
-
-		if (deltaX != 0)
-		{
-			_horizontalAngle += _rotationSpeed * deltaTime * (float)deltaX;
-		}
-
-		if (deltaY != 0)
-		{
-			_verticalAngle += _rotationSpeed * deltaTime * (float)deltaY;
-		}
-
-
-		ClampFloat(_verticalAngle, MIN_VERT_ANGLE, MAX_VERT_ANGLE);
-
-		_entity.GetComponent<TransformComponent>().SetRotateWorld(_verticalAngle * ONE_RAD, _horizontalAngle * ONE_RAD, 0.0f);
-
-		/*if (_cameraState == cNormal)
-		{
-			SetCursorPos(WINSTARTX + (WINSIZEX * 0.5), WINSTARTY + (WINSIZEY * 0.5));
-		}*/
-
-		break;
-	}
-}
 
 void Camera::NormalCameraUpdate(void)
 {
