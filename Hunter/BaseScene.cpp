@@ -116,7 +116,11 @@ bool BaseScene::Init()
 	_cat.CreateFromWorld(_world);
 	_hydra.CreateFromWorld(_world);
 	_lizard.CreateFromWorld(_world);
+
 	imguiRenderInit();
+//에디터 생성
+	_pEditor = new Editor;
+	_pEditor->Init();
 
 	return result;
 
@@ -125,6 +129,8 @@ bool BaseScene::Init()
 bool BaseScene::Update(float deltaTime, const InputManager &input)
 {
 	bool result = true;
+
+	_pEditor->Edit(RefVariant(), input);
 
 	_world.Refresh();
 
@@ -166,9 +172,9 @@ bool BaseScene::Render()
 
 	TERRAIN->Render(_camera);
 	_renderSystem.Render(_camera);
+	_pEditor->Render();
 
 	imguiRenderDraw();
-
 
 	gpDevice->EndScene();
 	gpDevice->Present(nullptr, nullptr, NULL, nullptr);

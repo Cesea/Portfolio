@@ -255,7 +255,7 @@ void Hydra::Update(float deltaTime)
 	{
 		if (findPlayer(transComp.GetForward(), _playerPos, transComp.GetWorldPosition(), _findStareDistance, _findDistance, _findRadian))
 		{
-			//찾으면 FIND가 되며 battle상태가 
+			//찾으면 FIND가 되며 battle상태가 
 			_battle = true;
 			_state = HYDRASTATE_FIND;
 			_pStateMachine->ChangeState(META_TYPE(HydraIdleState)->Name());

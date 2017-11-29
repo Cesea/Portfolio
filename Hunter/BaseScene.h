@@ -16,6 +16,9 @@
 #include "Cat.h"
 #include "Hydra.h"
 #include "Lizard.h"
+
+#include "WorldEditor.h"
+
 class BaseScene : public IScene
 {
 	friend class Terrain;
@@ -40,6 +43,8 @@ protected :
 	CollisionSystem _collisionSystem;
 
 	EventChannel _channel;
+
+	Editor *_pEditor{};
 
 
 	Turtle _turtle;
