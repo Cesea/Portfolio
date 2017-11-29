@@ -265,6 +265,12 @@
       <Filter>Game\GameScenes\GameScene</Filter>
     </ClCompile>
     <ClCompile Include="GameObjects.cpp" />
+    <ClCompile Include="SceneChangeEffect.cpp">
+      <Filter>Core\SceneManager</Filter>
+    </ClCompile>
+    <ClCompile Include="IScene.cpp">
+      <Filter>Game\GameScenes</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Lights.h" />

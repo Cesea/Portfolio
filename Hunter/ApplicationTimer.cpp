@@ -41,3 +41,12 @@ void ApplicationTimer::Tick()
 	_prevCounter = _currentCounter;
 }
 
+float ApplicationTimer::GetTotalTimeElapsed()
+{
+	LARGE_INTEGER currentCounter;
+	QueryPerformanceCounter(&currentCounter);
+
+	float elapsedTime = (currentCounter.QuadPart - _startCounter.QuadPart) * _timeScale;
+	return elapsedTime;
+}
+

@@ -7,6 +7,12 @@
 #include "MapToolScene.h"
 #include "GameScene.h"
 
+
+DWORD CALLBACK LoadingThread(LPVOID lpParam)
+{
+	return 0;
+}
+
 SceneManager::SceneManager()
 {
 	_pCurrentScene = nullptr;

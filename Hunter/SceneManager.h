@@ -12,6 +12,8 @@ class SceneManager
 	typedef std::map<std::string, IScene *>::iterator SceneMapIter;
 
 public :
+	friend DWORD CALLBACK LoadingThread(LPVOID lpParam);
+
 	struct SceneChangeEvent
 	{
 		SceneChangeEvent(const std::string &name) : newSceneName(name) {}
@@ -45,12 +47,10 @@ private :
 	SceneMap _loadingScene;
 
 	IScene *_pCurrentScene;
-
-	//SceneChaneEffect *_
+	IScene *_pReleaseScene;
 
 	EventChannel _channel;
 
-	//Event handle
 public :
 
 	void Handle(const SceneChangeEvent &event)

@@ -39,7 +39,6 @@ protected :
 
 	Editor *_editor{};
 
-	EnvironmentSphere *_pEnvironmentSphere{};
 
 public:
 	virtual void Handle(const Editor::GetObjectFromSceneEvent &event);

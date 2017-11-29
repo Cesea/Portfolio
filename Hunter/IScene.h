@@ -6,6 +6,8 @@
 #include "Camera.h"
 #include "BaseGameObject.h"
 
+class EnvironmentSphere;
+
 class IScene
 {
 public :
@@ -20,7 +22,17 @@ public :
 
 	virtual bool Init() = 0;
 	virtual bool Update(float deltaTime, const InputManager &input) = 0;
-	virtual bool Render() = 0;
+
+	//PostEffect까지 모두 렌더 한다...
+	bool Render();
+	//메인 카메라의 RenderToTexture 만 업데이트한다.
+	bool RenderToMainCamTexture();
+
+	LPDIRECT3DTEXTURE9 GetSceneTexture();
+
+	virtual void Render0() {}
+	virtual void Render1() {}
+	virtual void Render2() {}
 
 	virtual void Release() = 0;
 
@@ -34,6 +46,9 @@ protected :
 
 	EventChannel _channel;
 
+	EnvironmentSphere *_pEnvironmentSphere{};
+
+	bool RenderEnvironmentSphere();
 public :
 };
 

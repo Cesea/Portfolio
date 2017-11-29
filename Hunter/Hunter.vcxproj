@@ -166,6 +166,7 @@
     <ClCompile Include="HydraStates.cpp" />
     <ClCompile Include="imgui.cpp" />
     <ClCompile Include="imguiRenderer.cpp" />
+    <ClCompile Include="IScene.cpp" />
     <ClCompile Include="Lizard.cpp" />
     <ClCompile Include="LizardAnimationString.cpp" />
     <ClCompile Include="LizardStates.cpp" />
@@ -185,6 +186,7 @@
     <ClCompile Include="Ray.cpp" />
     <ClCompile Include="RenderComponent.cpp" />
     <ClCompile Include="RenderSystem.cpp" />
+    <ClCompile Include="SceneChangeEffect.cpp" />
     <ClCompile Include="ScriptComponent.cpp" />
     <ClCompile Include="ScriptSystem.cpp" />
     <ClCompile Include="Snake.cpp" />
