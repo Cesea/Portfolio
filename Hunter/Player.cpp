@@ -73,6 +73,9 @@ bool Player::CreateFromWorld(World & world)
    _moveToStanceTimer.Reset(0.05f);
    _attackToStanceTimer.Reset(1.5f);
 
+   _attackCombo1Timer.Reset(0.7f);
+   _attackCombo2Timer.Reset(0.7f);
+
    _currentMovement._horizontal = HORIZONTAL_MOVEMENT_NONE;
    _currentMovement._vertical = VERTICAL_MOVEMENT_NONE;
 
@@ -168,6 +171,7 @@ void Player::Update(float deltaTime)
             {
                _state = PLAYERSTATE_ATTACK;
                _pStateMachine->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWarSwingLeft));
+			   _attackCombo1Timer.Tick(deltaTime);
             }
             else if (_currentCommand._behavior._type == BEHAVIOR_BLOCK)
             {
@@ -415,25 +419,28 @@ void Player::Update(float deltaTime)
             _attackToStanceTimer.Restart();
             _comboCount = 0;
             _pStateMachine->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWarCombatMode));
+			/*_attackCombo1Timer.Restart();
+			_attackCombo2Timer.Restart();*/
          }
          if (_currentCommand._behavior._type == BEHAVIOR_ATTACK)
          {
             _comboCount++;
-            if (_comboCount <= 3)
+            if (_comboCount <= 2)
             {
+			   
                _attackToStanceTimer.Restart();
-               if (_comboCount == 1)
-               {
-                  _pStateMachine->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWarSwingRight));
-               }
-               else if (_comboCount == 2)
-               {
-                  _pStateMachine->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWarSwingHighStraigtDown));
-               }
-               else if (_comboCount == 3)
-               {
-                  _pStateMachine->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWarThrustMid));
-               }
+			  
+			   if (_comboCount == 1/* && _attackCombo1Timer._currentTime > 0.3*/)
+			   {
+				   _attackCombo2Timer.Tick(deltaTime);
+				   _pStateMachine->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWarSwingRight));
+			   }
+			   else if (_comboCount == 2 /*&& _attackCombo2Timer._currentTime > 0.3*/)
+			   {
+				   _pStateMachine->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWarThrustMid));
+				   /*_attackCombo1Timer.Restart();
+				   _attackCombo2Timer.Restart();*/
+			   }			   
             }
          }
       }

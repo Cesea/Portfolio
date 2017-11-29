@@ -71,6 +71,8 @@ private :
 	Movement _currentMovement;
 
 	StopWatch _attackToStanceTimer;
+	StopWatch _attackCombo1Timer;
+	StopWatch _attackCombo2Timer;
 	int32 _comboCount{};
 
 public :
