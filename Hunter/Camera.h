@@ -1,13 +1,30 @@
 #ifndef CAMERA_H
 #define CAMERA_H
 
+#define PLAYER_TO_CAMERA_DIST 1.5f
+
 #include "TransformComponent.h"
 
 #include "Frustum.h"
 
+enum cameraState
+{
+	cCreativeMode,
+	cNormal,
+	cPlaying,
+	cDirection,
+	//Editer
+};
+
 class Camera
 {
 public:
+
+	cameraState _cameraState;
+
+	float _curDist;
+	Vector3 playerPos;
+
 	float _fov;
 	float _camNear;
 	float _camFar;
@@ -45,6 +62,11 @@ public:
 	void Handle(const InputManager::MouseMoveEvent &event);
 
 	const Entity &GetEntity() const { return _entity; }
+
+private:
+
+	void NormalCameraUpdate(void);
+
 protected:
 
 	Entity _entity;

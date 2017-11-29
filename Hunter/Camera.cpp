@@ -22,6 +22,11 @@ Camera::Camera()
 	_moveSpeed = 1.0f;
 	_rotationSpeed = 1.0f;
 
+	_cameraState = cCreativeMode;
+
+	_curDist = 0;
+
+	playerPos = { 0,0,0 };
 	
 }
 
@@ -72,8 +77,11 @@ void Camera::UpdateMatrix()
 
 void Camera::UpdateCamToDevice()
 {
+	
+
 	gpDevice->SetTransform(D3DTS_VIEW, &_matView);
 	gpDevice->SetTransform(D3DTS_PROJECTION, &_matProjection);
+
 }
 
 void Camera::UpdateFrustum()
@@ -159,53 +167,122 @@ void Camera::Handle(const InputManager::KeyDownEvent & event)
 	Vector3 diff = Vector3(0.0f, 0.0f, 0.0f);
 	float deltaTime = APPTIMER->GetTargetTime();
 
+	if (event.code == '1')
+	{
+		_cameraState = cCreativeMode;
+		//ShowCursor(true);
+	}
+	if (event.code == '2')
+	{
+		_cameraState = cNormal;
+
+		
+
+		//ShowCursor(false);
+	}
+	if (event.code == '3')
+	{
+		
+	}
+
 	//move forward
-	if (event.code == 'W')
+	switch (_cameraState)
 	{
-		_toMove.z += _moveSpeed * deltaTime;
+	case cCreativeMode:
+		if (event.code == 'W')
+		{
+			_toMove.z += _moveSpeed * deltaTime;
+		}
+		else if (event.code == 'S')
+		{
+			_toMove.z -= _moveSpeed * deltaTime;
+		}
+		else if (event.code == 'A')
+		{
+			_toMove.x -= _moveSpeed * deltaTime;
+		}
+		else if (event.code == 'D')
+		{
+			_toMove.x += _moveSpeed * deltaTime;
+		}
+		else if (event.code == 'Q')
+		{
+			_toMove.y += _moveSpeed * deltaTime;
+		}
+		else if (event.code == 'E')
+		{
+			_toMove.y -= _moveSpeed * deltaTime;
+		}
+		break;
+	case cNormal:
+
+		break;
 	}
-	else if (event.code == 'S')
-	{
-		_toMove.z -= _moveSpeed * deltaTime;
-	}
-	else if (event.code == 'A')
-	{
-		_toMove.x -= _moveSpeed * deltaTime;
-	}
-	else if (event.code == 'D')
-	{
-		_toMove.x += _moveSpeed * deltaTime;
-	}
-	else if (event.code == 'Q')
-	{
-		_toMove.y += _moveSpeed * deltaTime;
-	}
-	else if (event.code == 'E')
-	{
-		_toMove.y -= _moveSpeed * deltaTime;
-	}
+	
+
+
 }
 
 void Camera::Handle(const InputManager::MousePressedEvent & event)
 {
-	if (event.code == MOUSE_BUTTON_RIGHT)
+	switch (_cameraState)
 	{
-		_rotating = true;
+	case cCreativeMode:
+		if (event.code == MOUSE_BUTTON_RIGHT)
+		{
+			_rotating = true;
+		}
+		break;
 	}
+	
 }
 
 void Camera::Handle(const InputManager::MouseReleasedEvent & event)
 {
-	if (event.code == MOUSE_BUTTON_RIGHT)
+	switch (_cameraState)
 	{
-		_rotating = false;
+	case cCreativeMode:
+		if (event.code == MOUSE_BUTTON_RIGHT)
+		{
+			_rotating = false;
+		}
+		break;
+	case cNormal:
+
+		break;
 	}
 }
 
 void Camera::Handle(const InputManager::MouseMoveEvent & event)
 {
-	if (_rotating)
+	switch (_cameraState)
 	{
+	case cCreativeMode:
+		if (_rotating)
+		{
+			float deltaTime = APPTIMER->GetTargetTime();
+
+			int32 deltaX = event.current.x - event.old.x;
+			int32 deltaY = event.current.y - event.old.y;
+
+			if (deltaX != 0)
+			{
+				_horizontalAngle += _rotationSpeed * deltaTime * (float)deltaX;
+			}
+
+			if (deltaY != 0)
+			{
+				_verticalAngle += _rotationSpeed * deltaTime * (float)deltaY;
+			}
+
+			ClampFloat(_verticalAngle, MIN_VERT_ANGLE, MAX_VERT_ANGLE);
+
+			_entity.GetComponent<TransformComponent>().SetRotateWorld(_verticalAngle * ONE_RAD, _horizontalAngle * ONE_RAD, 0.0f);
+
+		}
+		break;
+	case cNormal:
+
 		float deltaTime = APPTIMER->GetTargetTime();
 
 		int32 deltaX = event.current.x - event.old.x;
@@ -221,8 +298,29 @@ void Camera::Handle(const InputManager::MouseMoveEvent & event)
 			_verticalAngle += _rotationSpeed * deltaTime * (float)deltaY;
 		}
 
+
 		ClampFloat(_verticalAngle, MIN_VERT_ANGLE, MAX_VERT_ANGLE);
 
 		_entity.GetComponent<TransformComponent>().SetRotateWorld(_verticalAngle * ONE_RAD, _horizontalAngle * ONE_RAD, 0.0f);
+
+		/*if (_cameraState == cNormal)
+		{
+			SetCursorPos(WINSTARTX + (WINSIZEX * 0.5), WINSTARTY + (WINSIZEY * 0.5));
+		}*/
+
+		break;
+	}
+}
+
+void Camera::NormalCameraUpdate(void)
+{
+	if (_curDist < PLAYER_TO_CAMERA_DIST)
+	{
+		_curDist += 0.1f;
+	}
+
+	if (_curDist > PLAYER_TO_CAMERA_DIST)
+	{
+		_curDist -= 0.1f;
 	}
 }
