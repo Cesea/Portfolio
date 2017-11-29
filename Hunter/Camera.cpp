@@ -316,7 +316,6 @@ bool Camera::GetWorldPosToScreenPos(const Vector3 & worldPos, Vector2 * pOutScre
 
 void Camera::ReadyRenderToTexture(int32 width, int32 height)
 {
-
 	COM_RELEASE(_pRenderTexture);
 	COM_RELEASE(_pRenderSurface );
 
@@ -349,8 +348,9 @@ void Camera::ReadyShadowTexture(int32 size)
 	COM_RELEASE(_pRenderTexture);
 	COM_RELEASE(_pRenderSurface );
 
+	HRESULT result = 0;
 	//RenderTarget 빈 Texture 만들기
-	gpDevice->CreateTexture(
+	result = gpDevice->CreateTexture(
 		size,						//Texture 가로 해상도 
 		size,						//Texture 세로 해상도
 		1,							//밉맵체인 레벨
@@ -362,7 +362,7 @@ void Camera::ReadyShadowTexture(int32 size)
 		);
 
 	//Render 할 Surface 
-	gpDevice->CreateDepthStencilSurface(
+	result = gpDevice->CreateDepthStencilSurface(
 		size,					//Texture 가로 해상도 
 		size,					//Texture 세로 해상도
 		D3DFMT_D24S8,				//Deapth 는 24 비트 Stencil 은 8 비트	
@@ -375,26 +375,27 @@ void Camera::ReadyShadowTexture(int32 size)
 
 void Camera::RenderTextureBegin(uint32 backColor)
 {
+	HRESULT result = 0;
 	//현 디바이스의 Target 버퍼의표면과 DepthStencil 버퍼의 표면정보를 기억
-	gpDevice->GetRenderTarget( 0, &_pDeviceTargetSurface );
-	gpDevice->GetDepthStencilSurface( &_pDeviceDepthAndStencilSurface );
+	result = gpDevice->GetRenderTarget( 0, &_pDeviceTargetSurface );
+	result = gpDevice->GetDepthStencilSurface( &_pDeviceDepthAndStencilSurface );
 
 	//RenderTexture 의 Surface 를 얻는다.
 	LPDIRECT3DSURFACE9 texSurface = NULL;
 	if( SUCCEEDED( this->_pRenderTexture->GetSurfaceLevel( 0, &texSurface ) ) )
 	{
 		//Texture 표면을 Device 의 Target 버퍼로 셋팅한다.
-		gpDevice->SetRenderTarget( 0, texSurface );
+		result = gpDevice->SetRenderTarget( 0, texSurface );
 
 		//셋팅된 Surface 정보는 바로 날려주는 예의를 갖추자...
 		SAFE_RELEASE( texSurface );
 	}
 
 	//Depth 버퍼와 Stencil 버퍼의 Surface 로 m_pRenderSurface 셋팅
-	gpDevice->SetDepthStencilSurface( _pRenderSurface );
+	result = gpDevice->SetDepthStencilSurface( _pRenderSurface );
 
 	//디바이스 버퍼 클리어 ( 사실 위에서 Setting 된 Textuer 랑 Surface 가 클리어 된다  )
-	gpDevice->Clear( 0, NULL, 
+	result = gpDevice->Clear( 0, NULL, 
 		D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER | D3DCLEAR_STENCIL,
 		backColor, 
 		1.0f, 
@@ -404,8 +405,9 @@ void Camera::RenderTextureBegin(uint32 backColor)
 void Camera::RenderTextureEnd()
 {
 	//Render Texture 에 그릴 작업이 끝났으면 다시 원상복귀하는 센스....
-	gpDevice->SetRenderTarget( 0, _pDeviceTargetSurface );
-	gpDevice->SetDepthStencilSurface( _pDeviceDepthAndStencilSurface );
+	HRESULT result = 0;
+	result = gpDevice->SetRenderTarget( 0, _pDeviceTargetSurface );
+	result = gpDevice->SetDepthStencilSurface( _pDeviceDepthAndStencilSurface );
 
 	//셋팅된 Surface 정보는 바로 날려주는 예의를 갖추자...
 	COM_RELEASE( _pDeviceTargetSurface );

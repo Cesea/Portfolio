@@ -22,16 +22,16 @@ public:
 	{};
 	virtual ~MapToolScene() {}
 
-	virtual bool Init();
-	virtual bool Update(float deltaTime, const InputManager &input);
-	
-	virtual void Render0();
-	virtual void Render1();
-	virtual void Render2();
+	virtual bool SceneInit();
+	virtual bool SceneUpdate(float deltaTime, const InputManager &input);
+	virtual bool SceneRelease();
 
+	virtual bool SceneRender0();
+	//virtual bool SceneRender1() {}
+	//virtual bool SceneRender2() {}
+	//virtual bool SceneRenderSprite() {}
 
-	virtual void Release();
-	virtual const char *GetSceneName() { return "MapToolScene"; }
+	virtual const char *GetSceneName();
 
 protected :
 

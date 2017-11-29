@@ -474,9 +474,6 @@
     <ClInclude Include="VideoResourceHandles.h">
       <Filter>Core\VideoDevice</Filter>
     </ClInclude>
-    <ClInclude Include="VideoVertexFormat.h">
-      <Filter>Core\VideoDevice</Filter>
-    </ClInclude>
     <ClInclude Include="World.h">
       <Filter>ECS</Filter>
     </ClInclude>
@@ -633,6 +630,9 @@
     </ClInclude>
     <ClInclude Include="SceneChangeEffectUpDown.h">
       <Filter>Core\SceneManager</Filter>
+    </ClInclude>
+    <ClInclude Include="VideoVertexFormat.h">
+      <Filter>Core\VideoDevice</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

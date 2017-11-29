@@ -83,6 +83,13 @@ void Engine::Run()
 		float deltaTime = APPTIMER->GetTargetTime();
 		_pScene->Update(deltaTime, *_pInput.get());
 
+		gpDevice->Clear(0, nullptr, D3DCLEAR_TARGET | D3DCLEAR_STENCIL | D3DCLEAR_ZBUFFER, 0xff303040, 1.0f, 0);
+		gpDevice->BeginScene();
+		_pScene->Render();
+		gpDevice->EndScene();
+		gpDevice->Present(nullptr, nullptr, NULL, nullptr);
+
+
 		_pInput->UpdatePrevInput();
 
 		APPTIMER->Tick();

@@ -19,44 +19,44 @@
 
 #include "WorldEditor.h"
 
-class BaseScene : public IScene
-{
-	friend class Terrain;
-public:
-	BaseScene()
-		:IScene::IScene()
-	{};
-	virtual ~BaseScene() {}
-
-	virtual bool Init();
-	virtual bool Update(float deltaTime, const InputManager &input);
-	virtual void Render0();
-	virtual void Render1();
-	virtual void Render2();
-
-
-	virtual void Release();
-	virtual const char *GetSceneName() { return "BaseScene"; }
-
-protected :
-	TransformSystem _transformSystem;
-	RenderSystem _renderSystem;
-	ScriptSystem _scriptSystem;
-	ActionSystem _actionSystem;
-	CollisionSystem _collisionSystem;
-
-	EventChannel _channel;
-
-	Editor *_pEditor{};
-
-
-	Turtle _turtle;
-	Bat _bat;
-	Cat _cat;
-	Hydra _hydra;
-	Lizard _lizard;
-	EnvironmentSphere *_pEnvironmentSphere{};
-
-};
+//class BaseScene : public IScene
+//{
+//	friend class Terrain;
+//public:
+//	BaseScene()
+//		:IScene::IScene()
+//	{};
+//	virtual ~BaseScene() {}
+//
+//	virtual bool Init();
+//	virtual bool Update(float deltaTime, const InputManager &input);
+//	virtual void Render0();
+//	virtual void Render1();
+//	virtual void Render2();
+//
+//
+//	virtual void Release();
+//	virtual const char *GetSceneName() { return "BaseScene"; }
+//
+//protected :
+//	TransformSystem _transformSystem;
+//	RenderSystem _renderSystem;
+//	ScriptSystem _scriptSystem;
+//	ActionSystem _actionSystem;
+//	CollisionSystem _collisionSystem;
+//
+//	EventChannel _channel;
+//
+//	Editor *_pEditor{};
+//
+//
+//	Turtle _turtle;
+//	Bat _bat;
+//	Cat _cat;
+//	Hydra _hydra;
+//	Lizard _lizard;
+//	EnvironmentSphere *_pEnvironmentSphere{};
+//
+//};
 
 #endif

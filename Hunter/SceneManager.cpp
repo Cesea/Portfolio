@@ -76,21 +76,21 @@ SceneManager::~SceneManager()
 
 bool SceneManager::Init()
 {
+
+	GetChannel().Add<SceneChangeEvent, SceneManager>(*this);
 	//기본 베이스 씬 세팅
 	IScene *pScene = new MapToolScene;
 	AddScene(pScene->GetSceneName(), pScene);
 
-	pScene = new BaseScene;
-	AddScene(pScene->GetSceneName(), pScene);
+	//pScene = new BaseScene;
+	//AddScene(pScene->GetSceneName(), pScene);
 
-	pScene = new GameScene;
-	AddScene(pScene->GetSceneName(), pScene);
+	//pScene = new GameScene;
+	//AddScene(pScene->GetSceneName(), pScene);
 
 	//시작 씬을 설정한다
-	ChangeScene("MapToolScene");
 
 	//씬 전환 이벤트 설정
-	GetChannel().Add<SceneChangeEvent, SceneManager>(*this);
 
 	//씬전환 효과 추가
 	_changeEffects.push_back(nullptr);		//0 번은 효과 없음 따라서 NULL 추가
@@ -102,6 +102,8 @@ bool SceneManager::Init()
 	SceneChangeEffect *pEffect2 = new SceneChangeEffectUpDown;
 	pEffect2->Init();
 	_changeEffects.push_back(pEffect2 );
+
+	ChangeScene("MapToolScene");
 
 	return true;
 }

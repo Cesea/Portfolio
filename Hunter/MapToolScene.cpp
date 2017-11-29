@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "MapToolScene.h"
 
-bool MapToolScene::Init()
+bool MapToolScene::SceneInit()
 {
 	bool result = true;
 	_channel.Add<Editor::GetObjectFromSceneEvent, MapToolScene>(*this);
@@ -17,7 +17,6 @@ bool MapToolScene::Init()
 	for (int32 i = 0; i < numEntityToCreate; ++i)
 	{
 		dataPackage.ReadAs<EntitySaveInfo>(&entitySaveInfo);
-
 	}
 
 	GAMEOBJECTFACTORY->SetCurrentScene(this);
@@ -93,7 +92,7 @@ bool MapToolScene::Init()
 	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Tree/Tree4.X", &correctionMat, "Tree04");
 	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Tree/Tree5.X", &correctionMat, "Tree05");
 
-	//엔티티 생성
+	//시스템 생성
 	_world.AddSystem<RenderSystem>(_renderSystem);
 	_world.AddSystem<TransformSystem>(_transformSystem);
 	_world.AddSystem<ActionSystem>(_actionSystem);
@@ -104,6 +103,7 @@ bool MapToolScene::Init()
 	_camera.CreateFromWorld(_world);
 	_camera.SetRotationSpeed(10.0f);
 	_camera.SetMoveSpeed(20.0f);
+	_camera.GetEntity().GetComponent<TransformComponent>().MovePositionWorld(Vector3(0.0f, 4.0f, -6.0f));
 
 	//라이트 생성
 	_pMainLight = new DirectionalLight();
@@ -134,7 +134,7 @@ bool MapToolScene::Init()
 	return result;
 }
 
-bool MapToolScene::Update(float deltaTime, const InputManager & input)
+bool MapToolScene::SceneUpdate(float deltaTime, const InputManager & input)
 {
 	bool result = true;
 
@@ -158,46 +158,11 @@ bool MapToolScene::Update(float deltaTime, const InputManager & input)
 		_camera.UpdateCamToDevice();
 		_camera.UpdateFrustum();
 	}
-
 	//_channel.Update<BaseScene::SpawnEvent>(deltaTime);
-
 	return result;
 }
 
-void MapToolScene::Render0()
-{
-	video::StaticXMesh::SetCamera(_camera);
-	video::StaticXMesh::SetBaseLight(_pMainLight);
-
-	video::SkinnedXMesh::SetCamera(_camera);
-	video::SkinnedXMesh::SetBaseLight(_pMainLight);
-
-	gpDevice->Clear(0, nullptr, D3DCLEAR_TARGET | D3DCLEAR_STENCIL | D3DCLEAR_ZBUFFER, 0xff303040, 1.0f, 0);
-	gpDevice->BeginScene();
-
-	_pEnvironmentSphere->Render(_camera);
-	
-	GIZMOMANAGER->WorldGrid(1.0f, 20);
-
-	TERRAIN->Render(_camera);
-	_renderSystem.Render(_camera);
-	_editor->Render();
-
-	imguiRenderDraw();
-
-	gpDevice->EndScene();
-	gpDevice->Present(nullptr, nullptr, NULL, nullptr);
-
-}
-
-void MapToolScene::Render1()
-{
-}
-void MapToolScene::Render2()
-{
-}
-
-void MapToolScene::Release()
+bool MapToolScene::SceneRelease()
 {
 	for (auto object : _gameObjects)
 	{
@@ -206,6 +171,31 @@ void MapToolScene::Release()
 	_gameObjects.clear();
 
 	_world.Clear();
+
+	return true;
+}
+
+bool MapToolScene::SceneRender0()
+{
+	video::StaticXMesh::SetCamera(_camera);
+	video::StaticXMesh::SetBaseLight(_pMainLight);
+
+	video::SkinnedXMesh::SetCamera(_camera);
+	video::SkinnedXMesh::SetBaseLight(_pMainLight);
+
+	GIZMOMANAGER->WorldGrid(1.0f, 20);
+
+	TERRAIN->Render(_camera);
+	_renderSystem.Render(_camera);
+	_editor->Render();
+
+
+	return true;
+}
+
+const char * MapToolScene::GetSceneName()
+{
+	return "MapToolScene";
 }
 
 void MapToolScene::Handle(const Editor::GetObjectFromSceneEvent & event)

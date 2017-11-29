@@ -297,11 +297,8 @@ void video::VideoDevice::LoadDefaultEffects()
 	VIDEO->CreateEffect("../resources/Shaders/SkinnedMesh.fx", "SkinnedMesh.fx");
 	VIDEO->CreateEffect("../resources/Shaders/terrainBase.fx", "TerrainBase.fx");
 
-	
 	VIDEO->CreateEffect("../resources/Shaders/EnvironmentSphere.fx", "EnvironmentSphere.fx");
-	VIDEO->CreateEffect("../resources/Shaders/TreeShader.fx", "TreeShader.fx");
-
-
+	VIDEO->CreateEffect("../resources/Shaders/PostEffect.fx", "PostEffect.fx");
 }
 
 RenderView *video::VideoDevice::GetRenderView(RenderViewHandle handle)
