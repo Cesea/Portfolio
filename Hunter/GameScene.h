@@ -15,38 +15,37 @@
 #include "Snake.h"
 
 
-//class GameScene : public IScene
-//{
-//	friend class Terrain;
-//public:
-//	GameScene()
-//		:IScene::IScene()
-//	{};
-//	virtual ~GameScene() {}
-//
-//	virtual bool Init();
-//	virtual bool Update(float deltaTime, const InputManager &input);
-//
-//	virtual void Render0();
-//	virtual void Render1();
-//	virtual void Render2();
-//
-//	virtual void Release();
-//	virtual const char *GetSceneName() { return "GameScene"; }
-//
-//protected :
-//	TransformSystem _transformSystem;
-//	RenderSystem _renderSystem;
-//	ScriptSystem _scriptSystem;
-//	ActionSystem _actionSystem;
-//	CollisionSystem _collisionSystem;
-//
-//	Editor *_editor{};
-//
-//	EnvironmentSphere *_pEnvironmentSphere{};
-//
-//public:
-//	virtual void Handle(const Editor::GetObjectFromSceneEvent &event);
-//};
+class GameScene : public IScene
+{
+	friend class Terrain;
+public:
+	GameScene()
+		:IScene::IScene()
+	{};
+	virtual ~GameScene() {}
+
+	virtual bool SceneInit();
+	virtual bool SceneUpdate(float deltaTime, const InputManager &input);
+	virtual bool SceneRelease();
+
+	virtual bool SceneRender0();
+	//virtual bool SceneRender1() {}
+	//virtual bool SceneRender2() {}
+	//virtual bool SceneRenderSprite() {}
+
+	virtual const char *GetSceneName() { return "GameScene"; }
+
+protected :
+	TransformSystem _transformSystem;
+	RenderSystem _renderSystem;
+	ScriptSystem _scriptSystem;
+	ActionSystem _actionSystem;
+	CollisionSystem _collisionSystem;
+
+	Editor *_editor{};
+
+public:
+	virtual void Handle(const Editor::GetObjectFromSceneEvent &event);
+};
 
 #endif

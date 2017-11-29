@@ -7,7 +7,6 @@
 #include "MapToolScene.h"
 #include "GameScene.h"
 
-
 #include "SceneChangeEffect.h"
 #include "SceneChangeEffectUpDown.h"
 
@@ -82,13 +81,12 @@ bool SceneManager::Init()
 	IScene *pScene = new MapToolScene;
 	AddScene(pScene->GetSceneName(), pScene);
 
-	//pScene = new BaseScene;
-	//AddScene(pScene->GetSceneName(), pScene);
+	pScene = new BaseScene;
+	AddScene(pScene->GetSceneName(), pScene);
 
-	//pScene = new GameScene;
-	//AddScene(pScene->GetSceneName(), pScene);
+	pScene = new GameScene;
+	AddScene(pScene->GetSceneName(), pScene);
 
-	//시작 씬을 설정한다
 
 	//씬 전환 이벤트 설정
 
@@ -103,7 +101,8 @@ bool SceneManager::Init()
 	pEffect2->Init();
 	_changeEffects.push_back(pEffect2 );
 
-	ChangeScene("MapToolScene");
+	//시작 씬을 설정한다
+	ChangeScene("GameScene");
 
 	return true;
 }
