@@ -274,6 +274,9 @@
     <ClCompile Include="SceneChangeEffectUpDown.cpp">
       <Filter>Core\SceneManager</Filter>
     </ClCompile>
+    <ClCompile Include="TestScene.cpp">
+      <Filter>Game\GameScenes\TestScene</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Lights.h" />
@@ -634,6 +637,9 @@
     <ClInclude Include="VideoVertexFormat.h">
       <Filter>Core\VideoDevice</Filter>
     </ClInclude>
+    <ClInclude Include="TestScene.h">
+      <Filter>Game\GameScenes\TestScene</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Hunter.rc" />
@@ -783,14 +789,17 @@
     <Filter Include="Game\GameScenes\GameScene">
       <UniqueIdentifier>{e5cb61c6-f7d2-4895-8f96-74274a3ca6f4}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Game\GameScenes\MenuScene">
-      <UniqueIdentifier>{c30dc906-cde2-4bab-b872-b793d7fae627}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Game\GameObjects\Hydra">
       <UniqueIdentifier>{8dba6765-7a19-4924-ac01-9d7a785be573}</UniqueIdentifier>
     </Filter>
     <Filter Include="Game\GameObjects\Lizard">
       <UniqueIdentifier>{fefbf3c0-13f9-403e-ab47-3ac47b5cb429}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\GameScenes\TestScene">
+      <UniqueIdentifier>{10cb3218-4e5d-4dcf-936c-6eaeb92cba69}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\GameScenes\LoadingScenes">
+      <UniqueIdentifier>{33d569b5-3ac6-44bc-b4e4-711f43b9e88f}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

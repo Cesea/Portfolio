@@ -174,7 +174,7 @@ bool Engine::InitializePlatform(HINSTANCE instanceHandle)
 		return false;
 	}
 
-	SetCapture(_windowHandle);
+	//SetCapture(_windowHandle);
 	//SetCursorPos(WINSTARTX + WINSIZEX / 2, WINSTARTY + WINSIZEY / 2);
 
 	gWindowHandle = _windowHandle;
