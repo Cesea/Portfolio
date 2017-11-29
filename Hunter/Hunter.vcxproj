@@ -170,6 +170,7 @@
     <ClCompile Include="Lizard.cpp" />
     <ClCompile Include="LizardAnimationString.cpp" />
     <ClCompile Include="LizardStates.cpp" />
+    <ClCompile Include="LoadingScene00.cpp" />
     <ClCompile Include="MapToolScene.cpp" />
     <ClCompile Include="MathUtils.cpp" />
     <ClCompile Include="Matrix.cpp" />
@@ -279,6 +280,7 @@
     <ClInclude Include="Lizard.h" />
     <ClInclude Include="LizardAnimationString.h" />
     <ClInclude Include="LizardStates.h" />
+    <ClInclude Include="LoadingScene00.h" />
     <ClInclude Include="MapToolScene.h" />
     <ClInclude Include="Math.h" />
     <ClInclude Include="MathUtils.h" />

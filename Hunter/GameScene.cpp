@@ -156,7 +156,7 @@ bool GameScene::SceneRender0()
 	
 	GIZMOMANAGER->WorldGrid(1.0f, 20);
 
-	TERRAIN->Render(_camera);
+	TERRAIN->Render(_camera, *_pMainLight, _camera);
 	_renderSystem.Render(_camera);
 
 	return true;

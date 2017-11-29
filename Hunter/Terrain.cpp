@@ -410,7 +410,7 @@ float Terrain::GetSlant(Vector3 * pOut, float gravityPower, float x, float z)
 	return true;
 }
 
-void Terrain::Render(const Camera & camera)
+void Terrain::Render(const Camera &camera, const DirectionalLight &mainLight, const Camera &lightCameera)
 {
 	//월드 행렬셋팅
 	video::Effect *pEffect = VIDEO->GetEffect(_effect);
@@ -425,7 +425,7 @@ void Terrain::Render(const Camera & camera)
 	//뷰 행렬셋팅
 	pEffect->SetMatrix("matViewProjection", camera.GetViewProjectionMatrix());
 	pEffect->SetVector("vEyePosition", Vector4(camera.GetEntity().GetComponent<TransformComponent>()._position, 1.0f));
-	pEffect->SetMatrix("baseDirectionalLight", _pCurrentScene->_pMainLight->GetLightMatrix());
+	pEffect->SetMatrix("baseDirectionalLight", mainLight.GetLightMatrix());
 
 	//Texture 셋팅
 	pEffect->SetTexture("Terrain0_Tex", *VIDEO->GetTexture(_tile0Handle));

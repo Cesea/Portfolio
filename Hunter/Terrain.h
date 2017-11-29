@@ -138,7 +138,7 @@ public:
 	float GetHeight(float x, float z);
 	float GetSlant(Vector3* pOut, float gravityPower, float x, float z);
 
-	void Render(const Camera &camear);
+	void Render(const Camera &camera, const DirectionalLight &mainLight, const Camera &lightCameera);
 
 	void AddEntityToSection(const Entity &entity, const Vector3 &position);
 

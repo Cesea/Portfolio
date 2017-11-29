@@ -9,7 +9,7 @@ PointLight::~PointLight()
 {
 }
 
-Matrix PointLight::GetLightMatrix()
+Matrix PointLight::GetLightMatrix() const
 {
 	// Pos.x,         Pos.y,          Pos.z,         lightType ( 0 Direction, 1 Point, 2 Spot )
 	// Dir.x,         Dir.y,          Dir.z,         DistancePow;

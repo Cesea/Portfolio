@@ -277,6 +277,9 @@
     <ClCompile Include="TestScene.cpp">
       <Filter>Game\GameScenes\TestScene</Filter>
     </ClCompile>
+    <ClCompile Include="LoadingScene00.cpp">
+      <Filter>Game\GameScenes\LoadingScenes</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Lights.h" />
@@ -639,6 +642,9 @@
     </ClInclude>
     <ClInclude Include="TestScene.h">
       <Filter>Game\GameScenes\TestScene</Filter>
+    </ClInclude>
+    <ClInclude Include="LoadingScene00.h">
+      <Filter>Game\GameScenes\LoadingScenes</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -3,10 +3,16 @@
 
 #include "WorldEditor.h"
 
+//실질적으로 사용되는 씬들
 #include "BaseScene.h"
 #include "MapToolScene.h"
 #include "GameScene.h"
 #include "TestScene.h"
+
+//로딩 씬들
+#include "LoadingScene00.h"
+//#include "LoadingScene01.h"
+//#include "LoadingScene02.h"
 
 #include "SceneChangeEffect.h"
 #include "SceneChangeEffectUpDown.h"
@@ -81,15 +87,15 @@ bool SceneManager::Init()
 	//기본 베이스 씬 세팅
 	IScene *pScene = new MapToolScene;
 	AddScene(pScene->GetSceneName(), pScene);
-
 	pScene = new BaseScene;
 	AddScene(pScene->GetSceneName(), pScene);
-
 	pScene = new GameScene;
 	AddScene(pScene->GetSceneName(), pScene);
-
 	pScene = new TestScene;
 	AddScene(pScene->GetSceneName(), pScene);
+
+	IScene *pLoadingScene = new LoadingScene00;
+	AddLoadingScene(pLoadingScene->GetSceneName(), pLoadingScene);
 
 	//씬 전환 이벤트 설정
 
@@ -105,7 +111,7 @@ bool SceneManager::Init()
 	_changeEffects.push_back(pEffect2 );
 
 	//시작 씬을 설정한다
-	ChangeScene("TestScene");
+	ChangeScene("MapToolScene");
 
 	return true;
 }
