@@ -181,6 +181,7 @@ bool MapToolScene::Render()
 
 	TERRAIN->Render(_camera);
 	_renderSystem.Render(_camera);
+	_editor->Render();
 
 	imguiRenderDraw();
 
