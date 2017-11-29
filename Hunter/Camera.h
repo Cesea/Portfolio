@@ -1,7 +1,7 @@
 #ifndef CAMERA_H
 #define CAMERA_H
 
-#define PLAYER_TO_CAMERA_DIST 1.5f
+#define PLAYER_TO_CAMERA_DIST 3.0f
 
 #include "TransformComponent.h"
 #include "Frustum.h"
@@ -81,6 +81,8 @@ protected:
 
 	float _verticalAngle{};
 	float _horizontalAngle{};
+
+	TransformComponent* cameraTransform;
 
 	Vector3 _toMove;
 

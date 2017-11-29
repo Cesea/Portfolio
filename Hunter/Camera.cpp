@@ -26,8 +26,9 @@ Camera::Camera()
 
 	_curDist = 0;
 
-	//playerPos = { 0,0,0 };
 	
+
+	//playerPos = { 0,0,0 };
 }
 
 Camera::~Camera()
@@ -51,6 +52,8 @@ void Camera::CreateFromWorld(World & world)
 
 
 	_entity.Activate();
+
+	cameraTransform = &this->GetEntity().GetComponent<TransformComponent>();
 }
 
 void Camera::PreUpdateMatrix()
@@ -84,6 +87,16 @@ void Camera::UpdateCamToDevice()
 	
 	gpDevice->SetTransform(D3DTS_VIEW, &_matView);
 	gpDevice->SetTransform(D3DTS_PROJECTION, &_matProjection);
+
+	if (_cameraState == cNormal)
+	{
+		if (_curDist != PLAYER_TO_CAMERA_DIST)
+		{
+			NormalCameraUpdate();
+		}
+		
+		//cameraTransform->SetWorldPosition(cameraTransform->GetWorldPosition().x, cameraTransform->GetWorldPosition().y, cameraTransform->GetWorldPosition().z + _curDist);
+	}
 
 }
 
@@ -188,13 +201,24 @@ void Camera::Handle(const InputManager::KeyDownEvent & event)
 	{
 		_cameraState = cNormal;
 
-		
+		TransformComponent &targetTransform = _pTargetObject->_entity.GetComponent<TransformComponent>();
+
+		cameraTransform->SetWorldPosition(targetTransform.GetWorldPosition().x, targetTransform.GetWorldPosition().y, targetTransform.GetWorldPosition().z);
+
+		//cameraTransform->SetRotateWorld(targetTransform.GetWorldRotateQuaternion());
+
+		cameraTransform->SetForward(-targetTransform.GetForward());
+
+		targetTransform.AddChild(cameraTransform);
 
 		//ShowCursor(false);
 	}
 	if (event.code == '3')
 	{
-		
+		if (_curDist > 3)
+		{
+			int a = 0;
+		}
 	}
 
 	//move forward
@@ -326,13 +350,17 @@ void Camera::Handle(const InputManager::MouseMoveEvent & event)
 
 void Camera::NormalCameraUpdate(void)
 {
+	Vector3 dist = _pTargetObject->_entity.GetComponent<TransformComponent>().GetWorldPosition() - cameraTransform->GetWorldPosition();
+	_curDist = D3DXVec3Length(&dist);
+
 	if (_curDist < PLAYER_TO_CAMERA_DIST)
 	{
-		_curDist += 0.1f;
-	}
+		cameraTransform->_position.z += 0.1f;
 
-	if (_curDist > PLAYER_TO_CAMERA_DIST)
+	}
+	else if (_curDist > PLAYER_TO_CAMERA_DIST)
 	{
-		_curDist -= 0.1f;
+		//cameraTransform->_position.z -= 0.1f;
+		cameraTransform->_position.z = PLAYER_TO_CAMERA_DIST;
 	}
 }
