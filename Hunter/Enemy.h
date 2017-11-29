@@ -13,9 +13,11 @@ class Enemy : public BaseGameObject
 public:
 	virtual bool CreateFromWorld(World &world) = 0;
 	virtual void Update(float deltaTime) = 0;
+	virtual void Handle(const CollisionSystem::ActorTriggerEvent & event) = 0;
 	Enemy();
 	virtual ~Enemy();
 
+	void resetAllCount();
 protected:
 	//Base
 	float _hp;
@@ -46,6 +48,10 @@ protected:
 	//stand
 	int _standTime;
 	int _standCount;
+	//hurt
+	int _hurtTime;
+	int _hurtCount;
 	//¾²·¹±â
     Vector3 _playerPos;
+	public:
 };

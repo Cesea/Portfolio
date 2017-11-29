@@ -131,4 +131,16 @@ public:
 	virtual void OnExit() override;
 };
 
+class SnakeHurtState : public SnakeState
+{
+
+public:
+	DECLARE_META(SnakeHurtState);
+
+
+	virtual void OnEnter() override;
+	virtual void Update(float deltaTime, const GameCommand &command) override;
+	virtual void OnExit() override;
+};
+
 #endif

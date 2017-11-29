@@ -73,7 +73,8 @@ void CollisionSystem::Update(float deltaTime, float checkRange)
 				//둘다 고정됬으면 검사하지않음
 				if (collision2._locked && collision._locked) continue;
 				//둘중 하나가 고정되어있음
-				if ((collision._locked && !collision2._locked) || (!collision._locked && collision2._locked))
+				//if ((collision._locked && !collision2._locked) || (!collision._locked && collision2._locked))
+				else
 				{
 					//충돌했다면
 					if (Collision_AABBToAABB(aabb0._min,
@@ -86,11 +87,30 @@ void CollisionSystem::Update(float deltaTime, float checkRange)
 						//트리거 검사
 						if (collision._isTrigger)
 						{
+							switch (collision._triggerType)
+							{
+							case CollisionComponent::TRIGGER_TYPE_ENEMY:
+							case CollisionComponent::TRIGGER_TYPE_PLAYER:
+								_channel.Broadcast<ActorTriggerEvent>(ActorTriggerEvent(entities[i], entities[j]));
+								break;
+							case CollisionComponent::TRIGGER_TYPE_OBJECT:
+								_channel.Broadcast<ObjectTriggerEvent>(ObjectTriggerEvent(entities[i], entities[j]));
+								break;
+							}
 
 						}
 						if (collision2._isTrigger)
 						{
-
+							switch (collision._triggerType)
+							{
+							case CollisionComponent::TRIGGER_TYPE_ENEMY:
+							case CollisionComponent::TRIGGER_TYPE_PLAYER:
+								_channel.Broadcast<ActorTriggerEvent>(ActorTriggerEvent(entities[j], entities[i]));
+								break;
+							case CollisionComponent::TRIGGER_TYPE_OBJECT:
+								_channel.Broadcast<ObjectTriggerEvent>(ObjectTriggerEvent(entities[j], entities[i]));
+								break;
+							}
 						}
 
 					}

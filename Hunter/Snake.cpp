@@ -14,7 +14,7 @@ bool Snake::CreateFromWorld(World & world)
 {
 	_entity = world.CreateEntity();
 	TransformComponent &transComp = _entity.AddComponent<TransformComponent>();
-	transComp.MovePositionWorld(0, 10.0f, 0);
+	transComp.MovePositionWorld(0, 0.0f, 0);
 
 	static int32 animCount = 0;
 
@@ -32,6 +32,8 @@ bool Snake::CreateFromWorld(World & world)
 	collision._boundingSphere._localCenter = pAnimation->_pSkinnedMesh->_boundInfo._center;
 	collision._boundingSphere._radius = pAnimation->_pSkinnedMesh->_boundInfo._radius;
 	collision._locked = false;
+	collision._isTrigger = true;
+	collision._triggerType = CollisionComponent::TRIGGER_TYPE_ENEMY;
 
 	ScriptComponent &scriptComponent = _entity.AddComponent<ScriptComponent>();
 	scriptComponent.SetScript(MAKE_SCRIPT_DELEGATE(Snake, Update, *this));
@@ -57,9 +59,12 @@ bool Snake::CreateFromWorld(World & world)
 	_pStateMachine->RegisterState(META_TYPE(SnakeAttack3State)->Name(), new SnakeAttack3State());
 	_pStateMachine->RegisterState(META_TYPE(SnakeStandState)->Name(), new SnakeStandState());
 	_pStateMachine->RegisterState(META_TYPE(SnakeDeadState)->Name(), new SnakeDeadState());
+	_pStateMachine->RegisterState(META_TYPE(SnakeHurtState)->Name(), new SnakeHurtState());
 	_pStateMachine->ChangeState(META_TYPE(SnakeMoveState)->Name());
 	_state = SNAKESTATE_PATROL;
 	
+	_hp = 500;
+
 	_speed = 3.0f;
 	_rotateSpeed = D3DX_PI / 128;
 	_patrolIndex = 0;
@@ -86,6 +91,12 @@ bool Snake::CreateFromWorld(World & world)
 
 	_standTime = 90;
 	_standCount = _standTime;
+
+	_hurtTime = 60;
+	_hurtCount = _hurtTime;
+	//이벤트 등록
+	EventChannel channel;
+	channel.Add<CollisionSystem::ActorTriggerEvent, Snake>(*this);
 	return true;
 }
 
@@ -230,6 +241,44 @@ void Snake::Update(float deltaTime)
 			_pStateMachine->ChangeState(META_TYPE(SnakeMoveState)->Name());
 		}
 		break;
+	case SNAKESTATE_HURT:
+		_hurtCount--;
+		if (_hurtCount < 0)
+		{
+			_hurtCount = _hurtTime;
+			//거리를 계산해서 가까운상태면 어택
+			Vector3 direction = _playerPos - transComp.GetWorldPosition();
+			float distance = Vec3Length(&direction);
+			Vec3Normalize(&direction, &direction);
+			if (distance < _atkRange)
+			{
+				_state = SNAKESTATE_ATK1;
+				_pStateMachine->ChangeState(META_TYPE(SnakeAttackState)->Name());
+			}
+			else
+			{
+				//전투중에 거리가벌어진거라면 roar없이 돌격
+				if (_battle)
+				{
+					_state = SNAKESTATE_RUN;
+					_pStateMachine->ChangeState(META_TYPE(SnakeMoveState)->Name());
+				}
+				//비전투인데 맞았다?
+				else
+				{
+					// 추격
+					_battle = true;
+					_state = SNAKESTATE_FIND;
+					_pStateMachine->ChangeState(META_TYPE(SnakeFindState)->Name());
+					Vector3 distance = _playerPos - transComp.GetWorldPosition();
+					Vec3Normalize(&distance, &distance);
+					transComp.LookDirection(-distance, D3DX_PI * 2);
+				}
+			}
+		}
+		break;
+	case SNAKESTATE_DIE:
+		break;
 	}
 	//전투상태가 아니라면 항시 플레이어를 수색한다.
 	if (!_battle)
@@ -246,6 +295,38 @@ void Snake::Update(float deltaTime)
 		}
 	}
 
+
+}
+
+void Snake::Handle(const CollisionSystem::ActorTriggerEvent & event)
+{
+
+	if (event._entity1 != _entity) return;
+	CollisionComponent & _collision = event._entity2.GetComponent<CollisionComponent>();
+	switch (_collision._triggerType)
+	{
+		//플레이어와 충돌했다(내가 가해자)
+	case CollisionComponent::TRIGGER_TYPE_PLAYER:
+		if (_state != SNAKESTATE_HURT&&_state != SNAKESTATE_DIE)
+		{
+			resetAllCount();
+			_state = SNAKESTATE_HURT;
+			_pStateMachine->ChangeState(META_TYPE(SnakeHurtState)->Name());
+			_battle = true;
+			_hp -= 50;
+			if (_hp <= 0)
+			{
+				_state = SNAKESTATE_DIE;
+				_pStateMachine->ChangeState(META_TYPE(SnakeDeadState)->Name());
+			}
+		}
+		break;
+		//오브젝트와 충돌했다
+	case CollisionComponent::TRIGGER_TYPE_OBJECT:
+		break;
+	case CollisionComponent::TRIGGER_TYPE_DEFAULT:
+		break;
+	}
 
 }
 

@@ -49,6 +49,7 @@ void GameObjectFactory::CreateObject(ARCHE_TYPE type, ResourceHandle handle, con
 		collision._boundingSphere._localCenter = pMesh->_meshBoundInfo._center;
 		collision._boundingSphere._radius = pMesh->_meshBoundInfo._radius;
 		collision._locked = true;
+		collision._triggerType = CollisionComponent::TRIGGER_TYPE_OBJECT;
 
 		entity.Activate();
 

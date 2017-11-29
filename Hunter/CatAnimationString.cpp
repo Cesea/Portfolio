@@ -21,7 +21,7 @@ void InitCatAnimation()
 	CAT_ANIM_DEFINE(CAT_ATTACK3, false, false, false, 1.0f, 0.2f, 0.2f);
 	CAT_ANIM_DEFINE(CAT_ATTACK4, false, false, false, 1.0f, 0.2f, 0.2f);
 	CAT_ANIM_DEFINE(CAT_ATTACK5, false, false, false, 1.0f, 0.2f, 0.2f);
-	CAT_ANIM_DEFINE(CAT_DEATH, false, false, false, 1.0f, 0.2f, 0.2f);
+	CAT_ANIM_DEFINE(CAT_DEATH, true, true, true, 1.0f, 0.2f, 0.2f);
 	CAT_ANIM_DEFINE(CAT_HIT1, false, false, false, 1.0f, 0.2f, 0.2f);
 	CAT_ANIM_DEFINE(CAT_HIT2, false, false, false, 1.0f, 0.2f, 0.2f);
 	CAT_ANIM_DEFINE(CAT_IDLE, false, false, false, 1.0f, 0.2f, 0.2f);

@@ -34,7 +34,10 @@ DEFINE_META(SnakeDeadState)
 {
 	//ADD_MEMBER(_pActor);
 }
-
+DEFINE_META(SnakeHurtState)
+{
+	//ADD_MEMBER(_pActor);
+}
 
 bool SnakeState::Init(StateMachine<Snake>* pParent)
 {
@@ -199,4 +202,24 @@ void SnakeDeadState::OnExit()
 {
 	_pParent->ClearActioniQueue();
 }
+
+void SnakeHurtState::OnEnter()
+{
+	_pParent->QueueAction(SNAKE_ANIM(SNAKE_HIT1));
+}
+
+void SnakeHurtState::Update(float deltaTime, const GameCommand & command)
+{
+	switch (command._type)
+	{
+	default:
+		break;
+	}
+}
+
+void SnakeHurtState::OnExit()
+{
+	_pParent->ClearActioniQueue();
+}
+
 

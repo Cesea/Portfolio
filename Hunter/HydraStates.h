@@ -94,3 +94,33 @@ public:
 	virtual void Update(float deltaTime, const GameCommand &command) override;
 	virtual void OnExit() override;
 };
+
+class HydraHurt1State : public HydraState
+{
+public:
+	DECLARE_META(HydraHurt1State);
+
+	virtual void OnEnter() override;
+	virtual void Update(float deltaTime, const GameCommand &command) override;
+	virtual void OnExit() override;
+};
+
+class HydraHurt2State : public HydraState
+{
+public:
+	DECLARE_META(HydraHurt2State);
+
+	virtual void OnEnter() override;
+	virtual void Update(float deltaTime, const GameCommand &command) override;
+	virtual void OnExit() override;
+};
+
+class HydraDeadState : public HydraState
+{
+public:
+	DECLARE_META(HydraDeadState);
+
+	virtual void OnEnter() override;
+	virtual void Update(float deltaTime, const GameCommand &command) override;
+	virtual void OnExit() override;
+};

@@ -59,6 +59,7 @@ public:
 
 	virtual bool CreateFromWorld(World &world);
 	void Update(float deltaTime);
+	void Handle(const CollisionSystem::ActorTriggerEvent & event);
 
 	void render();
 

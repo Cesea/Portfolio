@@ -42,6 +42,20 @@ DEFINE_META(LizardStandState)
 	//ADD_MEMBER(_pActor);
 }
 
+DEFINE_META(LizardHurt1State)
+{
+	//ADD_MEMBER(_pActor);
+}
+
+DEFINE_META(LizardHurt2State)
+{
+	//ADD_MEMBER(_pActor);
+}
+
+DEFINE_META(LizardDeadState)
+{
+	//ADD_MEMBER(_pActor);
+}
 bool LizardState::Init(StateMachine<Lizard>* pParent)
 {
 	_pParent = pParent;
@@ -202,6 +216,67 @@ void LizardStandState::Update(float deltaTime, const GameCommand & command)
 }
 
 void LizardStandState::OnExit()
+{
+	_pParent->ClearActioniQueue();
+}
+
+
+
+void LizardHurt1State::OnEnter()
+{
+	_pParent->QueueAction(LIZARD_ANIM(LIZARD_HIT1));
+}
+
+void LizardHurt1State::Update(float deltaTime, const GameCommand & command)
+{
+	switch (command._type)
+	{
+	default:
+		break;
+	}
+}
+
+void LizardHurt1State::OnExit()
+{
+	_pParent->ClearActioniQueue();
+}
+
+
+void LizardHurt2State::OnEnter()
+{
+	_pParent->QueueAction(LIZARD_ANIM(LIZARD_HIT2));
+}
+
+void LizardHurt2State::Update(float deltaTime, const GameCommand & command)
+{
+	switch (command._type)
+	{
+	default:
+		break;
+	}
+}
+
+void LizardHurt2State::OnExit()
+{
+	_pParent->ClearActioniQueue();
+}
+
+
+void LizardDeadState::OnEnter()
+{
+	_pParent->QueueAction(LIZARD_ANIM(LIZARD_DEATH));
+}
+
+void LizardDeadState::Update(float deltaTime, const GameCommand & command)
+{
+	switch (command._type)
+	{
+	default:
+		break;
+	}
+}
+
+void LizardDeadState::OnExit()
 {
 	_pParent->ClearActioniQueue();
 }
