@@ -4,8 +4,8 @@
 #define PLAYER_TO_CAMERA_DIST 1.5f
 
 #include "TransformComponent.h"
-
 #include "Frustum.h"
+#include "BaseGameObject.h"
 
 enum cameraState
 {
@@ -19,11 +19,9 @@ enum cameraState
 class Camera
 {
 public:
-
 	cameraState _cameraState;
 
 	float _curDist;
-	Vector3 playerPos;
 
 	float _fov;
 	float _camNear;
@@ -38,6 +36,8 @@ public:
 	void UpdateMatrix();
 	void UpdateCamToDevice();
 	void UpdateFrustum();
+
+	void SetTargetObject(BaseGameObject *pTargetObject = nullptr);
 
 	void SetMoveSpeed(float speed) { _moveSpeed = speed; }
 	void SetRotationSpeed(float speed) { _rotationSpeed = speed; }
@@ -64,9 +64,7 @@ public:
 	const Entity &GetEntity() const { return _entity; }
 
 private:
-
 	void NormalCameraUpdate(void);
-
 protected:
 
 	Entity _entity;
@@ -87,6 +85,7 @@ protected:
 	Vector3 _toMove;
 
 	Frustum _frustum;
+	BaseGameObject *_pTargetObject{};
 };
 
 #endif

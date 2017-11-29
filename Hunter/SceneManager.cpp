@@ -28,7 +28,7 @@ bool SceneManager::Init()
 	pScene = new GameScene;
 	AddScene(pScene->GetSceneName(), pScene);
 
-	ChangeScene("BaseScene");
+	ChangeScene("GameScene");
 
 	GetChannel().Add<SceneChangeEvent, SceneManager>(*this);
 

@@ -6,7 +6,6 @@
 
 class IScene;
 
-
 enum ARCHE_TYPE
 {
 	ARCHE_NONE,
@@ -32,7 +31,6 @@ struct EntitySaveInfo
 	//Quaternion _orientation;
 };
 
-
 class GameObjectFactory : public SingletonBase<GameObjectFactory>
 {
 public :
@@ -44,6 +42,8 @@ public :
 	//void CreateObject(ArcheType type, const Vector3 &position);
 	//void CreateObject();
 
+	BaseGameObject *GetPlayerObject() { return _pPlayer; }
+
 private :
 	IScene *_pCurrentScene;
 
@@ -53,7 +53,7 @@ private :
 	void CreateObject(ARCHE_TYPE type, ResourceHandle handle, const Vector3 &position);
 	void CreateObject(ARCHE_TYPE type, char *name, const Vector3 &position);
 
-	//ResourceHandlePool<TreeHandle> _treeHandlePool;
+	BaseGameObject *_pPlayer{};
 
 public :
 

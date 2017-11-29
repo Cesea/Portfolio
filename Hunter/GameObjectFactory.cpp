@@ -15,6 +15,7 @@ void GameObjectFactory::Release()
 	_channel.Remove<GameObjectFactory::CreateObjectOnClickEvent, GameObjectFactory>(*this);
 	_channel.Remove<GameObjectFactory::CreateObjectOnLocationEvent, GameObjectFactory>(*this);
 	_pCurrentScene = nullptr;
+	_pPlayer = nullptr;
 }
 
 void GameObjectFactory::CreateObject(ARCHE_TYPE type, ResourceHandle handle, const Vector3 & position)
@@ -114,6 +115,8 @@ void GameObjectFactory::CreateObject(ARCHE_TYPE type, ResourceHandle handle, con
 		_pCurrentScene->_gameObjects.push_back(new Player());
 		BaseGameObject *pBack = _pCurrentScene->_gameObjects.back();
 		pBack->CreateFromWorld(_pCurrentScene->_world);
+		//NOTE : 여기서 플레이어의 포인터를 저장하고는 있지만, 나중에는 키값으로 찾을 수 있게끔 바꿔야 한다...
+		_pPlayer = pBack;
 	}break;
 
 	case ARCHE_BAT :

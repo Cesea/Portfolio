@@ -26,12 +26,16 @@ Camera::Camera()
 
 	_curDist = 0;
 
-	playerPos = { 0,0,0 };
+	//playerPos = { 0,0,0 };
 	
 }
 
 Camera::~Camera()
 {
+	//if(플레이어를 따라가는 모드일때)
+	//{
+	//	TransformComponent &targetTransform = _pTargetObject->_entity.GetComponent<TransformComponent>();
+	//}
 }
 
 void Camera::CreateFromWorld(World & world)
@@ -78,7 +82,6 @@ void Camera::UpdateMatrix()
 void Camera::UpdateCamToDevice()
 {
 	
-
 	gpDevice->SetTransform(D3DTS_VIEW, &_matView);
 	gpDevice->SetTransform(D3DTS_PROJECTION, &_matProjection);
 
@@ -87,6 +90,15 @@ void Camera::UpdateCamToDevice()
 void Camera::UpdateFrustum()
 {
 	_frustum.UpdateFrustum(*this);
+}
+
+void Camera::SetTargetObject(BaseGameObject * pTargetObject)
+{
+	if (nullptr == pTargetObject)
+	{
+		return;
+	}
+	_pTargetObject = pTargetObject;
 }
 
 void Camera::ComputeRay(const Vector2 & screenPos, Ray * pOutRay)

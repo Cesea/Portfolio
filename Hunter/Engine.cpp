@@ -167,8 +167,8 @@ bool Engine::InitializePlatform(HINSTANCE instanceHandle)
 		return false;
 	}
 
-	RECT windowRect;
-	GetWindowRect(_windowHandle, &windowRect);
+	RECT clipRect;
+	GetClientRect(_windowHandle, &clipRect);
 
 	gWindowHandle = _windowHandle;
 

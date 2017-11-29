@@ -88,6 +88,8 @@ bool GameScene::Init()
 	_channel.Broadcast<GameObjectFactory::CreateObjectOnLocationEvent>(
 		GameObjectFactory::CreateObjectOnLocationEvent(ARCHE_HERO, ResourceHandle(), Vector3(0.0f, 0.0f, 0.0f)));
 
+	_camera.SetTargetObject(GAMEOBJECTFACTORY->GetPlayerObject());
+
 	//에디터 생성
 	imguiRenderInit();
 	_editor = new Editor;

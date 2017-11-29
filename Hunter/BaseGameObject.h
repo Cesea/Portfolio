@@ -5,7 +5,10 @@
 
 class BaseGameObject
 {
+	//오브젝트 생성을 위해서 Friend class로 함
 	friend class GameObjectFactory;
+	//타겟 오브젝트의 트랜스폼을 받기 위해서 Friend class로 함
+	friend class Camera;
 public :
 	BaseGameObject() {}
 	virtual ~BaseGameObject() {}
