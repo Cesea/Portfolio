@@ -60,7 +60,15 @@ struct CollisionComponent : public Component
 	BoundingSphere _boundingSphere;
 	BoundingBox _boundingBox;
 
+	enum TRIGGER_TYPE
+	{
+		TRIGGER_TYPE_PLAYER,
+		TRIGGER_TYPE_ENEMY,
+		TRIGGER_TYPE_OBJECT,
+		TRIGGER_TYPE_DEFAULT
+	};
 	bool _isTrigger{};
+	TRIGGER_TYPE _triggerType;
 	bool _locked{};
 
 	//디버그용 함수들...

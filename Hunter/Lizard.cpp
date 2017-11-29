@@ -31,6 +31,14 @@ bool Lizard::CreateFromWorld(World & world)
 	collision._boundingSphere._localCenter = pAnimation->_pSkinnedMesh->_boundInfo._center;
 	collision._boundingSphere._radius = pAnimation->_pSkinnedMesh->_boundInfo._radius;
 
+	video::AnimationInstance *pAnimation = VIDEO->GetAnimationInstance(renderComp._skinned);
+	CollisionComponent &collision = _entity.AddComponent<CollisionComponent>();
+	collision._boundingBox.Init(pAnimation->_pSkinnedMesh->_boundInfo._min,
+		pAnimation->_pSkinnedMesh->_boundInfo._max);
+	collision._boundingSphere._localCenter = pAnimation->_pSkinnedMesh->_boundInfo._center;
+	collision._boundingSphere._radius = pAnimation->_pSkinnedMesh->_boundInfo._radius;
+	collision._locked = false;
+
 	ScriptComponent &scriptComponent = _entity.AddComponent<ScriptComponent>();
 	scriptComponent.SetScript(MAKE_SCRIPT_DELEGATE(Lizard, Update, *this));
 

@@ -113,11 +113,11 @@ void Bat::Update(float deltaTime)
 		}
 		else
 		{
-			//´ÙÀ½ ÀÎµ¦½º·Î ¹æÇâÀ» ¾ò°í
+			//ë‹¤ìŒ ì¸ë±ìŠ¤ë¡œ ë°©í–¥ì„ ì–»ê³ 
 			Vector3 direction = _moveSegment[_patrolIndex] - transComp.GetWorldPosition();
 			float distance = Vec3Length(&direction);
 			Vec3Normalize(&direction, &direction);
-			//¸öÀÌ ´ú µ¹¾Æ°¬´Â°¡?
+			//ëª¸ì´ ëœ ëŒì•„ê°”ëŠ”ê°€?
 			float distRadian = acos(
 				ClampMinusOnePlusOne(Vec3Dot(&-direction, &transComp.GetForward())));
 			if (distRadian > D3DX_PI) D3DX_PI * 2 - distRadian;
@@ -126,18 +126,18 @@ void Bat::Update(float deltaTime)
 				transComp.LookDirection(-direction, _rotateSpeed);
 				break;
 			}
-			//ÀÌµ¿¼Óµµº¸´Ù °¡±î¿ò?
+			//ì´ë™ì†ë„ë³´ë‹¤ ê°€ê¹Œì›€?
 			if (distance < _speed*deltaTime)
 			{
-				//°Å¸®¸¸Å­ ¿òÁ÷ÀÌ°í patrolIndexº¯°æ
+				//ê±°ë¦¬ë§Œí¼ ì›€ì§ì´ê³  patrolIndexë³€ê²½
 				transComp.SetWorldPosition(transComp.GetWorldPosition() + direction*distance);
 				_patrolIndex++;
 				if (_patrolIndex > _moveSegment.size() - 1) _patrolIndex = 0;
-				//IDLE ¾Ö´Ï¸ŞÀÌ¼Ç ½ÇÇà
+				//IDLE ì• ë‹ˆë©”ì´ì…˜ ì‹¤í–‰
 				_pStateMachine->ChangeState(META_TYPE(BatIdleState)->Name());
 				_state = BATSTATE_IDLE;
 			}
-			//¾Æ´Ï¸é ÀÌµ¿¼Óµµ¸¸Å­ ÀÌµ¿
+			//ì•„ë‹ˆë©´ ì´ë™ì†ë„ë§Œí¼ ì´ë™
 			else
 			{
 				transComp.SetWorldPosition(transComp.GetWorldPosition() + direction*_speed*deltaTime);
@@ -146,7 +146,7 @@ void Bat::Update(float deltaTime)
 		}
 		break;
 	case BATSTATE_FIND:
-		//roar°¡ ³¡³ª¸é ÇÃ·¹ÀÌ¾î¸¦ ÃßÀûÇÏ´Â RUNÀ¸·Î
+		//roarê°€ ëë‚˜ë©´ í”Œë ˆì´ì–´ë¥¼ ì¶”ì í•˜ëŠ” RUNìœ¼ë¡œ
 		_roarCount -= 1;
 		if (_roarCount < 0)
 		{
@@ -176,7 +176,7 @@ void Bat::Update(float deltaTime)
 		if (_atkCount < 0)
 		{
 			_atkCount = _atkTime2;
-			//°ø°İÀ» ¸¶ÃÆÀ¸¸é ´Ù½ÃÇÑ¹ø°Ë»ç
+			//ê³µê²©ì„ ë§ˆì³¤ìœ¼ë©´ ë‹¤ì‹œí•œë²ˆê²€ì‚¬
 			Vector3 direction = _playerPos - transComp.GetWorldPosition();
 			float distance = Vec3Length(&direction);
 			Vec3Normalize(&direction, &direction);
@@ -185,10 +185,10 @@ void Bat::Update(float deltaTime)
 				_state = BATSTATE_ATK2;
 				_pStateMachine->ChangeState(META_TYPE(BatAttack2State)->Name());
 			}
-			//°ø°İ¹üÀ§¸¦ ¹ş¾î³µ´Ù?
+			//ê³µê²©ë²”ìœ„ë¥¼ ë²—ì–´ë‚¬ë‹¤?
 			else
 			{
-				//¹èÆ²À» ¸ØÃß°í ±âº»ÀÚ¼¼ (´Ù½ÃÃßÀû½ÃÀÛ)
+				//ë°°í‹€ì„ ë©ˆì¶”ê³  ê¸°ë³¸ìì„¸ (ë‹¤ì‹œì¶”ì ì‹œì‘)
 				_battle = false;
 				_state = BATSTATE_IDLE;
 				_pStateMachine->ChangeState(META_TYPE(BatIdleState)->Name());
@@ -200,7 +200,7 @@ void Bat::Update(float deltaTime)
 		if (_atkCount < 0)
 		{
 			_atkCount = _atkTime3;
-			//°ø°İÀ» ¸¶ÃÆÀ¸¸é ´Ù½ÃÇÑ¹ø°Ë»ç
+			//ê³µê²©ì„ ë§ˆì³¤ìœ¼ë©´ ë‹¤ì‹œí•œë²ˆê²€ì‚¬
 			Vector3 direction = _playerPos - transComp.GetWorldPosition();
 			float distance = Vec3Length(&direction);
 			Vec3Normalize(&direction, &direction);
@@ -210,10 +210,10 @@ void Bat::Update(float deltaTime)
 				_pStateMachine->ChangeState(META_TYPE(BatAttack3State)->Name());
 				_playerPos = Vector3(RandFloat(-5.0, 5.0), 11.0f, RandFloat(-5.0, 5.0));
 			}
-			//°ø°İ¹üÀ§¸¦ ¹ş¾î³µ´Ù?
+			//ê³µê²©ë²”ìœ„ë¥¼ ë²—ì–´ë‚¬ë‹¤?
 			else
 			{
-				//¹èÆ²À» ¸ØÃß°í ±âº»ÀÚ¼¼ (´Ù½ÃÃßÀû½ÃÀÛ)
+				//ë°°í‹€ì„ ë©ˆì¶”ê³  ê¸°ë³¸ìì„¸ (ë‹¤ì‹œì¶”ì ì‹œì‘)
 				_battle = false;
 				_state = BATSTATE_IDLE;
 				_pStateMachine->ChangeState(META_TYPE(BatIdleState)->Name());
@@ -225,7 +225,7 @@ void Bat::Update(float deltaTime)
 		if (_atkCount < 0)
 		{
 			_atkCount = _atkTime;
-			//°ø°İÀ» ¸¶ÃÆÀ¸¸é ´Ù½ÃÇÑ¹ø°Ë»ç
+			//ê³µê²©ì„ ë§ˆì³¤ìœ¼ë©´ ë‹¤ì‹œí•œë²ˆê²€ì‚¬
 			Vector3 direction = _playerPos - transComp.GetWorldPosition();
 			float distance = Vec3Length(&direction);
 			Vec3Normalize(&direction, &direction);
@@ -234,10 +234,10 @@ void Bat::Update(float deltaTime)
 				_state = BATSTATE_ATK1;
 				_pStateMachine->ChangeState(META_TYPE(BatAttackState)->Name());
 			}
-			//°ø°İ¹üÀ§¸¦ ¹ş¾î³µ´Ù?
+			//ê³µê²©ë²”ìœ„ë¥¼ ë²—ì–´ë‚¬ë‹¤?
 			else
 			{
-				//¹èÆ²À» ¸ØÃß°í ±âº»ÀÚ¼¼ (´Ù½ÃÃßÀû½ÃÀÛ)
+				//ë°°í‹€ì„ ë©ˆì¶”ê³  ê¸°ë³¸ìì„¸ (ë‹¤ì‹œì¶”ì ì‹œì‘)
 				_battle = false;
 				_state = BATSTATE_IDLE;
 				_pStateMachine->ChangeState(META_TYPE(BatIdleState)->Name());
@@ -245,12 +245,12 @@ void Bat::Update(float deltaTime)
 		}
 		break;
 	}
-	//ÀüÅõ»óÅÂ°¡ ¾Æ´Ï¶ó¸é Ç×½Ã ÇÃ·¹ÀÌ¾î¸¦ ¼ö»öÇÑ´Ù.
+	//ì „íˆ¬ìƒíƒœê°€ ì•„ë‹ˆë¼ë©´ í•­ì‹œ í”Œë ˆì´ì–´ë¥¼ ìˆ˜ìƒ‰í•œë‹¤.
 	if (!_battle)
 	{
 		if (findPlayer(transComp.GetForward(), _playerPos, transComp.GetWorldPosition(), _findStareDistance, _findDistance, _findRadian))
 		{
-			//Ã£À¸¸é FIND°¡ µÇ¸ç battle»óÅÂ°¡ ‰Î
+			//ì°¾ìœ¼ë©´ FINDê°€ ë˜ë©° battleìƒíƒœê°€ Â‰
 			_battle = true;
 			_state = BATSTATE_FIND;
 			_pStateMachine->ChangeState(META_TYPE(BatFindState)->Name());
@@ -296,7 +296,7 @@ bool Bat::findPlayer(Vector3 forward, Vector3 playerPos, Vector3 myPos, float ra
 	float distRadian = acos(
 		ClampMinusOnePlusOne(Vec3Dot(&forward, &-toPlayer)));
 	if (distRadian > D3DX_PI) D3DX_PI * 2 - distRadian;
-	//½Ã¾ß°¢ÀÇ 1/2º¸´Ù ÀÛ´Ù¸é range1 ¼­Ä¡
+	//ì‹œì•¼ê°ì˜ 1/2ë³´ë‹¤ ì‘ë‹¤ë©´ range1 ì„œì¹˜
 	if (distRadian < findRadian / 2)
 	{
 		if (distance < range1)
@@ -304,7 +304,7 @@ bool Bat::findPlayer(Vector3 forward, Vector3 playerPos, Vector3 myPos, float ra
 			return true;
 		}
 	}
-	//¾Æ´Ï¶ó¸é range2 ¼­Ä¡
+	//ì•„ë‹ˆë¼ë©´ range2 ì„œì¹˜
 	else
 	{
 		if (distance < range2)
