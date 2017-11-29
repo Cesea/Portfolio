@@ -6,6 +6,7 @@
 
 class IScene;
 
+
 enum ARCHE_TYPE
 {
 	ARCHE_NONE,

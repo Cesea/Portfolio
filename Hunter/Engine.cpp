@@ -167,6 +167,9 @@ bool Engine::InitializePlatform(HINSTANCE instanceHandle)
 		return false;
 	}
 
+	RECT windowRect;
+	GetWindowRect(_windowHandle, &windowRect);
+
 	gWindowHandle = _windowHandle;
 
 	ShowWindow(_windowHandle, SW_SHOW);
@@ -193,7 +196,6 @@ bool Engine::InitializeSystems()
 	SPRITEMANAGER->Init(gpDevice);
 
 	GAMEOBJECTFACTORY->Init();
-
 
 	_pScene = std::make_shared<SceneManager>(SceneManager());
 	if (!_pScene->Init())

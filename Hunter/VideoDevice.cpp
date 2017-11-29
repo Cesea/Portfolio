@@ -393,6 +393,12 @@ void video::VideoDevice::DestroyVertexBuffer(VertexBufferHandle handle)
 	_vertexBufferPool.Remove(handle);
 }
 
+//TODO : Implement this
+void video::VideoDevice::DestroyEveryVertexBuffers()
+{
+	//ResourceHandlePool<VertexBufferHandle> &handleTable = _vertexBufferPool.GetHandleTable();
+}
+
 IndexBufferHandle video::VideoDevice::CreateIndexBuffer(Memory * memory, uint32 stride, const std::string & name)
 {
 	IndexBufferHandle result = _indexBufferPool.Create(name);
@@ -448,6 +454,10 @@ void video::VideoDevice::DestroyIndexBuffer(IndexBufferHandle handle)
 	_indexBufferPool.Remove(handle);
 }
 
+void video::VideoDevice::DestroyEveryndexBuffers()
+{
+}
+
 VertexDeclHandle video::VideoDevice::CreateVertexDecl(const VertexDecl *decl, const std::string &name)
 {
 	VertexDeclHandle result = _vertexDeclHandlePool.Create(name);
@@ -475,6 +485,10 @@ void video::VideoDevice::DestroyVertexDecl(VertexDeclHandle handle)
 {
 	_vertexDecls[handle.index].Destroy();
 	_vertexDeclHandlePool.Remove(handle);
+}
+
+void video::VideoDevice::DestroyEveryVertexDecls()
+{
 }
 
 TextureHandle video::VideoDevice::CreateTexture(const std::string &fileName, const std::string &name)
@@ -528,6 +542,10 @@ void video::VideoDevice::DestroyTexture(TextureHandle handle)
 	_textureHandlePool.Remove(handle);
 }
 
+void video::VideoDevice::DestroyEveryTextures()
+{
+}
+
 void video::VideoDevice::SaveTexture(const std::string & fileName, video::TextureHandle handle)
 {
 	_textures[handle.index].Save(fileName);
@@ -568,6 +586,10 @@ void video::VideoDevice::DestroyEffect(EffectHandle handle)
 	_effectHandlePool.Remove(handle);
 }
 
+void video::VideoDevice::DestroyEveryEffects()
+{
+}
+
 RenderViewHandle video::VideoDevice::CreateRenderView(const std::string & name)
 {
 	RenderViewHandle result = _renderViewHandlePool.Create(name);
@@ -584,6 +606,10 @@ void video::VideoDevice::DestroyRenderView(RenderViewHandle handle)
 {
 	_renderViews[handle.index].Destroy();
 	_renderViewHandlePool.Remove(handle);
+}
+
+void video::VideoDevice::DestroyEveryRenderViews()
+{
 }
 
 MaterialHandle video::VideoDevice::CreateMaterial(const std::string & name)
@@ -623,6 +649,10 @@ void video::VideoDevice::MaterialAddTexture(MaterialHandle material, uint32 text
 	_materials[material.index].AddTexture(textureSlot, texture);
 }
 
+void video::VideoDevice::DestroyEveryMaterials()
+{
+}
+
 StaticXMeshHandle video::VideoDevice::CreateStaticXMesh(const std::string fileName, const Matrix * pCorrection, const std::string &name)
 {
 	StaticXMeshHandle result = _staticXMeshHandlePool.Create(name);
@@ -657,6 +687,10 @@ void video::VideoDevice::DestroyStaticXMesh(StaticXMeshHandle handle)
 {
 	_staticMeshes[handle.index].Destroy();
 	_staticXMeshHandlePool.Remove(handle);
+}
+
+void video::VideoDevice::DestroyEveryStaticMesh()
+{
 }
 
 SkinnedXMeshHandle video::VideoDevice::CreateSkinnedXMesh(const std::string fileName, const Matrix * pCorrection, const std::string & name)
@@ -698,6 +732,10 @@ void video::VideoDevice::DestroySkinnedMesh(SkinnedXMeshHandle handle)
 	_skinnedXMeshHandlePool.Remove(handle);
 }
 
+void video::VideoDevice::DestroyEverySkinnedMesh()
+{
+}
+
 AnimationInstanceHandle video::VideoDevice::CreateAnimationInstance(SkinnedXMeshHandle xMesh, const std::string & name)
 {
 	AnimationInstanceHandle result = _animationInstanceHandlePool.Create(name);
@@ -735,6 +773,10 @@ void video::VideoDevice::DestroyAnimationInstance(AnimationInstanceHandle handle
 		_animationInstances[handle.index].Destroy();
 	}
 	_animationInstanceHandlePool.Remove(handle);
+}
+
+void video::VideoDevice::DestroyEveryAnimationInstances()
+{
 }
 
 FontHandle video::VideoDevice::CreateFont(const D3DXFONT_DESC & fontDesc, const std::string & name)
@@ -789,4 +831,8 @@ void video::VideoDevice::DrawFontShadow(FontHandle handle, const std::string & s
 void video::VideoDevice::GetBoundingRect(FontHandle handle, const std::string & str, int32 x, int32 y, RECT * pOutRect)
 {
 	_fonts[handle.index].GetBoundingRect(str, x, y, pOutRect);
+}
+
+void video::VideoDevice::DestroyEveryFonts()
+{
 }

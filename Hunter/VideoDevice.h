@@ -58,6 +58,7 @@ namespace video
 		VertexBuffer *GetVertexBuffer(VertexBufferHandle handle);
 		const std::string &GetVertexBufferName(VertexBufferHandle handle);
 		void DestroyVertexBuffer(VertexBufferHandle handle);
+		void DestroyEveryVertexBuffers();
 		//uint8 *UpdateVertexBuffer(VertexBufferHandle handle, Memory *memory);
 
 		//인덱스 버퍼 생성
@@ -67,6 +68,7 @@ namespace video
 		IndexBuffer *GetIndexBuffer(IndexBufferHandle handle);
 		const std::string &GetIndexBufferName(IndexBufferHandle handle);
 		void DestroyIndexBuffer(IndexBufferHandle handle);
+		void DestroyEveryndexBuffers();
 		//uint8 *UpdateIndexBuffer(IndexBufferHandle handle, Memory *memory);
 
 		//버텍스 데클 생성
@@ -75,6 +77,7 @@ namespace video
 		VertexDecl *GetVertexDecl(VertexDeclHandle handle);
 		const std::string &GetVertexDeclName(VertexDeclHandle handle);
 		void DestroyVertexDecl(VertexDeclHandle handle);
+		void DestroyEveryVertexDecls();
 
 		//텍스쳐 생성
 		//파일로부터 텍스쳐를 생성한다.
@@ -86,6 +89,7 @@ namespace video
 		Texture *GetTexture(TextureHandle handle);
 		const std::string &GetTextureName(TextureHandle handle);
 		void DestroyTexture(TextureHandle handle);
+		void DestroyEveryTextures();
 		void SaveTexture(const std::string &fileName, video::TextureHandle handle);
 
 		//이펙트 생성
@@ -94,6 +98,7 @@ namespace video
 		Effect *GetEffect(EffectHandle handle);
 		const std::string &GetEffectName(EffectHandle handle);
 		void DestroyEffect(EffectHandle handle);
+		void DestroyEveryEffects();
 
 		//렌더 뷰 생성
 		RenderViewHandle CreateRenderView(const std::string &name = "");
@@ -101,6 +106,7 @@ namespace video
 		RenderView *GetRenderView(RenderViewHandle handle);
 		const std::string &GetRenderViewName(RenderViewHandle handle);
 		void DestroyRenderView(RenderViewHandle handle);
+		void DestroyEveryRenderViews();
 		
 		MaterialHandle CreateMaterial(const std::string &name = "");
 		MaterialHandle GetMaterial(const std::string &name);
@@ -108,12 +114,15 @@ namespace video
 		void DestroyMaterial(MaterialHandle handle);
 		const std::string &GetMaterialName(MaterialHandle handle);
 		void MaterialAddTexture(MaterialHandle material, uint32 textureSlot, TextureHandle texture);
+		void DestroyEveryMaterials();
+
 
 		StaticXMeshHandle CreateStaticXMesh(const std::string fileName, const Matrix *pCorrection, const std::string &name);
 		StaticXMeshHandle GetStaticXMesh(const std::string &name);
 		StaticXMesh *GetStaticXMesh(StaticXMeshHandle handle);
 		const std::string &GetStaticXMeshName(StaticXMeshHandle handle);
 		void  DestroyStaticXMesh(StaticXMeshHandle handle);
+		void DestroyEveryStaticMesh();
 
 		SkinnedXMeshHandle CreateSkinnedXMesh(const std::string fileName, const Matrix *pCorrection, 
 			const std::string &name);
@@ -121,12 +130,14 @@ namespace video
 		SkinnedXMesh *GetSkinnedXMesh(SkinnedXMeshHandle handle);
 		const std::string &GetSkinnedXMeshName(SkinnedXMeshHandle handle);
 		void DestroySkinnedMesh(SkinnedXMeshHandle handle);
+		void DestroyEverySkinnedMesh();
 
 		AnimationInstanceHandle CreateAnimationInstance(SkinnedXMeshHandle xMesh, const std::string &name);
 		AnimationInstanceHandle GetAnimationInstance(const std::string &name);
 		AnimationInstance *GetAnimationInstance(AnimationInstanceHandle handle);
 		const std::string &GetAnimationInstanceName(AnimationInstanceHandle handle);
 		void DestroyAnimationInstance(AnimationInstanceHandle handle);
+		void DestroyEveryAnimationInstances();
 
 		//Font Functions
 		FontHandle CreateFont(const D3DXFONT_DESC &fontDesc, const std::string &name);
@@ -139,6 +150,7 @@ namespace video
 			int32 x, int32 y, uint32 color, uint32 shadow = 0xff000000);
 		void GetBoundingRect(FontHandle handle, const std::string &str, 
 			int32 x, int32 y, RECT *pOutRect);
+		void DestroyEveryFonts();
 
 	private:
 		//Private Functions

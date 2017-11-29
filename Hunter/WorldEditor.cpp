@@ -93,13 +93,9 @@ void Editor::InTerrainEditMode()
 	{
 		ImguiIndent();
 
-		if (ImguiSlider("Brush Inner Radius", &_terrainEditor._heightBrush._innerRadius, 0.0f, 5.0f, 0.1f))
-		{
-		}
+		ImguiSlider("Brush Inner Radius", &_terrainEditor._heightBrush._innerRadius, 0.0f, 5.0f, 0.1f);
 		_terrainEditor._heightBrush.SetInnerRadius(_terrainEditor._heightBrush._innerRadius);
-		if (ImguiSlider("Brush Outter Radius", &_terrainEditor._heightBrush._outterRadius, 0.0f, 5.0f, 0.1f))
-		{
-		}
+		ImguiSlider("Brush Outter Radius", &_terrainEditor._heightBrush._outterRadius, 0.0f, 5.0f, 0.1f);
 		_terrainEditor._heightBrush.SetOutterRadius(_terrainEditor._heightBrush._outterRadius);
 		ImguiSlider("Brush Intensity", &_terrainEditor._heightBrush._intensity, 0.0f, 1.0f, 0.05f);
 
@@ -183,16 +179,10 @@ void Editor::InTerrainEditMode()
 	if (_terrainEditor._editingTexture)
 	{
 		ImguiIndent();
-		if (ImguiSlider("Brush Inner Radius", &_terrainEditor._textureBrush._innerRadius, 
-			0.0f, 5.0f, 0.1f))
-		{
-			_terrainEditor._textureBrush.SetInnerRadius(_terrainEditor._textureBrush._innerRadius);
-		}
-		if (ImguiSlider("Brush Outter Radius", &_terrainEditor._textureBrush._outterRadius,
-			0.0f, 5.0f, 0.1f))
-		{
-			_terrainEditor._textureBrush.SetOutterRadius(_terrainEditor._textureBrush._outterRadius);
-		}
+		ImguiSlider("Brush Inner Radius", &_terrainEditor._textureBrush._innerRadius, 0.0f, 5.0f, 0.1f);
+		_terrainEditor._textureBrush.SetInnerRadius(_terrainEditor._textureBrush._innerRadius);
+		ImguiSlider("Brush Outter Radius", &_terrainEditor._textureBrush._outterRadius, 0.0f, 5.0f, 0.1f);
+		_terrainEditor._textureBrush.SetOutterRadius(_terrainEditor._textureBrush._outterRadius);
 
 #pragma region Texture Select
 		ImguiLabel("Select Texture");
