@@ -488,6 +488,8 @@ public:
 	void Clear();
 
 	const HandleType BuildHandle(uint16 index, uint16 count) const;
+	HandleTable &GetHandleTable() { return _handleTable; }
+	NameTable &GetNametable() { return _nameTable; }
 
 private:
 	uint32 _defaultPoolSize;

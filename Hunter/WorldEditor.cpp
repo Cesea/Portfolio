@@ -93,10 +93,11 @@ void Editor::InTerrainEditMode()
 	{
 		ImguiIndent();
 
-		//TODO : 브러쉬가 Inner, Outter Radius의 영향을 제대로 받게끔 고치자
-		ImguiSlider("Brush Inner Radius", &_terrainEditor._brushInnerRadius, 0.0f, 2.0f, 0.1f);
-		ImguiSlider("Brush Outter Radius", &_terrainEditor._brushOutterRadius, 2.0f, 5.0f, 0.1f);
-		ImguiSlider("Brush Intensity", &_terrainEditor._brushIntensity, 0.0f, 1.0f, 0.05f);
+		ImguiSlider("Brush Inner Radius", &_terrainEditor._heightBrush._innerRadius, 0.0f, 5.0f, 0.1f);
+		_terrainEditor._heightBrush.SetInnerRadius(_terrainEditor._heightBrush._innerRadius);
+		ImguiSlider("Brush Outter Radius", &_terrainEditor._heightBrush._outterRadius, 0.0f, 5.0f, 0.1f);
+		_terrainEditor._heightBrush.SetOutterRadius(_terrainEditor._heightBrush._outterRadius);
+		ImguiSlider("Brush Intensity", &_terrainEditor._heightBrush._intensity, 0.0f, 1.0f, 0.05f);
 
 		if (ImguiCheck("Grow", _terrainEditor._grow))
 		{
@@ -141,17 +142,21 @@ void Editor::InTerrainEditMode()
 			if (_terrainEditor._grow)
 			{
 				TERRAIN->AddHeightOnCursorPos(Vector2((float)_mx, (float)_my), 
-					_terrainEditor._brushInnerRadius, _terrainEditor._brushOutterRadius, _terrainEditor._brushIntensity);
+					_terrainEditor._heightBrush._innerRadius,
+					_terrainEditor._heightBrush._outterRadius,
+					_terrainEditor._heightBrush._intensity);
 			}
 			else if (_terrainEditor._dig)
 			{
 				TERRAIN->AddHeightOnCursorPos(Vector2((float)_mx, (float)_my), 
-					_terrainEditor._brushInnerRadius, _terrainEditor._brushOutterRadius,
-					-_terrainEditor._brushIntensity);
+					_terrainEditor._heightBrush._innerRadius,
+					_terrainEditor._heightBrush._outterRadius,
+					_terrainEditor._heightBrush._intensity);
 			}
 			else if (_terrainEditor._smooth)
 			{
-				TERRAIN->SmoothOnCursorPos(Vector2((float)_mx, (float)_my), _terrainEditor._brushInnerRadius);
+				TERRAIN->SmoothOnCursorPos(Vector2((float)_mx, (float)_my), 
+					_terrainEditor._heightBrush._outterRadius);
 			}
 			else if (_terrainEditor._flat)
 			{
@@ -174,8 +179,10 @@ void Editor::InTerrainEditMode()
 	if (_terrainEditor._editingTexture)
 	{
 		ImguiIndent();
-		ImguiSlider("Brush Inner Radius", &_terrainEditor._brushInnerRadius, 4.0f, 10.0f, 0.1f);
-		ImguiSlider("Brush Outter Radius", &_terrainEditor._brushOutterRadius, 4.0f, 10.0f, 0.1f);
+		ImguiSlider("Brush Inner Radius", &_terrainEditor._textureBrush._innerRadius, 0.0f, 5.0f, 0.1f);
+		_terrainEditor._textureBrush.SetInnerRadius(_terrainEditor._textureBrush._innerRadius);
+		ImguiSlider("Brush Outter Radius", &_terrainEditor._textureBrush._outterRadius, 0.0f, 5.0f, 0.1f);
+		_terrainEditor._textureBrush.SetOutterRadius(_terrainEditor._textureBrush._outterRadius);
 
 #pragma region Texture Select
 		ImguiLabel("Select Texture");
@@ -376,8 +383,8 @@ void Editor::InTerrainEditMode()
 			!(_mx > 0  && _mx < EDITORSIZEX && _my > 0 && _my < EDITORSIZEX))
 		{
 			TERRAIN->DrawAlphaTextureOnCursorPos(Vector2((float)_mx, (float)_my),
-				_terrainEditor._brushInnerRadius, _terrainEditor._brushOutterRadius,
-				_terrainEditor._brushIntensity, video::TextureHandle(), _terrainEditor._channel);
+				_terrainEditor._textureBrush._innerRadius, _terrainEditor._textureBrush._outterRadius,
+				_terrainEditor._channel);
 		}
 		ImguiUnindent();
 	}
@@ -679,11 +686,14 @@ void Editor::Init()
 	strncpy(_terrainEditor._textureName03, TERRAIN->_currentConfig._tile3FileName, EDITOR_MAX_NAME);
 
 	_terrainEditor._terrainConfig._textureMult = TERRAIN->_currentConfig._textureMult;
+	_terrainEditor._heightBrush.Init();
+	_terrainEditor._textureBrush.Init();
 
 	strncpy(_terrainEditor._terrainConfig._tile0FileName, TERRAIN->_currentConfig._tile0FileName, EDITOR_MAX_NAME);
 	strncpy(_terrainEditor._terrainConfig._tile1FileName, TERRAIN->_currentConfig._tile1FileName, EDITOR_MAX_NAME);
 	strncpy(_terrainEditor._terrainConfig._tile2FileName, TERRAIN->_currentConfig._tile2FileName, EDITOR_MAX_NAME);
 	strncpy(_terrainEditor._terrainConfig._tile3FileName, TERRAIN->_currentConfig._tile3FileName, EDITOR_MAX_NAME);
+
 }
 
 void Editor::Shutdown()
@@ -715,6 +725,15 @@ void Editor::Edit(RefVariant &object, const InputManager &input)
 	
 	case Editor::eTerrainEdit :
 	{
+		Vector3 cursorWorldPos;
+		Ray ray;
+		TERRAIN->_pCurrentScene->_camera.ComputeRay(
+			Vector2(input.mouse.GetCurrentPoint().x, input.mouse.GetCurrentPoint().y), &ray);
+		if (TERRAIN->IsIntersectRay(ray, &cursorWorldPos))
+		{
+			_terrainEditor._heightBrush._centerPos = cursorWorldPos;
+			_terrainEditor._textureBrush._centerPos = cursorWorldPos;
+		}
 		ImguiBeginScrollArea("Terrain Editor", EDITORX, EDITORY, EDITORSIZEX, EDITORSIZEY, &_scroll);
 		InTerrainEditMode();
 		ImguiEndScrollArea();
@@ -748,6 +767,28 @@ void Editor::SetEdittingEntity(Entity & entity)
 
 void Editor::Render()
 {
+	switch (_currentMode)
+	{
+	case Editor::eTerrainEdit:
+	{
+		if (_terrainEditor._editingHeight)
+		{
+			_terrainEditor._heightBrush.Render();
+		}
+		else if (_terrainEditor._editingTexture)
+		{
+			_terrainEditor._textureBrush.Render();
+		}
+	} break;
+	case Editor::eObjectLocate:
+	{
+
+	} break;
+	case Editor::eObjectEdit:
+	{
+
+	} break;
+	}
 }
 
 void ObjectEditor::OnNewSelection(Entity entity)
@@ -781,4 +822,87 @@ void ObjectEditor::OnNewSelection(Entity entity)
 
 void TerrainEditor::Reset()
 {
+}
+
+bool Brush::Init()
+{
+	_innerRadius = 1.0f;
+	_outterRadius = 2.0f;
+
+	_intensity = 1.0f;
+
+	_centerPos = Vector3(0.0f, 0.0f, 0.0f);
+
+	float deltaAngle = D3DX_PI / (BRUSH_CIRCLE_RES - 1);
+
+	for (int32 i = 0; i < BRUSH_CIRCLE_RES; ++i)
+	{
+		_innerVertices[i]._position.x = cosf(deltaAngle * i) * _innerRadius + _centerPos.x;
+		_innerVertices[i]._position.x = sinf(deltaAngle * i) * _innerRadius + _centerPos.z;
+		_innerVertices[i]._color = BRUSH_INNER_COLOR;
+	}
+
+	for (int32 i = 0; i < BRUSH_CIRCLE_RES; ++i)
+	{
+		_outterVertices[i]._position.x = cosf(deltaAngle * i) * _outterRadius + _centerPos.x;
+		_outterVertices[i]._position.x = sinf(deltaAngle * i) * _outterRadius + _centerPos.z;
+		_outterVertices[i]._color = BRUSH_OUTTER_COLOR;
+	}
+
+	return true;
+}
+
+void Brush::SetInnerRadius(float radius)
+{
+	_innerRadius = radius;
+
+	float deltaAngle = (2 * D3DX_PI) / (BRUSH_CIRCLE_RES - 1);
+
+	for (uint32 i = 0; i < BRUSH_CIRCLE_RES ; ++i)
+	{
+		_innerVertices[i]._position.x = cosf(i * deltaAngle) * _innerRadius + _centerPos.x;
+		_innerVertices[i]._position.z = sinf(i * deltaAngle) * _innerRadius + _centerPos.z;
+	}
+	for (uint32 i = 0; i < BRUSH_CIRCLE_RES; ++i)
+	{
+		_innerVertices[i]._position.y = TERRAIN->GetHeight(
+			_innerVertices[i]._position.x, _innerVertices[i]._position.z) + 0.1f;
+	}
+
+	if (_outterRadius < _innerRadius)
+	{
+		SetOutterRadius(radius + 0.1f);
+	}
+}
+
+void Brush::SetOutterRadius(float radius)
+{
+	_outterRadius = radius;
+
+	float deltaAngle = (2 * D3DX_PI) / (BRUSH_CIRCLE_RES - 1);
+
+	for (uint32 i = 0; i < BRUSH_CIRCLE_RES ; ++i)
+	{
+		_outterVertices[i]._position.x = cosf(i * deltaAngle) * _outterRadius + _centerPos.x;
+		_outterVertices[i]._position.z = sinf(i * deltaAngle) * _outterRadius + _centerPos.z;
+	}
+	for (uint32 i = 0; i < BRUSH_CIRCLE_RES; ++i)
+	{
+		_outterVertices[i]._position.y = TERRAIN->GetHeight(
+			_outterVertices[i]._position.x, _outterVertices[i]._position.z) + 0.1f;
+	}
+	if (_innerRadius >= _outterRadius)
+	{
+		SetInnerRadius(radius - 0.1f);
+	}
+}
+
+void Brush::Render()
+{
+	Matrix iden;
+	MatrixIdentity(&iden);
+	gpDevice->SetTransform(D3DTS_WORLD, &iden);
+	gpDevice->DrawPrimitiveUP(D3DPT_LINESTRIP, BRUSH_CIRCLE_RES - 1, _innerVertices, sizeof(BrushVertex));
+	gpDevice->DrawPrimitiveUP(D3DPT_LINESTRIP, BRUSH_CIRCLE_RES - 1, _outterVertices, sizeof(BrushVertex));
+
 }

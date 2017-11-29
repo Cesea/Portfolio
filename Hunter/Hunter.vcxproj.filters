@@ -261,9 +261,12 @@
     <ClCompile Include="LizardStates.cpp">
       <Filter>Game\GameObjects\Lizard</Filter>
     </ClCompile>
+    <ClCompile Include="GameScene.cpp">
+      <Filter>Game\GameScenes\GameScene</Filter>
+    </ClCompile>
+    <ClCompile Include="GameObjects.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="GameObjects.h" />
     <ClInclude Include="Lights.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="stdafx.h" />
@@ -612,6 +615,12 @@
     </ClInclude>
     <ClInclude Include="LizardStates.h">
       <Filter>Game\GameObjects\Lizard</Filter>
+    </ClInclude>
+    <ClInclude Include="GameScene.h">
+      <Filter>Game\GameScenes\GameScene</Filter>
+    </ClInclude>
+    <ClInclude Include="GameObjects.h">
+      <Filter>Game\GameObjects</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

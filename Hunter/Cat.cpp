@@ -16,19 +16,23 @@ bool Cat::CreateFromWorld(World & world)
 	TransformComponent &transComp = _entity.AddComponent<TransformComponent>();
 	transComp.MovePositionWorld(0, 7.0f, 0);
 
+	static int32 animCount = 0;
+
 	RenderComponent &renderComp = _entity.AddComponent<RenderComponent>();
 	renderComp._type = RenderComponent::Type::eSkinned;
 	renderComp._skinned = VIDEO->CreateAnimationInstance(
-		VIDEO->GetSkinnedXMesh("Cat"), "Anim" + std::to_string(0));
+		VIDEO->GetSkinnedXMesh("Cat"), "Cat_" + std::to_string(animCount));
 	renderComp._arche = ARCHE_CAT;
 
 	video::AnimationInstance *pAnimation = VIDEO->GetAnimationInstance(renderComp._skinned);
+
 	CollisionComponent &collision = _entity.AddComponent<CollisionComponent>();
 	collision._boundingBox.Init(pAnimation->_pSkinnedMesh->_boundInfo._min,
 		pAnimation->_pSkinnedMesh->_boundInfo._max);
 	collision._boundingSphere._localCenter = pAnimation->_pSkinnedMesh->_boundInfo._center;
 	collision._boundingSphere._radius = pAnimation->_pSkinnedMesh->_boundInfo._radius;
 	collision._locked = false;
+
 
 	ScriptComponent &scriptComponent = _entity.AddComponent<ScriptComponent>();
 	scriptComponent.SetScript(MAKE_SCRIPT_DELEGATE(Cat, Update, *this));
@@ -108,11 +112,11 @@ void Cat::Update(float deltaTime)
 		}
 		else
 		{
-			//´ÙÀ½ ÀÎµ¦½º·Î ¹æÇâÀ» ¾ò°í
+			//ë‹¤ìŒ ì¸ë±ìŠ¤ë¡œ ë°©í–¥ì„ ì–»ê³ 
 			Vector3 direction = _moveSegment[_patrolIndex] - transComp.GetWorldPosition();
 			float distance = Vec3Length(&direction);
 			Vec3Normalize(&direction, &direction);
-			//¸öÀÌ ´ú µ¹¾Æ°¬´Â°¡?
+			//ëª¸ì´ ëœ ëŒì•„ê°”ëŠ”ê°€?
 			float distRadian = acos(
 				ClampMinusOnePlusOne(Vec3Dot(&-direction, &transComp.GetForward())));
 			if (distRadian > D3DX_PI) D3DX_PI * 2 - distRadian;
@@ -121,18 +125,18 @@ void Cat::Update(float deltaTime)
 				transComp.LookDirection(-direction, _rotateSpeed);
 				break;
 			}
-			//ÀÌµ¿¼Óµµº¸´Ù °¡±î¿ò?
+			//ì´ë™ì†ë„ë³´ë‹¤ ê°€ê¹Œì›€?
 			if (distance < _speed*deltaTime)
 			{
-				//°Å¸®¸¸Å­ ¿òÁ÷ÀÌ°í patrolIndexº¯°æ
+				//ê±°ë¦¬ë§Œí¼ ì›€ì§ì´ê³  patrolIndexë³€ê²½
 				transComp.SetWorldPosition(transComp.GetWorldPosition() + direction*distance);
 				_patrolIndex++;
 				if (_patrolIndex > _moveSegment.size() - 1) _patrolIndex = 0;
-				//IDLE ¾Ö´Ï¸ŞÀÌ¼Ç ½ÇÇà
+				//IDLE ì• ë‹ˆë©”ì´ì…˜ ì‹¤í–‰
 				_pStateMachine->ChangeState(META_TYPE(CatStandState)->Name());
 				_state = CATSTATE_IDLE;
 			}
-			//¾Æ´Ï¸é ÀÌµ¿¼Óµµ¸¸Å­ ÀÌµ¿
+			//ì•„ë‹ˆë©´ ì´ë™ì†ë„ë§Œí¼ ì´ë™
 			else
 			{
 				transComp.SetWorldPosition(transComp.GetWorldPosition() + direction*_speed*deltaTime);
@@ -141,7 +145,7 @@ void Cat::Update(float deltaTime)
 		}
 		break;
 	case CATSTATE_FIND:
-		//roar°¡ ³¡³ª¸é ÇÃ·¹ÀÌ¾î¸¦ ÃßÀûÇÏ´Â RUNÀ¸·Î
+		//roarê°€ ëë‚˜ë©´ í”Œë ˆì´ì–´ë¥¼ ì¶”ì í•˜ëŠ” RUNìœ¼ë¡œ
 		_roarCount -= 1;
 		if (_roarCount < 0)
 		{
@@ -171,7 +175,7 @@ void Cat::Update(float deltaTime)
 		if (_atkCount < 0)
 		{
 			_atkCount = _atkTime;
-			//°ø°İÀ» ¸¶ÃÆÀ¸¸é ´Ù½ÃÇÑ¹ø°Ë»ç
+			//ê³µê²©ì„ ë§ˆì³¤ìœ¼ë©´ ë‹¤ì‹œí•œë²ˆê²€ì‚¬
 			Vector3 direction = _playerPos - transComp.GetWorldPosition();
 			float distance = Vec3Length(&direction);
 			Vec3Normalize(&direction, &direction);
@@ -180,10 +184,10 @@ void Cat::Update(float deltaTime)
 				_state = CATSTATE_ATK2;
 				_pStateMachine->ChangeState(META_TYPE(CatAttack2State)->Name());
 			}
-			//°ø°İ¹üÀ§¸¦ ¹ş¾î³µ´Ù?
+			//ê³µê²©ë²”ìœ„ë¥¼ ë²—ì–´ë‚¬ë‹¤?
 			else
 			{
-				//¹èÆ²À» ¸ØÃß°í ±âº»ÀÚ¼¼ (´Ù½ÃÃßÀû½ÃÀÛ)
+				//ë°°í‹€ì„ ë©ˆì¶”ê³  ê¸°ë³¸ìì„¸ (ë‹¤ì‹œì¶”ì ì‹œì‘)
 				_battle = false;
 				_state = CATSTATE_IDLE;
 				_pStateMachine->ChangeState(META_TYPE(CatStandState)->Name());
@@ -195,7 +199,7 @@ void Cat::Update(float deltaTime)
 		if (_atkCount < 0)
 		{
 			_atkCount = _atkTime;
-			//°ø°İÀ» ¸¶ÃÆÀ¸¸é ´Ù½ÃÇÑ¹ø°Ë»ç
+			//ê³µê²©ì„ ë§ˆì³¤ìœ¼ë©´ ë‹¤ì‹œí•œë²ˆê²€ì‚¬
 			Vector3 direction = _playerPos - transComp.GetWorldPosition();
 			float distance = Vec3Length(&direction);
 			Vec3Normalize(&direction, &direction);
@@ -204,10 +208,10 @@ void Cat::Update(float deltaTime)
 				_state = CATSTATE_ATK3;
 				_pStateMachine->ChangeState(META_TYPE(CatAttack3State)->Name());
 			}
-			//°ø°İ¹üÀ§¸¦ ¹ş¾î³µ´Ù?
+			//ê³µê²©ë²”ìœ„ë¥¼ ë²—ì–´ë‚¬ë‹¤?
 			else
 			{
-				//¹èÆ²À» ¸ØÃß°í ±âº»ÀÚ¼¼ (´Ù½ÃÃßÀû½ÃÀÛ)
+				//ë°°í‹€ì„ ë©ˆì¶”ê³  ê¸°ë³¸ìì„¸ (ë‹¤ì‹œì¶”ì ì‹œì‘)
 				_battle = false;
 				_state = CATSTATE_IDLE;
 				_pStateMachine->ChangeState(META_TYPE(CatStandState)->Name());
@@ -219,7 +223,7 @@ void Cat::Update(float deltaTime)
 		if (_atkCount < 0)
 		{
 			_atkCount = _atkTime;
-			//°ø°İÀ» ¸¶ÃÆÀ¸¸é ´Ù½ÃÇÑ¹ø°Ë»ç
+			//ê³µê²©ì„ ë§ˆì³¤ìœ¼ë©´ ë‹¤ì‹œí•œë²ˆê²€ì‚¬
 			Vector3 direction = _playerPos - transComp.GetWorldPosition();
 			float distance = Vec3Length(&direction);
 			Vec3Normalize(&direction, &direction);
@@ -228,10 +232,10 @@ void Cat::Update(float deltaTime)
 				_state = CATSTATE_ATK5;
 				_pStateMachine->ChangeState(META_TYPE(CatAttack5State)->Name());
 			}
-			//°ø°İ¹üÀ§¸¦ ¹ş¾î³µ´Ù?
+			//ê³µê²©ë²”ìœ„ë¥¼ ë²—ì–´ë‚¬ë‹¤?
 			else
 			{
-				//¹èÆ²À» ¸ØÃß°í ±âº»ÀÚ¼¼ (´Ù½ÃÃßÀû½ÃÀÛ)
+				//ë°°í‹€ì„ ë©ˆì¶”ê³  ê¸°ë³¸ìì„¸ (ë‹¤ì‹œì¶”ì ì‹œì‘)
 				_battle = false;
 				_state = CATSTATE_IDLE;
 				_pStateMachine->ChangeState(META_TYPE(CatStandState)->Name());
@@ -245,7 +249,7 @@ void Cat::Update(float deltaTime)
 		if (_atkCount < 0)
 		{
 			_atkCount = _atkTime;
-			//°ø°İÀ» ¸¶ÃÆÀ¸¸é ´Ù½ÃÇÑ¹ø°Ë»ç
+			//ê³µê²©ì„ ë§ˆì³¤ìœ¼ë©´ ë‹¤ì‹œí•œë²ˆê²€ì‚¬
 			Vector3 direction = _playerPos - transComp.GetWorldPosition();
 			float distance = Vec3Length(&direction);
 			Vec3Normalize(&direction, &direction);
@@ -255,10 +259,10 @@ void Cat::Update(float deltaTime)
 				_pStateMachine->ChangeState(META_TYPE(CatAttackState)->Name());
 				_playerPos = Vector3(RandFloat(-5.0, 5.0), 7.0f, RandFloat(-5.0, 5.0));
 			}
-			//°ø°İ¹üÀ§¸¦ ¹ş¾î³µ´Ù?
+			//ê³µê²©ë²”ìœ„ë¥¼ ë²—ì–´ë‚¬ë‹¤?
 			else
 			{
-				//¹èÆ²À» ¸ØÃß°í ±âº»ÀÚ¼¼ (´Ù½ÃÃßÀû½ÃÀÛ)
+				//ë°°í‹€ì„ ë©ˆì¶”ê³  ê¸°ë³¸ìì„¸ (ë‹¤ì‹œì¶”ì ì‹œì‘)
 				_battle = false;
 				_state = CATSTATE_IDLE;
 				_pStateMachine->ChangeState(META_TYPE(CatStandState)->Name());
@@ -275,12 +279,12 @@ void Cat::Update(float deltaTime)
 		}
 		break;
 	}
-	//ÀüÅõ»óÅÂ°¡ ¾Æ´Ï¶ó¸é Ç×½Ã ÇÃ·¹ÀÌ¾î¸¦ ¼ö»öÇÑ´Ù.
+	//ì „íˆ¬ìƒíƒœê°€ ì•„ë‹ˆë¼ë©´ í•­ì‹œ í”Œë ˆì´ì–´ë¥¼ ìˆ˜ìƒ‰í•œë‹¤.
 	if (!_battle)
 	{
 		if (findPlayer(transComp.GetForward(), _playerPos, transComp.GetWorldPosition(), _findStareDistance, _findDistance, _findRadian))
 		{
-			//Ã£À¸¸é FIND°¡ µÇ¸ç battle»óÅÂ°¡ ‰Î
+			//ì°¾ìœ¼ë©´ FINDê°€ ë˜ë©° battleìƒíƒœê°€ Â‰
 			_battle = true;
 			_state = CATSTATE_FIND;
 			_pStateMachine->ChangeState(META_TYPE(CatIdleState)->Name());
@@ -325,7 +329,7 @@ bool Cat::findPlayer(Vector3 forward, Vector3 playerPos, Vector3 myPos, float ra
 	float distRadian = acos(
 		ClampMinusOnePlusOne(Vec3Dot(&forward, &-toPlayer)));
 	if (distRadian > D3DX_PI) D3DX_PI * 2 - distRadian;
-	//½Ã¾ß°¢ÀÇ 1/2º¸´Ù ÀÛ´Ù¸é range1 ¼­Ä¡
+	//ì‹œì•¼ê°ì˜ 1/2ë³´ë‹¤ ì‘ë‹¤ë©´ range1 ì„œì¹˜
 	if (distRadian < findRadian / 2)
 	{
 		if (distance < range1)
@@ -333,7 +337,7 @@ bool Cat::findPlayer(Vector3 forward, Vector3 playerPos, Vector3 myPos, float ra
 			return true;
 		}
 	}
-	//¾Æ´Ï¶ó¸é range2 ¼­Ä¡
+	//ì•„ë‹ˆë¼ë©´ range2 ì„œì¹˜
 	else
 	{
 		if (distance < range2)

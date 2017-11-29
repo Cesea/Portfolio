@@ -14,13 +14,8 @@ bool BaseScene::Init()
 	video::SkinnedXMesh::_sStaticEffectHandle = VIDEO->GetEffect("StaticMesh.fx");
 	video::SkinnedXMesh::_sSkinnedEffectHandle = VIDEO->GetEffect("SkinnedMesh.fx");
 
-	InitPlayerAnimation();
-	InitSnakeAnimation();
-	InitTurtleAnimation();
-	InitBatAnimation();
-	InitCatAnimation();
-	InitHydraAnimation();
-	InitLizardAnimation();
+	InitAnimations();
+	
 	Terrain::TerrainConfig config;
 	config._xChunkCount = 2;
 	config._zChunkCount = 2;
@@ -53,7 +48,6 @@ bool BaseScene::Init()
 	video::SkinnedXMeshHandle batMesh = VIDEO->CreateSkinnedXMesh(
 		"../resources/Models/DragonBat/DragonBat_Black.X", &correctionMat, "Bat");
 
-
 	MatrixScaling(&correctionMat, 1.0f, 1.0f, 1.0f);
 	video::SkinnedXMeshHandle catMesh = VIDEO->CreateSkinnedXMesh(
 		"../resources/Models/DevilCat/DevilCat.X", &correctionMat, "Cat");
@@ -65,6 +59,7 @@ bool BaseScene::Init()
 	MatrixScaling(&correctionMat, 1.0f, 1.0f, 1.0f);
 	video::SkinnedXMeshHandle LizardMesh = VIDEO->CreateSkinnedXMesh(
 		"../resources/Models/Lizard/Lizard.X", &correctionMat, "Lizard");
+
 
 	MatrixScaling(&correctionMat, 1.0f, 1.0f, 1.0f);
 	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Rock/Rock1_A.X", &correctionMat, "Rock01");
@@ -105,11 +100,11 @@ bool BaseScene::Init()
 	_pEnvironmentSphere = new EnvironmentSphere;
 	_pEnvironmentSphere->Create("../resources/Textures/grassenvmap1024.dds");
 
-	//_channel.Broadcast<GameObjectFactory::CreateObjectOnLocationEvent>(
-	//	GameObjectFactory::CreateObjectOnLocationEvent(ARCHE_HERO, ResourceHandle(), Vector3(0.0f, 0.0f, 0.0f)));
-
 	_channel.Broadcast<GameObjectFactory::CreateObjectOnLocationEvent>(
 		GameObjectFactory::CreateObjectOnLocationEvent(ARCHE_SNAKE, ResourceHandle(), Vector3(0.0f, 5.0f, 0.0f)));
+
+	_channel.Broadcast<GameObjectFactory::CreateObjectOnLocationEvent>(
+		GameObjectFactory::CreateObjectOnLocationEvent(ARCHE_HERO, ResourceHandle(), Vector3(0.0f, 0.0f, 0.0f)));
 
 	_channel.Broadcast<GameObjectFactory::CreateObjectOnLocationEvent>(
 		GameObjectFactory::CreateObjectOnLocationEvent(ARCHE_HERO, ResourceHandle(), Vector3(0.0f, 0.0f, 0.0f)));

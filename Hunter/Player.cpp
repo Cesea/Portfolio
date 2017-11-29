@@ -32,9 +32,13 @@ bool Player::CreateFromWorld(World & world)
    transComp._position = Vector3(0, TERRAIN->GetHeight(0.0f, 0.0f), 0);
    //transComp.MovePositionWorld();
 
+   static int32 animCount = 0;
+
    RenderComponent &renderComp = _entity.AddComponent<RenderComponent>();
    renderComp._type = RenderComponent::Type::eSkinned;
-   renderComp._skinned = VIDEO->CreateAnimationInstance(VIDEO->GetSkinnedXMesh("Knight"), "Anim" + std::to_string(0));
+   renderComp._skinned = VIDEO->CreateAnimationInstance(VIDEO->GetSkinnedXMesh("Knight"), 
+	   "Knight_" + std::to_string(animCount));
+   renderComp._arche = ARCHE_HERO;
 
    video::AnimationInstance *pAnimation = VIDEO->GetAnimationInstance(renderComp._skinned);
 
