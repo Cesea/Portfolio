@@ -42,6 +42,21 @@ DEFINE_META(CatStandState)
 	//ADD_MEMBER(_pActor);
 }
 
+DEFINE_META(CatHurt1State)
+{
+	//ADD_MEMBER(_pActor);
+}
+
+DEFINE_META(CatHurt2State)
+{
+	//ADD_MEMBER(_pActor);
+}
+
+DEFINE_META(CatDeadState)
+{
+	//ADD_MEMBER(_pActor);
+}
+
 bool CatState::Init(StateMachine<Cat>* pParent)
 {
 	_pParent = pParent;
@@ -207,4 +222,66 @@ void CatStandState::OnExit()
 {
 	_pParent->ClearActioniQueue();
 }
+
+
+void CatHurt1State::OnEnter()
+{
+	_pParent->QueueAction(CAT_ANIM(CAT_HIT1));
+}
+
+void CatHurt1State::Update(float deltaTime, const GameCommand & command)
+{
+	switch (command._type)
+	{
+	default:
+		break;
+	}
+}
+
+void CatHurt1State::OnExit()
+{
+	_pParent->ClearActioniQueue();
+}
+
+
+void CatHurt2State::OnEnter()
+{
+	_pParent->QueueAction(CAT_ANIM(CAT_HIT2));
+}
+
+void CatHurt2State::Update(float deltaTime, const GameCommand & command)
+{
+	switch (command._type)
+	{
+	default:
+		break;
+	}
+}
+
+void CatHurt2State::OnExit()
+{
+	_pParent->ClearActioniQueue();
+}
+
+
+
+void CatDeadState::OnEnter()
+{
+	_pParent->QueueAction(CAT_ANIM(CAT_DEATH));
+}
+
+void CatDeadState::Update(float deltaTime, const GameCommand & command)
+{
+	switch (command._type)
+	{
+	default:
+		break;
+	}
+}
+
+void CatDeadState::OnExit()
+{
+	_pParent->ClearActioniQueue();
+}
+
 

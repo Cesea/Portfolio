@@ -138,6 +138,7 @@ bool BaseScene::Update(float deltaTime, const InputManager &input)
 
 	_camera.PreUpdateMatrix();
 	_transformSystem.PreUpdate(deltaTime);
+	_collisionSystem.Update(deltaTime, 1000.0f);
 
 	//Collision Check
 	//_transformSystem.PostUpdate(deltaTime);

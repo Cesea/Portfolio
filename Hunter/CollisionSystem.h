@@ -22,6 +22,22 @@ public :
 	virtual void OnEntityAdded(Entity& entity);
 
 	virtual void OnEntityRemoved(Entity& entity);
+
+	//Event
+	
+	struct ActorTriggerEvent
+	{
+		ActorTriggerEvent(Entity entity1,Entity entity2) : _entity1(entity1),_entity2(entity2){}
+		Entity _entity1;
+		Entity _entity2;
+	};
+	struct ObjectTriggerEvent
+	{
+		ObjectTriggerEvent(Entity entity1, Entity entity2) : _entity1(entity1), _entity2(entity2) {}
+		Entity _entity1;
+		Entity _entity2;
+	};
+	EventChannel _channel;
 };
 
 

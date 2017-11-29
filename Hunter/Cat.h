@@ -52,7 +52,7 @@ private:
 		CATSTATE_ATK4,
 		CATSTATE_ATK5,
 		CATSTATE_HURT,
-		CATSTATE_DIE,
+		CATSTATE_DEATH,
 		CATSTATE_STAND
 	};
 	CATSTATE _state;
@@ -62,7 +62,7 @@ public:
 
 	virtual bool CreateFromWorld(World &world);
 	void Update(float deltaTime);
-
+	void Handle(const CollisionSystem::ActorTriggerEvent & event);
 protected:
 	void SetupCallbackAndCompression();
 

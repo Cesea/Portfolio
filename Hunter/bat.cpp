@@ -31,6 +31,8 @@ bool Bat::CreateFromWorld(World & world)
 	collision._boundingSphere._localCenter = pAnimation->_pSkinnedMesh->_boundInfo._center;
 	collision._boundingSphere._radius = pAnimation->_pSkinnedMesh->_boundInfo._radius;
 	collision._locked = false;
+	collision._isTrigger = true;
+	collision._triggerType = CollisionComponent::TRIGGER_TYPE_ENEMY;
 
 	ScriptComponent &scriptComponent = _entity.AddComponent<ScriptComponent>();
 	scriptComponent.SetScript(MAKE_SCRIPT_DELEGATE(Bat, Update, *this));
@@ -54,6 +56,9 @@ bool Bat::CreateFromWorld(World & world)
 	_pStateMachine->RegisterState(META_TYPE(BatAttack2State)->Name(), new BatAttack2State());
 	_pStateMachine->RegisterState(META_TYPE(BatAttack3State)->Name(), new BatAttack3State());
 	_pStateMachine->RegisterState(META_TYPE(BatFindState)->Name(), new BatFindState());
+	_pStateMachine->RegisterState(META_TYPE(BatHurt1State)->Name(), new BatHurt1State());
+	_pStateMachine->RegisterState(META_TYPE(BatHurt2State)->Name(), new BatHurt2State());
+	_pStateMachine->RegisterState(META_TYPE(BatDeadState)->Name(), new BatDeadState());
 	_pStateMachine->ChangeState(META_TYPE(BatIdleState)->Name());
 
 	_state = BATSTATE_IDLE;;
@@ -87,6 +92,14 @@ bool Bat::CreateFromWorld(World & world)
 	_standTime = 90;
 	_standCount = _standTime;
 
+	_hurtTime = 100;
+	_hurtCount = _hurtTime;
+
+	_hp = 500;
+
+	//이벤트 등록
+	EventChannel channel;
+	channel.Add<CollisionSystem::ActorTriggerEvent, Bat>(*this);
 	return true;
 }
 
@@ -244,6 +257,44 @@ void Bat::Update(float deltaTime)
 			}
 		}
 		break;
+	case BATSTATE_HURT:
+		_hurtCount--;
+		if (_hurtCount < 0)
+		{
+			_hurtCount = _hurtTime;
+			//거리를 계산해서 가까운상태면 어택
+			Vector3 direction = _playerPos - transComp.GetWorldPosition();
+			float distance = Vec3Length(&direction);
+			Vec3Normalize(&direction, &direction);
+			if (distance < _atkRange)
+			{
+				_state = BATSTATE_ATK1;
+				_pStateMachine->ChangeState(META_TYPE(BatAttackState)->Name());
+			}
+			else
+			{
+				//전투중에 거리가벌어진거라면 roar없이 돌격
+				if (_battle)
+				{
+					_state = BATSTATE_RUN;
+					_pStateMachine->ChangeState(META_TYPE(BatMoveState)->Name());
+				}
+				//비전투인데 맞았다?
+				else
+				{
+					// 추격
+					_battle = true;
+					_state = BATSTATE_FIND;
+					_pStateMachine->ChangeState(META_TYPE(BatIdleState)->Name());
+					Vector3 distance = _playerPos - transComp.GetWorldPosition();
+					Vec3Normalize(&distance, &distance);
+					transComp.LookDirection(-distance, D3DX_PI * 2);
+				}
+			}
+		}
+		break;
+	case BATSTATE_DEATH:
+		break;
 	}
 	//전투상태가 아니라면 항시 플레이어를 수색한다.
 	if (!_battle)
@@ -259,6 +310,36 @@ void Bat::Update(float deltaTime)
 			transComp.LookDirection(-distance, D3DX_PI * 2);
 			_atkCount = _atkTime;
 		}
+	}
+}
+
+void Bat::Handle(const CollisionSystem::ActorTriggerEvent & event)
+{
+	if (event._entity1 != _entity) return;
+	CollisionComponent & _collision = event._entity2.GetComponent<CollisionComponent>();
+	switch (_collision._triggerType)
+	{
+		//플레이어와 충돌했다(내가 가해자)
+	case CollisionComponent::TRIGGER_TYPE_PLAYER:
+		if (_state != BATSTATE_HURT&&_state != BATSTATE_DEATH)
+		{
+			resetAllCount();
+			_state = BATSTATE_HURT;
+			_pStateMachine->ChangeState(META_TYPE(BatHurt1State)->Name());
+			_battle = true;
+			_hp -= 50;
+			if (_hp <= 0)
+			{
+				_state = BATSTATE_DEATH;
+				_pStateMachine->ChangeState(META_TYPE(BatDeadState)->Name());
+			}
+		}
+		break;
+		//오브젝트와 충돌했다
+	case CollisionComponent::TRIGGER_TYPE_OBJECT:
+		break;
+	case CollisionComponent::TRIGGER_TYPE_DEFAULT:
+		break;
 	}
 }
 

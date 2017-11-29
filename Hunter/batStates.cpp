@@ -31,6 +31,21 @@ DEFINE_META(BatFindState)
 	//ADD_MEMBER(_pActor);
 }
 
+DEFINE_META(BatHurt1State)
+{
+	//ADD_MEMBER(_pActor);
+}
+
+DEFINE_META(BatHurt2State)
+{
+	//ADD_MEMBER(_pActor);
+}
+
+DEFINE_META(BatDeadState)
+{
+	//ADD_MEMBER(_pActor);
+}
+
 bool BatState::Init(StateMachine<Bat>* pParent)
 {
 	_pParent = pParent;
@@ -153,6 +168,66 @@ void BatFindState::Update(float deltaTime, const GameCommand & command)
 }
 
 void BatFindState::OnExit()
+{
+	_pParent->ClearActioniQueue();
+}
+
+
+void BatHurt1State::OnEnter()
+{
+	_pParent->QueueAction(BAT_ANIM(BAT_HIT1));
+}
+
+void BatHurt1State::Update(float deltaTime, const GameCommand & command)
+{
+	switch (command._type)
+	{
+	default:
+		break;
+	}
+}
+
+void BatHurt1State::OnExit()
+{
+	_pParent->ClearActioniQueue();
+}
+
+
+void BatHurt2State::OnEnter()
+{
+	_pParent->QueueAction(BAT_ANIM(BAT_HIT2));
+}
+
+void BatHurt2State::Update(float deltaTime, const GameCommand & command)
+{
+	switch (command._type)
+	{
+	default:
+		break;
+	}
+}
+
+void BatHurt2State::OnExit()
+{
+	_pParent->ClearActioniQueue();
+}
+
+
+void BatDeadState::OnEnter()
+{
+	_pParent->QueueAction(BAT_ANIM(BAT_DEATH));
+}
+
+void BatDeadState::Update(float deltaTime, const GameCommand & command)
+{
+	switch (command._type)
+	{
+	default:
+		break;
+	}
+}
+
+void BatDeadState::OnExit()
 {
 	_pParent->ClearActioniQueue();
 }

@@ -115,3 +115,33 @@ public:
 	virtual void Update(float deltaTime, const GameCommand &command) override;
 	virtual void OnExit() override;
 };
+
+class CatHurt1State : public CatState
+{
+public:
+	DECLARE_META(CatHurt1State);
+
+	virtual void OnEnter() override;
+	virtual void Update(float deltaTime, const GameCommand &command) override;
+	virtual void OnExit() override;
+};
+
+class CatHurt2State : public CatState
+{
+public:
+	DECLARE_META(CatHurt2State);
+
+	virtual void OnEnter() override;
+	virtual void Update(float deltaTime, const GameCommand &command) override;
+	virtual void OnExit() override;
+};
+
+class CatDeadState : public CatState
+{
+public:
+	DECLARE_META(CatDeadState);
+
+	virtual void OnEnter() override;
+	virtual void Update(float deltaTime, const GameCommand &command) override;
+	virtual void OnExit() override;
+};
