@@ -129,7 +129,7 @@ bool GameScene::Update(float deltaTime, const InputManager & input)
 	return result;
 }
 
-bool GameScene::Render()
+void GameScene::Render0()
 {
 	video::StaticXMesh::SetCamera(_camera);
 	video::StaticXMesh::SetBaseLight(_pMainLight);
@@ -151,8 +151,12 @@ bool GameScene::Render()
 
 	gpDevice->EndScene();
 	gpDevice->Present(nullptr, nullptr, NULL, nullptr);
-
-	return true;
+}
+void GameScene::Render1()
+{
+}
+void GameScene::Render2()
+{
 }
 
 void GameScene::Release()

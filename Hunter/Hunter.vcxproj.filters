@@ -271,6 +271,9 @@
     <ClCompile Include="IScene.cpp">
       <Filter>Game\GameScenes</Filter>
     </ClCompile>
+    <ClCompile Include="SceneChangeEffectUpDown.cpp">
+      <Filter>Core\SceneManager</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Lights.h" />
@@ -627,6 +630,9 @@
     </ClInclude>
     <ClInclude Include="GameObjects.h">
       <Filter>Game\GameObjects</Filter>
+    </ClInclude>
+    <ClInclude Include="SceneChangeEffectUpDown.h">
+      <Filter>Core\SceneManager</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

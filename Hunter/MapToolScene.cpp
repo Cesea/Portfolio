@@ -164,7 +164,7 @@ bool MapToolScene::Update(float deltaTime, const InputManager & input)
 	return result;
 }
 
-bool MapToolScene::Render()
+void MapToolScene::Render0()
 {
 	video::StaticXMesh::SetCamera(_camera);
 	video::StaticXMesh::SetBaseLight(_pMainLight);
@@ -188,7 +188,13 @@ bool MapToolScene::Render()
 	gpDevice->EndScene();
 	gpDevice->Present(nullptr, nullptr, NULL, nullptr);
 
-	return true;
+}
+
+void MapToolScene::Render1()
+{
+}
+void MapToolScene::Render2()
+{
 }
 
 void MapToolScene::Release()

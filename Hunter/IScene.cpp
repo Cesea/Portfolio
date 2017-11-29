@@ -11,11 +11,13 @@ bool IScene::RenderToMainCamTexture()
 	//환경 랜더
 	RenderEnvironmentSphere();
 	//랜더된다.
-	Scene_Render0();
-	Scene_Render1();
-	Scene_Render2();
+	Render0();
+	Render1();
+	Render2();
 	
-	_camera.RenderTextureEnd();}
+	_camera.RenderTextureEnd();
+	return true;
+}
 
 LPDIRECT3DTEXTURE9 IScene::GetSceneTexture()
 {
@@ -24,5 +26,6 @@ LPDIRECT3DTEXTURE9 IScene::GetSceneTexture()
 
 bool IScene::RenderEnvironmentSphere()
 {
-	_pEnvironmentSphere->Render();
+	_pEnvironmentSphere->Render(_camera);
+	return true;
 }

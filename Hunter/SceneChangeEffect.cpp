@@ -97,15 +97,20 @@ void SceneChangeEffect::Update(float deltaTime)
 	//교채시간이 다 되었다면....
 	if( _deltaTime > _totalTime )
 	{
-		SCENE_MGR->GetInstance()->m_pNowScene = _pNextScene;
+		gEngine->GetScene()->_pCurrentScene = _pNextScene;
 
-		//이전씬은 해제씬으로...
-		SCENE_MGR->GetInstance()->m_pReleaseScene = _pPrevScene;
+		gEngine->GetScene()->_pReleaseScene = _pPrevScene;
 		
-		//씬메니져의 교체 Effect 은 없다.
-		SCENE_MGR->GetInstance()->_pCurrentChangingEffect = nullptr;
+		gEngine->GetScene()->_pCurrentChangeEffect = nullptr;
 
 		_drawReady = false;
+
+
+		//SCENE_MGR->GetInstance()->m_pNowScene = _pNextScene;
+		//이전씬은 해제씬으로...
+		//SCENE_MGR->GetInstance()->m_pReleaseScene = _pPrevScene;
+		//씬메니져의 교체 Effect 은 없다.
+		//SCENE_MGR->GetInstance()->_pCurrentChangingEffect = nullptr;
 	}
 }
 

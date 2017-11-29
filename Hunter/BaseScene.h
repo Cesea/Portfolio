@@ -30,7 +30,10 @@ public:
 
 	virtual bool Init();
 	virtual bool Update(float deltaTime, const InputManager &input);
-	virtual bool Render();
+	virtual void Render0();
+	virtual void Render1();
+	virtual void Render2();
+
 
 	virtual void Release();
 	virtual const char *GetSceneName() { return "BaseScene"; }

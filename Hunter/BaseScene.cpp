@@ -155,7 +155,7 @@ bool BaseScene::Update(float deltaTime, const InputManager &input)
 	return result;
 }
 
-bool BaseScene::Render()
+void BaseScene::Render0()
 {
 	video::StaticXMesh::SetCamera(_camera);
 	video::StaticXMesh::SetBaseLight(_pMainLight);
@@ -178,8 +178,13 @@ bool BaseScene::Render()
 
 	gpDevice->EndScene();
 	gpDevice->Present(nullptr, nullptr, NULL, nullptr);
+}
 
-	return true;	
+void BaseScene::Render1()
+{
+}
+void BaseScene::Render2()
+{
 }
 
 void BaseScene::Release()

@@ -187,6 +187,7 @@
     <ClCompile Include="RenderComponent.cpp" />
     <ClCompile Include="RenderSystem.cpp" />
     <ClCompile Include="SceneChangeEffect.cpp" />
+    <ClCompile Include="SceneChangeEffectUpDown.cpp" />
     <ClCompile Include="ScriptComponent.cpp" />
     <ClCompile Include="ScriptSystem.cpp" />
     <ClCompile Include="Snake.cpp" />
@@ -298,6 +299,7 @@
     <ClInclude Include="RenderSystem.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="SceneChangeEffect.h" />
+    <ClInclude Include="SceneChangeEffectUpDown.h" />
     <ClInclude Include="ScriptComponent.h" />
     <ClInclude Include="ScriptSystem.h" />
     <ClInclude Include="Snake.h" />
