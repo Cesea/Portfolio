@@ -115,7 +115,9 @@ void GameObjectFactory::CreateObject(ARCHE_TYPE type, ResourceHandle handle, con
 
 	case ARCHE_HERO :
 	{
-		_pCurrentScene->_gameObjects.push_back(new Player());
+		Player* _player = new Player();
+		_player->SetLinkCamera(&_pCurrentScene->_camera);
+		_pCurrentScene->_gameObjects.push_back(_player);
 		BaseGameObject *pBack = _pCurrentScene->_gameObjects.back();
 		pBack->CreateFromWorld(_pCurrentScene->_world);
 		//NOTE : 여기서 플레이어의 포인터를 저장하고는 있지만, 나중에는 키값으로 찾을 수 있게끔 바꿔야 한다...

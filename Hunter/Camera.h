@@ -1,7 +1,7 @@
 #ifndef CAMERA_H
 #define CAMERA_H
 
-#define PLAYER_TO_CAMERA_DIST 1.5f
+#define PLAYER_TO_CAMERA_DIST 3.0f
 
 #include "TransformComponent.h"
 #include "Frustum.h"
@@ -16,7 +16,7 @@ enum cameraState
 	//Editer
 };
 
-//Ä«¸Ş¶ó Å¬·¡½º´Â ¿¹¿ÜÀûÀ¸·Î texture¸¦ °¡Áö°í ÀÖ´Ù
+//ì¹´ë©”ë¼ í´ë˜ìŠ¤ëŠ” ì˜ˆì™¸ì ìœ¼ë¡œ textureë¥¼ ê°€ì§€ê³  ìˆë‹¤
 class Camera
 {
 public:
@@ -61,22 +61,28 @@ public:
 
 	const Entity &GetEntity() const { return _entity; }
 
-	//·£´õ Texture ¸¦ ÁØºñ ÇÑ´Ù.
+
+	const Entity &GetDummyEntity() const { return _dummyEntity; }
+
+	//ëœë” Texture ë¥¼ ì¤€ë¹„ í•œë‹¤.
 	void ReadyRenderToTexture( int32 width, int32 height );
 
-	//Shadow Map Texture¸¦ ÁØºñÇÑ´Ù.
+	//Shadow Map Textureë¥¼ ì¤€ë¹„í•œë‹¤.
 	void ReadyShadowTexture( int32 size );
 
-	//·£´õ Texture ·Î ·£´õ¸µ ½ÃÀÛ
+	//ëœë” Texture ë¡œ ëœë”ë§ ì‹œì‘
 	void RenderTextureBegin( uint32 backColor );
 
-	//·£´õ Texture ·Î ·£´õ¸µ Á¾·á
+	//ëœë” Texture ë¡œ ëœë”ë§ ì¢…ë£Œ
 	void RenderTextureEnd();
 
-	//·£ÅÍ Texture ¾ò´Â´Ù.
+	//ëœí„° Texture ì–»ëŠ”ë‹¤.
 	LPDIRECT3DTEXTURE9 GetRenderTexture();
 
 private:
+
+	
+
 	void NormalCameraUpdate(void);
 
 	LPDIRECT3DTEXTURE9 _pRenderTexture{};
@@ -101,8 +107,18 @@ protected:
 	float _verticalAngle{};
 	float _horizontalAngle{};
 
+	TransformComponent* cameraTransform;
+	TransformComponent* targetTransform;
+
+	TransformComponent* dummyTransform;
+
+	Entity _dummyEntity;
+
+	Vector3 _toMove;
+
 	Frustum _frustum;
 	BaseGameObject *_pTargetObject{};
+	
 };
 
 #endif

@@ -4,6 +4,8 @@
 #include "BaseGameObject.h"
 #include "PlayerAnimationString.h"
 
+class Camera;
+
 class Player;
 class PlayerStateMachine;
 
@@ -16,6 +18,7 @@ class PlayerCallbackHandler : public GameObjectAnimationCallbackHandler
 {
 public :
 	bool Init(Player *pPlayer) { _pPlayer = pPlayer; }
+
 	HRESULT CALLBACK HandleCallback(THIS_ UINT Track, LPVOID pCallbackData);
 private :
 	Player *_pPlayer{};
@@ -38,6 +41,8 @@ public :
 	void Handle(const InputManager::MousePressedEvent &event);
 	void Handle(const InputManager::KeyDownEvent &event);
 
+	void SetLinkCamera(Camera* camera) { _camera = camera; }
+
 private :
 	enum PLAYERSTATE
 	{
@@ -51,6 +56,8 @@ private :
 	PLAYERSTATE _state;
 	bool32 _inCombat{};
 
+	Camera* _camera;
+	Vector3 cForward;
 
 	void SetupCallbackAndCompression();
 	PlayerCallbackData _callbackData;

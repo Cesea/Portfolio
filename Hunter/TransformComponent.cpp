@@ -1148,3 +1148,14 @@ Vector3 TransformComponent::GetRight(bool bNormalize /*= true*/) const
 //	//GIZMO_MGR->Line(worldPos, worldPos + _axis[0], 0xffff0000);
 //
 //}
+
+///³»²¨
+void TransformComponent::SetForward(Vector3 Dir)
+{
+	Vector3 WorldUp = Vector3(0, 1, 0);
+	this->_forward = Dir;
+	D3DXVec3Cross(&_right, &WorldUp, &this->_forward);
+	D3DXVec3Cross(&_up, &this->_forward, &this->_right);
+	LookDirection(this->_forward, WorldUp);
+	_transformDirty = true;
+}
