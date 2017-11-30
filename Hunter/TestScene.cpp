@@ -65,9 +65,21 @@ bool TestScene::SceneInit()
 	video::SkinnedXMeshHandle catMesh = VIDEO->CreateSkinnedXMesh(
 		"../resources/Models/DevilCat/DevilCat.X", &correctionMat, "Cat");
 
-	MatrixScaling(&correctionMat, 1.0f, 1.0f, 1.0f);
-	video::SkinnedXMeshHandle HydraMesh = VIDEO->CreateSkinnedXMesh(
-		"../resources/Models/Hydra/Hydra_Red.X", &correctionMat, "Hydra");
+	MatrixScaling(&correctionMat, 2.0f, 2.0f, 2.0f);
+	video::SkinnedXMeshHandle HydraMesh1 = VIDEO->CreateSkinnedXMesh(
+		"../resources/Models/Hydra/Hydra_Green.X", &correctionMat, "Hydra1");
+
+	MatrixScaling(&correctionMat, 2.0f, 2.0f, 2.0f);
+	video::SkinnedXMeshHandle HydraMesh2 = VIDEO->CreateSkinnedXMesh(
+		"../resources/Models/Hydra/Hydra_Red.X", &correctionMat, "Hydra2");
+
+	MatrixScaling(&correctionMat, 2.0f, 2.0f, 2.0f);
+	video::SkinnedXMeshHandle HydraMesh3 = VIDEO->CreateSkinnedXMesh(
+		"../resources/Models/Hydra/Hydra_Black.X", &correctionMat, "Hydra3");
+
+	MatrixScaling(&correctionMat, 2.0f, 2.0f, 2.0f);
+	video::SkinnedXMeshHandle HydraMesh4 = VIDEO->CreateSkinnedXMesh(
+		"../resources/Models/Hydra/Hydra_Gold.X", &correctionMat, "Hydra4");
 
 	MatrixScaling(&correctionMat, 1.0f, 1.0f, 1.0f);
 	video::SkinnedXMeshHandle LizardMesh = VIDEO->CreateSkinnedXMesh(

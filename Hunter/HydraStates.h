@@ -124,3 +124,51 @@ public:
 	virtual void Update(float deltaTime, const GameCommand &command) override;
 	virtual void OnExit() override;
 };
+
+class HydraSpecialAttack1State : public HydraState
+{
+public:
+	DECLARE_META(HydraSpecialAttack1State);
+
+	virtual void OnEnter() override;
+	virtual void Update(float deltaTime, const GameCommand &command) override;
+	virtual void OnExit() override;
+};
+
+class HydraSpecialAttack2State : public HydraState
+{
+public:
+	DECLARE_META(HydraSpecialAttack2State);
+
+	virtual void OnEnter() override;
+	virtual void Update(float deltaTime, const GameCommand &command) override;
+	virtual void OnExit() override;
+};
+
+class HydraBreath1State : public HydraState
+{
+public:
+	DECLARE_META(HydraBreath1State);
+
+	virtual void OnEnter() override;
+	virtual void Update(float deltaTime, const GameCommand &command) override;
+	virtual void OnExit() override;
+};
+class HydraBreath2State : public HydraState
+{
+public:
+	DECLARE_META(HydraBreath2State);
+
+	virtual void OnEnter() override;
+	virtual void Update(float deltaTime, const GameCommand &command) override;
+	virtual void OnExit() override;
+};
+class HydraBreath3State : public HydraState
+{
+public:
+	DECLARE_META(HydraBreath3State);
+
+	virtual void OnEnter() override;
+	virtual void Update(float deltaTime, const GameCommand &command) override;
+	virtual void OnExit() override;
+};

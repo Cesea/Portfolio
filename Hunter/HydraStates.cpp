@@ -47,6 +47,31 @@ DEFINE_META(HydraDeadState)
 	//ADD_MEMBER(_pActor);
 }
 
+DEFINE_META(HydraSpecialAttack1State)
+{
+	//ADD_MEMBER(_pActor);
+}
+
+DEFINE_META(HydraSpecialAttack2State)
+{
+	//ADD_MEMBER(_pActor);
+}
+
+DEFINE_META(HydraBreath1State)
+{
+	//ADD_MEMBER(_pActor);
+}
+
+DEFINE_META(HydraBreath2State)
+{
+	//ADD_MEMBER(_pActor);
+}
+
+DEFINE_META(HydraBreath3State)
+{
+	//ADD_MEMBER(_pActor);
+}
+
 bool HydraState::Init(StateMachine<Hydra>* pParent)
 {
 	_pParent = pParent;
@@ -238,6 +263,110 @@ void HydraDeadState::OnExit()
 {
 	_pParent->ClearActioniQueue();
 }
+
+
+void HydraSpecialAttack1State::OnEnter()
+{
+	_pParent->QueueAction(HYDRA_ANIM(HYDRA_WHIP_HEAD));
+}
+
+void HydraSpecialAttack1State::Update(float deltaTime, const GameCommand & command)
+{
+	switch (command._type)
+	{
+	default:
+		break;
+	}
+}
+
+void HydraSpecialAttack1State::OnExit()
+{
+	_pParent->ClearActioniQueue();
+}
+
+void HydraSpecialAttack2State::OnEnter()
+{
+	_pParent->QueueAction(HYDRA_ANIM(HYDRA_WHIP_TAIL));
+}
+
+void HydraSpecialAttack2State::Update(float deltaTime, const GameCommand & command)
+{
+	switch (command._type)
+	{
+	default:
+		break;
+	}
+}
+
+void HydraSpecialAttack2State::OnExit()
+{
+	_pParent->ClearActioniQueue();
+}
+
+
+void HydraBreath1State::OnEnter()
+{
+	_pParent->QueueAction(HYDRA_ANIM(HYDRA_BREATH_FIRE1));
+}
+
+void HydraBreath1State::Update(float deltaTime, const GameCommand & command)
+{
+	switch (command._type)
+	{
+	default:
+		break;
+	}
+}
+
+void HydraBreath2State::OnExit()
+{
+	_pParent->ClearActioniQueue();
+}
+
+
+
+void HydraBreath2State::OnEnter()
+{
+	_pParent->QueueAction(HYDRA_ANIM(HYDRA_BREATH_FIRE2));
+}
+
+void HydraBreath2State::Update(float deltaTime, const GameCommand & command)
+{
+	switch (command._type)
+	{
+	default:
+		break;
+	}
+}
+
+void HydraBreath3State::OnExit()
+{
+	_pParent->ClearActioniQueue();
+}
+
+
+
+
+void HydraBreath3State::OnEnter()
+{
+	_pParent->QueueAction(HYDRA_ANIM(HYDRA_BREATH_FIRE3));
+}
+
+void HydraBreath3State::Update(float deltaTime, const GameCommand & command)
+{
+	switch (command._type)
+	{
+	default:
+		break;
+	}
+}
+
+void HydraBreath1State::OnExit()
+{
+	_pParent->ClearActioniQueue();
+}
+
+
 
 
 
