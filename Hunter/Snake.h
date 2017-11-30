@@ -52,7 +52,14 @@ private:
 		SNAKESTATE_HURT,
 		SNAKESTATE_DIE,
 	};
+	enum SNAKESKINSTATE
+	{
+		SNAKESKINSTATE_RED,
+		SNAKESKINSTATE_BLACK,
+		SNAKESKINSTATE_CYAN
+	};
 	SNAKESTATE _state;
+	SNAKESKINSTATE _skinType;
 public:
 	Snake();
 	virtual ~Snake();

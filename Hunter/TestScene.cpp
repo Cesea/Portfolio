@@ -43,7 +43,15 @@ bool TestScene::SceneInit()
 
 	MatrixScaling(&correctionMat, 1.0f, 1.0f, 1.0f);
 	video::SkinnedXMeshHandle snakeMesh = VIDEO->CreateSkinnedXMesh(
-		"../resources/Models/Snake/Snake_Red.X", &correctionMat, "Snake");
+		"../resources/Models/Snake/Snake_Red.X", &correctionMat, "Snake1");
+
+	MatrixScaling(&correctionMat, 1.0f, 1.0f, 1.0f);
+	video::SkinnedXMeshHandle snakeMesh2 = VIDEO->CreateSkinnedXMesh(
+		"../resources/Models/Snake/Snake_Black.X", &correctionMat, "Snake2");
+
+	MatrixScaling(&correctionMat, 1.0f, 1.0f, 1.0f);
+	video::SkinnedXMeshHandle snakeMesh3 = VIDEO->CreateSkinnedXMesh(
+		"../resources/Models/Snake/Snake_Cyan.X", &correctionMat, "Snake3");
 
 	MatrixScaling(&correctionMat, 1.0f, 1.0f, 1.0f);
 	video::SkinnedXMeshHandle turtleMesh = VIDEO->CreateSkinnedXMesh(
