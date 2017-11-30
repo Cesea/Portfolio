@@ -59,6 +59,7 @@ bool Turtle::CreateFromWorld(World & world)
 	_pStateMachine->RegisterState(META_TYPE(TurtleHurt1State)->Name(), new TurtleHurt1State());
 	_pStateMachine->RegisterState(META_TYPE(TurtleHurt2State)->Name(), new TurtleHurt2State());
 	_pStateMachine->RegisterState(META_TYPE(TurtleDeadState)->Name(), new TurtleDeadState());
+	_pStateMachine->RegisterState(META_TYPE(TurtleFindState)->Name(), new TurtleFindState());
 	_pStateMachine->ChangeState(META_TYPE(TurtleBite1State)->Name());
 	_state = TURTLESTATE_STAND;
 
@@ -68,15 +69,15 @@ bool Turtle::CreateFromWorld(World & world)
 	_speed = 1.0f;
 	_rotateSpeed = D3DX_PI / 256;
 	_patrolIndex = 0;
-	_moveSegment.push_back(Vector3(5.0f, 6.0f, 5.0f));
-	_moveSegment.push_back(Vector3(-5.0f, 6.0f, 5.0f));
-	_moveSegment.push_back(Vector3(-5.0f, 6.0f, -5.0f));
+	_moveSegment.push_back(Vector3(5.0f, TERRAIN->GetHeight(5.0f, 5.0f), 5.0f));
+	_moveSegment.push_back(Vector3(-5.0f, TERRAIN->GetHeight(-5.0f,6.0f), 6.0f));
+	_moveSegment.push_back(Vector3(-5.0f, TERRAIN->GetHeight(-5.0f, -5.0f), -5.0f));
 	_delayTime = 180.0f;
 	_delayCount = _delayTime;
 
 	_findDistance = 1.0f;
 	_findRadian = D3DX_PI / 3;
-	_findStareDistance = 3.0f;
+	_findStareDistance = 5.0f;
 	_roarTime = 180;
 	_roarCount = _roarTime;
 
@@ -133,12 +134,16 @@ void Turtle::Update(float deltaTime)
 			float distance = Vec3Length(&direction);
 			Vec3Normalize(&direction, &direction);
 			//몸이 덜 돌아갔는가?
+			Vector3 rotatePos = _moveSegment[_patrolIndex];
+			rotatePos.y = transComp.GetWorldPosition().y;
+			Vector3 rotateDir = rotatePos - transComp.GetWorldPosition();
+			Vec3Normalize(&rotateDir, &rotateDir);
 			float distRadian = acos(
-				ClampMinusOnePlusOne(Vec3Dot(&-direction, &transComp.GetForward())));
+				ClampMinusOnePlusOne(Vec3Dot(&-rotateDir, &transComp.GetForward())));
 			if (distRadian > D3DX_PI) D3DX_PI * 2 - distRadian;
 			if (distRadian > _rotateSpeed)
 			{
-				transComp.LookDirection(-direction, _rotateSpeed);
+				transComp.LookDirection(-rotateDir, _rotateSpeed);
 				break;
 			}
 			//이동속도보다 가까움?
@@ -175,6 +180,11 @@ void Turtle::Update(float deltaTime)
 		Vector3 direction = _playerPos - transComp.GetWorldPosition();
 		float distance = Vec3Length(&direction);
 		Vec3Normalize(&direction, &direction);
+		Vector3 rotatePos = _playerPos;
+		rotatePos.y = transComp.GetWorldPosition().y;
+		Vector3 rotateDir = rotatePos - transComp.GetWorldPosition();
+		Vec3Normalize(&rotateDir, &rotateDir);
+		transComp.LookDirection(-rotateDir, D3DX_PI);
 		if (distance < _atkRange)
 		{
 			_state = TURTLESTATE_ATK1;
@@ -283,7 +293,9 @@ void Turtle::Update(float deltaTime)
 			_battle = true;
 			_state = TURTLESTATE_FIND;
 			_pStateMachine->ChangeState(META_TYPE(TurtleFindState)->Name());
-			Vector3 distance = _playerPos - transComp.GetWorldPosition();
+			Vector3 rotatePos = _playerPos;
+			rotatePos.y = transComp.GetWorldPosition().y;
+			Vector3 distance = rotatePos - transComp.GetWorldPosition();
 			Vec3Normalize(&distance, &distance);
 			transComp.LookDirection(-distance, D3DX_PI * 2);
 		}

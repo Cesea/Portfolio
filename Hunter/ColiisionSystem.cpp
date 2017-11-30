@@ -83,7 +83,7 @@ void CollisionSystem::Update(float deltaTime, float checkRange)
 						aabb1._max))
 					{
 						//움직일수 없음의 이벤트
-						Console::Log("Collidededed!!!!\n");
+						//Console::Log("Collidededed!!!!\n");
 						//트리거 검사
 						if (collision._isTrigger)
 						{

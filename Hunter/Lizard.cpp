@@ -14,7 +14,6 @@ bool Lizard::CreateFromWorld(World & world)
 {
 	_entity = world.CreateEntity();
 	TransformComponent &transComp = _entity.AddComponent<TransformComponent>();
-	transComp.MovePositionWorld(0, 12.0f, 0);
 
 	static int32 animCount = 0;
 	RenderComponent &renderComp = _entity.AddComponent<RenderComponent>();
@@ -67,9 +66,9 @@ bool Lizard::CreateFromWorld(World & world)
 	_speed = 3.0f;
 	_rotateSpeed = D3DX_PI / 64;
 	_patrolIndex = 0;
-	_moveSegment.push_back(Vector3(5.0f, 12.0f, 5.0f));
-	_moveSegment.push_back(Vector3(-5.0f, 12.0f, 5.0f));
-	_moveSegment.push_back(Vector3(-5.0f, 12.0f, -5.0f));
+	_moveSegment.push_back(Vector3(7.0f, TERRAIN->GetHeight(7.0f, 5.0f), 5.0f));
+	_moveSegment.push_back(Vector3(-5.0f, TERRAIN->GetHeight(-5.0f, 6.0f), 6.0f));
+	_moveSegment.push_back(Vector3(-5.0f, TERRAIN->GetHeight(-5.0f, -5.0f), -5.0f));
 
 	_delayTime = 180.0f;
 	_delayCount = _delayTime;
@@ -81,8 +80,6 @@ bool Lizard::CreateFromWorld(World & world)
 	_roarCount = _roarTime;
 
 	_battle = false;
-
-	_playerPos = Vector3(5.0f, 12.0f, 5.0f);
 
 	_atkRange = 0.5f;
 	_atkTime = 80;
@@ -131,12 +128,16 @@ void Lizard::Update(float deltaTime)
 			float distance = Vec3Length(&direction);
 			Vec3Normalize(&direction, &direction);
 			//몸이 덜 돌아갔는가?
+			Vector3 rotatePos = _moveSegment[_patrolIndex];
+			rotatePos.y = transComp.GetWorldPosition().y;
+			Vector3 rotateDir = rotatePos - transComp.GetWorldPosition();
+			Vec3Normalize(&rotateDir, &rotateDir);
 			float distRadian = acos(
-				ClampMinusOnePlusOne(Vec3Dot(&-direction, &transComp.GetForward())));
+				ClampMinusOnePlusOne(Vec3Dot(&-rotateDir, &transComp.GetForward())));
 			if (distRadian > D3DX_PI) D3DX_PI * 2 - distRadian;
 			if (distRadian > _rotateSpeed)
 			{
-				transComp.LookDirection(-direction, _rotateSpeed);
+				transComp.LookDirection(-rotateDir, _rotateSpeed);
 				break;
 			}
 			//이동속도보다 가까움?
@@ -153,6 +154,7 @@ void Lizard::Update(float deltaTime)
 			//아니면 이동속도만큼 이동
 			else
 			{
+				Console::Log("MOVE!\n");
 				transComp.SetWorldPosition(transComp.GetWorldPosition() + direction*_speed*deltaTime);
 			}
 
@@ -173,6 +175,11 @@ void Lizard::Update(float deltaTime)
 		Vector3 direction = _playerPos - transComp.GetWorldPosition();
 		float distance = Vec3Length(&direction);
 		Vec3Normalize(&direction, &direction);
+		Vector3 rotatePos = _playerPos;
+		rotatePos.y = transComp.GetWorldPosition().y;
+		Vector3 rotateDir = rotatePos - transComp.GetWorldPosition();
+		Vec3Normalize(&rotateDir, &rotateDir);
+		transComp.LookDirection(-rotateDir, D3DX_PI);
 		if (distance < _atkRange)
 		{
 			_state = LIZARDSTATE_ATK1;
@@ -314,7 +321,9 @@ void Lizard::Update(float deltaTime)
 			_battle = true;
 			_state = LIZARDSTATE_FIND;
 			_pStateMachine->ChangeState(META_TYPE(LizardFindState)->Name());
-			Vector3 distance = _playerPos - transComp.GetWorldPosition();
+			Vector3 rotatePos = _playerPos;
+			rotatePos.y = transComp.GetWorldPosition().y;
+			Vector3 distance = rotatePos - transComp.GetWorldPosition();
 			Vec3Normalize(&distance, &distance);
 			transComp.LookDirection(-distance, D3DX_PI * 2);
 		}

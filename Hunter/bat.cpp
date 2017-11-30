@@ -66,9 +66,9 @@ bool Bat::CreateFromWorld(World & world)
 	_speed = 4.0f;
 	_rotateSpeed = D3DX_PI / 64;
 	_patrolIndex = 0;
-	_moveSegment.push_back(Vector3(5.0f, 11.0f, 5.0f));
-	_moveSegment.push_back(Vector3(-5.0f, 11.0f, 5.0f));
-	_moveSegment.push_back(Vector3(-5.0f, 11.0f, -5.0f));
+	_moveSegment.push_back(Vector3(5.0f, TERRAIN->GetHeight(5.0f, 5.0f) + 1.0f, 5.0f));
+	_moveSegment.push_back(Vector3(-5.0f, TERRAIN->GetHeight(-5.0f, 5.0f) + 1.0f, 5.0f));
+	_moveSegment.push_back(Vector3(-5.0f, TERRAIN->GetHeight(-5.0f, -5.0f) + 1.0f, -5.0f));
 
 	_delayTime = 180.0f;
 	_delayCount = _delayTime;
@@ -107,6 +107,7 @@ bool Bat::CreateFromWorld(World & world)
 void Bat::Update(float deltaTime)
 {
 	_pStateMachine->Update(deltaTime, _currentCommand);
+	_playerPos.y += 1.0f;
 	TransformComponent &transComp = _entity.GetComponent<TransformComponent>();
 	switch (_state)
 	{
@@ -132,12 +133,16 @@ void Bat::Update(float deltaTime)
 			float distance = Vec3Length(&direction);
 			Vec3Normalize(&direction, &direction);
 			//몸이 덜 돌아갔는가?
+			Vector3 rotatePos = _moveSegment[_patrolIndex];
+			rotatePos.y = transComp.GetWorldPosition().y;
+			Vector3 rotateDir = rotatePos - transComp.GetWorldPosition();
+			Vec3Normalize(&rotateDir, &rotateDir);
 			float distRadian = acos(
-				ClampMinusOnePlusOne(Vec3Dot(&-direction, &transComp.GetForward())));
+				ClampMinusOnePlusOne(Vec3Dot(&-rotateDir, &transComp.GetForward())));
 			if (distRadian > D3DX_PI) D3DX_PI * 2 - distRadian;
 			if (distRadian > _rotateSpeed)
 			{
-				transComp.LookDirection(-direction, _rotateSpeed);
+				transComp.LookDirection(-rotateDir, _rotateSpeed);
 				break;
 			}
 			//이동속도보다 가까움?
@@ -174,6 +179,12 @@ void Bat::Update(float deltaTime)
 		Vector3 direction = _playerPos - transComp.GetWorldPosition();
 		float distance = Vec3Length(&direction);
 		Vec3Normalize(&direction, &direction);
+		Vector3 rotatePos = _playerPos;
+		rotatePos.y = transComp.GetWorldPosition().y;
+		Vector3 rotateDir = rotatePos - transComp.GetWorldPosition();
+		Vec3Normalize(&rotateDir, &rotateDir);
+		transComp.LookDirection(-rotateDir, D3DX_PI);
+
 		if (distance < _atkRange)
 		{
 			_state = BATSTATE_ATK1;
@@ -306,13 +317,14 @@ void Bat::Update(float deltaTime)
 			_battle = true;
 			_state = BATSTATE_FIND;
 			_pStateMachine->ChangeState(META_TYPE(BatFindState)->Name());
-			Vector3 distance = _playerPos - transComp.GetWorldPosition();
+			Vector3 rotatePos = _playerPos;
+			rotatePos.y = transComp.GetWorldPosition().y;
+			Vector3 distance = rotatePos - transComp.GetWorldPosition();
 			Vec3Normalize(&distance, &distance);
 			transComp.LookDirection(-distance, D3DX_PI * 2);
-			_atkCount = _atkTime;
 		}
 	}
-	transComp.SetWorldPosition(transComp.GetWorldPosition().x, TERRAIN->GetHeight(transComp.GetWorldPosition().x, transComp.GetWorldPosition().z), transComp.GetWorldPosition().z);
+	transComp.SetWorldPosition(transComp.GetWorldPosition().x, TERRAIN->GetHeight(transComp.GetWorldPosition().x, transComp.GetWorldPosition().z)+1.0f, transComp.GetWorldPosition().z);
 }
 
 void Bat::Handle(const CollisionSystem::ActorTriggerEvent & event)

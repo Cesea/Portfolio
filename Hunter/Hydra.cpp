@@ -65,8 +65,8 @@ bool Hydra::CreateFromWorld(World & world)
 	_rotateSpeed = D3DX_PI / 256;
 	_patrolIndex = 0;
 	_moveSegment.push_back(Vector3(5.0f,TERRAIN->GetHeight(5.0f,5.0f), 5.0f));
-	_moveSegment.push_back(Vector3(-5.0f, TERRAIN->GetHeight(5.0f, 5.0f), 5.0f));
-	_moveSegment.push_back(Vector3(-5.0f, TERRAIN->GetHeight(5.0f, 5.0f), -5.0f));
+	_moveSegment.push_back(Vector3(-5.0f, TERRAIN->GetHeight(-5.0f, 5.0f), 5.0f));
+	_moveSegment.push_back(Vector3(-5.0f, TERRAIN->GetHeight(-5.0f, -5.0f), -5.0f));
 
 	_delayTime = 180.0f;
 	_delayCount = _delayTime;
@@ -96,7 +96,7 @@ bool Hydra::CreateFromWorld(World & world)
 	channel.Add<CollisionSystem::ActorTriggerEvent, Hydra>(*this);
 	setEvent();
 
-	return true;
+	return true; 
 }
 
 void Hydra::Update(float deltaTime)
@@ -127,12 +127,16 @@ void Hydra::Update(float deltaTime)
 			float distance = Vec3Length(&direction);
 			Vec3Normalize(&direction, &direction);
 			//몸이 덜 돌아갔는가?
+			Vector3 rotatePos = _moveSegment[_patrolIndex];
+			rotatePos.y = transComp.GetWorldPosition().y;
+			Vector3 rotateDir = rotatePos - transComp.GetWorldPosition();
+			Vec3Normalize(&rotateDir, &rotateDir);
 			float distRadian = acos(
-				ClampMinusOnePlusOne(Vec3Dot(&-direction, &transComp.GetForward())));
+				ClampMinusOnePlusOne(Vec3Dot(&-rotateDir, &transComp.GetForward())));
 			if (distRadian > D3DX_PI) D3DX_PI * 2 - distRadian;
 			if (distRadian > _rotateSpeed)
 			{
-				transComp.LookDirection(-direction, _rotateSpeed);
+				transComp.LookDirection(-rotateDir, _rotateSpeed);
 				break;
 			}
 			//이동속도보다 가까움?
@@ -151,7 +155,6 @@ void Hydra::Update(float deltaTime)
 			{
 				transComp.SetWorldPosition(transComp.GetWorldPosition() + direction*_speed*deltaTime);
 			}
-
 		}
 		break;
 	case HYDRASTATE_FIND:
@@ -169,6 +172,11 @@ void Hydra::Update(float deltaTime)
 		Vector3 direction = _playerPos - transComp.GetWorldPosition();
 		float distance = Vec3Length(&direction);
 		Vec3Normalize(&direction, &direction);
+		Vector3 rotatePos = _playerPos;
+		rotatePos.y = transComp.GetWorldPosition().y;
+		Vector3 rotateDir = rotatePos - transComp.GetWorldPosition();
+		Vec3Normalize(&rotateDir, &rotateDir);
+		transComp.LookDirection(-rotateDir, D3DX_PI);
 		if (distance < _atkRange)
 		{
 			_state = HYDRASTATE_ATK1;
@@ -310,7 +318,9 @@ void Hydra::Update(float deltaTime)
 			_battle = true;
 			_state = HYDRASTATE_FIND;
 			_pStateMachine->ChangeState(META_TYPE(HydraIdleState)->Name());
-			Vector3 distance = _playerPos - transComp.GetWorldPosition();
+			Vector3 rotatePos = _playerPos;
+			rotatePos.y = transComp.GetWorldPosition().y;
+			Vector3 distance = rotatePos - transComp.GetWorldPosition();
 			Vec3Normalize(&distance, &distance);
 			transComp.LookDirection(-distance, D3DX_PI * 2);
 		}
