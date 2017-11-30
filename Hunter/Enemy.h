@@ -11,7 +11,7 @@ enum ENEMYSTATE
 class Enemy : public BaseGameObject	
 {
 public:
-	virtual bool CreateFromWorld(World &world) = 0;
+	virtual bool CreateFromWorld(World &world,Vector3 Pos);
 	virtual void Update(float deltaTime) = 0;
 	virtual void Handle(const CollisionSystem::ActorTriggerEvent & event) = 0;
 	Enemy();
@@ -56,7 +56,13 @@ public:
     Vector3 _playerPos;
 	Vector3 _playerForward;
 	Player::PLAYERSTATE _playerState;
-
+	enum PATROLSET
+	{
+		PATROLSET_LINE,
+		PATROLSET_TRI,
+		PATROLSET_QUAD,
+	};
 	void setEvent();
 	void Handle(const Player::PlayerImformationEvent & event);
+	void PatrolSet(int type,Vector3 Position, float range);
 };

@@ -20,7 +20,7 @@ Player::~Player()
 {
 }
 
-bool Player::CreateFromWorld(World & world)
+bool Player::CreateFromWorld(World & world, Vector3 Pos)
 {
    EventChannel channel;
    channel.Add<InputManager::KeyPressedEvent, Player>(*this);

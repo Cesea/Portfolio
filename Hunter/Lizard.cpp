@@ -10,10 +10,12 @@ Lizard::~Lizard()
 {
 }
 
-bool Lizard::CreateFromWorld(World & world)
+bool Lizard::CreateFromWorld(World & world, Vector3 Pos)
 {
 	_entity = world.CreateEntity();
 	TransformComponent &transComp = _entity.AddComponent<TransformComponent>();
+
+	transComp.SetWorldPosition(Pos);
 
 	static int32 animCount = 0;
 	RenderComponent &renderComp = _entity.AddComponent<RenderComponent>();
@@ -66,9 +68,7 @@ bool Lizard::CreateFromWorld(World & world)
 	_speed = 3.0f;
 	_rotateSpeed = D3DX_PI / 64;
 	_patrolIndex = 0;
-	_moveSegment.push_back(Vector3(7.0f, TERRAIN->GetHeight(7.0f, 5.0f), 5.0f));
-	_moveSegment.push_back(Vector3(-5.0f, TERRAIN->GetHeight(-5.0f, 6.0f), 6.0f));
-	_moveSegment.push_back(Vector3(-5.0f, TERRAIN->GetHeight(-5.0f, -5.0f), -5.0f));
+	this->PatrolSet(rand() % 3, transComp.GetWorldPosition(), 5.0f);
 
 	_delayTime = 180.0f;
 	_delayCount = _delayTime;

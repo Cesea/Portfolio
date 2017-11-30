@@ -61,7 +61,7 @@ public:
 	Hydra();
 	virtual ~Hydra();
 
-	virtual bool CreateFromWorld(World &world);
+	virtual bool CreateFromWorld(World &world, Vector3 Pos);
 	void Update(float deltaTime);
 	void Handle(const CollisionSystem::ActorTriggerEvent & event);
 

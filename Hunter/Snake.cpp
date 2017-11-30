@@ -10,11 +10,12 @@ Snake::~Snake()
 {
 }
 
-bool Snake::CreateFromWorld(World & world)
+bool Snake::CreateFromWorld(World & world, Vector3 Pos)
 {
 	_entity = world.CreateEntity();
 	TransformComponent &transComp = _entity.AddComponent<TransformComponent>();
-	transComp.MovePositionWorld(0, 0.0f, 0);
+
+	transComp.SetWorldPosition(Pos);
 
 	static int32 animCount = 0;
 
@@ -68,9 +69,7 @@ bool Snake::CreateFromWorld(World & world)
 	_speed = 3.0f;
 	_rotateSpeed = D3DX_PI / 128;
 	_patrolIndex = 0;
-	_moveSegment.push_back(Vector3(5.0f, TERRAIN->GetHeight(5.0f,5.0f), 5.0f));
-	_moveSegment.push_back(Vector3(-5.0f, TERRAIN->GetHeight(-5.0f, 5.0f), 5.0f));
-	_moveSegment.push_back(Vector3(-5.0f, TERRAIN->GetHeight(-5.0f, -5.0f), -5.0f));
+	this->PatrolSet(rand() % 3, transComp.GetWorldPosition(), 5.0f);
 
 	_delayTime = 180.0f;
 	_delayCount = _delayTime;

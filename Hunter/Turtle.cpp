@@ -11,11 +11,12 @@ Turtle::~Turtle()
 {
 }
 
-bool Turtle::CreateFromWorld(World & world)
+bool Turtle::CreateFromWorld(World & world, Vector3 Pos)
 {
 	_entity = world.CreateEntity();
 	TransformComponent &transComp = _entity.AddComponent<TransformComponent>();
-	transComp.MovePositionWorld(0, 6.0f, 0);
+
+	transComp.SetWorldPosition(Pos);
 
 	static int32 animCount = 0;
 	RenderComponent &renderComp = _entity.AddComponent<RenderComponent>();
@@ -69,9 +70,7 @@ bool Turtle::CreateFromWorld(World & world)
 	_speed = 1.0f;
 	_rotateSpeed = D3DX_PI / 256;
 	_patrolIndex = 0;
-	_moveSegment.push_back(Vector3(5.0f, TERRAIN->GetHeight(5.0f, 5.0f), 5.0f));
-	_moveSegment.push_back(Vector3(-5.0f, TERRAIN->GetHeight(-5.0f,6.0f), 6.0f));
-	_moveSegment.push_back(Vector3(-5.0f, TERRAIN->GetHeight(-5.0f, -5.0f), -5.0f));
+	this->PatrolSet(rand() % 3, transComp.GetWorldPosition(), 5.0f);
 	_delayTime = 180.0f;
 	_delayCount = _delayTime;
 

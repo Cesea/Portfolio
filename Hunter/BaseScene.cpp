@@ -110,11 +110,11 @@ bool BaseScene::SceneInit()
 
 	//_player.CreateFromWorld(_world);
 	//_snake.CreateFromWorld(_world);
-	_turtle.CreateFromWorld(_world);
-	_bat.CreateFromWorld(_world);
-	_cat.CreateFromWorld(_world);
-	_hydra.CreateFromWorld(_world);
-	_lizard.CreateFromWorld(_world);
+	//_turtle.CreateFromWorld(_world,);
+	//_bat.CreateFromWorld(_world);
+	//_cat.CreateFromWorld(_world);
+	//_hydra.CreateFromWorld(_world);
+	//_lizard.CreateFromWorld(_world);
 
 	imguiRenderInit();
 //에디터 생성

@@ -13,7 +13,7 @@ public :
 	BaseGameObject() {}
 	virtual ~BaseGameObject() {}
 
-	virtual bool CreateFromWorld(World &world) = 0;
+	virtual bool CreateFromWorld(World &world,Vector3 Pos) = 0;
 
 protected :
 	Entity _entity;
