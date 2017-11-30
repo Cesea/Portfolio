@@ -61,27 +61,15 @@ public:
 
 	const Entity &GetEntity() const { return _entity; }
 
-
 	const Entity &GetDummyEntity() const { return _dummyEntity; }
 
-	//랜더 Texture 를 준비 한다.
 	void ReadyRenderToTexture( int32 width, int32 height );
-
-	//Shadow Map Texture를 준비한다.
 	void ReadyShadowTexture( int32 size );
-
-	//랜더 Texture 로 랜더링 시작
 	void RenderTextureBegin( uint32 backColor );
-
-	//랜더 Texture 로 랜더링 종료
 	void RenderTextureEnd();
-
-	//랜터 Texture 얻는다.
 	LPDIRECT3DTEXTURE9 GetRenderTexture();
 
 private:
-
-	
 
 	void NormalCameraUpdate(void);
 
@@ -107,10 +95,10 @@ protected:
 	float _verticalAngle{};
 	float _horizontalAngle{};
 
-	TransformComponent* cameraTransform;
-	TransformComponent* targetTransform;
+	TransformComponent* cameraTransform{};
+	TransformComponent* targetTransform{};
 
-	TransformComponent* dummyTransform;
+	TransformComponent* dummyTransform{};
 
 	Entity _dummyEntity;
 

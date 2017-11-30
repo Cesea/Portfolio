@@ -111,7 +111,7 @@ bool SceneManager::Init()
 	_changeEffects.push_back(pEffect2 );
 
 	//시작 씬을 설정한다
-	ChangeScene("MapToolScene");
+	ChangeScene("GameScene");
 
 	return true;
 }
