@@ -63,7 +63,12 @@ public:
 
 	const Entity &GetEntity() const { return _entity; }
 
+	const Entity &GetDummyEntity() const { return _dummyEntity; }
+
 private:
+
+	
+
 	void NormalCameraUpdate(void);
 protected:
 
@@ -83,11 +88,17 @@ protected:
 	float _horizontalAngle{};
 
 	TransformComponent* cameraTransform;
+	TransformComponent* targetTransform;
+
+	TransformComponent* dummyTransform;
+
+	Entity _dummyEntity;
 
 	Vector3 _toMove;
 
 	Frustum _frustum;
 	BaseGameObject *_pTargetObject{};
+	
 };
 
 #endif

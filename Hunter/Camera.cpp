@@ -26,8 +26,6 @@ Camera::Camera()
 
 	_curDist = 0;
 
-	
-
 	//playerPos = { 0,0,0 };
 }
 
@@ -53,7 +51,19 @@ void Camera::CreateFromWorld(World & world)
 
 	_entity.Activate();
 
+
+	_dummyEntity = world.CreateEntity();
+	_dummyEntity.AddComponent<TransformComponent>();
+
+	_dummyEntity.Activate();
+
 	cameraTransform = &this->GetEntity().GetComponent<TransformComponent>();
+
+	dummyTransform = &this->GetDummyEntity().GetComponent<TransformComponent>();
+
+
+
+	int a = 0;
 }
 
 void Camera::PreUpdateMatrix()
@@ -90,8 +100,18 @@ void Camera::UpdateCamToDevice()
 
 	if (_cameraState == cNormal)
 	{
-		if (_curDist != PLAYER_TO_CAMERA_DIST)
+		Vector3 tPos = targetTransform->GetWorldPosition();
+		tPos.y = targetTransform->GetWorldPosition().y + 1.5f;
+		
+		dummyTransform->SetWorldPosition(targetTransform->GetWorldPosition().x, targetTransform->GetWorldPosition().y + 2.5, targetTransform->GetWorldPosition().z);
+
+		if (_curDist < PLAYER_TO_CAMERA_DIST)
 		{
+			Vector3 dir = tPos - cameraTransform->GetWorldPosition();
+			D3DXVec3Normalize(&dir, &dir);
+
+			cameraTransform->SetForward(dir);
+
 			NormalCameraUpdate();
 		}
 		
@@ -192,24 +212,42 @@ void Camera::Handle(const InputManager::KeyDownEvent & event)
 	Vector3 diff = Vector3(0.0f, 0.0f, 0.0f);
 	float deltaTime = APPTIMER->GetTargetTime();
 
-	if (event.code == '1')
+	if (event.code == '1'&& _cameraState != cCreativeMode)
 	{
+		_curDist = 0.0f;
 		_cameraState = cCreativeMode;
 		//ShowCursor(true);
+		cameraTransform->ReleaseParent();
 	}
-	if (event.code == '2')
+	if (event.code == '2' && _cameraState != cNormal)
 	{
 		_cameraState = cNormal;
 
-		TransformComponent &targetTransform = _pTargetObject->_entity.GetComponent<TransformComponent>();
+		targetTransform = &_pTargetObject->_entity.GetComponent<TransformComponent>();
 
-		cameraTransform->SetWorldPosition(targetTransform.GetWorldPosition().x, targetTransform.GetWorldPosition().y, targetTransform.GetWorldPosition().z);
+		//cameraTransform->SetWorldPosition(targetTransform->GetWorldPosition().x, targetTransform->GetWorldPosition().y + 2.5, targetTransform->GetWorldPosition().z + 0.01);
 
 		//cameraTransform->SetRotateWorld(targetTransform.GetWorldRotateQuaternion());
 
-		cameraTransform->SetForward(-targetTransform.GetForward());
+		//cameraTransform->SetForward(-targetTransform->GetForward());
 
-		targetTransform.AddChild(cameraTransform);
+		/*_dummyEntity.GetComponent<TransformComponent>().SetForward(-targetTransform->GetForward());
+
+		_dummyEntity.GetComponent<TransformComponent>().SetWorldPosition(targetTransform->GetWorldPosition().x, targetTransform->GetWorldPosition().y + 2.5, targetTransform->GetWorldPosition().z);
+
+		_dummyEntity.GetComponent<TransformComponent>().AddChild(cameraTransform);*/
+
+		dummyTransform->SetForward(targetTransform->GetForward());
+
+		dummyTransform->SetWorldPosition(targetTransform->GetWorldPosition().x, targetTransform->GetWorldPosition().y + 2.5, targetTransform->GetWorldPosition().z);
+
+		dummyTransform->AddChild(cameraTransform);
+
+		
+
+		cameraTransform->SetLocalPosition(0, 0, 0);
+
+		
 
 		//ShowCursor(false);
 	}
@@ -337,7 +375,11 @@ void Camera::Handle(const InputManager::MouseMoveEvent & event)
 
 		ClampFloat(_verticalAngle, MIN_VERT_ANGLE, MAX_VERT_ANGLE);
 
-		_entity.GetComponent<TransformComponent>().SetRotateWorld(_verticalAngle * ONE_RAD, _horizontalAngle * ONE_RAD, 0.0f);
+		//_entity.GetComponent<TransformComponent>().SetRotateWorld(_verticalAngle * ONE_RAD, _horizontalAngle * ONE_RAD, 0.0f);
+
+		dummyTransform->SetRotateWorld(-_verticalAngle * ONE_RAD, _horizontalAngle * ONE_RAD, 0.0f);
+
+		//_dummyEntity.GetComponent<TransformComponent>().SetRotateWorld(_verticalAngle * ONE_RAD, _horizontalAngle * ONE_RAD, 0.0f);
 
 		/*if (_cameraState == cNormal)
 		{
@@ -350,7 +392,7 @@ void Camera::Handle(const InputManager::MouseMoveEvent & event)
 
 void Camera::NormalCameraUpdate(void)
 {
-	Vector3 dist = _pTargetObject->_entity.GetComponent<TransformComponent>().GetWorldPosition() - cameraTransform->GetWorldPosition();
+	Vector3 dist = dummyTransform->GetWorldPosition() - cameraTransform->GetWorldPosition();
 	_curDist = D3DXVec3Length(&dist);
 
 	if (_curDist < PLAYER_TO_CAMERA_DIST)
@@ -358,9 +400,9 @@ void Camera::NormalCameraUpdate(void)
 		cameraTransform->_position.z += 0.1f;
 
 	}
-	else if (_curDist > PLAYER_TO_CAMERA_DIST)
-	{
-		//cameraTransform->_position.z -= 0.1f;
-		cameraTransform->_position.z = PLAYER_TO_CAMERA_DIST;
-	}
+	//else if (_curDist > PLAYER_TO_CAMERA_DIST)
+	//{
+	//	//cameraTransform->_position.z -= 0.1f;
+	//	cameraTransform->_position.z = PLAYER_TO_CAMERA_DIST;
+	//}
 }

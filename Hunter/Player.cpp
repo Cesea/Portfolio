@@ -3,14 +3,16 @@
 
 #include "PlayerStates.h"
 
-#define MAX_COMBO_COUNT 3
-
-#include "stdafx.h"
-#include "Player.h"
-
-#include "PlayerStates.h"
+#include "Camera.h"
 
 #define MAX_COMBO_COUNT 3
+
+//#include "stdafx.h"
+//#include "Player.h"
+//
+//#include "PlayerStates.h"
+//
+//#define MAX_COMBO_COUNT 3
 
 Player::Player()
 {
@@ -88,6 +90,8 @@ bool Player::CreateFromWorld(World & world)
 
 void Player::Update(float deltaTime)
 {
+	//cForward = 
+
    _pStateMachine->Update(deltaTime, _currentCommand);
 
    TransformComponent &transComp = _entity.GetComponent<TransformComponent>();
@@ -205,22 +209,27 @@ void Player::Update(float deltaTime)
       if (_currentMovement._vertical == VERTICAL_MOVEMENT_UP)
       {
          //moveDelta.z -= _speed;
-         transComp.MovePositionSelf(playerForward * -_speed * deltaTime);
+         //transComp.MovePositionSelf(playerForward * -_speed * deltaTime);
+		 transComp.MovePositionWorld(playerForward * -_speed * deltaTime);
+		 //transComp.MovePositionSelf(_camera->GetEntity().GetComponent<TransformComponent>().GetForward() * -_speed * deltaTime);
       }
       else if (_currentMovement._vertical == VERTICAL_MOVEMENT_DOWN)
       {
          //moveDelta.z += _speed;
-         transComp.MovePositionSelf(playerForward * _speed * deltaTime);
+         //transComp.MovePositionSelf(playerForward * _speed * deltaTime);
+		  transComp.MovePositionWorld(playerForward * _speed * deltaTime);
       }
       else if (_currentMovement._horizontal == HORIZONTAL_MOVEMENT_LEFT)
       {
          //moveDelta.x -= _speed;
-         transComp.MovePositionSelf(playerRight * -_speed * deltaTime);
+         //transComp.MovePositionSelf(playerRight * -_speed * deltaTime);
+		  transComp.MovePositionWorld(playerRight * -_speed * deltaTime);
       }
       else if (_currentMovement._horizontal == HORIZONTAL_MOVEMENT_RIGHT)
       {
          //moveDelta.x += _speed;
-         transComp.MovePositionSelf(playerRight * _speed * deltaTime);
+         //transComp.MovePositionSelf(playerRight * _speed * deltaTime);
+		  transComp.MovePositionWorld(playerRight * _speed * deltaTime);
       }
       /*currentPos += moveDelta * deltaTime;
 
@@ -465,6 +474,8 @@ void Player::Update(float deltaTime)
    } break;
    }
 
+
+
    _currentCommand.Reset();
 }
 
@@ -530,32 +541,49 @@ void Player::Handle(const InputManager::KeyDownEvent & event)
 {
    uint32 inputCode = event.code;
 
-   if ('J' == inputCode)
+   TransformComponent &transComp = _entity.GetComponent<TransformComponent>();
+
+   Vector3 Dir = _camera->GetEntity().GetComponent<TransformComponent>().GetForward();
+
+   Dir.y = 0;
+
+   D3DXVec3Normalize(&Dir, &Dir);
+
+   if ('L' == inputCode)
    {
+	   transComp.SetForward(-Dir);
+	  // transComp.LookDirection(Dir);
       _currentCommand._type = GAMECOMMAND_MOVE;
       _currentCommand._movement._horizontal = HORIZONTAL_MOVEMENT_LEFT;
       _currentCommand._movement._vertical = VERTICAL_MOVEMENT_NONE;
    }
-   else if('L' == inputCode)
+   else if('J' == inputCode)
    {
+	   transComp.SetForward(-Dir);
+	  // transComp.LookDirection(Dir);
       _currentCommand._type = GAMECOMMAND_MOVE;
       _currentCommand._movement._horizontal = HORIZONTAL_MOVEMENT_RIGHT;
       _currentCommand._movement._vertical = VERTICAL_MOVEMENT_NONE;
    }
    else if('I' == inputCode)
    {
+	   transComp.SetForward(-Dir);
+	   //transComp.LookDirection(Dir);
       _currentCommand._type = GAMECOMMAND_MOVE;
       _currentCommand._movement._vertical = VERTICAL_MOVEMENT_UP;
       _currentCommand._movement._horizontal = HORIZONTAL_MOVEMENT_NONE;
    }
    else if ('K' == inputCode)
    {
+	   transComp.SetForward(-Dir);
+	  // transComp.LookDirection(Dir);
       _currentCommand._type = GAMECOMMAND_MOVE;
       _currentCommand._movement._vertical = VERTICAL_MOVEMENT_DOWN;
       _currentCommand._movement._horizontal = HORIZONTAL_MOVEMENT_NONE;
    }
    else if (VK_SPACE == inputCode)
    {
+	  
       _currentCommand._type = GAMECOMMAND_JUMP;
    }
    /*else
