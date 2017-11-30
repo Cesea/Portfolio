@@ -29,11 +29,12 @@ void ApplicationTimer::Tick()
 	_currentDeltaSecond = (_currentCounter.QuadPart - _prevCounter.QuadPart) * _timeScale;
 	_currentDeltaMS = (int32)(_currentDeltaSecond * 1000);
 
-	int64 timeToSleep = _targetFramePerMS - _currentDeltaMS;
+	int32 timeToSleep = _targetFramePerMS - _currentDeltaMS;
 
-	if (timeToSleep > 1)
+	Console::Log("%d\n", timeToSleep);
+	if (timeToSleep > 0 && timeToSleep < _targetFramePerMS)
 	{
-		Sleep(3);
+		Sleep(7);
 	}
 
 	QueryPerformanceCounter(&_currentCounter);

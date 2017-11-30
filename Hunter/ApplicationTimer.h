@@ -21,6 +21,9 @@ public :
 	float GetTotalTimeElapsed();
 
 private :
+
+
+
 	LARGE_INTEGER _prevCounter;;
 	LARGE_INTEGER _currentCounter;
 	LARGE_INTEGER _startCounter;
