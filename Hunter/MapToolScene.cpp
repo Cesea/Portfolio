@@ -30,7 +30,10 @@ bool MapToolScene::SceneInit()
 
 	//메쉬 불러오기..
 	Matrix correctionMat;
+	Matrix rotationCorrection;
+	MatrixRotationY(&rotationCorrection, D3DX_PI);
 	MatrixScaling(&correctionMat, 0.01f, 0.01f, 0.01f);
+	MatrixMultiply(&correctionMat, &correctionMat, &rotationCorrection);
 	video::SkinnedXMeshHandle knight  = VIDEO->CreateSkinnedXMesh(
 		"../resources/Models/Knight/Knight.X", &correctionMat, "Knight");
 
@@ -113,11 +116,10 @@ bool MapToolScene::SceneInit()
 	//_channel.Broadcast<GameObjectFactory::CreateObjectOnLocationEvent>(
 	//	GameObjectFactory::CreateObjectOnLocationEvent(ARCHE_BAT, ResourceHandle(), Vector3(18.0f, 2.0f, 0.0f)));
 
-
 	//카메라 생성
 	_camera.CreateFromWorld(_world);
-	_camera.SetRotationSpeed(10.0f);
-	_camera.SetMoveSpeed(20.0f);
+	_camera.SetRotationSpeed(5.0f);
+	_camera.SetMoveSpeed(10.0f);
 	_camera.GetEntity().GetComponent<TransformComponent>().MovePositionWorld(Vector3(0.0f, 4.0f, -6.0f));
 	//NOTE : GameObjectFactory의 GetPlayerObject는 생성에 의존성을 가진다
 	_camera.SetTargetObject(GAMEOBJECTFACTORY->GetPlayerObject());

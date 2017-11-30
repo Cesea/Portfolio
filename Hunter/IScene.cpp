@@ -140,7 +140,6 @@ bool IScene::Render()
 	}
 	_pPostEffect->EndEffect();
 	
-
 	imguiRenderDraw();
 
 	return true;

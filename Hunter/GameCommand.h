@@ -61,7 +61,7 @@ struct GameCommand
 	GAMECOMMAND_TYPE _type{ GAMECOMMAND_NONE };
 	Movement _movement;
 	Behavior _behavior;
-	bool32 _interpreted{false};
+	bool32 _dash{false};
 
 	void Reset();
 

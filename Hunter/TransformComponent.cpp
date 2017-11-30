@@ -668,7 +668,7 @@ void TransformComponent::LookDirection(const Vector3 &dir, float angle)
 
 	//외적축으로 각차만큼 회전 시키는 행렬
 	Matrix matRotate;
-	MatrixRotationAxis(&matRotate, &cross, min(angle, distRadian));
+	MatrixRotationAxis(&matRotate, &cross, fmin(angle, distRadian));
 
 	//만약 부모가 있다면...
 	if (this->_pParent)

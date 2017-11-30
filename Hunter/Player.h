@@ -37,7 +37,7 @@ public :
 	virtual bool CreateFromWorld(World &world);
 	void Update(float deltaTime);
 
-	void Handle(const InputManager::KeyPressedEvent &event);
+	void Handle(const InputManager::KeyDownEvent &event);
 	void Handle(const InputManager::KeyReleasedEvent &event);
 	//void Handle(const InputManager::KeyDownEvent &event);
 	void Handle(const InputManager::MousePressedEvent &event);
@@ -49,7 +49,7 @@ private :
 	{
 		PLAYERSTATE_STANCE,
 		PLAYERSTATE_MOVE,
-		PLAYER_STATE_RUN,
+		PLAYERSTATE_RUN,
 		PLAYERSTATE_ATTACK,
 		PLAYERSTATE_BLOCK,
 		PLAYERSTATE_MOVEATTACK,
@@ -76,6 +76,10 @@ private :
 	EventChannel _channel;
 	float _walkSpeed{2.0f};
 	float _runSpeed{4.0f};
+	float _rotationSpeed{ 0.05f };
+	float _backRotationSpeed{ 0.03f };
+
+	//int32 _stamina{ 100 };
 
 	StopWatch _combatToPeaceTimer;
 

@@ -77,9 +77,9 @@ enum PlayerAnimationEnum
    eWalk,
    eStrafeLeft,
    eStrafeRight,
-   eThrust,
-   eSwingRight,
-   eSwingLeft,
+   eWarWalkThrust,
+   eWarWalkSwingRight,
+   eWarWalkSwingLeft,
    COUNT
 };
 
@@ -196,8 +196,8 @@ PLAYER_ANIM_DECLARE(eSitting);
 PLAYER_ANIM_DECLARE(eWalk);
 PLAYER_ANIM_DECLARE(eStrafeLeft);
 PLAYER_ANIM_DECLARE(eStrafeRight);
-PLAYER_ANIM_DECLARE(eThrust);
-PLAYER_ANIM_DECLARE(eSwingLeft);
-PLAYER_ANIM_DECLARE(eSwingRight);
+PLAYER_ANIM_DECLARE(eWarWalkThrust);
+PLAYER_ANIM_DECLARE(eWarWalkSwingLeft);
+PLAYER_ANIM_DECLARE(eWarWalkSwingRight);
 
 #endif

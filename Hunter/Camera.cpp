@@ -25,7 +25,6 @@ Camera::Camera()
 	_cameraState = cCreativeMode;
 
 	_curDist = 0;
-
 }
 
 Camera::~Camera()
@@ -193,7 +192,7 @@ void Camera::MoveAndRotate(const InputManager & input)
 
 		ClampFloat(_verticalAngle, MIN_VERT_ANGLE, MAX_VERT_ANGLE);
 
-		dummyTransform->SetRotateWorld(-_verticalAngle * ONE_RAD, _horizontalAngle * ONE_RAD, 0.0f);
+		dummyTransform->SetRotateWorld(_verticalAngle * ONE_RAD, _horizontalAngle * ONE_RAD, 0.0f);
 
 		/*if (_cameraState == cNormal)
 		{
@@ -213,12 +212,15 @@ void Camera::UpdateMatrix()
 		Vector3 tPos = targetTransform->GetWorldPosition();
 		tPos.y = targetTransform->GetWorldPosition().y + 1.5f;
 		
-		dummyTransform->SetWorldPosition(targetTransform->GetWorldPosition().x, targetTransform->GetWorldPosition().y + 2.5, targetTransform->GetWorldPosition().z);
+		dummyTransform->SetWorldPosition(
+			targetTransform->GetWorldPosition().x, 
+			targetTransform->GetWorldPosition().y + 2.5, 
+			targetTransform->GetWorldPosition().z);
 
 		if (_curDist < PLAYER_TO_CAMERA_DIST)
 		{
 			Vector3 dir = tPos - cameraTransform->GetWorldPosition();
-			D3DXVec3Normalize(&dir, &dir);
+			Vec3Normalize(&dir, &dir);
 
 			cameraTransform->SetForward(dir);
 

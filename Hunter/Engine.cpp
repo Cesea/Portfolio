@@ -89,7 +89,6 @@ void Engine::Run()
 		gpDevice->EndScene();
 		gpDevice->Present(nullptr, nullptr, NULL, nullptr);
 
-
 		_pInput->UpdatePrevInput();
 
 		APPTIMER->Tick();
