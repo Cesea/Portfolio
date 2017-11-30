@@ -6,13 +6,13 @@ constexpr float MIN_VERT_ANGLE = -85.0f;
 
 Camera::Camera()
 {
-	//±âº» È­°¢ ¼³Á¤
+	//ê¸°ë³¸ í™”ê° ì„¤ì •
 	_fov = 60.f * ONE_RAD;
 
-	//±âº» Near
+	//ê¸°ë³¸ Near
 	_camNear = 0.01f;
 
-	//±âº» Far
+	//ê¸°ë³¸ Far
 #if defined (DEBUG) || defined (_DEBUG)
 	_camFar = 500.0f;
 #else 
@@ -31,24 +31,15 @@ Camera::Camera()
 
 Camera::~Camera()
 {
-	//if(ÇÃ·¹ÀÌ¾î¸¦ µû¶ó°¡´Â ¸ğµåÀÏ¶§)
-	//{
-	//	TransformComponent &targetTransform = _pTargetObject->_entity.GetComponent<TransformComponent>();
-	//}
+	COM_RELEASE( _pRenderTexture );
+	COM_RELEASE( _pRenderSurface );
 }
 
 void Camera::CreateFromWorld(World & world)
 {
-	EventChannel channel;
-	channel.Add<InputManager::KeyDownEvent, Camera>(*this);
-	channel.Add<InputManager::MousePressedEvent, Camera>(*this);
-	channel.Add<InputManager::MouseReleasedEvent, Camera>(*this);
-	channel.Add<InputManager::MouseMoveEvent, Camera>(*this);
-
 	_entity = world.CreateEntity();
 	_entity.AddComponent<TransformComponent>();
-
-
+	
 	_entity.Activate();
 
 
@@ -66,19 +57,168 @@ void Camera::CreateFromWorld(World & world)
 	int a = 0;
 }
 
-void Camera::PreUpdateMatrix()
+void Camera::MoveAndRotate(const InputManager & input)
 {
-	//ÀÌµ¿°ªÀÌ ³²¾ÆÀÖ´Ù¸é ¿òÁ÷¿©¶ó
-	if (!_toMove.IsZero())
+	float deltaTime = APPTIMER->GetTargetTime();
+
+	TransformComponent &refTransform = _entity.GetComponent<TransformComponent>();
+
+	Vector3 forward = refTransform.GetForward();
+	Vector3 right= refTransform.GetRight();
+	Vector3 up = refTransform.GetUp();
+
+	Vector3 diff = Vector3(0.0f, 0.0f, 0.0f);
+
+	if (input.keyboard.IsPressed('1'))
 	{
-		_entity.GetComponent<TransformComponent>().MovePositionSelf(_toMove);
-		_toMove = Vector3(0.0f, 0.0f, 0.0f);
+		_cameraState = cCreativeMode;
+		//ShowCursor(true);
 	}
+	if (input.keyboard.IsPressed('2'))
+	{
+		_cameraState = cNormal;
+
+		//ShowCursor(false);
+	}
+	if (input.keyboard.IsPressed('3'))
+	{
+		
+	}
+
+	//move forward
+	switch (_cameraState)
+	{
+	case cCreativeMode:
+	{
+		if (input.keyboard.IsDown('W'))
+		{
+			diff += forward * _moveSpeed * deltaTime;
+		}
+		else if (input.keyboard.IsDown('S'))
+		{
+			diff -= forward * _moveSpeed * deltaTime;
+		}
+		if (input.keyboard.IsDown('A'))
+		{
+			diff -= right * _moveSpeed * deltaTime;
+		}
+		else if (input.keyboard.IsDown('D'))
+		{
+			diff += right * _moveSpeed * deltaTime;
+		}
+		if (input.keyboard.IsDown('Q'))
+		{
+			diff += up * _moveSpeed * deltaTime;
+		}
+		else if (input.keyboard.IsDown('E'))
+		{
+			diff -= up * _moveSpeed * deltaTime;
+		}
+
+		float length = Vec3Length(&diff);
+		if (!FloatZero(length))
+		{
+			diff /= length;
+		}
+
+	} break;
+
+	case cNormal:
+	{
+
+	} break;
+	}
+
+	refTransform.MovePositionWorld(diff);
+
+	//Mouse Pressed////////////////////////////////////////////
+	switch (_cameraState)
+	{
+	case cCreativeMode:
+		if (input.mouse.IsPressed(MOUSE_BUTTON_RIGHT))
+		{
+			_rotating = true;
+			//SetCursorPos(WINSTARTX +  WINSIZEX / 2, WINSIZEY / 2);
+		}
+		break;
+	}
+	//Mouse Released/////////////////////////////////////////
+	switch (_cameraState)
+	{
+	case cCreativeMode:
+		if (input.mouse.IsReleased(MOUSE_BUTTON_RIGHT))
+		{
+			_rotating = false;
+		}
+		break;
+	case cNormal:
+
+		break;
+	}
+	
+	//Mouse Move//////////////////////////////////////////////
+	switch (_cameraState)
+	{
+	case cCreativeMode:
+		if (_rotating)
+		{
+			float deltaTime = APPTIMER->GetTargetTime();
+
+			int32 deltaX = input.mouse.GetMouseDelta().x;
+			int32 deltaY = input.mouse.GetMouseDelta().y;
+
+			if (deltaX != 0)
+			{
+				_horizontalAngle += _rotationSpeed * deltaTime * (float)deltaX;
+			}
+
+			if (deltaY != 0)
+			{
+				_verticalAngle += _rotationSpeed * deltaTime * (float)deltaY;
+			}
+
+			ClampFloat(_verticalAngle, MIN_VERT_ANGLE, MAX_VERT_ANGLE);
+
+			refTransform.SetRotateWorld(_verticalAngle * ONE_RAD, _horizontalAngle * ONE_RAD, 0.0f);
+
+			//SetCursorPos(WINSIZEX / 2, WINSIZEY / 2);
+		}
+		break;
+	case cNormal:
+
+		float deltaTime = APPTIMER->GetTargetTime();
+
+		int32 deltaX = input.mouse.GetMouseDelta().x;
+		int32 deltaY = input.mouse.GetMouseDelta().y;
+
+		if (deltaX != 0)
+		{
+			_horizontalAngle += _rotationSpeed * deltaTime * (float)deltaX;
+		}
+
+		if (deltaY != 0)
+		{
+			_verticalAngle += _rotationSpeed * deltaTime * (float)deltaY;
+		}
+
+
+		ClampFloat(_verticalAngle, MIN_VERT_ANGLE, MAX_VERT_ANGLE);
+
+		refTransform.SetRotateWorld(_verticalAngle * ONE_RAD, _horizontalAngle * ONE_RAD, 0.0f);
+
+		/*if (_cameraState == cNormal)
+		{
+			SetCursorPos(WINSTARTX + (WINSIZEX * 0.5), WINSTARTY + (WINSIZEY * 0.5));
+		}*/
+
+		break;
+	}
+
 }
 
 void Camera::UpdateMatrix()
 {
-	//È­°¢¿¡ ÀÇÇÑ Projection Çà·Ä ¾÷µ¥ÀÌÆ®
+	//í™”ê°ì— ì˜í•œ Projection í–‰ë ¬ ì—…ë°ì´íŠ¸
 	MatrixPerspectiveFovLH(
 		&_matProjection,
 		_fov,
@@ -86,7 +226,7 @@ void Camera::UpdateMatrix()
 		_camNear,
 		_camFar);
 
-	//ºäÇà·Ä Ä«¸Ş¶ó ¿ùµåÀ§Ä¡¿¡ ´ëÇÑ ¿ªÇà·ÄÀÌ´Ù.
+	//ë·°í–‰ë ¬ ì¹´ë©”ë¼ ì›”ë“œìœ„ì¹˜ì— ëŒ€í•œ ì—­í–‰ë ¬ì´ë‹¤.
 	MatrixInverse(&_matView, NULL, &_entity.GetComponent<TransformComponent>()._matFinal);
 
 	_matViewProjection = _matView * _matProjection;
@@ -136,11 +276,11 @@ void Camera::SetTargetObject(BaseGameObject * pTargetObject)
 
 void Camera::ComputeRay(const Vector2 & screenPos, Ray * pOutRay)
 {
-	//Device ÀÇ ºäÆ÷Æ®¸¦ ¾ò´Â´Ù.
+	//Device ì˜ ë·°í¬íŠ¸ë¥¼ ì–»ëŠ”ë‹¤.
 	D3DVIEWPORT9 viewPort;
 	gpDevice->GetViewport(&viewPort);
 
-	//½ºÅ©¸°ÀÇ À§Ä¡ ºñÀ²À» ¾òÀÚ 
+	//ìŠ¤í¬ë¦°ì˜ ìœ„ì¹˜ ë¹„ìœ¨ì„ ì–»ì 
 	float factorX = screenPos.x / viewPort.Width;
 	float factorY = (1.0f - (screenPos.y / viewPort.Height));
 
@@ -148,39 +288,39 @@ void Camera::ComputeRay(const Vector2 & screenPos, Ray * pOutRay)
 	factorX = factorX * 2.0f - 1.0f;
 	factorY = factorY * 2.0f - 1.0f;
 
-	//µ¿Â÷·Î À§Ä¡¿¡ È­°¢ ½ºÄÉÀÏ·®À» ³ª´«´Ù.
+	//ë™ì°¨ë¡œ ìœ„ì¹˜ì— í™”ê° ìŠ¤ì¼€ì¼ëŸ‰ì„ ë‚˜ëˆˆë‹¤.
 	Vector3 direction( factorX / _matProjection._11, factorY / _matProjection._22, 1.0f);
 
 	TransformComponent &refTransform = _entity.GetComponent<TransformComponent>();
 
-	//Ä«¸Ş¶ó ¿ùµå Çà·Ä
+	//ì¹´ë©”ë¼ ì›”ë“œ í–‰ë ¬
 	Matrix matCamWorld = refTransform.GetFinalMatrix();
 
-	//·¹ÀÌÀÇ ¹æÇâÀ» µ¿Â÷¿¡¼­ ¾òÀº º¤ÅÍ¸¦ Ä«¸Ş¶ó ¿ùµå ¸ÅÆ®¸¯½º
-	//¿ùµå ¹æÇâÀÌ ³ª¿Â´Ù.
+	//ë ˆì´ì˜ ë°©í–¥ì„ ë™ì°¨ì—ì„œ ì–»ì€ ë²¡í„°ë¥¼ ì¹´ë©”ë¼ ì›”ë“œ ë§¤íŠ¸ë¦­ìŠ¤
+	//ì›”ë“œ ë°©í–¥ì´ ë‚˜ì˜¨ë‹¤.
 	Vec3TransformNormal(
 		&direction, &direction, &matCamWorld);
 
-	//¹æÇâº¤ÅÍ Á¤±Ô
+	//ë°©í–¥ë²¡í„° ì •ê·œ
 	Vec3Normalize(&direction, &direction);
 
-	//·¹ÀÌÀÇ ¹æÇâ
+	//ë ˆì´ì˜ ë°©í–¥
 	pOutRay->direction = direction;
 
-	//·¹ÀÌÀÇ ¿À¸®ÁøÀº Ä«¸Ş¶ó À§Ä¡°¡ µÈ´Ù.
+	//ë ˆì´ì˜ ì˜¤ë¦¬ì§„ì€ ì¹´ë©”ë¼ ìœ„ì¹˜ê°€ ëœë‹¤.
 	pOutRay->origin = refTransform.GetWorldPosition();
 }
 
 bool Camera::GetWorldPosToScreenPos(const Vector3 & worldPos, Vector2 * pOutScreenPos)
 {
-	//Ä«¸Ş¶óÀÇ ViewProjection Çà·ÄÀ» ¾ò´Â´Ù.
+	//ì¹´ë©”ë¼ì˜ ViewProjection í–‰ë ¬ì„ ì–»ëŠ”ë‹¤.
 	Matrix matViewProj = GetViewProjectionMatrix();
 
-	//¿ùµå À§Ä¡¸¦ µ¿Â÷·Î...
+	//ì›”ë“œ ìœ„ì¹˜ë¥¼ ë™ì°¨ë¡œ...
 	Vector3 pos;
 	Vec3TransformCoord(&pos, &worldPos, &matViewProj);
 
-	//µ¿Â÷°ø°£
+	//ë™ì°¨ê³µê°„
 	//				*-------*<-( 1, 1, 1 )
 	//			   /|      /|
 	//			  *-------* |
@@ -188,27 +328,28 @@ bool Camera::GetWorldPosToScreenPos(const Vector3 & worldPos, Vector2 * pOutScre
 	//		      |/      |/
 	//(-1,-1, 0)->*-------* 
 
-	//0 ~ 1 »çÀÌ °ª¿¡ ¾øÀ¸¸é ÀÌ¸é Ä«¸Ş¶ó µÚ¿¡ ÀÖ´Ù´Â¿¹±â
+	//0 ~ 1 ì‚¬ì´ ê°’ì— ì—†ìœ¼ë©´ ì´ë©´ ì¹´ë©”ë¼ ë’¤ì— ìˆë‹¤ëŠ”ì˜ˆê¸°
 	if (pos.z < 0.0f || pos.z > 1.0f)
 		return false;
 
-	//È­¸é Áß¾Ó¿¡ ÀÖ´Ù¸é pos xy °ªÀº ´ÙÀ½°ú °°´Ù.
+	//í™”ë©´ ì¤‘ì•™ì— ìˆë‹¤ë©´ pos xy ê°’ì€ ë‹¤ìŒê³¼ ê°™ë‹¤.
 	//pos.x == 0  
 	//pos.y == 0
 
-	//È­¸é Àı¹İ »çÀÌÁî
+	//í™”ë©´ ì ˆë°˜ ì‚¬ì´ì¦ˆ
 	float halfScreenW = WINSIZEX * 0.5f;
 	float halfScreenH = WINSIZEY * 0.5f;
 
-	//ÃÖÁ¾ È­¸é À§Ä¡
+	//ìµœì¢… í™”ë©´ ìœ„ì¹˜
 	pOutScreenPos->x = halfScreenW + (halfScreenW * pos.x);
-	pOutScreenPos->y = halfScreenH - (halfScreenH * pos.y);	//Y °ªÀº ¹İÀü
+	pOutScreenPos->y = halfScreenH - (halfScreenH * pos.y);	//Y ê°’ì€ ë°˜ì „
 
 	return true;
 }
 
-void Camera::Handle(const InputManager::KeyDownEvent & event)
+void Camera::ReadyRenderToTexture(int32 width, int32 height)
 {
+
 	Vector3 diff = Vector3(0.0f, 0.0f, 0.0f);
 	float deltaTime = APPTIMER->GetTargetTime();
 
@@ -258,73 +399,108 @@ void Camera::Handle(const InputManager::KeyDownEvent & event)
 			int a = 0;
 		}
 	}
+  
+	COM_RELEASE(_pRenderTexture);
+	COM_RELEASE(_pRenderSurface );
 
-	//move forward
-	switch (_cameraState)
-	{
-	case cCreativeMode:
-		if (event.code == 'W')
-		{
-			_toMove.z += _moveSpeed * deltaTime;
-		}
-		else if (event.code == 'S')
-		{
-			_toMove.z -= _moveSpeed * deltaTime;
-		}
-		else if (event.code == 'A')
-		{
-			_toMove.x -= _moveSpeed * deltaTime;
-		}
-		else if (event.code == 'D')
-		{
-			_toMove.x += _moveSpeed * deltaTime;
-		}
-		else if (event.code == 'Q')
-		{
-			_toMove.y += _moveSpeed * deltaTime;
-		}
-		else if (event.code == 'E')
-		{
-			_toMove.y -= _moveSpeed * deltaTime;
-		}
-		break;
-	case cNormal:
+	//RenderTarget ë¹ˆ Texture ë§Œë“¤ê¸°
+	gpDevice->CreateTexture(
+		width,						//Texture ê°€ë¡œ í•´ìƒë„ 
+		height,						//Texture ì„¸ë¡œ í•´ìƒë„
+		1,							//ë°‰ë§µì²´ì¸ ë ˆë²¨
+		D3DUSAGE_RENDERTARGET,		//RenderTarget ìš© Textureì´ë‹¤
+		D3DFMT_A8R8G8B8,			//TEXTURE í¬ë§· RenderTexture ìš©ì€D3DFMT_A8R8G8B8 ë¡œí•˜ì
+		D3DPOOL_DEFAULT,			//RenderTarget ìš© Texture ëŠ” Pool ì„ Default
+		&_pRenderTexture,			//ìƒì„±ëœ Texture ë°›ì•„ì˜¬ í¬ì¸í„°
+		NULL						
+		);
 
-		break;
-	}
-	
-
-
+	//Render í•  Surface 
+	gpDevice->CreateDepthStencilSurface(
+		width,					//Texture ê°€ë¡œ í•´ìƒë„ 
+		height,					//Texture ì„¸ë¡œ í•´ìƒë„
+		D3DFMT_D24S8,				//Deapth ëŠ” 24 ë¹„íŠ¸ Stencil ì€ 8 ë¹„íŠ¸	
+		D3DMULTISAMPLE_NONE,		//ë©€í‹° ìƒ˜í”Œë§ ì•ˆí‹°ì•Œë¦¬ì•„ì‹±ì€ ì¡´ì¬í•˜ì§€ ì•ŠëŠ”ë‹¤, 
+		0,							//ë©€í‹° ìƒ˜í”Œë§ í€„ë¦¬í‹°ëŠ” 0
+		TRUE,						//ë²„í¼ êµì²´ì‹œ ì´ì „ í¼ë²„ë‚´ìš©ì„ ìœ ì§€í•˜ì§€ ì•Šë‹ˆ? ( TRUE ë¡œ ì“°ë©´ ë²„í¼êµì²´ ë ë•Œ ì´ì „ì— ì¨ì§„ ë²„í¼ë‚´ìš©ì„ ê¸°ì–µí•˜ì§€ ì•ŠëŠ”ë‹¤ )
+		&_pRenderSurface,			//ì–»ì–´ì˜¬ í¬ì¸í„°...
+		NULL);
 }
 
-void Camera::Handle(const InputManager::MousePressedEvent & event)
+void Camera::ReadyShadowTexture(int32 size)
 {
-	switch (_cameraState)
-	{
-	case cCreativeMode:
-		if (event.code == MOUSE_BUTTON_RIGHT)
-		{
-			_rotating = true;
-		}
-		break;
-	}
-	
+	COM_RELEASE(_pRenderTexture);
+	COM_RELEASE(_pRenderSurface );
+
+	HRESULT result = 0;
+	//RenderTarget ë¹ˆ Texture ë§Œë“¤ê¸°
+	result = gpDevice->CreateTexture(
+		size,						//Texture ê°€ë¡œ í•´ìƒë„ 
+		size,						//Texture ì„¸ë¡œ í•´ìƒë„
+		1,							//ë°‰ë§µì²´ì¸ ë ˆë²¨
+		D3DUSAGE_RENDERTARGET,		//RenderTarget ìš© Textureì´ë‹¤
+		D3DFMT_R32F,				//ëª¨ë“  ì»¬ëŸ¬ ë²„í¼ë¥¼ Red ë¡œ ë‹¤ì‚¬ìš© ( 4byte float ì‹¤ìˆ˜ë¡œ ì‚¬ìš© )
+		D3DPOOL_DEFAULT,			//RenderTarget ìš© Texture ëŠ” Pool ì„ Default
+		&_pRenderTexture,			//ìƒì„±ëœ Texture ë°›ì•„ì˜¬ í¬ì¸í„°
+		NULL						
+		);
+
+	//Render í•  Surface 
+	result = gpDevice->CreateDepthStencilSurface(
+		size,					//Texture ê°€ë¡œ í•´ìƒë„ 
+		size,					//Texture ì„¸ë¡œ í•´ìƒë„
+		D3DFMT_D24S8,				//Deapth ëŠ” 24 ë¹„íŠ¸ Stencil ì€ 8 ë¹„íŠ¸	
+		D3DMULTISAMPLE_NONE,		//ë©€í‹° ìƒ˜í”Œë§ ì•ˆí‹°ì•Œë¦¬ì•„ì‹±ì€ ì¡´ì¬í•˜ì§€ ì•ŠëŠ”ë‹¤, 
+		0,							//ë©€í‹° ìƒ˜í”Œë§ í€„ë¦¬í‹°ëŠ” 0
+		TRUE,						//ë²„í¼ êµì²´ì‹œ ì´ì „ í¼ë²„ë‚´ìš©ì„ ìœ ì§€í•˜ì§€ ì•Šë‹ˆ? ( TRUE ë¡œ ì“°ë©´ ë²„í¼êµì²´ ë ë•Œ ì´ì „ì— ì¨ì§„ ë²„í¼ë‚´ìš©ì„ ê¸°ì–µí•˜ì§€ ì•ŠëŠ”ë‹¤ )
+		&_pRenderSurface,			//ì–»ì–´ì˜¬ í¬ì¸í„°...
+		NULL);
 }
 
-void Camera::Handle(const InputManager::MouseReleasedEvent & event)
+void Camera::RenderTextureBegin(uint32 backColor)
 {
-	switch (_cameraState)
-	{
-	case cCreativeMode:
-		if (event.code == MOUSE_BUTTON_RIGHT)
-		{
-			_rotating = false;
-		}
-		break;
-	case cNormal:
+	HRESULT result = 0;
+	//í˜„ ë””ë°”ì´ìŠ¤ì˜ Target ë²„í¼ì˜í‘œë©´ê³¼ DepthStencil ë²„í¼ì˜ í‘œë©´ì •ë³´ë¥¼ ê¸°ì–µ
+	result = gpDevice->GetRenderTarget( 0, &_pDeviceTargetSurface );
+	result = gpDevice->GetDepthStencilSurface( &_pDeviceDepthAndStencilSurface );
 
-		break;
+	//RenderTexture ì˜ Surface ë¥¼ ì–»ëŠ”ë‹¤.
+	LPDIRECT3DSURFACE9 texSurface = NULL;
+	if( SUCCEEDED( this->_pRenderTexture->GetSurfaceLevel( 0, &texSurface ) ) )
+	{
+		//Texture í‘œë©´ì„ Device ì˜ Target ë²„í¼ë¡œ ì…‹íŒ…í•œë‹¤.
+		result = gpDevice->SetRenderTarget( 0, texSurface );
+
+		//ì…‹íŒ…ëœ Surface ì •ë³´ëŠ” ë°”ë¡œ ë‚ ë ¤ì£¼ëŠ” ì˜ˆì˜ë¥¼ ê°–ì¶”ì...
+		SAFE_RELEASE( texSurface );
 	}
+
+	//Depth ë²„í¼ì™€ Stencil ë²„í¼ì˜ Surface ë¡œ m_pRenderSurface ì…‹íŒ…
+	result = gpDevice->SetDepthStencilSurface( _pRenderSurface );
+
+	//ë””ë°”ì´ìŠ¤ ë²„í¼ í´ë¦¬ì–´ ( ì‚¬ì‹¤ ìœ„ì—ì„œ Setting ëœ Textuer ë‘ Surface ê°€ í´ë¦¬ì–´ ëœë‹¤  )
+	result = gpDevice->Clear( 0, NULL, 
+		D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER | D3DCLEAR_STENCIL,
+		backColor, 
+		1.0f, 
+		0 );
+}
+
+void Camera::RenderTextureEnd()
+{
+	//Render Texture ì— ê·¸ë¦´ ì‘ì—…ì´ ëë‚¬ìœ¼ë©´ ë‹¤ì‹œ ì›ìƒë³µê·€í•˜ëŠ” ì„¼ìŠ¤....
+	HRESULT result = 0;
+	result = gpDevice->SetRenderTarget( 0, _pDeviceTargetSurface );
+	result = gpDevice->SetDepthStencilSurface( _pDeviceDepthAndStencilSurface );
+
+	//ì…‹íŒ…ëœ Surface ì •ë³´ëŠ” ë°”ë¡œ ë‚ ë ¤ì£¼ëŠ” ì˜ˆì˜ë¥¼ ê°–ì¶”ì...
+	COM_RELEASE( _pDeviceTargetSurface );
+	COM_RELEASE( _pDeviceDepthAndStencilSurface );	
+}
+
+LPDIRECT3DTEXTURE9 Camera::GetRenderTexture()
+{
+	return _pRenderTexture;
 }
 
 void Camera::Handle(const InputManager::MouseMoveEvent & event)

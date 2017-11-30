@@ -46,8 +46,7 @@ private:
 		TURTLESTATE_BREATH_FIRE,
 		TURTLESTATE_DEATH,
 		TURTLESTATE_EARTHQUAKE,
-		TURTLESTATE_HIT1,
-		TURTLESTATE_HIT2,
+		TURTLESTATE_HURT,
 		TURTLESTATE_ROAR,
 		TURTLESTATE_SPIT,
 		TURTLESTATE_STAND,
@@ -62,6 +61,7 @@ public:
 
 	virtual bool CreateFromWorld(World &world);
 	void Update(float deltaTime);
+	void Handle(const CollisionSystem::ActorTriggerEvent & event);
 
 protected:
 	void SetupCallbackAndCompression();

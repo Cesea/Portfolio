@@ -16,10 +16,11 @@ enum cameraState
 	//Editer
 };
 
+//카메라 클래스는 예외적으로 texture를 가지고 있다
 class Camera
 {
 public:
-	cameraState _cameraState;
+	cameraState _cameraState{};
 
 	float _curDist;
 
@@ -32,7 +33,9 @@ public:
 
 	void CreateFromWorld(World &world);
 
-	void PreUpdateMatrix();
+	void MoveAndRotate(const InputManager &input);
+
+	//void PreUpdateMatrix();
 	void UpdateMatrix();
 	void UpdateCamToDevice();
 	void UpdateFrustum();
@@ -56,20 +59,37 @@ public:
 
 	const Frustum &GetFrustum() const { return _frustum; }
 
-	void Handle(const InputManager::KeyDownEvent &event);
-	void Handle(const InputManager::MousePressedEvent &event);
-	void Handle(const InputManager::MouseReleasedEvent &event);
-	void Handle(const InputManager::MouseMoveEvent &event);
-
 	const Entity &GetEntity() const { return _entity; }
 
+
 	const Entity &GetDummyEntity() const { return _dummyEntity; }
+
+	//랜더 Texture 를 준비 한다.
+	void ReadyRenderToTexture( int32 width, int32 height );
+
+	//Shadow Map Texture를 준비한다.
+	void ReadyShadowTexture( int32 size );
+
+	//랜더 Texture 로 랜더링 시작
+	void RenderTextureBegin( uint32 backColor );
+
+	//랜더 Texture 로 랜더링 종료
+	void RenderTextureEnd();
+
+	//랜터 Texture 얻는다.
+	LPDIRECT3DTEXTURE9 GetRenderTexture();
 
 private:
 
 	
 
 	void NormalCameraUpdate(void);
+
+	LPDIRECT3DTEXTURE9 _pRenderTexture{};
+	LPDIRECT3DSURFACE9 _pRenderSurface{};
+	LPDIRECT3DSURFACE9 _pDeviceTargetSurface{};
+	LPDIRECT3DSURFACE9 _pDeviceDepthAndStencilSurface{};
+
 protected:
 
 	Entity _entity;

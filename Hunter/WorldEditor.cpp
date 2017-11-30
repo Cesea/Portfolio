@@ -380,7 +380,7 @@ void Editor::InTerrainEditMode()
 
 		//여기서 선택되어있는 텍스쳐를 그리는 작업을 실행하자...
 		if (_mouseLeftDown && 
-			!(_mx > 0  && _mx < EDITORSIZEX && _my > 0 && _my < EDITORSIZEX))
+			!(_mx > 0  && _mx < EDITORSIZEX && _my > 0 && _my < EDITORSIZEY))
 		{
 			TERRAIN->DrawAlphaTextureOnCursorPos(Vector2((float)_mx, (float)_my),
 				_terrainEditor._textureBrush._innerRadius, _terrainEditor._textureBrush._outterRadius,
@@ -432,7 +432,11 @@ void Editor::InObjectLocateMode()
 	ImguiIndent();
 
 	ImguiSlider("Num Object To Paint", (float *)&_objectLocator._numObjectToPaint, 0.0f, 5.0f, 1.0f);
-	ImguiSlider("Object Spreadness", (float *)&_objectLocator._spreadness, 0.0f, 5.0f, 0.2f);
+
+	ImguiSlider("Brush Inner Radius", &_objectLocator._objectPaintBrush._innerRadius, 0.0f, 5.0f, 0.1f);
+	_terrainEditor._textureBrush.SetInnerRadius(_objectLocator._objectPaintBrush._innerRadius);
+	ImguiSlider("Brush Outter Radius", &_objectLocator._objectPaintBrush._outterRadius, 0.0f, 5.0f, 0.1f);
+	_terrainEditor._textureBrush.SetOutterRadius(_objectLocator._objectPaintBrush._outterRadius);
 
 	if (!_objectLocator._currentStaticHandle.IsValid())
 	{
@@ -448,50 +452,52 @@ void Editor::InObjectLocateMode()
 	}
 
 	//에디터에서 하나의 타입을 에디팅 하고 있을때 다른 옵션들은 꺼진다
-	if (false == _objectLocator._editingRock)
+
+	//NOTE : 돌 생성하는 부분
+	if (false == _objectLocator._locateRock)
 	{
-		if (ImguiCollapse("Rocks", nullptr, _objectLocator._editingRock))
+		if (ImguiCollapse("Rocks", nullptr, _objectLocator._locateRock))
 		{
-			_objectLocator._editingRock = !_objectLocator._editingRock;
-			_objectLocator._editingGrass = false;
-			_objectLocator._editingTree = false;
+			_objectLocator.Reset();
+			_objectLocator._locateRock = true;
 		}
 	}
 	else
 	{
-		if (ImguiCollapse("Rocks", nullptr, _objectLocator._editingRock))
+		if (ImguiCollapse("Rocks", nullptr, _objectLocator._locateRock))
 		{
-			_objectLocator._editingRock = !_objectLocator._editingRock;
+			_objectLocator.Reset();
 		}
 
 		ImguiIndent();
 		if (ImguiButton("Rock01"))
 		{
 			_objectLocator._currentStaticHandle = VIDEO->GetStaticXMesh("Rock01");
-			//_channel.Broadcast<GameObjectFactory::CreateObjectEvent>(
-			//	GameObjectFactory::CreateObjectEvent(ArcheType::eRock, Vector3(0.0f, 0.0f, 0.0f)));
 		}
 		if (ImguiButton("Rock02"))
 		{
 			_objectLocator._currentStaticHandle = VIDEO->GetStaticXMesh("Rock02");
 		}
+		_objectLocator._typeToLocate = 
+			(_objectLocator._currentStaticHandle.IsValid()) ? ARCHE_ROCK : ARCHE_NONE;
+
 		ImguiUnindent();
 	}
 
-	if (false == _objectLocator._editingTree)
+	//NOTE : 나무 생성하는 부분
+	if (false == _objectLocator._locateTree)
 	{
-		if (ImguiCollapse("Trees", nullptr, _objectLocator._editingTree))
+		if (ImguiCollapse("Trees", nullptr, _objectLocator._locateTree))
 		{
-			_objectLocator._editingTree = !_objectLocator._editingTree;
-			_objectLocator._editingRock = false;
-			_objectLocator._editingGrass = false;
+			_objectLocator.Reset();
+			_objectLocator._locateTree = true;
 		}
 	}
 	else
 	{
-		if (ImguiCollapse("Trees", nullptr, _objectLocator._editingTree))
+		if (ImguiCollapse("Trees", nullptr, _objectLocator._locateTree))
 		{
-			_objectLocator._editingTree = !_objectLocator._editingTree;
+			_objectLocator.Reset();
 		}
 		ImguiIndent();
 		if (ImguiButton("Tree01"))
@@ -502,23 +508,25 @@ void Editor::InObjectLocateMode()
 		{
 			_objectLocator._currentStaticHandle = VIDEO->GetStaticXMesh("Tree02");
 		}
+		_objectLocator._typeToLocate = 
+			(_objectLocator._currentStaticHandle.IsValid()) ? ARCHE_TREE : ARCHE_NONE;
 		ImguiUnindent();
 	}
 
-	if (false == _objectLocator._editingGrass)
+	//NOTE : 풀 생성하는 부분
+	if (false == _objectLocator._locateGrass)
 	{
-		if (ImguiCollapse("Grass", nullptr, _objectLocator._editingGrass))
+		if (ImguiCollapse("Grass", nullptr, _objectLocator._locateGrass))
 		{
-			_objectLocator._editingGrass = !_objectLocator._editingGrass;
-			_objectLocator._editingRock = false;
-			_objectLocator._editingTree = false;
+			_objectLocator.Reset();
+			_objectLocator._locateGrass = true;
 		}
 	}
 	else
 	{
-		if (ImguiCollapse("Grass", nullptr, _objectLocator._editingGrass))
+		if (ImguiCollapse("Grass", nullptr, _objectLocator._locateGrass))
 		{
-			_objectLocator._editingGrass = !_objectLocator._editingGrass;
+			_objectLocator.Reset();
 		}
 		ImguiIndent();
 		if (ImguiButton("Grass"))
@@ -529,33 +537,84 @@ void Editor::InObjectLocateMode()
 		{
 			_objectLocator._currentStaticHandle = VIDEO->GetStaticXMesh("Grass02");
 		}
+		_objectLocator._typeToLocate = 
+			(_objectLocator._currentStaticHandle.IsValid()) ? ARCHE_GRASS : ARCHE_NONE;
 		ImguiUnindent();
 	}
 
-	if (_objectLocator._currentStaticHandle.IsValid() &&
+	//NOTE : 몬스터 생성하는 부분
+	if (false == _objectLocator._locateMonster)
+	{
+		if (ImguiCollapse("Monsters", nullptr, _objectLocator._locateMonster))
+		{
+			_objectLocator.Reset();
+			_objectLocator._locateMonster = true;
+		}
+	}
+	else
+	{
+		if (ImguiCollapse("Monsters", nullptr, _objectLocator._locateMonster))
+		{
+			_objectLocator.Reset();
+		}
+		ImguiIndent();
+		if (ImguiButton("Bat"))
+		{
+			_objectLocator._currentSkinnedHandle = VIDEO->GetSkinnedXMesh("Bat");
+			_objectLocator._typeToLocate = ARCHE_BAT;
+		}
+		if (ImguiButton("Cat"))
+		{
+			_objectLocator._currentSkinnedHandle = VIDEO->GetSkinnedXMesh("Cat");
+			_objectLocator._typeToLocate = ARCHE_CAT;
+		}
+		if (ImguiButton("Hydra"))
+		{
+			_objectLocator._currentSkinnedHandle = VIDEO->GetSkinnedXMesh("Hydra");
+			_objectLocator._typeToLocate = ARCHE_HYDRA;
+		}
+		if (ImguiButton("Lizard"))
+		{
+			_objectLocator._currentSkinnedHandle = VIDEO->GetSkinnedXMesh("Lizard");
+			_objectLocator._typeToLocate = ARCHE_LIZARD;
+		}
+		if (ImguiButton("Snake"))
+		{
+			_objectLocator._currentSkinnedHandle = VIDEO->GetSkinnedXMesh("Snake");
+			_objectLocator._typeToLocate = ARCHE_SNAKE;
+		}
+		if (ImguiButton("Turtle"))
+		{
+			_objectLocator._currentSkinnedHandle = VIDEO->GetSkinnedXMesh("Turtle");
+			_objectLocator._typeToLocate = ARCHE_TURTLE;
+		}
+		//if (ImguiButton("Dragon"))
+		//{
+		//	_objectLocator._currentSkinnedHandle = VIDEO->GetSkinnedXMesh("Dragon");
+		//}
+		ImguiUnindent();
+	}
+
+
+	if ((_objectLocator._currentStaticHandle.IsValid() || _objectLocator._currentSkinnedHandle.IsValid()) &&
 		_leftButtonPressed &&
 		!(_mx > 0 && _mx < EDITORX + EDITORSIZEX && _my >= 0 && _my < EDITORY + EDITORSIZEY))
 	{
-		ARCHE_TYPE objectType;
-		if (_objectLocator._editingGrass)
-		{
-			objectType = ARCHE_GRASS;
-		}
-		else if (_objectLocator._editingRock)
-		{
-			objectType = ARCHE_ROCK;
-		}
-		else if (_objectLocator._editingTree)
-		{
-			objectType = ARCHE_TREE;
-		}
-
 		ResourceHandle resourceHandle;
-		resourceHandle.count = _objectLocator._currentStaticHandle.count;
-		resourceHandle.index = _objectLocator._currentStaticHandle.index;
+		if (_objectLocator._currentStaticHandle.IsValid())
+		{
+			resourceHandle.count = _objectLocator._currentStaticHandle.count;
+			resourceHandle.index = _objectLocator._currentStaticHandle.index;
+		}
+		else if (_objectLocator._currentSkinnedHandle.IsValid())
+		{
+			resourceHandle.count = _objectLocator._currentSkinnedHandle.count;
+			resourceHandle.index = _objectLocator._currentSkinnedHandle.index;
+		}
 
 		_channel.Broadcast<GameObjectFactory::CreateObjectOnClickEvent>(
-			GameObjectFactory::CreateObjectOnClickEvent(objectType, resourceHandle, Vector2((float)_mx, (float)_my)));
+			GameObjectFactory::CreateObjectOnClickEvent(_objectLocator._typeToLocate, resourceHandle, 
+				Vector2((float)_mx, (float)_my)));
 	}
 }
 
@@ -674,11 +733,12 @@ void Editor::UpdateInput(const InputManager & input)
 
 	_leftButtonPressed = input.mouse.IsPressed(MOUSE_BUTTON_LEFT);
 	_shiftDown = input.keyboard.GetShiftDown();
-	//Console::Log("%d\n", input.keyboard.GetVKCode());
 	_key = input.keyboard.GetVKCode();
+	_scroll = -(int32)((float)input.mouse.GetWheelDelta() / 120.0f) * 6;
+	//Console::Log("%d\n", _scroll);
 }
 
-void Editor::Init()
+void Editor::Init(IScene *pScene)
 {
 	strncpy(_terrainEditor._textureName00, TERRAIN->_currentConfig._tile0FileName, EDITOR_MAX_NAME);
 	strncpy(_terrainEditor._textureName01, TERRAIN->_currentConfig._tile1FileName, EDITOR_MAX_NAME);
@@ -689,20 +749,25 @@ void Editor::Init()
 	_terrainEditor._heightBrush.Init();
 	_terrainEditor._textureBrush.Init();
 
+	_objectLocator._objectPaintBrush.Init();
+
 	strncpy(_terrainEditor._terrainConfig._tile0FileName, TERRAIN->_currentConfig._tile0FileName, EDITOR_MAX_NAME);
 	strncpy(_terrainEditor._terrainConfig._tile1FileName, TERRAIN->_currentConfig._tile1FileName, EDITOR_MAX_NAME);
 	strncpy(_terrainEditor._terrainConfig._tile2FileName, TERRAIN->_currentConfig._tile2FileName, EDITOR_MAX_NAME);
 	strncpy(_terrainEditor._terrainConfig._tile3FileName, TERRAIN->_currentConfig._tile3FileName, EDITOR_MAX_NAME);
 
+	_pCurrentScene = pScene;
 }
 
 void Editor::Shutdown()
 {
+	_pCurrentScene = nullptr;
 }
 
-void Editor::Edit(RefVariant &object, const InputManager &input)
+bool Editor::Edit(RefVariant &object, const InputManager &input)
 {
 	UpdateInput(input);
+
 	ImguiBeginFrame(_mx, _my, _mouseLeftDown, _scroll, _key, _shiftDown);
 
 	switch (_currentMode)
@@ -741,10 +806,10 @@ void Editor::Edit(RefVariant &object, const InputManager &input)
 
 	case Editor::eObjectLocate:
 	{
-		ImguiBeginScrollArea("Object Locator", EDITORX, EDITORY, EDITORSIZEX, EDITORSIZEY, &_scroll);
+		static int32 scroll = 0;
+		ImguiBeginScrollArea("Object Locator", EDITORX, EDITORY, EDITORSIZEX, EDITORSIZEY, &scroll);
 		InObjectLocateMode();
 		ImguiEndScrollArea();
-
 	} break;
 
 	case Editor::eObjectEdit:
@@ -757,6 +822,7 @@ void Editor::Edit(RefVariant &object, const InputManager &input)
 
 	ImguiEndFrame();
 
+	return true;
 }
 
 void Editor::SetEdittingEntity(Entity & entity)
@@ -833,7 +899,7 @@ bool Brush::Init()
 
 	_centerPos = Vector3(0.0f, 0.0f, 0.0f);
 
-	float deltaAngle = D3DX_PI / (BRUSH_CIRCLE_RES - 1);
+	float deltaAngle = 2 * D3DX_PI / (BRUSH_CIRCLE_RES - 1);
 
 	for (int32 i = 0; i < BRUSH_CIRCLE_RES; ++i)
 	{
@@ -886,11 +952,13 @@ void Brush::SetOutterRadius(float radius)
 		_outterVertices[i]._position.x = cosf(i * deltaAngle) * _outterRadius + _centerPos.x;
 		_outterVertices[i]._position.z = sinf(i * deltaAngle) * _outterRadius + _centerPos.z;
 	}
+
 	for (uint32 i = 0; i < BRUSH_CIRCLE_RES; ++i)
 	{
 		_outterVertices[i]._position.y = TERRAIN->GetHeight(
 			_outterVertices[i]._position.x, _outterVertices[i]._position.z) + 0.1f;
 	}
+
 	if (_innerRadius >= _outterRadius)
 	{
 		SetInnerRadius(radius - 0.1f);
@@ -902,6 +970,7 @@ void Brush::Render()
 	Matrix iden;
 	MatrixIdentity(&iden);
 	gpDevice->SetTransform(D3DTS_WORLD, &iden);
+	gpDevice->SetFVF(BrushVertex::FVF);
 	gpDevice->DrawPrimitiveUP(D3DPT_LINESTRIP, BRUSH_CIRCLE_RES - 1, _innerVertices, sizeof(BrushVertex));
 	gpDevice->DrawPrimitiveUP(D3DPT_LINESTRIP, BRUSH_CIRCLE_RES - 1, _outterVertices, sizeof(BrushVertex));
 

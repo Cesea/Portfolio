@@ -22,6 +22,18 @@ DEFINE_META(TurtleFindState)
 {
 	//ADD_MEMBER(_pActor);
 }
+DEFINE_META(TurtleHurt1State)
+{
+	//ADD_MEMBER(_pActor);
+}
+DEFINE_META(TurtleHurt2State)
+{
+	//ADD_MEMBER(_pActor);
+}
+DEFINE_META(TurtleDeadState)
+{
+	//ADD_MEMBER(_pActor);
+}
 bool TurtleState::Init(StateMachine<Turtle>* pParent)
 {
 	_pParent = pParent;
@@ -126,6 +138,65 @@ void TurtleFindState::Update(float deltaTime, const GameCommand & command)
 }
 
 void TurtleFindState::OnExit()
+{
+	_pParent->ClearActioniQueue();
+}
+
+void TurtleHurt1State::OnEnter()
+{
+	_pParent->QueueAction(TURTLE_ANIM(TURTLE_HIT1));
+}
+
+void TurtleHurt1State::Update(float deltaTime, const GameCommand & command)
+{
+	switch (command._type)
+	{
+	default:
+		break;
+	}
+}
+
+void TurtleHurt1State::OnExit()
+{
+	_pParent->ClearActioniQueue();
+}
+
+
+void TurtleHurt2State::OnEnter()
+{
+	_pParent->QueueAction(TURTLE_ANIM(TURTLE_HIT2));
+}
+
+void TurtleHurt2State::Update(float deltaTime, const GameCommand & command)
+{
+	switch (command._type)
+	{
+	default:
+		break;
+	}
+}
+
+void TurtleHurt2State::OnExit()
+{
+	_pParent->ClearActioniQueue();
+}
+
+
+void TurtleDeadState::OnEnter()
+{
+	_pParent->QueueAction(TURTLE_ANIM(TURTLE_DEATH));
+}
+
+void TurtleDeadState::Update(float deltaTime, const GameCommand & command)
+{
+	switch (command._type)
+	{
+	default:
+		break;
+	}
+}
+
+void TurtleDeadState::OnExit()
 {
 	_pParent->ClearActioniQueue();
 }

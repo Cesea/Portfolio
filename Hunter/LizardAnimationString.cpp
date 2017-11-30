@@ -16,7 +16,7 @@ void InitLizardAnimation()
 {
 	LIZARD_ANIM_DEFINE(LIZARD_ATTACK, false, false, false, 1.0f, 0.2f, 0.2f);
 	LIZARD_ANIM_DEFINE(LIZARD_BITE, false, false, false, 1.0f, 0.2f, 0.2f);
-	LIZARD_ANIM_DEFINE(LIZARD_DEATH, false, false, false, 1.0f, 0.2f, 0.2f);
+	LIZARD_ANIM_DEFINE(LIZARD_DEATH, true, true, true, 1.0f, 0.2f, 0.2f);
 	LIZARD_ANIM_DEFINE(LIZARD_HIT1, false, false, false, 1.0f, 0.2f, 0.2f);
 	LIZARD_ANIM_DEFINE(LIZARD_HIT2, false, false, false, 1.0f, 0.2f, 0.2f);
 	LIZARD_ANIM_DEFINE(LIZARD_IDLE,false, false, false, 1.0f, 0.2f, 0.2f);

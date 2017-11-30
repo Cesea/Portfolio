@@ -1,5 +1,5 @@
-#ifndef MAP_TOOL_SCENE_H
-#define MAP_TOOL_SCENE_H
+#ifndef LOADING_SCENE_00_H
+#define LOADING_SCENE_00_H
 
 #include "TransformSystem.h"
 #include "RenderSystem.h"
@@ -9,19 +9,16 @@
 
 #include "IScene.h"
 
-#include "WorldEditor.h"
 #include "Player.h"
 #include "Snake.h"
 
-class MapToolScene : public IScene
+class LoadingScene00 : public IScene
 {
-	friend class Terrain;
-	friend class Editor;
 public:
-	MapToolScene()
+	LoadingScene00()
 		:IScene::IScene()
 	{};
-	virtual ~MapToolScene() {}
+	virtual ~LoadingScene00() {}
 
 	virtual bool SceneInit();
 	virtual bool SceneUpdate(float deltaTime, const InputManager &input);
@@ -35,17 +32,14 @@ public:
 	virtual const char *GetSceneName();
 
 protected :
-
 	TransformSystem _transformSystem;
 	RenderSystem _renderSystem;
 	ScriptSystem _scriptSystem;
 	ActionSystem _actionSystem;
 	CollisionSystem _collisionSystem;
 
-	Editor *_editor{};
-
-public:
-	virtual void Handle(const Editor::GetObjectFromSceneEvent &event);
+	BaseGameObject *_pRenderObject{};
+	video::StaticXMesh _pMesh{};
 };
 
 #endif

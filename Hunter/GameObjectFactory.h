@@ -51,12 +51,11 @@ private :
 	void UnRegisterEvent();
 
 	void CreateObject(ARCHE_TYPE type, ResourceHandle handle, const Vector3 &position);
-	void CreateObject(ARCHE_TYPE type, char *name, const Vector3 &position);
+	//void CreateObject(ARCHE_TYPE type, char *name, const Vector3 &position);
 
 	BaseGameObject *_pPlayer{};
 
 public :
-
 	struct CreateObjectOnClickEvent
 	{
 		CreateObjectOnClickEvent(ARCHE_TYPE type, ResourceHandle handle, const Vector2 &cursorPos)
@@ -70,6 +69,18 @@ public :
 		ResourceHandle _handle;
 	};
 	void Handle(const CreateObjectOnClickEvent &event);
+
+	struct CreateObjectFromSaveInfoEvent
+	{
+		CreateObjectFromSaveInfoEvent(ARCHE_TYPE type, const char *key, const Vector3 &position)
+			:_type(type), _key(key), _position(position)
+		{
+		}
+		ARCHE_TYPE _type;
+		const char *_key;
+		Vector3 _position;
+	};
+	void Handle(const CreateObjectFromSaveInfoEvent &event);
 
 	struct CreateObjectOnLocationEvent
 	{

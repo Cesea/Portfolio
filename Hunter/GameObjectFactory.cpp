@@ -8,12 +8,14 @@ void GameObjectFactory::Init()
 {
 	_channel.Add<GameObjectFactory::CreateObjectOnClickEvent, GameObjectFactory>(*this);
 	_channel.Add<GameObjectFactory::CreateObjectOnLocationEvent, GameObjectFactory>(*this);
+	_channel.Add<GameObjectFactory::CreateObjectFromSaveInfoEvent, GameObjectFactory>(*this);
 }
 
 void GameObjectFactory::Release()
 {
 	_channel.Remove<GameObjectFactory::CreateObjectOnClickEvent, GameObjectFactory>(*this);
 	_channel.Remove<GameObjectFactory::CreateObjectOnLocationEvent, GameObjectFactory>(*this);
+	_channel.Remove<GameObjectFactory::CreateObjectFromSaveInfoEvent, GameObjectFactory>(*this);
 	_pCurrentScene = nullptr;
 	_pPlayer = nullptr;
 }
@@ -47,6 +49,7 @@ void GameObjectFactory::CreateObject(ARCHE_TYPE type, ResourceHandle handle, con
 		collision._boundingSphere._localCenter = pMesh->_meshBoundInfo._center;
 		collision._boundingSphere._radius = pMesh->_meshBoundInfo._radius;
 		collision._locked = true;
+		collision._triggerType = CollisionComponent::TRIGGER_TYPE_OBJECT;
 
 		entity.Activate();
 
@@ -177,10 +180,6 @@ void GameObjectFactory::CreateObject(ARCHE_TYPE type, ResourceHandle handle, con
 	}
 }
 
-void GameObjectFactory::CreateObject(ARCHE_TYPE type, char * name, const Vector3 & position)
-{
-}
-
 //void GameObjectFactory::Handle(const CreateObjectEvent & event)
 //{
 //}
@@ -202,4 +201,59 @@ void GameObjectFactory::Handle(const CreateObjectOnClickEvent & event)
 void GameObjectFactory::Handle(const CreateObjectOnLocationEvent & event)
 {
 	CreateObject(event._type, event._handle, event._position);
+}
+
+void GameObjectFactory::Handle(const CreateObjectFromSaveInfoEvent & event)
+{
+	switch (event._type)
+	{
+	case ARCHE_HERO  :
+	{
+		CreateObject(ARCHE_HERO, ResourceHandle(), event._position);
+	}break;
+	case ARCHE_ROCK :
+	{
+		video::StaticXMeshHandle handle = VIDEO->GetStaticXMesh(event._key);
+		CreateObject(ARCHE_ROCK, handle, event._position);
+	}break;
+	case ARCHE_GRASS :
+	{
+		video::StaticXMeshHandle handle = VIDEO->GetStaticXMesh(event._key);
+		CreateObject(ARCHE_GRASS, handle, event._position);
+	}break;
+	case ARCHE_TREE:
+	{
+		video::StaticXMeshHandle handle = VIDEO->GetStaticXMesh(event._key);
+		CreateObject(ARCHE_TREE, handle, event._position);
+	}break;
+	case ARCHE_MUSHROOM:
+	{
+		video::StaticXMeshHandle handle = VIDEO->GetStaticXMesh(event._key);
+		CreateObject(ARCHE_MUSHROOM, handle, event._position);
+	}break;
+	case ARCHE_BAT:
+	{
+		CreateObject(ARCHE_BAT, ResourceHandle(), event._position);
+	}break;
+	case ARCHE_CAT:
+	{
+		CreateObject(ARCHE_CAT, ResourceHandle(), event._position);
+	}break;
+	case ARCHE_LIZARD:
+	{
+		CreateObject(ARCHE_LIZARD, ResourceHandle(), event._position);
+	}break;
+	case ARCHE_SNAKE:
+	{
+		CreateObject(ARCHE_SNAKE, ResourceHandle(), event._position);
+	}break;
+	case ARCHE_TURTLE:
+	{
+		CreateObject(ARCHE_TURTLE, ResourceHandle(), event._position);
+	}break;
+	case ARCHE_HYDRA:
+	{
+		CreateObject(ARCHE_HYDRA, ResourceHandle(), event._position);
+	}break;
+	}
 }

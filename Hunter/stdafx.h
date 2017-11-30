@@ -57,6 +57,9 @@
 #define EDITORSIZEX (400)
 #define EDITORSIZEY (900)
 
+constexpr int CLIENTCENTERX = WINSTARTX +  WINSIZEX / 2;
+constexpr int CLIENTCENTERY = WINSTARTY + WINSIZEY / 2;
+
 
 #include "Typedefs.h"
 #include "Memory.h"

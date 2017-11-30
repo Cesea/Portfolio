@@ -32,6 +32,21 @@ DEFINE_META(HydraAttack3State)
 	//ADD_MEMBER(_pActor);
 }
 
+DEFINE_META(HydraHurt1State)
+{
+	//ADD_MEMBER(_pActor);
+}
+
+DEFINE_META(HydraHurt2State)
+{
+	//ADD_MEMBER(_pActor);
+}
+
+DEFINE_META(HydraDeadState)
+{
+	//ADD_MEMBER(_pActor);
+}
+
 bool HydraState::Init(StateMachine<Hydra>* pParent)
 {
 	_pParent = pParent;
@@ -164,5 +179,66 @@ void HydraAttack3State::OnExit()
 {
 	_pParent->ClearActioniQueue();
 }
+
+void HydraHurt1State::OnEnter()
+{
+	_pParent->QueueAction(HYDRA_ANIM(HYDRA_HIT1));
+}
+
+void HydraHurt1State::Update(float deltaTime, const GameCommand & command)
+{
+	switch (command._type)
+	{
+	default:
+		break;
+	}
+}
+
+void HydraHurt1State::OnExit()
+{
+	_pParent->ClearActioniQueue();
+}
+
+
+void HydraHurt2State::OnEnter()
+{
+	_pParent->QueueAction(HYDRA_ANIM(HYDRA_HIT2));
+}
+
+void HydraHurt2State::Update(float deltaTime, const GameCommand & command)
+{
+	switch (command._type)
+	{
+	default:
+		break;
+	}
+}
+
+void HydraHurt2State::OnExit()
+{
+	_pParent->ClearActioniQueue();
+}
+
+
+void HydraDeadState::OnEnter()
+{
+	_pParent->QueueAction(HYDRA_ANIM(HYDRA_DEATH));
+}
+
+void HydraDeadState::Update(float deltaTime, const GameCommand & command)
+{
+	switch (command._type)
+	{
+	default:
+		break;
+	}
+}
+
+void HydraDeadState::OnExit()
+{
+	_pParent->ClearActioniQueue();
+}
+
+
 
 

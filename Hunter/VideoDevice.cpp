@@ -297,11 +297,8 @@ void video::VideoDevice::LoadDefaultEffects()
 	VIDEO->CreateEffect("../resources/Shaders/SkinnedMesh.fx", "SkinnedMesh.fx");
 	VIDEO->CreateEffect("../resources/Shaders/terrainBase.fx", "TerrainBase.fx");
 
-	
 	VIDEO->CreateEffect("../resources/Shaders/EnvironmentSphere.fx", "EnvironmentSphere.fx");
-	VIDEO->CreateEffect("../resources/Shaders/TreeShader.fx", "TreeShader.fx");
-
-
+	VIDEO->CreateEffect("../resources/Shaders/PostEffect.fx", "PostEffect.fx");
 }
 
 RenderView *video::VideoDevice::GetRenderView(RenderViewHandle handle)
@@ -396,7 +393,13 @@ void video::VideoDevice::DestroyVertexBuffer(VertexBufferHandle handle)
 //TODO : Implement this
 void video::VideoDevice::DestroyEveryVertexBuffers()
 {
-	//ResourceHandlePool<VertexBufferHandle> &handleTable = _vertexBufferPool.GetHandleTable();
+	 auto &handleTable = _vertexBufferPool.GetHandleTable();
+	 for (auto &handle : handleTable)
+	 {
+		 _vertexBuffers[handle.first].Destroy();
+	 }
+	 _vertexBufferPool.Clear();
+	 _vertexBufferPool.Resize(VIDEO_CONFIG_VERTEXBUFFER_MAX_NUM);
 }
 
 IndexBufferHandle video::VideoDevice::CreateIndexBuffer(Memory * memory, uint32 stride, const std::string & name)
@@ -456,6 +459,13 @@ void video::VideoDevice::DestroyIndexBuffer(IndexBufferHandle handle)
 
 void video::VideoDevice::DestroyEveryndexBuffers()
 {
+	 auto &handleTable = _indexBufferPool.GetHandleTable();
+	 for (auto &handle : handleTable)
+	 {
+		 _indexBuffers[handle.first].Destroy();
+	 }
+	 _indexBufferPool.Clear();
+	 _vertexBufferPool.Resize(VIDEO_CONFIG_INDEXBUFFER_MAX_NUM);
 }
 
 VertexDeclHandle video::VideoDevice::CreateVertexDecl(const VertexDecl *decl, const std::string &name)
@@ -489,6 +499,13 @@ void video::VideoDevice::DestroyVertexDecl(VertexDeclHandle handle)
 
 void video::VideoDevice::DestroyEveryVertexDecls()
 {
+	 auto &handleTable = _vertexDeclHandlePool.GetHandleTable();
+	 for (auto &handle : handleTable)
+	 {
+		 _vertexDecls[handle.first].Destroy();
+	 }
+	 _vertexDeclHandlePool.Clear();
+	 _vertexDeclHandlePool.Resize(VIDEO_CONFIG_DECL_MAX_NUM);
 }
 
 TextureHandle video::VideoDevice::CreateTexture(const std::string &fileName, const std::string &name)
@@ -544,6 +561,14 @@ void video::VideoDevice::DestroyTexture(TextureHandle handle)
 
 void video::VideoDevice::DestroyEveryTextures()
 {
+	auto &handleTable = _textureHandlePool.GetHandleTable();
+	for (auto &handle : handleTable)
+	{
+		_textures[handle.first].Destroy();
+	}
+	_textureHandlePool.Clear();
+
+	_textureHandlePool.Resize(VIDEO_CONFIG_TEXTURE_MAX_NUM);
 }
 
 void video::VideoDevice::SaveTexture(const std::string & fileName, video::TextureHandle handle)
@@ -588,6 +613,14 @@ void video::VideoDevice::DestroyEffect(EffectHandle handle)
 
 void video::VideoDevice::DestroyEveryEffects()
 {
+	auto &handleTable = _effectHandlePool.GetHandleTable();
+	for (auto &handle : handleTable)
+	{
+		_effects[handle.first].Destroy();
+	}
+	_effectHandlePool.Clear();
+
+	_effectHandlePool.Resize(VIDEO_CONFIG_EFFECT_MAX_NUM);
 }
 
 RenderViewHandle video::VideoDevice::CreateRenderView(const std::string & name)
@@ -610,6 +643,13 @@ void video::VideoDevice::DestroyRenderView(RenderViewHandle handle)
 
 void video::VideoDevice::DestroyEveryRenderViews()
 {
+	auto &handleTable = _renderViewHandlePool.GetHandleTable();
+	for (auto &handle : handleTable)
+	{
+		_renderViews[handle.first].Destroy();
+	}
+	_renderViewHandlePool.Clear();
+	_renderViewHandlePool.Resize(VIDEO_CONFIG_RENDER_VIEW_MAX_NUM);
 }
 
 MaterialHandle video::VideoDevice::CreateMaterial(const std::string & name)
@@ -651,6 +691,13 @@ void video::VideoDevice::MaterialAddTexture(MaterialHandle material, uint32 text
 
 void video::VideoDevice::DestroyEveryMaterials()
 {
+	auto &handleTable = _materialHandlePool.GetHandleTable();
+	for (auto &handle : handleTable)
+	{
+		_materials[handle.first].Destroy();
+	}
+	_materialHandlePool.Clear();
+	_materialHandlePool.Resize(VIDEO_CONFIG_MATERIAL_MAX_NUM);
 }
 
 StaticXMeshHandle video::VideoDevice::CreateStaticXMesh(const std::string fileName, const Matrix * pCorrection, const std::string &name)
@@ -691,6 +738,14 @@ void video::VideoDevice::DestroyStaticXMesh(StaticXMeshHandle handle)
 
 void video::VideoDevice::DestroyEveryStaticMesh()
 {
+	auto &handleTable = _staticXMeshHandlePool.GetHandleTable();
+	for (auto &handle : handleTable)
+	{
+		_staticMeshes[handle.first].Destroy();
+	}
+	_staticXMeshHandlePool.Clear();
+
+	_staticXMeshHandlePool.Resize(VIDEO_CONFIG_STATIC_XMESH_MAX_NUM);
 }
 
 SkinnedXMeshHandle video::VideoDevice::CreateSkinnedXMesh(const std::string fileName, const Matrix * pCorrection, const std::string & name)
@@ -734,9 +789,17 @@ void video::VideoDevice::DestroySkinnedMesh(SkinnedXMeshHandle handle)
 
 void video::VideoDevice::DestroyEverySkinnedMesh()
 {
+	auto &handleTable = _skinnedXMeshHandlePool.GetHandleTable();
+	for (auto &handle : handleTable)
+	{
+		_skinnedMeshes[handle.first].Destroy();
+	}
+	_skinnedXMeshHandlePool.Clear();
+	_skinnedXMeshHandlePool.Resize(VIDEO_CONFIG_SKINNED_XMESH_MAX_NUM);
 }
 
-AnimationInstanceHandle video::VideoDevice::CreateAnimationInstance(SkinnedXMeshHandle xMesh, const std::string & name)
+AnimationInstanceHandle video::VideoDevice::CreateAnimationInstance(SkinnedXMeshHandle xMesh, 
+	const std::string & name)
 {
 	AnimationInstanceHandle result = _animationInstanceHandlePool.Create(name);
 	if (!_animationInstances[result.index].Create(xMesh))
@@ -777,6 +840,13 @@ void video::VideoDevice::DestroyAnimationInstance(AnimationInstanceHandle handle
 
 void video::VideoDevice::DestroyEveryAnimationInstances()
 {
+	auto &handleTable = _animationInstanceHandlePool.GetHandleTable();
+	for (auto &handle : handleTable)
+	{
+		_animationInstances[handle.first].Destroy();
+	}
+	_animationInstanceHandlePool.Clear();
+	_animationInstanceHandlePool.Resize(VIDEO_CONFIG_ANIMATION_MAX_NUM);
 }
 
 FontHandle video::VideoDevice::CreateFont(const D3DXFONT_DESC & fontDesc, const std::string & name)
@@ -835,4 +905,11 @@ void video::VideoDevice::GetBoundingRect(FontHandle handle, const std::string & 
 
 void video::VideoDevice::DestroyEveryFonts()
 {
+	auto &handleTable = _fontHandlePool.GetHandleTable();
+	for (auto &handle : handleTable)
+	{
+		_fonts[handle.first].Destroy();
+	}
+	_fontHandlePool.Clear();
+	_fontHandlePool.Resize(VIDEO_CONFIG_FONT_MAX_NUM);
 }

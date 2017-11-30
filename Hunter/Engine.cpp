@@ -83,18 +83,25 @@ void Engine::Run()
 		float deltaTime = APPTIMER->GetTargetTime();
 		_pScene->Update(deltaTime, *_pInput.get());
 
+		gpDevice->Clear(0, nullptr, D3DCLEAR_TARGET | D3DCLEAR_STENCIL | D3DCLEAR_ZBUFFER, 0xff303040, 1.0f, 0);
+		gpDevice->BeginScene();
+		_pScene->Render();
+		gpDevice->EndScene();
+		gpDevice->Present(nullptr, nullptr, NULL, nullptr);
+
+
 		_pInput->UpdatePrevInput();
 
 		APPTIMER->Tick();
 
-#if defined (DEBUG) || defined (_DEBUG)
+//#if defined (DEBUG) || defined (_DEBUG)
 		static uint64 counter = 0;
 		if ((counter % 60) == 0)
 		{
 			Console::Log("DeltaMS : %d\n", APPTIMER->GetDeltaMS());
 		}
 		counter++;
-#endif
+//#endif
 	}
 	ShutDownSystems();
 }
@@ -167,8 +174,8 @@ bool Engine::InitializePlatform(HINSTANCE instanceHandle)
 		return false;
 	}
 
-	RECT clipRect;
-	GetClientRect(_windowHandle, &clipRect);
+	//SetCapture(_windowHandle);
+	//SetCursorPos(WINSTARTX + WINSIZEX / 2, WINSTARTY + WINSIZEY / 2);
 
 	gWindowHandle = _windowHandle;
 

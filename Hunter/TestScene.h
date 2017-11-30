@@ -1,5 +1,7 @@
-#ifndef MAP_TOOL_SCENE_H
-#define MAP_TOOL_SCENE_H
+#ifndef TEST_SCENE_H
+#define TEST_SCENE_H
+
+//현이가 테스트 할 씬 이다.
 
 #include "TransformSystem.h"
 #include "RenderSystem.h"
@@ -13,15 +15,16 @@
 #include "Player.h"
 #include "Snake.h"
 
-class MapToolScene : public IScene
+
+class TestScene : public IScene
 {
 	friend class Terrain;
 	friend class Editor;
 public:
-	MapToolScene()
+	TestScene()
 		:IScene::IScene()
 	{};
-	virtual ~MapToolScene() {}
+	virtual ~TestScene() {}
 
 	virtual bool SceneInit();
 	virtual bool SceneUpdate(float deltaTime, const InputManager &input);

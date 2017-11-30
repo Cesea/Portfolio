@@ -18,7 +18,7 @@ void InitTurtleAnimation()
 	TURTLE_ANIM_DEFINE(TURTLE_BITE1, false, false, false, 1.0f, 0.2f, 0.2f);
 	TURTLE_ANIM_DEFINE(TURTLE_BITE2, false, false, false, 1.0f, 0.2f, 0.2f);
 	TURTLE_ANIM_DEFINE(TURTLE_BREATHFIRE, false, false, false, 1.0f, 0.2f, 0.2f);
-	TURTLE_ANIM_DEFINE(TURTLE_DEATH, false, false, false, 1.0f, 0.2f, 0.2f);
+	TURTLE_ANIM_DEFINE(TURTLE_DEATH, true, true, true, 1.0f, 0.2f, 0.2f);
 	TURTLE_ANIM_DEFINE(TURTLE_EARTHQUAKE, false, false, false, 1.0f, 0.2f, 0.2f);
 	TURTLE_ANIM_DEFINE(TURTLE_HIT1, false, false, false, 1.0f, 0.2f, 0.2f);
 	TURTLE_ANIM_DEFINE(TURTLE_HIT2, false, false, false, 1.0f, 0.2f, 0.2f);

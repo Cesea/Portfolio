@@ -53,7 +53,7 @@ private:
 		HYDRASTATE_BREATH2,
 		HYDRASTATE_BREATH3,
 		HYDRASTATE_STAND,
-		HYDRASTATE_HIT,
+		HYDRASTATE_HURT,
 		HYDRASTATE_DEATH
 	};
 	HYDRASTATE _state;
@@ -63,6 +63,7 @@ public:
 
 	virtual bool CreateFromWorld(World &world);
 	void Update(float deltaTime);
+	void Handle(const CollisionSystem::ActorTriggerEvent & event);
 
 protected:
 	void SetupCallbackAndCompression();

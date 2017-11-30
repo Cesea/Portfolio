@@ -9,7 +9,7 @@ public:
 	DirectionalLight();
 	~DirectionalLight();
 
-	virtual Matrix GetLightMatrix();
+	virtual Matrix GetLightMatrix() const;
 
 	virtual void SetTarget(const Vector3 &target);
 	virtual void RenderGizmo();

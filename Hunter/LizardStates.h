@@ -114,3 +114,33 @@ public:
 	virtual void Update(float deltaTime, const GameCommand &command) override;
 	virtual void OnExit() override;
 };
+
+class LizardHurt1State : public LizardState
+{
+public:
+	DECLARE_META(LizardHurt1State);
+
+	virtual void OnEnter() override;
+	virtual void Update(float deltaTime, const GameCommand &command) override;
+	virtual void OnExit() override;
+};
+
+class LizardHurt2State : public LizardState
+{
+public:
+	DECLARE_META(LizardHurt2State);
+
+	virtual void OnEnter() override;
+	virtual void Update(float deltaTime, const GameCommand &command) override;
+	virtual void OnExit() override;
+};
+
+class LizardDeadState : public LizardState
+{
+public:
+	DECLARE_META(LizardDeadState);
+
+	virtual void OnEnter() override;
+	virtual void Update(float deltaTime, const GameCommand &command) override;
+	virtual void OnExit() override;
+};

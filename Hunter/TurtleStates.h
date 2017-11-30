@@ -82,3 +82,34 @@ public:
 	virtual void Update(float deltaTime, const GameCommand &command) override;
 	virtual void OnExit() override;
 };
+
+class TurtleHurt1State : public TurtleState
+{
+public:
+	DECLARE_META(TurtleHurt1State);
+
+	virtual void OnEnter() override;
+	virtual void Update(float deltaTime, const GameCommand &command) override;
+	virtual void OnExit() override;
+};
+
+class TurtleHurt2State : public TurtleState
+{
+public:
+	DECLARE_META(TurtleHurt2State);
+
+	virtual void OnEnter() override;
+	virtual void Update(float deltaTime, const GameCommand &command) override;
+	virtual void OnExit() override;
+};
+
+class TurtleDeadState : public TurtleState
+{
+public:
+	DECLARE_META(TurtleDeadState);
+
+	virtual void OnEnter() override;
+	virtual void Update(float deltaTime, const GameCommand &command) override;
+	virtual void OnExit() override;
+};
+

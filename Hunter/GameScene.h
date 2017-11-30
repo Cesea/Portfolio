@@ -18,17 +18,22 @@
 class GameScene : public IScene
 {
 	friend class Terrain;
+	friend class Editor;
 public:
 	GameScene()
 		:IScene::IScene()
 	{};
 	virtual ~GameScene() {}
 
-	virtual bool Init();
-	virtual bool Update(float deltaTime, const InputManager &input);
-	virtual bool Render();
+	virtual bool SceneInit();
+	virtual bool SceneUpdate(float deltaTime, const InputManager &input);
+	virtual bool SceneRelease();
 
-	virtual void Release();
+	virtual bool SceneRender0();
+	//virtual bool SceneRender1() {}
+	//virtual bool SceneRender2() {}
+	//virtual bool SceneRenderSprite() {}
+
 	virtual const char *GetSceneName() { return "GameScene"; }
 
 protected :
@@ -39,8 +44,6 @@ protected :
 	CollisionSystem _collisionSystem;
 
 	Editor *_editor{};
-
-	EnvironmentSphere *_pEnvironmentSphere{};
 
 public:
 	virtual void Handle(const Editor::GetObjectFromSceneEvent &event);

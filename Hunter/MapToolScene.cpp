@@ -1,24 +1,10 @@
 #include "stdafx.h"
 #include "MapToolScene.h"
 
-bool MapToolScene::Init()
+bool MapToolScene::SceneInit()
 {
 	bool result = true;
 	_channel.Add<Editor::GetObjectFromSceneEvent, MapToolScene>(*this);
-
-	DataPackage dataPackage;
-	uint32 fileSize{};
-	dataPackage.OpenFile("../resources/Test.ed", &fileSize);
-	int32 numEntityToCreate;
-	dataPackage.ReadAs<int32>(&numEntityToCreate);
-
-	EntitySaveInfo entitySaveInfo;
-	ZeroMemory(&entitySaveInfo, sizeof(EntitySaveInfo));
-	for (int32 i = 0; i < numEntityToCreate; ++i)
-	{
-		dataPackage.ReadAs<EntitySaveInfo>(&entitySaveInfo);
-
-	}
 
 	GAMEOBJECTFACTORY->SetCurrentScene(this);
 
@@ -93,7 +79,7 @@ bool MapToolScene::Init()
 	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Tree/Tree4.X", &correctionMat, "Tree04");
 	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Tree/Tree5.X", &correctionMat, "Tree05");
 
-	//엔티티 생성
+	//시스템 생성
 	_world.AddSystem<RenderSystem>(_renderSystem);
 	_world.AddSystem<TransformSystem>(_transformSystem);
 	_world.AddSystem<ActionSystem>(_actionSystem);
@@ -104,6 +90,7 @@ bool MapToolScene::Init()
 	_camera.CreateFromWorld(_world);
 	_camera.SetRotationSpeed(10.0f);
 	_camera.SetMoveSpeed(20.0f);
+	_camera.GetEntity().GetComponent<TransformComponent>().MovePositionWorld(Vector3(0.0f, 4.0f, -6.0f));
 
 	//라이트 생성
 	_pMainLight = new DirectionalLight();
@@ -115,28 +102,33 @@ bool MapToolScene::Init()
 	_pEnvironmentSphere->Create("../resources/Textures/grassenvmap1024.dds");
 
 	_channel.Broadcast<GameObjectFactory::CreateObjectOnLocationEvent>(
-		GameObjectFactory::CreateObjectOnLocationEvent(ARCHE_SNAKE, ResourceHandle(), Vector3(0.0f, 5.0f, 0.0f)));
+		GameObjectFactory::CreateObjectOnLocationEvent(ARCHE_HERO, ResourceHandle(), Vector3(0.0f, 2.0f, 0.0f)));
 
-	_channel.Broadcast<GameObjectFactory::CreateObjectOnLocationEvent>(
-		GameObjectFactory::CreateObjectOnLocationEvent(ARCHE_CAT, ResourceHandle(), Vector3(0.0f, 7.0f, 0.0f)));
-
-	_channel.Broadcast<GameObjectFactory::CreateObjectOnLocationEvent>(
-		GameObjectFactory::CreateObjectOnLocationEvent(ARCHE_HYDRA, ResourceHandle(), Vector3(0.0f, 9.0f, 0.0f)));
-
-	_channel.Broadcast<GameObjectFactory::CreateObjectOnLocationEvent>(
-		GameObjectFactory::CreateObjectOnLocationEvent(ARCHE_HERO, ResourceHandle(), Vector3(0.0f, 0.0f, 0.0f)));
+	//_channel.Broadcast<GameObjectFactory::CreateObjectOnLocationEvent>(
+	//	GameObjectFactory::CreateObjectOnLocationEvent(ARCHE_SNAKE, ResourceHandle(), Vector3(3.0f, 2.0f, 0.0f)));
+	//_channel.Broadcast<GameObjectFactory::CreateObjectOnLocationEvent>(
+	//	GameObjectFactory::CreateObjectOnLocationEvent(ARCHE_CAT, ResourceHandle(), Vector3(6.0f, 2.0f, 0.0f)));
+	//_channel.Broadcast<GameObjectFactory::CreateObjectOnLocationEvent>(
+	//	GameObjectFactory::CreateObjectOnLocationEvent(ARCHE_HYDRA, ResourceHandle(), Vector3(9.0f, 2.0f, 0.0f)));
+	//_channel.Broadcast<GameObjectFactory::CreateObjectOnLocationEvent>(
+	//	GameObjectFactory::CreateObjectOnLocationEvent(ARCHE_TURTLE, ResourceHandle(), Vector3(12.0f, 2.0f, 0.0f)));
+	//_channel.Broadcast<GameObjectFactory::CreateObjectOnLocationEvent>(
+	//	GameObjectFactory::CreateObjectOnLocationEvent(ARCHE_LIZARD, ResourceHandle(), Vector3(15.0f, 2.0f, 0.0f)));
+	//_channel.Broadcast<GameObjectFactory::CreateObjectOnLocationEvent>(
+	//	GameObjectFactory::CreateObjectOnLocationEvent(ARCHE_BAT, ResourceHandle(), Vector3(18.0f, 2.0f, 0.0f)));
 
 	//에디터 생성
 	imguiRenderInit();
 	_editor = new Editor;
-	_editor->Init();
+	_editor->Init(this);
 
 	return result;
 }
 
-bool MapToolScene::Update(float deltaTime, const InputManager & input)
+bool MapToolScene::SceneUpdate(float deltaTime, const InputManager & input)
 {
 	bool result = true;
+
 
 	_editor->Edit(RefVariant(), input);
 
@@ -144,7 +136,7 @@ bool MapToolScene::Update(float deltaTime, const InputManager & input)
 
 	_scriptSystem.Update(deltaTime);
 
-	_camera.PreUpdateMatrix();
+	_camera.MoveAndRotate(input);
 	_transformSystem.PreUpdate(deltaTime);
 
 	//Collision Check
@@ -158,40 +150,16 @@ bool MapToolScene::Update(float deltaTime, const InputManager & input)
 		_camera.UpdateCamToDevice();
 		_camera.UpdateFrustum();
 	}
-
 	//_channel.Update<BaseScene::SpawnEvent>(deltaTime);
 
+	//if (input.keyboard.IsPressed(VK_SPACE))
+	//{
+	//	gEngine->GetScene()->ChangeSceneWithLoading("BaseScene", "LoadingScene00", 1, 1);
+	//}
 	return result;
 }
 
-bool MapToolScene::Render()
-{
-	video::StaticXMesh::SetCamera(_camera);
-	video::StaticXMesh::SetBaseLight(_pMainLight);
-
-	video::SkinnedXMesh::SetCamera(_camera);
-	video::SkinnedXMesh::SetBaseLight(_pMainLight);
-
-	gpDevice->Clear(0, nullptr, D3DCLEAR_TARGET | D3DCLEAR_STENCIL | D3DCLEAR_ZBUFFER, 0xff303040, 1.0f, 0);
-	gpDevice->BeginScene();
-
-	_pEnvironmentSphere->Render(_camera);
-	
-	GIZMOMANAGER->WorldGrid(1.0f, 20);
-
-	TERRAIN->Render(_camera);
-	_renderSystem.Render(_camera);
-	_editor->Render();
-
-	imguiRenderDraw();
-
-	gpDevice->EndScene();
-	gpDevice->Present(nullptr, nullptr, NULL, nullptr);
-
-	return true;
-}
-
-void MapToolScene::Release()
+bool MapToolScene::SceneRelease()
 {
 	for (auto object : _gameObjects)
 	{
@@ -200,6 +168,41 @@ void MapToolScene::Release()
 	_gameObjects.clear();
 
 	_world.Clear();
+
+	//VIDEO->DestroyEveryVertexBuffers();
+	//VIDEO->DestroyEveryndexBuffers();
+
+	//VIDEO->DestroyEveryAnimationInstances();
+	//VIDEO->DestroyEverySkinnedMesh();
+
+	//VIDEO->DestroyEveryStaticMesh();
+
+	//VIDEO->DestroyEveryTextures();
+
+	return true;
+}
+
+bool MapToolScene::SceneRender0()
+{
+	video::StaticXMesh::SetCamera(_camera);
+	video::StaticXMesh::SetBaseLight(_pMainLight);
+
+	video::SkinnedXMesh::SetCamera(_camera);
+	video::SkinnedXMesh::SetBaseLight(_pMainLight);
+
+	GIZMOMANAGER->WorldGrid(1.0f, 20);
+
+	TERRAIN->Render(_camera, *_pMainLight, _camera);
+	_renderSystem.Render(_camera);
+	_editor->Render();
+
+
+	return true;
+}
+
+const char * MapToolScene::GetSceneName()
+{
+	return "MapToolScene";
 }
 
 void MapToolScene::Handle(const Editor::GetObjectFromSceneEvent & event)

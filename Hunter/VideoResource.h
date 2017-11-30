@@ -644,7 +644,7 @@ inline void ResourceHandlePool<HandleType>::Clear()
 
 	_handleTable.clear();
 	_nameTable.clear();
-	_nextID = 0;
+	_nextID = 1;
 }
 
 template<typename HandleType>

@@ -3,8 +3,7 @@
 
 using namespace video;
 
-
-bool BaseScene::Init()
+bool BaseScene::SceneInit()
 {
 	bool result = true;
 
@@ -34,7 +33,6 @@ bool BaseScene::Init()
 	MatrixScaling(&correctionMat, 0.01f, 0.01f, 0.01f);
 	video::SkinnedXMeshHandle knight  = VIDEO->CreateSkinnedXMesh(
 		"../resources/Models/Knight/Knight.X", &correctionMat, "Knight");
-	video::AnimationInstanceHandle ainmHandle = VIDEO->CreateAnimationInstance(knight, "Knight0");
 
 	MatrixScaling(&correctionMat, 1.0f, 1.0f, 1.0f);
 	video::SkinnedXMeshHandle snakeMesh = VIDEO->CreateSkinnedXMesh(
@@ -106,9 +104,6 @@ bool BaseScene::Init()
 	_channel.Broadcast<GameObjectFactory::CreateObjectOnLocationEvent>(
 		GameObjectFactory::CreateObjectOnLocationEvent(ARCHE_HERO, ResourceHandle(), Vector3(0.0f, 0.0f, 0.0f)));
 
-	_channel.Broadcast<GameObjectFactory::CreateObjectOnLocationEvent>(
-		GameObjectFactory::CreateObjectOnLocationEvent(ARCHE_HERO, ResourceHandle(), Vector3(0.0f, 0.0f, 0.0f)));
-
 	//_player.CreateFromWorld(_world);
 	//_snake.CreateFromWorld(_world);
 	_turtle.CreateFromWorld(_world);
@@ -120,13 +115,12 @@ bool BaseScene::Init()
 	imguiRenderInit();
 //에디터 생성
 	_pEditor = new Editor;
-	_pEditor->Init();
+	_pEditor->Init(this);
 
-	return result;
-
+	return result; 
 }
 
-bool BaseScene::Update(float deltaTime, const InputManager &input)
+bool BaseScene::SceneUpdate(float deltaTime, const InputManager & input)
 {
 	bool result = true;
 
@@ -136,8 +130,9 @@ bool BaseScene::Update(float deltaTime, const InputManager &input)
 
 	_scriptSystem.Update(deltaTime);
 
-	_camera.PreUpdateMatrix();
+	_camera.MoveAndRotate(input);
 	_transformSystem.PreUpdate(deltaTime);
+	_collisionSystem.Update(deltaTime, 1000.0f);
 
 	//Collision Check
 	//_transformSystem.PostUpdate(deltaTime);
@@ -155,7 +150,19 @@ bool BaseScene::Update(float deltaTime, const InputManager &input)
 	return result;
 }
 
-bool BaseScene::Render()
+bool BaseScene::SceneRelease()
+{
+	for (auto object : _gameObjects)
+	{
+		SAFE_DELETE(object);
+	}
+	_gameObjects.clear();
+
+	_world.Clear();
+	return true;
+}
+
+bool BaseScene::SceneRender0()
 {
 	video::StaticXMesh::SetCamera(_camera);
 	video::StaticXMesh::SetBaseLight(_pMainLight);
@@ -163,25 +170,12 @@ bool BaseScene::Render()
 	video::SkinnedXMesh::SetCamera(_camera);
 	video::SkinnedXMesh::SetBaseLight(_pMainLight);
 
-	gpDevice->Clear(0, nullptr, D3DCLEAR_TARGET | D3DCLEAR_STENCIL | D3DCLEAR_ZBUFFER, 0xff303040, 1.0f, 0);
-	gpDevice->BeginScene();
-
-	_pEnvironmentSphere->Render(_camera);
-	
 	GIZMOMANAGER->WorldGrid(1.0f, 20);
 
-	TERRAIN->Render(_camera);
+	TERRAIN->Render(_camera, *_pMainLight, _camera);
 	_renderSystem.Render(_camera);
 	_pEditor->Render();
 
-	imguiRenderDraw();
-
-	gpDevice->EndScene();
-	gpDevice->Present(nullptr, nullptr, NULL, nullptr);
-
-	return true;	
+	return true;
 }
 
-void BaseScene::Release()
-{
-}

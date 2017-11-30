@@ -25,7 +25,7 @@ public:
 	virtual void SetTarget(const Vector3 &target) {};
 
 	//라이트 행렬을 얻는다.
-	virtual Matrix GetLightMatrix() = 0;
+	virtual Matrix GetLightMatrix() const = 0;
 
 	//라이트 기즈모를 그린다.
 	virtual void RenderGizmo() = 0;

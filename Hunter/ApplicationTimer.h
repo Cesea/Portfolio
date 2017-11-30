@@ -18,6 +18,7 @@ public :
 
 	inline float GetTargetTime() { return _targetFramePerMS / 1000.0f; }
 
+	float GetTotalTimeElapsed();
 
 private :
 	LARGE_INTEGER _prevCounter;;

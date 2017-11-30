@@ -32,6 +32,8 @@ bool Cat::CreateFromWorld(World & world)
 	collision._boundingSphere._localCenter = pAnimation->_pSkinnedMesh->_boundInfo._center;
 	collision._boundingSphere._radius = pAnimation->_pSkinnedMesh->_boundInfo._radius;
 	collision._locked = false;
+	collision._isTrigger = true;
+	collision._triggerType = CollisionComponent::TRIGGER_TYPE_ENEMY;
 
 
 	ScriptComponent &scriptComponent = _entity.AddComponent<ScriptComponent>();
@@ -58,6 +60,9 @@ bool Cat::CreateFromWorld(World & world)
 	_pStateMachine->RegisterState(META_TYPE(CatAttack4State)->Name(), new CatAttack4State());
 	_pStateMachine->RegisterState(META_TYPE(CatAttack5State)->Name(), new CatAttack5State());
 	_pStateMachine->RegisterState(META_TYPE(CatStandState)->Name(), new CatStandState());
+	_pStateMachine->RegisterState(META_TYPE(CatHurt1State)->Name(), new CatHurt1State());
+	_pStateMachine->RegisterState(META_TYPE(CatHurt2State)->Name(), new CatHurt2State());
+	_pStateMachine->RegisterState(META_TYPE(CatDeadState)->Name(), new CatDeadState());
 	_pStateMachine->ChangeState(META_TYPE(CatIdleState)->Name());
 
 	_speed = 5.0f;
@@ -86,6 +91,16 @@ bool Cat::CreateFromWorld(World & world)
 
 	_standTime = 70;
 	_standCount = _standTime;
+
+	_hurtTime = 40;
+	_hurtCount = _hurtTime;
+
+	_hp = 500;
+
+	//이벤트 등록
+	EventChannel channel;
+	channel.Add<CollisionSystem::ActorTriggerEvent, Cat>(*this);
+
 	return true;
 }
 
@@ -278,6 +293,44 @@ void Cat::Update(float deltaTime)
 			_pStateMachine->ChangeState(META_TYPE(CatMoveState)->Name());
 		}
 		break;
+	case CATSTATE_HURT:
+		_hurtCount--;
+		if (_hurtCount < 0)
+		{
+			_hurtCount = _hurtTime;
+			//거리를 계산해서 가까운상태면 어택
+			Vector3 direction = _playerPos - transComp.GetWorldPosition();
+			float distance = Vec3Length(&direction);
+			Vec3Normalize(&direction, &direction);
+			if (distance < _atkRange)
+			{
+				_state = CATSTATE_ATK1;
+				_pStateMachine->ChangeState(META_TYPE(CatAttackState)->Name());
+			}
+			else
+			{
+				//전투중에 거리가벌어진거라면 roar없이 돌격
+				if (_battle)
+				{
+					_state = CATSTATE_RUN;
+					_pStateMachine->ChangeState(META_TYPE(CatMoveState)->Name());
+				}
+				//비전투인데 맞았다?
+				else
+				{
+					// 추격
+					_battle = true;
+					_state = CATSTATE_FIND;
+					_pStateMachine->ChangeState(META_TYPE(CatIdleState)->Name());
+					Vector3 distance = _playerPos - transComp.GetWorldPosition();
+					Vec3Normalize(&distance, &distance);
+					transComp.LookDirection(-distance, D3DX_PI * 2);
+				}
+			}
+		}
+		break;
+	case CATSTATE_DEATH:
+		break;
 	}
 	//전투상태가 아니라면 항시 플레이어를 수색한다.
 	if (!_battle)
@@ -292,6 +345,36 @@ void Cat::Update(float deltaTime)
 			Vec3Normalize(&distance, &distance);
 			transComp.LookDirection(-distance, D3DX_PI * 2);
 		}
+	}
+}
+
+void Cat::Handle(const CollisionSystem::ActorTriggerEvent & event)
+{
+	if (event._entity1 != _entity) return;
+	CollisionComponent & _collision = event._entity2.GetComponent<CollisionComponent>();
+	switch (_collision._triggerType)
+	{
+		//플레이어와 충돌했다(내가 가해자)
+	case CollisionComponent::TRIGGER_TYPE_PLAYER:
+		if (_state != CATSTATE_HURT&&_state != CATSTATE_DEATH)
+		{
+			resetAllCount();
+			_state = CATSTATE_HURT;
+			_pStateMachine->ChangeState(META_TYPE(CatHurt1State)->Name());
+			_battle = true;
+			_hp -= 50;
+			if (_hp <= 0)
+			{
+				_state = CATSTATE_DEATH;
+				_pStateMachine->ChangeState(META_TYPE(CatDeadState)->Name());
+			}
+		}
+		break;
+		//오브젝트와 충돌했다
+	case CollisionComponent::TRIGGER_TYPE_OBJECT:
+		break;
+	case CollisionComponent::TRIGGER_TYPE_DEFAULT:
+		break;
 	}
 }
 
