@@ -104,28 +104,23 @@ bool MapToolScene::SceneInit()
 	_channel.Broadcast<GameObjectFactory::CreateObjectOnLocationEvent>(
 		GameObjectFactory::CreateObjectOnLocationEvent(ARCHE_HERO, ResourceHandle(), Vector3(0.0f, 2.0f, 0.0f)));
 
-	_channel.Broadcast<GameObjectFactory::CreateObjectOnLocationEvent>(
-		GameObjectFactory::CreateObjectOnLocationEvent(ARCHE_SNAKE, ResourceHandle(), Vector3(3.0f, 2.0f, 0.0f)));
-
-	_channel.Broadcast<GameObjectFactory::CreateObjectOnLocationEvent>(
-		GameObjectFactory::CreateObjectOnLocationEvent(ARCHE_CAT, ResourceHandle(), Vector3(6.0f, 2.0f, 0.0f)));
-
-	_channel.Broadcast<GameObjectFactory::CreateObjectOnLocationEvent>(
-		GameObjectFactory::CreateObjectOnLocationEvent(ARCHE_HYDRA, ResourceHandle(), Vector3(9.0f, 2.0f, 0.0f)));
-
-	_channel.Broadcast<GameObjectFactory::CreateObjectOnLocationEvent>(
-		GameObjectFactory::CreateObjectOnLocationEvent(ARCHE_TURTLE, ResourceHandle(), Vector3(12.0f, 2.0f, 0.0f)));
-
-	_channel.Broadcast<GameObjectFactory::CreateObjectOnLocationEvent>(
-		GameObjectFactory::CreateObjectOnLocationEvent(ARCHE_LIZARD, ResourceHandle(), Vector3(15.0f, 2.0f, 0.0f)));
-
-	_channel.Broadcast<GameObjectFactory::CreateObjectOnLocationEvent>(
-		GameObjectFactory::CreateObjectOnLocationEvent(ARCHE_BAT, ResourceHandle(), Vector3(18.0f, 2.0f, 0.0f)));
+	//_channel.Broadcast<GameObjectFactory::CreateObjectOnLocationEvent>(
+	//	GameObjectFactory::CreateObjectOnLocationEvent(ARCHE_SNAKE, ResourceHandle(), Vector3(3.0f, 2.0f, 0.0f)));
+	//_channel.Broadcast<GameObjectFactory::CreateObjectOnLocationEvent>(
+	//	GameObjectFactory::CreateObjectOnLocationEvent(ARCHE_CAT, ResourceHandle(), Vector3(6.0f, 2.0f, 0.0f)));
+	//_channel.Broadcast<GameObjectFactory::CreateObjectOnLocationEvent>(
+	//	GameObjectFactory::CreateObjectOnLocationEvent(ARCHE_HYDRA, ResourceHandle(), Vector3(9.0f, 2.0f, 0.0f)));
+	//_channel.Broadcast<GameObjectFactory::CreateObjectOnLocationEvent>(
+	//	GameObjectFactory::CreateObjectOnLocationEvent(ARCHE_TURTLE, ResourceHandle(), Vector3(12.0f, 2.0f, 0.0f)));
+	//_channel.Broadcast<GameObjectFactory::CreateObjectOnLocationEvent>(
+	//	GameObjectFactory::CreateObjectOnLocationEvent(ARCHE_LIZARD, ResourceHandle(), Vector3(15.0f, 2.0f, 0.0f)));
+	//_channel.Broadcast<GameObjectFactory::CreateObjectOnLocationEvent>(
+	//	GameObjectFactory::CreateObjectOnLocationEvent(ARCHE_BAT, ResourceHandle(), Vector3(18.0f, 2.0f, 0.0f)));
 
 	//에디터 생성
 	imguiRenderInit();
 	_editor = new Editor;
-	_editor->Init();
+	_editor->Init(this);
 
 	return result;
 }
@@ -177,12 +172,12 @@ bool MapToolScene::SceneRelease()
 	//VIDEO->DestroyEveryVertexBuffers();
 	//VIDEO->DestroyEveryndexBuffers();
 
-	VIDEO->DestroyEveryAnimationInstances();
-	VIDEO->DestroyEverySkinnedMesh();
+	//VIDEO->DestroyEveryAnimationInstances();
+	//VIDEO->DestroyEverySkinnedMesh();
 
-	VIDEO->DestroyEveryStaticMesh();
+	//VIDEO->DestroyEveryStaticMesh();
 
-	VIDEO->DestroyEveryTextures();
+	//VIDEO->DestroyEveryTextures();
 
 	return true;
 }

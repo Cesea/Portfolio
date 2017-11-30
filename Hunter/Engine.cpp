@@ -94,14 +94,14 @@ void Engine::Run()
 
 		APPTIMER->Tick();
 
-#if defined (DEBUG) || defined (_DEBUG)
+//#if defined (DEBUG) || defined (_DEBUG)
 		static uint64 counter = 0;
 		if ((counter % 60) == 0)
 		{
 			Console::Log("DeltaMS : %d\n", APPTIMER->GetDeltaMS());
 		}
 		counter++;
-#endif
+//#endif
 	}
 	ShutDownSystems();
 }

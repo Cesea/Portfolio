@@ -95,7 +95,7 @@ bool GameScene::SceneInit()
 	//에디터 생성
 	imguiRenderInit();
 	_editor = new Editor;
-	_editor->Init();
+	_editor->Init(this);
 
 	return result;
 }

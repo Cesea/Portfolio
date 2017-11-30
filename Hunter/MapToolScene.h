@@ -16,6 +16,7 @@
 class MapToolScene : public IScene
 {
 	friend class Terrain;
+	friend class Editor;
 public:
 	MapToolScene()
 		:IScene::IScene()

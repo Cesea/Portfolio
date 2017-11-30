@@ -1304,31 +1304,31 @@ void Terrain::DrawAlphaTextureOnCursorPos(const Vector2 & cursorPos,
 		int32 minPixelY = centerPixelY - brushSize;
 		int32 maxPixelY = centerPixelY + brushSize;
 
-		ClampInt(minPixelX, 0, TERRAIN_ALPHA_TEXTURE_SIZE);
-		ClampInt(maxPixelX, 0, TERRAIN_ALPHA_TEXTURE_SIZE);
-		ClampInt(minPixelY, 0, TERRAIN_ALPHA_TEXTURE_SIZE);
-		ClampInt(minPixelY, 0, TERRAIN_ALPHA_TEXTURE_SIZE);
+		ClampInt(minPixelX, 0, TERRAIN_ALPHA_TEXTURE_SIZE - 1);
+		ClampInt(maxPixelX, 0, TERRAIN_ALPHA_TEXTURE_SIZE - 1);
+		ClampInt(minPixelY, 0, TERRAIN_ALPHA_TEXTURE_SIZE - 1);
+		ClampInt(minPixelY, 0, TERRAIN_ALPHA_TEXTURE_SIZE - 1);
 
 		D3DLOCKED_RECT lockRect{};
 		video::Texture *pTexture = VIDEO->GetTexture(_tileSplatHandle);
 		if (SUCCEEDED(pTexture->_ptr->LockRect(0, &lockRect, nullptr, 0)))
 		{
-
 			uint8 *pStart = (uint8 *)lockRect.pBits;
 
 			uint8 write{};
 
-			for (int32 y = minPixelY; y < maxPixelY; ++y)
+			for (int32 y = minPixelY; y <= maxPixelY; ++y)
 			{
-				for (int32 x = minPixelX; x < maxPixelX; ++x)
+				for (int32 x = minPixelX; x <= maxPixelX; ++x)
 				{
 					int32 in = (lockRect.Pitch * y) + (x * 4);
 
-					uint8 read = pStart[in];
+					uint8 read = pStart[in + channel];
 
 					Vector3 diff = Vector3(x * pixelSize, 0.0f, y * pixelSize) -
 						Vector3(centerPixelX * pixelSize, 0.0f, centerPixelY * pixelSize);
 					float length = Vec3Length(&diff);
+
 					if (length <= innerRadius)
 					{
 						write = 0xff;
@@ -1336,8 +1336,10 @@ void Terrain::DrawAlphaTextureOnCursorPos(const Vector2 & cursorPos,
 					else if(length <= outterRadius)
 					{
 						length -= innerRadius;
-						int32 smooth = (int32)(outterRadius - innerRadius);
-						write = (uint8)((smooth - length) / (float)(smooth)) * 0xff;
+						float range = (float)(outterRadius - innerRadius);
+						write =  (uint8)(((float)(range - length) / (float)(range)) * 0xff);
+
+						int a = 0;
 					}
 					else
 					{
@@ -1353,7 +1355,8 @@ void Terrain::DrawAlphaTextureOnCursorPos(const Vector2 & cursorPos,
 						}
 						else
 						{
-							pStart[in] = 0x00;
+							pStart[in] = (uint8)((float)pStart[in] * 0.1f);
+							//pStart[in] = 0x00;
 						}
 						in++;
 					}

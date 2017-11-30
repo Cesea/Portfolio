@@ -115,7 +115,7 @@ bool BaseScene::SceneInit()
 	imguiRenderInit();
 //에디터 생성
 	_pEditor = new Editor;
-	_pEditor->Init();
+	_pEditor->Init(this);
 
 	return result; 
 }

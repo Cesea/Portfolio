@@ -18,6 +18,7 @@
 class GameScene : public IScene
 {
 	friend class Terrain;
+	friend class Editor;
 public:
 	GameScene()
 		:IScene::IScene()
