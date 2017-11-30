@@ -24,10 +24,10 @@ struct Movement
 bool IsMovementNone(Movement &movement);
 
 void MovementStop(Movement &movement);
-void MovementLeft(Movement &movement);
-void MovementRight(Movement &movement);
-void MovementUp(Movement &movement);
-void MovementDown(Movement &movement);
+//void MovementLeft(Movement &movement);
+//void MovementRight(Movement &movement);
+//void MovementUp(Movement &movement);
+//void MovementDown(Movement &movement);
 
 enum BEHAVIOR_TYPE
 {

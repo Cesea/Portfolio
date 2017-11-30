@@ -38,8 +38,9 @@ public :
 	void Update(float deltaTime);
 
 	void Handle(const InputManager::KeyPressedEvent &event);
+	void Handle(const InputManager::KeyReleasedEvent &event);
+	//void Handle(const InputManager::KeyDownEvent &event);
 	void Handle(const InputManager::MousePressedEvent &event);
-	void Handle(const InputManager::KeyDownEvent &event);
 
 	void SetLinkCamera(Camera* camera) { _camera = camera; }
 
@@ -60,6 +61,9 @@ private :
 	Vector3 cForward;
 
 	void SetupCallbackAndCompression();
+
+	void MoveAndRotate(float deltaTime);
+
 	PlayerCallbackData _callbackData;
 	PlayerStateMachine *_pStateMachine;
 	GameCommand _currentCommand;
@@ -70,7 +74,8 @@ private :
 
 private :
 	EventChannel _channel;
-	float _speed{2.0f};
+	float _walkSpeed{2.0f};
+	float _runSpeed{4.0f};
 
 	StopWatch _combatToPeaceTimer;
 

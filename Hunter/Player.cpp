@@ -26,7 +26,8 @@ bool Player::CreateFromWorld(World & world)
 {
    EventChannel channel;
    channel.Add<InputManager::KeyPressedEvent, Player>(*this);
-   channel.Add<InputManager::KeyDownEvent, Player>(*this);
+   channel.Add<InputManager::KeyReleasedEvent, Player>(*this);
+   //channel.Add<InputManager::KeyDownEvent, Player>(*this);
    channel.Add<InputManager::MousePressedEvent, Player>(*this);
    _entity = world.CreateEntity();
 
@@ -50,7 +51,6 @@ bool Player::CreateFromWorld(World & world)
    collision._boundingSphere._localCenter = pAnimation->_pSkinnedMesh->_boundInfo._center;
    collision._boundingSphere._radius = pAnimation->_pSkinnedMesh->_boundInfo._radius;
    collision._triggerType = CollisionComponent::TRIGGER_TYPE_PLAYER;
-
 
    ScriptComponent &scriptComponent = _entity.AddComponent<ScriptComponent>();
    scriptComponent.SetScript(MAKE_SCRIPT_DELEGATE(Player, Update, *this));
@@ -92,11 +92,10 @@ bool Player::CreateFromWorld(World & world)
 
 void Player::Update(float deltaTime)
 {
-	//cForward = 
-
    _pStateMachine->Update(deltaTime, _currentCommand);
 
-   TransformComponent &transComp = _entity.GetComponent<TransformComponent>();
+   MoveAndRotate(deltaTime);
+
    switch (_state)
    {
    case Player::PLAYERSTATE_STANCE:
@@ -107,24 +106,21 @@ void Player::Update(float deltaTime)
          if (_currentCommand._type == GAMECOMMAND_MOVE)
          {
             _state = PLAYERSTATE_MOVE;
-            if (_currentCommand._movement._vertical == VERTICAL_MOVEMENT_DOWN)
+
+            if(_currentCommand._movement._vertical == VERTICAL_MOVEMENT_UP)
             {
-               MovementDown(_currentMovement);
-               _pStateMachine->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWalkingBack));
-            }
-            else if(_currentCommand._movement._vertical == VERTICAL_MOVEMENT_UP)
-            {
-               MovementUp(_currentMovement);
                _pStateMachine->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWalk));
+            }
+            else if (_currentCommand._movement._vertical == VERTICAL_MOVEMENT_DOWN)
+            {
+               _pStateMachine->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWalkingBack));
             }
             else if (_currentCommand._movement._horizontal == HORIZONTAL_MOVEMENT_LEFT)
             {
-               MovementLeft(_currentMovement);
                _pStateMachine->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eStrafeRight));
             }
             else if (_currentCommand._movement._horizontal == HORIZONTAL_MOVEMENT_RIGHT)
             {
-               MovementRight(_currentMovement);
                _pStateMachine->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eStrafeLeft));
             }
          }
@@ -156,22 +152,18 @@ void Player::Update(float deltaTime)
             
             if (_currentCommand._movement._horizontal == HORIZONTAL_MOVEMENT_LEFT)
             {
-               MovementLeft(_currentMovement);
                _pStateMachine->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWarMovingLeft));
             }
             else if(_currentCommand._movement._horizontal == HORIZONTAL_MOVEMENT_RIGHT)
             {
-               MovementRight(_currentMovement);
                _pStateMachine->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWarMovingRight));
             }
             else if (_currentCommand._movement._vertical == VERTICAL_MOVEMENT_UP)
             {
-               MovementUp(_currentMovement);
                _pStateMachine->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWalk));
             }
             else if (_currentCommand._movement._vertical == VERTICAL_MOVEMENT_DOWN)
             {
-               MovementDown(_currentMovement);
                _pStateMachine->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWarRetreat));
             }
          }
@@ -200,47 +192,6 @@ void Player::Update(float deltaTime)
          moveToStance = _moveToStanceTimer.Tick(deltaTime);
       }
 
-      Vector3 moveDelta{};
-      Vector3 currentPos = transComp._position;
-
-      Vector3 playerForward = transComp.GetForward();
-      Vector3 playerRight = transComp.GetRight();
-
-
-      //Vector3 forward = transComp.GetForward();
-      if (_currentMovement._vertical == VERTICAL_MOVEMENT_UP)
-      {
-         //moveDelta.z -= _speed;
-         //transComp.MovePositionSelf(playerForward * -_speed * deltaTime);
-		 transComp.MovePositionWorld(playerForward * -_speed * deltaTime);
-		 //transComp.MovePositionSelf(_camera->GetEntity().GetComponent<TransformComponent>().GetForward() * -_speed * deltaTime);
-      }
-      else if (_currentMovement._vertical == VERTICAL_MOVEMENT_DOWN)
-      {
-         //moveDelta.z += _speed;
-         //transComp.MovePositionSelf(playerForward * _speed * deltaTime);
-		  transComp.MovePositionWorld(playerForward * _speed * deltaTime);
-      }
-      else if (_currentMovement._horizontal == HORIZONTAL_MOVEMENT_LEFT)
-      {
-         //moveDelta.x -= _speed;
-         //transComp.MovePositionSelf(playerRight * -_speed * deltaTime);
-		  transComp.MovePositionWorld(playerRight * -_speed * deltaTime);
-      }
-      else if (_currentMovement._horizontal == HORIZONTAL_MOVEMENT_RIGHT)
-      {
-         //moveDelta.x += _speed;
-         //transComp.MovePositionSelf(playerRight * _speed * deltaTime);
-		  transComp.MovePositionWorld(playerRight * _speed * deltaTime);
-      }
-      /*currentPos += moveDelta * deltaTime;
-
-      currentPos.y = TERRAIN->GetHeight(currentPos.x, currentPos.z);*/
-
-      transComp.SetWorldPosition(transComp.GetWorldPosition().x, TERRAIN->GetHeight(transComp.GetWorldPosition().x, transComp.GetWorldPosition().z), transComp.GetWorldPosition().z);
-
-      //transComp.SetWorldPosition(currentPos);
-
       //공격 모드가 아닐때
       if (false == _inCombat)
       {
@@ -253,8 +204,6 @@ void Player::Update(float deltaTime)
             return;
          }
 
-         //일반 걷기
-         //TODO : 옆으로 걷는거 모션 추가 해야 한다.
          if (_currentCommand._type == GAMECOMMAND_MOVE)
          {
             _moveToStanceTimer.Restart();
@@ -262,53 +211,49 @@ void Player::Update(float deltaTime)
             {
                if (_currentCommand._movement._vertical == VERTICAL_MOVEMENT_DOWN)
                {
-                  MovementDown(_currentMovement);
                   _pStateMachine->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWalkingBack));
                }
-               else if (_currentCommand._movement._horizontal == HORIZONTAL_MOVEMENT_LEFT)
-               {
-                  MovementLeft(_currentMovement);
-                  _pStateMachine->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eStrafeRight));
-               }
-               else if (_currentCommand._movement._horizontal == HORIZONTAL_MOVEMENT_RIGHT)
-               {
-                  MovementRight(_currentMovement);
-                  _pStateMachine->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eStrafeLeft));
-               }
+			   //NOTE : 앞으로 갈 때는 좌우 모션은 없고 돌아가게끔 한다...
+               //else if (_currentCommand._movement._horizontal == HORIZONTAL_MOVEMENT_LEFT)
+               //{
+               //   _pStateMachine->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eStrafeRight));
+               //}
+               //else if (_currentCommand._movement._horizontal == HORIZONTAL_MOVEMENT_RIGHT)
+               //{
+               //   _pStateMachine->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eStrafeLeft));
+               //}
             }
             else if (_currentMovement._vertical == VERTICAL_MOVEMENT_DOWN)
             {
                if (_currentCommand._movement._vertical == VERTICAL_MOVEMENT_UP)
                {
-                  MovementUp(_currentMovement);
                   _pStateMachine->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWalk));
                }
-               else if (_currentCommand._movement._horizontal == HORIZONTAL_MOVEMENT_LEFT)
-               {
-                  MovementLeft(_currentMovement);
-                  _pStateMachine->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eStrafeRight));
-               }
-               else if (_currentCommand._movement._horizontal == HORIZONTAL_MOVEMENT_RIGHT)
-               {
-                  MovementRight(_currentMovement);
-                  _pStateMachine->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eStrafeLeft));
-               }
+			   //NOTE : 뒤로 갈 때는 좌우 모션은 없고 돌아가게끔 한다...
+               //else if (_currentCommand._movement._horizontal == HORIZONTAL_MOVEMENT_LEFT)
+               //{
+               //   MovementLeft(_currentMovement);
+               //   _pStateMachine->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eStrafeRight));
+               //}
+               //else if (_currentCommand._movement._horizontal == HORIZONTAL_MOVEMENT_RIGHT)
+               //{
+               //   MovementRight(_currentMovement);
+               //   _pStateMachine->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eStrafeLeft));
+               //}
             }
+
             if (_currentMovement._horizontal == HORIZONTAL_MOVEMENT_LEFT)
             {
                if (_currentCommand._movement._horizontal == HORIZONTAL_MOVEMENT_RIGHT)
                {
-                  MovementRight(_currentMovement);
                   _pStateMachine->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eStrafeLeft));
                }
                else if (_currentCommand._movement._vertical == VERTICAL_MOVEMENT_UP)
                {
-                  MovementUp(_currentMovement);
                   _pStateMachine->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWalk));
                }
                else if (_currentCommand._movement._vertical == VERTICAL_MOVEMENT_DOWN)
                {
-                  MovementDown(_currentMovement);
                   _pStateMachine->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWalkingBack));
                }
             }
@@ -316,24 +261,20 @@ void Player::Update(float deltaTime)
             {
                if (_currentCommand._movement._horizontal == HORIZONTAL_MOVEMENT_LEFT)
                {
-                  MovementLeft(_currentMovement);
                   _pStateMachine->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eStrafeRight));
                }
                else if (_currentCommand._movement._vertical == VERTICAL_MOVEMENT_UP)
                {
-                  MovementUp(_currentMovement);
                   _pStateMachine->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWalk));
                }
                else if (_currentCommand._movement._vertical == VERTICAL_MOVEMENT_DOWN)
                {
-                  MovementDown(_currentMovement);
                   _pStateMachine->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWalkingBack));
                }
             }
          }
       }
       //공격 모드 일때
-      //공격 모드에서 앞으로 가는 모션을 어떤걸로 할까...
       else if (true == _inCombat)
       {
          if (moveToStance)
@@ -347,78 +288,50 @@ void Player::Update(float deltaTime)
          if (_currentCommand._type == GAMECOMMAND_MOVE)
          {
             _moveToStanceTimer.Restart();
-            if (_currentMovement._horizontal == HORIZONTAL_MOVEMENT_LEFT)
-            {
-               if (_currentCommand._movement._horizontal == HORIZONTAL_MOVEMENT_RIGHT)
-               {
-                  MovementRight(_currentMovement);
-                  _pStateMachine->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWarMovingRight));
-               }
-               else if(_currentCommand._movement._vertical == VERTICAL_MOVEMENT_DOWN)
-               {
-                  MovementDown(_currentMovement);
-                  _pStateMachine->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWarRetreat));
-               }
-               else if (_currentCommand._movement._vertical == VERTICAL_MOVEMENT_UP)
-               {
-                  MovementUp(_currentMovement);
-                  _pStateMachine->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWalk));
-               }
-            }
-            else if (_currentMovement._horizontal == HORIZONTAL_MOVEMENT_RIGHT)
-            {
-               if (_currentCommand._movement._horizontal == HORIZONTAL_MOVEMENT_LEFT)
-               {
-                  MovementLeft(_currentMovement);
-                  _pStateMachine->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWarMovingLeft));
-               }
-               else if (_currentCommand._movement._vertical == VERTICAL_MOVEMENT_DOWN)
-               {
-                  MovementDown(_currentMovement);
-                  _pStateMachine->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWarRetreat));
-               }
-               else if (_currentCommand._movement._vertical == VERTICAL_MOVEMENT_UP)
-               {
-                  MovementUp(_currentMovement);
-                  _pStateMachine->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWalk));
-               }
-            }
-            else if (_currentMovement._vertical == VERTICAL_MOVEMENT_DOWN)
-            {
-               if (_currentCommand._movement._horizontal == HORIZONTAL_MOVEMENT_LEFT)
-               {
-                  MovementLeft(_currentMovement);
-                  _pStateMachine->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWarMovingLeft));
-               }
-               else if (_currentCommand._movement._horizontal == HORIZONTAL_MOVEMENT_RIGHT)
-               {
-                  MovementRight(_currentMovement);
-                  _pStateMachine->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWarMovingRight));
-               }
-               else if (_currentCommand._movement._vertical == VERTICAL_MOVEMENT_UP)
-               {
-                  MovementUp(_currentMovement);
-                  _pStateMachine->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWalk));
-               }
-            }
-            else if (_currentMovement._vertical == VERTICAL_MOVEMENT_UP)
-            {
-               if (_currentCommand._movement._horizontal == HORIZONTAL_MOVEMENT_LEFT)
-               {
-                  MovementLeft(_currentMovement);
-                  _pStateMachine->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWarMovingLeft));
-               }
-               else if (_currentCommand._movement._horizontal == HORIZONTAL_MOVEMENT_RIGHT)
-               {
-                  MovementRight(_currentMovement);
-                  _pStateMachine->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWarMovingRight));
-               }
-               else if (_currentCommand._movement._vertical == VERTICAL_MOVEMENT_DOWN)
-               {
-                  MovementDown(_currentMovement);
-                  _pStateMachine->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWarRetreat));
-               }
-            }
+			if (_currentMovement._vertical == VERTICAL_MOVEMENT_DOWN)
+			{
+				if (_currentCommand._movement._vertical == VERTICAL_MOVEMENT_UP)
+				{
+					_pStateMachine->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWalk));
+				}
+			}
+			else if (_currentMovement._vertical == VERTICAL_MOVEMENT_UP)
+			{
+				if (_currentCommand._movement._vertical == VERTICAL_MOVEMENT_DOWN)
+				{
+					_pStateMachine->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWarRetreat));
+				}
+			}
+			else if (_currentMovement._horizontal == HORIZONTAL_MOVEMENT_LEFT)
+			{
+				if (_currentCommand._movement._horizontal == HORIZONTAL_MOVEMENT_RIGHT)
+				{
+					_pStateMachine->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWarMovingRight));
+				}
+				else if (_currentCommand._movement._vertical == VERTICAL_MOVEMENT_DOWN)
+				{
+					_pStateMachine->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWarRetreat));
+				}
+				else if (_currentCommand._movement._vertical == VERTICAL_MOVEMENT_UP)
+				{
+					_pStateMachine->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWalk));
+				}
+			}
+			else if (_currentMovement._horizontal == HORIZONTAL_MOVEMENT_RIGHT)
+			{
+				if (_currentCommand._movement._horizontal == HORIZONTAL_MOVEMENT_LEFT)
+				{
+					_pStateMachine->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWarMovingLeft));
+				}
+				else if (_currentCommand._movement._vertical == VERTICAL_MOVEMENT_DOWN)
+				{
+					_pStateMachine->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWarRetreat));
+				}
+				else if (_currentCommand._movement._vertical == VERTICAL_MOVEMENT_UP)
+				{
+					_pStateMachine->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWalk));
+				}
+			}
          }
       }
    } break;
@@ -442,7 +355,6 @@ void Player::Update(float deltaTime)
             _comboCount++;
             if (_comboCount <= 2)
             {
-			   
                _attackToStanceTimer.Restart();
 			  
 			   if (_comboCount == 1/* && _attackCombo1Timer._currentTime > 0.3*/)
@@ -460,6 +372,7 @@ void Player::Update(float deltaTime)
          }
       }
    } break;
+
    case Player::PLAYERSTATE_BLOCK:
    {
       if (_inCombat)
@@ -475,10 +388,6 @@ void Player::Update(float deltaTime)
       }
    } break;
    }
-
-
-
-   _currentCommand.Reset();
 }
 
 void Player::SetupCallbackAndCompression()
@@ -489,38 +398,138 @@ void Player::SetupCallbackAndCompression()
    ID3DXAnimationController *pController = refActionComp._pAnimationController;
    uint32 numAnimationSet = pController->GetNumAnimationSets();
    ID3DXKeyframedAnimationSet *anim0;
-   //ID3DXKeyframedAnimationSet *anim1;
-   //ID3DXKeyframedAnimationSet *anim2;
-   //ID3DXKeyframedAnimationSet *anim3;
-   //ID3DXKeyframedAnimationSet *anim4;
 
    pController->GetAnimationSetByName(PlayerAnimationString[PlayerAnimationEnum::eWarSwingLeft], (ID3DXAnimationSet **)&anim0);
-
-   //pController->GetAnimationSet(0, (ID3DXAnimationSet **)&anim0);
-   //pController->GetAnimationSet(1, (ID3DXAnimationSet **)&anim1);
-   //pController->GetAnimationSet(2, (ID3DXAnimationSet **)&anim2);
-   //pController->GetAnimationSet(3, (ID3DXAnimationSet **)&anim3);
-   //pController->GetAnimationSet(4, (ID3DXAnimationSet **)&anim4);
 
    _callbackData._animtionEnum = (PlayerAnimationEnum *)&_animationEnum;
 
    D3DXKEY_CALLBACK warSwingLeftKeys;
    warSwingLeftKeys.Time = anim0->GetPeriod() / 1.0f * anim0->GetSourceTicksPerSecond();
    warSwingLeftKeys.pCallbackData = (void *)&_callbackData;
-   //anim0Keys[0].Time = 0;
-   //anim0Keys[0].pCallbackData = (void *)&_callbackData;
-   //anim0Keys[1].Time = anim0->GetPeriod() / 2.0f * anim0->GetSourceTicksPerSecond();
-   //anim0Keys[1].pCallbackData = (void *)&_callbackData;
 
    AddCallbackKeysAndCompress(pController, anim0, 1, &warSwingLeftKeys, D3DXCOMPRESS_DEFAULT, 0.1f);
-   //AddCallbackKeysAndCompress(pController, anim1, 2, anim0Keys, D3DXCOMPRESS_DEFAULT, 0.1f);
-   //AddCallbackKeysAndCompress(pController, anim2, 2, anim0Keys, D3DXCOMPRESS_DEFAULT, 0.1f);
-   //AddCallbackKeysAndCompress(pController, anim3, 2, anim0Keys, D3DXCOMPRESS_DEFAULT, 0.1f);
-   //AddCallbackKeysAndCompress(pController, anim4, 2, anim0Keys, D3DXCOMPRESS_DEFAULT, 0.1f);
+}
+
+void Player::MoveAndRotate(float deltaTime)
+{
+	////움직이지 않는 상태일때는 Move
+	//if (_state == PLAYERSTATE_STANCE ||
+	//	_state == PLAYERSTATE_ATTACK ||
+	//	_state == PLAYERSTATE_BLOCK)
+	//{
+	//	return;
+	//}
+
+	TransformComponent &refTransform = _entity.GetComponent<TransformComponent>();
+
+	Vector3 forward = refTransform.GetForward();
+	Vector3 right = refTransform.GetRight();
+
+	Vector3 toMove;
+
+	if (_currentCommand._movement._horizontal == HORIZONTAL_MOVEMENT_LEFT)
+	{
+		toMove -= right;
+	}
+	else if (_currentCommand._movement._horizontal == HORIZONTAL_MOVEMENT_RIGHT)
+	{
+		toMove += right;
+	}
+
+	if (_currentCommand._movement._vertical == VERTICAL_MOVEMENT_UP)
+	{
+		toMove += forward;
+	}
+	else if (_currentCommand._movement._vertical == VERTICAL_MOVEMENT_DOWN)
+	{
+		toMove -= forward;
+	}
+
+   if (!toMove.IsZero())
+   {
+	   Vec3Normalize(&toMove, &toMove);
+
+	   toMove *= deltaTime;
+
+	   switch (_state)
+	   {
+	   //case Player::PLAYERSTATE_STANCE:
+	   //{
+	   //} break;
+	   case Player::PLAYERSTATE_MOVE:
+	   {
+		   refTransform.MovePositionWorld(toMove * _walkSpeed);
+	   } break;
+	   case Player::PLAYER_STATE_RUN:
+	   {
+		   refTransform.MovePositionWorld(toMove * _runSpeed);
+	   } break;
+	   case Player::PLAYERSTATE_ATTACK:
+	   {
+	   } break;
+	   case Player::PLAYERSTATE_BLOCK:
+	   {
+	   } break;
+	   case Player::PLAYERSTATE_MOVEATTACK:
+	   {
+		   refTransform.MovePositionWorld(toMove * _walkSpeed * 0.7f);
+	   } break;
+	   }
+
+      refTransform.SetWorldPosition(
+		  refTransform.GetWorldPosition().x, 
+		  TERRAIN->GetHeight(refTransform.GetWorldPosition().x, refTransform.GetWorldPosition().z), refTransform.GetWorldPosition().z);
+   }
 }
 
 void Player::Handle(const InputManager::KeyPressedEvent & event)
 {
+   uint32 inputCode = event.code;
+   if('J' == inputCode)
+   {
+      _currentCommand._type = GAMECOMMAND_MOVE;
+      _currentCommand._movement._horizontal = HORIZONTAL_MOVEMENT_LEFT;
+   }
+   else if ('L' == inputCode)
+   {
+      _currentCommand._type = GAMECOMMAND_MOVE;
+      _currentCommand._movement._horizontal = HORIZONTAL_MOVEMENT_RIGHT;
+   }
+   else if('I' == inputCode)
+   {
+      _currentCommand._type = GAMECOMMAND_MOVE;
+      _currentCommand._movement._vertical = VERTICAL_MOVEMENT_UP;
+   }
+   else if ('K' == inputCode)
+   {
+      _currentCommand._type = GAMECOMMAND_MOVE;
+      _currentCommand._movement._vertical = VERTICAL_MOVEMENT_DOWN;
+   }
+}
+
+void Player::Handle(const InputManager::KeyReleasedEvent & event)
+{
+   uint32 inputCode = event.code;
+   if('J' == inputCode)
+   {
+      _currentCommand._type = GAMECOMMAND_NONE;
+      _currentCommand._movement._horizontal = HORIZONTAL_MOVEMENT_NONE;
+   }
+   else if ('L' == inputCode)
+   {
+      _currentCommand._type = GAMECOMMAND_NONE;
+      _currentCommand._movement._horizontal = HORIZONTAL_MOVEMENT_NONE;
+   }
+   else if('I' == inputCode)
+   {
+      _currentCommand._type = GAMECOMMAND_NONE;
+      _currentCommand._movement._vertical = VERTICAL_MOVEMENT_NONE;
+   }
+   else if ('K' == inputCode)
+   {
+      _currentCommand._type = GAMECOMMAND_NONE;
+      _currentCommand._movement._vertical = VERTICAL_MOVEMENT_NONE;
+   }
 }
 
 void Player::Handle(const InputManager::MousePressedEvent & event)
@@ -539,62 +548,61 @@ void Player::Handle(const InputManager::MousePressedEvent & event)
    }
 }
 
-void Player::Handle(const InputManager::KeyDownEvent & event)
-{
-   uint32 inputCode = event.code;
-
-   TransformComponent &transComp = _entity.GetComponent<TransformComponent>();
-
-   Vector3 Dir = _camera->GetEntity().GetComponent<TransformComponent>().GetForward();
-
-   Dir.y = 0;
-
-   D3DXVec3Normalize(&Dir, &Dir);
-
-   if ('L' == inputCode)
-   {
-	   transComp.SetForward(-Dir);
-	  // transComp.LookDirection(Dir);
-      _currentCommand._type = GAMECOMMAND_MOVE;
-      _currentCommand._movement._horizontal = HORIZONTAL_MOVEMENT_LEFT;
-      _currentCommand._movement._vertical = VERTICAL_MOVEMENT_NONE;
-   }
-   else if('J' == inputCode)
-   {
-	   transComp.SetForward(-Dir);
-	  // transComp.LookDirection(Dir);
-      _currentCommand._type = GAMECOMMAND_MOVE;
-      _currentCommand._movement._horizontal = HORIZONTAL_MOVEMENT_RIGHT;
-      _currentCommand._movement._vertical = VERTICAL_MOVEMENT_NONE;
-   }
-   else if('I' == inputCode)
-   {
-	   transComp.SetForward(-Dir);
-	   //transComp.LookDirection(Dir);
-      _currentCommand._type = GAMECOMMAND_MOVE;
-      _currentCommand._movement._vertical = VERTICAL_MOVEMENT_UP;
-      _currentCommand._movement._horizontal = HORIZONTAL_MOVEMENT_NONE;
-   }
-   else if ('K' == inputCode)
-   {
-	   transComp.SetForward(-Dir);
-	  // transComp.LookDirection(Dir);
-      _currentCommand._type = GAMECOMMAND_MOVE;
-      _currentCommand._movement._vertical = VERTICAL_MOVEMENT_DOWN;
-      _currentCommand._movement._horizontal = HORIZONTAL_MOVEMENT_NONE;
-   }
-   else if (VK_SPACE == inputCode)
-   {
-	  
-      _currentCommand._type = GAMECOMMAND_JUMP;
-   }
-   /*else
-   {
-      _currentCommand._type = GAMECOMMAND_NONE;
-      _currentCommand._movement._vertical = VERTICAL_MOVEMENT_NONE;
-      _currentCommand._movement._horizontal = HORIZONTAL_MOVEMENT_NONE;
-   }*/
-}
+//void Player::Handle(const InputManager::KeyDownEvent & event)
+//{
+//   uint32 inputCode = event.code;
+//
+//   TransformComponent &transComp = _entity.GetComponent<TransformComponent>();
+//
+//   Vector3 Dir = _camera->GetEntity().GetComponent<TransformComponent>().GetForward();
+//
+//   Dir.y = 0;
+//
+//   D3DXVec3Normalize(&Dir, &Dir);
+//
+//   if ('L' == inputCode)
+//   {
+//	   //transComp.SetForward(-Dir);
+//	  // transComp.LookDirection(Dir);
+//      _currentCommand._type = GAMECOMMAND_MOVE;
+//      _currentCommand._movement._horizontal = HORIZONTAL_MOVEMENT_LEFT;
+//      _currentCommand._movement._vertical = VERTICAL_MOVEMENT_NONE;
+//   }
+//   else if('J' == inputCode)
+//   {
+//	   //transComp.SetForward(-Dir);
+//	  // transComp.LookDirection(Dir);
+//      _currentCommand._type = GAMECOMMAND_MOVE;
+//      _currentCommand._movement._horizontal = HORIZONTAL_MOVEMENT_RIGHT;
+//      _currentCommand._movement._vertical = VERTICAL_MOVEMENT_NONE;
+//   }
+//   else if('I' == inputCode)
+//   {
+//	   //transComp.SetForward(-Dir);
+//	   //transComp.LookDirection(Dir);
+//      _currentCommand._type = GAMECOMMAND_MOVE;
+//      _currentCommand._movement._vertical = VERTICAL_MOVEMENT_UP;
+//      _currentCommand._movement._horizontal = HORIZONTAL_MOVEMENT_NONE;
+//   }
+//   else if ('K' == inputCode)
+//   {
+//	   //transComp.SetForward(-Dir);
+//	  // transComp.LookDirection(Dir);
+//      _currentCommand._type = GAMECOMMAND_MOVE;
+//      _currentCommand._movement._vertical = VERTICAL_MOVEMENT_DOWN;
+//      _currentCommand._movement._horizontal = HORIZONTAL_MOVEMENT_NONE;
+//   }
+//   else if (VK_SPACE == inputCode)
+//   {
+//      _currentCommand._type = GAMECOMMAND_JUMP;
+//   }
+//   /*else
+//   {
+//      _currentCommand._type = GAMECOMMAND_NONE;
+//      _currentCommand._movement._vertical = VERTICAL_MOVEMENT_NONE;
+//      _currentCommand._movement._horizontal = HORIZONTAL_MOVEMENT_NONE;
+//   }*/
+//}
 
 void Player::QueueAction(const Action & action)
 {
@@ -603,23 +611,18 @@ void Player::QueueAction(const Action & action)
 
 HRESULT PlayerCallbackHandler::HandleCallback(UINT Track, LPVOID pCallbackData)
 {
-    {
-        PlayerCallbackData* pData = ( PlayerCallbackData* )pCallbackData;
-      if (nullptr == pData)
-      {
-            return S_OK;
-      }
+	PlayerCallbackData* pData = (PlayerCallbackData*)pCallbackData;
+	if (nullptr == pData)
+	{
+		return S_OK;
+	}
+	switch (*pData->_animtionEnum)
+	{
+	case PlayerAnimationEnum::eWarSwingLeft:
+	{
+		int a = 0;
+	}break;
 
-      switch (*pData->_animtionEnum)
-      {
-      case PlayerAnimationEnum::eWarSwingLeft :
-      {
-         int a = 0;
-      }break;
-
-      }
-        return S_OK;
-    }
-
-
+	}
+	return S_OK;
 }
