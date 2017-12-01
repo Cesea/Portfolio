@@ -116,3 +116,13 @@ void StopWatch::Restart()
 {
 	_currentTime = 0;
 }
+
+POINT GetMousePos()
+{
+	POINT mousePos;
+	GetCursorPos(&mousePos);
+
+	ScreenToClient(gWindowHandle, &mousePos);
+
+	return mousePos;
+}

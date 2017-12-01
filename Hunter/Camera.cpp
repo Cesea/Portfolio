@@ -69,6 +69,8 @@ void Camera::MoveAndRotate(const InputManager & input)
 		_cameraState = cCreativeMode;
 		//ShowCursor(true);
 		cameraTransform->ReleaseParent();
+
+		ShowCursor(true);
 	}
 	if (input.keyboard.IsPressed('2'))
 	{
@@ -83,6 +85,10 @@ void Camera::MoveAndRotate(const InputManager & input)
 		dummyTransform->AddChild(cameraTransform);
 
 		cameraTransform->SetLocalPosition(0, 0, 0);
+
+		SetCursorPos(CLIENTCENTERX, CLIENTCENTERY);
+
+		ShowCursor(false);
 
 	}
 	if (input.keyboard.IsPressed('3'))
@@ -171,35 +177,49 @@ void Camera::MoveAndRotate(const InputManager & input)
 
 			refTransform.SetRotateWorld(_verticalAngle * ONE_RAD, _horizontalAngle * ONE_RAD, 0.0f);
 
-			//SetCursorPos(WINSIZEX / 2, WINSIZEY / 2);
 		}
 		break;
 	case cNormal:
 
-		float deltaTime = APPTIMER->GetTargetTime();
+		POINT pt;
 
-		int32 deltaX = input.mouse.GetMouseDelta().x;
-		int32 deltaY = input.mouse.GetMouseDelta().y;
+		GetCursorPos(&pt);
 
-		if (deltaX != 0)
+		if (_curDist >= PLAYER_TO_CAMERA_DIST)
 		{
-			_horizontalAngle += _rotationSpeed * deltaTime * (float)deltaX;
+			if (move(pt) == true)
+			{
+				float screenCenterX = 892;
+				float screenCenterY = 519;
+
+				float deltaTime = APPTIMER->GetTargetTime();
+
+				POINT mousePos = GetMousePos();
+
+				mousePos.x = mousePos.x + WINSTARTX;
+				mousePos.y = mousePos.y + WINSTARTY;
+
+				//이동량 ( 중앙에서 멀어진 량 )
+				int deltaX = mousePos.x - screenCenterX;
+				int deltaY = mousePos.y - screenCenterY;
+
+				if (deltaX != 0)
+				{
+					_horizontalAngle += _rotationSpeed * deltaTime * (float)deltaX;
+				}
+
+				if (deltaY != 0)
+				{
+					_verticalAngle += _rotationSpeed * deltaTime * (float)deltaY;
+				}
+
+				ClampFloat(_verticalAngle, MIN_VERT_ANGLE, MAX_VERT_ANGLE);
+
+				dummyTransform->SetRotateWorld(-_verticalAngle * ONE_RAD, _horizontalAngle * ONE_RAD, 0.0f);
+
+				SetCursorPos(CLIENTCENTERX, CLIENTCENTERY);
+			}
 		}
-
-		if (deltaY != 0)
-		{
-			_verticalAngle += _rotationSpeed * deltaTime * (float)deltaY;
-		}
-
-		ClampFloat(_verticalAngle, MIN_VERT_ANGLE, MAX_VERT_ANGLE);
-
-		dummyTransform->SetRotateWorld(-_verticalAngle * ONE_RAD, _horizontalAngle * ONE_RAD, 0.0f);
-
-		/*if (_cameraState == cNormal)
-		{
-			SetCursorPos(WINSTARTX + (WINSIZEX * 0.5), WINSTARTY + (WINSIZEY * 0.5));
-		}*/
-
 		break;
 	}
 
@@ -514,9 +534,22 @@ void Camera::NormalCameraUpdate(void)
 		cameraTransform->_position.z += 0.1f;
 
 	}
+
+	SetCursorPos(WINSTARTX + (WINSIZEX * 0.5), WINSTARTY + (WINSIZEY * 0.5));
 	//else if (_curDist > PLAYER_TO_CAMERA_DIST)
 	//{
 	//	//cameraTransform->_position.z -= 0.1f;
 	//	cameraTransform->_position.z = PLAYER_TO_CAMERA_DIST;
 	//}
+}
+
+bool Camera::move(POINT pt)
+{
+	if (pt.x != tempPt.x || pt.y != tempPt.y)
+	{
+		tempPt.x = pt.x;
+		tempPt.y = pt.y;
+		return true;
+	}
+	return false;
 }
