@@ -19,7 +19,8 @@
    PlayerAnimationAction<Name>::_action._crossFadeTime = CrossFadeTime; \
    PlayerAnimationAction<Name>::_action._outCrossFadeTime = OutCrossFadeTime; \
    strncpy(PlayerAnimationAction<Name>::_action._name, PlayerAnimationString[PlayerAnimationEnum::Name], strlen(PlayerAnimationString[PlayerAnimationEnum::Name])); \
-   PlayerAnimationAction<Name>::_action._name; 
+   PlayerAnimationAction<Name>::_action._enum = Name; 
+
 
 #define PLAYER_ANIM( Name ) PlayerAnimationAction<Name>::_action
 

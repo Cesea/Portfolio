@@ -26,7 +26,7 @@ public:
 
 	void CreateFromWorld(World &world);
 
-	void MoveAndRotate(const InputManager &input);
+	void MoveAndRotate(float deltaTime, const InputManager &input);
 
 	const Entity &GetEntity() const { return _entity; }
 
@@ -63,7 +63,7 @@ private:
 
 	void NormalCameraUpdate(void);
 
-	bool move(POINT pt);
+	//bool move(POINT pt);
 
 	POINT tempPt;
 

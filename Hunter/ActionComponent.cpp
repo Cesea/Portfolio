@@ -295,11 +295,13 @@ Action::Action()
 	_crossFadeTime = 0.0f;
 	_outCrossFadeTime = 0.0f;
 	_playOnce = false;
+	_enum = 0;
 }
 
 Action::Action(const Action & other)
 	: _blocking(other._blocking), _playSpeed(other._playSpeed), _stop(other._stop),
-	_crossFadeTime(other._crossFadeTime), _outCrossFadeTime(other._outCrossFadeTime), _playOnce(other._playOnce)
+	_crossFadeTime(other._crossFadeTime), _outCrossFadeTime(other._outCrossFadeTime), _playOnce(other._playOnce), 
+	_enum(other._enum)
 {
 	strncpy(_name, other._name, sizeof(char) * ACTION_MAX_NAME);
 }
@@ -313,6 +315,7 @@ Action & Action::operator=(const Action & other)
 	_crossFadeTime = other._crossFadeTime;
 	_outCrossFadeTime = other._outCrossFadeTime;
 	_playOnce = other._playOnce;
+	_enum = other._enum;
 
 	return *this;
 }

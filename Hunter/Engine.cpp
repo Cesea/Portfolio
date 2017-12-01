@@ -160,12 +160,12 @@ bool Engine::InitializePlatform(HINSTANCE instanceHandle)
 	}
 
 	RECT clientRect = { 0, 0, WINSIZEX, WINSIZEY };
-	AdjustWindowRect(&clientRect, WS_OVERLAPPEDWINDOW, false);
+	AdjustWindowRect(&clientRect, WS_POPUP | WS_BORDER, false);
 
 	int32 clientWidth = clientRect.right - clientRect.left;
 	int32 clientHeight = clientRect.bottom - clientRect.top;
 
-	_windowHandle = CreateWindow(wc.lpszClassName, "Hunter", WS_OVERLAPPEDWINDOW,
+	_windowHandle = CreateWindow(wc.lpszClassName, "Hunter", WS_POPUP | WS_BORDER,
 		WINSTARTX, WINSTARTY, clientWidth, clientHeight, nullptr, nullptr, _instanceHandle, nullptr);
 
 	if (!_windowHandle)

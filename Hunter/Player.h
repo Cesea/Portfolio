@@ -17,7 +17,7 @@ struct PlayerCallbackData
 class PlayerCallbackHandler : public GameObjectAnimationCallbackHandler
 {
 public :
-	bool Init(Player *pPlayer) { _pPlayer = pPlayer; }
+	virtual bool Init(BaseGameObject *pPlayer) { _pPlayer = (Player *)pPlayer;  return true; }
 
 	HRESULT CALLBACK HandleCallback(THIS_ UINT Track, LPVOID pCallbackData);
 private :
@@ -87,8 +87,9 @@ private :
 	Movement _currentMovement;
 
 	StopWatch _attackToStanceTimer;
-	StopWatch _comboTimer;
 	int32 _comboCount{};
+
+	bool32 _canCombo{false};
 
 public :
 

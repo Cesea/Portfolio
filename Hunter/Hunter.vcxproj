@@ -181,6 +181,7 @@
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="PlayerAnimationString.cpp" />
     <ClCompile Include="PlayerStates.cpp" />
+    <ClCompile Include="Player_CallBack.cpp" />
     <ClCompile Include="PointLight.cpp" />
     <ClCompile Include="QuadTree.cpp" />
     <ClCompile Include="Quaternion.cpp" />

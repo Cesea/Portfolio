@@ -283,6 +283,9 @@
     <ClCompile Include="UI.cpp">
       <Filter>Game\UI</Filter>
     </ClCompile>
+    <ClCompile Include="Player_CallBack.cpp">
+      <Filter>Game\GameObjects\Player</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Lights.h" />

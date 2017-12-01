@@ -35,6 +35,8 @@ struct Action
 
 	float _crossFadeTime;
 	float _outCrossFadeTime;
+
+	int32 _enum;
 };
 
 class ActionQueue

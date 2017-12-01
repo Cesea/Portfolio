@@ -13,7 +13,7 @@ struct TurtleCallbackData
 class TurtleCallbackHandler : public GameObjectAnimationCallbackHandler
 {
 public:
-	bool Init(Turtle *pTurtle) { _pTurtle = pTurtle; }
+	bool Init(BaseGameObject *pTurtle) { _pTurtle = (Turtle *)pTurtle; return true; }
 	HRESULT CALLBACK HandleCallback(THIS_ UINT Track, LPVOID pCallbackData)
 	{
 		//      SnakeCallbackData* pData = ( SnakeCallbackData* )pCallbackData;

@@ -24,11 +24,8 @@ protected :
 class GameObjectAnimationCallbackHandler : public ID3DXAnimationCallbackHandler
 {
 public :
-	bool Init(BaseGameObject *pBaseObject) { _pOwner = pBaseObject; return true; }
+	virtual bool Init(BaseGameObject *pBaseObject) = 0;
 	virtual HRESULT CALLBACK HandleCallback(THIS_ UINT Track, LPVOID pCallbackData) = 0;
-
-private :
-	BaseGameObject *_pOwner{};
 };
 
 #endif

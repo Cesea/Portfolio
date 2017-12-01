@@ -15,7 +15,7 @@ struct LizardCallbackData
 class LizardCallbackHandler : public GameObjectAnimationCallbackHandler
 {
 public:
-	bool Init(Lizard *pLizard) { _pLizard = pLizard; }
+	bool Init(BaseGameObject *pLizard) { _pLizard = (Lizard *)pLizard; return true; }
 	HRESULT CALLBACK HandleCallback(THIS_ UINT Track, LPVOID pCallbackData)
 	{
 		//      SnakeCallbackData* pData = ( SnakeCallbackData* )pCallbackData;
