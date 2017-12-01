@@ -115,6 +115,7 @@ void GameObjectFactory::CreateObject(ARCHE_TYPE type, ResourceHandle handle, con
 
 	case ARCHE_HERO :
 	{
+		//NOTE : SetLinkCamera를 이렇게 할때 MultiThreadedLoading을 할때 터질 수 있다
 		Player* _player = new Player();
 		_player->SetLinkCamera(&_pCurrentScene->_camera);
 		_pCurrentScene->_gameObjects.push_back(_player);

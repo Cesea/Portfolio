@@ -71,17 +71,17 @@ IScene::IScene()
 
 bool IScene::Init()
 {
-	//¾ÀÀÇ ÃÊ±âÈ­ ÀÌ·ç¾îÁø´Ù.
+	//ì”¬ì˜ ì´ˆê¸°í™” ì´ë£¨ì–´ì§„ë‹¤.
 	if (!SceneInit())
 	{
 		return false;
 	}
-	//¸ŞÀÎÄ«¸Ş¶ó RenderToTexture ÁØºñ
+	//ë©”ì¸ì¹´ë©”ë¼ RenderToTexture ì¤€ë¹„
 	_camera.ReadyRenderToTexture( WINSIZEX, WINSIZEY );
 
 	
 
-	//NOTE : ¾ÆÁ÷ PostEffect°¡ ¾ø´Ù...
+	//NOTE : ì•„ì§ PostEffectê°€ ì—†ë‹¤...
 	//postEffect = RESOURCE_FX->GetResource( "../Resources/Shaders/PostEffect.fx" );
 
 	return true;
@@ -103,17 +103,17 @@ bool IScene::Render()
 {
 	_camera.RenderTextureBegin( 0xff404040 );
 	
-	//È¯°æ ·£´õ
+	//í™˜ê²½ ëœë”
 	RenderEnvironmentSphere();
 
-	//·£´õµÈ´Ù.
+	//ëœë”ëœë‹¤.
 	SceneRender0();
 	SceneRender1();
 	SceneRender2();
 
 	_camera.RenderTextureEnd();
 
-	//Scene ·£´õ
+	//Scene ëœë”
 	_pPostEffect->SetTechnique( "Base" );
 	HRESULT re = _pPostEffect->_ptr->SetTexture( "screenTex", _camera.GetRenderTexture() );
 
@@ -142,7 +142,7 @@ bool IScene::Render()
 	
 	SceneRenderSprite();
 
-	//imguiRenderDraw();
+	imguiRenderDraw();
 
 	return true;
 }
@@ -150,9 +150,9 @@ bool IScene::Render()
 bool IScene::RenderToMainCamTexture()
 {
 	_camera.RenderTextureBegin(0x00101010);
-	//È¯°æ ·£´õ
+	//í™˜ê²½ ëœë”
 	RenderEnvironmentSphere();
-	//·£´õµÈ´Ù.
+	//ëœë”ëœë‹¤.
 	SceneRender0();
 	SceneRender1();
 	SceneRender2();

@@ -37,9 +37,10 @@ public :
 	virtual bool CreateFromWorld(World &world);
 	void Update(float deltaTime);
 
-	void Handle(const InputManager::KeyPressedEvent &event);
-	void Handle(const InputManager::MousePressedEvent &event);
 	void Handle(const InputManager::KeyDownEvent &event);
+	void Handle(const InputManager::KeyReleasedEvent &event);
+	//void Handle(const InputManager::KeyDownEvent &event);
+	void Handle(const InputManager::MousePressedEvent &event);
 
 	void SetLinkCamera(Camera* camera) { _camera = camera; }
 
@@ -48,7 +49,7 @@ private :
 	{
 		PLAYERSTATE_STANCE,
 		PLAYERSTATE_MOVE,
-		PLAYER_STATE_RUN,
+		PLAYERSTATE_RUN,
 		PLAYERSTATE_ATTACK,
 		PLAYERSTATE_BLOCK,
 		PLAYERSTATE_MOVEATTACK,
@@ -60,6 +61,9 @@ private :
 	Vector3 cForward;
 
 	void SetupCallbackAndCompression();
+
+	void MoveAndRotate(float deltaTime);
+
 	PlayerCallbackData _callbackData;
 	PlayerStateMachine *_pStateMachine;
 	GameCommand _currentCommand;
@@ -70,7 +74,12 @@ private :
 
 private :
 	EventChannel _channel;
-	float _speed{2.0f};
+	float _walkSpeed{2.0f};
+	float _runSpeed{5.0f};
+	float _rotationSpeed{ 0.05f };
+	float _backRotationSpeed{ 0.03f };
+
+	//int32 _stamina{ 100 };
 
 	StopWatch _combatToPeaceTimer;
 
@@ -78,8 +87,7 @@ private :
 	Movement _currentMovement;
 
 	StopWatch _attackToStanceTimer;
-	StopWatch _attackCombo1Timer;
-	StopWatch _attackCombo2Timer;
+	StopWatch _comboTimer;
 	int32 _comboCount{};
 
 public :

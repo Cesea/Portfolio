@@ -1,28 +1,21 @@
 #ifndef CAMERA_H
 #define CAMERA_H
 
-#define PLAYER_TO_CAMERA_DIST 3.0f
-
 #include "TransformComponent.h"
 #include "Frustum.h"
 #include "BaseGameObject.h"
 
-enum cameraState
+enum CAMERA_STATE
 {
-	cCreativeMode,
-	cNormal,
-	cPlaying,
-	cDirection,
-	//Editer
+	CAMERASTATE_CREATE,
+	CAMERASTATE_INGAME,
 };
 
 //카메라 클래스는 예외적으로 texture를 가지고 있다
 class Camera
 {
 public:
-	cameraState _cameraState{};
-
-	float _curDist;
+	CAMERA_STATE _cameraState{};
 
 	float _fov;
 	float _camNear;
@@ -35,7 +28,8 @@ public:
 
 	void MoveAndRotate(const InputManager &input);
 
-	//void PreUpdateMatrix();
+	const Entity &GetEntity() const { return _entity; }
+
 	void UpdateMatrix();
 	void UpdateCamToDevice();
 	void UpdateFrustum();
@@ -59,10 +53,6 @@ public:
 
 	const Frustum &GetFrustum() const { return _frustum; }
 
-	const Entity &GetEntity() const { return _entity; }
-
-	const Entity &GetDummyEntity() const { return _dummyEntity; }
-
 	void ReadyRenderToTexture( int32 width, int32 height );
 	void ReadyShadowTexture( int32 size );
 	void RenderTextureBegin( uint32 backColor );
@@ -83,7 +73,6 @@ private:
 	LPDIRECT3DSURFACE9 _pDeviceDepthAndStencilSurface{};
 
 protected:
-
 	Entity _entity;
 
 	Matrix _matView;
@@ -99,18 +88,11 @@ protected:
 	float _verticalAngle{};
 	float _horizontalAngle{};
 
-	TransformComponent* cameraTransform{};
-	TransformComponent* targetTransform{};
-
-	TransformComponent* dummyTransform{};
-
-	Entity _dummyEntity;
-
-	Vector3 _toMove;
-
 	Frustum _frustum;
 	BaseGameObject *_pTargetObject{};
-	
+
+	float _offsetForwardMult{};
+	float _offsetUpMult{};
 };
 
 #endif

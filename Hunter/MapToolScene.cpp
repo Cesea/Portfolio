@@ -30,54 +30,57 @@ bool MapToolScene::SceneInit()
 
 	//메쉬 불러오기..
 	Matrix correctionMat;
+	Matrix rotationCorrection;
+	MatrixRotationY(&rotationCorrection, D3DX_PI);
 	MatrixScaling(&correctionMat, 0.01f, 0.01f, 0.01f);
+	MatrixMultiply(&correctionMat, &correctionMat, &rotationCorrection);
 	video::SkinnedXMeshHandle knight  = VIDEO->CreateSkinnedXMesh(
 		"../resources/Models/Knight/Knight.X", &correctionMat, "Knight");
 
-	MatrixScaling(&correctionMat, 1.0f, 1.0f, 1.0f);
-	video::SkinnedXMeshHandle snakeMesh = VIDEO->CreateSkinnedXMesh(
-		"../resources/Models/Snake/Snake_Red.X", &correctionMat, "Snake");
+	//MatrixScaling(&correctionMat, 1.0f, 1.0f, 1.0f);
+	//video::SkinnedXMeshHandle snakeMesh = VIDEO->CreateSkinnedXMesh(
+	//	"../resources/Models/Snake/Snake_Red.X", &correctionMat, "Snake");
 
-	MatrixScaling(&correctionMat, 1.0f, 1.0f, 1.0f);
-	video::SkinnedXMeshHandle turtleMesh = VIDEO->CreateSkinnedXMesh(
-		"../resources/Models/DragonTurtle/DragonTurtle_Black.X", &correctionMat, "Turtle");
+	//MatrixScaling(&correctionMat, 1.0f, 1.0f, 1.0f);
+	//video::SkinnedXMeshHandle turtleMesh = VIDEO->CreateSkinnedXMesh(
+	//	"../resources/Models/DragonTurtle/DragonTurtle_Black.X", &correctionMat, "Turtle");
 
-	MatrixScaling(&correctionMat, 1.0f, 1.0f, 1.0f);
-	video::SkinnedXMeshHandle batMesh = VIDEO->CreateSkinnedXMesh(
-		"../resources/Models/DragonBat/DragonBat_Black.X", &correctionMat, "Bat");
+	//MatrixScaling(&correctionMat, 1.0f, 1.0f, 1.0f);
+	//video::SkinnedXMeshHandle batMesh = VIDEO->CreateSkinnedXMesh(
+	//	"../resources/Models/DragonBat/DragonBat_Black.X", &correctionMat, "Bat");
 
-	MatrixScaling(&correctionMat, 1.0f, 1.0f, 1.0f);
-	video::SkinnedXMeshHandle catMesh = VIDEO->CreateSkinnedXMesh(
-		"../resources/Models/DevilCat/DevilCat.X", &correctionMat, "Cat");
+	//MatrixScaling(&correctionMat, 1.0f, 1.0f, 1.0f);
+	//video::SkinnedXMeshHandle catMesh = VIDEO->CreateSkinnedXMesh(
+	//	"../resources/Models/DevilCat/DevilCat.X", &correctionMat, "Cat");
 
-	MatrixScaling(&correctionMat, 1.0f, 1.0f, 1.0f);
-	video::SkinnedXMeshHandle HydraMesh = VIDEO->CreateSkinnedXMesh(
-		"../resources/Models/Hydra/Hydra_Red.X", &correctionMat, "Hydra");
+	//MatrixScaling(&correctionMat, 1.0f, 1.0f, 1.0f);
+	//video::SkinnedXMeshHandle HydraMesh = VIDEO->CreateSkinnedXMesh(
+	//	"../resources/Models/Hydra/Hydra_Red.X", &correctionMat, "Hydra");
 
-	MatrixScaling(&correctionMat, 1.0f, 1.0f, 1.0f);
-	video::SkinnedXMeshHandle LizardMesh = VIDEO->CreateSkinnedXMesh(
-		"../resources/Models/Lizard/Lizard.X", &correctionMat, "Lizard");
+	//MatrixScaling(&correctionMat, 1.0f, 1.0f, 1.0f);
+	//video::SkinnedXMeshHandle LizardMesh = VIDEO->CreateSkinnedXMesh(
+	//	"../resources/Models/Lizard/Lizard.X", &correctionMat, "Lizard");
 
-	MatrixScaling(&correctionMat, 1.0f, 1.0f, 1.0f);
-	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Rock/Rock1_A.X", &correctionMat, "Rock01");
-	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Rock/Rock2_A.X", &correctionMat, "Rock02");
-	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Rock/Rock3_A.X", &correctionMat, "Rock03");
-	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Rock/Rock4_A.X", &correctionMat, "Rock04");
-	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Rock/Rock5_A.X", &correctionMat, "Rock05");
+	//MatrixScaling(&correctionMat, 1.0f, 1.0f, 1.0f);
+	//VIDEO->CreateStaticXMesh("../resources/Models/Environment/Rock/Rock1_A.X", &correctionMat, "Rock01");
+	//VIDEO->CreateStaticXMesh("../resources/Models/Environment/Rock/Rock2_A.X", &correctionMat, "Rock02");
+	//VIDEO->CreateStaticXMesh("../resources/Models/Environment/Rock/Rock3_A.X", &correctionMat, "Rock03");
+	//VIDEO->CreateStaticXMesh("../resources/Models/Environment/Rock/Rock4_A.X", &correctionMat, "Rock04");
+	//VIDEO->CreateStaticXMesh("../resources/Models/Environment/Rock/Rock5_A.X", &correctionMat, "Rock05");
 
-	MatrixScaling(&correctionMat, 0.01f, 0.01f, 0.01f);
-	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Grass/Grass1.X", &correctionMat, "Grass01");
-	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Grass/Grass2.X", &correctionMat, "Grass02");
-	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Grass/Grass3.X", &correctionMat, "Grass03");
-	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Grass/Grass4.X", &correctionMat, "Grass04");
-	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Grass/Grass5.X", &correctionMat, "Grass05");
+	//MatrixScaling(&correctionMat, 0.01f, 0.01f, 0.01f);
+	//VIDEO->CreateStaticXMesh("../resources/Models/Environment/Grass/Grass1.X", &correctionMat, "Grass01");
+	//VIDEO->CreateStaticXMesh("../resources/Models/Environment/Grass/Grass2.X", &correctionMat, "Grass02");
+	//VIDEO->CreateStaticXMesh("../resources/Models/Environment/Grass/Grass3.X", &correctionMat, "Grass03");
+	//VIDEO->CreateStaticXMesh("../resources/Models/Environment/Grass/Grass4.X", &correctionMat, "Grass04");
+	//VIDEO->CreateStaticXMesh("../resources/Models/Environment/Grass/Grass5.X", &correctionMat, "Grass05");
 
-	MatrixScaling(&correctionMat, 1.0f, 1.0f, 1.0f);
-	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Tree/Tree1.X", &correctionMat, "Tree01");
-	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Tree/Tree2.X", &correctionMat, "Tree02");
-	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Tree/Tree3.X", &correctionMat, "Tree03");
-	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Tree/Tree4.X", &correctionMat, "Tree04");
-	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Tree/Tree5.X", &correctionMat, "Tree05");
+	//MatrixScaling(&correctionMat, 1.0f, 1.0f, 1.0f);
+	//VIDEO->CreateStaticXMesh("../resources/Models/Environment/Tree/Tree1.X", &correctionMat, "Tree01");
+	//VIDEO->CreateStaticXMesh("../resources/Models/Environment/Tree/Tree2.X", &correctionMat, "Tree02");
+	//VIDEO->CreateStaticXMesh("../resources/Models/Environment/Tree/Tree3.X", &correctionMat, "Tree03");
+	//VIDEO->CreateStaticXMesh("../resources/Models/Environment/Tree/Tree4.X", &correctionMat, "Tree04");
+	//VIDEO->CreateStaticXMesh("../resources/Models/Environment/Tree/Tree5.X", &correctionMat, "Tree05");
 
 	//시스템 생성
 	_world.AddSystem<RenderSystem>(_renderSystem);
@@ -86,11 +89,6 @@ bool MapToolScene::SceneInit()
 	_world.AddSystem<ScriptSystem>(_scriptSystem);
 	_world.AddSystem<CollisionSystem>(_collisionSystem);
 
-	//카메라 생성
-	_camera.CreateFromWorld(_world);
-	_camera.SetRotationSpeed(10.0f);
-	_camera.SetMoveSpeed(20.0f);
-	_camera.GetEntity().GetComponent<TransformComponent>().MovePositionWorld(Vector3(0.0f, 4.0f, -6.0f));
 
 	//라이트 생성
 	_pMainLight = new DirectionalLight();
@@ -104,6 +102,7 @@ bool MapToolScene::SceneInit()
 	_channel.Broadcast<GameObjectFactory::CreateObjectOnLocationEvent>(
 		GameObjectFactory::CreateObjectOnLocationEvent(ARCHE_HERO, ResourceHandle(), Vector3(0.0f, 2.0f, 0.0f)));
 
+
 	//_channel.Broadcast<GameObjectFactory::CreateObjectOnLocationEvent>(
 	//	GameObjectFactory::CreateObjectOnLocationEvent(ARCHE_SNAKE, ResourceHandle(), Vector3(3.0f, 2.0f, 0.0f)));
 	//_channel.Broadcast<GameObjectFactory::CreateObjectOnLocationEvent>(
@@ -116,6 +115,14 @@ bool MapToolScene::SceneInit()
 	//	GameObjectFactory::CreateObjectOnLocationEvent(ARCHE_LIZARD, ResourceHandle(), Vector3(15.0f, 2.0f, 0.0f)));
 	//_channel.Broadcast<GameObjectFactory::CreateObjectOnLocationEvent>(
 	//	GameObjectFactory::CreateObjectOnLocationEvent(ARCHE_BAT, ResourceHandle(), Vector3(18.0f, 2.0f, 0.0f)));
+
+	//카메라 생성
+	_camera.CreateFromWorld(_world);
+	_camera.SetRotationSpeed(5.0f);
+	_camera.SetMoveSpeed(10.0f);
+	_camera.GetEntity().GetComponent<TransformComponent>().MovePositionWorld(Vector3(0.0f, 4.0f, -6.0f));
+	//NOTE : GameObjectFactory의 GetPlayerObject는 생성에 의존성을 가진다
+	_camera.SetTargetObject(GAMEOBJECTFACTORY->GetPlayerObject());
 
 	//에디터 생성
 	imguiRenderInit();

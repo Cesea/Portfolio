@@ -56,6 +56,8 @@ public :
 	const Vector3 &operator= (const Vector3 &other);
 
 	bool IsZero() { return FloatZero(x) && FloatZero(y) && FloatZero(z); }
+	void ToZero() { x = 0.0f; y = 0.0f; z = 0.0f; }
+	bool IsDiagonal();
 
 	// assignment operators
 	Vector3& operator += (const Vector3& other);
