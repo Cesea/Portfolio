@@ -470,16 +470,18 @@ void Editor::InObjectLocateMode()
 		}
 
 		ImguiIndent();
-		if (ImguiButton("Rock01"))
-		{
-			_objectLocator._currentStaticHandle = VIDEO->GetStaticXMesh("Rock01");
-		}
-		if (ImguiButton("Rock02"))
-		{
-			_objectLocator._currentStaticHandle = VIDEO->GetStaticXMesh("Rock02");
-		}
-		_objectLocator._typeToLocate = 
-			(_objectLocator._currentStaticHandle.IsValid()) ? ARCHE_ROCK : ARCHE_NONE;
+		if (ImguiButton("Rock01")) { _objectLocator._currentStaticHandle = VIDEO->GetStaticXMesh("Rock01"); }
+		if (ImguiButton("Rock02")) { _objectLocator._currentStaticHandle = VIDEO->GetStaticXMesh("Rock02"); }
+		if (ImguiButton("Rock03")) { _objectLocator._currentStaticHandle = VIDEO->GetStaticXMesh("Rock03"); }
+		if (ImguiButton("Rock04")) { _objectLocator._currentStaticHandle = VIDEO->GetStaticXMesh("Rock04"); }
+		if (ImguiButton("Rock05")) { _objectLocator._currentStaticHandle = VIDEO->GetStaticXMesh("Rock05"); }
+		if (ImguiButton("Rock06")) { _objectLocator._currentStaticHandle = VIDEO->GetStaticXMesh("Rock06"); }
+		if (ImguiButton("Rock07")) { _objectLocator._currentStaticHandle = VIDEO->GetStaticXMesh("Rock07"); }
+		if (ImguiButton("Rock08")) { _objectLocator._currentStaticHandle = VIDEO->GetStaticXMesh("Rock08"); }
+		if (ImguiButton("Rock09")) { _objectLocator._currentStaticHandle = VIDEO->GetStaticXMesh("Rock09"); }
+		if (ImguiButton("Rock10")) { _objectLocator._currentStaticHandle = VIDEO->GetStaticXMesh("Rock10"); }
+
+		_objectLocator._typeToLocate = (_objectLocator._currentStaticHandle.IsValid()) ? ARCHE_ROCK : ARCHE_NONE;
 
 		ImguiUnindent();
 	}
@@ -500,16 +502,40 @@ void Editor::InObjectLocateMode()
 			_objectLocator.Reset();
 		}
 		ImguiIndent();
-		if (ImguiButton("Tree01"))
+		if (ImguiButton("Tree01")) { _objectLocator._currentStaticHandle = VIDEO->GetStaticXMesh("Tree01"); }
+		if (ImguiButton("Tree02")) { _objectLocator._currentStaticHandle = VIDEO->GetStaticXMesh("Tree02"); }
+		if (ImguiButton("Tree03")) { _objectLocator._currentStaticHandle = VIDEO->GetStaticXMesh("Tree03"); }
+		if (ImguiButton("Tree04")) { _objectLocator._currentStaticHandle = VIDEO->GetStaticXMesh("Tree04"); }
+		if (ImguiButton("Tree05")) { _objectLocator._currentStaticHandle = VIDEO->GetStaticXMesh("Tree05"); }
+		if (ImguiButton("Tree06")) { _objectLocator._currentStaticHandle = VIDEO->GetStaticXMesh("Tree06"); }
+		if (ImguiButton("Tree07")) { _objectLocator._currentStaticHandle = VIDEO->GetStaticXMesh("Tree07"); }
+		if (ImguiButton("Tree08")) { _objectLocator._currentStaticHandle = VIDEO->GetStaticXMesh("Tree08"); }
+		if (ImguiButton("Tree09")) { _objectLocator._currentStaticHandle = VIDEO->GetStaticXMesh("Tree09"); }
+		if (ImguiButton("Tree10")) { _objectLocator._currentStaticHandle = VIDEO->GetStaticXMesh("Tree10"); }
+		_objectLocator._typeToLocate = (_objectLocator._currentStaticHandle.IsValid()) ? ARCHE_TREE : ARCHE_NONE;
+		ImguiUnindent();
+	}
+
+	//NOTE : 나무기둥 생성하는 부분
+	if (false == _objectLocator._locateTrunk)
+	{
+		if (ImguiCollapse("Trunk", nullptr, _objectLocator._locateTrunk))
 		{
-			_objectLocator._currentStaticHandle = VIDEO->GetStaticXMesh("Tree01");
+			_objectLocator.Reset();
+			_objectLocator._locateTrunk = true;
 		}
-		if (ImguiButton("Tree01"))
+	}
+	else
+	{
+		if (ImguiCollapse("Trunk", nullptr, _objectLocator._locateTrunk))
 		{
-			_objectLocator._currentStaticHandle = VIDEO->GetStaticXMesh("Tree02");
+			_objectLocator.Reset();
 		}
-		_objectLocator._typeToLocate = 
-			(_objectLocator._currentStaticHandle.IsValid()) ? ARCHE_TREE : ARCHE_NONE;
+		ImguiIndent();
+		if (ImguiButton("Trunk01")) { _objectLocator._currentStaticHandle = VIDEO->GetStaticXMesh("TreeTrunk01"); }
+		if (ImguiButton("Trunk02")) { _objectLocator._currentStaticHandle = VIDEO->GetStaticXMesh("TreeTrunk02"); }
+		if (ImguiButton("Trunk03")) { _objectLocator._currentStaticHandle = VIDEO->GetStaticXMesh("TreeTrunk03"); }
+		_objectLocator._typeToLocate = (_objectLocator._currentStaticHandle.IsValid()) ? ARCHE_TREETRUNK : ARCHE_NONE;
 		ImguiUnindent();
 	}
 
@@ -529,16 +555,39 @@ void Editor::InObjectLocateMode()
 			_objectLocator.Reset();
 		}
 		ImguiIndent();
-		if (ImguiButton("Grass"))
+		if (ImguiButton("Grass01")) { _objectLocator._currentStaticHandle = VIDEO->GetStaticXMesh("Grass01"); }
+		if (ImguiButton("Grass02")) { _objectLocator._currentStaticHandle = VIDEO->GetStaticXMesh("Grass02"); }
+		if (ImguiButton("Grass03")) { _objectLocator._currentStaticHandle = VIDEO->GetStaticXMesh("Grass03"); }
+		if (ImguiButton("Grass04")) { _objectLocator._currentStaticHandle = VIDEO->GetStaticXMesh("Grass04"); }
+		if (ImguiButton("Grass05")) { _objectLocator._currentStaticHandle = VIDEO->GetStaticXMesh("Grass05"); }
+		if (ImguiButton("Grass06")) { _objectLocator._currentStaticHandle = VIDEO->GetStaticXMesh("Grass06"); }
+		if (ImguiButton("Grass07")) { _objectLocator._currentStaticHandle = VIDEO->GetStaticXMesh("Grass07"); }
+		if (ImguiButton("Grass08")) { _objectLocator._currentStaticHandle = VIDEO->GetStaticXMesh("Grass08"); }
+		if (ImguiButton("Grass09")) { _objectLocator._currentStaticHandle = VIDEO->GetStaticXMesh("Grass09"); }
+		if (ImguiButton("Grass10")) { _objectLocator._currentStaticHandle = VIDEO->GetStaticXMesh("Grass10"); }
+		_objectLocator._typeToLocate = (_objectLocator._currentStaticHandle.IsValid()) ? ARCHE_GRASS : ARCHE_NONE;
+		ImguiUnindent();
+	}
+	//NOTE : 버섯 생성하는 부분
+	if (false == _objectLocator._locateMushroom)
+	{
+		if (ImguiCollapse("Mushroom", nullptr, _objectLocator._locateMushroom))
 		{
-			_objectLocator._currentStaticHandle = VIDEO->GetStaticXMesh("Grass01");
+			_objectLocator.Reset();
+			_objectLocator._locateMushroom = true;
 		}
-		if (ImguiButton("Grass"))
+	}
+	else
+	{
+		if (ImguiCollapse("Mushroom", nullptr, _objectLocator._locateMushroom))
 		{
-			_objectLocator._currentStaticHandle = VIDEO->GetStaticXMesh("Grass02");
+			_objectLocator.Reset();
 		}
-		_objectLocator._typeToLocate = 
-			(_objectLocator._currentStaticHandle.IsValid()) ? ARCHE_GRASS : ARCHE_NONE;
+		ImguiIndent();
+		if (ImguiButton("Mushroom01")) { _objectLocator._currentStaticHandle = VIDEO->GetStaticXMesh("Mushroom01"); }
+		if (ImguiButton("Mushroom02")) { _objectLocator._currentStaticHandle = VIDEO->GetStaticXMesh("Mushroom02"); }
+		if (ImguiButton("Mushroom03")) { _objectLocator._currentStaticHandle = VIDEO->GetStaticXMesh("Mushroom03"); }
+		_objectLocator._typeToLocate = (_objectLocator._currentStaticHandle.IsValid()) ? ARCHE_MUSHROOM : ARCHE_NONE;
 		ImguiUnindent();
 	}
 

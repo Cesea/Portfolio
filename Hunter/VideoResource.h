@@ -269,7 +269,7 @@ namespace video
 
 		void EndEffect() const;
 
-		void SetTechnique(LPCSTR name) const;
+		HRESULT SetTechnique(LPCSTR name) const;
 
 		void SetUniform(PredefinedUniform::Enum uniform, void *data);
 

@@ -7,6 +7,8 @@ struct TransformComponent;
 class Light;
 class DirectionalLight;
 
+enum ARCHE_TYPE;
+
 struct MeshBoundInfo
 {
 	Vector3 _min;
@@ -101,7 +103,7 @@ namespace video
 		void Destroy();
 		void BuidSubMeshBoundInfo();
 
-		void Render(const TransformComponent &transform);
+		void Render(ARCHE_TYPE type, const TransformComponent &transform);
 
 		bool32 _visible{ true };
 		ID3DXMesh *_pMesh{};

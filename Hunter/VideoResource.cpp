@@ -125,9 +125,9 @@ namespace video
 	}
 
 
-	void Effect::SetTechnique(LPCSTR name) const
+	HRESULT Effect::SetTechnique(LPCSTR name) const
 	{
-		_ptr->SetTechnique(name);
+		return _ptr->SetTechnique(name);
 	}
 	void Effect::SetUniform(PredefinedUniform::Enum uniform, void *data)
 	{

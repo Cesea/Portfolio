@@ -114,34 +114,26 @@ technique Base
 
 technique Tree
 {
-	pass Pass0
+	pass p0
 	{
 		VertexShader = compile vs_3_0 vs_main();
 		PixelShader = compile ps_3_0 ps_main();
 
-		// Alpha test to mask out parts of texture from showing up.
-		AlphaRef = 200;
-		AlphaFunc = GreaterEqual;
 		AlphaTestEnable = true;
-
-		// We want to be able to see both sides of grass fins.
-		CullMode = None;
+		AlphaFunc = GreaterEqual;
+		AlphaRef = 150;
 	}
 }
 
 technique Grass
 {
-	pass Pass0
+	pass p0
 	{
 		VertexShader = compile vs_3_0 vs_main();
 		PixelShader = compile ps_3_0 ps_main();
 
-		// Alpha test to mask out parts of texture from showing up.
-		AlphaRef = 200;
-		AlphaFunc = GreaterEqual;
 		AlphaTestEnable = true;
-
-		// We want to be able to see both sides of grass fins.
-		CullMode = None;
+		AlphaFunc = GreaterEqual;
+		AlphaRef = 150;
 	}
 }

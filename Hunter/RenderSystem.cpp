@@ -55,7 +55,7 @@ void RenderSystem::Render(const Camera &camera)
 		else if (refRenderComponent._type == RenderComponent::Type::eStatic)
 		{
 			video::StaticXMesh *pMesh = VIDEO->GetStaticXMesh(refRenderComponent._static);
-			pMesh->Render(refTransformComponent);
+			pMesh->Render(refRenderComponent._arche, refTransformComponent);
 			
 #if defined (DEBUG) || defined (_DEBUG)
 			CollisionComponent &refCollisionComp = entities[i].GetComponent<CollisionComponent>();

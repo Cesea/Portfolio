@@ -380,6 +380,7 @@ namespace video
 				//tex 파일경로는 Mesh 파일경로 + texture 파일이름
 				texFilePath = path + pMaterials[i].pTextureFilename;
 
+#pragma region Load Rock Texture
 				if (strncmp(pMaterials[i].pTextureFilename, "Rocks", 4) == 0)
 				{
 					video::TextureHandle diffuseHandle = VIDEO->GetTexture(texFilePath);
@@ -432,14 +433,124 @@ namespace video
 
 					_emissionTexture.push_back(VIDEO->GetTexture("emissionDefault.png"));
 				}
+#pragma endregion
+			else if (strncmp(pMaterials[i].pTextureFilename, "TreeTrunk", strlen("TreeTrunk")) == 0)
+#pragma region Load TreeTrunk
+			{
+				video::TextureHandle diffuseHandle = VIDEO->GetTexture(texFilePath);
+				if (!diffuseHandle.IsValid())
+				{
+					_diffuseTextures.push_back(VIDEO->CreateTexture(texFilePath, texFilePath));
+				}
 				else
 				{
-					//Texture 로딩하고 푸쉬
-					video::TextureHandle diffuseHandle = VIDEO->GetTexture(texFilePath);
-					if (!diffuseHandle.IsValid())
+					_diffuseTextures.push_back(diffuseHandle);
+				}
+
+				texFilePath = path + "TreeTrunk_N.png";
+				video::TextureHandle normalHandle = VIDEO->GetTexture(texFilePath);
+				if (!normalHandle.IsValid())
+				{
+					video::TextureHandle loadedHandle = VIDEO->CreateTexture(texFilePath, texFilePath);
+					if (!loadedHandle.IsValid())
 					{
-						_diffuseTextures.push_back(VIDEO->CreateTexture(texFilePath, texFilePath));
+						_normalTextures.push_back(VIDEO->GetTexture("normalDefault.png"));
 					}
+					else
+					{
+						_normalTextures.push_back(loadedHandle);
+					}
+				}
+				else
+				{
+					_normalTextures.push_back(normalHandle);
+				}
+
+				texFilePath = path + "TreeTrunk_S.png";
+				video::TextureHandle specularHandle = VIDEO->GetTexture(texFilePath);
+				if (!specularHandle.IsValid())
+				{
+					video::TextureHandle loadedHandle = VIDEO->CreateTexture(texFilePath, texFilePath);
+					if (!loadedHandle.IsValid())
+					{
+						_specularTextures.push_back(VIDEO->GetTexture("specularDefault.png"));
+					}
+					else
+					{
+						_specularTextures.push_back(loadedHandle);
+					}
+				}
+				else
+				{
+					_specularTextures.push_back(specularHandle);
+				}
+
+				_emissionTexture.push_back(VIDEO->GetTexture("emissionDefault.png"));
+			}
+#pragma endregion
+			else if (strncmp(pMaterials[i].pTextureFilename, "Mush", strlen("Mush")) == 0)
+#pragma region Load Mushroom
+			{
+				video::TextureHandle diffuseHandle = VIDEO->GetTexture(texFilePath);
+				if (!diffuseHandle.IsValid())
+				{
+					_diffuseTextures.push_back(VIDEO->CreateTexture(texFilePath, texFilePath));
+				}
+				else
+				{
+					_diffuseTextures.push_back(diffuseHandle);
+				}
+
+				texFilePath = path + "Mushroom_N.png";
+				video::TextureHandle normalHandle = VIDEO->GetTexture(texFilePath);
+				if (!normalHandle.IsValid())
+				{
+					video::TextureHandle loadedHandle = VIDEO->CreateTexture(texFilePath, texFilePath);
+					if (!loadedHandle.IsValid())
+					{
+						_normalTextures.push_back(VIDEO->GetTexture("normalDefault.png"));
+					}
+					else
+					{
+						_normalTextures.push_back(loadedHandle);
+					}
+				}
+				else
+				{
+					_normalTextures.push_back(normalHandle);
+				}
+
+				texFilePath = path + "Mushroom_S.png";
+				video::TextureHandle specularHandle = VIDEO->GetTexture(texFilePath);
+				if (!specularHandle.IsValid())
+				{
+					video::TextureHandle loadedHandle = VIDEO->CreateTexture(texFilePath, texFilePath);
+					if (!loadedHandle.IsValid())
+					{
+						_specularTextures.push_back(VIDEO->GetTexture("specularDefault.png"));
+					}
+					else
+					{
+						_specularTextures.push_back(loadedHandle);
+					}
+				}
+				else
+				{
+					_specularTextures.push_back(specularHandle);
+				}
+
+				_emissionTexture.push_back(VIDEO->GetTexture("emissionDefault.png"));
+			}
+#pragma endregion
+
+			else
+			{
+				//Texture 로딩하고 푸쉬
+				video::TextureHandle diffuseHandle = VIDEO->GetTexture(texFilePath);
+				if (!diffuseHandle.IsValid())
+				{
+					_diffuseTextures.push_back(VIDEO->CreateTexture(texFilePath, texFilePath));
+				}
 
 					//파일 이름과 확장자 위치
 					int dotIndex = texFilePath.find_last_of(".");
@@ -551,7 +662,7 @@ namespace video
 		//}
 	}
 
-	void StaticXMesh::Render(const TransformComponent & transform)
+	void StaticXMesh::Render(ARCHE_TYPE type, const TransformComponent & transform)
 	{
 		//월드행렬 셋팅
 
@@ -569,7 +680,7 @@ namespace video
 		pEffect->SetVector("vLightColor", lightColor);
 
 		//Effect 로 그리기 시작
-		pEffect->SetTechnique("Base");
+		HRESULT result = pEffect->SetTechnique(ArcheToString(type));
 
 		uint32 passNum = pEffect->BeginEffect();
 

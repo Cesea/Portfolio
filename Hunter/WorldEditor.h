@@ -90,7 +90,9 @@ struct ObjectLocator
 	{
 		_locateRock = false;
 		_locateTree = false;
+		_locateTrunk = false;
 		_locateGrass = false;
+		_locateMushroom = false;
 		_locateMonster = false;
 		_currentStaticHandle.MakeInvalid();
 		_currentSkinnedHandle.MakeInvalid();
@@ -99,7 +101,9 @@ struct ObjectLocator
 	
 	bool32 _locateRock{};
 	bool32 _locateTree{};
+	bool32 _locateTrunk{};
 	bool32 _locateGrass{};
+	bool32 _locateMushroom{};
 	bool32 _locateMonster{};
 
 	video::StaticXMeshHandle _currentStaticHandle;
@@ -108,10 +112,6 @@ struct ObjectLocator
 	int32 _numObjectToPaint{};
 	Brush _objectPaintBrush{};
 	ARCHE_TYPE _typeToLocate{};
-
-	std::vector<std::string> _rockNames{};
-	std::vector<std::string> _treeNames{};
-	std::vector<std::string> _grassNames{};
 };
 
 struct ObjectEditor
