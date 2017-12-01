@@ -337,7 +337,7 @@ technique Base
     pass p0
     {
         VertexShader = ( vsArray20[ CurNumBones ] );
-		PixelShader = compile ps_3_0 ps_default();
+		PixelShader = compile ps_3_0 ps_main();
     }
 }
 

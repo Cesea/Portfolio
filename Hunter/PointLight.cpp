@@ -3,6 +3,8 @@
 
 PointLight::PointLight()
 {
+	_color = 0xffffffff;
+	_intensity = 1.0f;
 }
 
 PointLight::~PointLight()
@@ -23,8 +25,8 @@ Matrix PointLight::GetLightMatrix() const
 
 	matLight._14 = 1;		//Point Light Type
 	Vector3 pos = refTransform.GetWorldPosition();
-	memcpy(&matLight._11, &pos, sizeof(D3DXVECTOR3));
-	memcpy(&matLight._31, &_color, sizeof(FLOAT) * 3);
+	memcpy(&matLight._11, &pos, sizeof(Vector3));
+	memcpy(&matLight._31, &_color, sizeof(float) * 3);
 	matLight._24 = _distancePow;
 	matLight._41 = this->_maxRange;
 	matLight._42 = this->_minRange;

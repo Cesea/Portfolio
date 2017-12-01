@@ -33,7 +33,6 @@ public:
 	//virtual bool SceneRenderSprite() {}
 
 	virtual const char *GetSceneName();
-
 protected :
 
 	TransformSystem _transformSystem;
@@ -43,6 +42,7 @@ protected :
 	CollisionSystem _collisionSystem;
 
 	Editor *_editor{};
+
 
 public:
 	virtual void Handle(const Editor::GetObjectFromSceneEvent &event);

@@ -58,8 +58,8 @@ void RenderSystem::Render(const Camera &camera)
 			pMesh->Render(refRenderComponent._arche, refTransformComponent);
 			
 #if defined (DEBUG) || defined (_DEBUG)
-			CollisionComponent &refCollisionComp = entities[i].GetComponent<CollisionComponent>();
-			refCollisionComp.RenderBoxGizmo(refTransformComponent);
+			//CollisionComponent &refCollisionComp = entities[i].GetComponent<CollisionComponent>();
+			//refCollisionComp.RenderBoxGizmo(refTransformComponent);
 #endif
 		}
 		else if (refRenderComponent._type == RenderComponent::Type::eSkinned)

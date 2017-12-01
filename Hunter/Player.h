@@ -39,7 +39,7 @@ public :
 
 	void Handle(const InputManager::KeyDownEvent &event);
 	void Handle(const InputManager::KeyReleasedEvent &event);
-	//void Handle(const InputManager::KeyDownEvent &event);
+	void Handle(const InputManager::KeyPressedEvent &event);
 	void Handle(const InputManager::MousePressedEvent &event);
 
 	void SetLinkCamera(Camera* camera) { _camera = camera; }

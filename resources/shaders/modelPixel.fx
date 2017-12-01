@@ -3,44 +3,43 @@
 float camNear;			//카메라 근거리 평면
 float camFar;			//카메라 원거리 평면
 
-texture Diffuse_Tex;
+texture DiffuseTexture;
 sampler2D Diffuse = sampler_state
 {
-	Texture = (Diffuse_Tex);
+	Texture = (DiffuseTexture);
 	MAGFILTER = LINEAR;
 	MIPFILTER = LINEAR;
 	MINFILTER = LINEAR;
 };
-texture Normal_Tex;
+texture NormalTexture;
 sampler2D Normal = sampler_state
 {
-	Texture = (Normal_Tex);
+	Texture = (NormalTexture);
 	MAGFILTER = LINEAR;
 	MINFILTER = LINEAR;
 	MIPFILTER = LINEAR;
 };
 
-texture Specular_Tex;
+texture SpecularTexture;
 sampler2D Specular = sampler_state
 {
-	Texture = (Specular_Tex);
+	Texture = (SpecularTexture);
 	MAGFILTER = LINEAR;
 	MINFILTER = LINEAR;
 	MIPFILTER = LINEAR;
 };
 
 
-texture Emission_Tex;
+texture EmissionTexture;
 sampler2D Emission = sampler_state
 {
-	Texture = (Emission_Tex);
+	Texture = (EmissionTexture);
 	MAGFILTER = LINEAR;
 	MIPFILTER = LINEAR;
 	MINFILTER = LINEAR;
 };
 
-float4x4 baseDirectionLight;			//기본라이팅 행렬
-
+float4x4 baseDirectionalLight;			//기본라이팅 행렬
 
 struct PS_INPUT
 {
@@ -51,6 +50,12 @@ struct PS_INPUT
 	float3 viewDir : TEXCOORD4;
 	float3 worldPos : TEXCOORD5;
 	float4 FinalPos : TEXCOORD6;
+};
+
+struct ps_diffuse_input 
+{
+	float2 texcoord : TEXCOORD0;
+	float3 normal : TEXCOORD1;
 };
 
 //픽셀셰이더 출력 구조체
@@ -64,21 +69,13 @@ struct PS_OUTPUT
 // Render Base 관련
 //---------------------------------------------------------------
 
-float4 ps_default(PS_INPUT input) : COLOR
+float4 ps_diffuse(ps_diffuse_input input) : COLOR
 {
-//	float3 lightDirection = -float3(baseDirectionLight._21, 
-//			baseDirectionLight._22, 
-//			baseDirectionLight._23);
-
-	float3 diffuseColor = tex2D(Diffuse, input.Texcoord).rgb;
-
-	return float4(diffuseColor, 1.0f);
+	return float4(tex2D(Diffuse, input.texcoord).rgb, 1.0f);
 }
 
-PS_OUTPUT ps_main(PS_INPUT Input)
+float4 ps_main(PS_INPUT Input) : COLOR
 {
-	PS_OUTPUT Output = (PS_OUTPUT)0;
-
 	float4 diffTex = tex2D(Diffuse, Input.Texcoord);
 		clip(diffTex.a - 0.1f);
 
@@ -106,12 +103,11 @@ PS_OUTPUT ps_main(PS_INPUT Input)
 		//기본 라이팅 처리
 
 		//광원의 방향
-		float3 dir = float3(baseDirectionLight._21, baseDirectionLight._22, baseDirectionLight._23);
+		float3 dir = float3(baseDirectionalLight._21, baseDirectionalLight._22, baseDirectionalLight._23);
 		float3 lightDir = -dir;
 
 		//광원의 컬러
-		float3 lightColor = float3(baseDirectionLight._31, baseDirectionLight._32, baseDirectionLight._33) * baseDirectionLight._34;
-
+		float3 lightColor = float3(baseDirectionalLight._31, baseDirectionalLight._32, baseDirectionalLight._33) * baseDirectionalLight._34;
 
 		float NdotL = dot(lightDir, worldNormal);
 
@@ -122,8 +118,9 @@ PS_OUTPUT ps_main(PS_INPUT Input)
 
 	float diff = NdotL;
 	if (diff < 0.0)
+	{
 		diff = abs(NdotL) * 0.3f;
-
+	}
 
 	//라이트 반사
 	float3 lightRefl = normalize(dir + 2.0f * NdotL * worldNormal);
@@ -135,63 +132,32 @@ PS_OUTPUT ps_main(PS_INPUT Input)
 	finalSpecular = lightColor * spec * diff;		//Specular 에 diff 안곱하면 Specular 에 의한 역광이 나온다...
 
 	//추가되는 광원
-	float3 addDiffuse = float3(0, 0, 0);
-		float3 addSpecular = float3(0, 0, 0);
-	for (int i = 0; i < LightNum; i++)
-	{
+	//float3 addDiffuse = float3(0, 0, 0);
+//		float3 addSpecular = float3(0, 0, 0);
+//	for (int i = 0; i < LightNum; i++)
+//	{
 		//i 인덱스의 광원이 계산되어 addDiffuse, addSpecular 에 대입된다.
 		//AddLingt.fx
-		ComputeLight(
-			addDiffuse,
-			addSpecular,
-			Input.worldPos,
-			worldNormal,
-			viewDir,
-			i);
+		//ComputeLight( addDiffuse, addSpecular, Input.worldPos, worldNormal, viewDir, i);
 
 		//최종 광원 량에 쌓인다.
-		finalDiffuse += addDiffuse;
-		finalSpecular += addSpecular;
-	}
+		//finalDiffuse += addDiffuse;
+		//finalSpecular += addSpecular;
+	//}
 
-
-	//
 	// Diffuse
-	//
 	float3 diffuseColor = diffTex.rgb * finalDiffuse;
 
-		//
-		// Specular 
-		//
-		float3 specularColor = tex2D(Specular, Input.Texcoord).rgb * finalSpecular;
+	// Specular 
+	float3 specularColor = tex2D(Specular, Input.Texcoord).rgb * finalSpecular;
 
-		//
-		// Emission
-		//
-		float3 emissionColor = tex2D(Emission, Input.Texcoord).rgb;
+	// Emission
+	float3 emissionColor = tex2D(Emission, Input.Texcoord).rgb;
 
-		//
-		// Final Color 
-		//
-		float3 finalColor = diffuseColor + specularColor + emissionColor;
+	// Final Color 
+	float3 finalColor = diffuseColor + specularColor + emissionColor;
 
-
-		//행렬변환을 거친 값 z 에 행렬변환에서 얻는 가중치 w 를 나누면 0 ~ 1 사이의 깊이 값이 된다.
-		float depth = Input.FinalPos.z / Input.FinalPos.w;
-
-	//위의 depth 값을 카메라의 near 와 far 를 이용하여 선형으로 펴준다....
-	//Perspective Projection Linear Depth
-	float z = depth;
-	float a = camFar / (camFar - camNear);
-	float b = -camNear / (camFar - camNear);
-	depth = b / (z - a);
-
-
-	Output.baseColor = float4(finalColor, 1);
-	Output.normalDepth = float4(worldNormal, depth);		//alpha 값에 뎁스를 썼다.
-
-
-	return Output;
+	return float4(finalColor, 1.0f);
 }
 
 
@@ -304,11 +270,11 @@ PS_OUTPUT ps_ReciveShadow(PS_INPUT_RECIVESHADOW Input)
 		//기본 라이팅 처리
 
 		//광원의 방향
-		float3 dir = float3(baseDirectionLight._21, baseDirectionLight._22, baseDirectionLight._23);
+		float3 dir = float3(baseDirectionalLight._21, baseDirectionalLight._22, baseDirectionalLight._23);
 		float3 lightDir = -dir;
 
 		//광원의 컬러
-		float3 lightColor = float3(baseDirectionLight._31, baseDirectionLight._32, baseDirectionLight._33) * baseDirectionLight._34;
+		float3 lightColor = float3(baseDirectionalLight._31, baseDirectionalLight._32, baseDirectionalLight._33) * baseDirectionalLight._34;
 
 
 		float NdotL = dot(lightDir, worldNormal);
@@ -414,11 +380,11 @@ PS_OUTPUT ps_Toon(PS_INPUT Input)
 	float3 worldNormal = normalize(Input.Normal);
 
 	//광원의 방향
-	float3 dir = float3(baseDirectionLight._21, baseDirectionLight._22, baseDirectionLight._23);
+	float3 dir = float3(baseDirectionalLight._21, baseDirectionalLight._22, baseDirectionalLight._23);
 	float3 lightDir = -dir;
 
 	//광원의 컬러
-	float3 lightColor = float3(baseDirectionLight._31, baseDirectionLight._32, baseDirectionLight._33) * baseDirectionLight._34;
+	float3 lightColor = float3(baseDirectionalLight._31, baseDirectionalLight._32, baseDirectionalLight._33) * baseDirectionalLight._34;
 
 
 	float diff = dot(worldNormal, lightDir);
@@ -559,11 +525,11 @@ PS_OUTPUT ps_ReciveShadowToon(PS_INPUT_RECIVESHADOW Input)
 	float3 worldNormal = normalize(Input.Normal);
 
 		//광원의 방향
-		float3 dir = float3(baseDirectionLight._21, baseDirectionLight._22, baseDirectionLight._23);
+		float3 dir = float3(baseDirectionalLight._21, baseDirectionalLight._22, baseDirectionalLight._23);
 		float3 lightDir = -dir;
 
 		//광원의 컬러
-		float3 lightColor = float3(baseDirectionLight._31, baseDirectionLight._32, baseDirectionLight._33) * baseDirectionLight._34;
+		float3 lightColor = float3(baseDirectionalLight._31, baseDirectionalLight._32, baseDirectionalLight._33) * baseDirectionalLight._34;
 
 
 		float diff = dot(worldNormal, lightDir);
@@ -582,8 +548,6 @@ PS_OUTPUT ps_ReciveShadowToon(PS_INPUT_RECIVESHADOW Input)
 		toon = max(0.3f, toon);
 
 	}
-
-
 
 	//최종 색
 	float3 finalDiffuse = lightColor * toon;

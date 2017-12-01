@@ -626,6 +626,9 @@ namespace video
 		_attributeRange = new D3DXATTRIBUTERANGE[attributeTableSize];
 		_pMesh->GetAttributeTable(_attributeRange, &attributeTableSize);
 
+		D3DVERTEXELEMENT9 elements[64];
+		_pMesh->GetDeclaration(elements);
+
 
 		// 메쉬 보정 처리
 		if (nullptr != matCorrection)
@@ -671,16 +674,9 @@ namespace video
 		Matrix matWorld = transform.GetFinalMatrix();
 		pEffect->SetMatrix("matWorld", matWorld);
 
-		//광원 방향 일단...
-		Vector4 lightDir(1, -1, 1, 1);
-		pEffect->SetVector("vLightDir", lightDir);
-
-		//라이트 컬러 일단 흰색
-		Vector4 lightColor(1, 1, 1, 1);
-		pEffect->SetVector("vLightColor", lightColor);
-
 		//Effect 로 그리기 시작
 		HRESULT result = pEffect->SetTechnique(ArcheToString(type));
+		//HRESULT result = pEffect->SetTechnique("Base");
 
 		uint32 passNum = pEffect->BeginEffect();
 

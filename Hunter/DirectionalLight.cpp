@@ -3,6 +3,8 @@
 
 DirectionalLight::DirectionalLight()
 {
+	_color = 0xffffffff;
+	_intensity = 1.0f;
 }
 
 DirectionalLight::~DirectionalLight()
@@ -23,8 +25,8 @@ Matrix DirectionalLight::GetLightMatrix() const
 
 	matLight._14 = 0;
 	Vector3 forward = refTransform.GetForward();
-	memcpy(&matLight._21, &forward, sizeof(D3DXVECTOR3));
-	memcpy(&matLight._31, &_color, sizeof(FLOAT) * 3);
+	memcpy(&matLight._21, &forward, sizeof(Vector3));
+	memcpy(&matLight._31, &_color, sizeof(float) * 3);
 	matLight._34 = _intensity;
 
 	return matLight;

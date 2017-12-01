@@ -27,7 +27,7 @@ bool Player::CreateFromWorld(World & world)
    EventChannel channel;
    channel.Add<InputManager::KeyDownEvent, Player>(*this);
    channel.Add<InputManager::KeyReleasedEvent, Player>(*this);
-   //channel.Add<InputManager::KeyDownEvent, Player>(*this);
+   channel.Add<InputManager::KeyPressedEvent, Player>(*this);
    channel.Add<InputManager::MousePressedEvent, Player>(*this);
    _entity = world.CreateEntity();
 
@@ -248,17 +248,10 @@ void Player::Update(float deltaTime)
             }
             else if (_currentMovement._vertical == VERTICAL_MOVEMENT_DOWN)
             {
-				if (_currentCommand._movement._horizontal == HORIZONTAL_MOVEMENT_LEFT)
+				if (_currentCommand._movement._vertical == VERTICAL_MOVEMENT_UP)
 				{
-					_currentMovement._horizontal = HORIZONTAL_MOVEMENT_LEFT;
-					_currentMovement._vertical = VERTICAL_MOVEMENT_NONE;
-					this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eStrafeLeft));
-				}
-				else if (_currentCommand._movement._horizontal == HORIZONTAL_MOVEMENT_RIGHT)
-				{
-					_currentMovement._horizontal = HORIZONTAL_MOVEMENT_RIGHT;
-					_currentMovement._vertical = VERTICAL_MOVEMENT_NONE;
-					this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eStrafeRight));
+					_currentMovement._vertical = VERTICAL_MOVEMENT_UP;
+					this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWalk));
 				}
 			}
 			else if (_currentMovement._horizontal == HORIZONTAL_MOVEMENT_RIGHT)
@@ -652,7 +645,7 @@ void Player::Handle(const InputManager::KeyDownEvent & event)
       _currentCommand._type = GAMECOMMAND_MOVE;
       _currentCommand._movement._horizontal = HORIZONTAL_MOVEMENT_LEFT;
    }
-   else if ('L' == inputCode)
+   if ('L' == inputCode)
    {
       _currentCommand._type = GAMECOMMAND_MOVE;
       _currentCommand._movement._horizontal = HORIZONTAL_MOVEMENT_RIGHT;
@@ -663,14 +656,41 @@ void Player::Handle(const InputManager::KeyDownEvent & event)
       _currentCommand._type = GAMECOMMAND_MOVE;
       _currentCommand._movement._vertical = VERTICAL_MOVEMENT_UP;
    }
-   else if ('K' == inputCode)
+   if ('K' == inputCode)
    {
       _currentCommand._type = GAMECOMMAND_MOVE;
       _currentCommand._movement._vertical = VERTICAL_MOVEMENT_DOWN;
    }
+
    if (VK_SHIFT == inputCode)
    {
 	   _currentCommand._dash = true;
+   }
+}
+
+void Player::Handle(const InputManager::KeyPressedEvent & event)
+{
+   uint32 inputCode = event.code;
+   if('J' == inputCode)
+   {
+      _currentCommand._type = GAMECOMMAND_MOVE;
+      _currentCommand._movement._horizontal = HORIZONTAL_MOVEMENT_LEFT;
+   }
+   if ('L' == inputCode)
+   {
+      _currentCommand._type = GAMECOMMAND_MOVE;
+      _currentCommand._movement._horizontal = HORIZONTAL_MOVEMENT_RIGHT;
+   }
+
+   if('I' == inputCode)
+   {
+      _currentCommand._type = GAMECOMMAND_MOVE;
+      _currentCommand._movement._vertical = VERTICAL_MOVEMENT_UP;
+   }
+   if ('K' == inputCode)
+   {
+      _currentCommand._type = GAMECOMMAND_MOVE;
+      _currentCommand._movement._vertical = VERTICAL_MOVEMENT_DOWN;
    }
 }
 
