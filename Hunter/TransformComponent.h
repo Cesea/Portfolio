@@ -102,7 +102,7 @@ struct TransformComponent : public Component
 	void Interpolate(const TransformComponent& from, const TransformComponent& to, float t);
 
 	///³»²¨
-	void SetForward(Vector3 Dir);
+	void SetForward(const Vector3 &forward);
 
 	/////// update/////
 	//void UpdateTransform();

@@ -4,6 +4,8 @@
 constexpr float MAX_VERT_ANGLE = 85.0f;
 constexpr float MIN_VERT_ANGLE = -85.0f;
 
+//constexpr float CAMERA_LOOKDOWN_ANGLE = D3DX_PI /
+
 Camera::Camera()
 {
 	//기본 화각 설정
@@ -24,6 +26,8 @@ Camera::Camera()
 
 	_cameraState = CAMERASTATE_CREATE;
 
+	_offsetForwardMult = -6.0f;
+	_offsetUpMult = 4.0f;
 }
 
 Camera::~Camera()
@@ -45,6 +49,8 @@ void Camera::MoveAndRotate(const InputManager & input)
 	float deltaTime = APPTIMER->GetTargetTime();
 
 	TransformComponent &refTransform = _entity.GetComponent<TransformComponent>();
+	TransformComponent &refTargetTransform = 
+		_pTargetObject->GetEntity().GetComponent<TransformComponent>();
 
 	Vector3 forward = refTransform.GetForward();
 	Vector3 right= refTransform.GetRight();
@@ -54,59 +60,17 @@ void Camera::MoveAndRotate(const InputManager & input)
 	if (input.keyboard.IsPressed('1'))
 	{
 		_cameraState = CAMERASTATE_CREATE;
+		refTransform.LookDirection(Vector3(0.0f, 0.0f, 1.0f));
 	}
 	else if (input.keyboard.IsPressed('2'))
 	{
+		Assert(_pTargetObject);
 		_cameraState = CAMERASTATE_INGAME;
+
+		refTransform.SetRotateWorld(-0.2, 0.0f, 0.0f);
 	}
 
-	Vector3 diff = Vector3(0.0f, 0.0f, 0.0f);
-	////move forward
-	switch (_cameraState)
-	{
-	case CAMERASTATE_CREATE :
-	{
-		if (input.keyboard.IsDown('W')) { diff += forward * _moveSpeed * deltaTime; }
-		else if (input.keyboard.IsDown('S')) { diff -= forward * _moveSpeed * deltaTime; }
-
-		if (input.keyboard.IsDown('A')) { diff -= right * _moveSpeed * deltaTime; }
-		else if (input.keyboard.IsDown('D')) { diff += right * _moveSpeed * deltaTime; }
-
-		if (input.keyboard.IsDown('Q')) { diff += up * _moveSpeed * deltaTime; }
-		else if (input.keyboard.IsDown('E')) { diff -= up * _moveSpeed * deltaTime; }
-
-		float length = Vec3Length(&diff);
-		if (!FloatZero(length))
-		{
-			diff /= length;
-		}
-		refTransform.MovePositionWorld(diff);
-	} break;
-
-	case CAMERASTATE_INGAME:
-	{
-
-	} break;
-
-	}
-
-	//Mouse Pressed////////////////////////////////////////////
-	switch (_cameraState)
-	{
-	case CAMERASTATE_CREATE :
-	{
-		if (input.mouse.IsPressed(MOUSE_BUTTON_RIGHT))
-		{
-			_rotating = true;
-		}
-		if (input.mouse.IsReleased(MOUSE_BUTTON_RIGHT))
-		{
-			_rotating = false;
-		}
-	} break;
-	}
-	
-	//Mouse Move//////////////////////////////////////////////
+//Mouse Move//////////////////////////////////////////////
 	switch (_cameraState)
 	{
 	case CAMERASTATE_CREATE:
@@ -146,21 +110,72 @@ void Camera::MoveAndRotate(const InputManager & input)
 		{
 			_horizontalAngle += _rotationSpeed * deltaTime * (float)deltaX;
 		}
+		//if (deltaY != 0)
+		//{
+		//	_verticalAngle += _rotationSpeed * deltaTime * (float)deltaY;
+		//}
 
-		if (deltaY != 0)
-		{
-			_verticalAngle += _rotationSpeed * deltaTime * (float)deltaY;
-		}
+		//ClampFloat(_verticalAngle, MIN_VERT_ANGLE, MAX_VERT_ANGLE);
+		refTransform.SetRotateWorld(_verticalAngle * ONE_RAD, _horizontalAngle * ONE_RAD, 0.0f);
 
-		ClampFloat(_verticalAngle, MIN_VERT_ANGLE, MAX_VERT_ANGLE);
-
-		//dummyTransform->SetRotateWorld(_verticalAngle * ONE_RAD, _horizontalAngle * ONE_RAD, 0.0f);
-		/*if (_cameraState == cNormal)
-		{
-			SetCursorPos(WINSTARTX + (WINSIZEX * 0.5), WINSTARTY + (WINSIZEY * 0.5));
-		}*/
+		Vector3 planerForward = _entity.GetComponent<TransformComponent>().GetForward();
+		planerForward.y = 0.0f;
+		refTargetTransform.LookDirection(planerForward);
 	} break;
 	}
+
+
+
+	Vector3 diff = Vector3(0.0f, 0.0f, 0.0f);
+	////move forward
+	switch (_cameraState)
+	{
+	case CAMERASTATE_CREATE :
+	{
+		if (input.keyboard.IsDown('W')) { diff += forward * _moveSpeed * deltaTime; }
+		else if (input.keyboard.IsDown('S')) { diff -= forward * _moveSpeed * deltaTime; }
+
+		if (input.keyboard.IsDown('A')) { diff -= right * _moveSpeed * deltaTime; }
+		else if (input.keyboard.IsDown('D')) { diff += right * _moveSpeed * deltaTime; }
+
+		if (input.keyboard.IsDown('Q')) { diff += up * _moveSpeed * deltaTime; }
+		else if (input.keyboard.IsDown('E')) { diff -= up * _moveSpeed * deltaTime; }
+
+		float length = Vec3Length(&diff);
+		if (!FloatZero(length))
+		{
+			diff /= length;
+		}
+		refTransform.MovePositionWorld(diff);
+	} break;
+
+	case CAMERASTATE_INGAME:
+	{
+		Vector3 offsetVector;
+		offsetVector += refTargetTransform.GetForward() * _offsetForwardMult;
+		offsetVector += refTargetTransform.GetUp() * _offsetUpMult;
+
+		refTransform.SetWorldPosition(refTargetTransform.GetWorldPosition() + offsetVector);
+	} break;
+	}
+
+	//Mouse Pressed////////////////////////////////////////////
+	switch (_cameraState)
+	{
+	case CAMERASTATE_CREATE :
+	{
+		if (input.mouse.IsPressed(MOUSE_BUTTON_RIGHT))
+		{
+			_rotating = true;
+		}
+		if (input.mouse.IsReleased(MOUSE_BUTTON_RIGHT))
+		{
+			_rotating = false;
+		}
+	} break;
+	}
+	
+	
 }
 
 void Camera::UpdateMatrix()
@@ -215,10 +230,6 @@ void Camera::SetTargetObject(BaseGameObject * pTargetObject)
 		return;
 	}
 	_pTargetObject = pTargetObject;
-}
-
-void Camera::SetToRotateTransform(TransformComponent * pRotateTransform)
-{
 }
 
 void Camera::ComputeRay(const Vector2 & screenPos, Ray * pOutRay)

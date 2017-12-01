@@ -21,23 +21,20 @@ public :
 	float GetTotalTimeElapsed();
 
 private :
-
-
-
-	LARGE_INTEGER _prevCounter;;
+	LARGE_INTEGER _prevCounter;
 	LARGE_INTEGER _currentCounter;
 	LARGE_INTEGER _startCounter;
 
-	float _timeScale;
+	double _timeScale;
 	LARGE_INTEGER _frequency;
 
 	int32 _currentDeltaMS;
-	float _currentDeltaSecond;
+	double _currentDeltaSecond;
+	double _targetFrameSecond;
 	int32 _targetFramePerMS;
 
 };
 
-#define APPTIMER (ApplicationTimer::GetInstance())
-
+#define APPTIMER ApplicationTimer::GetInstance()
 
 #endif

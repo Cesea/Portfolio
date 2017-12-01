@@ -79,8 +79,7 @@ bool Player::CreateFromWorld(World & world)
    _moveToStanceTimer.Reset(0.05f);
    _attackToStanceTimer.Reset(1.5f);
 
-   _attackCombo1Timer.Reset(0.7f);
-   _attackCombo2Timer.Reset(0.7f);
+   _comboTimer.Reset(0.4f);
 
    return true;
 }
@@ -187,7 +186,6 @@ void Player::Update(float deltaTime)
             {
                _state = PLAYERSTATE_ATTACK;
                _pStateMachine->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWarSwingLeft));
-			   _attackCombo1Timer.Tick(deltaTime);
             }
             else if (_currentCommand._behavior._type == BEHAVIOR_BLOCK)
             {
@@ -406,7 +404,6 @@ void Player::Update(float deltaTime)
 			   _state = PLAYERSTATE_MOVE;
 			   _pStateMachine->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWalk));
 		   }
-		   //if(_currentCommand._movement.)
 	   }
    }break;
 
@@ -415,28 +412,33 @@ void Player::Update(float deltaTime)
       if (_inCombat)
       {
          bool toStance = _attackToStanceTimer.Tick(deltaTime);
+		 bool canCombo = _comboTimer.Tick(deltaTime);
+		 if (canCombo)
+		 {
+			 int a = 0;
+		 }
+
          if (toStance)
          {
             _state = PLAYERSTATE_STANCE;
 			MovementStop(_currentMovement);
             _attackToStanceTimer.Restart();
+			_comboTimer.Restart();
             _comboCount = 0;
             _pStateMachine->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWarCombatMode));
 			return;
-			/*_attackCombo1Timer.Restart();
-			_attackCombo2Timer.Restart();*/
          }
 
          if (_currentCommand._behavior._type == BEHAVIOR_ATTACK)
          {
                _attackToStanceTimer.Restart();
+			   _comboTimer.Restart();
 			  
-			   if (_comboCount == 1/* && _attackCombo1Timer._currentTime > 0.3*/)
+			   if (_comboCount == 0)
 			   {
-				   _attackCombo2Timer.Tick(deltaTime);
 				   _pStateMachine->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWarSwingRight));
 			   }
-			   else if (_comboCount == 2 /*&& _attackCombo2Timer._currentTime > 0.3*/)
+			   else if (_comboCount == 1)
 			   {
 				   _pStateMachine->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWarThrustMid));
 				   _comboCount = 0;
@@ -506,7 +508,6 @@ void Player::Update(float deltaTime)
 
 			   if (_comboCount == 1/* && _attackCombo1Timer._currentTime > 0.3*/)
 			   {
-				   _attackCombo2Timer.Tick(deltaTime);
 				   _pStateMachine->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWarWalkSwingRight));
 			   }
 			   else if (_comboCount == 2 /*&& _attackCombo2Timer._currentTime > 0.3*/)
@@ -763,7 +764,7 @@ HRESULT PlayerCallbackHandler::HandleCallback(UINT Track, LPVOID pCallbackData)
 	{
 	case PlayerAnimationEnum::eWarSwingLeft:
 	{
-		int a = 0;
+		//_pPlayer->_canCombo = true;
 	}break;
 
 	}

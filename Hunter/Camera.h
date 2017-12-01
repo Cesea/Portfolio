@@ -1,8 +1,6 @@
 #ifndef CAMERA_H
 #define CAMERA_H
 
-#define PLAYER_TO_CAMERA_DIST 3.0f
-
 #include "TransformComponent.h"
 #include "Frustum.h"
 #include "BaseGameObject.h"
@@ -50,8 +48,6 @@ public:
 
 	void OrthoToggle() { _ortho = !_ortho; }
 
-	void SetToRotateTransform(TransformComponent *pRotateTransform);
-
 	void ComputeRay(const Vector2 &screenPos, Ray *pOutRay);
 	bool GetWorldPosToScreenPos(const Vector3 &worldPos, Vector2* pOutScreenPos);
 
@@ -88,12 +84,11 @@ protected:
 	float _verticalAngle{};
 	float _horizontalAngle{};
 
-	TransformComponent *_toRotateComponent{};
-
-	Vector3 _toMove;
-
 	Frustum _frustum;
 	BaseGameObject *_pTargetObject{};
+
+	float _offsetForwardMult{};
+	float _offsetUpMult{};
 };
 
 #endif

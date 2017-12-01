@@ -1150,12 +1150,13 @@ Vector3 TransformComponent::GetRight(bool bNormalize /*= true*/) const
 //}
 
 ///³»²¨
-void TransformComponent::SetForward(Vector3 Dir)
+void TransformComponent::SetForward(const Vector3 &forward)
 {
 	Vector3 WorldUp = Vector3(0, 1, 0);
-	this->_forward = Dir;
-	D3DXVec3Cross(&_right, &WorldUp, &this->_forward);
-	D3DXVec3Cross(&_up, &this->_forward, &this->_right);
+	this->_forward = forward;
+	Vec3Cross(&_right, &WorldUp, &this->_forward);
+	Vec3Cross(&_up, &this->_forward, &this->_right);
+
 	LookDirection(this->_forward, WorldUp);
 	_transformDirty = true;
 }

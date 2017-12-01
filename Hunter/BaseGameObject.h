@@ -14,6 +14,7 @@ public :
 	virtual ~BaseGameObject() {}
 
 	virtual bool CreateFromWorld(World &world) = 0;
+	Entity &GetEntity() { return _entity; }
 
 protected :
 	Entity _entity;

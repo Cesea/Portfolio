@@ -75,7 +75,7 @@ private :
 private :
 	EventChannel _channel;
 	float _walkSpeed{2.0f};
-	float _runSpeed{4.0f};
+	float _runSpeed{5.0f};
 	float _rotationSpeed{ 0.05f };
 	float _backRotationSpeed{ 0.03f };
 
@@ -87,8 +87,7 @@ private :
 	Movement _currentMovement;
 
 	StopWatch _attackToStanceTimer;
-	StopWatch _attackCombo1Timer;
-	StopWatch _attackCombo2Timer;
+	StopWatch _comboTimer;
 	int32 _comboCount{};
 
 public :
