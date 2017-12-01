@@ -70,10 +70,7 @@ bool GameScene::SceneInit()
 	_world.AddSystem<ScriptSystem>(_scriptSystem);
 	_world.AddSystem<CollisionSystem>(_collisionSystem);
 
-	//카메라 생성
-	_camera.CreateFromWorld(_world);
-	_camera.SetRotationSpeed(10.0f);
-	_camera.SetMoveSpeed(20.0f);
+	
 
 	//라이트 생성
 	_pMainLight = new DirectionalLight();
@@ -90,6 +87,10 @@ bool GameScene::SceneInit()
 	_channel.Broadcast<GameObjectFactory::CreateObjectOnLocationEvent>(
 		GameObjectFactory::CreateObjectOnLocationEvent(ARCHE_HERO, ResourceHandle(), Vector3(0.0f, 0.0f, 0.0f)));
 
+//카메라 생성
+	_camera.CreateFromWorld(_world);
+	_camera.SetRotationSpeed(10.0f);
+	_camera.SetMoveSpeed(20.0f);
 	_camera.SetTargetObject(GAMEOBJECTFACTORY->GetPlayerObject());
 
 	//에디터 생성

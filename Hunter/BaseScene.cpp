@@ -86,9 +86,7 @@ bool BaseScene::SceneInit()
 	_world.AddSystem<ScriptSystem>(_scriptSystem);
 	_world.AddSystem<CollisionSystem>(_collisionSystem);
 
-	_camera.CreateFromWorld(_world);
-	_camera.SetRotationSpeed(10.0f);
-	_camera.SetMoveSpeed(20.0f);
+	
 
 	_pMainLight = new DirectionalLight();
 	_pMainLight->CreateFromWorld(_world);
@@ -111,6 +109,11 @@ bool BaseScene::SceneInit()
 	_cat.CreateFromWorld(_world);
 	_hydra.CreateFromWorld(_world);
 	_lizard.CreateFromWorld(_world);
+
+	_camera.CreateFromWorld(_world);
+	_camera.SetRotationSpeed(10.0f);
+	_camera.SetMoveSpeed(20.0f);
+	_camera.SetTargetObject(GAMEOBJECTFACTORY->GetPlayerObject());
 
 	imguiRenderInit();
 //에디터 생성

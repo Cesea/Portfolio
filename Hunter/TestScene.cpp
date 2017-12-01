@@ -93,12 +93,6 @@ bool TestScene::SceneInit()
 	_world.AddSystem<ScriptSystem>(_scriptSystem);
 	_world.AddSystem<CollisionSystem>(_collisionSystem);
 
-	//카메라 생성
-	_camera.CreateFromWorld(_world);
-	_camera.SetRotationSpeed(10.0f);
-	_camera.SetMoveSpeed(20.0f);
-	_camera.GetEntity().GetComponent<TransformComponent>().MovePositionWorld(Vector3(0.0f, 4.0f, -6.0f));
-
 	//라이트 생성
 	_pMainLight = new DirectionalLight();
 	_pMainLight->CreateFromWorld(_world);
@@ -124,6 +118,14 @@ bool TestScene::SceneInit()
 			GameObjectFactory::CreateObjectFromSaveInfoEvent(entitySaveInfo._archeType, 
 				entitySaveInfo._resourceName, entitySaveInfo._position));
 	}
+
+
+	//카메라 생성
+	_camera.CreateFromWorld(_world);
+	_camera.SetRotationSpeed(10.0f);
+	_camera.SetMoveSpeed(20.0f);
+	_camera.GetEntity().GetComponent<TransformComponent>().MovePositionWorld(Vector3(0.0f, 4.0f, -6.0f));
+	_camera.SetTargetObject(GAMEOBJECTFACTORY->GetPlayerObject());
 
 	//_channel.Broadcast<GameObjectFactory::CreateObjectOnLocationEvent>(
 	//	GameObjectFactory::CreateObjectOnLocationEvent(ARCHE_SNAKE, ResourceHandle(), Vector3(0.0f, 5.0f, 0.0f)));
