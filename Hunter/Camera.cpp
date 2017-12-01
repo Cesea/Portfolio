@@ -96,10 +96,14 @@ void Camera::MoveAndRotate(const InputManager & input)
 
 			refTransform.SetRotateWorld(_verticalAngle * ONE_RAD, _horizontalAngle * ONE_RAD, 0.0f);
 
-		}
-	} break;
+		SetCursorPos(CLIENTCENTERX, CLIENTCENTERY);
+
+		ShowCursor(false);
+
+	}break;
 
 	case CAMERASTATE_INGAME:
+
 	{
 		float deltaTime = APPTIMER->GetTargetTime();
 
@@ -175,6 +179,74 @@ void Camera::MoveAndRotate(const InputManager & input)
 	} break;
 	}
 	
+	switch (_cameraState)
+	{
+	case cCreativeMode:
+		if (_rotating)
+		{
+			float deltaTime = APPTIMER->GetTargetTime();
+
+			int32 deltaX = input.mouse.GetMouseDelta().x;
+			int32 deltaY = input.mouse.GetMouseDelta().y;
+
+			if (deltaX != 0)
+			{
+				_horizontalAngle += _rotationSpeed * deltaTime * (float)deltaX;
+			}
+
+			if (deltaY != 0)
+			{
+				_verticalAngle += _rotationSpeed * deltaTime * (float)deltaY;
+			}
+
+			ClampFloat(_verticalAngle, MIN_VERT_ANGLE, MAX_VERT_ANGLE);
+
+			refTransform.SetRotateWorld(_verticalAngle * ONE_RAD, _horizontalAngle * ONE_RAD, 0.0f);
+
+		}
+		break;
+	case cNormal:
+
+		POINT pt;
+
+		GetCursorPos(&pt);
+
+		if (_curDist >= PLAYER_TO_CAMERA_DIST)
+		{
+			if (move(pt) == true)
+			{
+				float screenCenterX = 892;
+				float screenCenterY = 519;
+
+				float deltaTime = APPTIMER->GetTargetTime();
+
+				POINT mousePos = GetMousePos();
+
+				mousePos.x = mousePos.x + WINSTARTX;
+				mousePos.y = mousePos.y + WINSTARTY;
+
+				//이동량 ( 중앙에서 멀어진 량 )
+				int deltaX = mousePos.x - screenCenterX;
+				int deltaY = mousePos.y - screenCenterY;
+
+				if (deltaX != 0)
+				{
+					_horizontalAngle += _rotationSpeed * deltaTime * (float)deltaX;
+				}
+
+				if (deltaY != 0)
+				{
+					_verticalAngle += _rotationSpeed * deltaTime * (float)deltaY;
+				}
+
+				ClampFloat(_verticalAngle, MIN_VERT_ANGLE, MAX_VERT_ANGLE);
+
+				dummyTransform->SetRotateWorld(-_verticalAngle * ONE_RAD, _horizontalAngle * ONE_RAD, 0.0f);
+
+				SetCursorPos(CLIENTCENTERX, CLIENTCENTERY);
+			}
+		}		break;
+	}
 	
 }
 
@@ -416,13 +488,29 @@ void Camera::NormalCameraUpdate(void)
 	//Vector3 dist = dummyTransform->GetWorldPosition() - cameraTransform->GetWorldPosition();
 	//_curDist = D3DXVec3Length(&dist);
 
+}
+
+	SetCursorPos(WINSTARTX + (WINSIZEX * 0.5), WINSTARTY + (WINSIZEY * 0.5));
+
 	//if (_curDist < PLAYER_TO_CAMERA_DIST)
 	//{
 	//	cameraTransform->_position.z += 0.1f;
 	//}
+
 	//else if (_curDist > PLAYER_TO_CAMERA_DIST)
 	//{
 	//	//cameraTransform->_position.z -= 0.1f;
 	//	cameraTransform->_position.z = PLAYER_TO_CAMERA_DIST;
 	//}
+}
+
+bool Camera::move(POINT pt)
+{
+	if (pt.x != tempPt.x || pt.y != tempPt.y)
+	{
+		tempPt.x = pt.x;
+		tempPt.y = pt.y;
+		return true;
+	}
+	return false;
 }

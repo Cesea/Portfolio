@@ -355,6 +355,6 @@ inline bool IsInRect(const RECT *pRect, POINT p)
 	return (p.x >= pRect->left) && (p.x <= pRect->right) && (p.y <= pRect->top) && (p.y >= pRect->bottom);
 }
 
-
+POINT GetMousePos();
 
 #endif

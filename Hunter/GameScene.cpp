@@ -97,6 +97,8 @@ bool GameScene::SceneInit()
 	_editor = new Editor;
 	_editor->Init(this);
 
+	_ui = new UI;
+
 	return result;
 }
 
@@ -158,6 +160,12 @@ bool GameScene::SceneRender0()
 	TERRAIN->Render(_camera, *_pMainLight, _camera);
 	_renderSystem.Render(_camera);
 
+	return true;
+}
+
+bool GameScene::SceneRenderSprite()
+{
+	_ui->RenderUI();
 	return true;
 }
 

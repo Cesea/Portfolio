@@ -63,6 +63,10 @@ private:
 
 	void NormalCameraUpdate(void);
 
+	bool move(POINT pt);
+
+	POINT tempPt;
+
 	LPDIRECT3DTEXTURE9 _pRenderTexture{};
 	LPDIRECT3DSURFACE9 _pRenderSurface{};
 	LPDIRECT3DSURFACE9 _pDeviceTargetSurface{};
