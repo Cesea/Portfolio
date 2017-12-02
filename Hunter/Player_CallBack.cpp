@@ -35,6 +35,18 @@ void Player::SetupCallbackAndCompression()
 	   AddCallbackKeysAndCompress(pController, anim, 1, &key, D3DXCOMPRESS_DEFAULT, 0.1f);
    }
 
+   //War Thrust Mid
+   {
+	   ID3DXKeyframedAnimationSet *anim;
+	   pController->GetAnimationSetByName(PlayerAnimationString[PlayerAnimationEnum::eWarThrustMid], (ID3DXAnimationSet **)&anim);
+
+	   D3DXKEY_CALLBACK key;
+	   key.Time = anim->GetPeriod() / 2.0f * anim->GetSourceTicksPerSecond();
+	   key.pCallbackData = (void *)&_callbackData;
+
+	   AddCallbackKeysAndCompress(pController, anim, 1, &key, D3DXCOMPRESS_DEFAULT, 0.1f);
+   }
+
    //War Walk Swing Left
    {
 	   ID3DXKeyframedAnimationSet *anim;
@@ -51,6 +63,18 @@ void Player::SetupCallbackAndCompression()
    {
 	   ID3DXKeyframedAnimationSet *anim;
 	   pController->GetAnimationSetByName(PlayerAnimationString[PlayerAnimationEnum::eWarWalkSwingRight], (ID3DXAnimationSet **)&anim);
+
+	   D3DXKEY_CALLBACK key;
+	   key.Time =anim->GetPeriod() / 2.0f * anim->GetSourceTicksPerSecond();
+	   key.pCallbackData = (void *)&_callbackData;
+
+	   AddCallbackKeysAndCompress(pController, anim, 1, &key, D3DXCOMPRESS_DEFAULT, 0.1f);
+   }
+
+   //War Walk WalkThrust Mid
+   {
+	   ID3DXKeyframedAnimationSet *anim;
+	   pController->GetAnimationSetByName(PlayerAnimationString[PlayerAnimationEnum::eWarWalkThrust], (ID3DXAnimationSet **)&anim);
 
 	   D3DXKEY_CALLBACK key;
 	   key.Time =anim->GetPeriod() / 2.0f * anim->GetSourceTicksPerSecond();
@@ -77,11 +101,19 @@ HRESULT PlayerCallbackHandler::HandleCallback(UINT Track, LPVOID pCallbackData)
 	{
 		_pPlayer->_canCombo = true;
 	}break;
+	case PlayerAnimationEnum::eWarThrustMid :
+	{
+		_pPlayer->_canCombo = true;
+	}break;
 	case PlayerAnimationEnum::eWarWalkSwingLeft:
 	{
 		_pPlayer->_canCombo = true;
 	}break;
 	case PlayerAnimationEnum::eWarWalkSwingRight:
+	{
+		_pPlayer->_canCombo = true;
+	}break;
+	case PlayerAnimationEnum::eWarWalkThrust:
 	{
 		_pPlayer->_canCombo = true;
 	}break;

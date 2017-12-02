@@ -44,6 +44,12 @@ void ActionComponent::UpdateAnimation(float deltaTime)
 	_pAnimationController->GetTrackDesc( 0, &_playingTrackDesc );
 	_animationPlayFactor = _playingTrackDesc.Position / _pPlayingAnimationSet->GetPeriod();
 
+	if (_pPrevPlayingAnimationSet == nullptr)
+	{
+		int a = 0;
+		Console::Log("Prev Null\n");
+	}
+
 	if (!_blocking)
 	{
 		if (_actionQueue.HasAction())
@@ -54,16 +60,27 @@ void ActionComponent::UpdateAnimation(float deltaTime)
 	}
 	else
 	{
-		if (_animationPlayFactor >= 0.95f)
+		if (_actionQueue.HasAction() &&
+			_actionQueue.Front()._cancle)
 		{
-			if (false == _looping)
+			PlayActionImmediate(_actionQueue.Front());
+			_actionQueue.PopAction();
+		}
+		else if (_animationPlayFactor >= 0.95f)
+		{
+			if (_actionQueue.HasAction())
+			{
+				PlayActionImmediate(_actionQueue.Front());
+				_actionQueue.PopAction();
+			}
+			else if (false == _looping)
 			{
 				if (nullptr != _pPrevPlayingAnimationSet)
 				{
 					_crossFadeTime = _outCrossFadeTime;
 					_leftCrossFadeTime = _outCrossFadeTime;
+					_blocking = false;
 					_looping = true;
-					_blocking = _prevBlocking;
 					SetAnimation(_pPrevPlayingAnimationSet);
 					_pPrevPlayingAnimationSet = nullptr;
 				}
@@ -72,11 +89,6 @@ void ActionComponent::UpdateAnimation(float deltaTime)
 					this->Stop();
 					_blocking = false;
 				}
-			}
-			else if (_actionQueue.HasAction())
-			{
-				PlayActionImmediate(_actionQueue.Front());
-				_actionQueue.PopAction();
 			}
 		}
 	}
@@ -134,8 +146,10 @@ bool ActionComponent::PlayActionImmediate(const Action & action)
 void ActionComponent::Play(const std::string & animName, float crossFadeTime, bool32 blocking)
 {
 	_playing = true;
+	_prevLooping = _looping;
 	_looping = true;
 
+	_prevBlocking = _blocking;
 	_blocking = blocking;
 
 	AnimationSetTable::iterator find = _animationTable.find( animName );
@@ -151,8 +165,10 @@ void ActionComponent::Play(const std::string & animName, float crossFadeTime, bo
 void ActionComponent::Play(int32 animIndex, float crossFadeTime, bool32 blocking)
 {
 	_playing = true;
+	_prevLooping = _looping;
 	_looping = true;
 
+	_prevBlocking = _blocking;
 	_blocking = blocking;
 
 	if ( animIndex < _numAnimation ) 
@@ -167,8 +183,10 @@ void ActionComponent::Play(int32 animIndex, float crossFadeTime, bool32 blocking
 void ActionComponent::Play(LPD3DXANIMATIONSET animSet, float crossFadeTime, bool32 blocking)
 {
 	_playing = true;
+	_prevLooping = _looping;
 	_looping = true;
 
+	_prevBlocking = _blocking;
 	_blocking = blocking;
 
 	_crossFadeTime = crossFadeTime;
@@ -181,16 +199,20 @@ void ActionComponent::PlayOneShot(const std::string &animName,
 	float inCrossFadeTime, float outCrossFadeTime, bool32 blocking)
 {
 	_playing = true;
+	_prevLooping = _looping;
 	_looping = false;
 
 	_prevBlocking = _blocking;
-
 	_blocking = blocking;
 
 	AnimationSetTable::iterator find = _animationTable.find( animName );
 	if ( find != _animationTable.end() ) 
 	{
-		_pPrevPlayingAnimationSet = _pPlayingAnimationSet;
+		if (_prevLooping)
+		{
+			Console::Log("PrevLooping\n");
+			_pPrevPlayingAnimationSet = _pPlayingAnimationSet;
+		}
 
 		_crossFadeTime = inCrossFadeTime;
 		_leftCrossFadeTime = inCrossFadeTime;
@@ -204,10 +226,11 @@ void ActionComponent::PlayOneShot(const std::string &animName,
 void ActionComponent::PlayOneShotAfterHold(const std::string & animName, float crossFadeTime, bool32 blocking)
 {
 	_playing = true;
+
+	_prevLooping = _looping;
 	_looping = false;
 
 	_prevBlocking = _blocking;
-
 	_blocking = blocking;
 
 	AnimationSetTable::iterator find = _animationTable.find( animName );

@@ -692,8 +692,7 @@ namespace video
 				pEffect->SetTexture("SpecularTexture", *VIDEO->GetTexture(_specularTextures[m]));
 				pEffect->SetTexture("EmissionTexture", *VIDEO->GetTexture(_emissionTexture[m]));
 				////스펙파워
-				pEffect->SetFloat("fSpecPower", this->_materials[m].Power);
-
+				//pEffect->SetFloat("fSpecPower", this->_materials[m].Power);
 
 				//Begin 이 들어오고 난후 값이 바뀌면 다음과 같이 실행
 				pEffect->CommitChanges();
