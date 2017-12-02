@@ -58,8 +58,19 @@ bool TestScene::SceneInit()
 		"../resources/Models/DragonTurtle/DragonTurtle_Black.X", &correctionMat, "Turtle");
 
 	MatrixScaling(&correctionMat, 1.0f, 1.0f, 1.0f);
-	video::SkinnedXMeshHandle batMesh = VIDEO->CreateSkinnedXMesh(
-		"../resources/Models/DragonBat/DragonBat_Black.X", &correctionMat, "Bat");
+	video::SkinnedXMeshHandle batMesh1 = VIDEO->CreateSkinnedXMesh(
+		"../resources/Models/DragonBat/DragonBat_Red.X", &correctionMat, "Bat1");
+
+
+	MatrixScaling(&correctionMat, 1.0f, 1.0f, 1.0f);
+	video::SkinnedXMeshHandle batMesh2 = VIDEO->CreateSkinnedXMesh(
+		"../resources/Models/DragonBat/DragonBat_Black.X", &correctionMat, "Bat2");
+
+
+	MatrixScaling(&correctionMat, 1.0f, 1.0f, 1.0f);
+	video::SkinnedXMeshHandle batMesh3 = VIDEO->CreateSkinnedXMesh(
+		"../resources/Models/DragonBat/DragonBat_Gold.X", &correctionMat, "Bat3");
+
 
 	MatrixScaling(&correctionMat, 1.0f, 1.0f, 1.0f);
 	video::SkinnedXMeshHandle catMesh = VIDEO->CreateSkinnedXMesh(
@@ -82,8 +93,12 @@ bool TestScene::SceneInit()
 		"../resources/Models/Hydra/Hydra_Gold.X", &correctionMat, "Hydra4");
 
 	MatrixScaling(&correctionMat, 1.0f, 1.0f, 1.0f);
-	video::SkinnedXMeshHandle LizardMesh = VIDEO->CreateSkinnedXMesh(
-		"../resources/Models/Lizard/Lizard.X", &correctionMat, "Lizard");
+	video::SkinnedXMeshHandle LizardMesh1 = VIDEO->CreateSkinnedXMesh(
+		"../resources/Models/Lizard/Lizard.X", &correctionMat, "Lizard1");
+
+	MatrixScaling(&correctionMat, 1.0f, 1.0f, 1.0f);
+	video::SkinnedXMeshHandle LizardMesh2 = VIDEO->CreateSkinnedXMesh(
+		"../resources/Models/Lizard/Lizard_Black.X", &correctionMat, "Lizard2");
 
 	MatrixScaling(&correctionMat, 1.0f, 1.0f, 1.0f);
 	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Rock/Rock1_A.X", &correctionMat, "Rock01");

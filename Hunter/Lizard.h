@@ -53,7 +53,13 @@ private:
 		LIZARDSTATE_DEATH,
 		LIZARDSTATE_STAND
 	};
+	enum LIZARDSKINSTATE
+	{
+		LIZARDSKINSTATE_NORMAL,
+		LIZARDSKINSTATE_BLACK
+	};
 	LIZARDSTATE _state;
+	LIZARDSKINSTATE _skinType;
 public:
 	Lizard();
 	virtual ~Lizard();

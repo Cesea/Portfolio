@@ -52,8 +52,14 @@ private:
 		BATSTATE_DEATH,
 		BATSTATE_HURT
 	};
-
+	enum BATSKINSTATE
+	{
+		BATSKINSTATE_RED,
+		BATSKINSTATE_BLACK,
+		BATSKINSTATE_GOLD
+	};
 	BATSTATE _state;
+	BATSKINSTATE _skinType;
 public:
 	Bat();
 	virtual ~Bat();
