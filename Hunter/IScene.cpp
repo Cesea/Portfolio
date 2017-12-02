@@ -71,25 +71,43 @@ IScene::IScene()
 
 bool IScene::Init()
 {
-	//씬의 초기화 이루어진다.
-	if (!SceneInit())
-	{
-		return false;
-	}
+	//시스템 생성
+	_world.AddSystem<RenderSystem>(_renderSystem);
+	_world.AddSystem<TransformSystem>(_transformSystem);
+	_world.AddSystem<ActionSystem>(_actionSystem);
+	_world.AddSystem<ScriptSystem>(_scriptSystem);
+	_world.AddSystem<CollisionSystem>(_collisionSystem);
+
+	//카메라 생성
+	_camera.CreateFromWorld(_world);
+	_camera.SetRotationSpeed(2.0f);
+	_camera.SetMoveSpeed(3.0f);
+	_camera.GetEntity().GetComponent<TransformComponent>().MovePositionWorld(Vector3(0.0f, 4.0f, -6.0f));
 	//메인카메라 RenderToTexture 준비
 	_camera.ReadyRenderToTexture( WINSIZEX, WINSIZEY );
 
+
 	_shadowDistance = 100.0f;
+	_shadowCamera.CreateFromWorld(_world);
 	_shadowCamera._ortho = true;
 	_shadowCamera._camNear = 0.1f;
 	_shadowCamera._camFar = _shadowDistance * 2.0f;
 	_shadowCamera._aspect = 1;
 	_shadowCamera._orthoSize = _shadowDistance * 1.5f;	//투영크기는 그림자크기로...
 	_shadowCamera.ReadyShadowTexture(2048);
-	
-	//NOTE : 아직 PostEffect가 없다...
-	//postEffect = RESOURCE_FX->GetResource( "../Resources/Shaders/PostEffect.fx" );
 
+
+	//라이트 생성
+	_pMainLight = new DirectionalLight();
+	_pMainLight->CreateFromWorld(_world);
+
+	_pEnvironmentSphere = new EnvironmentSphere;
+
+	//씬의 초기화 이루어진다.
+	if (!SceneInit())
+	{
+		return false;
+	}
 	return true;
 }
 
@@ -110,8 +128,8 @@ bool IScene::Update(float deltaTime, const InputManager & input)
 
 	Vector3 lightPos = camPos + ( camFront * ( _shadowDistance * 0.5f ) ) + ( -lightDir * _shadowDistance );
 
-	_shadowCamera.GetEntity().GetComponent<TransformComponent>().SetWorldPosition(lightPos.x, lightPos.y, lightPos.z );
-	_shadowCamera.GetEntity().GetComponent<TransformComponent>().LookDirection(lightDir);
+	//_shadowCamera.GetEntity().GetComponent<TransformComponent>().SetWorldPosition(lightPos.x, lightPos.y, lightPos.z );
+	//_shadowCamera.GetEntity().GetComponent<TransformComponent>().LookDirection(lightDir);
 
 	SceneUpdate(deltaTime, input);
 

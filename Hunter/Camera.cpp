@@ -29,6 +29,7 @@ Camera::Camera()
 	_offsetForwardMult = -6.0f;
 	_offsetUpMult = 4.0f;
 
+	_ortho = false;
 	_aspect = (float)(WINSIZEX) / (float)(WINSIZEY);
 	_orthoSize = 10;
 }
@@ -176,10 +177,9 @@ void Camera::MoveAndRotate(float deltaTime, const InputManager & input)
 		if (input.keyboard.IsDown('Q')) { diff += up * _moveSpeed * deltaTime; }
 		else if (input.keyboard.IsDown('E')) { diff -= up * _moveSpeed * deltaTime; }
 
-		float length = Vec3Length(&diff);
-		if (!FloatZero(length))
+		if (!FloatZero(diff.IsZero()))
 		{
-			diff /= length;
+			Vec3Normalize(&diff, &diff);
 		}
 		refTransform.MovePositionWorld(diff);
 	} break;
@@ -231,7 +231,7 @@ void Camera::UpdateMatrix()
 	//	}
 	//}
 
-	if (false == _ortho)
+	if (_ortho)
 	{
 		MatrixOrthoLH(&_matProjection, _fov, _aspect, _camNear, _camFar);
 	}

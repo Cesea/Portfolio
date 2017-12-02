@@ -123,24 +123,10 @@ bool MapToolScene::SceneInit()
 	LoadEverySkinnedResources();
 	LoadEveryStaticResources();
 
-	//시스템 생성
-	_world.AddSystem<RenderSystem>(_renderSystem);
-	_world.AddSystem<TransformSystem>(_transformSystem);
-	_world.AddSystem<ActionSystem>(_actionSystem);
-	_world.AddSystem<ScriptSystem>(_scriptSystem);
-	_world.AddSystem<CollisionSystem>(_collisionSystem);
-
-
-
-	//라이트 생성
-	_pMainLight = new DirectionalLight();
-	_pMainLight->CreateFromWorld(_world);
 	_pMainLight->SetWorldPosition(Vector3(0.0f, 5.0f, 5.0f));
 	_pMainLight->SetTarget(Vector3(0.0f, 0.0f, 0.0f));
 
-	_pEnvironmentSphere = new EnvironmentSphere;
 	_pEnvironmentSphere->Create("../resources/Textures/grassenvmap1024.dds");
-
 
 	_channel.Broadcast<GameObjectFactory::CreateObjectOnLocationEvent>(
 		GameObjectFactory::CreateObjectOnLocationEvent(ARCHE_HERO, ResourceHandle(), Vector3(0.0f, 2.0f, 0.0f)));
@@ -158,11 +144,6 @@ bool MapToolScene::SceneInit()
 	//_channel.Broadcast<GameObjectFactory::CreateObjectOnLocationEvent>(
 	//	GameObjectFactory::CreateObjectOnLocationEvent(ARCHE_BAT, ResourceHandle(), Vector3(18.0f, 2.0f, 0.0f)));
 
-	//카메라 생성
-	_camera.CreateFromWorld(_world);
-	_camera.SetRotationSpeed(2.0f);
-	_camera.SetMoveSpeed(3.0f);
-	_camera.GetEntity().GetComponent<TransformComponent>().MovePositionWorld(Vector3(0.0f, 4.0f, -6.0f));
 	//NOTE : GameObjectFactory의 GetPlayerObject는 생성에 의존성을 가진다
 	_camera.SetTargetObject(GAMEOBJECTFACTORY->GetPlayerObject());
 
@@ -177,21 +158,12 @@ bool MapToolScene::SceneInit()
 bool MapToolScene::SceneUpdate(float deltaTime, const InputManager & input)
 {
 	bool result = true;
-
 	_editor->Edit(RefVariant(), input);
-
 	_world.Refresh();
-
 	_scriptSystem.Update(deltaTime);
-
 	_transformSystem.PreUpdate(deltaTime);
-
-	//Collision Check
 	_collisionSystem.Update(deltaTime, 4.0f);
-	//_transformSystem.PostUpdate(deltaTime);
 	_actionSystem.Update(deltaTime);
-
-	//_channel.Update<BaseScene::SpawnEvent>(deltaTime);
 	return result;
 }
 
@@ -207,12 +179,9 @@ bool MapToolScene::SceneRelease()
 
 	//VIDEO->DestroyEveryVertexBuffers();
 	//VIDEO->DestroyEveryndexBuffers();
-
 	//VIDEO->DestroyEveryAnimationInstances();
 	//VIDEO->DestroyEverySkinnedMesh();
-
 	//VIDEO->DestroyEveryStaticMesh();
-
 	//VIDEO->DestroyEveryTextures();
 
 	return true;

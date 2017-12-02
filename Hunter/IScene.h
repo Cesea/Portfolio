@@ -5,6 +5,7 @@
 #include "Terrain.h"
 #include "Camera.h"
 #include "BaseGameObject.h"
+#include "GameSystems.h"
 
 class EnvironmentSphere;
 
@@ -81,6 +82,13 @@ protected :
 	float _shadowDistance{ 100.0f };
 
 	bool RenderEnvironmentSphere();
+
+	TransformSystem _transformSystem;
+	RenderSystem _renderSystem;
+	ScriptSystem _scriptSystem;
+	ActionSystem _actionSystem;
+	CollisionSystem _collisionSystem;
+
 public :
 };
 

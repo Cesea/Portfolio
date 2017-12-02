@@ -172,6 +172,15 @@ technique Base
    }
 }
 
+technique Rock
+{
+	pass Pass_0
+	{
+		VertexShader = compile vs_3_0 vs_main();
+		PixelShader = compile ps_3_0 ps_main();
+	}
+}
+
 technique Tree
 {
 	pass Pass_0

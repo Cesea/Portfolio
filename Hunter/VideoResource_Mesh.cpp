@@ -978,15 +978,15 @@ namespace video
 			else
 			{
 				video::Effect *pEffect = VIDEO->GetEffect(_sEffectHandle);
-				pEffect->SetMatrix("matWorld", pBone->CombinedTransformationMatrix);
 				pEffect->SetTechnique("Static");
+				pEffect->SetMatrix("matWorld", pBone->CombinedTransformationMatrix);
 				for (DWORD i = 0; i < pBoneMesh->NumAttributesGroup; i++)
 				{
 					//pBoneMesh->_attributeRange[i].AttribId;
-					pEffect->SetTexture("Diffuse_Tex", *VIDEO->GetTexture(pBoneMesh->_diffuseTextures[i]));
-					pEffect->SetTexture("Specular_Tex", *VIDEO->GetTexture(pBoneMesh->_specularTextures[i]));
-					pEffect->SetTexture("Normal_Tex", *VIDEO->GetTexture(pBoneMesh->_normalTextures[i]));
-					pEffect->SetTexture("Emission_Tex", *VIDEO->GetTexture(pBoneMesh->_emissionTexture[i]));
+					pEffect->SetTexture("DiffuseTexture", *VIDEO->GetTexture(pBoneMesh->_diffuseTextures[i]));
+					pEffect->SetTexture("SpecularTexture", *VIDEO->GetTexture(pBoneMesh->_specularTextures[i]));
+					pEffect->SetTexture("NormalTexture", *VIDEO->GetTexture(pBoneMesh->_normalTextures[i]));
+					pEffect->SetTexture("EmissionTexture", *VIDEO->GetTexture(pBoneMesh->_emissionTexture[i]));
 					pEffect->SetFloat("fSpecPower", pBoneMesh->_materials[i].Power);
 
 					pEffect->CommitChanges();
@@ -1141,6 +1141,11 @@ STDMETHODIMP BoneHierachy::CreateMeshContainer(LPCSTR Name, CONST D3DXMESHDATA *
 	LPDIRECT3DDEVICE9 d3dDevice = NULL;
 	pMeshData->pMesh->GetDevice(&d3dDevice);
 
+	if (strcmp(Name, "cuirass_metal") == 0)
+	{
+		int a = 0;
+	}
+
 	//메시데이터를 물린다.
 	boneMesh->MeshData.pMesh = pMeshData->pMesh;
 	boneMesh->MeshData.Type = D3DXMESHTYPE_MESH;
@@ -1218,7 +1223,7 @@ STDMETHODIMP BoneHierachy::CreateMeshContainer(LPCSTR Name, CONST D3DXMESHDATA *
 
 			//파일 명과 확장자를 나눈다.
 			texFile = texFilePath.substr(0, dotIndex);
-			texExp = texFilePath.substr(dotIndex + 1, texPath.length());
+			texExp = texFilePath.substr(dotIndex + 1, texFilePath.length());
 
 			texFilePath = texFile + "_N." + texExp;
 

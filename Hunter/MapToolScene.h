@@ -35,11 +35,6 @@ public:
 	virtual const char *GetSceneName();
 protected :
 
-	TransformSystem _transformSystem;
-	RenderSystem _renderSystem;
-	ScriptSystem _scriptSystem;
-	ActionSystem _actionSystem;
-	CollisionSystem _collisionSystem;
 
 	Editor *_editor{};
 

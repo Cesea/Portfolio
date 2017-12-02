@@ -44,12 +44,6 @@ void ActionComponent::UpdateAnimation(float deltaTime)
 	_pAnimationController->GetTrackDesc( 0, &_playingTrackDesc );
 	_animationPlayFactor = _playingTrackDesc.Position / _pPlayingAnimationSet->GetPeriod();
 
-	if (_pPrevPlayingAnimationSet == nullptr)
-	{
-		int a = 0;
-		Console::Log("Prev Null\n");
-	}
-
 	if (!_blocking)
 	{
 		if (_actionQueue.HasAction())
@@ -210,7 +204,6 @@ void ActionComponent::PlayOneShot(const std::string &animName,
 	{
 		if (_prevLooping)
 		{
-			Console::Log("PrevLooping\n");
 			_pPrevPlayingAnimationSet = _pPlayingAnimationSet;
 		}
 
