@@ -20,6 +20,9 @@ public:
 	float _fov;
 	float _camNear;
 	float _camFar;
+	float _aspect;
+	bool _ortho;
+	float _orthoSize;
 
 	Camera();
 	~Camera();
@@ -79,7 +82,6 @@ protected:
 	Matrix _matProjection;
 	Matrix _matViewProjection;
 
-	bool32 _ortho;
 	bool32 _rotating{false};
 
 	float _moveSpeed{1.0f};

@@ -79,8 +79,14 @@ bool IScene::Init()
 	//메인카메라 RenderToTexture 준비
 	_camera.ReadyRenderToTexture( WINSIZEX, WINSIZEY );
 
+	_shadowDistance = 100.0f;
+	_shadowCamera._ortho = true;
+	_shadowCamera._camNear = 0.1f;
+	_shadowCamera._camFar = _shadowDistance * 2.0f;
+	_shadowCamera._aspect = 1;
+	_shadowCamera._orthoSize = _shadowDistance * 1.5f;	//투영크기는 그림자크기로...
+	_shadowCamera.ReadyShadowTexture(2048);
 	
-
 	//NOTE : 아직 PostEffect가 없다...
 	//postEffect = RESOURCE_FX->GetResource( "../Resources/Shaders/PostEffect.fx" );
 
@@ -89,6 +95,24 @@ bool IScene::Init()
 
 bool IScene::Update(float deltaTime, const InputManager & input)
 {
+	_camera.MoveAndRotate(deltaTime,input);
+
+	_camera.UpdateMatrix();
+	_camera.UpdateCamToDevice();
+	_camera.UpdateFrustum();
+
+	//메인카메라에 DirectionLight 를 방향을 유지한체 따라다니게....
+	
+	//광원 위치
+	Vector3 camPos = _camera.GetEntity().GetComponent<TransformComponent>().GetWorldPosition();		//메인카메라의 위치
+	Vector3 camFront = _camera.GetEntity().GetComponent<TransformComponent>().GetForward();			//메인카메라의 정면
+	Vector3 lightDir = _pMainLight->GetEntity().GetComponent<TransformComponent>().GetForward();	//방향성 광원의 방향
+
+	Vector3 lightPos = camPos + ( camFront * ( _shadowDistance * 0.5f ) ) + ( -lightDir * _shadowDistance );
+
+	_shadowCamera.GetEntity().GetComponent<TransformComponent>().SetWorldPosition(lightPos.x, lightPos.y, lightPos.z );
+	_shadowCamera.GetEntity().GetComponent<TransformComponent>().LookDirection(lightDir);
+
 	SceneUpdate(deltaTime, input);
 
 	return true;
@@ -159,6 +183,66 @@ bool IScene::RenderToMainCamTexture()
 	
 	_camera.RenderTextureEnd();
 	return true;
+}
+
+void IScene::ReadyShadowMap(Terrain *pTerrain)
+{
+	//방향성광원에 붙은 카메라의 Frustum 업데이트
+	_shadowCamera.UpdateMatrix();
+	_shadowCamera.UpdateFrustum();
+
+	////다이렉션라이팅 카메라에 들어오는 애들만 그린다...
+	//static std::vector<cBaseObject*>		shadowCullObject;
+	//shadowCullObject.clear();
+	//for( int i = 0 ; i < renderObjects->size() ; i++ )
+	//{
+	//	//프러스텀 안에 있니?
+	//	if( this->pDirectionLightCamera->Frustum.IsInFrustum( (*renderObjects)[i] ) )
+	//	{
+	//		shadowCullObject.push_back( (*renderObjects)[i] );
+	//	}
+	//}
+
+	//쉐도우 맵 그린다.
+	_shadowCamera.RenderTextureBegin( 0xffffffff );
+
+	video::StaticXMesh::SetCamera( _shadowCamera );
+	video::StaticXMesh::SetTechnique("CreateShadow");
+
+	video::SkinnedXMesh::SetCamera( _shadowCamera);
+	video::SkinnedXMesh::SetTechnique("CreateShadow");
+
+
+	//for( int i = 0 ; i < shadowCullObject.size() ; i++ )
+	//{
+	//	if( shadowCullObject[i]->IgnoreCreateShadow == false )
+	//		shadowCullObject[i]->Render();
+	//}
+
+	//만약 Terrain 도 쉐도우 맵을 그려야한다면...
+	//if( pTerrain != NULL )
+	//{
+	//	pTerrain->RenderShadow( this->pDirectionLightCamera ); 
+	//}
+	_shadowCamera.RenderTextureEnd();
+
+	//만약 Terrain 도 쉐도우 맵을 셋팅한다면...
+	//if( pTerrain != NULL )
+	//{
+	//	pTerrain->m_pTerrainEffect->SetTexture( "Shadow_Tex", 
+	//			this->pDirectionLightCamera->GetRenderTexture() );
+
+	//	pTerrain->m_pTerrainEffect->SetMatrix( "matLightViewProjection", 
+	//			&this->pDirectionLightCamera->GetViewProjectionMatrix() );
+	//}
+
+	//쉐도우 Texture
+	VIDEO->GetEffect(video::StaticXMesh::_sEffectHandle)->_ptr->SetTexture( "ShadowTexture", _shadowCamera.GetRenderTexture());
+	VIDEO->GetEffect(video::StaticXMesh::_sEffectHandle)->SetMatrix( "matLightViewProjection", _shadowCamera.GetViewProjectionMatrix());
+	
+	VIDEO->GetEffect(video::SkinnedXMesh::_sEffectHandle)->_ptr->SetTexture( "ShadowTexture", _shadowCamera.GetRenderTexture());
+	VIDEO->GetEffect(video::SkinnedXMesh::_sEffectHandle)->SetMatrix( "matLightViewProjection", _shadowCamera.GetViewProjectionMatrix());
+	
 }
 
 LPDIRECT3DTEXTURE9 IScene::GetSceneTexture()

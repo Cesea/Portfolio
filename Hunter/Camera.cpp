@@ -28,6 +28,9 @@ Camera::Camera()
 
 	_offsetForwardMult = -6.0f;
 	_offsetUpMult = 4.0f;
+
+	_aspect = (float)(WINSIZEX) / (float)(WINSIZEY);
+	_orthoSize = 10;
 }
 
 Camera::~Camera()
@@ -43,48 +46,37 @@ void Camera::CreateFromWorld(World & world)
 	
 	_entity.Activate();
 }
+
 	//case cNormal:
 	//	POINT pt;
-
 	//	GetCursorPos(&pt);
-
 	//	if (_curDist >= PLAYER_TO_CAMERA_DIST)
 	//	{
 	//		if (move(pt) == true)
 	//		{
 	//			float screenCenterX = 892;
 	//			float screenCenterY = 519;
-
 	//			float deltaTime = APPTIMER->GetTargetTime();
-
 	//			POINT mousePos = GetMousePos();
-
 	//			mousePos.x = mousePos.x + WINSTARTX;
 	//			mousePos.y = mousePos.y + WINSTARTY;
-
 	//			//이동량 ( 중앙에서 멀어진 량 )
 	//			int deltaX = mousePos.x - screenCenterX;
 	//			int deltaY = mousePos.y - screenCenterY;
-
 	//			if (deltaX != 0)
 	//			{
 	//				_horizontalAngle += _rotationSpeed * deltaTime * (float)deltaX;
 	//			}
-
 	//			if (deltaY != 0)
 	//			{
 	//				_verticalAngle += _rotationSpeed * deltaTime * (float)deltaY;
 	//			}
-
 	//			ClampFloat(_verticalAngle, MIN_VERT_ANGLE, MAX_VERT_ANGLE);
-
-
 	//			SetCursorPos(CLIENTCENTERX, CLIENTCENTERY);
 	//		}
 	//	}		break;
 	//}
 	//
-
 
 void Camera::MoveAndRotate(float deltaTime, const InputManager & input)
 {
@@ -239,16 +231,19 @@ void Camera::UpdateMatrix()
 	//	}
 	//}
 
-	//화각에 의한 Projection 행렬 업데이트
-	MatrixPerspectiveFovLH(
-		&_matProjection,
-		_fov,
-		static_cast<float>(WINSIZEX) / static_cast<float>(WINSIZEY),
-		_camNear,
-		_camFar);
+	if (false == _ortho)
+	{
+		MatrixOrthoLH(&_matProjection, _fov, _aspect, _camNear, _camFar);
+	}
+	else
+	{
+		//화각에 의한 Projection 행렬 업데이트
+		MatrixPerspectiveFovLH( &_matProjection, _fov,
+			static_cast<float>(WINSIZEX) / static_cast<float>(WINSIZEY), _camNear, _camFar);
+	}
 
 	//뷰행렬 카메라 월드위치에 대한 역행렬이다.
-	MatrixInverse(&_matView, NULL, &_entity.GetComponent<TransformComponent>()._matFinal);
+	MatrixInverse(&_matView, nullptr, &_entity.GetComponent<TransformComponent>()._matFinal);
 
 	_matViewProjection = _matView * _matProjection;
 }
@@ -348,7 +343,6 @@ bool Camera::GetWorldPosToScreenPos(const Vector3 & worldPos, Vector2 * pOutScre
 
 void Camera::ReadyRenderToTexture(int32 width, int32 height)
 {
-	
 	COM_RELEASE(_pRenderTexture);
 	COM_RELEASE(_pRenderSurface );
 
@@ -458,21 +452,17 @@ void Camera::NormalCameraUpdate(void)
 	//_curDist = D3DXVec3Length(&dist);
 
 }
-
-	//SetCursorPos(WINSTARTX + (WINSIZEX * 0.5), WINSTARTY + (WINSIZEY * 0.5));
-
-	//if (_curDist < PLAYER_TO_CAMERA_DIST)
-	//{
-	//	cameraTransform->_position.z += 0.1f;
-	//}
-
-	//else if (_curDist > PLAYER_TO_CAMERA_DIST)
-	//{
-	//	//cameraTransform->_position.z -= 0.1f;
-	//	cameraTransform->_position.z = PLAYER_TO_CAMERA_DIST;
-	//}
+//SetCursorPos(WINSTARTX + (WINSIZEX * 0.5), WINSTARTY + (WINSIZEY * 0.5));
+//if (_curDist < PLAYER_TO_CAMERA_DIST)
+//{
+//	cameraTransform->_position.z += 0.1f;
 //}
-
+//else if (_curDist > PLAYER_TO_CAMERA_DIST)
+//{
+//	//cameraTransform->_position.z -= 0.1f;
+//	cameraTransform->_position.z = PLAYER_TO_CAMERA_DIST;
+//}
+//}
 //bool Camera::move(POINT pt)
 //{
 //	if (pt.x != tempPt.x || pt.y != tempPt.y)

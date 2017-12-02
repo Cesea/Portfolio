@@ -102,8 +102,7 @@ bool MapToolScene::SceneInit()
 	GAMEOBJECTFACTORY->SetCurrentScene(this);
 
 	video::StaticXMesh::_sEffectHandle = VIDEO->GetEffect("StaticMesh.fx");
-	video::SkinnedXMesh::_sStaticEffectHandle = VIDEO->GetEffect("StaticMesh.fx");
-	video::SkinnedXMesh::_sSkinnedEffectHandle = VIDEO->GetEffect("SkinnedMesh.fx");
+	video::SkinnedXMesh::_sEffectHandle  = VIDEO->GetEffect("SkinnedMesh.fx");
 
 	InitAnimations();
 
@@ -130,6 +129,7 @@ bool MapToolScene::SceneInit()
 	_world.AddSystem<ActionSystem>(_actionSystem);
 	_world.AddSystem<ScriptSystem>(_scriptSystem);
 	_world.AddSystem<CollisionSystem>(_collisionSystem);
+
 
 
 	//라이트 생성
@@ -178,14 +178,12 @@ bool MapToolScene::SceneUpdate(float deltaTime, const InputManager & input)
 {
 	bool result = true;
 
-
 	_editor->Edit(RefVariant(), input);
 
 	_world.Refresh();
 
 	_scriptSystem.Update(deltaTime);
 
-	_camera.MoveAndRotate(deltaTime,input);
 	_transformSystem.PreUpdate(deltaTime);
 
 	//Collision Check
@@ -193,18 +191,7 @@ bool MapToolScene::SceneUpdate(float deltaTime, const InputManager & input)
 	//_transformSystem.PostUpdate(deltaTime);
 	_actionSystem.Update(deltaTime);
 
-	//Update Camera
-	{
-		_camera.UpdateMatrix();
-		_camera.UpdateCamToDevice();
-		_camera.UpdateFrustum();
-	}
 	//_channel.Update<BaseScene::SpawnEvent>(deltaTime);
-
-	//if (input.keyboard.IsPressed(VK_SPACE))
-	//{
-	//	gEngine->GetScene()->ChangeSceneWithLoading("BaseScene", "LoadingScene00", 1, 1);
-	//}
 	return result;
 }
 

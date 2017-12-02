@@ -6,8 +6,7 @@
 namespace video
 {
 	EffectHandle StaticXMesh::_sEffectHandle;
-	EffectHandle SkinnedXMesh::_sSkinnedEffectHandle;
-	EffectHandle SkinnedXMesh::_sStaticEffectHandle;
+	EffectHandle SkinnedXMesh::_sEffectHandle;
 
 	void CalculateMeshBoundInfo(ID3DXMesh *pMesh, const Matrix &correction, MeshBoundInfo *pOutBoundInfo)
 	{
@@ -320,6 +319,11 @@ namespace video
 	{
 		video::Effect *pEffect = VIDEO->GetEffect(_sEffectHandle);
 		pEffect->SetMatrix("baseDirectionalLight", pDirectional->GetLightMatrix());
+	}
+
+	void StaticXMesh::SetTechnique(D3DXHANDLE name)
+	{
+		VIDEO->GetEffect(_sEffectHandle)->SetTechnique(name);
 	}
 
 	bool StaticXMesh::Create(const std::string & fileName, const Matrix * matCorrection)
@@ -707,7 +711,7 @@ namespace video
 	void SkinnedXMesh::SetCamera(const Camera & camera)
 	{
 		Matrix matViewProj = camera.GetViewProjectionMatrix();
-		video::Effect *pSkinned = VIDEO->GetEffect(_sSkinnedEffectHandle);
+		video::Effect *pSkinned = VIDEO->GetEffect(_sEffectHandle);
 
 		pSkinned->SetMatrix("matViewProjection", matViewProj);
 
@@ -716,29 +720,18 @@ namespace video
 		pSkinned->_ptr->SetVector("vEyePos", &Vector4(vEyePos, 1));
 		pSkinned->_ptr->SetFloat("camFar", camera._camFar);
 		pSkinned->_ptr->SetFloat("camNear", camera._camNear);
-
-		video::Effect *pStatic = VIDEO->GetEffect(_sStaticEffectHandle);
-
-		pStatic->SetMatrix("matViewProjection", matViewProj);
-
-		vEyePos = camera.GetEntity().GetComponent<TransformComponent>().GetWorldPosition();
-
-		pStatic->_ptr->SetVector("vEyePos", &Vector4(vEyePos, 1));
-		pStatic->_ptr->SetFloat("camFar", camera._camFar);
-		pStatic->_ptr->SetFloat("camNear", camera._camNear);
 	}
 
 	void SkinnedXMesh::SetBaseLight(DirectionalLight * pDirectional)
 	{
-		video::Effect *pSkinned = VIDEO->GetEffect(_sSkinnedEffectHandle);
-		video::Effect *pStatic = VIDEO->GetEffect(_sStaticEffectHandle);
+		video::Effect *pEffect = VIDEO->GetEffect(_sEffectHandle);
 
-		pSkinned->SetMatrix("baseDirectionalLight", pDirectional->GetLightMatrix());
-		pStatic->SetMatrix("baseDirectionalLight", pDirectional->GetLightMatrix());
+		pEffect->SetMatrix("baseDirectionalLight", pDirectional->GetLightMatrix());
 	}
 
-	void SkinnedXMesh::SetTechniqueName(const std::string & name)
+	void SkinnedXMesh::SetTechnique(D3DXHANDLE name)
 	{
+		VIDEO->GetEffect(_sEffectHandle)->SetTechnique(name);
 	}
 
 	//Skinned XMesh ////////////////////////////////////////////////////////
@@ -898,8 +891,7 @@ namespace video
 		Matrix matWorld = transform.GetFinalMatrix();
 		matFinal = _matCorrection * matWorld;
 
-		video::Effect *pSkinnedEffect = VIDEO->GetEffect(_sSkinnedEffectHandle);
-		pSkinnedEffect->SetTechnique("SkinnedMesh");
+		video::Effect *pSkinnedEffect = VIDEO->GetEffect(_sEffectHandle);
 		pSkinnedEffect->SetMatrix("matWorld", matFinal);
 
 		//pStaticEffect->SetTechnique("SkinnedMesh");
@@ -929,7 +921,8 @@ namespace video
 			//본 컴비네이션 정보가  
 			if (nullptr != pBoneMesh->BufBoneCombos)
 			{
-				video::Effect *pSkinnedEffect = VIDEO->GetEffect(_sSkinnedEffectHandle);
+				video::Effect *pEffect = VIDEO->GetEffect(_sEffectHandle);
+				pEffect->SetTechnique("Skinned");
 
 				//해당 본의 컴비네이션 정보를 얻는다.
 				LPD3DXBONECOMBINATION pBoneComb =
@@ -955,56 +948,57 @@ namespace video
 					}
 
 					//위에서 셋팅됭 작업행렬을 Effect 팔래스에 적용한다.
-					pSkinnedEffect->SetMatrices( "amPalette", _workingPalettes, pBoneMesh->NumPaletteEntries);
+					pEffect->SetMatrices( "amPalette", _workingPalettes, pBoneMesh->NumPaletteEntries);
 
 					//적용되는 정점의 본최대 영향수 를 대입 최대 영향수  -1 
-					pSkinnedEffect->SetInt("CurNumBones", pBoneMesh->MaxNumFaceInfls - 1);
+					pEffect->SetInt("CurNumBones", pBoneMesh->MaxNumFaceInfls - 1);
 
 					//메터리얼 인덱스
 					DWORD materialIndex = pBoneComb[i].AttribId;
 
 					//텍스쳐 셋팅
-					pSkinnedEffect->SetTexture("Diffuse_Tex", *VIDEO->GetTexture(pBoneMesh->_diffuseTextures[materialIndex]));
-					pSkinnedEffect->SetTexture("Specular_Tex", *VIDEO->GetTexture(pBoneMesh->_specularTextures[materialIndex]));
-					pSkinnedEffect->SetTexture("Normal_Tex", *VIDEO->GetTexture(pBoneMesh->_normalTextures[materialIndex]));
-					pSkinnedEffect->SetTexture("Emission_Tex", *VIDEO->GetTexture(pBoneMesh->_emissionTexture[materialIndex]));
-					pSkinnedEffect->SetFloat("fSpecPower", pBoneMesh->_materials[materialIndex].Power);
+					pEffect->SetTexture("DiffuseTexture", *VIDEO->GetTexture(pBoneMesh->_diffuseTextures[materialIndex]));
+					pEffect->SetTexture("SpecularTexture", *VIDEO->GetTexture(pBoneMesh->_specularTextures[materialIndex]));
+					pEffect->SetTexture("NormalTexture", *VIDEO->GetTexture(pBoneMesh->_normalTextures[materialIndex]));
+					pEffect->SetTexture("EmissionTexture", *VIDEO->GetTexture(pBoneMesh->_emissionTexture[materialIndex]));
+					pEffect->SetFloat("fSpecPower", pBoneMesh->_materials[materialIndex].Power);
 
-					pSkinnedEffect->CommitChanges();
+					pEffect->CommitChanges();
 
-					uint32 numPass = pSkinnedEffect->BeginEffect();
+					uint32 numPass = pEffect->BeginEffect();
 					for (uint32 p = 0; p < numPass; ++p)
 					{
-						pSkinnedEffect->BeginPass(p);
+						pEffect->BeginPass(p);
 						pBoneMesh->WorkingMesh->DrawSubset(i);
-						pSkinnedEffect->EndPass();
+						pEffect->EndPass();
 					}
-					pSkinnedEffect->EndEffect();
+					pEffect->EndEffect();
 				}
 			}
 			else
 			{
-				video::Effect *pStaticEffect = VIDEO->GetEffect(_sStaticEffectHandle);
-				pStaticEffect->SetMatrix("matWorld", pBone->CombinedTransformationMatrix);
+				video::Effect *pEffect = VIDEO->GetEffect(_sEffectHandle);
+				pEffect->SetMatrix("matWorld", pBone->CombinedTransformationMatrix);
+				pEffect->SetTechnique("Static");
 				for (DWORD i = 0; i < pBoneMesh->NumAttributesGroup; i++)
 				{
 					//pBoneMesh->_attributeRange[i].AttribId;
-					pStaticEffect->SetTexture("Diffuse_Tex", *VIDEO->GetTexture(pBoneMesh->_diffuseTextures[i]));
-					pStaticEffect->SetTexture("Specular_Tex", *VIDEO->GetTexture(pBoneMesh->_specularTextures[i]));
-					pStaticEffect->SetTexture("Normal_Tex", *VIDEO->GetTexture(pBoneMesh->_normalTextures[i]));
-					pStaticEffect->SetTexture("Emission_Tex", *VIDEO->GetTexture(pBoneMesh->_emissionTexture[i]));
-					pStaticEffect->SetFloat("fSpecPower", pBoneMesh->_materials[i].Power);
+					pEffect->SetTexture("Diffuse_Tex", *VIDEO->GetTexture(pBoneMesh->_diffuseTextures[i]));
+					pEffect->SetTexture("Specular_Tex", *VIDEO->GetTexture(pBoneMesh->_specularTextures[i]));
+					pEffect->SetTexture("Normal_Tex", *VIDEO->GetTexture(pBoneMesh->_normalTextures[i]));
+					pEffect->SetTexture("Emission_Tex", *VIDEO->GetTexture(pBoneMesh->_emissionTexture[i]));
+					pEffect->SetFloat("fSpecPower", pBoneMesh->_materials[i].Power);
 
-					pStaticEffect->CommitChanges();
+					pEffect->CommitChanges();
 
-					uint32 numPass = pStaticEffect->BeginEffect();
+					uint32 numPass = pEffect->BeginEffect();
 					for (uint32 p = 0; p < numPass; ++p)
 					{
-						pStaticEffect->BeginPass(p);
+						pEffect->BeginPass(p);
 						pBoneMesh->MeshData.pMesh->DrawSubset(i);
-						pStaticEffect->EndPass();
+						pEffect->EndPass();
 					}
-					pStaticEffect->EndEffect();
+					pEffect->EndEffect();
 				}
 			}
 		}
