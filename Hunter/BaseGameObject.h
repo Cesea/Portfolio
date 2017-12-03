@@ -5,9 +5,9 @@
 
 class BaseGameObject
 {
-	//¿ÀºêÁ§Æ® »ı¼ºÀ» À§ÇØ¼­ Friend class·Î ÇÔ
+	//ì˜¤ë¸Œì íŠ¸ ìƒì„±ì„ ìœ„í•´ì„œ Friend classë¡œ í•¨
 	friend class GameObjectFactory;
-	//Å¸°Ù ¿ÀºêÁ§Æ®ÀÇ Æ®·£½ºÆûÀ» ¹Ş±â À§ÇØ¼­ Friend class·Î ÇÔ
+	//íƒ€ê²Ÿ ì˜¤ë¸Œì íŠ¸ì˜ íŠ¸ëœìŠ¤í¼ì„ ë°›ê¸° ìœ„í•´ì„œ Friend classë¡œ í•¨
 	friend class Camera;
 public :
 	BaseGameObject() {}
@@ -15,6 +15,7 @@ public :
 
 	virtual bool CreateFromWorld(World &world) = 0;
 	Entity &GetEntity() { return _entity; }
+
 
 protected :
 	Entity _entity;

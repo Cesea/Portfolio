@@ -22,7 +22,7 @@ Player::~Player()
 {
 }
 
-bool Player::CreateFromWorld(World & world)
+bool Player::CreateFromWorld(World & world, Vector3 Pos)
 {
    EventChannel channel;
    channel.Add<InputManager::KeyDownEvent, Player>(*this);
@@ -565,6 +565,8 @@ void Player::Update(float deltaTime)
    }
 
    _currentCommand.Reset();
+
+   _channel.Broadcast<PlayerImformationEvent>(PlayerImformationEvent(transComp.GetWorldPosition(), _state, transComp.GetForward()));
 }
 
 void Player::MoveAndRotate(float deltaTime)

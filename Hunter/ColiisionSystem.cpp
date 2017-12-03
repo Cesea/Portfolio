@@ -46,10 +46,7 @@ void CollisionSystem::Update(float deltaTime, float checkRange)
 		TransformComponent & transform = entities[i].GetComponent<TransformComponent>();
 		CollisionComponent & collision = entities[i].GetComponent<CollisionComponent>();
 
-		aabb0._min = collision._boundingBox._localMinPos;
-		aabb0._max = collision._boundingBox._localMaxPos;
-
-		TransformAABB(&aabb0, transform);
+		aabb0 = SetAABB(collision._boundingBox._xSize, collision._boundingBox._ySize, collision._boundingBox._zSize, transform.GetWorldPosition());
 
 		for (uint32 j = 0; j < entities.size(); ++j)
 		{
@@ -61,10 +58,8 @@ void CollisionSystem::Update(float deltaTime, float checkRange)
 			TransformComponent& transform2 = entities[j].GetComponent<TransformComponent>();
 			CollisionComponent & collision2 = entities[j].GetComponent<CollisionComponent>();
 
-			aabb1._min = collision2._boundingBox._localMinPos;
-			aabb1._max = collision2._boundingBox._localMaxPos;
-
-			TransformAABB(&aabb1, transform2);
+			
+			aabb1 = SetAABB(collision2._boundingBox._xSize, collision2._boundingBox._ySize, collision2._boundingBox._zSize, transform2.GetWorldPosition());
 
 			Vector3 distanceVec = transform.GetWorldPosition() - transform2.GetWorldPosition();
 			float distance = Vec3Length(&distanceVec);
@@ -83,7 +78,7 @@ void CollisionSystem::Update(float deltaTime, float checkRange)
 						aabb1._max))
 					{
 						//움직일수 없음의 이벤트
-						Console::Log("Collidededed!!!!\n");
+						//Console::Log("Collidededed!!!!\n");
 						//트리거 검사
 						if (collision._isTrigger)
 						{
@@ -115,21 +110,6 @@ void CollisionSystem::Update(float deltaTime, float checkRange)
 
 					}
 				}
-				//둘다 고정되어 있지 않음
-				//else if (!collision._locked && !collision2._locked)
-				//{
-				//	IsBlocking(&transform, &collision._boundingBox, &transform2, &collision2._boundingBox, 1.0f);
-				//	//트리거 검사
-				//	if (collision._isTrigger)
-				//	{
-
-				//	}
-				//	if (collision2._isTrigger)
-				//	{
-
-				//	}
-				//}
-
 			}
 		}
 	}

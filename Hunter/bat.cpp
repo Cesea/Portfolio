@@ -10,17 +10,38 @@ Bat::~Bat()
 {
 }
 
-bool Bat::CreateFromWorld(World & world)
+bool Bat::CreateFromWorld(World & world, Vector3 Pos)
 {
 	_entity = world.CreateEntity();
 	TransformComponent &transComp = _entity.AddComponent<TransformComponent>();
-	transComp.MovePositionWorld(0, 11.0f, 0);
+
+	transComp.SetWorldPosition(Pos);
+
 
 	static int32 animCount = 0;
 	RenderComponent &renderComp = _entity.AddComponent<RenderComponent>();
 	renderComp._type = RenderComponent::Type::eSkinned;
-	renderComp._skinned = VIDEO->CreateAnimationInstance(
-		VIDEO->GetSkinnedXMesh("Bat"), "Bat_" + std::to_string(animCount));
+
+	switch (rand() % 3)
+	{
+	case 0:
+		_skinType = BATSKINSTATE_RED;
+		renderComp._skinned = VIDEO->CreateAnimationInstance(
+			VIDEO->GetSkinnedXMesh("Bat1"), "Bat_" + std::to_string(animCount));
+		break;
+	case 1:
+		_skinType = BATSKINSTATE_BLACK;
+		renderComp._skinned = VIDEO->CreateAnimationInstance(
+			VIDEO->GetSkinnedXMesh("Bat2"), "Bat_" + std::to_string(animCount));
+		break;
+	case 2:
+		_skinType = BATSKINSTATE_GOLD;
+		renderComp._skinned = VIDEO->CreateAnimationInstance(
+			VIDEO->GetSkinnedXMesh("Bat3"), "Bat_" + std::to_string(animCount));
+		break;
+
+	}
+
 	renderComp._arche = ARCHE_BAT;
 
 	video::AnimationInstance *pAnimation = VIDEO->GetAnimationInstance(renderComp._skinned);
@@ -31,7 +52,7 @@ bool Bat::CreateFromWorld(World & world)
 	collision._boundingSphere._localCenter = pAnimation->_pSkinnedMesh->_boundInfo._center;
 	collision._boundingSphere._radius = pAnimation->_pSkinnedMesh->_boundInfo._radius;
 	collision._locked = false;
-	collision._isTrigger = true;
+	collision._isTrigger = false;;
 	collision._triggerType = CollisionComponent::TRIGGER_TYPE_ENEMY;
 
 	ScriptComponent &scriptComponent = _entity.AddComponent<ScriptComponent>();
@@ -66,9 +87,14 @@ bool Bat::CreateFromWorld(World & world)
 	_speed = 4.0f;
 	_rotateSpeed = D3DX_PI / 64;
 	_patrolIndex = 0;
-	_moveSegment.push_back(Vector3(5.0f, 11.0f, 5.0f));
-	_moveSegment.push_back(Vector3(-5.0f, 11.0f, 5.0f));
-	_moveSegment.push_back(Vector3(-5.0f, 11.0f, -5.0f));
+
+	this->PatrolSet(rand() % 3, transComp.GetWorldPosition(), 5.0f);
+
+	for (int i = 0; i < _moveSegment.size(); i++)
+	{
+		_moveSegment[i].y++;
+	}
+
 
 	_delayTime = 180.0f;
 	_delayCount = _delayTime;
@@ -83,7 +109,18 @@ bool Bat::CreateFromWorld(World & world)
 
 	_playerPos = Vector3(5.0f, 11.0f, 5.0f);
 
-	_atkRange = 0.5f;
+	switch (_skinType)
+	{
+	case BATSKINSTATE_RED:
+		_atkRange = 1.5f;
+		break;
+	case BATSKINSTATE_BLACK:
+		_atkRange = 2.0f;
+		break;
+	case BATSKINSTATE_GOLD:
+		_atkRange = 2.5f;
+		break;
+	}
 	_atkTime = 80;
 	_atkTime2 = 172;
 	_atkTime3 = 100;
@@ -100,12 +137,14 @@ bool Bat::CreateFromWorld(World & world)
 	//이벤트 등록
 	EventChannel channel;
 	channel.Add<CollisionSystem::ActorTriggerEvent, Bat>(*this);
+	setEvent();
 	return true;
 }
 
 void Bat::Update(float deltaTime)
 {
 	_pStateMachine->Update(deltaTime, _currentCommand);
+	_playerPos.y += 1.0f;
 	TransformComponent &transComp = _entity.GetComponent<TransformComponent>();
 	switch (_state)
 	{
@@ -131,12 +170,16 @@ void Bat::Update(float deltaTime)
 			float distance = Vec3Length(&direction);
 			Vec3Normalize(&direction, &direction);
 			//몸이 덜 돌아갔는가?
+			Vector3 rotatePos = _moveSegment[_patrolIndex];
+			rotatePos.y = transComp.GetWorldPosition().y;
+			Vector3 rotateDir = rotatePos - transComp.GetWorldPosition();
+			Vec3Normalize(&rotateDir, &rotateDir);
 			float distRadian = acos(
-				ClampMinusOnePlusOne(Vec3Dot(&-direction, &transComp.GetForward())));
+				ClampMinusOnePlusOne(Vec3Dot(&-rotateDir, &transComp.GetForward())));
 			if (distRadian > D3DX_PI) D3DX_PI * 2 - distRadian;
 			if (distRadian > _rotateSpeed)
 			{
-				transComp.LookDirection(-direction, _rotateSpeed);
+				transComp.LookDirection(-rotateDir, _rotateSpeed);
 				break;
 			}
 			//이동속도보다 가까움?
@@ -173,10 +216,29 @@ void Bat::Update(float deltaTime)
 		Vector3 direction = _playerPos - transComp.GetWorldPosition();
 		float distance = Vec3Length(&direction);
 		Vec3Normalize(&direction, &direction);
+		Vector3 rotatePos = _playerPos;
+		rotatePos.y = transComp.GetWorldPosition().y;
+		Vector3 rotateDir = rotatePos - transComp.GetWorldPosition();
+		Vec3Normalize(&rotateDir, &rotateDir);
+		transComp.LookDirection(-rotateDir, D3DX_PI);
+
 		if (distance < _atkRange)
 		{
-			_state = BATSTATE_ATK1;
-			_pStateMachine->ChangeState(META_TYPE(BatAttackState)->Name());
+			switch (_skinType)
+			{
+			case BATSKINSTATE_RED:
+				_state = BATSTATE_ATK1;
+				_pStateMachine->ChangeState(META_TYPE(BatAttackState)->Name());
+				break;
+			case BATSKINSTATE_BLACK:
+				_state = BATSTATE_ATK2;
+				_pStateMachine->ChangeState(META_TYPE(BatAttack2State)->Name());
+				break;
+			case BATSKINSTATE_GOLD:
+				_state = BATSTATE_ATK3;
+				_pStateMachine->ChangeState(META_TYPE(BatAttack3State)->Name());
+				break;
+			}
 		}
 		else
 		{
@@ -193,13 +255,8 @@ void Bat::Update(float deltaTime)
 			Vector3 direction = _playerPos - transComp.GetWorldPosition();
 			float distance = Vec3Length(&direction);
 			Vec3Normalize(&direction, &direction);
-			if (distance < _atkRange)
-			{
-				_state = BATSTATE_ATK2;
-				_pStateMachine->ChangeState(META_TYPE(BatAttack2State)->Name());
-			}
 			//공격범위를 벗어났다?
-			else
+			if (distance > _atkRange)
 			{
 				//배틀을 멈추고 기본자세 (다시추적시작)
 				_battle = false;
@@ -217,14 +274,8 @@ void Bat::Update(float deltaTime)
 			Vector3 direction = _playerPos - transComp.GetWorldPosition();
 			float distance = Vec3Length(&direction);
 			Vec3Normalize(&direction, &direction);
-			if (distance < _atkRange)
-			{
-				_state = BATSTATE_ATK3;
-				_pStateMachine->ChangeState(META_TYPE(BatAttack3State)->Name());
-				_playerPos = Vector3(RandFloat(-5.0, 5.0), 11.0f, RandFloat(-5.0, 5.0));
-			}
 			//공격범위를 벗어났다?
-			else
+			if (distance > _atkRange)
 			{
 				//배틀을 멈추고 기본자세 (다시추적시작)
 				_battle = false;
@@ -242,13 +293,8 @@ void Bat::Update(float deltaTime)
 			Vector3 direction = _playerPos - transComp.GetWorldPosition();
 			float distance = Vec3Length(&direction);
 			Vec3Normalize(&direction, &direction);
-			if (distance < _atkRange)
-			{
-				_state = BATSTATE_ATK1;
-				_pStateMachine->ChangeState(META_TYPE(BatAttackState)->Name());
-			}
 			//공격범위를 벗어났다?
-			else
+			if (distance > _atkRange)
 			{
 				//배틀을 멈추고 기본자세 (다시추적시작)
 				_battle = false;
@@ -305,12 +351,14 @@ void Bat::Update(float deltaTime)
 			_battle = true;
 			_state = BATSTATE_FIND;
 			_pStateMachine->ChangeState(META_TYPE(BatFindState)->Name());
-			Vector3 distance = _playerPos - transComp.GetWorldPosition();
+			Vector3 rotatePos = _playerPos;
+			rotatePos.y = transComp.GetWorldPosition().y;
+			Vector3 distance = rotatePos - transComp.GetWorldPosition();
 			Vec3Normalize(&distance, &distance);
 			transComp.LookDirection(-distance, D3DX_PI * 2);
-			_atkCount = _atkTime;
 		}
 	}
+	transComp.SetWorldPosition(transComp.GetWorldPosition().x, TERRAIN->GetHeight(transComp.GetWorldPosition().x, transComp.GetWorldPosition().z)+1.0f, transComp.GetWorldPosition().z);
 }
 
 void Bat::Handle(const CollisionSystem::ActorTriggerEvent & event)
@@ -341,6 +389,7 @@ void Bat::Handle(const CollisionSystem::ActorTriggerEvent & event)
 	case CollisionComponent::TRIGGER_TYPE_DEFAULT:
 		break;
 	}
+
 }
 
 void Bat::SetupCallbackAndCompression()

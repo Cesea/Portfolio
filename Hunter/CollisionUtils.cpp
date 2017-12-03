@@ -1069,3 +1069,19 @@ void TransformAABB(AABB *pOutAABB, const TransformComponent &transform)
 	Vec3TransformCoord(&pOutAABB->_min, &pOutAABB->_min, &transform.GetFinalMatrix());
 	Vec3TransformCoord(&pOutAABB->_max, &pOutAABB->_max, &transform.GetFinalMatrix());
 }
+
+AABB SetAABB(float xSize, float ySize, float zSize, Vector3 Pos)
+{
+	AABB s;
+	s._xSize = xSize;
+	s._ySize = ySize;
+	s._zSize = zSize;
+	s._center = Pos;
+	s._min.x = Pos.x - xSize;
+	s._min.y = Pos.y - ySize;
+	s._min.z = Pos.z - zSize;
+	s._max.x = Pos.x + xSize;
+	s._max.y = Pos.y + ySize;
+	s._max.z = Pos.z + zSize;
+	return s;
+}

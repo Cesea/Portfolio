@@ -11,11 +11,12 @@ Turtle::~Turtle()
 {
 }
 
-bool Turtle::CreateFromWorld(World & world)
+bool Turtle::CreateFromWorld(World & world, Vector3 Pos)
 {
 	_entity = world.CreateEntity();
 	TransformComponent &transComp = _entity.AddComponent<TransformComponent>();
-	transComp.MovePositionWorld(0, 6.0f, 0);
+
+	transComp.SetWorldPosition(Pos);
 
 	static int32 animCount = 0;
 	RenderComponent &renderComp = _entity.AddComponent<RenderComponent>();
@@ -32,7 +33,7 @@ bool Turtle::CreateFromWorld(World & world)
 	collision._boundingSphere._localCenter = pAnimation->_pSkinnedMesh->_boundInfo._center;
 	collision._boundingSphere._radius = pAnimation->_pSkinnedMesh->_boundInfo._radius;
 	collision._locked = false;
-	collision._isTrigger = true;
+	collision._isTrigger = false;;
 	collision._triggerType = CollisionComponent::TRIGGER_TYPE_ENEMY;
 
 	ScriptComponent &scriptComponent = _entity.AddComponent<ScriptComponent>();
@@ -59,6 +60,7 @@ bool Turtle::CreateFromWorld(World & world)
 	_pStateMachine->RegisterState(META_TYPE(TurtleHurt1State)->Name(), new TurtleHurt1State());
 	_pStateMachine->RegisterState(META_TYPE(TurtleHurt2State)->Name(), new TurtleHurt2State());
 	_pStateMachine->RegisterState(META_TYPE(TurtleDeadState)->Name(), new TurtleDeadState());
+	_pStateMachine->RegisterState(META_TYPE(TurtleFindState)->Name(), new TurtleFindState());
 	_pStateMachine->ChangeState(META_TYPE(TurtleBite1State)->Name());
 	_state = TURTLESTATE_STAND;
 
@@ -68,15 +70,13 @@ bool Turtle::CreateFromWorld(World & world)
 	_speed = 1.0f;
 	_rotateSpeed = D3DX_PI / 256;
 	_patrolIndex = 0;
-	_moveSegment.push_back(Vector3(5.0f, 6.0f, 5.0f));
-	_moveSegment.push_back(Vector3(-5.0f, 6.0f, 5.0f));
-	_moveSegment.push_back(Vector3(-5.0f, 6.0f, -5.0f));
+	this->PatrolSet(rand() % 3, transComp.GetWorldPosition(), 5.0f);
 	_delayTime = 180.0f;
 	_delayCount = _delayTime;
 
 	_findDistance = 1.0f;
 	_findRadian = D3DX_PI / 3;
-	_findStareDistance = 3.0f;
+	_findStareDistance = 5.0f;
 	_roarTime = 180;
 	_roarCount = _roarTime;
 
@@ -99,6 +99,7 @@ bool Turtle::CreateFromWorld(World & world)
 	//이벤트 등록
 	EventChannel channel;
 	channel.Add<CollisionSystem::ActorTriggerEvent, Turtle>(*this);
+	setEvent();
 	return true;
 }
 
@@ -132,12 +133,16 @@ void Turtle::Update(float deltaTime)
 			float distance = Vec3Length(&direction);
 			Vec3Normalize(&direction, &direction);
 			//몸이 덜 돌아갔는가?
+			Vector3 rotatePos = _moveSegment[_patrolIndex];
+			rotatePos.y = transComp.GetWorldPosition().y;
+			Vector3 rotateDir = rotatePos - transComp.GetWorldPosition();
+			Vec3Normalize(&rotateDir, &rotateDir);
 			float distRadian = acos(
-				ClampMinusOnePlusOne(Vec3Dot(&-direction, &transComp.GetForward())));
+				ClampMinusOnePlusOne(Vec3Dot(&-rotateDir, &transComp.GetForward())));
 			if (distRadian > D3DX_PI) D3DX_PI * 2 - distRadian;
 			if (distRadian > _rotateSpeed)
 			{
-				transComp.LookDirection(-direction, _rotateSpeed);
+				transComp.LookDirection(-rotateDir, _rotateSpeed);
 				break;
 			}
 			//이동속도보다 가까움?
@@ -174,6 +179,11 @@ void Turtle::Update(float deltaTime)
 		Vector3 direction = _playerPos - transComp.GetWorldPosition();
 		float distance = Vec3Length(&direction);
 		Vec3Normalize(&direction, &direction);
+		Vector3 rotatePos = _playerPos;
+		rotatePos.y = transComp.GetWorldPosition().y;
+		Vector3 rotateDir = rotatePos - transComp.GetWorldPosition();
+		Vec3Normalize(&rotateDir, &rotateDir);
+		transComp.LookDirection(-rotateDir, D3DX_PI);
 		if (distance < _atkRange)
 		{
 			_state = TURTLESTATE_ATK1;
@@ -282,11 +292,15 @@ void Turtle::Update(float deltaTime)
 			_battle = true;
 			_state = TURTLESTATE_FIND;
 			_pStateMachine->ChangeState(META_TYPE(TurtleFindState)->Name());
-			Vector3 distance = _playerPos - transComp.GetWorldPosition();
+			Vector3 rotatePos = _playerPos;
+			rotatePos.y = transComp.GetWorldPosition().y;
+			Vector3 distance = rotatePos - transComp.GetWorldPosition();
 			Vec3Normalize(&distance, &distance);
 			transComp.LookDirection(-distance, D3DX_PI * 2);
 		}
 	}
+
+	transComp.SetWorldPosition(transComp.GetWorldPosition().x, TERRAIN->GetHeight(transComp.GetWorldPosition().x, transComp.GetWorldPosition().z), transComp.GetWorldPosition().z);
 }
 
 void Turtle::Handle(const CollisionSystem::ActorTriggerEvent & event)

@@ -34,7 +34,7 @@ public :
 	Player();
 	virtual ~Player();
 
-	virtual bool CreateFromWorld(World &world);
+	virtual bool CreateFromWorld(World &world, Vector3 Pos);
 	void Update(float deltaTime);
 
 	void Handle(const InputManager::KeyDownEvent &event);
@@ -44,7 +44,7 @@ public :
 
 	void SetLinkCamera(Camera* camera) { _camera = camera; }
 
-private :
+public:
 	enum PLAYERSTATE
 	{
 		PLAYERSTATE_STANCE,
@@ -54,6 +54,7 @@ private :
 		PLAYERSTATE_BLOCK,
 		PLAYERSTATE_MOVEATTACK,
 	};
+private :
 	PLAYERSTATE _state;
 	bool32 _inCombat{};
 
@@ -93,13 +94,17 @@ private :
 
 public :
 
-	struct PlayerPositionEvent
+	struct PlayerImformationEvent
 	{
-		PlayerPositionEvent(const Vector3 &position)
-			:_position(position)
+		PlayerImformationEvent(const Vector3 &position,const PLAYERSTATE &state,const Vector3 &forward)
+			:_position(position),
+			_state(state),
+			_forward(forward)
 		{
 		}
 		Vector3 _position;
+		PLAYERSTATE _state;
+		Vector3 _forward;
 	};
 
 };
