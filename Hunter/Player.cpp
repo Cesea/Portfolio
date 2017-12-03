@@ -52,7 +52,7 @@ bool Player::CreateFromWorld(World & world, const Vector3 &Pos)
    collision._boundingSphere._localCenter = pAnimation->_pSkinnedMesh->_boundInfo._center;
    collision._boundingSphere._radius = pAnimation->_pSkinnedMesh->_boundInfo._radius;
    collision._triggerType = CollisionComponent::TRIGGER_TYPE_PLAYER;
-   collision._type = CollisionComponent::COLLISION_TYPE_OBB;
+   collision._type = CollisionComponent::COLLISION_TYPE_BOX;
 
    ScriptComponent &scriptComponent = _entity.AddComponent<ScriptComponent>();
    scriptComponent.SetScript(MAKE_SCRIPT_DELEGATE(Player, Update, *this));

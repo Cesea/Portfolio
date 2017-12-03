@@ -260,6 +260,7 @@ bool MapToolScene::SceneRender0()
 
 	TERRAIN->Render(_camera, *_pMainLight, _camera);
 	_renderSystem.Render(_camera);
+	_collisionSystem.render();
 	_editor->Render();
 
 	return true;

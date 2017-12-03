@@ -65,49 +65,185 @@ void CollisionSystem::Update(float deltaTime, float checkRange)
 			float distance = Vec3Length(&distanceVec);
 			if (distance < checkRange)
 			{
+				bool checkCollision = false;
 				//둘다 고정됬으면 검사하지않음
 				if (collision2._locked && collision._locked) continue;
 				//둘중 하나가 고정되어있음
 				//if ((collision._locked && !collision2._locked) || (!collision._locked && collision2._locked))
 				else
 				{
-					//충돌했다면
-					if (Collision_AABBToAABB(aabb0._min,
-						aabb0._max,
-						aabb1._min, 
-						aabb1._max))
+					//충돌타입이 어떻게 되는가
+					switch (collision._type)
 					{
-						//움직일수 없음의 이벤트
-						//Console::Log("Collidededed!!!!\n");
-						//트리거 검사
-						if (collision._isTrigger)
+					case CollisionComponent::COLLISION_TYPE_BOX:
+					{
+						if (collision2._type == CollisionComponent::COLLISION_TYPE_BOX)
 						{
-							switch (collision._triggerType)
+							if (Collision_AABBToAABB(aabb0._min,
+								aabb0._max,
+								aabb1._min,
+								aabb1._max))
 							{
-							case CollisionComponent::TRIGGER_TYPE_ENEMY:
-							case CollisionComponent::TRIGGER_TYPE_PLAYER:
-								_channel.Broadcast<ActorTriggerEvent>(ActorTriggerEvent(entities[i], entities[j]));
-								break;
-							case CollisionComponent::TRIGGER_TYPE_OBJECT:
-								_channel.Broadcast<ObjectTriggerEvent>(ObjectTriggerEvent(entities[i], entities[j]));
-								break;
-							}
+								if (collision._isTrigger)
+								{
+									switch (collision._triggerType)
+									{
+									case CollisionComponent::TRIGGER_TYPE_ENEMY:
+									case CollisionComponent::TRIGGER_TYPE_PLAYER:
+										_channel.Broadcast<ActorTriggerEvent>(ActorTriggerEvent(entities[i], entities[j]));
+										break;
+									case CollisionComponent::TRIGGER_TYPE_OBJECT:
+										_channel.Broadcast<ObjectTriggerEvent>(ObjectTriggerEvent(entities[i], entities[j]));
+										break;
+									}
 
+								}
+								if (collision2._isTrigger)
+								{
+									switch (collision._triggerType)
+									{
+									case CollisionComponent::TRIGGER_TYPE_ENEMY:
+									case CollisionComponent::TRIGGER_TYPE_PLAYER:
+										_channel.Broadcast<ActorTriggerEvent>(ActorTriggerEvent(entities[j], entities[i]));
+										break;
+									case CollisionComponent::TRIGGER_TYPE_OBJECT:
+										_channel.Broadcast<ObjectTriggerEvent>(ObjectTriggerEvent(entities[j], entities[i]));
+										break;
+									}
+								}
+
+							}
 						}
-						if (collision2._isTrigger)
+						else if(collision2._type == CollisionComponent::COLLISION_TYPE_OBB)
 						{
-							switch (collision._triggerType)
+							Matrix a = transform2.GetFinalMatrix();
+							float b;
+							MatrixInverse(&a, &b, &a);
+							Vector3 xVec = Vector3(a._11, a._21, a._31);
+							Vector3 yVec = Vector3(a._12, a._22, a._32);
+							Vector3 zVec = Vector3(a._13, a._23, a._33);
+							if (Collision_AABBToOBB(aabb0._min, aabb0._max, aabb1._center, -xVec, yVec, -zVec, aabb1._xSize, aabb1._ySize, aabb1._zSize))
 							{
-							case CollisionComponent::TRIGGER_TYPE_ENEMY:
-							case CollisionComponent::TRIGGER_TYPE_PLAYER:
-								_channel.Broadcast<ActorTriggerEvent>(ActorTriggerEvent(entities[j], entities[i]));
-								break;
-							case CollisionComponent::TRIGGER_TYPE_OBJECT:
-								_channel.Broadcast<ObjectTriggerEvent>(ObjectTriggerEvent(entities[j], entities[i]));
-								break;
+								if (collision._isTrigger)
+								{
+									switch (collision._triggerType)
+									{
+									case CollisionComponent::TRIGGER_TYPE_ENEMY:
+									case CollisionComponent::TRIGGER_TYPE_PLAYER:
+										_channel.Broadcast<ActorTriggerEvent>(ActorTriggerEvent(entities[i], entities[j]));
+										break;
+									case CollisionComponent::TRIGGER_TYPE_OBJECT:
+										_channel.Broadcast<ObjectTriggerEvent>(ObjectTriggerEvent(entities[i], entities[j]));
+										break;
+									}
+
+								}
+								if (collision2._isTrigger)
+								{
+									switch (collision._triggerType)
+									{
+									case CollisionComponent::TRIGGER_TYPE_ENEMY:
+									case CollisionComponent::TRIGGER_TYPE_PLAYER:
+										_channel.Broadcast<ActorTriggerEvent>(ActorTriggerEvent(entities[j], entities[i]));
+										break;
+									case CollisionComponent::TRIGGER_TYPE_OBJECT:
+										_channel.Broadcast<ObjectTriggerEvent>(ObjectTriggerEvent(entities[j], entities[i]));
+										break;
+									}
+								}
 							}
 						}
+					}
+						break;
+					case CollisionComponent::COLLISION_TYPE_OBB:
+					{
+						if (collision2._type == CollisionComponent::COLLISION_TYPE_BOX)
+						{
+							Matrix a = transform.GetFinalMatrix();
+							float b;
+							MatrixInverse(&a, &b, &a);
+							Vector3 xVec = Vector3(a._11, a._21, a._31);
+							Vector3 yVec = Vector3(a._12, a._22, a._32);
+							Vector3 zVec = Vector3(a._13, a._23, a._33);
+							if (Collision_AABBToOBB(aabb1._min, aabb1._max, aabb0._center, -xVec, yVec, -zVec, aabb0._xSize, aabb0._ySize, aabb0._zSize))
+							{
+								if (collision._isTrigger)
+								{
+									switch (collision._triggerType)
+									{
+									case CollisionComponent::TRIGGER_TYPE_ENEMY:
+									case CollisionComponent::TRIGGER_TYPE_PLAYER:
+										_channel.Broadcast<ActorTriggerEvent>(ActorTriggerEvent(entities[i], entities[j]));
+										break;
+									case CollisionComponent::TRIGGER_TYPE_OBJECT:
+										_channel.Broadcast<ObjectTriggerEvent>(ObjectTriggerEvent(entities[i], entities[j]));
+										break;
+									}
 
+								}
+								if (collision2._isTrigger)
+								{
+									switch (collision._triggerType)
+									{
+									case CollisionComponent::TRIGGER_TYPE_ENEMY:
+									case CollisionComponent::TRIGGER_TYPE_PLAYER:
+										_channel.Broadcast<ActorTriggerEvent>(ActorTriggerEvent(entities[j], entities[i]));
+										break;
+									case CollisionComponent::TRIGGER_TYPE_OBJECT:
+										_channel.Broadcast<ObjectTriggerEvent>(ObjectTriggerEvent(entities[j], entities[i]));
+										break;
+									}
+								}
+							}
+						}
+						else if (collision2._type == CollisionComponent::COLLISION_TYPE_OBB)
+						{
+							Matrix a = transform.GetFinalMatrix();
+							float b;
+							MatrixInverse(&a, &b, &a);
+							Vector3 xVec = Vector3(a._11, a._21, a._31);
+							Vector3 yVec = Vector3(a._12, a._22, a._32);
+							Vector3 zVec = Vector3(a._13, a._23, a._33);
+
+							a = transform2.GetFinalMatrix();
+							MatrixInverse(&a, &b, &a);
+							Vector3 xVec2 = Vector3(a._11, a._21, a._31);
+							Vector3 yVec2 = Vector3(a._12, a._22, a._32);
+							Vector3 zVec2 = Vector3(a._13, a._23, a._33);
+
+							if (Collision_OBBToOBB(aabb0._center,-xVec,yVec,-zVec,aabb0._xSize, aabb0._ySize, aabb0._zSize,aabb1._center,-xVec2, yVec2, -zVec2,aabb1._xSize,aabb1._ySize,aabb1._zSize))
+							{
+								if (collision._isTrigger)
+								{
+									switch (collision._triggerType)
+									{
+									case CollisionComponent::TRIGGER_TYPE_ENEMY:
+									case CollisionComponent::TRIGGER_TYPE_PLAYER:
+										_channel.Broadcast<ActorTriggerEvent>(ActorTriggerEvent(entities[i], entities[j]));
+										break;
+									case CollisionComponent::TRIGGER_TYPE_OBJECT:
+										_channel.Broadcast<ObjectTriggerEvent>(ObjectTriggerEvent(entities[i], entities[j]));
+										break;
+									}
+
+								}
+								if (collision2._isTrigger)
+								{
+									switch (collision._triggerType)
+									{
+									case CollisionComponent::TRIGGER_TYPE_ENEMY:
+									case CollisionComponent::TRIGGER_TYPE_PLAYER:
+										_channel.Broadcast<ActorTriggerEvent>(ActorTriggerEvent(entities[j], entities[i]));
+										break;
+									case CollisionComponent::TRIGGER_TYPE_OBJECT:
+										_channel.Broadcast<ObjectTriggerEvent>(ObjectTriggerEvent(entities[j], entities[i]));
+										break;
+									}
+								}
+							}
+						}
+					}
+						break;
 					}
 				}
 			}
@@ -148,4 +284,30 @@ void CollisionSystem::OnEntityAdded(Entity & entity)
 
 void CollisionSystem::OnEntityRemoved(Entity & entity)
 {
+}
+
+void CollisionSystem::render()
+{
+	auto &entities = GetEntities();
+
+	Vector3 hitPos;
+	for (uint32 i = 0; i < entities.size(); ++i)
+	{
+		CollisionComponent &refCollision = entities[i].GetComponent<CollisionComponent>();
+		TransformComponent &transform = entities[i].GetComponent<TransformComponent>();
+
+		refCollision.RenderBoxGizmo(transform);
+
+		Matrix a = transform.GetFinalMatrix();
+		float b;
+		MatrixInverse(&a, &b, &a);
+		Vector3 xVec = Vector3(a._11, a._21, a._31);
+		Vector3 yVec = Vector3(a._12, a._22, a._32);
+		Vector3 zVec = Vector3(a._13, a._23, a._33);
+
+		GIZMOMANAGER->Line(transform.GetWorldPosition(), transform.GetWorldPosition()- xVec, 0xFFFF0000);
+		GIZMOMANAGER->Line(transform.GetWorldPosition(), transform.GetWorldPosition()+yVec, 0xFF00FF00);
+		GIZMOMANAGER->Line(transform.GetWorldPosition(), transform.GetWorldPosition()-zVec, 0xFF0000FF);
+
+	}
 }
