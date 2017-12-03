@@ -35,6 +35,7 @@ bool Turtle::CreateFromWorld(World & world, const Vector3 &Pos)
 	collision._locked = false;
 	collision._isTrigger = false;;
 	collision._triggerType = CollisionComponent::TRIGGER_TYPE_ENEMY;
+	collision._type = CollisionComponent::COLLISION_TYPE_OBB;
 
 	ScriptComponent &scriptComponent = _entity.AddComponent<ScriptComponent>();
 	scriptComponent.SetScript(MAKE_SCRIPT_DELEGATE(Turtle, Update, *this));
