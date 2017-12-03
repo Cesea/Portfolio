@@ -68,19 +68,19 @@ void LoadEverySkinnedResources()
 	video::SkinnedXMeshHandle knight  = VIDEO->CreateSkinnedXMesh(
 		"../resources/Models/Knight/Knight.X", &correctionMat, "Knight");
 
-	MatrixScaling(&correctionMat, 1.0f, 1.0f, 1.0f);
+	MatrixScaling(&correctionMat, 1.4f, 1.4f, 1.4f);
 	video::SkinnedXMeshHandle snakeMesh = VIDEO->CreateSkinnedXMesh(
 		"../resources/Models/Snake/Snake_Red.X", &correctionMat, "Snake1");
 
-	MatrixScaling(&correctionMat, 1.0f, 1.0f, 1.0f);
+	MatrixScaling(&correctionMat, 1.4f, 1.4f, 1.4f);
 	video::SkinnedXMeshHandle snakeMesh2 = VIDEO->CreateSkinnedXMesh(
 		"../resources/Models/Snake/Snake_Black.X", &correctionMat, "Snake2");
 
-	MatrixScaling(&correctionMat, 1.0f, 1.0f, 1.0f);
+	MatrixScaling(&correctionMat, 1.4f, 1.4f, 1.4f);
 	video::SkinnedXMeshHandle snakeMesh3 = VIDEO->CreateSkinnedXMesh(
 		"../resources/Models/Snake/Snake_Cyan.X", &correctionMat, "Snake3");
 
-	MatrixScaling(&correctionMat, 1.0f, 1.0f, 1.0f);
+	MatrixScaling(&correctionMat, 1.4f, 1.4f, 1.4f);
 	video::SkinnedXMeshHandle turtleMesh = VIDEO->CreateSkinnedXMesh(
 		"../resources/Models/DragonTurtle/DragonTurtle_Black.X", &correctionMat, "Turtle");
 
@@ -99,7 +99,7 @@ void LoadEverySkinnedResources()
 		"../resources/Models/DragonBat/DragonBat_Gold.X", &correctionMat, "Bat3");
 
 
-	MatrixScaling(&correctionMat, 1.0f, 1.0f, 1.0f);
+	MatrixScaling(&correctionMat, 1.4f, 1.4f, 1.4f);
 	video::SkinnedXMeshHandle catMesh = VIDEO->CreateSkinnedXMesh(
 		"../resources/Models/DevilCat/DevilCat.X", &correctionMat, "Cat");
 
@@ -157,7 +157,7 @@ bool MapToolScene::SceneInit()
 	LoadEverySkinnedResources();
 	LoadEveryStaticResources();
 
-	_pMainLight->SetWorldPosition(Vector3(4.0f, 10.0f, 3.0f));
+	_pMainLight->SetWorldPosition(Vector3(4.0f, 7.0f, 3.0f));
 	_pMainLight->SetTarget(Vector3(0.0f, 0.0f, 0.0f));
 
 	_pEnvironmentSphere->Create("../resources/Textures/grassenvmap1024.dds");
@@ -216,7 +216,7 @@ bool MapToolScene::SceneUpdate(float deltaTime, const InputManager & input)
 		//_pMainLight->_entity.GetComponent<TransformComponent>().SetRotateWorld(Vector3(x, y, 0.0f));
 	}
 
-	_editor->Edit(RefVariant(), input);
+	bool editorInput = _editor->Edit(RefVariant(), input);
 	_world.Refresh();
 	_scriptSystem.Update(deltaTime);
 	_transformSystem.PreUpdate(deltaTime);
@@ -267,9 +267,11 @@ bool MapToolScene::SceneRender0()
 
 bool MapToolScene::SceneRenderSprite()
 {
-	//SPRITEMANAGER->BeginSpriteRender();
-	//SPRITEMANAGER->DrawTexture(_shadowCamera.GetRenderTexture(), nullptr, 500, 0);
-	//SPRITEMANAGER->EndSpriteRender();
+	RECT destRect = { 600, 0, 800, 200 };
+	RECT sourceRect = { 0, 0, 2048, 2048 };
+	SPRITEMANAGER->BeginSpriteRender();
+	SPRITEMANAGER->DrawArea(_shadowCamera.GetRenderTexture(), &sourceRect, &destRect, 0);
+	SPRITEMANAGER->EndSpriteRender();
 	return true;
 }
 

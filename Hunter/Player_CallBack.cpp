@@ -109,26 +109,32 @@ HRESULT PlayerCallbackHandler::HandleCallback(UINT Track, LPVOID pCallbackData)
 	case PlayerAnimationEnum::eWarSwingLeft:
 	{
 		_pPlayer->_canCombo = true;
+		_pPlayer->_pCollisionComp->_isTrigger = true;
 	}break;
 	case PlayerAnimationEnum::eWarSwingRight:
 	{
 		_pPlayer->_canCombo = true;
+		_pPlayer->_pCollisionComp->_isTrigger = true;
 	}break;
 	case PlayerAnimationEnum::eWarThrustMid :
 	{
 		_pPlayer->_canCombo = true;
+		_pPlayer->_pCollisionComp->_isTrigger = true;
 	}break;
 	case PlayerAnimationEnum::eWarWalkSwingLeft:
 	{
 		_pPlayer->_canCombo = true;
+		_pPlayer->_pCollisionComp->_isTrigger = true;
 	}break;
 	case PlayerAnimationEnum::eWarWalkSwingRight:
 	{
 		_pPlayer->_canCombo = true;
+		_pPlayer->_pCollisionComp->_isTrigger = true;
 	}break;
 	case PlayerAnimationEnum::eWarWalkThrust:
 	{
 		_pPlayer->_canCombo = true;
+		_pPlayer->_pCollisionComp->_isTrigger = true;
 	}break;
 
 	//Shield

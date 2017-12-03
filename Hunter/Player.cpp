@@ -29,6 +29,9 @@ bool Player::CreateFromWorld(World & world, const Vector3 &Pos)
    channel.Add<InputManager::KeyReleasedEvent, Player>(*this);
    channel.Add<InputManager::KeyPressedEvent, Player>(*this);
    channel.Add<InputManager::MousePressedEvent, Player>(*this);
+
+   //channel.Add<CollisionSystem::ActorTriggerEvent, Player>(*this);
+
    _entity = world.CreateEntity();
 
    TransformComponent &transComp = _entity.AddComponent<TransformComponent>();
@@ -52,6 +55,8 @@ bool Player::CreateFromWorld(World & world, const Vector3 &Pos)
    collision._boundingSphere._localCenter = pAnimation->_pSkinnedMesh->_boundInfo._center;
    collision._boundingSphere._radius = pAnimation->_pSkinnedMesh->_boundInfo._radius;
    collision._triggerType = CollisionComponent::TRIGGER_TYPE_PLAYER;
+   collision._isTrigger = false;
+   _pCollisionComp = &collision;
 
    ScriptComponent &scriptComponent = _entity.AddComponent<ScriptComponent>();
    scriptComponent.SetScript(MAKE_SCRIPT_DELEGATE(Player, Update, *this));
@@ -79,6 +84,7 @@ bool Player::CreateFromWorld(World & world, const Vector3 &Pos)
    _combatToPeaceTimer.Reset(2.0f);
    _moveToStanceTimer.Reset(0.15f);
    _attackToStanceTimer.Reset(0.4f);
+   _attackTriggerTimer.Reset(0.08f);
 
    return true;
 }
@@ -456,37 +462,41 @@ void Player::Update(float deltaTime)
    {
       if (_inCombat)
       {
-         if (_canCombo && 
-			 _attackToStanceTimer.Tick(deltaTime))
-         {
-            _state = PLAYERSTATE_STANCE;
-			MovementStop(_currentMovement);
-            _attackToStanceTimer.Restart();
-            _comboCount = 0;
-			_canCombo = false;
-			_pActionComp->_actionQueue.ClearQueue();
-            this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWarCombatMode));
-			break;
-         }
+		  if (_canCombo && _attackTriggerTimer.Tick(deltaTime))
+		  {
+			  _attackTriggerTimer.Restart();
+			  _pCollisionComp->_isTrigger = false;
+		  }
+		  if (_canCombo &&
+			  _attackToStanceTimer.Tick(deltaTime))
+		  {
+			  _state = PLAYERSTATE_STANCE;
+			  MovementStop(_currentMovement);
+			  _attackToStanceTimer.Restart();
+			  _comboCount = 0;
+			  _canCombo = false;
+			  this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWarCombatMode));
+			  break;
+		  }
 
-         if (_currentCommand._behavior._type == BEHAVIOR_ATTACK && _canCombo)
-         {
-               _attackToStanceTimer.Restart();
-			   _canCombo = false;
+		  if (_currentCommand._behavior._type == BEHAVIOR_ATTACK && _canCombo)
+		  {
+			  _attackToStanceTimer.Restart();
+			  _canCombo = false;
 			  
-			   if (_comboCount == 0)
-			   {
-				   this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWarSwingRight));
-			   }
-			   else if (_comboCount == 1)
-			   {
-				   this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWarThrustMid));
-				   _comboCount = 0;
-				   break;
-			   }			   
-            _comboCount++;
-         }
-      }
+			  if (_comboCount == 0)
+			  {
+				  this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWarSwingRight));
+			  }
+			  else if (_comboCount == 1)
+			  {
+				  this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWarThrustMid));
+				  _comboCount = 0;
+				  break;
+			  }
+			  _comboCount++;
+		  }
+	  }
    } break;
 
    case Player::PLAYERSTATE_BLOCK:
@@ -509,6 +519,12 @@ void Player::Update(float deltaTime)
    {
 	   if (_inCombat)
 	   {
+		  if (_canCombo && _attackTriggerTimer.Tick(deltaTime))
+		  {
+			  _attackTriggerTimer.Restart();
+			  _pCollisionComp->_isTrigger = false;
+		  }
+
 		   //bool toStance = _attackToStanceTimer.Tick(deltaTime);
 		   if (_canCombo && _attackToStanceTimer.Tick(deltaTime))
 		   {
@@ -606,6 +622,15 @@ void Player::Update(float deltaTime)
 	   }
    }break;
 
+   case Player::PLAYERSTATE_HURT :
+   {
+
+   }break;
+
+   case Player::PLAYERSTATE_DEAD :
+   {
+
+   }break;
    }
    _currentCommand.Reset();
 
@@ -619,6 +644,8 @@ void Player::MoveAndRotate(float deltaTime)
 	if (_state == PLAYERSTATE_STANCE ||
 		_state == PLAYERSTATE_ATTACK ||
 		_state == PLAYERSTATE_BLOCK ||
+		_state == PLAYERSTATE_DEAD || 
+		_state == PLAYERSTATE_HURT ||
 		(_state == PLAYERSTATE_MOVEATTACK && _currentMovement._vertical == VERTICAL_MOVEMENT_DOWN))
 	{
 		return;
@@ -870,30 +897,6 @@ void Player::Handle(const InputManager::KeyReleasedEvent & event)
    } break;
    }
 
-   //if('J' == inputCode)
-   //{
-   //   _currentCommand._type = GAMECOMMAND_NONE;
-   //   _currentCommand._movement._horizontal = HORIZONTAL_MOVEMENT_NONE;
-   //}
-   //else if ('L' == inputCode)
-   //{
-   //   _currentCommand._type = GAMECOMMAND_NONE;
-   //   _currentCommand._movement._horizontal = HORIZONTAL_MOVEMENT_NONE;
-   //}
-   //if('I' == inputCode)
-   //{
-   //   _currentCommand._type = GAMECOMMAND_NONE;
-   //   _currentCommand._movement._vertical = VERTICAL_MOVEMENT_NONE;
-   //}
-   //else if ('K' == inputCode)
-   //{
-   //   _currentCommand._type = GAMECOMMAND_NONE;
-   //   _currentCommand._movement._vertical = VERTICAL_MOVEMENT_NONE;
-   //}
-   //if (VK_SHIFT == inputCode)
-   //{
-	  // _currentCommand._dash = false;
-   //}
 }
 
 void Player::Handle(const InputManager::MousePressedEvent & event)
@@ -902,14 +905,52 @@ void Player::Handle(const InputManager::MousePressedEvent & event)
 
    if (inputCode == MOUSE_BUTTON_LEFT)
    {
-      _currentCommand._type = GAMECOMMAND_ACTION;
-      _currentCommand._behavior._type = BEHAVIOR_ATTACK;
+	   _currentCommand._type = GAMECOMMAND_ACTION;
+	   _currentCommand._behavior._type = BEHAVIOR_ATTACK;
    }
    else if (inputCode == MOUSE_BUTTON_RIGHT)
    {
-      _currentCommand._type = GAMECOMMAND_ACTION;
-      _currentCommand._behavior._type = BEHAVIOR_BLOCK;
+	   _currentCommand._type = GAMECOMMAND_ACTION;
+	   _currentCommand._behavior._type = BEHAVIOR_BLOCK;
    }
+}
+
+//Player가 당하는 입장이다.
+void Player::Handle(const CollisionSystem::ActorTriggerEvent & event)
+{
+	if (event._entity1 != _entity)
+	{
+		return;
+	}
+	CollisionComponent & _collision = event._entity2.GetComponent<CollisionComponent>();
+	switch (_collision._triggerType)
+	{
+	case CollisionComponent::TRIGGER_TYPE_ENEMY :
+	{
+		if (_state != PLAYERSTATE_HURT && _state != PLAYERSTATE_DEAD)
+		{
+			_state = PLAYERSTATE_HURT;
+			this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWarTakingHit));
+			//_pStateMachine->ChangeState(META_TYPE(HydraHurt1State)->Name());
+			_inCombat = true;
+			_hp -= 50;
+			if (_hp <= 0)
+			{
+				_state = PLAYERSTATE_DEAD;
+				this->_pActionComp->_actionQueue.ClearQueue();
+				this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWarDying));
+			}
+		}
+
+	} break;
+	//오브젝트와 충돌했다
+	case CollisionComponent::TRIGGER_TYPE_OBJECT:
+	{
+	} break;
+	case CollisionComponent::TRIGGER_TYPE_DEFAULT:
+	{
+	} break;
+	}
 }
 
 void Player::QueueAction(const Action & action)

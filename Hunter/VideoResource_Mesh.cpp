@@ -725,7 +725,8 @@ namespace video
 
 			for (uint32 m = 0; m < this->_numMaterial; m++) 
 			{
-
+				pEffect->SetTexture("DiffuseTexture", *VIDEO->GetTexture(_diffuseTextures[m]));
+				pEffect->CommitChanges();
 				_pMesh->DrawSubset(m);
 			}
 			pEffect->EndPass();

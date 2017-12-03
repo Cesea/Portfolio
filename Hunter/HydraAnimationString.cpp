@@ -25,8 +25,8 @@ void InitHydraAnimation()
 	HYDRA_ANIM_DEFINE(HYDRA_BREATH_FIRE2, false, false, false, 1.0f, 0.2f, 0.2f);
 	HYDRA_ANIM_DEFINE(HYDRA_BREATH_FIRE3 , false, false, false, 1.0f, 0.2f, 0.2f);
 	HYDRA_ANIM_DEFINE(HYDRA_DEATH , true, true, true, 1.0f, 0.2f, 0.2f);
-	HYDRA_ANIM_DEFINE(HYDRA_HIT1 , false, false, false, 1.0f, 0.2f, 0.2f);
-	HYDRA_ANIM_DEFINE(HYDRA_HIT2, false, false, false, 1.0f, 0.2f, 0.2f);
+	HYDRA_ANIM_DEFINE(HYDRA_HIT1 , false, true, false, 1.0f, 0.2f, 0.2f);
+	HYDRA_ANIM_DEFINE(HYDRA_HIT2, false, true, false, 1.0f, 0.2f, 0.2f);
 	HYDRA_ANIM_DEFINE(HYDRA_IDLE , false, false, false, 1.0f, 0.2f, 0.2f);
 	HYDRA_ANIM_DEFINE(HYDRA_STAND , false, true, false, 2.0f, 0.2f, 0.2f);
 	HYDRA_ANIM_DEFINE(HYDRA_RUN , false, false, false, 1.0f, 0.2f, 0.2f);

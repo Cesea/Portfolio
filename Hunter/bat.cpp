@@ -363,7 +363,10 @@ void Bat::Update(float deltaTime)
 
 void Bat::Handle(const CollisionSystem::ActorTriggerEvent & event)
 {
-	if (event._entity1 != _entity) return;
+	if (event._entity1 != _entity)
+	{
+		return;
+	}
 	CollisionComponent & _collision = event._entity2.GetComponent<CollisionComponent>();
 	switch (_collision._triggerType)
 	{
@@ -389,7 +392,6 @@ void Bat::Handle(const CollisionSystem::ActorTriggerEvent & event)
 	case CollisionComponent::TRIGGER_TYPE_DEFAULT:
 		break;
 	}
-
 }
 
 void Bat::SetupCallbackAndCompression()

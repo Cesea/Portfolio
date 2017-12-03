@@ -87,13 +87,13 @@ bool IScene::Init()
 	_camera.ReadyRenderToTexture( WINSIZEX, WINSIZEY );
 
 
-	_shadowDistance = 50.0f;
+	_shadowDistance = 30.0f;
 	_shadowCamera.CreateFromWorld(_world);
 	_shadowCamera._ortho = true;
 	_shadowCamera._camNear = 0.1f;
 	_shadowCamera._camFar = _shadowDistance * 2.0f;
 	_shadowCamera._aspect = 1;
-	_shadowCamera._orthoSize = _shadowDistance * 1.5f;	//투영크기는 그림자크기로...
+	_shadowCamera._orthoSize = _shadowDistance * 1.0f;	//투영크기는 그림자크기로...
 	_shadowCamera.ReadyShadowTexture(2048);
 
 
