@@ -42,7 +42,7 @@ bool Lizard::CreateFromWorld(World & world, Vector3 Pos)
 	collision._boundingSphere._localCenter = pAnimation->_pSkinnedMesh->_boundInfo._center;
 	collision._boundingSphere._radius = pAnimation->_pSkinnedMesh->_boundInfo._radius;
 	collision._locked = false;
-	collision._isTrigger = true;
+	collision._isTrigger = false;;
 	collision._triggerType = CollisionComponent::TRIGGER_TYPE_ENEMY;
 
 	ScriptComponent &scriptComponent = _entity.AddComponent<ScriptComponent>();
