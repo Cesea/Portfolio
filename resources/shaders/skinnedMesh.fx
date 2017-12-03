@@ -254,9 +254,9 @@ VS_OUTPUT VertSkinning( VS_INPUT Input, uniform int iNumBones )
 struct VS_INPUT_DEPTH
 {
    float4 Position : POSITION0;
-   float2 Texcoord : TEXCOORD0;
    float3  BlendWeights    : BLENDWEIGHT;
    float4  BlendIndices    : BLENDINDICES;
+   float2 Texcoord : TEXCOORD0;
 };
 
 struct VS_OUTPUT_DEPTH
@@ -277,7 +277,6 @@ VS_OUTPUT_DEPTH vs_CreateShadow( VS_INPUT_DEPTH Input, uniform int iNumBones )
    float4 worldPos = float4( vso.Position.xyz, 1.0f );
 
    Output.Position = mul( worldPos, matViewProjection );
-   Output.Position = float4( vso.Position.xyz, 1.0f );
    
    Output.FinalPos = Output.Position;
 
