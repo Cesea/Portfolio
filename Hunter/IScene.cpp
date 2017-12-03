@@ -87,14 +87,14 @@ bool IScene::Init()
 	_camera.ReadyRenderToTexture( WINSIZEX, WINSIZEY );
 
 
-	_shadowDistance = 100.0f;
+	_shadowDistance = 50.0f;
 	_shadowCamera.CreateFromWorld(_world);
 	_shadowCamera._ortho = true;
 	_shadowCamera._camNear = 0.1f;
 	_shadowCamera._camFar = _shadowDistance * 2.0f;
 	_shadowCamera._aspect = 1;
 	_shadowCamera._orthoSize = _shadowDistance * 1.5f;	//투영크기는 그림자크기로...
-	_shadowCamera.ReadyShadowTexture(2048);
+	_shadowCamera.ReadyShadowTexture(1024);
 
 
 	//라이트 생성
@@ -113,6 +113,7 @@ bool IScene::Init()
 
 bool IScene::Update(float deltaTime, const InputManager & input)
 {
+
 	_camera.MoveAndRotate(deltaTime,input);
 
 	_camera.UpdateMatrix();
@@ -128,11 +129,10 @@ bool IScene::Update(float deltaTime, const InputManager & input)
 
 	Vector3 lightPos = camPos + ( camFront * ( _shadowDistance * 0.5f ) ) + ( -lightDir * _shadowDistance );
 
-	//_shadowCamera.GetEntity().GetComponent<TransformComponent>().SetWorldPosition(lightPos.x, lightPos.y, lightPos.z );
-	//_shadowCamera.GetEntity().GetComponent<TransformComponent>().LookDirection(lightDir);
+	_shadowCamera.GetEntity().GetComponent<TransformComponent>().SetWorldPosition(lightPos.x, lightPos.y, lightPos.z );
+	_shadowCamera.GetEntity().GetComponent<TransformComponent>().LookDirection(lightDir);
 
 	SceneUpdate(deltaTime, input);
-
 	return true;
 }
 
@@ -170,7 +170,6 @@ bool IScene::Render()
 	gpDevice->SetIndices(_pScreenIndexBuffer->_ptr);
 	gpDevice->SetVertexDeclaration(_pDecl->_ptr);
 
-	//GIZMOMANAGER->WorldGrid(1, 10);
 	uint32 numPass = _pPostEffect->BeginEffect();
 	for (uint32 i = 0; i < numPass; ++i)
 	{
@@ -225,42 +224,34 @@ void IScene::ReadyShadowMap(Terrain *pTerrain)
 	_shadowCamera.RenderTextureBegin( 0xffffffff );
 
 	video::StaticXMesh::SetCamera( _shadowCamera );
-	video::StaticXMesh::SetTechnique("CreateShadow");
 
 	video::SkinnedXMesh::SetCamera( _shadowCamera);
-	video::SkinnedXMesh::SetTechnique("CreateShadow");
 
-
-	//for( int i = 0 ; i < shadowCullObject.size() ; i++ )
-	//{
-	//	if( shadowCullObject[i]->IgnoreCreateShadow == false )
-	//		shadowCullObject[i]->Render();
-	//}
+	_renderSystem.RenderShadow(_shadowCamera);
 
 	//만약 Terrain 도 쉐도우 맵을 그려야한다면...
-	//if( pTerrain != NULL )
+	//if(nullptr != pTerrain)
 	//{
-	//	pTerrain->RenderShadow( this->pDirectionLightCamera ); 
+	//	pTerrain->RenderShadow( _shadowCamera ); 
 	//}
 	_shadowCamera.RenderTextureEnd();
 
 	//만약 Terrain 도 쉐도우 맵을 셋팅한다면...
-	//if( pTerrain != NULL )
-	//{
-	//	pTerrain->m_pTerrainEffect->SetTexture( "Shadow_Tex", 
-	//			this->pDirectionLightCamera->GetRenderTexture() );
+	if(nullptr != pTerrain)
+	{
+		pTerrain->EffectSetTexture( "ShadowTexture", 
+				_shadowCamera.GetRenderTexture() );
 
-	//	pTerrain->m_pTerrainEffect->SetMatrix( "matLightViewProjection", 
-	//			&this->pDirectionLightCamera->GetViewProjectionMatrix() );
-	//}
+		pTerrain->EffectSetMatrix( "matLightViewProjection", 
+				_shadowCamera.GetViewProjectionMatrix() );
+	}
 
 	//쉐도우 Texture
-	VIDEO->GetEffect(video::StaticXMesh::_sEffectHandle)->_ptr->SetTexture( "ShadowTexture", _shadowCamera.GetRenderTexture());
-	VIDEO->GetEffect(video::StaticXMesh::_sEffectHandle)->SetMatrix( "matLightViewProjection", _shadowCamera.GetViewProjectionMatrix());
-	
-	VIDEO->GetEffect(video::SkinnedXMesh::_sEffectHandle)->_ptr->SetTexture( "ShadowTexture", _shadowCamera.GetRenderTexture());
-	VIDEO->GetEffect(video::SkinnedXMesh::_sEffectHandle)->SetMatrix( "matLightViewProjection", _shadowCamera.GetViewProjectionMatrix());
-	
+	//VIDEO->GetEffect(video::StaticXMesh::_sEffectHandle)->_ptr->SetTexture( "ShadowTexture", _shadowCamera.GetRenderTexture());
+	//VIDEO->GetEffect(video::StaticXMesh::_sEffectHandle)->SetMatrix( "matLightViewProjection", _shadowCamera.GetViewProjectionMatrix());
+	//
+	//VIDEO->GetEffect(video::SkinnedXMesh::_sEffectHandle)->_ptr->SetTexture( "ShadowTexture", _shadowCamera.GetRenderTexture());
+	//VIDEO->GetEffect(video::SkinnedXMesh::_sEffectHandle)->SetMatrix( "matLightViewProjection", _shadowCamera.GetViewProjectionMatrix());
 }
 
 LPDIRECT3DTEXTURE9 IScene::GetSceneTexture()

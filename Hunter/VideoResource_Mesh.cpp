@@ -310,9 +310,9 @@ namespace video
 
 		Vector3 vEyePos = camera.GetEntity().GetComponent<TransformComponent>().GetWorldPosition();
 
-		pEffect->_ptr->SetVector("vEyePos", &Vector4(vEyePos, 1));
-		pEffect->_ptr->SetFloat("camFar", camera._camFar);
-		pEffect->_ptr->SetFloat("camNear", camera._camNear);
+		HRESULT re = pEffect->_ptr->SetVector("vEyePos", &Vector4(vEyePos, 1));
+		re = pEffect->_ptr->SetFloat("camFar", camera._camFar);
+		re = pEffect->_ptr->SetFloat("camNear", camera._camNear);
 	}
 
 	void StaticXMesh::SetBaseLight(DirectionalLight * pDirectional)
@@ -672,7 +672,6 @@ namespace video
 	void StaticXMesh::Render(ARCHE_TYPE type, const TransformComponent & transform)
 	{
 		//월드행렬 셋팅
-
 		video::Effect *pEffect = VIDEO->GetEffect(_sEffectHandle);
 
 		Matrix matWorld = transform.GetFinalMatrix();
@@ -700,6 +699,32 @@ namespace video
 
 				//Begin 이 들어오고 난후 값이 바뀌면 다음과 같이 실행
 				pEffect->CommitChanges();
+
+				_pMesh->DrawSubset(m);
+			}
+			pEffect->EndPass();
+		}
+		pEffect->EndEffect();
+	}
+
+	void StaticXMesh::RenderShadow(const TransformComponent & transform)
+	{
+		//월드행렬 셋팅
+		video::Effect *pEffect = VIDEO->GetEffect(_sEffectHandle);
+
+		//Effect 로 그리기 시작
+		HRESULT result = pEffect->SetTechnique("CreateShadow");
+		pEffect->SetMatrix("matWorld", transform.GetFinalMatrix());
+		pEffect->CommitChanges();
+
+		uint32 passNum = pEffect->BeginEffect();
+
+		for (uint32 i = 0; i < passNum; i++)
+		{
+			pEffect->BeginPass(i);
+
+			for (uint32 m = 0; m < this->_numMaterial; m++) 
+			{
 
 				_pMesh->DrawSubset(m);
 			}
@@ -891,18 +916,18 @@ namespace video
 		Matrix matWorld = transform.GetFinalMatrix();
 		matFinal = _matCorrection * matWorld;
 
-		video::Effect *pSkinnedEffect = VIDEO->GetEffect(_sEffectHandle);
-		pSkinnedEffect->SetMatrix("matWorld", matFinal);
-
-		//pStaticEffect->SetTechnique("SkinnedMesh");
-		//pStaticEffect->SetMatrix("matWorld", matFinal);
-
 		//행렬 업데이트 
 		Update(&transform.GetFinalMatrix());
 
 		//루트 본부터 타고 들어간다.
 		RenderBone((Bone*)_pRootBone);
 	}
+
+	void SkinnedXMesh::RenderShadow()
+	{
+		RenderShadowInternal(_pRootBone);
+	}
+
 
 	void SkinnedXMesh::RenderBone(Bone * pBone)
 	{
@@ -911,10 +936,8 @@ namespace video
 			return;
 		}
 
-		//본에 메쉬 컨테이너가 존재한다면 그려야한다.
 		if (pBone->pMeshContainer)
 		{
-
 			//본에 있는 메쉬 컨테이너는 BONE_MESH 이다
 			BoneMesh* pBoneMesh = (BoneMesh*)pBone->pMeshContainer;
 
@@ -924,39 +947,28 @@ namespace video
 				video::Effect *pEffect = VIDEO->GetEffect(_sEffectHandle);
 				pEffect->SetTechnique("Skinned");
 
-				//해당 본의 컴비네이션 정보를 얻는다.
 				LPD3DXBONECOMBINATION pBoneComb =
 					(LPD3DXBONECOMBINATION)(pBoneMesh->BufBoneCombos->GetBufferPointer());
 
-				//본에 물려있는 메쉬의 서브셋갯수을 속성그룹수와 같다
 				for (DWORD i = 0; i < pBoneMesh->NumAttributesGroup; i++)
 				{
-					//해당 속성의 팔래트 엔트리 수만큼 돌면서 작업용 팔래트 행렬 갱신
 					for (DWORD palEntry = 0; palEntry < pBoneMesh->NumPaletteEntries; palEntry++)
 					{
-						//적용되는 행렬 ID 를 얻는다
 						DWORD dwMatrixIndex = pBoneComb[i].BoneId[palEntry];
 
-						//행렬 인덱스가 유효하다면...
 						if (dwMatrixIndex != UINT_MAX)
 						{
-							//작업 앵렬을 만든다.
 							D3DXMatrixMultiply(&_workingPalettes[palEntry],
 								&(pBoneMesh->pBoneOffsetMatices[dwMatrixIndex]),
 								pBoneMesh->ppBoneMatrixPtrs[dwMatrixIndex]);
 						}
 					}
-
-					//위에서 셋팅됭 작업행렬을 Effect 팔래스에 적용한다.
 					pEffect->SetMatrices( "amPalette", _workingPalettes, pBoneMesh->NumPaletteEntries);
 
-					//적용되는 정점의 본최대 영향수 를 대입 최대 영향수  -1 
 					pEffect->SetInt("CurNumBones", pBoneMesh->MaxNumFaceInfls - 1);
 
-					//메터리얼 인덱스
 					DWORD materialIndex = pBoneComb[i].AttribId;
 
-					//텍스쳐 셋팅
 					pEffect->SetTexture("DiffuseTexture", *VIDEO->GetTexture(pBoneMesh->_diffuseTextures[materialIndex]));
 					pEffect->SetTexture("SpecularTexture", *VIDEO->GetTexture(pBoneMesh->_specularTextures[materialIndex]));
 					pEffect->SetTexture("NormalTexture", *VIDEO->GetTexture(pBoneMesh->_normalTextures[materialIndex]));
@@ -982,7 +994,6 @@ namespace video
 				pEffect->SetMatrix("matWorld", pBone->CombinedTransformationMatrix);
 				for (DWORD i = 0; i < pBoneMesh->NumAttributesGroup; i++)
 				{
-					//pBoneMesh->_attributeRange[i].AttribId;
 					pEffect->SetTexture("DiffuseTexture", *VIDEO->GetTexture(pBoneMesh->_diffuseTextures[i]));
 					pEffect->SetTexture("SpecularTexture", *VIDEO->GetTexture(pBoneMesh->_specularTextures[i]));
 					pEffect->SetTexture("NormalTexture", *VIDEO->GetTexture(pBoneMesh->_normalTextures[i]));
@@ -1003,18 +1014,110 @@ namespace video
 			}
 		}
 
-
-		//이웃 본이 존재한다면...
 		if (pBone->pFrameSibling)
 		{
 			RenderBone((Bone*)pBone->pFrameSibling);
 		}
-
-		//자식 본이 존재한다면...
 		if (pBone->pFrameFirstChild)
 		{
 			RenderBone((Bone*)pBone->pFrameFirstChild);
 		}
+	}
+
+	void SkinnedXMesh::RenderShadowInternal(Bone * pBone)
+	{
+		if (nullptr == pBone)
+		{
+			return;
+		}
+
+		if (pBone->pMeshContainer)
+		{
+			//본에 있는 메쉬 컨테이너는 BONE_MESH 이다
+			BoneMesh* pBoneMesh = (BoneMesh*)pBone->pMeshContainer;
+
+			//본 컴비네이션 정보가  
+			if (nullptr != pBoneMesh->BufBoneCombos)
+			{
+				video::Effect *pEffect = VIDEO->GetEffect(_sEffectHandle);
+				pEffect->SetTechnique("CreateShadowSkinned");
+
+				LPD3DXBONECOMBINATION pBoneComb =
+					(LPD3DXBONECOMBINATION)(pBoneMesh->BufBoneCombos->GetBufferPointer());
+
+				for (DWORD i = 0; i < pBoneMesh->NumAttributesGroup; i++)
+				{
+					for (DWORD palEntry = 0; palEntry < pBoneMesh->NumPaletteEntries; palEntry++)
+					{
+						DWORD dwMatrixIndex = pBoneComb[i].BoneId[palEntry];
+
+						if (dwMatrixIndex != UINT_MAX)
+						{
+							D3DXMatrixMultiply(&_workingPalettes[palEntry],
+								&(pBoneMesh->pBoneOffsetMatices[dwMatrixIndex]),
+								pBoneMesh->ppBoneMatrixPtrs[dwMatrixIndex]);
+						}
+					}
+					pEffect->SetMatrices( "amPalette", _workingPalettes, pBoneMesh->NumPaletteEntries);
+
+					pEffect->SetInt("CurNumBones", pBoneMesh->MaxNumFaceInfls - 1);
+
+					DWORD materialIndex = pBoneComb[i].AttribId;
+
+					//pEffect->SetTexture("DiffuseTexture", *VIDEO->GetTexture(pBoneMesh->_diffuseTextures[materialIndex]));
+					//pEffect->SetTexture("SpecularTexture", *VIDEO->GetTexture(pBoneMesh->_specularTextures[materialIndex]));
+					//pEffect->SetTexture("NormalTexture", *VIDEO->GetTexture(pBoneMesh->_normalTextures[materialIndex]));
+					//pEffect->SetTexture("EmissionTexture", *VIDEO->GetTexture(pBoneMesh->_emissionTexture[materialIndex]));
+					//pEffect->SetFloat("fSpecPower", pBoneMesh->_materials[materialIndex].Power);
+
+					//pEffect->CommitChanges();
+
+					uint32 numPass = pEffect->BeginEffect();
+					for (uint32 p = 0; p < numPass; ++p)
+					{
+						pEffect->BeginPass(p);
+						pBoneMesh->WorkingMesh->DrawSubset(i);
+						pEffect->EndPass();
+					}
+					pEffect->EndEffect();
+				}
+			}
+			else
+			{
+				video::Effect *pEffect = VIDEO->GetEffect(_sEffectHandle);
+				pEffect->SetTechnique("Static");
+				pEffect->SetMatrix("matWorld", pBone->CombinedTransformationMatrix);
+				for (DWORD i = 0; i < pBoneMesh->NumAttributesGroup; i++)
+				{
+					pEffect->SetTexture("DiffuseTexture", *VIDEO->GetTexture(pBoneMesh->_diffuseTextures[i]));
+					pEffect->SetTexture("SpecularTexture", *VIDEO->GetTexture(pBoneMesh->_specularTextures[i]));
+					pEffect->SetTexture("NormalTexture", *VIDEO->GetTexture(pBoneMesh->_normalTextures[i]));
+					pEffect->SetTexture("EmissionTexture", *VIDEO->GetTexture(pBoneMesh->_emissionTexture[i]));
+					pEffect->SetFloat("fSpecPower", pBoneMesh->_materials[i].Power);
+
+					pEffect->CommitChanges();
+
+					uint32 numPass = pEffect->BeginEffect();
+					for (uint32 p = 0; p < numPass; ++p)
+					{
+						pEffect->BeginPass(p);
+						pBoneMesh->MeshData.pMesh->DrawSubset(i);
+						pEffect->EndPass();
+					}
+					pEffect->EndEffect();
+				}
+			}
+		}
+
+		if (pBone->pFrameSibling)
+		{
+			RenderShadowInternal((Bone*)pBone->pFrameSibling);
+		}
+		if (pBone->pFrameFirstChild)
+		{
+			RenderShadowInternal((Bone*)pBone->pFrameFirstChild);
+		}
+
 	}
 
 	void SkinnedXMesh::CalculateTotalBoundInfo(Bone *pBone)

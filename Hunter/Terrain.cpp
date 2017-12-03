@@ -427,6 +427,8 @@ void Terrain::Render(const Camera &camera, const DirectionalLight &mainLight, co
 	pEffect->SetVector("vEyePosition", Vector4(camera.GetEntity().GetComponent<TransformComponent>()._position, 1.0f));
 	pEffect->SetMatrix("baseDirectionalLight", mainLight.GetLightMatrix());
 
+	HRESULT re = pEffect->SetTechnique("ReciveShadow");
+
 	//Texture 셋팅
 	pEffect->SetTexture("Terrain0_Tex", *VIDEO->GetTexture(_tile0Handle));
 	pEffect->SetTexture("Terrain1_Tex", *VIDEO->GetTexture(_tile1Handle));
@@ -434,6 +436,107 @@ void Terrain::Render(const Camera &camera, const DirectionalLight &mainLight, co
 	pEffect->SetTexture("Terrain3_Tex", *VIDEO->GetTexture(_tile3Handle));
 	pEffect->SetTexture("TerrainControl_Tex", *VIDEO->GetTexture(_tileSplatHandle));
 
+	if (_inEditMode)
+	{
+		for (int32 z = 0; z < _zChunkCount; ++z)
+		{
+			for (int32 x = 0; x < _xChunkCount; ++x)
+			{
+				TerrainChunk &refChunk = _pChunks[Index2D(x, z, _xChunkCount)];
+				if (camera.GetFrustum().IsSphereInFrustum( Vector3(refChunk._relCenterX, 0.0f, refChunk._relCenterZ), refChunk._radius))
+				{
+					video::VertexBuffer *vBuffer = VIDEO->GetVertexBuffer(refChunk._vHandle);
+					video::IndexBuffer *iBuffer = VIDEO->GetIndexBuffer(refChunk._iHandle);
+					video::VertexDecl *decl = VIDEO->GetVertexDecl(vBuffer->_decl);
+
+					//버텍스 버퍼에 정점 정보를 넣는다
+					video::TerrainVertex *pVertexData = nullptr;
+					video::TerrainVertex *pToCopy = _terrainVertices;
+					vBuffer->_ptr->Lock(0, 0, (void **)&pVertexData, D3DLOCK_DISCARD);
+					for (int32 i = 0; i < TERRAIN_CHUNK_DIM + 1; ++i)
+					{
+						int32 vertexXOffset = (x * TERRAIN_CHUNK_DIM);
+						int32 vertexZOffset = (z * TERRAIN_CHUNK_DIM) + i;
+
+						int32 offset = i * (TERRAIN_CHUNK_DIM + 1);
+						int32 toCopyOffset = Index2D(vertexXOffset, vertexZOffset, _numVertexX);
+
+						memcpy(pVertexData + offset, pToCopy + toCopyOffset, sizeof(video::TerrainVertex) * (TERRAIN_CHUNK_DIM + 1));
+					}
+
+					vBuffer->_ptr->Unlock();
+
+					//인덱스 버퍼에 정점 정보를 넣는다
+					void *pIndexData = nullptr;
+					iBuffer->_ptr->Lock(0, 0, (void **)&pIndexData, D3DLOCK_DISCARD);
+					memcpy(pIndexData, _chunkIndex, sizeof(TerrainFace) * TERRAIN_CHUNK_DIM * TERRAIN_CHUNK_DIM * 2);
+					iBuffer->_ptr->Unlock();
+
+					gpDevice->SetStreamSource(0, vBuffer->_ptr, 0, sizeof(video::TerrainVertex));
+					gpDevice->SetVertexDeclaration(decl->_ptr);
+					gpDevice->SetIndices(iBuffer->_ptr);
+
+					uint32 numPass = pEffect->BeginEffect();
+
+					for (uint32 i = 0; i < numPass; i++)
+					{
+						pEffect->BeginPass(i);
+
+						HRESULT re = gpDevice->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, 0,
+							_sectionNumVertexX * _sectionNumVertexZ, 0, _sectionNumCellX * _sectionNumCellX * 2);
+
+						pEffect->EndPass();
+					}
+					pEffect->EndEffect();
+				}
+
+			}
+		}
+	}
+	else
+	{
+		for (int32 i = 0; i < _xChunkCount * _zChunkCount; ++i)
+		{
+			TerrainChunk &refChunk = _pChunks[i];
+			if (camera.GetFrustum().IsSphereInFrustum(
+				Vector3(refChunk._relCenterX, 0.0f, refChunk._relCenterZ), refChunk._radius))
+			{
+				video::VertexBuffer *vBuffer = VIDEO->GetVertexBuffer(refChunk._vHandle);
+				video::IndexBuffer *iBuffer = VIDEO->GetIndexBuffer(refChunk._iHandle);
+				video::VertexDecl *decl = VIDEO->GetVertexDecl(vBuffer->_decl);
+
+				gpDevice->SetStreamSource(0, vBuffer->_ptr, 0, sizeof(video::TerrainVertex));
+				gpDevice->SetVertexDeclaration(decl->_ptr);
+				gpDevice->SetIndices(iBuffer->_ptr);
+
+				uint32 numPass = pEffect->BeginEffect();
+
+				for (uint32 i = 0; i < numPass; i++)
+				{
+					pEffect->BeginPass(i);
+
+					gpDevice->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, 0,
+						_sectionNumVertexX * _sectionNumVertexZ, 0, _sectionNumCellX * _sectionNumCellX * 2);
+
+					pEffect->EndPass();
+				}
+				pEffect->EndEffect();
+			}
+		}
+	}
+}
+
+void Terrain::RenderShadow(const Camera & camera)
+{
+	video::Effect *pEffect = VIDEO->GetEffect(_effect);
+	Matrix matInd;
+	MatrixIdentity( &matInd );
+	pEffect->SetMatrix( "matWorld", matInd );
+
+	//뷰 행렬셋팅
+	pEffect->SetMatrix( "matViewProjection", camera.GetViewProjectionMatrix() );
+
+	pEffect->SetTechnique("CreateShadow");
 	if (_inEditMode)
 	{
 		for (int32 z = 0; z < _zChunkCount; ++z)
@@ -986,6 +1089,16 @@ TerrainTilePos Terrain::ConvertWorldPostoTilePos(const Vector3 & worldPos)
 	result._relZ = (float)(terrainPosZ - (float)(chunkStartZ + result._tileZ));
 
 	return result;
+}
+
+void Terrain::EffectSetTexture(LPCSTR handle, LPDIRECT3DTEXTURE9 texture)
+{
+	VIDEO->GetEffect(_effect)->_ptr->SetTexture(handle, texture);
+}
+
+void Terrain::EffectSetMatrix(LPCSTR handle, const Matrix & matrix)
+{
+	VIDEO->GetEffect(_effect)->SetMatrix(handle, matrix);
 }
 
 const Vector3 ConvertChunkPosToWorldPos(const TerrainChunkPos & chunkPos)

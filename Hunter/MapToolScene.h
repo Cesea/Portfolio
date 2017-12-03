@@ -30,12 +30,10 @@ public:
 	virtual bool SceneRender0();
 	//virtual bool SceneRender1() {}
 	//virtual bool SceneRender2() {}
-	//virtual bool SceneRenderSprite() {}
+	virtual bool SceneRenderSprite();
 
 	virtual const char *GetSceneName();
 protected :
-
-
 	Editor *_editor{};
 
 

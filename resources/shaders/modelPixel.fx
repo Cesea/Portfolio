@@ -56,6 +56,8 @@ struct ps_diffuse_input
 {
 	float2 texcoord : TEXCOORD0;
 	float3 normal : TEXCOORD1;
+	float3 worldPos : TEXCOORD2;
+	float4 FinalPos : TEXCOORD3;
 };
 
 //픽셀셰이더 출력 구조체
@@ -178,9 +180,8 @@ float4 ps_CreateShadow(PS_INPUT_SHADOW Input) : COLOR0
 	//행렬변환을 거친 값 z 에 행렬변환에서 얻는 가중치 w 를 나누면 0 ~ 1 사이의 깊이 값이 된다.
 	float depth = Input.FinalPos.z / Input.FinalPos.w;
 
-	float4 diffTex = tex2D(Diffuse, Input.Texcoord);
-		clip(diffTex.a - 0.1f);
-
+	//float4 diffTex = tex2D(Diffuse, Input.Texcoord);
+	//clip(diffTex.a - 0.1f);
 	return float4(depth.xxx, 1);
 }
 
@@ -193,10 +194,10 @@ float4 ps_CreateShadow(PS_INPUT_SHADOW Input) : COLOR0
 float4x4 matLightViewProjection;			//방향성 광원 ViewProjection 행렬
 
 //쉐도우 Texture
-texture Shadow_Tex;
+texture ShadowTexture;
 sampler2D ShadowSampler = sampler_state
 {
-	Texture = (Shadow_Tex);
+	Texture = (ShadowTexture);
 	ADDRESSU = BORDER;
 	ADDRESSV = BORDER;
 	BORDERCOLOR = 0xFFFFFFFF;

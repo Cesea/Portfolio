@@ -233,7 +233,7 @@ void Camera::UpdateMatrix()
 
 	if (_ortho)
 	{
-		MatrixOrthoLH(&_matProjection, _fov, _aspect, _camNear, _camFar);
+		MatrixOrthoLH(&_matProjection, _aspect * _orthoSize, _orthoSize, _camNear, _camFar);
 	}
 	else
 	{
@@ -375,9 +375,8 @@ void Camera::ReadyShadowTexture(int32 size)
 	COM_RELEASE(_pRenderTexture);
 	COM_RELEASE(_pRenderSurface );
 
-	HRESULT result = 0;
 	//RenderTarget 빈 Texture 만들기
-	result = gpDevice->CreateTexture(
+	gpDevice->CreateTexture(
 		size,						//Texture 가로 해상도 
 		size,						//Texture 세로 해상도
 		1,							//밉맵체인 레벨
@@ -389,7 +388,7 @@ void Camera::ReadyShadowTexture(int32 size)
 		);
 
 	//Render 할 Surface 
-	result = gpDevice->CreateDepthStencilSurface(
+	gpDevice->CreateDepthStencilSurface(
 		size,					//Texture 가로 해상도 
 		size,					//Texture 세로 해상도
 		D3DFMT_D24S8,				//Deapth 는 24 비트 Stencil 은 8 비트	

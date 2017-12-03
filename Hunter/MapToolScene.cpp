@@ -123,7 +123,7 @@ bool MapToolScene::SceneInit()
 	LoadEverySkinnedResources();
 	LoadEveryStaticResources();
 
-	_pMainLight->SetWorldPosition(Vector3(0.0f, 5.0f, 5.0f));
+	_pMainLight->SetWorldPosition(Vector3(4.0f, 10.0f, 3.0f));
 	_pMainLight->SetTarget(Vector3(0.0f, 0.0f, 0.0f));
 
 	_pEnvironmentSphere->Create("../resources/Textures/grassenvmap1024.dds");
@@ -158,12 +158,39 @@ bool MapToolScene::SceneInit()
 bool MapToolScene::SceneUpdate(float deltaTime, const InputManager & input)
 {
 	bool result = true;
+	{
+		static float x = 0;
+		static float y = 0;
+
+		if (input.keyboard.IsDown(VK_DOWN))
+		{
+			x -= 0.02f;
+		}
+		if (input.keyboard.IsDown(VK_UP))
+		{
+			x += 0.02f;
+		}
+		if (input.keyboard.IsDown(VK_LEFT))
+		{
+			y -= 0.02f;
+		}
+		if (input.keyboard.IsDown(VK_RIGHT))
+		{
+			y += 0.02f;
+		}
+
+		//_pMainLight->_entity.GetComponent<TransformComponent>().SetRotateWorld(Vector3(x, y, 0.0f));
+	}
+
 	_editor->Edit(RefVariant(), input);
 	_world.Refresh();
 	_scriptSystem.Update(deltaTime);
 	_transformSystem.PreUpdate(deltaTime);
 	_collisionSystem.Update(deltaTime, 4.0f);
 	_actionSystem.Update(deltaTime);
+
+	ReadyShadowMap(TERRAIN);
+
 	return result;
 }
 
@@ -201,6 +228,14 @@ bool MapToolScene::SceneRender0()
 	_renderSystem.Render(_camera);
 	_editor->Render();
 
+	return true;
+}
+
+bool MapToolScene::SceneRenderSprite()
+{
+	//SPRITEMANAGER->BeginSpriteRender();
+	//SPRITEMANAGER->DrawTexture(_shadowCamera.GetRenderTexture(), nullptr, 500, 0);
+	//SPRITEMANAGER->EndSpriteRender();
 	return true;
 }
 

@@ -32,9 +32,6 @@ void ApplicationTimer::Tick()
 
 	int32 timeToSleep{};
 
-	int32 a = 0;
-	double prev;
-
 	while (_currentDeltaSecond < _targetFrameSecond)
 	{
 		QueryPerformanceCounter(&_currentCounter);
@@ -48,7 +45,6 @@ void ApplicationTimer::Tick()
 		//Console::Log("%d\n", timeToSleep);
 		//prev = _currentDeltaSecond;
 		Sleep(1);
-		a++;
 	}
 
 	////Console::Log("%d\n", timeToSleep);

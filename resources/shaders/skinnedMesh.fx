@@ -277,7 +277,8 @@ VS_OUTPUT_DEPTH vs_CreateShadow( VS_INPUT_DEPTH Input, uniform int iNumBones )
    //정점 월드 포지션 변경 완료.....
    float4 worldPos = float4( vso.Position.xyz, 1.0f );
 
-   Output.Position = mul( worldPos, matViewProjection );
+   //Output.Position = mul( worldPos, matViewProjection );
+   Output.Position = float4( vso.Position.xyz, 1.0f );
    
    Output.FinalPos = Output.Position;
 
@@ -401,7 +402,7 @@ technique Toon
 	}
 }
 
-technique CreateShadow
+technique CreateShadowSkinned
 {
     pass p0
     {

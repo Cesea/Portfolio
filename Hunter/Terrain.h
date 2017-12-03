@@ -139,6 +139,7 @@ public:
 	float GetSlant(Vector3* pOut, float gravityPower, float x, float z);
 
 	void Render(const Camera &camera, const DirectionalLight &mainLight, const Camera &lightCameera);
+	void RenderShadow(const Camera &camera);
 
 	void AddEntityToSection(const Entity &entity, const Vector3 &position);
 
@@ -147,6 +148,9 @@ public:
 
 	//const Vector3 ConvertChunkPosToWorldPos(const TerrainChunkPos &chunkPos);
 	const Vector3 ConvertTilePosToWorldPos(const TerrainTilePos &tilePos);
+
+	void EffectSetTexture(LPCSTR handle, LPDIRECT3DTEXTURE9 texture);
+	void EffectSetMatrix(LPCSTR handle, const Matrix &matrix);
 
 private:
 	//bool CreateInGame(const Terrain::TerrainConfig &config);

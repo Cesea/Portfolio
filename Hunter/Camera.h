@@ -63,12 +63,11 @@ public:
 	LPDIRECT3DTEXTURE9 GetRenderTexture();
 
 private:
-
 	void NormalCameraUpdate(void);
 
 	//bool move(POINT pt);
 
-	POINT tempPt;
+	//POINT tempPt;
 
 	LPDIRECT3DTEXTURE9 _pRenderTexture{};
 	LPDIRECT3DSURFACE9 _pRenderSurface{};

@@ -204,7 +204,7 @@ namespace video
 
 	void Effect::SetMatrix(LPCSTR name, const Matrix &matrix) const
 	{
-		_ptr->SetMatrix(name, &matrix);
+		HRESULT re = _ptr->SetMatrix(name, &matrix);
 	}
 
 	void Effect::SetMatrices(LPCSTR name, const Matrix *matrices, uint32 numMatrices) const

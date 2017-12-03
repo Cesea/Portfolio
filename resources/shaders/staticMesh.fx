@@ -37,6 +37,9 @@ struct vs_diffuse_output
 	float4 position : POSITION0;
 	float2 texcoord : TEXCOORD0;
 	float3 normal : TEXCOORD1;
+
+	float3 worldPos : TEXCOORD2;
+	float4 FinalPos : TEXCOORD3;
 };
 
 vs_diffuse_output vs_diffuse_main(VS_INPUT input)
@@ -47,6 +50,9 @@ vs_diffuse_output vs_diffuse_main(VS_INPUT input)
 
 	result.texcoord = input.Texcoord;
 	result.normal = input.Normal;
+
+	result.worldPos = worldPos;
+	result.FinalPos = result.position;
 
 	return result;
 }
@@ -174,11 +180,11 @@ technique Base
 
 technique Rock
 {
-	pass Pass_0
-	{
-		VertexShader = compile vs_3_0 vs_main();
-		PixelShader = compile ps_3_0 ps_main();
-	}
+   pass Pass_0
+   {
+      VertexShader = compile vs_3_0 vs_main();
+      PixelShader = compile ps_3_0 ps_main();
+   }
 }
 
 technique Tree
@@ -190,7 +196,7 @@ technique Tree
 
 		AlphaTestEnable = true;
 		AlphaFunc = GreaterEqual;
-		AlphaRef = 180;
+		AlphaRef = 100;
 	}
 }
 technique Grass
@@ -242,7 +248,6 @@ technique ReciveShadowToon
 		PixelShader = compile ps_3_0 ps_ReciveShadowToon();
 	}
 }
-
 
 technique Distort
 {
