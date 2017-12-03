@@ -41,12 +41,6 @@ public:
 	virtual const char *GetSceneName() { return "BaseScene"; }
 
 protected :
-	TransformSystem _transformSystem;
-	RenderSystem _renderSystem;
-	ScriptSystem _scriptSystem;
-	ActionSystem _actionSystem;
-	CollisionSystem _collisionSystem;
-
 	EventChannel _channel;
 
 	Editor *_pEditor{};

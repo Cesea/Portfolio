@@ -10,7 +10,7 @@ Snake::~Snake()
 {
 }
 
-bool Snake::CreateFromWorld(World & world, Vector3 Pos)
+bool Snake::CreateFromWorld(World & world, const Vector3 &Pos)
 {
 	srand(time(NULL));
 	

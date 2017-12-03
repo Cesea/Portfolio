@@ -10,7 +10,7 @@ Bat::~Bat()
 {
 }
 
-bool Bat::CreateFromWorld(World & world, Vector3 Pos)
+bool Bat::CreateFromWorld(World & world, const Vector3 &Pos)
 {
 	_entity = world.CreateEntity();
 	TransformComponent &transComp = _entity.AddComponent<TransformComponent>();

@@ -34,7 +34,7 @@ public :
 	Player();
 	virtual ~Player();
 
-	virtual bool CreateFromWorld(World &world, Vector3 Pos);
+	virtual bool CreateFromWorld(World &world, const Vector3 &Pos);
 	void Update(float deltaTime);
 
 	void Handle(const InputManager::KeyDownEvent &event);
@@ -69,6 +69,7 @@ private :
 	PlayerStateMachine *_pStateMachine;
 	GameCommand _currentCommand;
 	ActionComponent *_pActionComp{};
+	TransformComponent *_pTransformComp{};
 	void QueueAction(const Action &action);
 
 	TerrainTilePos _tilePos;

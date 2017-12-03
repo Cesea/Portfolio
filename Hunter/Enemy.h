@@ -11,7 +11,7 @@ enum ENEMYSTATE
 class Enemy : public BaseGameObject	
 {
 public:
-	virtual bool CreateFromWorld(World &world,Vector3 Pos);
+	virtual bool CreateFromWorld(World &world, const Vector3 &Pos) = 0;
 	virtual void Update(float deltaTime) = 0;
 	virtual void Handle(const CollisionSystem::ActorTriggerEvent & event) = 0;
 	Enemy();

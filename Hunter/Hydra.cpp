@@ -10,7 +10,7 @@ Hydra::~Hydra()
 {
 }
 
-bool Hydra::CreateFromWorld(World & world, Vector3 Pos)
+bool Hydra::CreateFromWorld(World & world, const Vector3 &Pos)
 {
 	_entity = world.CreateEntity();
 	TransformComponent &transComp = _entity.AddComponent<TransformComponent>();

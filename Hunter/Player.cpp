@@ -22,7 +22,7 @@ Player::~Player()
 {
 }
 
-bool Player::CreateFromWorld(World & world, Vector3 Pos)
+bool Player::CreateFromWorld(World & world, const Vector3 &Pos)
 {
    EventChannel channel;
    channel.Add<InputManager::KeyDownEvent, Player>(*this);
@@ -33,6 +33,7 @@ bool Player::CreateFromWorld(World & world, Vector3 Pos)
 
    TransformComponent &transComp = _entity.AddComponent<TransformComponent>();
    transComp._position = Vector3(0, TERRAIN->GetHeight(0.0f, 0.0f), 0);
+   _pTransformComp = &transComp;
    //transComp.MovePositionWorld();
 
    static int32 animCount = 0;
@@ -563,10 +564,10 @@ void Player::Update(float deltaTime)
    }break;
 
    }
-
    _currentCommand.Reset();
 
-   _channel.Broadcast<PlayerImformationEvent>(PlayerImformationEvent(transComp.GetWorldPosition(), _state, transComp.GetForward()));
+   _channel.Broadcast<PlayerImformationEvent>(
+	   PlayerImformationEvent(_pTransformComp->GetWorldPosition(), _state, _pTransformComp->GetForward()));
 }
 
 void Player::MoveAndRotate(float deltaTime)

@@ -2,11 +2,6 @@
 #include "Enemy.h"
 #include "TransformComponent.h"
 
-bool Enemy::CreateFromWorld(World & world, Vector3 Pos)
-{
-	return false;
-}
-
 Enemy::Enemy()
 {
 }

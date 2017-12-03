@@ -609,32 +609,32 @@ void Editor::InObjectLocateMode()
 		ImguiIndent();
 		if (ImguiButton("Bat"))
 		{
-			_objectLocator._currentSkinnedHandle = VIDEO->GetSkinnedXMesh("Bat");
+			//_objectLocator._currentSkinnedHandle = VIDEO->GetSkinnedXMesh("Bat");
 			_objectLocator._typeToLocate = ARCHE_BAT;
 		}
 		if (ImguiButton("Cat"))
 		{
-			_objectLocator._currentSkinnedHandle = VIDEO->GetSkinnedXMesh("Cat");
+			//_objectLocator._currentSkinnedHandle = VIDEO->GetSkinnedXMesh("Cat");
 			_objectLocator._typeToLocate = ARCHE_CAT;
 		}
 		if (ImguiButton("Hydra"))
 		{
-			_objectLocator._currentSkinnedHandle = VIDEO->GetSkinnedXMesh("Hydra");
+			//_objectLocator._currentSkinnedHandle = VIDEO->GetSkinnedXMesh("Hydra");
 			_objectLocator._typeToLocate = ARCHE_HYDRA;
 		}
 		if (ImguiButton("Lizard"))
 		{
-			_objectLocator._currentSkinnedHandle = VIDEO->GetSkinnedXMesh("Lizard");
+			//_objectLocator._currentSkinnedHandle = VIDEO->GetSkinnedXMesh("Lizard");
 			_objectLocator._typeToLocate = ARCHE_LIZARD;
 		}
 		if (ImguiButton("Snake"))
 		{
-			_objectLocator._currentSkinnedHandle = VIDEO->GetSkinnedXMesh("Snake");
+			//_objectLocator._currentSkinnedHandle = VIDEO->GetSkinnedXMesh("Snake");
 			_objectLocator._typeToLocate = ARCHE_SNAKE;
 		}
 		if (ImguiButton("Turtle"))
 		{
-			_objectLocator._currentSkinnedHandle = VIDEO->GetSkinnedXMesh("Turtle");
+			//_objectLocator._currentSkinnedHandle = VIDEO->GetSkinnedXMesh("Turtle");
 			_objectLocator._typeToLocate = ARCHE_TURTLE;
 		}
 		//if (ImguiButton("Dragon"))
@@ -645,7 +645,11 @@ void Editor::InObjectLocateMode()
 	}
 
 
-	if ((_objectLocator._currentStaticHandle.IsValid() || _objectLocator._currentSkinnedHandle.IsValid()) &&
+	//if ((_objectLocator._currentStaticHandle.IsValid() || _objectLocator._currentSkinnedHandle.IsValid()) &&
+	//	_leftButtonPressed &&
+	//	!(_mx > 0 && _mx < EDITORX + EDITORSIZEX && _my >= 0 && _my < EDITORY + EDITORSIZEY))
+
+	if ((_objectLocator._currentStaticHandle.IsValid() || _objectLocator._typeToLocate != ARCHE_NONE) &&
 		_leftButtonPressed &&
 		!(_mx > 0 && _mx < EDITORX + EDITORSIZEX && _my >= 0 && _my < EDITORY + EDITORSIZEY))
 	{
@@ -655,7 +659,7 @@ void Editor::InObjectLocateMode()
 			resourceHandle.count = _objectLocator._currentStaticHandle.count;
 			resourceHandle.index = _objectLocator._currentStaticHandle.index;
 		}
-		else if (_objectLocator._currentSkinnedHandle.IsValid())
+		else if (_objectLocator._typeToLocate != ARCHE_NONE)
 		{
 			resourceHandle.count = _objectLocator._currentSkinnedHandle.count;
 			resourceHandle.index = _objectLocator._currentSkinnedHandle.index;

@@ -39,12 +39,6 @@ public:
 
 protected :
 
-	TransformSystem _transformSystem;
-	RenderSystem _renderSystem;
-	ScriptSystem _scriptSystem;
-	ActionSystem _actionSystem;
-	CollisionSystem _collisionSystem;
-
 	Editor *_editor{};
 
 public:

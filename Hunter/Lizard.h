@@ -64,7 +64,7 @@ public:
 	Lizard();
 	virtual ~Lizard();
 
-	virtual bool CreateFromWorld(World &world, Vector3 Pos);
+	virtual bool CreateFromWorld(World &world, const Vector3 &Pos);
 	void Update(float deltaTime);
 	void Handle(const CollisionSystem::ActorTriggerEvent & event);
 
