@@ -7,6 +7,8 @@ struct TransformComponent;
 class Light;
 class DirectionalLight;
 
+enum ARCHE_TYPE;
+
 struct MeshBoundInfo
 {
 	Vector3 _min;
@@ -96,12 +98,14 @@ namespace video
 		static video::EffectHandle _sEffectHandle;
 		static void SetCamera(const Camera &camera);
 		static void SetBaseLight(DirectionalLight *pDirectional);
+		static void SetTechnique(D3DXHANDLE name);
 
 		bool Create(const std::string &fileName, const Matrix* matCorrection = nullptr);
 		void Destroy();
 		void BuidSubMeshBoundInfo();
 
-		void Render(const TransformComponent &transform);
+		void Render(ARCHE_TYPE type, const TransformComponent &transform);
+		void RenderShadow(const TransformComponent &transform);
 
 		bool32 _visible{ true };
 		ID3DXMesh *_pMesh{};
@@ -123,11 +127,11 @@ namespace video
 
 	struct SkinnedXMesh
 	{
-		static video::EffectHandle _sSkinnedEffectHandle;
-		static video::EffectHandle _sStaticEffectHandle;
+		//NOTE : Shader 하나로 통합하자..
+		static video::EffectHandle _sEffectHandle;
 		static void SetCamera(const Camera &Camera);
 		static void SetBaseLight(DirectionalLight *pDirectionalLight);
-		static void SetTechniqueName(const std::string &name);
+		static void SetTechnique(D3DXHANDLE name);
 
 		bool Create(const std::string &fileName, const Matrix* matCorrection = nullptr);
 		void Destroy();
@@ -137,9 +141,11 @@ namespace video
 		void Update(const Matrix *pMatrix);
 		void UpdateMatrices(Bone *pBone, Matrix *pParentMatrix) const;
 
-		virtual void Render(const TransformComponent &transform);
+		void Render(const TransformComponent &transform);
+		void RenderShadow();
 
 		void RenderBone(Bone* pBone);
+		void RenderShadowInternal(Bone *pBone);
 
 		void CalculateTotalBoundInfo(Bone *pRoot);
 

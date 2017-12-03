@@ -13,7 +13,7 @@ public:
 	PointLight();
 	~PointLight();
 
-	virtual Matrix GetLightMatrix();
+	virtual Matrix GetLightMatrix() const;
 
 	virtual void RenderGizmo();
 };

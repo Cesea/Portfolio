@@ -1,41 +1,38 @@
 #ifndef CAMERA_H
 #define CAMERA_H
 
-#define PLAYER_TO_CAMERA_DIST 1.5f
-
 #include "TransformComponent.h"
 #include "Frustum.h"
 #include "BaseGameObject.h"
 
-enum cameraState
+enum CAMERA_STATE
 {
-	cCreativeMode,
-	cNormal,
-	cPlaying,
-	cDirection,
-	//Editer
+	CAMERASTATE_CREATE,
+	CAMERASTATE_INGAME,
 };
 
-//Ä«¸Ş¶ó Å¬·¡½º´Â ¿¹¿ÜÀûÀ¸·Î texture¸¦ °¡Áö°í ÀÖ´Ù
+//ì¹´ë©”ë¼ í´ë˜ìŠ¤ëŠ” ì˜ˆì™¸ì ìœ¼ë¡œ textureë¥¼ ê°€ì§€ê³  ìˆë‹¤
 class Camera
 {
 public:
-	cameraState _cameraState{};
-
-	float _curDist;
+	CAMERA_STATE _cameraState{};
 
 	float _fov;
 	float _camNear;
 	float _camFar;
+	float _aspect;
+	bool _ortho;
+	float _orthoSize;
 
 	Camera();
 	~Camera();
 
 	void CreateFromWorld(World &world);
 
-	void MoveAndRotate(const InputManager &input);
+	void MoveAndRotate(float deltaTime, const InputManager &input);
 
-	//void PreUpdateMatrix();
+	const Entity &GetEntity() const { return _entity; }
+
 	void UpdateMatrix();
 	void UpdateCamToDevice();
 	void UpdateFrustum();
@@ -59,25 +56,18 @@ public:
 
 	const Frustum &GetFrustum() const { return _frustum; }
 
-	const Entity &GetEntity() const { return _entity; }
-
-	//·£´õ Texture ¸¦ ÁØºñ ÇÑ´Ù.
 	void ReadyRenderToTexture( int32 width, int32 height );
-
-	//Shadow Map Texture¸¦ ÁØºñÇÑ´Ù.
 	void ReadyShadowTexture( int32 size );
-
-	//·£´õ Texture ·Î ·£´õ¸µ ½ÃÀÛ
 	void RenderTextureBegin( uint32 backColor );
-
-	//·£´õ Texture ·Î ·£´õ¸µ Á¾·á
 	void RenderTextureEnd();
-
-	//·£ÅÍ Texture ¾ò´Â´Ù.
 	LPDIRECT3DTEXTURE9 GetRenderTexture();
 
 private:
 	void NormalCameraUpdate(void);
+
+	//bool move(POINT pt);
+
+	//POINT tempPt;
 
 	LPDIRECT3DTEXTURE9 _pRenderTexture{};
 	LPDIRECT3DSURFACE9 _pRenderSurface{};
@@ -85,14 +75,12 @@ private:
 	LPDIRECT3DSURFACE9 _pDeviceDepthAndStencilSurface{};
 
 protected:
-
 	Entity _entity;
 
 	Matrix _matView;
 	Matrix _matProjection;
 	Matrix _matViewProjection;
 
-	bool32 _ortho;
 	bool32 _rotating{false};
 
 	float _moveSpeed{1.0f};
@@ -103,6 +91,9 @@ protected:
 
 	Frustum _frustum;
 	BaseGameObject *_pTargetObject{};
+
+	float _offsetForwardMult{};
+	float _offsetUpMult{};
 };
 
 #endif

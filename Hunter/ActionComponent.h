@@ -35,6 +35,8 @@ struct Action
 
 	float _crossFadeTime;
 	float _outCrossFadeTime;
+
+	int32 _enum;
 };
 
 class ActionQueue
@@ -103,6 +105,7 @@ public :
 
 	bool32 _blocking{};
 	bool32 _prevBlocking{};
+	bool32 _prevLooping{};
 
 	ID3DXAnimationSet *_pPrevPlayingAnimationSet{};
 

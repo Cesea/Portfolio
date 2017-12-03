@@ -1,29 +1,107 @@
 #include "stdafx.h"
 #include "MapToolScene.h"
 
+void LoadEveryStaticResources()
+{
+	Matrix correctionMat;
+	Matrix rotationCorrection;
+//Load Rocks
+	MatrixScaling(&correctionMat, 1.0f, 1.0f, 1.0f);
+	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Rock/Rock1_A.X", &correctionMat, "Rock01");
+	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Rock/Rock2_A.X", &correctionMat, "Rock02");
+	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Rock/Rock3_A.X", &correctionMat, "Rock03");
+	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Rock/Rock4_A.X", &correctionMat, "Rock04");
+	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Rock/Rock5_A.X", &correctionMat, "Rock05");
+	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Rock/Rock6_A.X", &correctionMat, "Rock06");
+	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Rock/Rock7_A.X", &correctionMat, "Rock07");
+	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Rock/Rock8_A.X", &correctionMat, "Rock08");
+	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Rock/Rock9_A.X", &correctionMat, "Rock09");
+	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Rock/Rock10_A.X", &correctionMat, "Rock10");
+
+	//Load Grass
+	MatrixScaling(&correctionMat, 0.01f, 0.01f, 0.01f);
+	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Grass/Grass1.X", &correctionMat, "Grass01");
+	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Grass/Grass2.X", &correctionMat, "Grass02");
+	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Grass/Grass3.X", &correctionMat, "Grass03");
+	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Grass/Grass4.X", &correctionMat, "Grass04");
+	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Grass/Grass5.X", &correctionMat, "Grass05");
+	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Grass/Grass6.X", &correctionMat, "Grass06");
+	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Grass/Grass7.X", &correctionMat, "Grass07");
+	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Grass/Grass8.X", &correctionMat, "Grass08");
+	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Grass/Grass9.X", &correctionMat, "Grass09");
+	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Grass/Grass10.X", &correctionMat, "Grass10");
+
+	//Load Tree
+	MatrixScaling(&correctionMat, 0.01f, 0.01f, 0.01f);
+	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Tree/Tree1.X", &correctionMat, "Tree01");
+	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Tree/Tree2.X", &correctionMat, "Tree02");
+	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Tree/Tree3.X", &correctionMat, "Tree03");
+	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Tree/Tree4.X", &correctionMat, "Tree04");
+	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Tree/Tree5.X", &correctionMat, "Tree05");
+	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Tree/Tree6.X", &correctionMat, "Tree06");
+	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Tree/Tree7.X", &correctionMat, "Tree07");
+	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Tree/Tree8.X", &correctionMat, "Tree08");
+	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Tree/Tree9.X", &correctionMat, "Tree09");
+	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Tree/Tree10.X", &correctionMat, "Tree10");
+
+	//Load TreeTrunk
+	MatrixScaling(&correctionMat, 0.01f, 0.01f, 0.01f);
+	VIDEO->CreateStaticXMesh("../resources/Models/Environment/TreeTrunk/TreeTrunk1.X", &correctionMat, "TreeTrunk01");
+	VIDEO->CreateStaticXMesh("../resources/Models/Environment/TreeTrunk/TreeTrunk2.X", &correctionMat, "TreeTrunk02");
+	VIDEO->CreateStaticXMesh("../resources/Models/Environment/TreeTrunk/TreeTrunk3.X", &correctionMat, "TreeTrunk03");
+
+	//Load Mushroom
+	MatrixScaling(&correctionMat, 0.01f, 0.01f, 0.01f);
+	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Mushroom/Mushroom1.X", &correctionMat, "Mushroom01");
+	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Mushroom/Mushroom2.X", &correctionMat, "Mushroom02");
+	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Mushroom/Mushroom3.X", &correctionMat, "Mushroom03");
+}
+
+void LoadEverySkinnedResources()
+{
+//메쉬 불러오기..
+	Matrix correctionMat;
+	Matrix rotationCorrection;
+	MatrixRotationY(&rotationCorrection, D3DX_PI);
+	MatrixScaling(&correctionMat, 0.01f, 0.01f, 0.01f);
+	MatrixMultiply(&correctionMat, &correctionMat, &rotationCorrection);
+	video::SkinnedXMeshHandle knight  = VIDEO->CreateSkinnedXMesh(
+		"../resources/Models/Knight/Knight.X", &correctionMat, "Knight");
+
+	//MatrixScaling(&correctionMat, 1.0f, 1.0f, 1.0f);
+	//video::SkinnedXMeshHandle snakeMesh = VIDEO->CreateSkinnedXMesh(
+	//	"../resources/Models/Snake/Snake_Red.X", &correctionMat, "Snake");
+
+	//MatrixScaling(&correctionMat, 1.0f, 1.0f, 1.0f);
+	//video::SkinnedXMeshHandle turtleMesh = VIDEO->CreateSkinnedXMesh(
+	//	"../resources/Models/DragonTurtle/DragonTurtle_Black.X", &correctionMat, "Turtle");
+
+	//MatrixScaling(&correctionMat, 1.0f, 1.0f, 1.0f);
+	//video::SkinnedXMeshHandle batMesh = VIDEO->CreateSkinnedXMesh(
+	//	"../resources/Models/DragonBat/DragonBat_Black.X", &correctionMat, "Bat");
+
+	//MatrixScaling(&correctionMat, 1.0f, 1.0f, 1.0f);
+	//video::SkinnedXMeshHandle catMesh = VIDEO->CreateSkinnedXMesh(
+	//	"../resources/Models/DevilCat/DevilCat.X", &correctionMat, "Cat");
+
+	//MatrixScaling(&correctionMat, 1.0f, 1.0f, 1.0f);
+	//video::SkinnedXMeshHandle HydraMesh = VIDEO->CreateSkinnedXMesh(
+	//	"../resources/Models/Hydra/Hydra_Red.X", &correctionMat, "Hydra");
+
+	//MatrixScaling(&correctionMat, 1.0f, 1.0f, 1.0f);
+	//video::SkinnedXMeshHandle LizardMesh = VIDEO->CreateSkinnedXMesh(
+	//	"../resources/Models/Lizard/Lizard.X", &correctionMat, "Lizard");
+}
+
 bool MapToolScene::SceneInit()
 {
 	bool result = true;
 	_channel.Add<Editor::GetObjectFromSceneEvent, MapToolScene>(*this);
 
-	DataPackage dataPackage;
-	uint32 fileSize{};
-	dataPackage.OpenFile("../resources/Test.ed", &fileSize);
-	int32 numEntityToCreate;
-	dataPackage.ReadAs<int32>(&numEntityToCreate);
-
-	EntitySaveInfo entitySaveInfo;
-	ZeroMemory(&entitySaveInfo, sizeof(EntitySaveInfo));
-	for (int32 i = 0; i < numEntityToCreate; ++i)
-	{
-		dataPackage.ReadAs<EntitySaveInfo>(&entitySaveInfo);
-	}
-
 	GAMEOBJECTFACTORY->SetCurrentScene(this);
 
 	video::StaticXMesh::_sEffectHandle = VIDEO->GetEffect("StaticMesh.fx");
-	video::SkinnedXMesh::_sStaticEffectHandle = VIDEO->GetEffect("StaticMesh.fx");
-	video::SkinnedXMesh::_sSkinnedEffectHandle = VIDEO->GetEffect("SkinnedMesh.fx");
+	video::SkinnedXMesh::_sEffectHandle  = VIDEO->GetEffect("SkinnedMesh.fx");
 
 	InitAnimations();
 
@@ -40,96 +118,38 @@ bool MapToolScene::SceneInit()
 
 	TERRAIN->SetScene(this);
 	TERRAIN->Create(config, true);
+	
+	LoadEverySkinnedResources();
+	LoadEveryStaticResources();
 
-	//메쉬 불러오기..
-	Matrix correctionMat;
-	MatrixScaling(&correctionMat, 0.01f, 0.01f, 0.01f);
-	video::SkinnedXMeshHandle knight  = VIDEO->CreateSkinnedXMesh(
-		"../resources/Models/Knight/Knight.X", &correctionMat, "Knight");
-
-	MatrixScaling(&correctionMat, 1.0f, 1.0f, 1.0f);
-	video::SkinnedXMeshHandle snakeMesh = VIDEO->CreateSkinnedXMesh(
-		"../resources/Models/Snake/Snake_Red.X", &correctionMat, "Snake");
-
-	MatrixScaling(&correctionMat, 1.0f, 1.0f, 1.0f);
-	video::SkinnedXMeshHandle turtleMesh = VIDEO->CreateSkinnedXMesh(
-		"../resources/Models/DragonTurtle/DragonTurtle_Black.X", &correctionMat, "Turtle");
-
-	MatrixScaling(&correctionMat, 1.0f, 1.0f, 1.0f);
-	video::SkinnedXMeshHandle batMesh = VIDEO->CreateSkinnedXMesh(
-		"../resources/Models/DragonBat/DragonBat_Black.X", &correctionMat, "Bat");
-
-	MatrixScaling(&correctionMat, 1.0f, 1.0f, 1.0f);
-	video::SkinnedXMeshHandle catMesh = VIDEO->CreateSkinnedXMesh(
-		"../resources/Models/DevilCat/DevilCat.X", &correctionMat, "Cat");
-
-	MatrixScaling(&correctionMat, 1.0f, 1.0f, 1.0f);
-	video::SkinnedXMeshHandle HydraMesh = VIDEO->CreateSkinnedXMesh(
-		"../resources/Models/Hydra/Hydra_Red.X", &correctionMat, "Hydra");
-
-	MatrixScaling(&correctionMat, 1.0f, 1.0f, 1.0f);
-	video::SkinnedXMeshHandle LizardMesh = VIDEO->CreateSkinnedXMesh(
-		"../resources/Models/Lizard/Lizard.X", &correctionMat, "Lizard");
-
-	MatrixScaling(&correctionMat, 1.0f, 1.0f, 1.0f);
-	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Rock/Rock1_A.X", &correctionMat, "Rock01");
-	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Rock/Rock2_A.X", &correctionMat, "Rock02");
-	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Rock/Rock3_A.X", &correctionMat, "Rock03");
-	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Rock/Rock4_A.X", &correctionMat, "Rock04");
-	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Rock/Rock5_A.X", &correctionMat, "Rock05");
-
-	MatrixScaling(&correctionMat, 0.01f, 0.01f, 0.01f);
-	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Grass/Grass1.X", &correctionMat, "Grass01");
-	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Grass/Grass2.X", &correctionMat, "Grass02");
-	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Grass/Grass3.X", &correctionMat, "Grass03");
-	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Grass/Grass4.X", &correctionMat, "Grass04");
-	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Grass/Grass5.X", &correctionMat, "Grass05");
-
-	MatrixScaling(&correctionMat, 1.0f, 1.0f, 1.0f);
-	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Tree/Tree1.X", &correctionMat, "Tree01");
-	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Tree/Tree2.X", &correctionMat, "Tree02");
-	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Tree/Tree3.X", &correctionMat, "Tree03");
-	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Tree/Tree4.X", &correctionMat, "Tree04");
-	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Tree/Tree5.X", &correctionMat, "Tree05");
-
-	//시스템 생성
-	_world.AddSystem<RenderSystem>(_renderSystem);
-	_world.AddSystem<TransformSystem>(_transformSystem);
-	_world.AddSystem<ActionSystem>(_actionSystem);
-	_world.AddSystem<ScriptSystem>(_scriptSystem);
-	_world.AddSystem<CollisionSystem>(_collisionSystem);
-
-	//카메라 생성
-	_camera.CreateFromWorld(_world);
-	_camera.SetRotationSpeed(10.0f);
-	_camera.SetMoveSpeed(20.0f);
-	_camera.GetEntity().GetComponent<TransformComponent>().MovePositionWorld(Vector3(0.0f, 4.0f, -6.0f));
-
-	//라이트 생성
-	_pMainLight = new DirectionalLight();
-	_pMainLight->CreateFromWorld(_world);
-	_pMainLight->SetWorldPosition(Vector3(0.0f, 5.0f, 5.0f));
+	_pMainLight->SetWorldPosition(Vector3(4.0f, 10.0f, 3.0f));
 	_pMainLight->SetTarget(Vector3(0.0f, 0.0f, 0.0f));
 
-	_pEnvironmentSphere = new EnvironmentSphere;
 	_pEnvironmentSphere->Create("../resources/Textures/grassenvmap1024.dds");
 
 	_channel.Broadcast<GameObjectFactory::CreateObjectOnLocationEvent>(
-		GameObjectFactory::CreateObjectOnLocationEvent(ARCHE_SNAKE, ResourceHandle(), Vector3(0.0f, 5.0f, 0.0f)));
+		GameObjectFactory::CreateObjectOnLocationEvent(ARCHE_HERO, ResourceHandle(), Vector3(0.0f, 2.0f, 0.0f)));
 
-	_channel.Broadcast<GameObjectFactory::CreateObjectOnLocationEvent>(
-		GameObjectFactory::CreateObjectOnLocationEvent(ARCHE_CAT, ResourceHandle(), Vector3(0.0f, 7.0f, 0.0f)));
+	//_channel.Broadcast<GameObjectFactory::CreateObjectOnLocationEvent>(
+	//	GameObjectFactory::CreateObjectOnLocationEvent(ARCHE_SNAKE, ResourceHandle(), Vector3(3.0f, 2.0f, 0.0f)));
+	//_channel.Broadcast<GameObjectFactory::CreateObjectOnLocationEvent>(
+	//	GameObjectFactory::CreateObjectOnLocationEvent(ARCHE_CAT, ResourceHandle(), Vector3(6.0f, 2.0f, 0.0f)));
+	//_channel.Broadcast<GameObjectFactory::CreateObjectOnLocationEvent>(
+	//	GameObjectFactory::CreateObjectOnLocationEvent(ARCHE_HYDRA, ResourceHandle(), Vector3(9.0f, 2.0f, 0.0f)));
+	//_channel.Broadcast<GameObjectFactory::CreateObjectOnLocationEvent>(
+	//	GameObjectFactory::CreateObjectOnLocationEvent(ARCHE_TURTLE, ResourceHandle(), Vector3(12.0f, 2.0f, 0.0f)));
+	//_channel.Broadcast<GameObjectFactory::CreateObjectOnLocationEvent>(
+	//	GameObjectFactory::CreateObjectOnLocationEvent(ARCHE_LIZARD, ResourceHandle(), Vector3(15.0f, 2.0f, 0.0f)));
+	//_channel.Broadcast<GameObjectFactory::CreateObjectOnLocationEvent>(
+	//	GameObjectFactory::CreateObjectOnLocationEvent(ARCHE_BAT, ResourceHandle(), Vector3(18.0f, 2.0f, 0.0f)));
 
-	_channel.Broadcast<GameObjectFactory::CreateObjectOnLocationEvent>(
-		GameObjectFactory::CreateObjectOnLocationEvent(ARCHE_HYDRA, ResourceHandle(), Vector3(0.0f, 9.0f, 0.0f)));
-
-	_channel.Broadcast<GameObjectFactory::CreateObjectOnLocationEvent>(
-		GameObjectFactory::CreateObjectOnLocationEvent(ARCHE_HERO, ResourceHandle(), Vector3(0.0f, 0.0f, 0.0f)));
+	//NOTE : GameObjectFactory의 GetPlayerObject는 생성에 의존성을 가진다
+	_camera.SetTargetObject(GAMEOBJECTFACTORY->GetPlayerObject());
 
 	//에디터 생성
 	imguiRenderInit();
 	_editor = new Editor;
-	_editor->Init();
+	_editor->Init(this);
 
 	return result;
 }
@@ -137,28 +157,39 @@ bool MapToolScene::SceneInit()
 bool MapToolScene::SceneUpdate(float deltaTime, const InputManager & input)
 {
 	bool result = true;
+	{
+		static float x = 0;
+		static float y = 0;
+
+		if (input.keyboard.IsDown(VK_DOWN))
+		{
+			x -= 0.02f;
+		}
+		if (input.keyboard.IsDown(VK_UP))
+		{
+			x += 0.02f;
+		}
+		if (input.keyboard.IsDown(VK_LEFT))
+		{
+			y -= 0.02f;
+		}
+		if (input.keyboard.IsDown(VK_RIGHT))
+		{
+			y += 0.02f;
+		}
+
+		//_pMainLight->_entity.GetComponent<TransformComponent>().SetRotateWorld(Vector3(x, y, 0.0f));
+	}
 
 	_editor->Edit(RefVariant(), input);
-
 	_world.Refresh();
-
 	_scriptSystem.Update(deltaTime);
-
-	_camera.MoveAndRotate(input);
 	_transformSystem.PreUpdate(deltaTime);
-
-	//Collision Check
 	_collisionSystem.Update(deltaTime, 4.0f);
-	//_transformSystem.PostUpdate(deltaTime);
 	_actionSystem.Update(deltaTime);
 
-	//Update Camera
-	{
-		_camera.UpdateMatrix();
-		_camera.UpdateCamToDevice();
-		_camera.UpdateFrustum();
-	}
-	//_channel.Update<BaseScene::SpawnEvent>(deltaTime);
+	ReadyShadowMap(TERRAIN);
+
 	return result;
 }
 
@@ -171,6 +202,13 @@ bool MapToolScene::SceneRelease()
 	_gameObjects.clear();
 
 	_world.Clear();
+
+	//VIDEO->DestroyEveryVertexBuffers();
+	//VIDEO->DestroyEveryndexBuffers();
+	//VIDEO->DestroyEveryAnimationInstances();
+	//VIDEO->DestroyEverySkinnedMesh();
+	//VIDEO->DestroyEveryStaticMesh();
+	//VIDEO->DestroyEveryTextures();
 
 	return true;
 }
@@ -185,11 +223,18 @@ bool MapToolScene::SceneRender0()
 
 	GIZMOMANAGER->WorldGrid(1.0f, 20);
 
-	TERRAIN->Render(_camera);
+	TERRAIN->Render(_camera, *_pMainLight, _camera);
 	_renderSystem.Render(_camera);
 	_editor->Render();
 
+	return true;
+}
 
+bool MapToolScene::SceneRenderSprite()
+{
+	//SPRITEMANAGER->BeginSpriteRender();
+	//SPRITEMANAGER->DrawTexture(_shadowCamera.GetRenderTexture(), nullptr, 500, 0);
+	//SPRITEMANAGER->EndSpriteRender();
 	return true;
 }
 

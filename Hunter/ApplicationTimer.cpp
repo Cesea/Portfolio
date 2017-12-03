@@ -17,7 +17,8 @@ void ApplicationTimer::Initialize(int32 targetMS)
 	_prevCounter = _startCounter;
 
 	_targetFramePerMS = targetMS;
-	_timeScale = 1.0f / (float)_frequency.QuadPart;
+	_targetFrameSecond = (double)targetMS / 1000.0;
+	_timeScale = 1.0f / (double)_frequency.QuadPart;
 
 	QueryPerformanceCounter(&_currentCounter);
 }
@@ -29,15 +30,28 @@ void ApplicationTimer::Tick()
 	_currentDeltaSecond = (_currentCounter.QuadPart - _prevCounter.QuadPart) * _timeScale;
 	_currentDeltaMS = (int32)(_currentDeltaSecond * 1000);
 
-	int64 timeToSleep = _targetFramePerMS - _currentDeltaMS;
+	int32 timeToSleep{};
 
-	//Console::Log("%d\n", (int32)timeToSleep);
-	if (timeToSleep > 0)
+	while (_currentDeltaSecond < _targetFrameSecond)
 	{
-		Sleep(timeToSleep);
+		QueryPerformanceCounter(&_currentCounter);
+
+		_currentDeltaSecond = (_currentCounter.QuadPart - _prevCounter.QuadPart) * _timeScale;
+		if (_currentDeltaSecond > _targetFrameSecond)
+		{
+			break;
+		}
+		//timeToSleep = int32(_targetFramePerMS - _currentDeltaMS);
+		//Console::Log("%d\n", timeToSleep);
+		//prev = _currentDeltaSecond;
+		//Sleep(1);
 	}
 
-	QueryPerformanceCounter(&_currentCounter);
+	////Console::Log("%d\n", timeToSleep);
+	//if (timeToSleep > 0 && timeToSleep < _targetFramePerMS)
+	//{
+	//	Sleep(timeToSleep);
+	//}
 	_prevCounter = _currentCounter;
 }
 

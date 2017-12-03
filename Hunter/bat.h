@@ -15,19 +15,9 @@ struct BatCallbackData
 class BatCallbackHandler : public GameObjectAnimationCallbackHandler
 {
 public:
-	bool Init(Bat *pbat) { _pBat = pbat; }
+	virtual bool Init(BaseGameObject *pBat) { _pBat = (Bat *)pBat; return true; }
 	HRESULT CALLBACK HandleCallback(THIS_ UINT Track, LPVOID pCallbackData)
 	{
-		//      SnakeCallbackData* pData = ( SnakeCallbackData* )pCallbackData;
-		//if (nullptr == pData)
-		//{
-		//          return S_OK;
-		//}
-
-		//switch (*pData->_animtionEnum)
-		//{
-
-		//}
 		return S_OK;
 	}
 

@@ -7,7 +7,7 @@ void GameCommand::Reset()
 	_movement._horizontal = HORIZONTAL_MOVEMENT_NONE;
 	_behavior._type = BEHAVIOR_NONE;
 	_behavior._usageIndex = 0;
-	_interpreted = false;
+	_dash = false;
 }
 
 GameCommand::GameCommand()
@@ -22,7 +22,7 @@ GameCommand::GameCommand(const GameCommand & other)
 	_movement._horizontal = other._movement._horizontal;
 	_behavior._type = other._behavior._type;
 	_behavior._usageIndex = other._behavior._usageIndex;
-	_interpreted = other._interpreted;
+	_dash = other._dash;
 }
 
 GameCommand & GameCommand::operator=(const GameCommand & other)
@@ -32,7 +32,7 @@ GameCommand & GameCommand::operator=(const GameCommand & other)
 	_movement._horizontal = other._movement._horizontal;
 	_behavior._type = other._behavior._type;
 	_behavior._usageIndex = other._behavior._usageIndex;
-	_interpreted = other._interpreted;
+	_dash = other._dash;
 
 	return *this;
 }
@@ -48,26 +48,26 @@ void MovementStop(Movement & movement)
 	movement._horizontal = HORIZONTAL_MOVEMENT_NONE;
 }
 
-void MovementLeft(Movement & movement)
-{
-	movement._vertical = VERTICAL_MOVEMENT_NONE;
-	movement._horizontal = HORIZONTAL_MOVEMENT_LEFT;
-}
-
-void MovementRight(Movement & movement)
-{
-	movement._vertical = VERTICAL_MOVEMENT_NONE;
-	movement._horizontal = HORIZONTAL_MOVEMENT_RIGHT;
-}
-
-void MovementUp(Movement & movement)
-{
-	movement._vertical = VERTICAL_MOVEMENT_UP;
-	movement._horizontal = HORIZONTAL_MOVEMENT_NONE;
-}
-
-void MovementDown(Movement & movement)
-{
-	movement._vertical = VERTICAL_MOVEMENT_DOWN;
-	movement._horizontal = HORIZONTAL_MOVEMENT_NONE;
-}
+//void MovementLeft(Movement & movement)
+//{
+//	movement._vertical = VERTICAL_MOVEMENT_NONE;
+//	movement._horizontal = HORIZONTAL_MOVEMENT_LEFT;
+//}
+//
+//void MovementRight(Movement & movement)
+//{
+//	movement._vertical = VERTICAL_MOVEMENT_NONE;
+//	movement._horizontal = HORIZONTAL_MOVEMENT_RIGHT;
+//}
+//
+//void MovementUp(Movement & movement)
+//{
+//	movement._vertical = VERTICAL_MOVEMENT_UP;
+//	movement._horizontal = HORIZONTAL_MOVEMENT_NONE;
+//}
+//
+//void MovementDown(Movement & movement)
+//{
+//	movement._vertical = VERTICAL_MOVEMENT_DOWN;
+//	movement._horizontal = HORIZONTAL_MOVEMENT_NONE;
+//}

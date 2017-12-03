@@ -101,6 +101,9 @@ struct TransformComponent : public Component
 	// 자신의 모든 정보를 from 과 to 사이의 정보만큼 보간 하여 적용
 	void Interpolate(const TransformComponent& from, const TransformComponent& to, float t);
 
+	///내꺼
+	void SetForward(const Vector3 &forward);
+
 	/////// update/////
 	//void UpdateTransform();
 	//void SetDeviceWorld(LPDIRECT3DDEVICE9 pDevie);

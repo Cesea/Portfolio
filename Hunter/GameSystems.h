@@ -5,6 +5,6 @@
 #include "RenderSystem.h"
 #include "CollisionSystem.h"
 #include "ScriptSystem.h"
-#include "ActionComponent.h"	
+#include "ActionSystem.h"	
 
 #endif

@@ -12,8 +12,7 @@ bool GameScene::SceneInit()
 	GAMEOBJECTFACTORY->SetCurrentScene(this);
 
 	video::StaticXMesh::_sEffectHandle = VIDEO->GetEffect("StaticMesh.fx");
-	video::SkinnedXMesh::_sStaticEffectHandle = VIDEO->GetEffect("StaticMesh.fx");
-	video::SkinnedXMesh::_sSkinnedEffectHandle = VIDEO->GetEffect("SkinnedMesh.fx");
+	video::SkinnedXMesh::_sEffectHandle = VIDEO->GetEffect("SkinnedMesh.fx");
 
 	InitPlayerAnimation();
 	InitSnakeAnimation();
@@ -70,10 +69,7 @@ bool GameScene::SceneInit()
 	_world.AddSystem<ScriptSystem>(_scriptSystem);
 	_world.AddSystem<CollisionSystem>(_collisionSystem);
 
-	//카메라 생성
-	_camera.CreateFromWorld(_world);
-	_camera.SetRotationSpeed(10.0f);
-	_camera.SetMoveSpeed(20.0f);
+	
 
 	//라이트 생성
 	_pMainLight = new DirectionalLight();
@@ -90,12 +86,18 @@ bool GameScene::SceneInit()
 	_channel.Broadcast<GameObjectFactory::CreateObjectOnLocationEvent>(
 		GameObjectFactory::CreateObjectOnLocationEvent(ARCHE_HERO, ResourceHandle(), Vector3(0.0f, 0.0f, 0.0f)));
 
+//카메라 생성
+	_camera.CreateFromWorld(_world);
+	_camera.SetRotationSpeed(10.0f);
+	_camera.SetMoveSpeed(20.0f);
 	_camera.SetTargetObject(GAMEOBJECTFACTORY->GetPlayerObject());
 
 	//에디터 생성
 	imguiRenderInit();
 	_editor = new Editor;
-	_editor->Init();
+	_editor->Init(this);
+
+	_ui = new UI;
 
 	return result;
 }
@@ -110,8 +112,7 @@ bool GameScene::SceneUpdate(float deltaTime, const InputManager & input)
 
 	_scriptSystem.Update(deltaTime);
 
-	//_camera.PreUpdateMatrix();
-	_camera.MoveAndRotate(input);
+	_camera.MoveAndRotate(deltaTime, input);
 	_transformSystem.PreUpdate(deltaTime);
 
 	//Collision Check
@@ -156,9 +157,15 @@ bool GameScene::SceneRender0()
 	
 	GIZMOMANAGER->WorldGrid(1.0f, 20);
 
-	TERRAIN->Render(_camera);
+	TERRAIN->Render(_camera, *_pMainLight, _camera);
 	_renderSystem.Render(_camera);
 
+	return true;
+}
+
+bool GameScene::SceneRenderSprite()
+{
+	_ui->RenderUI();
 	return true;
 }
 

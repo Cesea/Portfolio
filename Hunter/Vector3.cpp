@@ -45,6 +45,13 @@ const Vector3 &Vector3::operator=(const Vector3 & other)
 	return *this;
 }
 
+bool Vector3::IsDiagonal()
+{
+	return (!FloatZero(x) && !FloatZero(y)) ||
+		(!FloatZero(x) && !FloatZero(z)) ||
+		(!FloatZero(y) && !FloatZero(z));
+}
+
 Vector3 & Vector3::operator+=(const Vector3 & other)
 {
 	x += other.x;

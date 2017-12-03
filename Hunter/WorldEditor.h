@@ -88,23 +88,30 @@ struct ObjectLocator
 {
 	void Reset()
 	{
-		_editingRock = false;
-		_editingTree = false;
-		_editingGrass = false;
-		_currentStaticHandle.MakeInvalid();;
+		_locateRock = false;
+		_locateTree = false;
+		_locateTrunk = false;
+		_locateGrass = false;
+		_locateMushroom = false;
+		_locateMonster = false;
+		_currentStaticHandle.MakeInvalid();
+		_currentSkinnedHandle.MakeInvalid();
+		_typeToLocate = ARCHE_NONE;
 	}
-	bool32 _editingRock{};
-	bool32 _editingTree{};
-	bool32 _editingGrass{};
+	
+	bool32 _locateRock{};
+	bool32 _locateTree{};
+	bool32 _locateTrunk{};
+	bool32 _locateGrass{};
+	bool32 _locateMushroom{};
+	bool32 _locateMonster{};
 
 	video::StaticXMeshHandle _currentStaticHandle;
+	video::SkinnedXMeshHandle _currentSkinnedHandle;
 
 	int32 _numObjectToPaint{};
-	float _spreadness{ 1.0f };
-
-	std::vector<std::string> _rockNames{};
-	std::vector<std::string> _treeNames{};
-	std::vector<std::string> _grassNames{};
+	Brush _objectPaintBrush{};
+	ARCHE_TYPE _typeToLocate{};
 };
 
 struct ObjectEditor
@@ -139,13 +146,25 @@ struct ObjectEditor
 	Quaternion _zRotation;
 };
 
+struct SceneEditor
+{
+	void Reset()
+	{
+
+	}
+	bool32 _scriptSystemRunning;
+
+
+};
+
+//Editor에서는 Scene의 포인터를 가지고 있어서 몬스터들의 스크립트나, 액션 시스템을 비 활성화 할 수 있다.
 class Editor
 {
 public :
 	Editor();
 	~Editor();
 
-	void Init();
+	void Init(IScene *pScene);
 	void Shutdown();
 
 	struct GetObjectFromSceneEvent
@@ -156,7 +175,7 @@ public :
 		Vector2 _cursorPos;
 	};
 
-	virtual void Edit(RefVariant &pObject, const InputManager &input);
+	virtual bool Edit(RefVariant &pObject, const InputManager &input);
 
 	void SetEdittingEntity(Entity &entity);
 
@@ -200,6 +219,8 @@ public :
 	TerrainEditor _terrainEditor;
 	ObjectLocator _objectLocator;
 	ObjectEditor _objectEditor;
+
+	IScene *_pCurrentScene{};
 
 	EventChannel _channel;
 };

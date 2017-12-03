@@ -15,17 +15,9 @@ struct SnakeCallbackData
 class SnakeCallbackHandler : public GameObjectAnimationCallbackHandler
 {
 public :
-	bool Init(Snake *pSnake) { _pSnake = pSnake; }
+	virtual bool Init(BaseGameObject *pSnake) { _pSnake = (Snake *)pSnake; return true; }
     HRESULT CALLBACK HandleCallback( THIS_ UINT Track, LPVOID pCallbackData )
     {
-  //      SnakeCallbackData* pData = ( SnakeCallbackData* )pCallbackData;
-		//if (nullptr == pData)
-		//{
-  //          return S_OK;
-		//}
-		//switch (*pData->_animtionEnum)
-		//{
-		//}
         return S_OK;
     }
 

@@ -37,7 +37,7 @@ void Engine::Run()
 	_running = true;
 	_valid = true;
 
-	APPTIMER->Initialize(16);
+	APPTIMER->Initialize(33);
 
 	while (_valid && _running)
 	{
@@ -89,19 +89,18 @@ void Engine::Run()
 		gpDevice->EndScene();
 		gpDevice->Present(nullptr, nullptr, NULL, nullptr);
 
-
 		_pInput->UpdatePrevInput();
 
 		APPTIMER->Tick();
 
-#if defined (DEBUG) || defined (_DEBUG)
+//#if defined (DEBUG) || defined (_DEBUG)
 		static uint64 counter = 0;
 		if ((counter % 60) == 0)
 		{
 			Console::Log("DeltaMS : %d\n", APPTIMER->GetDeltaMS());
 		}
 		counter++;
-#endif
+//#endif
 	}
 	ShutDownSystems();
 }
@@ -161,12 +160,12 @@ bool Engine::InitializePlatform(HINSTANCE instanceHandle)
 	}
 
 	RECT clientRect = { 0, 0, WINSIZEX, WINSIZEY };
-	AdjustWindowRect(&clientRect, WS_OVERLAPPEDWINDOW, false);
+	AdjustWindowRect(&clientRect, WS_POPUP | WS_BORDER, false);
 
 	int32 clientWidth = clientRect.right - clientRect.left;
 	int32 clientHeight = clientRect.bottom - clientRect.top;
 
-	_windowHandle = CreateWindow(wc.lpszClassName, "Hunter", WS_OVERLAPPEDWINDOW,
+	_windowHandle = CreateWindow(wc.lpszClassName, "Hunter", WS_POPUP | WS_BORDER,
 		WINSTARTX, WINSTARTY, clientWidth, clientHeight, nullptr, nullptr, _instanceHandle, nullptr);
 
 	if (!_windowHandle)

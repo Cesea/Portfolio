@@ -10,8 +10,7 @@ bool BaseScene::SceneInit()
 	GAMEOBJECTFACTORY->SetCurrentScene(this);
 
 	video::StaticXMesh::_sEffectHandle = VIDEO->GetEffect("StaticMesh.fx");
-	video::SkinnedXMesh::_sStaticEffectHandle = VIDEO->GetEffect("StaticMesh.fx");
-	video::SkinnedXMesh::_sSkinnedEffectHandle = VIDEO->GetEffect("SkinnedMesh.fx");
+	video::SkinnedXMesh::_sEffectHandle = VIDEO->GetEffect("SkinnedMesh.fx");
 
 	InitAnimations();
 	
@@ -33,7 +32,6 @@ bool BaseScene::SceneInit()
 	MatrixScaling(&correctionMat, 0.01f, 0.01f, 0.01f);
 	video::SkinnedXMeshHandle knight  = VIDEO->CreateSkinnedXMesh(
 		"../resources/Models/Knight/Knight.X", &correctionMat, "Knight");
-	video::AnimationInstanceHandle ainmHandle = VIDEO->CreateAnimationInstance(knight, "Knight0");
 
 	MatrixScaling(&correctionMat, 1.0f, 1.0f, 1.0f);
 	video::SkinnedXMeshHandle snakeMesh = VIDEO->CreateSkinnedXMesh(
@@ -87,9 +85,7 @@ bool BaseScene::SceneInit()
 	_world.AddSystem<ScriptSystem>(_scriptSystem);
 	_world.AddSystem<CollisionSystem>(_collisionSystem);
 
-	_camera.CreateFromWorld(_world);
-	_camera.SetRotationSpeed(10.0f);
-	_camera.SetMoveSpeed(20.0f);
+	
 
 	_pMainLight = new DirectionalLight();
 	_pMainLight->CreateFromWorld(_world);
@@ -105,9 +101,6 @@ bool BaseScene::SceneInit()
 	_channel.Broadcast<GameObjectFactory::CreateObjectOnLocationEvent>(
 		GameObjectFactory::CreateObjectOnLocationEvent(ARCHE_HERO, ResourceHandle(), Vector3(0.0f, 0.0f, 0.0f)));
 
-	_channel.Broadcast<GameObjectFactory::CreateObjectOnLocationEvent>(
-		GameObjectFactory::CreateObjectOnLocationEvent(ARCHE_HERO, ResourceHandle(), Vector3(0.0f, 0.0f, 0.0f)));
-
 	//_player.CreateFromWorld(_world);
 	//_snake.CreateFromWorld(_world);
 	//_turtle.CreateFromWorld(_world,);
@@ -116,10 +109,15 @@ bool BaseScene::SceneInit()
 	//_hydra.CreateFromWorld(_world);
 	//_lizard.CreateFromWorld(_world);
 
+	_camera.CreateFromWorld(_world);
+	_camera.SetRotationSpeed(10.0f);
+	_camera.SetMoveSpeed(20.0f);
+	_camera.SetTargetObject(GAMEOBJECTFACTORY->GetPlayerObject());
+
 	imguiRenderInit();
 //에디터 생성
 	_pEditor = new Editor;
-	_pEditor->Init();
+	_pEditor->Init(this);
 
 	return result; 
 }
@@ -134,7 +132,7 @@ bool BaseScene::SceneUpdate(float deltaTime, const InputManager & input)
 
 	_scriptSystem.Update(deltaTime);
 
-	_camera.MoveAndRotate(input);
+	_camera.MoveAndRotate(deltaTime, input);
 	_transformSystem.PreUpdate(deltaTime);
 	_collisionSystem.Update(deltaTime, 1000.0f);
 
@@ -176,7 +174,7 @@ bool BaseScene::SceneRender0()
 
 	GIZMOMANAGER->WorldGrid(1.0f, 20);
 
-	TERRAIN->Render(_camera);
+	TERRAIN->Render(_camera, *_pMainLight, _camera);
 	_renderSystem.Render(_camera);
 	_pEditor->Render();
 

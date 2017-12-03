@@ -16,6 +16,7 @@
 class MapToolScene : public IScene
 {
 	friend class Terrain;
+	friend class Editor;
 public:
 	MapToolScene()
 		:IScene::IScene()
@@ -29,18 +30,10 @@ public:
 	virtual bool SceneRender0();
 	//virtual bool SceneRender1() {}
 	//virtual bool SceneRender2() {}
-	//virtual bool SceneRenderSprite() {}
+	virtual bool SceneRenderSprite();
 
 	virtual const char *GetSceneName();
-
 protected :
-
-	TransformSystem _transformSystem;
-	RenderSystem _renderSystem;
-	ScriptSystem _scriptSystem;
-	ActionSystem _actionSystem;
-	CollisionSystem _collisionSystem;
-
 	Editor *_editor{};
 
 

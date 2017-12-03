@@ -25,6 +25,11 @@ public :
 	void Update(float deltaTime, const InputManager &input);
 	void Render();
 
+	void ChangeScene(const std::string &sceneName, int32 effectNum = 0 );
+	//씬을 변경하는데 로딩씬을 추가하여 변경
+	void ChangeSceneWithLoading(const std::string &sceneName, const std::string &loadingSceneName, 
+		int32 inEffect, int32 outEffect );
+
 	EventChannel GetChannel() { return _channel; }
 private :
 	//게임에 사용되는 씬추가 씬들은 Init 가 안된다.
@@ -32,10 +37,6 @@ private :
 	//게임에 사용되는 로딩씬 추가 씬들은 모두 Init 된상태가 된다.
 	void AddLoadingScene(const std::string &sceneName, IScene *pScene );
 	//씬변경
-	void ChangeScene(const std::string &sceneName, int32 effectNum = 0 );
-	//씬을 변경하는데 로딩씬을 추가하여 변경
-	void ChangeSceneWithLoading(const std::string &sceneName, const std::string &loadingSceneName, 
-		int32 inEffect, int32 outEffect );
 
 	//bool ChangeScene(const std::string &key);
 	//bool ChangeSceneWithEffect(const std::string &key, int32 numEffect);

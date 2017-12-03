@@ -5,6 +5,7 @@
 #include "Terrain.h"
 #include "Camera.h"
 #include "BaseGameObject.h"
+#include "GameSystems.h"
 
 class EnvironmentSphere;
 
@@ -47,6 +48,8 @@ public :
 	//메인 카메라의 RenderToTexture 만 업데이트한다.
 	bool RenderToMainCamTexture();
 
+	void ReadyShadowMap(Terrain *pTerrain);
+
 	LPDIRECT3DTEXTURE9 GetSceneTexture();
 
 	virtual const char *GetSceneName() = 0;
@@ -69,14 +72,23 @@ protected :
 	Camera _camera;
 
 	DirectionalLight *_pMainLight;
-	//Camera _mainLightCamera;
+	Camera _shadowCamera;
 
 	EventChannel _channel;
 
 	EnvironmentSphere *_pEnvironmentSphere{};
 	video::Effect *_pPostEffect{};
 
+	float _shadowDistance{ 100.0f };
+
 	bool RenderEnvironmentSphere();
+
+	TransformSystem _transformSystem;
+	RenderSystem _renderSystem;
+	ScriptSystem _scriptSystem;
+	ActionSystem _actionSystem;
+	CollisionSystem _collisionSystem;
+
 public :
 };
 

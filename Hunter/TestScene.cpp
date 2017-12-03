@@ -9,8 +9,7 @@ bool TestScene::SceneInit()
 	GAMEOBJECTFACTORY->SetCurrentScene(this);
 
 	video::StaticXMesh::_sEffectHandle = VIDEO->GetEffect("StaticMesh.fx");
-	video::SkinnedXMesh::_sStaticEffectHandle = VIDEO->GetEffect("StaticMesh.fx");
-	video::SkinnedXMesh::_sSkinnedEffectHandle = VIDEO->GetEffect("SkinnedMesh.fx");
+	video::SkinnedXMesh::_sEffectHandle = VIDEO->GetEffect("SkinnedMesh.fx");
 
 	InitAnimations();
 
@@ -128,12 +127,6 @@ bool TestScene::SceneInit()
 	_world.AddSystem<ScriptSystem>(_scriptSystem);
 	_world.AddSystem<CollisionSystem>(_collisionSystem);
 
-	//카메라 생성
-	_camera.CreateFromWorld(_world);
-	_camera.SetRotationSpeed(10.0f);
-	_camera.SetMoveSpeed(20.0f);
-	_camera.GetEntity().GetComponent<TransformComponent>().MovePositionWorld(Vector3(0.0f, 4.0f, -6.0f));
-
 	//라이트 생성
 	_pMainLight = new DirectionalLight();
 	_pMainLight->CreateFromWorld(_world);
@@ -160,6 +153,14 @@ bool TestScene::SceneInit()
 				entitySaveInfo._resourceName, entitySaveInfo._position));
 	}
 
+
+	//카메라 생성
+	_camera.CreateFromWorld(_world);
+	_camera.SetRotationSpeed(10.0f);
+	_camera.SetMoveSpeed(20.0f);
+	_camera.GetEntity().GetComponent<TransformComponent>().MovePositionWorld(Vector3(0.0f, 4.0f, -6.0f));
+	_camera.SetTargetObject(GAMEOBJECTFACTORY->GetPlayerObject());
+
 	//_channel.Broadcast<GameObjectFactory::CreateObjectOnLocationEvent>(
 	//	GameObjectFactory::CreateObjectOnLocationEvent(ARCHE_SNAKE, ResourceHandle(), Vector3(0.0f, 5.0f, 0.0f)));
 	//_channel.Broadcast<GameObjectFactory::CreateObjectOnLocationEvent>(
@@ -172,7 +173,7 @@ bool TestScene::SceneInit()
 	//에디터 생성
 	imguiRenderInit();
 	_editor = new Editor;
-	_editor->Init();
+	_editor->Init(this);
 
 	return result; 
 }
@@ -187,7 +188,7 @@ bool TestScene::SceneUpdate(float deltaTime, const InputManager & input)
 
 	_scriptSystem.Update(deltaTime);
 
-	_camera.MoveAndRotate(input);
+	_camera.MoveAndRotate(deltaTime, input);
 	_transformSystem.PreUpdate(deltaTime);
 
 	//Collision Check
@@ -227,7 +228,7 @@ bool TestScene::SceneRender0()
 
 	GIZMOMANAGER->WorldGrid(1.0f, 20);
 
-	TERRAIN->Render(_camera);
+	TERRAIN->Render(_camera, *_pMainLight, _camera);
 	_renderSystem.Render(_camera);
 	_editor->Render();
 

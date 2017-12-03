@@ -14,10 +14,13 @@
 #include "Player.h"
 #include "Snake.h"
 
+#include "UI.h"
+
 
 class GameScene : public IScene
 {
 	friend class Terrain;
+	friend class Editor;
 public:
 	GameScene()
 		:IScene::IScene()
@@ -31,7 +34,7 @@ public:
 	virtual bool SceneRender0();
 	//virtual bool SceneRender1() {}
 	//virtual bool SceneRender2() {}
-	//virtual bool SceneRenderSprite() {}
+	virtual bool SceneRenderSprite();
 
 	virtual const char *GetSceneName() { return "GameScene"; }
 
@@ -43,6 +46,8 @@ protected :
 	CollisionSystem _collisionSystem;
 
 	Editor *_editor{};
+
+	UI* _ui;
 
 public:
 	virtual void Handle(const Editor::GetObjectFromSceneEvent &event);

@@ -22,6 +22,7 @@
 class BaseScene : public IScene
 {
 	friend class Terrain;
+	friend class Editor;
 public:
 	BaseScene()
 		:IScene::IScene()

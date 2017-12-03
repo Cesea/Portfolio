@@ -13,6 +13,7 @@ enum ARCHE_TYPE
 	ARCHE_ROCK,
 	ARCHE_GRASS,
 	ARCHE_TREE,
+	ARCHE_TREETRUNK,
 	ARCHE_MUSHROOM,
 	ARCHE_BAT,
 	ARCHE_CAT,
@@ -22,6 +23,8 @@ enum ARCHE_TYPE
 	ARCHE_HYDRA,
 	ARCHE_COUNT,
 };
+
+const char *ArcheToString(ARCHE_TYPE type);
 
 struct EntitySaveInfo
 {

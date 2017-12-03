@@ -8,7 +8,7 @@
 #define MATRIX_PALETTE_SIZE_DEFAULT 45
 #endif
 
-const int MATRIX_PALETTE_SIZE = MATRIX_PALETTE_SIZE_DEFAULT;
+//const int MATRIX_PALETTE_SIZE = MATRIX_PALETTE_SIZE_DEFAULT;
 float4x3 amPalette[ MATRIX_PALETTE_SIZE_DEFAULT ];
 
 struct VS_SKIN_INPUT
@@ -133,24 +133,21 @@ VS_SKIN_OUTPUT3 VS_Skin3( VS_SKIN_INPUT3 Input, int iNumBones )
     return Output;
 }
 
-//------------------------------------------------------------------------------------
-// SkinnedMesh Base 
-//------------------------------------------------------------------------------------
-
 float4x4 matWorld : World;
 float4x4 matViewProjection : ViewProjection;
 float4 vEyePos;
 
+// ---------------------------------------------------------------------------
+// StaticMesh Base
+// ---------------------------------------------------------------------------
 
-struct VS_INPUT
+struct vs_static_input
 {
-    float4  Position        : POSITION;
-    float3  BlendWeights    : BLENDWEIGHT;
-    float4  BlendIndices    : BLENDINDICES;
-    float3  Normal          : NORMAL;
-    float3  Binormal        : Binormal;
-    float3  Tangent         : TANGENT;
-    float2  Texcoord        : TEXCOORD0;
+   float4 Position : POSITION0;
+   float3 Normal : NORMAL0;
+   float3 Tangent : TANGENT0;
+   float3 Binormal : BINORMAL0;
+   float2 Texcoord : TEXCOORD0;
 };
 
 struct VS_OUTPUT
@@ -165,12 +162,54 @@ struct VS_OUTPUT
 	float4 FinalPos : TEXCOORD6;
 };
 
+VS_OUTPUT vs_static_main( vs_static_input input )
+{
+   VS_OUTPUT Output = (VS_OUTPUT)0;
+
+   float4 worldPos = mul( input.Position, matWorld );
+   Output.Position = mul( worldPos, matViewProjection );
+   
+   Output.Texcoord = input.Texcoord;
+   
+   Output.Normal = mul( input.Normal, (float3x3)matWorld );
+   Output.Binormal = mul( input.Binormal, (float3x3)matWorld );  
+   Output.Tangent = mul( input.Tangent, (float3x3)matWorld ); 
+   
+   Output.viewDir = vEyePos.xyz - worldPos.xyz;
+   Output.worldPos = worldPos;
+
+   Output.FinalPos = Output.Position;
+
+   return( Output );
+}
+
+//------------------------------------------------------------------------------------
+// SkinnedMesh Base 
+//------------------------------------------------------------------------------------
+
+struct VS_INPUT
+{
+    float4  Position        : POSITION;
+    float3  BlendWeights    : BLENDWEIGHT;
+    float4  BlendIndices    : BLENDINDICES;
+    float3  Normal          : NORMAL;
+    float3  Tangent         : TANGENT;
+    float3  Binormal        : Binormal;
+    float2  Texcoord        : TEXCOORD0;
+};
+
 //버택스 진입
 VS_OUTPUT VertSkinning( VS_INPUT Input, uniform int iNumBones )
 {
     VS_OUTPUT Output;
 
-    VS_SKIN_INPUT vsi = { Input.Position, Input.BlendWeights, Input.BlendIndices, Input.Normal, Input.Binormal, Input.Tangent };
+    VS_SKIN_INPUT vsi = { Input.Position, 
+		Input.BlendWeights, 
+		Input.BlendIndices, 
+		Input.Normal, 
+		Input.Binormal, 
+		Input.Tangent };
+
     VS_SKIN_OUTPUT vso = VS_Skin( vsi, iNumBones );
 
 	//정점 월드 포지션 변경 완료.....
@@ -188,15 +227,18 @@ VS_OUTPUT VertSkinning( VS_INPUT Input, uniform int iNumBones )
 	};
 	*/
 
-
 	Output.worldPos = worldPos.xyz;
     Output.Position = mul( worldPos, matViewProjection );
 
 	Output.viewDir = vEyePos.xyz - Output.Position.xyz;
 
-    Output.Normal = mul( vso.Normal, (float3x3)matWorld );
-    Output.Binormal = mul( vso.Binormal, (float3x3)matWorld );
-    Output.Tangent = mul( vso.Tangent, (float3x3)matWorld );
+	Output.Normal = vso.Normal;
+    Output.Binormal = vso.Binormal;
+    Output.Tangent = vso.Tangent;
+
+    //Output.Normal = mul( vso.Normal, (float3x3)matWorld );
+    //Output.Binormal = mul( vso.Binormal, (float3x3)matWorld );
+    //Output.Tangent = mul( vso.Tangent, (float3x3)matWorld );
    
     Output.Texcoord = Input.Texcoord;
 
@@ -231,15 +273,37 @@ VS_OUTPUT_DEPTH vs_CreateShadow( VS_INPUT_DEPTH Input, uniform int iNumBones )
    VS_SKIN_INPUT2 vsi = { Input.Position, Input.BlendWeights, Input.BlendIndices };
    VS_SKIN_OUTPUT2 vso = VS_Skin2( vsi, iNumBones );
 
-
    //정점 월드 포지션 변경 완료.....
    float4 worldPos = float4( vso.Position.xyz, 1.0f );
 
    Output.Position = mul( worldPos, matViewProjection );
+   Output.Position = float4( vso.Position.xyz, 1.0f );
    
    Output.FinalPos = Output.Position;
 
    Output.Texcoord = Input.Texcoord;
+
+   return( Output );
+}
+
+struct vs_input_static_create_shadow
+{
+   float4 position : POSITION0;
+   float2 texcoord : TEXCOORD0;
+};
+
+
+VS_OUTPUT_DEPTH vs_static_create_shadow( vs_input_static_create_shadow input)
+{
+   VS_OUTPUT_DEPTH Output = (VS_OUTPUT_DEPTH)0;
+
+   //정점 월드 포지션 변경 완료.....
+   float4 worldPos = mul(float4( input.position.xyz, 1.0f), matWorld);
+   Output.Position = mul( worldPos, matViewProjection );
+   
+   Output.FinalPos = Output.Position;
+
+   Output.Texcoord = input.texcoord;
 
    return( Output );
 }
@@ -251,8 +315,8 @@ VS_OUTPUT_DEPTH vs_CreateShadow( VS_INPUT_DEPTH Input, uniform int iNumBones )
 struct VS_INPUT_RECIVESHADOW
 {
    float4 Position : POSITION0;
-   float3  BlendWeights    : BLENDWEIGHT;
-   float4  BlendIndices    : BLENDINDICES;
+   float3 BlendWeights    : BLENDWEIGHT;
+   float4 BlendIndices    : BLENDINDICES;
    float2 Texcoord : TEXCOORD0;
    float3 Normal : NORMAL0;
    float3 Binormal : BINORMAL0;
@@ -332,13 +396,22 @@ VertexShader ReciveShadowArr[ 4 ] = { compile vs_3_0 vs_ReciveShadow( 1 ),
 // Techniques
 //--------------------------------------------------------------------------------------
 
-technique Base
+technique Skinned
 {
     pass p0
     {
         VertexShader = ( vsArray20[ CurNumBones ] );
-		PixelShader = compile ps_3_0 ps_default();
+		PixelShader = compile ps_3_0 ps_main();
     }
+}
+
+technique Static
+{
+	pass p0
+	{
+		VertexShader = compile vs_3_0 vs_static_main();
+		PixelShader = compile ps_3_0 ps_main();
+	}
 }
 
 technique Toon
@@ -350,13 +423,22 @@ technique Toon
 	}
 }
 
-technique CreateShadow
+technique CreateShadowSkinned
 {
     pass p0
     {
         VertexShader = ( CreateShadowArr[ CurNumBones ] );
         PixelShader = compile ps_3_0 ps_CreateShadow();
     }
+}
+
+technique CreateShadowStatic
+{
+	pass p0
+	{
+		VertexShader = compile vs_3_0 vs_static_create_shadow();
+        PixelShader = compile ps_3_0 ps_CreateShadow();
+	}
 }
 
 technique ReciveShadow

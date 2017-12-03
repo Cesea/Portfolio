@@ -29,8 +29,7 @@ VS_OUTPUT vs_Base(VS_INPUT Input)
 
 //Sampler
 texture screenTex;
-sampler2D screenSampler = sampler_state
-{
+sampler2D screenSampler = sampler_state{
 	Texture = screenTex;
 	MAGFILTER = LINEAR;
 	MIPFILTER = LINEAR;
@@ -43,8 +42,8 @@ float4 ps_Base( VS_OUTPUT Input ) : COLOR0
 	Input.uv.x += pixelHalfSizeU;
 	Input.uv.y += pixelHalfSizeV;
 
-	//return float4(1.0f, 0.0f, 1.0f, 1.0f);
 	return tex2D( screenSampler, Input.uv );
+
 	//return float4(tex2D(screenSampler, Input.uv).www, 1);
 
 }
@@ -305,6 +304,9 @@ float4 ps_ColorLevel(VS_OUTPUT Input) : COLOR0
 
 	return finalColor;
 }
+
+
+
 
 
 

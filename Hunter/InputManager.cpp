@@ -141,8 +141,8 @@ void Mouse::UpdateWithMessage(WPARAM wParam, LPARAM lParam)
 void Mouse::UpdateWheelWithMessage(WPARAM wParam, LPARAM lParam)
 {
 	_wheelDelta = GET_WHEEL_DELTA_WPARAM(wParam);
-	_currentPoint.x = LOWORD(lParam);
-	_currentPoint.y = HIWORD(lParam);
+	//_currentPoint.x = LOWORD(lParam);
+	//_currentPoint.y = HIWORD(lParam);
 
 }
 

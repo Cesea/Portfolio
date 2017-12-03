@@ -55,9 +55,9 @@ PLAYER_ANIM_LINK(eSitting);
 PLAYER_ANIM_LINK(eWalk);
 PLAYER_ANIM_LINK(eStrafeLeft);
 PLAYER_ANIM_LINK(eStrafeRight);
-PLAYER_ANIM_LINK(eThrust);
-PLAYER_ANIM_LINK(eSwingLeft);
-PLAYER_ANIM_LINK(eSwingRight);
+PLAYER_ANIM_LINK(eWarWalkThrust);
+PLAYER_ANIM_LINK(eWarWalkSwingLeft);
+PLAYER_ANIM_LINK(eWarWalkSwingRight);
 
 
 void InitPlayerAnimation()
@@ -112,7 +112,7 @@ void InitPlayerAnimation()
    PLAYER_ANIM_DEFINE(eWalk, false, false, false, 1.0f, 0.2f, 0.2f);
    PLAYER_ANIM_DEFINE(eStrafeLeft, false, true,false, 1.0f, 0.2f,0.2f);
    PLAYER_ANIM_DEFINE(eStrafeRight, false, true, false, 1.0f, 0.2f, 0.2f);
-   PLAYER_ANIM_DEFINE(eThrust, false, true, false, 1.0f, 0.2f, 0.2f);
-   PLAYER_ANIM_DEFINE(eSwingLeft, false, true, false, 1.0f, 0.2f, 0.2f);
-   PLAYER_ANIM_DEFINE(eSwingRight, false, true, false, 1.0f, 0.2f, 0.2f);
+   PLAYER_ANIM_DEFINE(eWarWalkThrust, true, true, false, 1.0f, 0.2f, 0.2f);
+   PLAYER_ANIM_DEFINE(eWarWalkSwingLeft, true, true, false, 1.0f, 0.2f, 0.2f);
+   PLAYER_ANIM_DEFINE(eWarWalkSwingRight, true, true, false, 1.0f, 0.2f, 0.2f);
 }

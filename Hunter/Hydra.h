@@ -15,19 +15,9 @@ struct HydraCallbackData
 class HydraCallbackHandler : public GameObjectAnimationCallbackHandler
 {
 public:
-	bool Init(Hydra *pHydra) { _pHydra = pHydra; }
+	virtual bool Init(BaseGameObject *pHydra) { _pHydra = (Hydra *)pHydra; return true; }
 	HRESULT CALLBACK HandleCallback(THIS_ UINT Track, LPVOID pCallbackData)
 	{
-		//      SnakeCallbackData* pData = ( SnakeCallbackData* )pCallbackData;
-		//if (nullptr == pData)
-		//{
-		//          return S_OK;
-		//}
-
-		//switch (*pData->_animtionEnum)
-		//{
-
-		//}
 		return S_OK;
 	}
 
