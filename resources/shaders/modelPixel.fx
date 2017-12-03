@@ -73,7 +73,31 @@ struct PS_OUTPUT
 
 float4 ps_diffuse(ps_diffuse_input input) : COLOR
 {
-	return float4(tex2D(Diffuse, input.texcoord).rgb, 1.0f);
+	float4 diffTex = tex2D(Diffuse, input.texcoord);
+	clip(diffTex.a - 0.1f);
+
+	float3 finalDiffuse = float3(0.0f, 0.0f, 0.0f);
+
+	//광원의 방향
+	float3 dir = float3(baseDirectionalLight._21, baseDirectionalLight._22, baseDirectionalLight._23);
+	float3 lightDir = -dir;
+
+	//광원의 컬러
+	float3 lightColor = float3(baseDirectionalLight._31, baseDirectionalLight._32, baseDirectionalLight._33) * baseDirectionalLight._34;
+
+	float NdotL = dot(lightDir, input.normal);
+	float diff = NdotL;
+	if (diff < 0.0)
+	{
+		diff = abs(NdotL) * 0.3f;
+	}
+
+	finalDiffuse = lightColor * diff;
+
+	// Diffuse
+	float3 diffuseColor = diffTex.rgb * finalDiffuse;
+
+	return float4(diffuseColor.rgb, 1.0f);
 }
 
 float4 ps_main(PS_INPUT Input) : COLOR
@@ -180,8 +204,8 @@ float4 ps_CreateShadow(PS_INPUT_SHADOW Input) : COLOR0
 	//행렬변환을 거친 값 z 에 행렬변환에서 얻는 가중치 w 를 나누면 0 ~ 1 사이의 깊이 값이 된다.
 	float depth = Input.FinalPos.z / Input.FinalPos.w;
 
-	//float4 diffTex = tex2D(Diffuse, Input.Texcoord);
-	//clip(diffTex.a - 0.1f);
+	float4 diffTex = tex2D(Diffuse, Input.Texcoord);
+	clip(diffTex.a - 0.1f);
 	return float4(depth.xxx, 1);
 }
 
@@ -226,7 +250,7 @@ PS_OUTPUT ps_ReciveShadow(PS_INPUT_RECIVESHADOW Input)
 	PS_OUTPUT Output = (PS_OUTPUT)0;
 
 	float4 diffTex = tex2D(Diffuse, Input.Texcoord);
-		clip(diffTex.a - 0.1f);
+	clip(diffTex.a - 0.1f);
 
 	//광원 입장에서 바라본 위치의 뎁스 값 ( 라이트 행렬을 직교이기때문에 선형으로 안핀다 )
 	float lightDepth = Input.LightClipPos.z / Input.LightClipPos.w;
@@ -243,9 +267,6 @@ PS_OUTPUT ps_ReciveShadow(PS_INPUT_RECIVESHADOW Input)
 
 	//그림자가 그려지는 상황은 shadowDepth + bias 값 보다 lightDepth 가 큰경우이다.
 
-
-
-
 	//TBN Matrix
 	float3x3 TBN = float3x3(
 		normalize(Input.Tangent),
@@ -257,28 +278,27 @@ PS_OUTPUT ps_ReciveShadow(PS_INPUT_RECIVESHADOW Input)
 	//
 	float3 norColor = tex2D(Normal, Input.Texcoord).rgb;
 
-		//Tangent Space Normal
-		float3 spaceNor = (norColor * 2.0f) - 1.0f;
+	//Tangent Space Normal
+	float3 spaceNor = (norColor * 2.0f) - 1.0f;
 
-		float3 worldNormal = mul(spaceNor, TBN);
-		worldNormal = normalize(worldNormal);
+	float3 worldNormal = mul(spaceNor, TBN);
+	worldNormal = normalize(worldNormal);
 	float3 viewDir = normalize(Input.viewDir);
 
-		//최종 색
-		float3 finalDiffuse = float3(0, 0, 0);
-		float3 finalSpecular = float3(0, 0, 0);
+	//최종 색
+	float3 finalDiffuse = float3(0, 0, 0);
+	float3 finalSpecular = float3(0, 0, 0);
 
-		//기본 라이팅 처리
+	//기본 라이팅 처리
 
-		//광원의 방향
-		float3 dir = float3(baseDirectionalLight._21, baseDirectionalLight._22, baseDirectionalLight._23);
-		float3 lightDir = -dir;
+	//광원의 방향
+	float3 dir = float3(baseDirectionalLight._21, baseDirectionalLight._22, baseDirectionalLight._23);
+	float3 lightDir = -dir;
 
-		//광원의 컬러
-		float3 lightColor = float3(baseDirectionalLight._31, baseDirectionalLight._32, baseDirectionalLight._33) * baseDirectionalLight._34;
+	//광원의 컬러
+	float3 lightColor = float3(baseDirectionalLight._31, baseDirectionalLight._32, baseDirectionalLight._33) * baseDirectionalLight._34;
 
-
-		float NdotL = dot(lightDir, worldNormal);
+	float NdotL = dot(lightDir, worldNormal);
 
 	//Ambient
 	//float diff = saturate( NdotL );
@@ -329,25 +349,24 @@ PS_OUTPUT ps_ReciveShadow(PS_INPUT_RECIVESHADOW Input)
 	//
 	float3 diffuseColor = diffTex.rgb * finalDiffuse;
 
-		//
-		// Specular 
-		//
-		float3 specularColor = tex2D(Specular, Input.Texcoord).rgb * finalSpecular;
+	//
+	// Specular 
+	//
+	float3 specularColor = tex2D(Specular, Input.Texcoord).rgb * finalSpecular;
 
-		//
-		// Emission
-		//
-		float3 emissionColor = tex2D(Emission, Input.Texcoord).rgb;
+	//
+	// Emission
+	//
+	float3 emissionColor = tex2D(Emission, Input.Texcoord).rgb;
 
-		//
-		// Final Color 
-		//
-		float3 finalColor = diffuseColor + specularColor + emissionColor;
+	//
+	// Final Color 
+	//
+	float3 finalColor = diffuseColor + specularColor + emissionColor;
 
 
-
-		//행렬변환을 거친 값 z 에 행렬변환에서 얻는 가중치 w 를 나누면 0 ~ 1 사이의 깊이 값이 된다.
-		float depth = Input.FinalPos.z / Input.FinalPos.w;
+	//행렬변환을 거친 값 z 에 행렬변환에서 얻는 가중치 w 를 나누면 0 ~ 1 사이의 깊이 값이 된다.
+	float depth = Input.FinalPos.z / Input.FinalPos.w;
 
 	//위의 depth 값을 카메라의 near 와 far 를 이용하여 선형으로 펴준다....
 	//Perspective Projection Linear Depth
@@ -355,7 +374,6 @@ PS_OUTPUT ps_ReciveShadow(PS_INPUT_RECIVESHADOW Input)
 	float a = camFar / (camFar - camNear);
 	float b = -camNear / (camFar - camNear);
 	depth = b / (z - a);
-
 
 	Output.baseColor = float4(finalColor, 1);
 	Output.normalDepth = float4(worldNormal, depth);		//alpha 값에 뎁스를 썼다.

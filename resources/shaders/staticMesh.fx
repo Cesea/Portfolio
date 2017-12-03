@@ -37,7 +37,6 @@ struct vs_diffuse_output
 	float4 position : POSITION0;
 	float2 texcoord : TEXCOORD0;
 	float3 normal : TEXCOORD1;
-
 	float3 worldPos : TEXCOORD2;
 	float4 FinalPos : TEXCOORD3;
 };
@@ -205,6 +204,7 @@ technique Grass
 	{
 		VertexShader = compile vs_3_0 vs_diffuse_main();
 		PixelShader = compile ps_3_0 ps_diffuse();
+
 		AlphaTestEnable = true;
 		AlphaFunc = GreaterEqual;
 		AlphaRef = 180;
@@ -238,7 +238,6 @@ technique ReciveShadow
       PixelShader = compile ps_3_0 ps_ReciveShadow();
    }
 }
-
 
 technique ReciveShadowToon
 {

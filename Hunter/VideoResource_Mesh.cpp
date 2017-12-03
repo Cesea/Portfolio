@@ -735,13 +735,11 @@ namespace video
 
 	void SkinnedXMesh::SetCamera(const Camera & camera)
 	{
-		Matrix matViewProj = camera.GetViewProjectionMatrix();
 		video::Effect *pSkinned = VIDEO->GetEffect(_sEffectHandle);
 
-		pSkinned->SetMatrix("matViewProjection", matViewProj);
+		pSkinned->SetMatrix("matViewProjection", camera.GetViewProjectionMatrix());
 
 		Vector3 vEyePos = camera.GetEntity().GetComponent<TransformComponent>().GetWorldPosition();
-
 		pSkinned->_ptr->SetVector("vEyePos", &Vector4(vEyePos, 1));
 		pSkinned->_ptr->SetFloat("camFar", camera._camFar);
 		pSkinned->_ptr->SetFloat("camNear", camera._camNear);
@@ -1064,7 +1062,7 @@ namespace video
 
 					DWORD materialIndex = pBoneComb[i].AttribId;
 
-					//pEffect->SetTexture("DiffuseTexture", *VIDEO->GetTexture(pBoneMesh->_diffuseTextures[materialIndex]));
+					pEffect->SetTexture("DiffuseTexture", *VIDEO->GetTexture(pBoneMesh->_diffuseTextures[materialIndex]));
 					//pEffect->SetTexture("SpecularTexture", *VIDEO->GetTexture(pBoneMesh->_specularTextures[materialIndex]));
 					//pEffect->SetTexture("NormalTexture", *VIDEO->GetTexture(pBoneMesh->_normalTextures[materialIndex]));
 					//pEffect->SetTexture("EmissionTexture", *VIDEO->GetTexture(pBoneMesh->_emissionTexture[materialIndex]));
@@ -1085,17 +1083,16 @@ namespace video
 			else
 			{
 				video::Effect *pEffect = VIDEO->GetEffect(_sEffectHandle);
-				pEffect->SetTechnique("Static");
+				HRESULT re = pEffect->SetTechnique("CreateShadowStatic");
 				pEffect->SetMatrix("matWorld", pBone->CombinedTransformationMatrix);
 				for (DWORD i = 0; i < pBoneMesh->NumAttributesGroup; i++)
 				{
-					pEffect->SetTexture("DiffuseTexture", *VIDEO->GetTexture(pBoneMesh->_diffuseTextures[i]));
-					pEffect->SetTexture("SpecularTexture", *VIDEO->GetTexture(pBoneMesh->_specularTextures[i]));
-					pEffect->SetTexture("NormalTexture", *VIDEO->GetTexture(pBoneMesh->_normalTextures[i]));
-					pEffect->SetTexture("EmissionTexture", *VIDEO->GetTexture(pBoneMesh->_emissionTexture[i]));
-					pEffect->SetFloat("fSpecPower", pBoneMesh->_materials[i].Power);
-
-					pEffect->CommitChanges();
+					//pEffect->SetTexture("DiffuseTexture", *VIDEO->GetTexture(pBoneMesh->_diffuseTextures[i]));
+					//pEffect->SetTexture("SpecularTexture", *VIDEO->GetTexture(pBoneMesh->_specularTextures[i]));
+					//pEffect->SetTexture("NormalTexture", *VIDEO->GetTexture(pBoneMesh->_normalTextures[i]));
+					//pEffect->SetTexture("EmissionTexture", *VIDEO->GetTexture(pBoneMesh->_emissionTexture[i]));
+					//pEffect->SetFloat("fSpecPower", pBoneMesh->_materials[i].Power);
+					//pEffect->CommitChanges();
 
 					uint32 numPass = pEffect->BeginEffect();
 					for (uint32 p = 0; p < numPass; ++p)

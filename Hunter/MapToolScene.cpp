@@ -68,30 +68,29 @@ void LoadEverySkinnedResources()
 	video::SkinnedXMeshHandle knight  = VIDEO->CreateSkinnedXMesh(
 		"../resources/Models/Knight/Knight.X", &correctionMat, "Knight");
 
-	MatrixScaling(&correctionMat, 1.0f, 1.0f, 1.0f);
-	video::SkinnedXMeshHandle snakeMesh = VIDEO->CreateSkinnedXMesh(
-		"../resources/Models/Snake/Snake_Red.X", &correctionMat, "Snake");
+	//MatrixScaling(&correctionMat, 1.0f, 1.0f, 1.0f);
+	//video::SkinnedXMeshHandle snakeMesh = VIDEO->CreateSkinnedXMesh(
+	//	"../resources/Models/Snake/Snake_Red.X", &correctionMat, "Snake");
 
-	MatrixScaling(&correctionMat, 1.0f, 1.0f, 1.0f);
-	video::SkinnedXMeshHandle turtleMesh = VIDEO->CreateSkinnedXMesh(
-		"../resources/Models/DragonTurtle/DragonTurtle_Black.X", &correctionMat, "Turtle");
+	//MatrixScaling(&correctionMat, 1.0f, 1.0f, 1.0f);
+	//video::SkinnedXMeshHandle turtleMesh = VIDEO->CreateSkinnedXMesh(
+	//	"../resources/Models/DragonTurtle/DragonTurtle_Black.X", &correctionMat, "Turtle");
 
-	MatrixScaling(&correctionMat, 1.0f, 1.0f, 1.0f);
-	video::SkinnedXMeshHandle batMesh = VIDEO->CreateSkinnedXMesh(
-		"../resources/Models/DragonBat/DragonBat_Black.X", &correctionMat, "Bat");
+	//MatrixScaling(&correctionMat, 1.0f, 1.0f, 1.0f);
+	//video::SkinnedXMeshHandle batMesh = VIDEO->CreateSkinnedXMesh(
+	//	"../resources/Models/DragonBat/DragonBat_Black.X", &correctionMat, "Bat");
 
-	MatrixScaling(&correctionMat, 1.0f, 1.0f, 1.0f);
-	video::SkinnedXMeshHandle catMesh = VIDEO->CreateSkinnedXMesh(
-		"../resources/Models/DevilCat/DevilCat.X", &correctionMat, "Cat");
+	//MatrixScaling(&correctionMat, 1.0f, 1.0f, 1.0f);
+	//video::SkinnedXMeshHandle catMesh = VIDEO->CreateSkinnedXMesh(
+	//	"../resources/Models/DevilCat/DevilCat.X", &correctionMat, "Cat");
 
-	MatrixScaling(&correctionMat, 1.0f, 1.0f, 1.0f);
-	video::SkinnedXMeshHandle HydraMesh = VIDEO->CreateSkinnedXMesh(
-		"../resources/Models/Hydra/Hydra_Red.X", &correctionMat, "Hydra");
+	//MatrixScaling(&correctionMat, 1.0f, 1.0f, 1.0f);
+	//video::SkinnedXMeshHandle HydraMesh = VIDEO->CreateSkinnedXMesh(
+	//	"../resources/Models/Hydra/Hydra_Red.X", &correctionMat, "Hydra");
 
-	MatrixScaling(&correctionMat, 1.0f, 1.0f, 1.0f);
-	video::SkinnedXMeshHandle LizardMesh = VIDEO->CreateSkinnedXMesh(
-		"../resources/Models/Lizard/Lizard.X", &correctionMat, "Lizard");
-
+	//MatrixScaling(&correctionMat, 1.0f, 1.0f, 1.0f);
+	//video::SkinnedXMeshHandle LizardMesh = VIDEO->CreateSkinnedXMesh(
+	//	"../resources/Models/Lizard/Lizard.X", &correctionMat, "Lizard");
 }
 
 bool MapToolScene::SceneInit()

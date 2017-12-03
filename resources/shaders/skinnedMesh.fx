@@ -273,16 +273,37 @@ VS_OUTPUT_DEPTH vs_CreateShadow( VS_INPUT_DEPTH Input, uniform int iNumBones )
    VS_SKIN_INPUT2 vsi = { Input.Position, Input.BlendWeights, Input.BlendIndices };
    VS_SKIN_OUTPUT2 vso = VS_Skin2( vsi, iNumBones );
 
-
    //정점 월드 포지션 변경 완료.....
    float4 worldPos = float4( vso.Position.xyz, 1.0f );
 
-   //Output.Position = mul( worldPos, matViewProjection );
+   Output.Position = mul( worldPos, matViewProjection );
    Output.Position = float4( vso.Position.xyz, 1.0f );
    
    Output.FinalPos = Output.Position;
 
    Output.Texcoord = Input.Texcoord;
+
+   return( Output );
+}
+
+struct vs_input_static_create_shadow
+{
+   float4 position : POSITION0;
+   float2 texcoord : TEXCOORD0;
+};
+
+
+VS_OUTPUT_DEPTH vs_static_create_shadow( vs_input_static_create_shadow input)
+{
+   VS_OUTPUT_DEPTH Output = (VS_OUTPUT_DEPTH)0;
+
+   //정점 월드 포지션 변경 완료.....
+   float4 worldPos = mul(float4( input.position.xyz, 1.0f), matWorld);
+   Output.Position = mul( worldPos, matViewProjection );
+   
+   Output.FinalPos = Output.Position;
+
+   Output.Texcoord = input.texcoord;
 
    return( Output );
 }
@@ -409,6 +430,15 @@ technique CreateShadowSkinned
         VertexShader = ( CreateShadowArr[ CurNumBones ] );
         PixelShader = compile ps_3_0 ps_CreateShadow();
     }
+}
+
+technique CreateShadowStatic
+{
+	pass p0
+	{
+		VertexShader = compile vs_3_0 vs_static_create_shadow();
+        PixelShader = compile ps_3_0 ps_CreateShadow();
+	}
 }
 
 technique ReciveShadow
