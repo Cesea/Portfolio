@@ -1087,7 +1087,7 @@ namespace video
 				pEffect->SetMatrix("matWorld", pBone->CombinedTransformationMatrix);
 				for (DWORD i = 0; i < pBoneMesh->NumAttributesGroup; i++)
 				{
-					//pEffect->SetTexture("DiffuseTexture", *VIDEO->GetTexture(pBoneMesh->_diffuseTextures[i]));
+					pEffect->SetTexture("DiffuseTexture", *VIDEO->GetTexture(pBoneMesh->_diffuseTextures[i]));
 					//pEffect->SetTexture("SpecularTexture", *VIDEO->GetTexture(pBoneMesh->_specularTextures[i]));
 					//pEffect->SetTexture("NormalTexture", *VIDEO->GetTexture(pBoneMesh->_normalTextures[i]));
 					//pEffect->SetTexture("EmissionTexture", *VIDEO->GetTexture(pBoneMesh->_emissionTexture[i]));

@@ -37,7 +37,7 @@ void Engine::Run()
 	_running = true;
 	_valid = true;
 
-	APPTIMER->Initialize(33);
+	APPTIMER->Initialize(16);
 
 	while (_valid && _running)
 	{

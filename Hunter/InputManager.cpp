@@ -86,17 +86,22 @@ void Keyboard::Update()
 		{
 			_pParent->GetChannel().Broadcast<InputManager::KeyDownEvent>(InputManager::KeyDownEvent(i));
 		}
-		if (IsReleased(i))
-		{
-			_pParent->GetChannel().Broadcast<InputManager::KeyReleasedEvent>(InputManager::KeyReleasedEvent(i));
-		}
+	}
+	for (int32 i = 0; i < 256; ++i)
+	{
 		if (IsPressed(i))
 		{
 			_pParent->GetChannel().Broadcast<InputManager::KeyPressedEvent>(InputManager::KeyPressedEvent(i));
 			_vkCode = i;
 		}
 	}
-
+	for (int32 i = 0; i < 256; ++i)
+	{
+		if (IsReleased(i))
+		{
+			_pParent->GetChannel().Broadcast<InputManager::KeyReleasedEvent>(InputManager::KeyReleasedEvent(i));
+		}
+	}
 }
 
 void Keyboard::UpdatePrevInput()
