@@ -60,6 +60,22 @@ UI::~UI()
 {
 }
 
+void UI::Update(float deltaTime, const InputManager & input)
+{
+	//input.keyboard.IsDown();
+	//input.keyboard.IsPressed();
+	//input.keyboard.IsReleased();
+
+	//input.mouse.GetCurrentPoint();
+
+	//MOUSE_BUTTON_LEFT;
+	//MOUSE_BUTTON_RIGHT;
+	//MOUSE_BUTTON_MIDDLE;
+	//input.mouse.IsDown();
+	//input.mouse.IsReleased();
+	//input.mouse.IsPressed();
+}
+
 void UI::RenderUI(void)
 {
 	SPRITEMANAGER->BeginSpriteRender();

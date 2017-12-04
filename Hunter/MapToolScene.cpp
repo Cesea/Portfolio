@@ -173,6 +173,8 @@ bool MapToolScene::SceneInit()
 	_editor = new Editor;
 	_editor->Init(this);
 
+	_ui = new UI;
+
 	return result;
 }
 
@@ -256,12 +258,9 @@ bool MapToolScene::SceneRender0()
 
 bool MapToolScene::SceneRenderSprite()
 {
-	//RECT destRect = { 600, 0, 800, 200 };
-	//RECT sourceRect = { 0, 0, 2048, 2048 };
-	//SPRITEMANAGER->BeginSpriteRender();
-	//SPRITEMANAGER->DrawArea(_shadowCamera.GetRenderTexture(), &sourceRect, &destRect, 0);
-	//SPRITEMANAGER->EndSpriteRender();
-	//return true;
+	SPRITEMANAGER->BeginSpriteRender();
+	_ui->RenderUI();
+	SPRITEMANAGER->EndSpriteRender();
 	return true;
 }
 

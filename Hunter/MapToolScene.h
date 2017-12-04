@@ -7,6 +7,8 @@
 #include "Player.h"
 #include "Snake.h"
 
+#include "UI.h"
+
 class MapToolScene : public IScene
 {
 	friend class Terrain;
@@ -30,8 +32,11 @@ public:
 protected :
 	Editor *_editor{};
 
+	UI *_ui{};
+
 public:
 	virtual void Handle(const Editor::GetObjectFromSceneEvent &event);
+
 };
 
 #endif

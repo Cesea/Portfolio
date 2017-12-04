@@ -25,12 +25,6 @@ IScene::IScene()
 	_screenIndices[5] = 2;
 
 
-    //WORD    Stream;     // Stream index
-    //WORD    Offset;     // Offset in the stream in bytes
-    //BYTE    Type;       // Data type
-    //BYTE    Method;     // Processing method
-    //BYTE    Usage;      // Semantics
-    //BYTE    UsageIndex; // Semantic index
 
 	video::VertexDecl decl;
 	decl.Begin();
@@ -69,7 +63,6 @@ IScene::IScene()
 
 	_pScreenIndexBuffer = VIDEO->GetIndexBuffer(iBufferHandle);
 
-	_ui = new UI;
 }
 
 bool IScene::Init()
@@ -269,11 +262,5 @@ LPDIRECT3DTEXTURE9 IScene::GetSceneTexture()
 bool IScene::RenderEnvironmentSphere()
 {
 	_pEnvironmentSphere->Render(_camera);
-	return true;
-}
-
-bool IScene::SceneRenderSprite()
-{
-	_ui->RenderUI();
 	return true;
 }

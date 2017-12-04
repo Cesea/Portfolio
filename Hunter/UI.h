@@ -2,6 +2,8 @@
 
 class Player;
 
+#include "Inventory.h"
+
 class UI
 {
 private:
@@ -38,6 +40,8 @@ private:
 	float CurFury;
 
 public:
+
+	void Update(float deltaTime, const InputManager &input);
 
 	void RenderUI(void);
 

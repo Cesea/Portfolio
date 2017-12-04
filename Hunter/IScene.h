@@ -64,7 +64,7 @@ protected :
 	virtual bool SceneRender0() = 0;
 	virtual bool SceneRender1() { return true; }
 	virtual bool SceneRender2() { return true; }
-	virtual bool SceneRenderSprite();
+	virtual bool SceneRenderSprite() { return true; }
 
 	SceneVertex _screenVertices[4];
 	uint16 _screenIndices[6];
@@ -84,8 +84,6 @@ protected :
 	float _shadowDistance{ 100.0f };
 
 	bool RenderEnvironmentSphere();
-
-	UI* _ui;
 
 	TransformSystem _transformSystem;
 	RenderSystem _renderSystem;

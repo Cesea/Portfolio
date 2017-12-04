@@ -1111,20 +1111,31 @@ const Vector3 ConvertTilePosToWorldPos(const TerrainTilePos & tilePos)
 	return Vector3();
 }
 
+//플레이어가 접근하면 터레인 청크에 있는 모든 엔티티들을 활성화 시킨다
 void Terrain::TerrainChunk::ValidateEntities()
 {
-	for (int32 i = 0; i < _entities.size(); ++i)
+	for (int32 i = 0; i < TERRAIN_CHUNKS_TILE_COUNT; ++i)
 	{
-		_entities[i].Deactivate();
+
 	}
+	//for (int32 i = 0; i < _entities.size(); ++i)
+	//{
+	//	_entities[i].Deactivate();
+	//}
 }
 
+//플레이어가 접근하면 터레인 청크에 있는 모든 엔티티들을 비활성화 시킨다
 void Terrain::TerrainChunk::InvalidateEntities()
 {
-	for (int32 i = 0; i < _entities.size(); ++i)
+
+	for (int32 i = 0; i < TERRAIN_CHUNKS_TILE_COUNT; ++i)
 	{
-		_entities[i].Activate();
+
 	}
+	//for (int32 i = 0; i < _entities.size(); ++i)
+	//{
+	//	_entities[i].Activate();
+	//}
 }
 
 //Rebuild Seciton은 인자로 들어온 min, max의 범위를 1씩 증가시켜서 내부 처리를 진행한다.

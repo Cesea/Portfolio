@@ -286,6 +286,9 @@
     <ClCompile Include="Player_CallBack.cpp">
       <Filter>Game\GameObjects\Player</Filter>
     </ClCompile>
+    <ClCompile Include="Inventory.cpp">
+      <Filter>Game\UI</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Lights.h" />
@@ -653,6 +656,9 @@
       <Filter>Game\GameScenes\LoadingScenes</Filter>
     </ClInclude>
     <ClInclude Include="UI.h">
+      <Filter>Game\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="Inventory.h">
       <Filter>Game\UI</Filter>
     </ClInclude>
   </ItemGroup>
