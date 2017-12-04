@@ -42,6 +42,9 @@ void ImguiLabel(const char* text);
 void ImguiValue(const char* text);
 bool ImguiSlider(const char* text, float* val, float vmin, float vmax, float vinc, bool enabled = true);
 
+bool ImguiFreeCollapse(const char* text, const char* subtext, bool checked, int32 x_, int32 y_, bool enabled = true);
+
+
 void ImguiDrawTexture( int16 xOffset, int16 yOffset, int16 width, int16 height, video::TextureHandle handle);
 
 bool ImguiEdit(char *text, int32 width, bool enable = true);

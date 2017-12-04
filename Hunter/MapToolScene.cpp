@@ -165,19 +165,6 @@ bool MapToolScene::SceneInit()
 	_channel.Broadcast<GameObjectFactory::CreateObjectOnLocationEvent>(
 		GameObjectFactory::CreateObjectOnLocationEvent(ARCHE_HERO, ResourceHandle(), Vector3(0.0f, 2.0f, 0.0f)));
 
-	//_channel.Broadcast<GameObjectFactory::CreateObjectOnLocationEvent>(
-	//	GameObjectFactory::CreateObjectOnLocationEvent(ARCHE_SNAKE, ResourceHandle(), Vector3(3.0f, 2.0f, 0.0f)));
-	//_channel.Broadcast<GameObjectFactory::CreateObjectOnLocationEvent>(
-	//	GameObjectFactory::CreateObjectOnLocationEvent(ARCHE_CAT, ResourceHandle(), Vector3(6.0f, 2.0f, 0.0f)));
-	//_channel.Broadcast<GameObjectFactory::CreateObjectOnLocationEvent>(
-	//	GameObjectFactory::CreateObjectOnLocationEvent(ARCHE_HYDRA, ResourceHandle(), Vector3(9.0f, 2.0f, 0.0f)));
-	//_channel.Broadcast<GameObjectFactory::CreateObjectOnLocationEvent>(
-	//	GameObjectFactory::CreateObjectOnLocationEvent(ARCHE_TURTLE, ResourceHandle(), Vector3(12.0f, 2.0f, 0.0f)));
-	//_channel.Broadcast<GameObjectFactory::CreateObjectOnLocationEvent>(
-	//	GameObjectFactory::CreateObjectOnLocationEvent(ARCHE_LIZARD, ResourceHandle(), Vector3(15.0f, 2.0f, 0.0f)));
-	//_channel.Broadcast<GameObjectFactory::CreateObjectOnLocationEvent>(
-	//	GameObjectFactory::CreateObjectOnLocationEvent(ARCHE_BAT, ResourceHandle(), Vector3(18.0f, 2.0f, 0.0f)));
-
 	//NOTE : GameObjectFactory의 GetPlayerObject는 생성에 의존성을 가진다
 	_camera.SetTargetObject(GAMEOBJECTFACTORY->GetPlayerObject());
 
@@ -216,7 +203,8 @@ bool MapToolScene::SceneUpdate(float deltaTime, const InputManager & input)
 		//_pMainLight->_entity.GetComponent<TransformComponent>().SetRotateWorld(Vector3(x, y, 0.0f));
 	}
 
-	bool editorInput = _editor->Edit(RefVariant(), input);
+	_editor->Edit(RefVariant(), input);
+
 	_world.Refresh();
 	_scriptSystem.Update(deltaTime);
 	_transformSystem.PreUpdate(deltaTime);
@@ -230,6 +218,8 @@ bool MapToolScene::SceneUpdate(float deltaTime, const InputManager & input)
 
 bool MapToolScene::SceneRelease()
 {
+	SAFE_DELETE(_editor);
+
 	for (auto object : _gameObjects)
 	{
 		SAFE_DELETE(object);
@@ -237,7 +227,6 @@ bool MapToolScene::SceneRelease()
 	_gameObjects.clear();
 
 	_world.Clear();
-
 	//VIDEO->DestroyEveryVertexBuffers();
 	//VIDEO->DestroyEveryndexBuffers();
 	//VIDEO->DestroyEveryAnimationInstances();
@@ -267,11 +256,12 @@ bool MapToolScene::SceneRender0()
 
 bool MapToolScene::SceneRenderSprite()
 {
-	RECT destRect = { 600, 0, 800, 200 };
-	RECT sourceRect = { 0, 0, 2048, 2048 };
-	SPRITEMANAGER->BeginSpriteRender();
-	SPRITEMANAGER->DrawArea(_shadowCamera.GetRenderTexture(), &sourceRect, &destRect, 0);
-	SPRITEMANAGER->EndSpriteRender();
+	//RECT destRect = { 600, 0, 800, 200 };
+	//RECT sourceRect = { 0, 0, 2048, 2048 };
+	//SPRITEMANAGER->BeginSpriteRender();
+	//SPRITEMANAGER->DrawArea(_shadowCamera.GetRenderTexture(), &sourceRect, &destRect, 0);
+	//SPRITEMANAGER->EndSpriteRender();
+	//return true;
 	return true;
 }
 

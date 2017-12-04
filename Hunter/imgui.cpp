@@ -728,6 +728,51 @@ bool ImguiSlider(const char * text, float * val, float vmin, float vmax, float v
 	return res || valChanged;
 }
 
+bool ImguiFreeCollapse(const char * text, const char * subtext, bool checked, int32 x_, int32 y_, bool enabled)
+{
+	gState._widgetID = 1;
+	gState._areaID++;
+	unsigned int id = (gState._areaID << 16) | gState._widgetID;
+
+	int x = x_;
+	int y = y_;
+	int w = gState._widgetW;
+	int h = BUTTON_HEIGHT;
+
+	const int cx = x + BUTTON_HEIGHT / 2 - CHECK_SIZE / 2;
+	const int cy = y + BUTTON_HEIGHT / 2 - CHECK_SIZE / 2;
+
+	bool over = enabled && InRect(x, y, w, h);
+	bool res = ButtonLogic(id, over);
+
+	if (checked)
+	{
+		AddCommandTriangle(cx, cy, CHECK_SIZE, CHECK_SIZE, 2, ImguiRGBA(255, 255, 255, IsActive(id) ? 255 : 200));
+	}
+	else
+	{
+		AddCommandTriangle(cx, cy, CHECK_SIZE, CHECK_SIZE, 1, ImguiRGBA(255, 255, 255, IsActive(id) ? 255 : 200));
+	}
+
+	if (enabled)
+	{
+		AddCommandText(x + BUTTON_HEIGHT, y + BUTTON_HEIGHT / 2 - TEXT_HEIGHT / 2, ImguiTextAlign::eImguiAlignLeft, text, 
+			IsHot(id) ? ImguiRGBA(255, 196, 0, 255) : ImguiRGBA(255, 255, 255, 200));
+	}
+	else
+	{
+		AddCommandText(x + BUTTON_HEIGHT, y + BUTTON_HEIGHT / 2 - TEXT_HEIGHT / 2, ImguiTextAlign::eImguiAlignLeft, text, ImguiRGBA(128, 128, 128, 200));
+	}
+
+	if (subtext)
+	{
+		AddCommandText(x + w - BUTTON_HEIGHT / 2, y + BUTTON_HEIGHT / 2 - TEXT_HEIGHT / 2, 
+			ImguiTextAlign::eImguiAlignLeft, subtext, ImguiRGBA(255, 255, 255, 128));
+	}
+
+	return res;
+}
+
 void ImguiDrawTexture( int16 xOffset, int16 yOffset, int16 width, int16 height, video::TextureHandle handle)
 {
 	const int32 x = gState._widgetX;

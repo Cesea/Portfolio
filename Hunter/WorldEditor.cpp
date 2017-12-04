@@ -843,7 +843,7 @@ void Editor::Shutdown()
 	_pCurrentScene = nullptr;
 }
 
-bool Editor::Edit(RefVariant &object, const InputManager &input)
+void Editor::Edit(RefVariant &object, const InputManager &input)
 {
 	UpdateInput(input);
 
@@ -899,9 +899,25 @@ bool Editor::Edit(RefVariant &object, const InputManager &input)
 	} break;
 	}
 
-	ImguiEndFrame();
+	if (_showStatus)
+	{
+		if (ImguiFreeCollapse("Show Status", nullptr, _showStatus, WINSIZEX - 400, 0))
+		{
+			_showStatus = !_showStatus;
+		}
+	}
+	else
+	{
+		ImguiBeginScrollArea("Status", WINSIZEX - 400, 0, 400, 600, &_scroll);
+		if (ImguiCollapse("Status", nullptr, _showStatus))
+		{
+			_showStatus = !_showStatus;
+		}
+		ImguiEndScrollArea();
 
-	return true;
+	}
+
+	ImguiEndFrame();
 }
 
 void Editor::SetEdittingEntity(Entity & entity)
