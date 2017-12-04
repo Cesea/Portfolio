@@ -69,8 +69,8 @@ public:
 		char _tile0FileName[MAX_FILE_NAME]{ 0, };
 		char _tile1FileName[MAX_FILE_NAME]{ 0, };
 		char _tile2FileName[MAX_FILE_NAME]{ 0, };
-		char _tile3FileName[MAX_FILE_NAME]{ 0, };
-		char _splatFileName[MAX_FILE_NAME]{ 0, };
+		char _control1Name[MAX_FILE_NAME]{ 0, };
+		char _control2Name[MAX_FILE_NAME]{ 0, };
 	};
 
 	struct TerrainFace
@@ -199,7 +199,7 @@ private:
 	void SmoothSection(int32 minX, int32 maxX, int32 minZ, int32 maxZ);
 
 	void DrawAlphaTextureOnCursorPos(const Vector2 & cursorPos, float innerRadius,
-		float outterRadius, int32 channel, bool32 subtract);
+		float outterRadius, int32 layer, bool32 subtract);
 
 	void LoadTextureFromConfig(const Terrain::TerrainConfig &config);
 
@@ -253,7 +253,8 @@ private:
 	video::TextureHandle _tile0Handle{};
 	video::TextureHandle _tile1Handle{};
 	video::TextureHandle _tile2Handle{};
-	video::TextureHandle _tileSplatHandle{};
+	video::TextureHandle _tileControl1Handle{};
+	video::TextureHandle _tileControl2Handle{};
 
 	video::TerrainVertex *_terrainVertices{};
 	TerrainFace *_chunkIndex{};

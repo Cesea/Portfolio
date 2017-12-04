@@ -65,12 +65,9 @@ struct TerrainEditor
 	//float _brushOutterRadius{4.0f};
 	//float _brushIntensity{1.0f};
 
-	//채널은 r : 0, g : 1, b : 2, a : 3순으로 간다..
-	int32 _channel{ 0 };
-	bool32 _r{true};
-	bool32 _g{false};
-	bool32 _b{false};
-	bool32 _a{false};
+	int32 _layer{ 0 };
+	bool32 _layer1{ 0 };
+	bool32 _layer2{ 0 };
 
 	float _countX{};
 	float _countZ{};
@@ -79,7 +76,6 @@ struct TerrainEditor
 	char _textureName00[EDITOR_MAX_NAME]{0, };
 	char _textureName01[EDITOR_MAX_NAME]{0, };
 	char _textureName02[EDITOR_MAX_NAME]{0, };
-	char _textureName03[EDITOR_MAX_NAME]{0, };
 
 	char _fileName[EDITOR_MAX_NAME];
 };

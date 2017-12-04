@@ -189,48 +189,22 @@ void Editor::InTerrainEditMode()
 		ImguiLabel("Select Texture");
 		{
 			ImguiIndent();
-			if (ImguiCheck("Texture0", _terrainEditor._r))
+			if (ImguiCheck("Layer1", _terrainEditor._layer1))
 			{
-				_terrainEditor._r = !_terrainEditor._r;
-				if (_terrainEditor._r)
+				_terrainEditor._layer1 = !_terrainEditor._layer1;
+				if (_terrainEditor._layer1)
 				{
-					_terrainEditor._channel = 0;
-					_terrainEditor._g = false;
-					_terrainEditor._b = false;
-					_terrainEditor._a = false;
+					_terrainEditor._layer = 0;
+					_terrainEditor._layer2 = false;
 				}
 			}
-			if (ImguiCheck("Texture1", _terrainEditor._g))
+			if (ImguiCheck("Layer2", _terrainEditor._layer2))
 			{
-				_terrainEditor._g = !_terrainEditor._g;
-				if (_terrainEditor._g)
+				_terrainEditor._layer2 = !_terrainEditor._layer2;
+				if (_terrainEditor._layer2)
 				{
-					_terrainEditor._channel = 1;
-					_terrainEditor._r = false;
-					_terrainEditor._b = false;
-					_terrainEditor._a = false;
-				}
-			}
-			if (ImguiCheck("Texture2", _terrainEditor._b))
-			{
-				_terrainEditor._b = !_terrainEditor._b;
-				if (_terrainEditor._b)
-				{
-					_terrainEditor._channel = 2;
-					_terrainEditor._r = false;
-					_terrainEditor._g = false;
-					_terrainEditor._a = false;
-				}
-			}
-			if (ImguiCheck("Texture3", _terrainEditor._a))
-			{
-				_terrainEditor._a = !_terrainEditor._a;
-				if (_terrainEditor._a)
-				{
-					_terrainEditor._channel = 3;
-					_terrainEditor._r = false;
-					_terrainEditor._g = false;
-					_terrainEditor._b = false;
+					_terrainEditor._layer = 1;
+					_terrainEditor._layer1 = false;
 				}
 			}
 			ImguiUnindent();
@@ -239,7 +213,7 @@ void Editor::InTerrainEditMode()
 		
 #pragma region Texture Load
 		//Tile Texture 0/////////////////////////////////////////////////////
-		ImguiLabel("Texture00");
+		ImguiLabel("Base Texture");
 		{
 			ImguiIndent();
 
@@ -279,7 +253,7 @@ void Editor::InTerrainEditMode()
 		}
 
 		//Tile Texture 1/////////////////////////////////////////////////////
-		ImguiLabel("Texture01");
+		ImguiLabel("Texture Layer1");
 		{
 			ImguiIndent();
 
@@ -319,7 +293,7 @@ void Editor::InTerrainEditMode()
 		}
 
 		//Tile Texture 2/////////////////////////////////////////////////////
-		ImguiLabel("Texture02");
+		ImguiLabel("Texture Layer2");
 		{
 			ImguiIndent();
 
@@ -358,45 +332,6 @@ void Editor::InTerrainEditMode()
 			ImguiUnindent();
 		}
 
-		//Tile Texture 3/////////////////////////////////////////////////////
-		ImguiLabel("Texture03");
-		{
-			ImguiIndent();
-			if (TERRAIN->_tile3Handle.IsValid())
-			{
-				ImguiDrawTexture(0, 0, 64, 64, TERRAIN->_tile3Handle);
-			}
-
-			if (ImguiEdit(_terrainEditor._textureName03, 120))
-			{
-				_pCurrentScene->_editorInput = true;
-			}
-
-			if (ImguiButton("LoadTexture"))
-			{
-				if (_terrainEditor._textureName03 == TERRAIN->_currentConfig._tile3FileName)
-				{
-					ZeroMemory(_terrainEditor._textureName03, sizeof(char) * EDITOR_MAX_NAME);
-					strncpy(_terrainEditor._textureName03, "Texture is Same", EDITOR_MAX_NAME);
-					return;
-				}
-				video::TextureHandle loadedTexture = VIDEO->CreateTexture(_terrainEditor._textureName03,
-					_terrainEditor._textureName03);
-				if (loadedTexture.IsValid())
-				{
-					VIDEO->DestroyTexture(TERRAIN->_tile3Handle);
-					TERRAIN->_tile3Handle = loadedTexture;
-					strncpy(TERRAIN->_currentConfig._tile3FileName, _terrainEditor._textureName03, EDITOR_MAX_NAME);
-				}
-				else
-				{
-					ZeroMemory(_terrainEditor._textureName03, sizeof(char) * EDITOR_MAX_NAME);
-					strncpy(_terrainEditor._textureName03, "Texture Not Found", EDITOR_MAX_NAME);
-				}
-			}
-			ImguiUnindent();
-		}
-
 #pragma endregion
 
 		//여기서 선택되어있는 텍스쳐를 그리는 작업을 실행하자...
@@ -405,7 +340,7 @@ void Editor::InTerrainEditMode()
 		{
 			TERRAIN->DrawAlphaTextureOnCursorPos(Vector2((float)_mx, (float)_my),
 				_terrainEditor._textureBrush._innerRadius, _terrainEditor._textureBrush._outterRadius,
-				_terrainEditor._channel, _shiftDown ? true : false);
+				_terrainEditor._layer, _shiftDown ? true : false);
 		}
 		ImguiUnindent();
 	}
@@ -828,7 +763,7 @@ void Editor::ShowStatusWindow()
 				ImguiIndent();
 				sprintf(_statusWindow._chunkPosStr, "ChunkX : %d, ChunkZ : %d", tilePos._chunkX, tilePos._chunkZ);
 				sprintf(_statusWindow._tilePosStr, "TileX : %d, TileZ : %d", tilePos._tileX, tilePos._tileZ);
-				sprintf(_statusWindow._relPosStr, "RelX : %f, RelZ : %f", tilePos._relX, tilePos._relX);
+				sprintf(_statusWindow._relPosStr, "RelX : %f, RelZ : %f", tilePos._relX, tilePos._relZ);
 
 				ImguiLabel(_statusWindow._chunkPosStr);
 				ImguiLabel(_statusWindow._tilePosStr);
@@ -881,7 +816,6 @@ void Editor::Init(IScene *pScene)
 	strncpy(_terrainEditor._textureName00, TERRAIN->_currentConfig._tile0FileName, EDITOR_MAX_NAME);
 	strncpy(_terrainEditor._textureName01, TERRAIN->_currentConfig._tile1FileName, EDITOR_MAX_NAME);
 	strncpy(_terrainEditor._textureName02, TERRAIN->_currentConfig._tile2FileName, EDITOR_MAX_NAME);
-	strncpy(_terrainEditor._textureName03, TERRAIN->_currentConfig._tile3FileName, EDITOR_MAX_NAME);
 
 	_terrainEditor._terrainConfig._textureMult = TERRAIN->_currentConfig._textureMult;
 	_terrainEditor._heightBrush.Init();
@@ -892,7 +826,6 @@ void Editor::Init(IScene *pScene)
 	strncpy(_terrainEditor._terrainConfig._tile0FileName, TERRAIN->_currentConfig._tile0FileName, EDITOR_MAX_NAME);
 	strncpy(_terrainEditor._terrainConfig._tile1FileName, TERRAIN->_currentConfig._tile1FileName, EDITOR_MAX_NAME);
 	strncpy(_terrainEditor._terrainConfig._tile2FileName, TERRAIN->_currentConfig._tile2FileName, EDITOR_MAX_NAME);
-	strncpy(_terrainEditor._terrainConfig._tile3FileName, TERRAIN->_currentConfig._tile3FileName, EDITOR_MAX_NAME);
 
 	_pCurrentScene = pScene;
 }
@@ -1026,6 +959,9 @@ void ObjectEditor::OnNewSelection(Entity entity)
 
 void TerrainEditor::Reset()
 {
+	_layer = 0;
+	_layer1 = false;
+	_layer2 = false;
 }
 
 bool Brush::Init()
