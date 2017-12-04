@@ -8,6 +8,8 @@
 
 class EnvironmentSphere;
 
+class UI;
+
 namespace video
 {
 	class Effect;
@@ -59,7 +61,7 @@ protected :
 	virtual bool SceneRender0() = 0;
 	virtual bool SceneRender1() { return true; }
 	virtual bool SceneRender2() { return true; }
-	virtual bool SceneRenderSprite() { return true; }
+	virtual bool SceneRenderSprite();
 
 	SceneVertex _screenVertices[4];
 	uint16 _screenIndices[6];
@@ -77,6 +79,8 @@ protected :
 	video::Effect *_pPostEffect{};
 
 	bool RenderEnvironmentSphere();
+
+	UI* _ui;
 public :
 };
 
