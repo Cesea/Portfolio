@@ -3,7 +3,8 @@
 
 #include "TransformComponent.h"
 #include "Frustum.h"
-#include "BaseGameObject.h"
+
+class BaseGameObject;
 
 enum CAMERA_STATE
 {

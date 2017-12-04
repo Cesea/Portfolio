@@ -1,5 +1,6 @@
 #include "stdafx.h"
-#include "UI.h"
+
+#include "BaseGameObject.h"
 
 IScene::IScene()
 	:_world(4096)

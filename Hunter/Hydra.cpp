@@ -134,6 +134,8 @@ bool Hydra::CreateFromWorld(World & world, const Vector3 &Pos)
 
 	//이벤트 등록
 	EventChannel channel;
+	channel.Broadcast<GameObjectFactory::ObjectCreatedEvent>(
+		GameObjectFactory::ObjectCreatedEvent(ARCHE_HYDRA, _entity, transComp.GetWorldPosition()));
 	channel.Add<CollisionSystem::ActorTriggerEvent, Hydra>(*this);
 	setEvent();
 

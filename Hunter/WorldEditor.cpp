@@ -803,6 +803,66 @@ void Editor::InObjectEditMode()
 	}
 }
 
+void Editor::ShowStatusWindow()
+{
+	if (false == _showStatus)
+	{
+		if (ImguiFreeCollapse("Show Status", nullptr, _showStatus, WINSIZEX - 400, 0))
+		{
+			_showStatus = !_showStatus;
+		}
+	}
+	else
+	{
+		ImguiBeginScrollArea("Status", WINSIZEX - 400, 0, 400, 600, &_scroll);
+		if (ImguiCollapse("Status", nullptr, _showStatus))
+		{
+			_showStatus = !_showStatus;
+		}
+
+		if (nullptr != _pSelectedObject)
+		{
+			TerrainTilePos tilePos = _pSelectedObject->GetTilePos();
+			ImguiLabel("Player State");
+			{
+				ImguiIndent();
+				sprintf(_statusWindow._chunkPosStr, "ChunkX : %d, ChunkZ : %d", tilePos._chunkX, tilePos._chunkZ);
+				sprintf(_statusWindow._tilePosStr, "TileX : %d, TileZ : %d", tilePos._tileX, tilePos._tileZ);
+				sprintf(_statusWindow._relPosStr, "RelX : %f, RelZ : %f", tilePos._relX, tilePos._relX);
+
+				ImguiLabel(_statusWindow._chunkPosStr);
+				ImguiLabel(_statusWindow._tilePosStr);
+				ImguiLabel(_statusWindow._relPosStr);
+				ImguiUnindent();
+			}
+
+			ImguiSeparatorLine();
+
+			ImguiLabel("Terrain Chunk State");
+			{
+				ImguiIndent();
+				ImguiLabel(_statusWindow._chunkPosStr);
+
+				const Terrain::TerrainChunk &refChunk = TERRAIN->GetChunkAt(tilePos._chunkX, tilePos._chunkZ);
+				sprintf(_statusWindow._chunkInfoStr, "Total Num Entities : %d", refChunk._numTotalEntity);
+
+				ImguiLabel(_statusWindow._chunkInfoStr);
+
+				sprintf(_statusWindow._tileInfoStr, "Tile Num Entity : %d", 
+					refChunk._tiles[Index2D(tilePos._tileX, tilePos._tileZ, TERRAIN->GetXChunkCount())].
+					_entities.size());
+				ImguiLabel(_statusWindow._tileInfoStr);
+
+				ImguiUnindent();
+			}
+
+		}
+
+		ImguiEndScrollArea();
+	}
+}
+
+
 void Editor::UpdateInput(const InputManager & input)
 {
 	_mx = input.mouse.GetCurrentPoint().x;
@@ -899,22 +959,8 @@ void Editor::Edit(RefVariant &object, const InputManager &input)
 	} break;
 	}
 
-	if (false == _showStatus)
-	{
-		if (ImguiFreeCollapse("Show Status", nullptr, _showStatus, WINSIZEX - 400, 0))
-		{
-			_showStatus = !_showStatus;
-		}
-	}
-	else
-	{
-		ImguiBeginScrollArea("Status", WINSIZEX - 400, 0, 400, 600, &_scroll);
-		if (ImguiCollapse("Status", nullptr, _showStatus))
-		{
-			_showStatus = !_showStatus;
-		}
-		ImguiEndScrollArea();
-	}
+	ShowStatusWindow();
+
 
 	ImguiEndFrame();
 }
@@ -922,7 +968,6 @@ void Editor::Edit(RefVariant &object, const InputManager &input)
 void Editor::SetEdittingEntity(Entity & entity)
 {
 	_objectEditor.OnNewSelection(entity);
-	//_objectEditor._pSelectingEntity = &entity;
 }
 
 void Editor::Render()

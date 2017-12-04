@@ -2,14 +2,16 @@
 #define I_SCENE_H
 
 #include "World.h"
-#include "Terrain.h"
 #include "Camera.h"
-#include "BaseGameObject.h"
-#include "GameSystems.h"
+
+#include "TransformSystem.h"
+#include "RenderSystem.h"
+#include "ActionSystem.h"
+#include "ScriptSystem.h"
+#include "CollisionSystem.h"
 
 class EnvironmentSphere;
-
-class UI;
+class BaseGameObject;
 
 namespace video
 {

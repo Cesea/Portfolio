@@ -153,6 +153,7 @@ bool MapToolScene::SceneInit()
 
 	TERRAIN->SetScene(this);
 	TERRAIN->Create(config, true);
+
 	
 	LoadEverySkinnedResources();
 	LoadEveryStaticResources();
@@ -167,13 +168,13 @@ bool MapToolScene::SceneInit()
 
 	//NOTE : GameObjectFactory의 GetPlayerObject는 생성에 의존성을 가진다
 	_camera.SetTargetObject(GAMEOBJECTFACTORY->GetPlayerObject());
+	TERRAIN->SetMainTilePosLink(GAMEOBJECTFACTORY->GetPlayerObject());
 
 	//에디터 생성
 	imguiRenderInit();
 	_editor = new Editor;
 	_editor->Init(this);
-
-	_ui = new UI;
+	_editor->_pSelectedObject = GAMEOBJECTFACTORY->GetPlayerObject();
 
 	return result;
 }
@@ -259,7 +260,6 @@ bool MapToolScene::SceneRender0()
 bool MapToolScene::SceneRenderSprite()
 {
 	SPRITEMANAGER->BeginSpriteRender();
-	_ui->RenderUI();
 	SPRITEMANAGER->EndSpriteRender();
 	return true;
 }

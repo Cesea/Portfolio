@@ -3,8 +3,6 @@
 
 #include "QuadTree.h"
 
-#include "BaseScene.h"
-
 Terrain::~Terrain()
 {
 }
@@ -71,7 +69,20 @@ bool Terrain::Create(const Terrain::TerrainConfig &config, bool32 inEditMode)
 
 void Terrain::RegisterEvents()
 {
+	EventChannel channel;
+	channel.Add<GameObjectFactory::ObjectCreatedEvent, Terrain>(*this);
+
 }
+
+void Terrain::UnRegisterEvents()
+{
+	EventChannel channel;
+}
+
+void Terrain::Handle(const GameObjectFactory::ObjectCreatedEvent & event)
+{
+}
+
 
 void Terrain::Destroy()
 {
@@ -1099,6 +1110,11 @@ void Terrain::EffectSetTexture(LPCSTR handle, LPDIRECT3DTEXTURE9 texture)
 void Terrain::EffectSetMatrix(LPCSTR handle, const Matrix & matrix)
 {
 	VIDEO->GetEffect(_effect)->SetMatrix(handle, matrix);
+}
+
+void Terrain::SetMainTilePosLink(const BaseGameObject * pObject)
+{
+	_pMainTilePos = &pObject->GetTilePos();
 }
 
 const Vector3 ConvertChunkPosToWorldPos(const TerrainChunkPos & chunkPos)

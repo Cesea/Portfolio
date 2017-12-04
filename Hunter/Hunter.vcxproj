@@ -134,7 +134,6 @@
     <ClCompile Include="Allocators.cpp" />
     <ClCompile Include="ApplicationTimer.cpp" />
     <ClCompile Include="BaseLight.cpp" />
-    <ClCompile Include="BaseScene.cpp" />
     <ClCompile Include="BaseSystem.cpp" />
     <ClCompile Include="bat.cpp" />
     <ClCompile Include="batAnimationString.cpp" />
@@ -159,7 +158,6 @@
     <ClCompile Include="GameCommand.cpp" />
     <ClCompile Include="GameObjectFactory.cpp" />
     <ClCompile Include="GameObjects.cpp" />
-    <ClCompile Include="GameScene.cpp" />
     <ClCompile Include="GizmoManager.cpp" />
     <ClCompile Include="Hydra.cpp" />
     <ClCompile Include="HydraAnimationString.cpp" />
@@ -237,7 +235,6 @@
     <ClInclude Include="ApplicationTimer.h" />
     <ClInclude Include="BaseGameObject.h" />
     <ClInclude Include="BaseLight.h" />
-    <ClInclude Include="BaseScene.h" />
     <ClInclude Include="BaseSystem.h" />
     <ClInclude Include="bat.h" />
     <ClInclude Include="batAnimationString.h" />
@@ -269,7 +266,6 @@
     <ClInclude Include="GameObjectFactory.h" />
     <ClInclude Include="GameObjectHandle.h" />
     <ClInclude Include="GameObjects.h" />
-    <ClInclude Include="GameScene.h" />
     <ClInclude Include="GameSystems.h" />
     <ClInclude Include="GameUtils.h" />
     <ClInclude Include="GizmoManager.h" />

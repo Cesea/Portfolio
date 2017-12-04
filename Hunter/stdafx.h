@@ -60,6 +60,7 @@
 constexpr int CLIENTCENTERX = WINSTARTX +  WINSIZEX / 2;
 constexpr int CLIENTCENTERY = WINSTARTY + WINSIZEY / 2;
 
+#define MAX_FILE_NAME 256
 
 #include "Typedefs.h"
 #include "Memory.h"

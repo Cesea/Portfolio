@@ -98,6 +98,9 @@ bool Turtle::CreateFromWorld(World & world, const Vector3 &Pos)
 
 	//이벤트 등록
 	EventChannel channel;
+	channel.Broadcast<GameObjectFactory::ObjectCreatedEvent>(
+		GameObjectFactory::ObjectCreatedEvent(ARCHE_TURTLE, _entity, transComp.GetWorldPosition()));
+
 	channel.Add<CollisionSystem::ActorTriggerEvent, Turtle>(*this);
 	setEvent();
 	return true;

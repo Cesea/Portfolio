@@ -32,11 +32,8 @@ public:
 protected :
 	Editor *_editor{};
 
-	UI *_ui{};
-
 public:
 	virtual void Handle(const Editor::GetObjectFromSceneEvent &event);
-
 };
 
 #endif

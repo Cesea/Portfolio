@@ -97,6 +97,9 @@ bool Cat::CreateFromWorld(World & world, const Vector3 &Pos)
 
 	//이벤트 등록
 	EventChannel channel;
+
+	channel.Broadcast<GameObjectFactory::ObjectCreatedEvent>(
+		GameObjectFactory::ObjectCreatedEvent(ARCHE_CAT, _entity, transComp.GetWorldPosition()));
 	channel.Add<CollisionSystem::ActorTriggerEvent, Cat>(*this);
 	setEvent();
 	return true;

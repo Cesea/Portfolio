@@ -2,7 +2,6 @@
 #define GAME_OBJECT_FACTORY_H
 
 #include "SingletonBase.h"
-#include "GameObjectHandle.h"
 
 class IScene;
 
@@ -50,15 +49,13 @@ public :
 private :
 	IScene *_pCurrentScene;
 
-	void RegisterEvent();
-	void UnRegisterEvent();
-
 	void CreateObject(ARCHE_TYPE type, ResourceHandle handle, const Vector3 &position);
 	//void CreateObject(ARCHE_TYPE type, char *name, const Vector3 &position);
 
 	BaseGameObject *_pPlayer{};
 
 public :
+	//ObjectCreatedEvent///////////////////////////////////////////////////////
 	struct ObjectCreatedEvent
 	{
 		ObjectCreatedEvent(ARCHE_TYPE type, Entity entity, const Vector3 &world)
@@ -69,6 +66,7 @@ public :
 		Entity _entity;
 		Vector3 _worldPosition;
 	};
+	/////////////////////////////////////////////////////////////////////////////////////
 
 	//CreateObjectOnClickEvent///////////////////////////////////////////////////////
 	struct CreateObjectOnClickEvent

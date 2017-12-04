@@ -37,6 +37,9 @@ bool Player::CreateFromWorld(World & world, const Vector3 &Pos)
    TransformComponent &transComp = _entity.AddComponent<TransformComponent>();
    transComp._position = Vector3(0, TERRAIN->GetHeight(0.0f, 0.0f), 0);
    _pTransformComp = &transComp;
+
+   _tilePos = TERRAIN->ConvertWorldPostoTilePos(transComp.GetWorldPosition());
+
    //transComp.MovePositionWorld();
 
    static int32 animCount = 0;
@@ -72,13 +75,8 @@ bool Player::CreateFromWorld(World & world, const Vector3 &Pos)
 
    _entity.Activate();
 
-   _pStateMachine = new PlayerStateMachine;
-   _pStateMachine->Init(this);
-   _pStateMachine->RegisterState(META_TYPE(PlayerStanceState)->Name(), new PlayerStanceState());
-   _pStateMachine->RegisterState(META_TYPE(PlayerMoveState)->Name(), new PlayerMoveState());
-   _pStateMachine->RegisterState(META_TYPE(PlayerCombatState)->Name(), new PlayerCombatState());
-   _pStateMachine->RegisterState(META_TYPE(PlayerDeadState)->Name(), new PlayerDeadState());
-   _pStateMachine->ChangeState(META_TYPE(PlayerStanceState)->Name());
+   _channel.Broadcast<GameObjectFactory::ObjectCreatedEvent>(
+	   GameObjectFactory::ObjectCreatedEvent(ARCHE_HERO, _entity, transComp.GetWorldPosition()));
 
    //Plyer의 맴버 변수들을 셋팅해주자
    _combatToPeaceTimer.Reset(2.0f);
@@ -91,8 +89,6 @@ bool Player::CreateFromWorld(World & world, const Vector3 &Pos)
 
 void Player::Update(float deltaTime)
 {
-   _pStateMachine->Update(deltaTime, _currentCommand);
-
    MoveAndRotate(deltaTime);
 
    switch (_state)
@@ -719,6 +715,8 @@ void Player::MoveAndRotate(float deltaTime)
       refTransform.SetWorldPosition(
 		  refTransform.GetWorldPosition().x, 
 		  TERRAIN->GetHeight(refTransform.GetWorldPosition().x, refTransform.GetWorldPosition().z), refTransform.GetWorldPosition().z);
+
+	  _tilePos = TERRAIN->ConvertWorldPostoTilePos(refTransform.GetWorldPosition());
    }
 }
 
@@ -931,7 +929,6 @@ void Player::Handle(const CollisionSystem::ActorTriggerEvent & event)
 		{
 			_state = PLAYERSTATE_HURT;
 			this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWarTakingHit));
-			//_pStateMachine->ChangeState(META_TYPE(HydraHurt1State)->Name());
 			_inCombat = true;
 			_hp -= 50;
 			if (_hp <= 0)

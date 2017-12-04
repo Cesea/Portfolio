@@ -115,6 +115,9 @@ bool Snake::CreateFromWorld(World & world, const Vector3 &Pos)
 	_hurtCount = _hurtTime;
 	//이벤트 등록
 	EventChannel channel;
+
+	channel.Broadcast<GameObjectFactory::ObjectCreatedEvent>(
+		GameObjectFactory::ObjectCreatedEvent(ARCHE_SNAKE, _entity, transComp.GetWorldPosition()));
 	channel.Add<CollisionSystem::ActorTriggerEvent, Snake>(*this);
 	setEvent();
 	return true;

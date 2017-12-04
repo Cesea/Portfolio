@@ -95,7 +95,6 @@ private :
 	StopWatch _attackToStanceTimer;
 	int32 _comboCount{};
 
-
 	StopWatch _attackTriggerTimer;
 
 	bool32 _canCombo{false};

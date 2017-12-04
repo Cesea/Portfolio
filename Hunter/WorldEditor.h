@@ -165,16 +165,26 @@ struct StatusWindow
 		_selectingType = ARCHE_NONE;
 		_selectingState = 0;
 
-		ZeroMemory(_worldPosition, sizeof(char) *EDITOR_MAX_NAME);
-		ZeroMemory(_terrainChunkPos, sizeof(char) *EDITOR_MAX_NAME);
-		ZeroMemory(_terrainTilePos, sizeof(char) *EDITOR_MAX_NAME);
+		ZeroMemory(_worldPosStr, sizeof(char) *EDITOR_MAX_NAME);
+		ZeroMemory(_chunkPosStr, sizeof(char) *EDITOR_MAX_NAME);
+		ZeroMemory(_tilePosStr, sizeof(char) *EDITOR_MAX_NAME);
+		ZeroMemory(_relPosStr, sizeof(char) *EDITOR_MAX_NAME);
+
+		ZeroMemory(_chunkInfoStr, sizeof(char) *EDITOR_MAX_NAME);
+		ZeroMemory(_tileInfoStr, sizeof(char) *EDITOR_MAX_NAME);
+
 	}
 
 	ARCHE_TYPE _selectingType{ARCHE_NONE};
 	int32 _selectingState{0};
-	char _worldPosition[EDITOR_MAX_NAME];
-	char _terrainChunkPos[EDITOR_MAX_NAME];
-	char _terrainTilePos[EDITOR_MAX_NAME];
+
+	char _worldPosStr[EDITOR_MAX_NAME];
+	char _chunkPosStr[EDITOR_MAX_NAME];
+	char _tilePosStr[EDITOR_MAX_NAME];
+	char _relPosStr[EDITOR_MAX_NAME];
+
+	char _chunkInfoStr[EDITOR_MAX_NAME];
+	char _tileInfoStr[EDITOR_MAX_NAME];
 };
 
 //Editor에서는 Scene의 포인터를 가지고 있어서 몬스터들의 스크립트나, 액션 시스템을 비 활성화 할 수 있다.
@@ -199,12 +209,15 @@ public :
 
 	void SetEdittingEntity(Entity &entity);
 
+	void SetShowStatusObject(BaseGameObject *pObject) { _pSelectedObject = pObject; }
+
 	void Render();
 public:
 	void RegisterEvents();
 public :
 
 	Entity *_selectedEntity{};
+	BaseGameObject *_pSelectedObject{};
 
 	enum EditMode
 	{
@@ -218,6 +231,8 @@ public :
 	void InTerrainEditMode();
 	void InObjectLocateMode();
 	void InObjectEditMode();
+
+	void ShowStatusWindow();
 
 	EditMode _currentMode;
 	
