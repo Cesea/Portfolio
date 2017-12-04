@@ -74,8 +74,6 @@ private :
 	GameCommand _currentCommand;
 	void QueueAction(const Action &action);
 
-	TerrainTilePos _tilePos;
-
 	ActionComponent *_pActionComp{};
 	TransformComponent *_pTransformComp{};
 	CollisionComponent *_pCollisionComp{};

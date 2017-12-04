@@ -20,6 +20,7 @@ void GameObjectFactory::Release()
 	_pPlayer = nullptr;
 }
 
+//NOTE : 오브젝트를 생성하면 ObjectCreated Event를 발생시킨다
 void GameObjectFactory::CreateObject(ARCHE_TYPE type, ResourceHandle handle, const Vector3 & position)
 {
 	switch (type)
@@ -52,6 +53,8 @@ void GameObjectFactory::CreateObject(ARCHE_TYPE type, ResourceHandle handle, con
 		collision._triggerType = CollisionComponent::TRIGGER_TYPE_OBJECT;
 
 		entity.Activate();
+		_channel.Broadcast<GameObjectFactory::ObjectCreatedEvent>(
+			ObjectCreatedEvent(ARCHE_ROCK, entity, transform.GetWorldPosition()));
 
 	}break;
 	case ARCHE_TREE:
@@ -82,6 +85,9 @@ void GameObjectFactory::CreateObject(ARCHE_TYPE type, ResourceHandle handle, con
 		collision._locked = true;
 
 		entity.Activate();
+
+		_channel.Broadcast<GameObjectFactory::ObjectCreatedEvent>(
+			ObjectCreatedEvent(ARCHE_ROCK, entity, transform.GetWorldPosition()));
 	}break;
 
 	case ARCHE_TREETRUNK :

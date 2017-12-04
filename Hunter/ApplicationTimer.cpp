@@ -44,7 +44,7 @@ void ApplicationTimer::Tick()
 		//timeToSleep = int32(_targetFramePerMS - _currentDeltaMS);
 		//Console::Log("%d\n", timeToSleep);
 		//prev = _currentDeltaSecond;
-		//Sleep(1);
+		Sleep(1);
 	}
 
 	////Console::Log("%d\n", timeToSleep);

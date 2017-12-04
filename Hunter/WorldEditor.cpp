@@ -899,7 +899,7 @@ void Editor::Edit(RefVariant &object, const InputManager &input)
 	} break;
 	}
 
-	if (_showStatus)
+	if (false == _showStatus)
 	{
 		if (ImguiFreeCollapse("Show Status", nullptr, _showStatus, WINSIZEX - 400, 0))
 		{
@@ -914,7 +914,6 @@ void Editor::Edit(RefVariant &object, const InputManager &input)
 			_showStatus = !_showStatus;
 		}
 		ImguiEndScrollArea();
-
 	}
 
 	ImguiEndFrame();
