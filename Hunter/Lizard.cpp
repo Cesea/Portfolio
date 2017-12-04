@@ -10,17 +10,29 @@ Lizard::~Lizard()
 {
 }
 
-bool Lizard::CreateFromWorld(World & world)
+bool Lizard::CreateFromWorld(World & world, const Vector3 &Pos)
 {
 	_entity = world.CreateEntity();
 	TransformComponent &transComp = _entity.AddComponent<TransformComponent>();
-	transComp.MovePositionWorld(0, 12.0f, 0);
+
+	transComp.SetWorldPosition(Pos);
 
 	static int32 animCount = 0;
 	RenderComponent &renderComp = _entity.AddComponent<RenderComponent>();
 	renderComp._type = RenderComponent::Type::eSkinned;
-	renderComp._skinned = VIDEO->CreateAnimationInstance(VIDEO->GetSkinnedXMesh("Lizard"), 
-		"Lizard" + std::to_string(animCount));
+	switch (rand()%2)
+	{
+	case 0:
+		_skinType = LIZARDSKINSTATE_NORMAL;
+		renderComp._skinned = VIDEO->CreateAnimationInstance(VIDEO->GetSkinnedXMesh("Lizard1"),
+			"Lizard" + std::to_string(animCount));
+		break;
+	case 1:
+		_skinType = LIZARDSKINSTATE_BLACK;
+		renderComp._skinned = VIDEO->CreateAnimationInstance(VIDEO->GetSkinnedXMesh("Lizard2"),
+			"Lizard" + std::to_string(animCount));
+		break;
+	}
 	renderComp._arche = ARCHE_LIZARD;
 
 	video::AnimationInstance *pAnimation = VIDEO->GetAnimationInstance(renderComp._skinned);
@@ -30,7 +42,7 @@ bool Lizard::CreateFromWorld(World & world)
 	collision._boundingSphere._localCenter = pAnimation->_pSkinnedMesh->_boundInfo._center;
 	collision._boundingSphere._radius = pAnimation->_pSkinnedMesh->_boundInfo._radius;
 	collision._locked = false;
-	collision._isTrigger = true;
+	collision._isTrigger = false;;
 	collision._triggerType = CollisionComponent::TRIGGER_TYPE_ENEMY;
 
 	ScriptComponent &scriptComponent = _entity.AddComponent<ScriptComponent>();
@@ -60,6 +72,7 @@ bool Lizard::CreateFromWorld(World & world)
 	_pStateMachine->RegisterState(META_TYPE(LizardHurt1State)->Name(), new LizardHurt1State());
 	_pStateMachine->RegisterState(META_TYPE(LizardHurt2State)->Name(), new LizardHurt2State());
 	_pStateMachine->RegisterState(META_TYPE(LizardDeadState)->Name(), new LizardDeadState());
+	_pStateMachine->RegisterState(META_TYPE(LizardSpitState)->Name(), new LizardSpitState());
 	_pStateMachine->ChangeState(META_TYPE(LizardIdleState)->Name());
 
 	_state = LIZARDSTATE_IDLE;
@@ -67,9 +80,7 @@ bool Lizard::CreateFromWorld(World & world)
 	_speed = 3.0f;
 	_rotateSpeed = D3DX_PI / 64;
 	_patrolIndex = 0;
-	_moveSegment.push_back(Vector3(5.0f, 12.0f, 5.0f));
-	_moveSegment.push_back(Vector3(-5.0f, 12.0f, 5.0f));
-	_moveSegment.push_back(Vector3(-5.0f, 12.0f, -5.0f));
+	this->PatrolSet(rand() % 3, transComp.GetWorldPosition(), 5.0f);
 
 	_delayTime = 180.0f;
 	_delayCount = _delayTime;
@@ -82,10 +93,10 @@ bool Lizard::CreateFromWorld(World & world)
 
 	_battle = false;
 
-	_playerPos = Vector3(5.0f, 12.0f, 5.0f);
-
-	_atkRange = 0.5f;
+	_atkRange = 2.0f;
+	if (_skinType == LIZARDSKINSTATE_BLACK) _atkRange = 15.0f;
 	_atkTime = 80;
+	_atkTime2 = 90;
 	_atkCount = _atkTime;
 
 	_standTime = 90;
@@ -99,6 +110,7 @@ bool Lizard::CreateFromWorld(World & world)
 	//이벤트 등록
 	EventChannel channel;
 	channel.Add<CollisionSystem::ActorTriggerEvent, Lizard>(*this);
+	setEvent();
 	return true;
 }
 
@@ -130,12 +142,16 @@ void Lizard::Update(float deltaTime)
 			float distance = Vec3Length(&direction);
 			Vec3Normalize(&direction, &direction);
 			//몸이 덜 돌아갔는가?
+			Vector3 rotatePos = _moveSegment[_patrolIndex];
+			rotatePos.y = transComp.GetWorldPosition().y;
+			Vector3 rotateDir = rotatePos - transComp.GetWorldPosition();
+			Vec3Normalize(&rotateDir, &rotateDir);
 			float distRadian = acos(
-				ClampMinusOnePlusOne(Vec3Dot(&-direction, &transComp.GetForward())));
+				ClampMinusOnePlusOne(Vec3Dot(&-rotateDir, &transComp.GetForward())));
 			if (distRadian > D3DX_PI) D3DX_PI * 2 - distRadian;
 			if (distRadian > _rotateSpeed)
 			{
-				transComp.LookDirection(-direction, _rotateSpeed);
+				transComp.LookDirection(-rotateDir, _rotateSpeed);
 				break;
 			}
 			//이동속도보다 가까움?
@@ -172,10 +188,26 @@ void Lizard::Update(float deltaTime)
 		Vector3 direction = _playerPos - transComp.GetWorldPosition();
 		float distance = Vec3Length(&direction);
 		Vec3Normalize(&direction, &direction);
+		Vector3 rotatePos = _playerPos;
+		rotatePos.y = transComp.GetWorldPosition().y;
+		Vector3 rotateDir = rotatePos - transComp.GetWorldPosition();
+		Vec3Normalize(&rotateDir, &rotateDir);
+		transComp.LookDirection(-rotateDir, D3DX_PI);
 		if (distance < _atkRange)
 		{
-			_state = LIZARDSTATE_ATK1;
-			_pStateMachine->ChangeState(META_TYPE(LizardAttackState)->Name());
+			switch (_skinType)
+			{
+			case LIZARDSKINSTATE_NORMAL:
+				_state = LIZARDSTATE_ATK1;
+				_pStateMachine->ChangeState(META_TYPE(LizardAttackState)->Name());
+				_atkCount = _atkTime;
+				break;
+			case LIZARDSKINSTATE_BLACK:
+				_state = LIZARDSTATE_ATK3;
+				_pStateMachine->ChangeState(META_TYPE(LizardAttack3State)->Name());
+				_atkCount = _atkTime2;
+				break;
+			}
 		}
 		else
 		{
@@ -218,31 +250,6 @@ void Lizard::Update(float deltaTime)
 			Vec3Normalize(&direction, &direction);
 			if (distance < _atkRange)
 			{
-				_state = LIZARDSTATE_ATK3;
-				_pStateMachine->ChangeState(META_TYPE(LizardAttack3State)->Name());
-				_playerPos = Vector3(RandFloat(-5.0, 5.0), 12.0f, RandFloat(-5.0, 5.0));
-			}
-			//공격범위를 벗어났다?
-			else
-			{
-				//배틀을 멈추고 기본자세 (다시추적시작)
-				_battle = false;
-				_state = LIZARDSTATE_IDLE;
-				_pStateMachine->ChangeState(META_TYPE(LizardStandState)->Name());
-			}
-		}
-		break;
-	case LIZARDSTATE_ATK3:
-		_atkCount--;
-		if (_atkCount < 0)
-		{
-			_atkCount = _atkTime;
-			//공격을 마쳤으면 다시한번검사
-			Vector3 direction = _playerPos - transComp.GetWorldPosition();
-			float distance = Vec3Length(&direction);
-			Vec3Normalize(&direction, &direction);
-			if (distance < _atkRange)
-			{
 				_state = LIZARDSTATE_ATK1;
 				_pStateMachine->ChangeState(META_TYPE(LizardAttackState)->Name());
 			}
@@ -255,6 +262,37 @@ void Lizard::Update(float deltaTime)
 				_pStateMachine->ChangeState(META_TYPE(LizardStandState)->Name());
 			}
 		}
+		break;
+	case LIZARDSTATE_ATK3:
+	{
+		_atkCount--;
+		if (_atkCount < 0)
+		{
+			_atkCount = _atkTime2;
+			//공격을 마쳤으면 다시한번검사
+			Vector3 direction = _playerPos - transComp.GetWorldPosition();
+			float distance = Vec3Length(&direction);
+			Vec3Normalize(&direction, &direction);
+			if (distance < _atkRange)
+			{
+				_state = LIZARDSTATE_ATK3;
+				_pStateMachine->ChangeState(META_TYPE(LizardAttack3State)->Name());
+			}
+			//공격범위를 벗어났다?
+			else
+			{
+				//배틀을 멈추고 기본자세 (다시추적시작)
+				_battle = false;
+				_state = LIZARDSTATE_IDLE;
+				_pStateMachine->ChangeState(META_TYPE(LizardStandState)->Name());
+			}
+		}
+		Vector3 rotatePos = _playerPos;
+		rotatePos.y = transComp.GetWorldPosition().y;
+		Vector3 rotateDir = rotatePos - transComp.GetWorldPosition();
+		Vec3Normalize(&rotateDir, &rotateDir);
+		transComp.LookDirection(-rotateDir, _rotateSpeed);
+	}
 		break;
 	case LIZARDSTATE_STAND:
 		_standCount--;
@@ -313,11 +351,14 @@ void Lizard::Update(float deltaTime)
 			_battle = true;
 			_state = LIZARDSTATE_FIND;
 			_pStateMachine->ChangeState(META_TYPE(LizardFindState)->Name());
-			Vector3 distance = _playerPos - transComp.GetWorldPosition();
+			Vector3 rotatePos = _playerPos;
+			rotatePos.y = transComp.GetWorldPosition().y;
+			Vector3 distance = rotatePos - transComp.GetWorldPosition();
 			Vec3Normalize(&distance, &distance);
 			transComp.LookDirection(-distance, D3DX_PI * 2);
 		}
 	}
+	transComp.SetWorldPosition(transComp.GetWorldPosition().x, TERRAIN->GetHeight(transComp.GetWorldPosition().x, transComp.GetWorldPosition().z), transComp.GetWorldPosition().z);
 }
 
 void Lizard::Handle(const CollisionSystem::ActorTriggerEvent & event)

@@ -110,8 +110,8 @@ void InitPlayerAnimation()
    PLAYER_ANIM_DEFINE(eSitDown, true, false, true, 1.0f, 0.2f, 0.2f);
    PLAYER_ANIM_DEFINE(eSitting, true, false, true, 1.0f, 0.2f, 0.2f);
    PLAYER_ANIM_DEFINE(eWalk, false, false, false, 1.0f, 0.2f, 0.2f);
-   PLAYER_ANIM_DEFINE(eStrafeLeft, false, true,false, 1.0f, 0.2f,0.2f);
-   PLAYER_ANIM_DEFINE(eStrafeRight, false, true, false, 1.0f, 0.2f, 0.2f);
+   PLAYER_ANIM_DEFINE(eStrafeLeft, false, false, false, 1.0f, 0.2f,0.2f);
+   PLAYER_ANIM_DEFINE(eStrafeRight, false, false, false, 1.0f, 0.2f, 0.2f);
    PLAYER_ANIM_DEFINE(eWarWalkThrust, true, true, false, 1.0f, 0.2f, 0.2f);
    PLAYER_ANIM_DEFINE(eWarWalkSwingLeft, true, true, false, 1.0f, 0.2f, 0.2f);
    PLAYER_ANIM_DEFINE(eWarWalkSwingRight, true, true, false, 1.0f, 0.2f, 0.2f);

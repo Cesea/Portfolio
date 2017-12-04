@@ -20,6 +20,7 @@ void GameObjectFactory::Release()
 	_pPlayer = nullptr;
 }
 
+//NOTE : 오브젝트를 생성하면 ObjectCreated Event를 발생시킨다
 void GameObjectFactory::CreateObject(ARCHE_TYPE type, ResourceHandle handle, const Vector3 & position)
 {
 	switch (type)
@@ -52,6 +53,8 @@ void GameObjectFactory::CreateObject(ARCHE_TYPE type, ResourceHandle handle, con
 		collision._triggerType = CollisionComponent::TRIGGER_TYPE_OBJECT;
 
 		entity.Activate();
+		_channel.Broadcast<GameObjectFactory::ObjectCreatedEvent>(
+			ObjectCreatedEvent(ARCHE_ROCK, entity, transform.GetWorldPosition()));
 
 	}break;
 	case ARCHE_TREE:
@@ -82,6 +85,9 @@ void GameObjectFactory::CreateObject(ARCHE_TYPE type, ResourceHandle handle, con
 		collision._locked = true;
 
 		entity.Activate();
+
+		_channel.Broadcast<GameObjectFactory::ObjectCreatedEvent>(
+			ObjectCreatedEvent(ARCHE_ROCK, entity, transform.GetWorldPosition()));
 	}break;
 
 	case ARCHE_TREETRUNK :
@@ -182,7 +188,7 @@ void GameObjectFactory::CreateObject(ARCHE_TYPE type, ResourceHandle handle, con
 		_player->SetLinkCamera(&_pCurrentScene->_camera);
 		_pCurrentScene->_gameObjects.push_back(_player);
 		BaseGameObject *pBack = _pCurrentScene->_gameObjects.back();
-		pBack->CreateFromWorld(_pCurrentScene->_world);
+		pBack->CreateFromWorld(_pCurrentScene->_world,Vector3(0,0,0));
 		//NOTE : 여기서 플레이어의 포인터를 저장하고는 있지만, 나중에는 키값으로 찾을 수 있게끔 바꿔야 한다...
 		_pPlayer = pBack;
 	}break;
@@ -191,54 +197,42 @@ void GameObjectFactory::CreateObject(ARCHE_TYPE type, ResourceHandle handle, con
 	{
 		_pCurrentScene->_gameObjects.push_back(new Bat());
 		BaseGameObject *pBack = _pCurrentScene->_gameObjects.back();
-		pBack->CreateFromWorld(_pCurrentScene->_world);
-		TransformComponent &refTransform = pBack->_entity.GetComponent<TransformComponent>();
-		refTransform._position = position;
+		pBack->CreateFromWorld(_pCurrentScene->_world, position);
 	}break;
 
 	case ARCHE_CAT :
 	{
 		_pCurrentScene->_gameObjects.push_back(new Cat());
 		BaseGameObject *pBack = _pCurrentScene->_gameObjects.back();
-		pBack->CreateFromWorld(_pCurrentScene->_world);
-		TransformComponent &refTransform = pBack->_entity.GetComponent<TransformComponent>();
-		refTransform._position = position;
+		pBack->CreateFromWorld(_pCurrentScene->_world, position);
 	}break;
 
 	case ARCHE_LIZARD:
 	{
 		_pCurrentScene->_gameObjects.push_back(new Lizard());
 		BaseGameObject *pBack = _pCurrentScene->_gameObjects.back();
-		pBack->CreateFromWorld(_pCurrentScene->_world);
-		TransformComponent &refTransform = pBack->_entity.GetComponent<TransformComponent>();
-		refTransform._position = position;
+		pBack->CreateFromWorld(_pCurrentScene->_world, position);
 	}break;
 
 	case ARCHE_SNAKE:
 	{
 		_pCurrentScene->_gameObjects.push_back(new Snake());
 		BaseGameObject *pBack = _pCurrentScene->_gameObjects.back();
-		pBack->CreateFromWorld(_pCurrentScene->_world);
-		TransformComponent &refTransform = pBack->_entity.GetComponent<TransformComponent>();
-		refTransform._position = position;
+		pBack->CreateFromWorld(_pCurrentScene->_world, position);
 	}break;
 
 	case ARCHE_TURTLE :
 	{
 		_pCurrentScene->_gameObjects.push_back(new Turtle());
 		BaseGameObject *pBack = _pCurrentScene->_gameObjects.back();
-		pBack->CreateFromWorld(_pCurrentScene->_world);
-		TransformComponent &refTransform = pBack->_entity.GetComponent<TransformComponent>();
-		refTransform._position = position;
+		pBack->CreateFromWorld(_pCurrentScene->_world, position);
 	}break;
 
 	case ARCHE_HYDRA :
 	{
 		_pCurrentScene->_gameObjects.push_back(new Hydra());
 		BaseGameObject *pBack = _pCurrentScene->_gameObjects.back();
-		pBack->CreateFromWorld(_pCurrentScene->_world);
-		TransformComponent &refTransform = pBack->_entity.GetComponent<TransformComponent>();
-		refTransform._position = position;
+		pBack->CreateFromWorld(_pCurrentScene->_world, position);
 	}break;
 	}
 }

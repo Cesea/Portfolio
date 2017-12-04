@@ -56,6 +56,12 @@ DEFINE_META(LizardDeadState)
 {
 	//ADD_MEMBER(_pActor);
 }
+
+DEFINE_META(LizardSpitState)
+{
+	//ADD_MEMBER(_pActor);
+}
+
 bool LizardState::Init(StateMachine<Lizard>* pParent)
 {
 	_pParent = pParent;
@@ -277,6 +283,25 @@ void LizardDeadState::Update(float deltaTime, const GameCommand & command)
 }
 
 void LizardDeadState::OnExit()
+{
+	_pParent->ClearActioniQueue();
+}
+
+void LizardSpitState::OnEnter()
+{
+	_pParent->QueueAction(LIZARD_ANIM(LIZARD_SPIT));
+}
+
+void LizardSpitState::Update(float deltaTime, const GameCommand & command)
+{
+	switch (command._type)
+	{
+	default:
+		break;
+	}
+}
+
+void LizardSpitState::OnExit()
 {
 	_pParent->ClearActioniQueue();
 }

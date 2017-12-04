@@ -20,6 +20,9 @@ public:
 	float _fov;
 	float _camNear;
 	float _camFar;
+	float _aspect;
+	bool _ortho;
+	float _orthoSize;
 
 	Camera();
 	~Camera();
@@ -60,12 +63,11 @@ public:
 	LPDIRECT3DTEXTURE9 GetRenderTexture();
 
 private:
-
 	void NormalCameraUpdate(void);
 
 	//bool move(POINT pt);
 
-	POINT tempPt;
+	//POINT tempPt;
 
 	LPDIRECT3DTEXTURE9 _pRenderTexture{};
 	LPDIRECT3DSURFACE9 _pRenderSurface{};
@@ -79,7 +81,6 @@ protected:
 	Matrix _matProjection;
 	Matrix _matViewProjection;
 
-	bool32 _ortho;
 	bool32 _rotating{false};
 
 	float _moveSpeed{1.0f};

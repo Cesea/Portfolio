@@ -7,10 +7,11 @@ class IScene;
 class QuadTree;
 
 constexpr int32 TERRAIN_SHOW_EXTENT = 2;
-
 constexpr int32 TERRAIN_CHUNK_DIM = 64;
-
 constexpr int32 TERRAIN_ALPHA_TEXTURE_SIZE = 512;
+
+constexpr int32 TERRAIN_TILE_DIM = 8;
+constexpr int32 TERRAIN_CHUNKS_TILE_COUNT = 64;
 
 #define MAX_FILE_NAME 256
 
@@ -31,7 +32,6 @@ struct TerrainChunkPos
 	float _relZ{};
 };
 
-
 //청크 안에서
 struct TerrainTilePos
 {
@@ -45,16 +45,6 @@ struct TerrainTilePos
 	float _relZ{};
 };
 
-struct TerrainGrid
-{
-	int32 _chunkX{};
-	int32 _chunkZ{};
-
-	int32 _gridX{};
-	int32 _gridZ{};
-
-	std::vector<ResourceHandle> _objects;
-};
 
 class Terrain : public SingletonBase<Terrain>
 {
@@ -86,6 +76,17 @@ public:
 		uint32 i2;
 	};
 
+	struct TerrainTile
+	{
+		int32 _chunkX{};
+		int32 _chunkZ{};
+
+		int32 _gridX{};
+		int32 _gridZ{};
+
+		std::vector<Entity> _entities;
+	};
+
 	struct TerrainChunk
 	{
 		void ValidateEntities();
@@ -114,11 +115,11 @@ public:
 		//smoothing을 가하는 정보로 사용한다??
 		bool32 _dirty{false};
 
-		//QuadTree* _pQuadTree{};  //쿼드 트리
-		const video::TerrainVertex *_pVertices;
+		TerrainTile _tiles[TERRAIN_CHUNKS_TILE_COUNT];
 
-		std::vector<Entity> _entities;
+		const video::TerrainVertex *_pVertices;
 	};
+
 
 	Terrain() {}
 	~Terrain();
@@ -139,6 +140,7 @@ public:
 	float GetSlant(Vector3* pOut, float gravityPower, float x, float z);
 
 	void Render(const Camera &camera, const DirectionalLight &mainLight, const Camera &lightCameera);
+	void RenderShadow(const Camera &camera);
 
 	void AddEntityToSection(const Entity &entity, const Vector3 &position);
 
@@ -147,6 +149,9 @@ public:
 
 	//const Vector3 ConvertChunkPosToWorldPos(const TerrainChunkPos &chunkPos);
 	const Vector3 ConvertTilePosToWorldPos(const TerrainTilePos &tilePos);
+
+	void EffectSetTexture(LPCSTR handle, LPDIRECT3DTEXTURE9 texture);
+	void EffectSetMatrix(LPCSTR handle, const Matrix &matrix);
 
 private:
 	//bool CreateInGame(const Terrain::TerrainConfig &config);

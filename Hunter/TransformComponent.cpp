@@ -653,7 +653,6 @@ void TransformComponent::LookDirection(const Vector3 &dir, float angle)
 	//진짜로월드 축
 	Vector3 worldAxis[3];
 	this->GetUnitAxies(worldAxis);
-
 	//정면 벡터와 바라볼 방향의 각도차를 얻자...
 	float distRadian = acos(
 		ClampMinusOnePlusOne(Vec3Dot(worldAxis + AXIS_Z, &dir)));

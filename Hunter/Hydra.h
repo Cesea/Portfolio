@@ -44,14 +44,24 @@ private:
 		HYDRASTATE_BREATH3,
 		HYDRASTATE_STAND,
 		HYDRASTATE_HURT,
-		HYDRASTATE_DEATH
+		HYDRASTATE_DEATH,
+		HYDRASTATE_SP_ATK1,
+		HYDRASTATE_SP_ATK2,
+	};
+	enum HYDRASKINSTATE
+	{
+		HYDRASKINSTATE_GREEN,
+		HYDRASKINSTATE_RED,
+		HYDRASKINSTATE_BLACK,
+		HYDRASKINSTATE_GOLD
 	};
 	HYDRASTATE _state;
+	HYDRASKINSTATE _skinType;
 public:
 	Hydra();
 	virtual ~Hydra();
 
-	virtual bool CreateFromWorld(World &world);
+	virtual bool CreateFromWorld(World &world, const Vector3 &Pos);
 	void Update(float deltaTime);
 	void Handle(const CollisionSystem::ActorTriggerEvent & event);
 

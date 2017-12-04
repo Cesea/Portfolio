@@ -42,13 +42,19 @@ private:
 		BATSTATE_DEATH,
 		BATSTATE_HURT
 	};
-
+	enum BATSKINSTATE
+	{
+		BATSKINSTATE_RED,
+		BATSKINSTATE_BLACK,
+		BATSKINSTATE_GOLD
+	};
 	BATSTATE _state;
+	BATSKINSTATE _skinType;
 public:
 	Bat();
 	virtual ~Bat();
 
-	virtual bool CreateFromWorld(World &world);
+	virtual bool CreateFromWorld(World &world, const Vector3 &Pos);
 	void Update(float deltaTime);
 	void Handle(const CollisionSystem::ActorTriggerEvent & event);
 

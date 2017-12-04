@@ -5,6 +5,7 @@
 #include "Terrain.h"
 #include "Camera.h"
 #include "BaseGameObject.h"
+#include "GameSystems.h"
 
 class EnvironmentSphere;
 
@@ -45,9 +46,11 @@ public :
 	void Release();
 	bool Render();
 
-	//PostEffect±îÁö ¸ğµÎ ·»´õ ÇÑ´Ù...
-	//¸ŞÀÎ Ä«¸Ş¶óÀÇ RenderToTexture ¸¸ ¾÷µ¥ÀÌÆ®ÇÑ´Ù.
+	//PostEffectê¹Œì§€ ëª¨ë‘ ë Œë” í•œë‹¤...
+	//ë©”ì¸ ì¹´ë©”ë¼ì˜ RenderToTexture ë§Œ ì—…ë°ì´íŠ¸í•œë‹¤.
 	bool RenderToMainCamTexture();
+
+	void ReadyShadowMap(Terrain *pTerrain);
 
 	LPDIRECT3DTEXTURE9 GetSceneTexture();
 
@@ -71,16 +74,27 @@ protected :
 	Camera _camera;
 
 	DirectionalLight *_pMainLight;
-	//Camera _mainLightCamera;
+	Camera _shadowCamera;
 
 	EventChannel _channel;
 
 	EnvironmentSphere *_pEnvironmentSphere{};
 	video::Effect *_pPostEffect{};
 
+	float _shadowDistance{ 100.0f };
+
 	bool RenderEnvironmentSphere();
 
 	UI* _ui;
+
+	TransformSystem _transformSystem;
+	RenderSystem _renderSystem;
+	ScriptSystem _scriptSystem;
+	ActionSystem _actionSystem;
+	CollisionSystem _collisionSystem;
+
+	bool32 _editorInput{ false };
+
 public :
 };
 

@@ -17,7 +17,6 @@ public:
 	// Dir.x,         Dir.y,          Dir.z,         DistancePow;
 	// Color.r,       Color.g,        Color.b,       strength
 	// MaxRange,      MinRange,       InAngle        OutAngle 
-
 	void SetWorldPosition(const Vector3 &position);
 	void MoveSelf(const Vector3 &position);
 	void SetRotateWorld(float x, float y, float z);
@@ -29,6 +28,8 @@ public:
 
 	//라이트 기즈모를 그린다.
 	virtual void RenderGizmo() = 0;
+
+	Entity &GetEntity() { return _entity; }
 
 public:
 	D3DXCOLOR _color;

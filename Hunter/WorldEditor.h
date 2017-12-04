@@ -150,11 +150,31 @@ struct SceneEditor
 {
 	void Reset()
 	{
-
+		_editScrptSystem = false;
+		_editRenderSystem = false;
 	}
-	bool32 _scriptSystemRunning;
+	bool32 _editScrptSystem;
+	bool32 _editRenderSystem;
+};
 
+//일단은 StatusWindow는 Player만 사용할 수 있게끔 한다..
+struct StatusWindow
+{
+	void Reset()
+	{
+		_selectingType = ARCHE_NONE;
+		_selectingState = 0;
 
+		ZeroMemory(_worldPosition, sizeof(char) *EDITOR_MAX_NAME);
+		ZeroMemory(_terrainChunkPos, sizeof(char) *EDITOR_MAX_NAME);
+		ZeroMemory(_terrainTilePos, sizeof(char) *EDITOR_MAX_NAME);
+	}
+
+	ARCHE_TYPE _selectingType{ARCHE_NONE};
+	int32 _selectingState{0};
+	char _worldPosition[EDITOR_MAX_NAME];
+	char _terrainChunkPos[EDITOR_MAX_NAME];
+	char _terrainTilePos[EDITOR_MAX_NAME];
 };
 
 //Editor에서는 Scene의 포인터를 가지고 있어서 몬스터들의 스크립트나, 액션 시스템을 비 활성화 할 수 있다.
@@ -175,7 +195,7 @@ public :
 		Vector2 _cursorPos;
 	};
 
-	virtual bool Edit(RefVariant &pObject, const InputManager &input);
+	void Edit(RefVariant &pObject, const InputManager &input);
 
 	void SetEdittingEntity(Entity &entity);
 
@@ -203,6 +223,8 @@ public :
 	
 	bool32 _editing{ false };
 
+	bool32 _showStatus{ false };
+
 	int32 _mx;
 	int32 _my;
 
@@ -210,6 +232,7 @@ public :
 	uint8 _mouseRightDown;
 
 	bool32 _leftButtonPressed{};
+	bool32 _leftButtonReleased{};
 	int32 _scroll;
 	bool32 _shiftDown;
 	uint32 _key;
@@ -219,6 +242,8 @@ public :
 	TerrainEditor _terrainEditor;
 	ObjectLocator _objectLocator;
 	ObjectEditor _objectEditor;
+
+	StatusWindow _statusWindow;
 
 	IScene *_pCurrentScene{};
 

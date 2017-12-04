@@ -59,7 +59,73 @@ void LoadEveryStaticResources()
 
 void LoadEverySkinnedResources()
 {
+//메쉬 불러오기..
+	Matrix correctionMat;
+	Matrix rotationCorrection;
+	MatrixRotationY(&rotationCorrection, D3DX_PI);
+	MatrixScaling(&correctionMat, 0.01f, 0.01f, 0.01f);
+	MatrixMultiply(&correctionMat, &correctionMat, &rotationCorrection);
+	video::SkinnedXMeshHandle knight  = VIDEO->CreateSkinnedXMesh(
+		"../resources/Models/Knight/Knight.X", &correctionMat, "Knight");
 
+	MatrixScaling(&correctionMat, 1.4f, 1.4f, 1.4f);
+	video::SkinnedXMeshHandle snakeMesh = VIDEO->CreateSkinnedXMesh(
+		"../resources/Models/Snake/Snake_Red.X", &correctionMat, "Snake1");
+
+	MatrixScaling(&correctionMat, 1.4f, 1.4f, 1.4f);
+	video::SkinnedXMeshHandle snakeMesh2 = VIDEO->CreateSkinnedXMesh(
+		"../resources/Models/Snake/Snake_Black.X", &correctionMat, "Snake2");
+
+	MatrixScaling(&correctionMat, 1.4f, 1.4f, 1.4f);
+	video::SkinnedXMeshHandle snakeMesh3 = VIDEO->CreateSkinnedXMesh(
+		"../resources/Models/Snake/Snake_Cyan.X", &correctionMat, "Snake3");
+
+	MatrixScaling(&correctionMat, 1.4f, 1.4f, 1.4f);
+	video::SkinnedXMeshHandle turtleMesh = VIDEO->CreateSkinnedXMesh(
+		"../resources/Models/DragonTurtle/DragonTurtle_Black.X", &correctionMat, "Turtle");
+
+	MatrixScaling(&correctionMat, 1.0f, 1.0f, 1.0f);
+	video::SkinnedXMeshHandle batMesh1 = VIDEO->CreateSkinnedXMesh(
+		"../resources/Models/DragonBat/DragonBat_Red.X", &correctionMat, "Bat1");
+
+
+	MatrixScaling(&correctionMat, 1.0f, 1.0f, 1.0f);
+	video::SkinnedXMeshHandle batMesh2 = VIDEO->CreateSkinnedXMesh(
+		"../resources/Models/DragonBat/DragonBat_Black.X", &correctionMat, "Bat2");
+
+
+	MatrixScaling(&correctionMat, 1.0f, 1.0f, 1.0f);
+	video::SkinnedXMeshHandle batMesh3 = VIDEO->CreateSkinnedXMesh(
+		"../resources/Models/DragonBat/DragonBat_Gold.X", &correctionMat, "Bat3");
+
+
+	MatrixScaling(&correctionMat, 1.4f, 1.4f, 1.4f);
+	video::SkinnedXMeshHandle catMesh = VIDEO->CreateSkinnedXMesh(
+		"../resources/Models/DevilCat/DevilCat.X", &correctionMat, "Cat");
+
+	MatrixScaling(&correctionMat, 2.0f, 2.0f, 2.0f);
+	video::SkinnedXMeshHandle HydraMesh1 = VIDEO->CreateSkinnedXMesh(
+		"../resources/Models/Hydra/Hydra_Green.X", &correctionMat, "Hydra1");
+
+	MatrixScaling(&correctionMat, 2.0f, 2.0f, 2.0f);
+	video::SkinnedXMeshHandle HydraMesh2 = VIDEO->CreateSkinnedXMesh(
+		"../resources/Models/Hydra/Hydra_Red.X", &correctionMat, "Hydra2");
+
+	MatrixScaling(&correctionMat, 2.0f, 2.0f, 2.0f);
+	video::SkinnedXMeshHandle HydraMesh3 = VIDEO->CreateSkinnedXMesh(
+		"../resources/Models/Hydra/Hydra_Black.X", &correctionMat, "Hydra3");
+
+	MatrixScaling(&correctionMat, 2.0f, 2.0f, 2.0f);
+	video::SkinnedXMeshHandle HydraMesh4 = VIDEO->CreateSkinnedXMesh(
+		"../resources/Models/Hydra/Hydra_Gold.X", &correctionMat, "Hydra4");
+
+	MatrixScaling(&correctionMat, 1.0f, 1.0f, 1.0f);
+	video::SkinnedXMeshHandle LizardMesh1 = VIDEO->CreateSkinnedXMesh(
+		"../resources/Models/Lizard/Lizard.X", &correctionMat, "Lizard1");
+
+	MatrixScaling(&correctionMat, 1.0f, 1.0f, 1.0f);
+	video::SkinnedXMeshHandle LizardMesh2 = VIDEO->CreateSkinnedXMesh(
+		"../resources/Models/Lizard/Lizard_Black.X", &correctionMat, "Lizard2");
 }
 
 bool MapToolScene::SceneInit()
@@ -70,8 +136,7 @@ bool MapToolScene::SceneInit()
 	GAMEOBJECTFACTORY->SetCurrentScene(this);
 
 	video::StaticXMesh::_sEffectHandle = VIDEO->GetEffect("StaticMesh.fx");
-	video::SkinnedXMesh::_sStaticEffectHandle = VIDEO->GetEffect("StaticMesh.fx");
-	video::SkinnedXMesh::_sSkinnedEffectHandle = VIDEO->GetEffect("SkinnedMesh.fx");
+	video::SkinnedXMesh::_sEffectHandle  = VIDEO->GetEffect("SkinnedMesh.fx");
 
 	InitAnimations();
 
@@ -88,82 +153,18 @@ bool MapToolScene::SceneInit()
 
 	TERRAIN->SetScene(this);
 	TERRAIN->Create(config, true);
-
-	//메쉬 불러오기..
-	Matrix correctionMat;
-	Matrix rotationCorrection;
-	MatrixRotationY(&rotationCorrection, D3DX_PI);
-	MatrixScaling(&correctionMat, 0.01f, 0.01f, 0.01f);
-	MatrixMultiply(&correctionMat, &correctionMat, &rotationCorrection);
-	video::SkinnedXMeshHandle knight  = VIDEO->CreateSkinnedXMesh(
-		"../resources/Models/Knight/Knight.X", &correctionMat, "Knight");
-
-	//MatrixScaling(&correctionMat, 1.0f, 1.0f, 1.0f);
-	//video::SkinnedXMeshHandle snakeMesh = VIDEO->CreateSkinnedXMesh(
-	//	"../resources/Models/Snake/Snake_Red.X", &correctionMat, "Snake");
-
-	//MatrixScaling(&correctionMat, 1.0f, 1.0f, 1.0f);
-	//video::SkinnedXMeshHandle turtleMesh = VIDEO->CreateSkinnedXMesh(
-	//	"../resources/Models/DragonTurtle/DragonTurtle_Black.X", &correctionMat, "Turtle");
-
-	//MatrixScaling(&correctionMat, 1.0f, 1.0f, 1.0f);
-	//video::SkinnedXMeshHandle batMesh = VIDEO->CreateSkinnedXMesh(
-	//	"../resources/Models/DragonBat/DragonBat_Black.X", &correctionMat, "Bat");
-
-	//MatrixScaling(&correctionMat, 1.0f, 1.0f, 1.0f);
-	//video::SkinnedXMeshHandle catMesh = VIDEO->CreateSkinnedXMesh(
-	//	"../resources/Models/DevilCat/DevilCat.X", &correctionMat, "Cat");
-
-	//MatrixScaling(&correctionMat, 1.0f, 1.0f, 1.0f);
-	//video::SkinnedXMeshHandle HydraMesh = VIDEO->CreateSkinnedXMesh(
-	//	"../resources/Models/Hydra/Hydra_Red.X", &correctionMat, "Hydra");
-
-	//MatrixScaling(&correctionMat, 1.0f, 1.0f, 1.0f);
-	//video::SkinnedXMeshHandle LizardMesh = VIDEO->CreateSkinnedXMesh(
-	//	"../resources/Models/Lizard/Lizard.X", &correctionMat, "Lizard");
-
+	
 	LoadEverySkinnedResources();
 	LoadEveryStaticResources();
 
-	//시스템 생성
-	_world.AddSystem<RenderSystem>(_renderSystem);
-	_world.AddSystem<TransformSystem>(_transformSystem);
-	_world.AddSystem<ActionSystem>(_actionSystem);
-	_world.AddSystem<ScriptSystem>(_scriptSystem);
-	_world.AddSystem<CollisionSystem>(_collisionSystem);
-
-
-	//라이트 생성
-	_pMainLight = new DirectionalLight();
-	_pMainLight->CreateFromWorld(_world);
-	_pMainLight->SetWorldPosition(Vector3(0.0f, 5.0f, 5.0f));
+	_pMainLight->SetWorldPosition(Vector3(4.0f, 7.0f, 3.0f));
 	_pMainLight->SetTarget(Vector3(0.0f, 0.0f, 0.0f));
 
-	_pEnvironmentSphere = new EnvironmentSphere;
 	_pEnvironmentSphere->Create("../resources/Textures/grassenvmap1024.dds");
 
 	_channel.Broadcast<GameObjectFactory::CreateObjectOnLocationEvent>(
 		GameObjectFactory::CreateObjectOnLocationEvent(ARCHE_HERO, ResourceHandle(), Vector3(0.0f, 2.0f, 0.0f)));
 
-
-	//_channel.Broadcast<GameObjectFactory::CreateObjectOnLocationEvent>(
-	//	GameObjectFactory::CreateObjectOnLocationEvent(ARCHE_SNAKE, ResourceHandle(), Vector3(3.0f, 2.0f, 0.0f)));
-	//_channel.Broadcast<GameObjectFactory::CreateObjectOnLocationEvent>(
-	//	GameObjectFactory::CreateObjectOnLocationEvent(ARCHE_CAT, ResourceHandle(), Vector3(6.0f, 2.0f, 0.0f)));
-	//_channel.Broadcast<GameObjectFactory::CreateObjectOnLocationEvent>(
-	//	GameObjectFactory::CreateObjectOnLocationEvent(ARCHE_HYDRA, ResourceHandle(), Vector3(9.0f, 2.0f, 0.0f)));
-	//_channel.Broadcast<GameObjectFactory::CreateObjectOnLocationEvent>(
-	//	GameObjectFactory::CreateObjectOnLocationEvent(ARCHE_TURTLE, ResourceHandle(), Vector3(12.0f, 2.0f, 0.0f)));
-	//_channel.Broadcast<GameObjectFactory::CreateObjectOnLocationEvent>(
-	//	GameObjectFactory::CreateObjectOnLocationEvent(ARCHE_LIZARD, ResourceHandle(), Vector3(15.0f, 2.0f, 0.0f)));
-	//_channel.Broadcast<GameObjectFactory::CreateObjectOnLocationEvent>(
-	//	GameObjectFactory::CreateObjectOnLocationEvent(ARCHE_BAT, ResourceHandle(), Vector3(18.0f, 2.0f, 0.0f)));
-
-	//카메라 생성
-	_camera.CreateFromWorld(_world);
-	_camera.SetRotationSpeed(5.0f);
-	_camera.SetMoveSpeed(10.0f);
-	_camera.GetEntity().GetComponent<TransformComponent>().MovePositionWorld(Vector3(0.0f, 4.0f, -6.0f));
 	//NOTE : GameObjectFactory의 GetPlayerObject는 생성에 의존성을 가진다
 	_camera.SetTargetObject(GAMEOBJECTFACTORY->GetPlayerObject());
 
@@ -178,39 +179,47 @@ bool MapToolScene::SceneInit()
 bool MapToolScene::SceneUpdate(float deltaTime, const InputManager & input)
 {
 	bool result = true;
+	{
+		static float x = 0;
+		static float y = 0;
 
+		if (input.keyboard.IsDown(VK_DOWN))
+		{
+			x -= 0.02f;
+		}
+		if (input.keyboard.IsDown(VK_UP))
+		{
+			x += 0.02f;
+		}
+		if (input.keyboard.IsDown(VK_LEFT))
+		{
+			y -= 0.02f;
+		}
+		if (input.keyboard.IsDown(VK_RIGHT))
+		{
+			y += 0.02f;
+		}
+
+		//_pMainLight->_entity.GetComponent<TransformComponent>().SetRotateWorld(Vector3(x, y, 0.0f));
+	}
 
 	_editor->Edit(RefVariant(), input);
 
 	_world.Refresh();
-
 	_scriptSystem.Update(deltaTime);
-
-	_camera.MoveAndRotate(deltaTime,input);
 	_transformSystem.PreUpdate(deltaTime);
-
-	//Collision Check
 	_collisionSystem.Update(deltaTime, 4.0f);
-	//_transformSystem.PostUpdate(deltaTime);
 	_actionSystem.Update(deltaTime);
 
-	//Update Camera
-	{
-		_camera.UpdateMatrix();
-		_camera.UpdateCamToDevice();
-		_camera.UpdateFrustum();
-	}
-	//_channel.Update<BaseScene::SpawnEvent>(deltaTime);
+	ReadyShadowMap(TERRAIN);
 
-	//if (input.keyboard.IsPressed(VK_SPACE))
-	//{
-	//	gEngine->GetScene()->ChangeSceneWithLoading("BaseScene", "LoadingScene00", 1, 1);
-	//}
 	return result;
 }
 
 bool MapToolScene::SceneRelease()
 {
+	SAFE_DELETE(_editor);
+
 	for (auto object : _gameObjects)
 	{
 		SAFE_DELETE(object);
@@ -218,15 +227,11 @@ bool MapToolScene::SceneRelease()
 	_gameObjects.clear();
 
 	_world.Clear();
-
 	//VIDEO->DestroyEveryVertexBuffers();
 	//VIDEO->DestroyEveryndexBuffers();
-
 	//VIDEO->DestroyEveryAnimationInstances();
 	//VIDEO->DestroyEverySkinnedMesh();
-
 	//VIDEO->DestroyEveryStaticMesh();
-
 	//VIDEO->DestroyEveryTextures();
 
 	return true;
@@ -246,7 +251,17 @@ bool MapToolScene::SceneRender0()
 	_renderSystem.Render(_camera);
 	_editor->Render();
 
+	return true;
+}
 
+bool MapToolScene::SceneRenderSprite()
+{
+	//RECT destRect = { 600, 0, 800, 200 };
+	//RECT sourceRect = { 0, 0, 2048, 2048 };
+	//SPRITEMANAGER->BeginSpriteRender();
+	//SPRITEMANAGER->DrawArea(_shadowCamera.GetRenderTexture(), &sourceRect, &destRect, 0);
+	//SPRITEMANAGER->EndSpriteRender();
+	//return true;
 	return true;
 }
 

@@ -105,6 +105,7 @@ public :
 
 	bool32 _blocking{};
 	bool32 _prevBlocking{};
+	bool32 _prevLooping{};
 
 	ID3DXAnimationSet *_pPrevPlayingAnimationSet{};
 

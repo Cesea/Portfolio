@@ -34,17 +34,19 @@ public :
 	Player();
 	virtual ~Player();
 
-	virtual bool CreateFromWorld(World &world);
+	virtual bool CreateFromWorld(World &world, const Vector3 &Pos);
 	void Update(float deltaTime);
 
 	void Handle(const InputManager::KeyDownEvent &event);
 	void Handle(const InputManager::KeyReleasedEvent &event);
-	//void Handle(const InputManager::KeyDownEvent &event);
+	void Handle(const InputManager::KeyPressedEvent &event);
 	void Handle(const InputManager::MousePressedEvent &event);
+
+	void Handle(const CollisionSystem::ActorTriggerEvent &event);
 
 	void SetLinkCamera(Camera* camera) { _camera = camera; }
 
-private :
+public:
 	enum PLAYERSTATE
 	{
 		PLAYERSTATE_STANCE,
@@ -53,7 +55,10 @@ private :
 		PLAYERSTATE_ATTACK,
 		PLAYERSTATE_BLOCK,
 		PLAYERSTATE_MOVEATTACK,
+		PLAYERSTATE_HURT,
+		PLAYERSTATE_DEAD,
 	};
+private :
 	PLAYERSTATE _state;
 	bool32 _inCombat{};
 
@@ -67,17 +72,18 @@ private :
 	PlayerCallbackData _callbackData;
 	PlayerStateMachine *_pStateMachine;
 	GameCommand _currentCommand;
-	ActionComponent *_pActionComp{};
 	void QueueAction(const Action &action);
 
-	TerrainTilePos _tilePos;
+	ActionComponent *_pActionComp{};
+	TransformComponent *_pTransformComp{};
+	CollisionComponent *_pCollisionComp{};
 
 private :
 	EventChannel _channel;
 	float _walkSpeed{2.0f};
 	float _runSpeed{5.0f};
-	float _rotationSpeed{ 0.05f };
-	float _backRotationSpeed{ 0.03f };
+
+	int32 _hp{ 400 };
 
 	//int32 _stamina{ 100 };
 
@@ -89,17 +95,24 @@ private :
 	StopWatch _attackToStanceTimer;
 	int32 _comboCount{};
 
+
+	StopWatch _attackTriggerTimer;
+
 	bool32 _canCombo{false};
 
 public :
 
-	struct PlayerPositionEvent
+	struct PlayerImformationEvent
 	{
-		PlayerPositionEvent(const Vector3 &position)
-			:_position(position)
+		PlayerImformationEvent(const Vector3 &position,const PLAYERSTATE &state,const Vector3 &forward)
+			:_position(position),
+			_state(state),
+			_forward(forward)
 		{
 		}
 		Vector3 _position;
+		PLAYERSTATE _state;
+		Vector3 _forward;
 	};
 
 };

@@ -12,6 +12,7 @@ public:
 
 	void UpdateAnimations(float deltaTime);
 	void Render(const Camera &camera);
+	void RenderShadow(const Camera &camera);
 
 	virtual void Initialize();
 

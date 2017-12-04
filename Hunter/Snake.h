@@ -44,12 +44,19 @@ private:
 		SNAKESTATE_HURT,
 		SNAKESTATE_DIE,
 	};
+	enum SNAKESKINSTATE
+	{
+		SNAKESKINSTATE_RED,
+		SNAKESKINSTATE_BLACK,
+		SNAKESKINSTATE_CYAN
+	};
 	SNAKESTATE _state;
+	SNAKESKINSTATE _skinType;
 public:
 	Snake();
 	virtual ~Snake();
 
-	virtual bool CreateFromWorld(World &world);
+	virtual bool CreateFromWorld(World &world, const Vector3 &Pos);
 	void Update(float deltaTime);
 	void Handle(const CollisionSystem::ActorTriggerEvent & event);
 

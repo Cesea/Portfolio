@@ -10,11 +10,12 @@ Cat::~Cat()
 {
 }
 
-bool Cat::CreateFromWorld(World & world)
+bool Cat::CreateFromWorld(World & world, const Vector3 &Pos)
 {
 	_entity = world.CreateEntity();
 	TransformComponent &transComp = _entity.AddComponent<TransformComponent>();
-	transComp.MovePositionWorld(0, 7.0f, 0);
+
+	transComp.SetWorldPosition(Pos);
 
 	static int32 animCount = 0;
 
@@ -32,7 +33,7 @@ bool Cat::CreateFromWorld(World & world)
 	collision._boundingSphere._localCenter = pAnimation->_pSkinnedMesh->_boundInfo._center;
 	collision._boundingSphere._radius = pAnimation->_pSkinnedMesh->_boundInfo._radius;
 	collision._locked = false;
-	collision._isTrigger = true;
+	collision._isTrigger = false;;
 	collision._triggerType = CollisionComponent::TRIGGER_TYPE_ENEMY;
 
 
@@ -68,9 +69,7 @@ bool Cat::CreateFromWorld(World & world)
 	_speed = 5.0f;
 	_rotateSpeed = D3DX_PI / 64;
 	_patrolIndex = 0;
-	_moveSegment.push_back(Vector3(5.0f, 7.0f, 5.0f));
-	_moveSegment.push_back(Vector3(-5.0f, 7.0f, 5.0f));
-	_moveSegment.push_back(Vector3(-5.0f, 7.0f, -5.0f));
+	this->PatrolSet(rand() % 3, transComp.GetWorldPosition(), 5.0f);
 
 	_delayTime = 180.0f;
 	_delayCount = _delayTime;
@@ -83,7 +82,6 @@ bool Cat::CreateFromWorld(World & world)
 
 	_battle = false;
 
-	_playerPos = Vector3(5.0f, 7.0f, 5.0f);
 
 	_atkRange = 0.5f;
 	_atkTime = 70;
@@ -100,7 +98,7 @@ bool Cat::CreateFromWorld(World & world)
 	//이벤트 등록
 	EventChannel channel;
 	channel.Add<CollisionSystem::ActorTriggerEvent, Cat>(*this);
-
+	setEvent();
 	return true;
 }
 
@@ -132,12 +130,16 @@ void Cat::Update(float deltaTime)
 			float distance = Vec3Length(&direction);
 			Vec3Normalize(&direction, &direction);
 			//몸이 덜 돌아갔는가?
+			Vector3 rotatePos = _moveSegment[_patrolIndex];
+			rotatePos.y = transComp.GetWorldPosition().y;
+			Vector3 rotateDir = rotatePos - transComp.GetWorldPosition();
+			Vec3Normalize(&rotateDir, &rotateDir);
 			float distRadian = acos(
-				ClampMinusOnePlusOne(Vec3Dot(&-direction, &transComp.GetForward())));
+				ClampMinusOnePlusOne(Vec3Dot(&-rotateDir, &transComp.GetForward())));
 			if (distRadian > D3DX_PI) D3DX_PI * 2 - distRadian;
 			if (distRadian > _rotateSpeed)
 			{
-				transComp.LookDirection(-direction, _rotateSpeed);
+				transComp.LookDirection(-rotateDir, _rotateSpeed);
 				break;
 			}
 			//이동속도보다 가까움?
@@ -174,6 +176,11 @@ void Cat::Update(float deltaTime)
 		Vector3 direction = _playerPos - transComp.GetWorldPosition();
 		float distance = Vec3Length(&direction);
 		Vec3Normalize(&direction, &direction);
+		Vector3 rotatePos = _playerPos;
+		rotatePos.y = transComp.GetWorldPosition().y;
+		Vector3 rotateDir = rotatePos - transComp.GetWorldPosition();
+		Vec3Normalize(&rotateDir, &rotateDir);
+		transComp.LookDirection(-rotateDir, D3DX_PI);
 		if (distance < _atkRange)
 		{
 			_state = CATSTATE_ATK1;
@@ -341,11 +348,14 @@ void Cat::Update(float deltaTime)
 			_battle = true;
 			_state = CATSTATE_FIND;
 			_pStateMachine->ChangeState(META_TYPE(CatIdleState)->Name());
-			Vector3 distance = _playerPos - transComp.GetWorldPosition();
+			Vector3 rotatePos = _playerPos;
+			rotatePos.y = transComp.GetWorldPosition().y;
+			Vector3 distance = rotatePos - transComp.GetWorldPosition();
 			Vec3Normalize(&distance, &distance);
 			transComp.LookDirection(-distance, D3DX_PI * 2);
 		}
 	}
+	transComp.SetWorldPosition(transComp.GetWorldPosition().x, TERRAIN->GetHeight(transComp.GetWorldPosition().x, transComp.GetWorldPosition().z), transComp.GetWorldPosition().z);
 }
 
 void Cat::Handle(const CollisionSystem::ActorTriggerEvent & event)
