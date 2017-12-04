@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#include "UI.h"
 
 IScene::IScene()
 	:_world(4096)
@@ -67,6 +68,8 @@ IScene::IScene()
 	video::IndexBufferHandle iBufferHandle = VIDEO->CreateIndexBuffer(&mem, sizeof(uint16), "Scene");
 
 	_pScreenIndexBuffer = VIDEO->GetIndexBuffer(iBufferHandle);
+
+	_ui = new UI;
 }
 
 bool IScene::Init()
@@ -266,5 +269,11 @@ LPDIRECT3DTEXTURE9 IScene::GetSceneTexture()
 bool IScene::RenderEnvironmentSphere()
 {
 	_pEnvironmentSphere->Render(_camera);
+	return true;
+}
+
+bool IScene::SceneRenderSprite()
+{
+	_ui->RenderUI();
 	return true;
 }

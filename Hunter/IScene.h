@@ -9,6 +9,8 @@
 
 class EnvironmentSphere;
 
+class UI;
+
 namespace video
 {
 	class Effect;
@@ -44,8 +46,8 @@ public :
 	void Release();
 	bool Render();
 
-	//PostEffect±îÁö ¸ğµÎ ·»´õ ÇÑ´Ù...
-	//¸ŞÀÎ Ä«¸Ş¶óÀÇ RenderToTexture ¸¸ ¾÷µ¥ÀÌÆ®ÇÑ´Ù.
+	//PostEffectê¹Œì§€ ëª¨ë‘ ë Œë” í•œë‹¤...
+	//ë©”ì¸ ì¹´ë©”ë¼ì˜ RenderToTexture ë§Œ ì—…ë°ì´íŠ¸í•œë‹¤.
 	bool RenderToMainCamTexture();
 
 	void ReadyShadowMap(Terrain *pTerrain);
@@ -62,7 +64,7 @@ protected :
 	virtual bool SceneRender0() = 0;
 	virtual bool SceneRender1() { return true; }
 	virtual bool SceneRender2() { return true; }
-	virtual bool SceneRenderSprite() { return true; }
+	virtual bool SceneRenderSprite();
 
 	SceneVertex _screenVertices[4];
 	uint16 _screenIndices[6];
@@ -82,6 +84,8 @@ protected :
 	float _shadowDistance{ 100.0f };
 
 	bool RenderEnvironmentSphere();
+
+	UI* _ui;
 
 	TransformSystem _transformSystem;
 	RenderSystem _renderSystem;
