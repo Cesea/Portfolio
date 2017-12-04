@@ -7,7 +7,6 @@
 class Camera;
 
 class Player;
-class PlayerStateMachine;
 
 struct PlayerCallbackData
 {

@@ -54,13 +54,13 @@ void ActionComponent::UpdateAnimation(float deltaTime)
 	}
 	else
 	{
-		//if (_actionQueue.HasAction() &&
-		//	_actionQueue.Front()._cancle)
-		//{
-		//	PlayActionImmediate(_actionQueue.Front());
-		//	_actionQueue.PopAction();
-		//}
-		if (_animationPlayFactor >= 0.95f)
+		//NOTE : 여기서 cancle 처리를 한다....
+		if (_actionQueue.HasAction() && 
+			_actionQueue.Front()._cancle)
+		{
+
+		}
+		else if (_animationPlayFactor >= 0.95f)
 		{
 			if (_actionQueue.HasAction())
 			{
@@ -312,12 +312,13 @@ Action::Action()
 	_outCrossFadeTime = 0.0f;
 	_playOnce = false;
 	_enum = 0;
+	_cancle = false;
 }
 
 Action::Action(const Action & other)
 	: _blocking(other._blocking), _playSpeed(other._playSpeed), _stop(other._stop),
 	_crossFadeTime(other._crossFadeTime), _outCrossFadeTime(other._outCrossFadeTime), _playOnce(other._playOnce), 
-	_enum(other._enum)
+	_enum(other._enum), _cancle(other._cancle)
 {
 	strncpy(_name, other._name, sizeof(char) * ACTION_MAX_NAME);
 }
@@ -332,6 +333,7 @@ Action & Action::operator=(const Action & other)
 	_outCrossFadeTime = other._outCrossFadeTime;
 	_playOnce = other._playOnce;
 	_enum = other._enum;
+	_cancle = other._cancle;
 
 	return *this;
 }

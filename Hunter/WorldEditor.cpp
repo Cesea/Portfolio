@@ -849,8 +849,7 @@ void Editor::ShowStatusWindow()
 				ImguiLabel(_statusWindow._chunkInfoStr);
 
 				sprintf(_statusWindow._tileInfoStr, "Tile Num Entity : %d", 
-					refChunk._tiles[Index2D(tilePos._tileX, tilePos._tileZ, TERRAIN->GetXChunkCount())].
-					_entities.size());
+					refChunk._tiles[Index2D(tilePos._tileX, tilePos._tileZ, TERRAIN_TILE_DIM)]._entities.size());
 				ImguiLabel(_statusWindow._tileInfoStr);
 
 				ImguiUnindent();

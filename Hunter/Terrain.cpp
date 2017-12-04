@@ -3,6 +3,12 @@
 
 #include "QuadTree.h"
 
+Terrain::Terrain()
+{
+	EventChannel channel;
+	channel.Add<GameObjectFactory::ObjectCreatedEvent, Terrain>(*this);
+}
+
 Terrain::~Terrain()
 {
 }
@@ -76,11 +82,20 @@ void Terrain::RegisterEvents()
 
 void Terrain::UnRegisterEvents()
 {
-	EventChannel channel;
 }
 
 void Terrain::Handle(const GameObjectFactory::ObjectCreatedEvent & event)
 {
+	TerrainTilePos tilePos;
+	ConvertWorldPostoTilePos(event._worldPosition, &tilePos);
+
+	TerrainChunk &refChunk = _pChunks[Index2D(tilePos._chunkX, tilePos._chunkZ, _xChunkCount)];
+	if (event._entity.IsValid())
+	{
+		int32 index = Index2D(tilePos._tileX, tilePos._tileZ, TERRAIN_TILE_RES);
+		refChunk._tiles[index]._entities.push_back(event._entity);
+		refChunk._numTotalEntity++;
+	}
 }
 
 
@@ -648,8 +663,8 @@ bool Terrain::CreateTerrain(int32 tileNum)
 	float tileIntervalX = static_cast<float>(tileNum) / _numCellX;
 	float tileIntervalY = static_cast<float>(tileNum) / _numCellZ;
 
-	float terrainStartX = -(_numCellX / 2);
-	float terrainStartZ = (_numCellZ / 2);
+	float terrainStartX = (float)-(_numCellX / 2);
+	float terrainStartZ = (float)(_numCellZ / 2);
 
 	_terrainVertices = new video::TerrainVertex[_numTotalVertex];
 
@@ -835,11 +850,13 @@ bool Terrain::CreateTerrainChunk(int32 x, int32 z, const video::TerrainVertex * 
 {
 	int32 sectionIndex = Index2D(x, z, _xChunkCount);
 
-	TerrainChunk &refSection = _pChunks[sectionIndex];
-	refSection._pVertices = pTerrainVertices;
+	TerrainChunk &refChunk = _pChunks[sectionIndex];
 
-	refSection._chunkX = x;
-	refSection._chunkZ = z;
+
+	refChunk._pVertices = pTerrainVertices;
+
+	refChunk._chunkX = x;
+	refChunk._chunkZ = z;
 
 	int32 globalStartX = x * _sectionResolution;
 	int32 globalStartZ = z * _sectionResolution;
@@ -867,11 +884,11 @@ bool Terrain::CreateTerrainChunk(int32 x, int32 z, const video::TerrainVertex * 
 		}
 	}
 
-	refSection._relStartX = vertices[0]._pos.x;
-	refSection._relStartZ = vertices[0]._pos.z;
+	refChunk._relStartX = vertices[0]._pos.x;
+	refChunk._relStartZ = vertices[0]._pos.z;
 
-	refSection._relEndX = vertices.back()._pos.x;
-	refSection._relEndZ = vertices.back()._pos.z;
+	refChunk._relEndX = vertices.back()._pos.x;
+	refChunk._relEndZ = vertices.back()._pos.z;
 
 	if (_inEditMode)
 	{
@@ -880,18 +897,18 @@ bool Terrain::CreateTerrainChunk(int32 x, int32 z, const video::TerrainVertex * 
 		mem._data = nullptr;
 		mem._size = sizeof(video::TerrainVertex) * _sectionNumVertexX * _sectionNumVertexZ;
 
-		refSection._vHandle = VIDEO->CreateVertexBuffer(&mem, _declHandle);
-		Assert(refSection._vHandle.IsValid());
+		refChunk._vHandle = VIDEO->CreateVertexBuffer(&mem, _declHandle);
+		Assert(refChunk._vHandle.IsValid());
 
 		mem._data = nullptr;
 		mem._size = sizeof(uint32) * _sectionResolution * _sectionResolution * 2 * 3;
 
-		if (!refSection._iHandle.IsValid())
+		if (!refChunk._iHandle.IsValid())
 		{
-			refSection._iHandle = VIDEO->CreateIndexBuffer(&mem, sizeof(uint32));
+			refChunk._iHandle = VIDEO->CreateIndexBuffer(&mem, sizeof(uint32));
 		}
 
-		Assert(refSection._iHandle.IsValid());
+		Assert(refChunk._iHandle.IsValid());
 	}
 	else
 	{
@@ -900,22 +917,22 @@ bool Terrain::CreateTerrainChunk(int32 x, int32 z, const video::TerrainVertex * 
 		mem._data = &vertices[0];
 		mem._size = sizeof(video::TerrainVertex) * _sectionNumVertexX * _sectionNumVertexZ;
 
-		refSection._vHandle = VIDEO->CreateVertexBuffer(&mem, _declHandle);
-		Assert(refSection._vHandle.IsValid());
+		refChunk._vHandle = VIDEO->CreateVertexBuffer(&mem, _declHandle);
+		Assert(refChunk._vHandle.IsValid());
 
 		mem._data = &_chunkIndex[0];
 		mem._size = sizeof(uint32) * _sectionResolution * _sectionResolution * 2 * 3;
 
-		if (!refSection._iHandle.IsValid())
+		if (!refChunk._iHandle.IsValid())
 		{
-			refSection._iHandle = VIDEO->CreateIndexBuffer(&mem, sizeof(uint32));
+			refChunk._iHandle = VIDEO->CreateIndexBuffer(&mem, sizeof(uint32));
 		}
-		Assert(refSection._iHandle.IsValid());
+		Assert(refChunk._iHandle.IsValid());
 	}
 
-	refSection._relCenterX = (refSection._relStartX + refSection._relEndX) * 0.5f;
-	refSection._relCenterZ = (refSection._relStartZ + refSection._relEndZ) * 0.5f;
-	refSection._radius = (refSection._relCenterX - refSection._relStartX) * 1.2f;
+	refChunk._relCenterX = (refChunk._relStartX + refChunk._relEndX) * 0.5f;
+	refChunk._relCenterZ = (refChunk._relStartZ + refChunk._relEndZ) * 0.5f;
+	refChunk._radius = (refChunk._relCenterX - refChunk._relStartX) * 1.2f;
 
 	return true;
 }
@@ -930,7 +947,8 @@ void Terrain::AddHeightOnCursorPos(const Vector2 &cursorPos, float innerRadius, 
 	Vector3 worldPos;
 	if (IsIntersectRay(ray, &worldPos))
 	{
-		TerrainTilePos tilePos =  ConvertWorldPostoTilePos(worldPos);
+		TerrainTilePos tilePos;
+		ConvertWorldPostoTilePos(worldPos, &tilePos);
 
 		int32 centerX = tilePos._chunkX * TERRAIN_CHUNK_DIM + tilePos._tileX;
 		int32 centerZ = tilePos._chunkZ * TERRAIN_CHUNK_DIM + tilePos._tileZ;
@@ -964,7 +982,8 @@ void Terrain::SmoothOnCursorPos(const Vector2 & cursorPos, float brushRadius)
 
 	if (IsIntersectRay(ray, &worldPos))
 	{
-		TerrainTilePos tilePos = ConvertWorldPostoTilePos(worldPos);
+		TerrainTilePos tilePos;
+		ConvertWorldPostoTilePos(worldPos, &tilePos);
 
 		int32 centerX = tilePos._chunkX * TERRAIN_CHUNK_DIM + tilePos._tileX;
 		int32 centerZ = tilePos._chunkZ * TERRAIN_CHUNK_DIM + tilePos._tileZ;
@@ -1081,25 +1100,22 @@ TerrainChunkPos Terrain::ConvertWorldPosToChunkPos(const Vector3 & worldPos)
 	return result;
 }
 
-TerrainTilePos Terrain::ConvertWorldPostoTilePos(const Vector3 & worldPos)
+void Terrain::ConvertWorldPostoTilePos(const Vector3 & worldPos, TerrainTilePos *pOutTilePos)
 {
-	TerrainTilePos result;
-	
 	float terrainPosX = worldPos.x + (float)_terrainHalfSizeX;
 	float terrainPosZ = -worldPos.z + (float)_terrainHalfSizeZ;
 
-	result._chunkX = (int32)(terrainPosX / TERRAIN_CHUNK_DIM);
-	result._chunkZ = (int32)(terrainPosZ / TERRAIN_CHUNK_DIM);
-	int32 chunkStartX = result._chunkX * TERRAIN_CHUNK_DIM;
-	int32 chunkStartZ = result._chunkZ * TERRAIN_CHUNK_DIM;
+	pOutTilePos->_chunkX = (int32)(terrainPosX / TERRAIN_CHUNK_DIM);
+	pOutTilePos->_chunkZ = (int32)(terrainPosZ / TERRAIN_CHUNK_DIM);
 
-	result._tileX = ((int32)terrainPosX - (int32)chunkStartX);
-	result._tileZ = ((int32)terrainPosZ - (int32)chunkStartZ);
+	int32 chunkStartX = pOutTilePos->_chunkX * TERRAIN_CHUNK_DIM;
+	int32 chunkStartZ = pOutTilePos->_chunkZ * TERRAIN_CHUNK_DIM;
 
-	result._relX = (float)(terrainPosX - (float)(chunkStartX + result._tileX));
-	result._relZ = (float)(terrainPosZ - (float)(chunkStartZ + result._tileZ));
+	pOutTilePos->_tileX = ((int32)terrainPosX - (int32)chunkStartX) / TERRAIN_TILE_DIM;
+	pOutTilePos->_tileZ = ((int32)terrainPosZ - (int32)chunkStartZ) / TERRAIN_TILE_DIM;
 
-	return result;
+	pOutTilePos->_relX = (float)(terrainPosX - (float)(chunkStartX + (pOutTilePos->_tileX * TERRAIN_TILE_DIM) ));
+	pOutTilePos->_relZ = (float)(terrainPosZ - (float)(chunkStartZ + (pOutTilePos->_tileZ * TERRAIN_TILE_DIM) ));
 }
 
 void Terrain::EffectSetTexture(LPCSTR handle, LPDIRECT3DTEXTURE9 texture)
@@ -1128,30 +1144,21 @@ const Vector3 ConvertTilePosToWorldPos(const TerrainTilePos & tilePos)
 }
 
 //플레이어가 접근하면 터레인 청크에 있는 모든 엔티티들을 활성화 시킨다
-void Terrain::TerrainChunk::ValidateEntities()
+void Terrain::TerrainChunk::ActivateEntities()
 {
 	for (int32 i = 0; i < TERRAIN_CHUNKS_TILE_COUNT; ++i)
 	{
-
+		_tiles[i]._entities[i].Activate();
 	}
-	//for (int32 i = 0; i < _entities.size(); ++i)
-	//{
-	//	_entities[i].Deactivate();
-	//}
 }
 
-//플레이어가 접근하면 터레인 청크에 있는 모든 엔티티들을 비활성화 시킨다
-void Terrain::TerrainChunk::InvalidateEntities()
+//플레이어가 청크에서 멀어진다면.... 터레인 청크에 있는 모든 엔티티들을 비활성화 시킨다
+void Terrain::TerrainChunk::DeactivateEntities()
 {
-
 	for (int32 i = 0; i < TERRAIN_CHUNKS_TILE_COUNT; ++i)
 	{
-
+		_tiles[i]._entities[i].Deactivate();
 	}
-	//for (int32 i = 0; i < _entities.size(); ++i)
-	//{
-	//	_entities[i].Activate();
-	//}
 }
 
 //Rebuild Seciton은 인자로 들어온 min, max의 범위를 1씩 증가시켜서 내부 처리를 진행한다.
@@ -1423,7 +1430,8 @@ void Terrain::DrawAlphaTextureOnCursorPos(const Vector2 & cursorPos,
 
 	if (IsIntersectRay(ray, &worldPos))
 	{
-		TerrainTilePos tilePos = ConvertWorldPostoTilePos(worldPos);
+		TerrainTilePos tilePos;
+		ConvertWorldPostoTilePos(worldPos, &tilePos);
 
 		int32 centerX = tilePos._chunkX * TERRAIN_CHUNK_DIM + tilePos._tileX;
 		int32 centerZ = tilePos._chunkZ * TERRAIN_CHUNK_DIM + tilePos._tileZ;

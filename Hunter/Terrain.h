@@ -11,6 +11,7 @@ constexpr int32 TERRAIN_CHUNK_DIM = 64;
 constexpr int32 TERRAIN_ALPHA_TEXTURE_SIZE = 512;
 
 constexpr int32 TERRAIN_TILE_DIM = 8;
+constexpr int32 TERRAIN_TILE_RES = 8;
 constexpr int32 TERRAIN_CHUNKS_TILE_COUNT = 64;
 
 
@@ -107,13 +108,13 @@ public:
 		int32 _tileX{};
 		int32 _tileZ{};
 
-		std::vector<Entity> _entities;
+		std::vector<Entity> _entities{};
 	};
 
 	struct TerrainChunk
 	{
-		void ValidateEntities();
-		void InvalidateEntities();
+		void ActivateEntities();
+		void DeactivateEntities();
 
 		TerrainChunkPos _chunkPos;
 
@@ -134,24 +135,19 @@ public:
 		video::VertexBufferHandle _vHandle{};
 		video::IndexBufferHandle _iHandle{};
 
-		//만약에 터레인 에디터에서 버텍스 정보가 변경되었다면 dirty를 true로 바꾸고....
-		//smoothing을 가하는 정보로 사용한다??
-		bool32 _dirty{ false };
-
 		int32 _numTotalEntity{};
 
-		TerrainTile _tiles[TERRAIN_CHUNKS_TILE_COUNT];
+		TerrainTile _tiles[TERRAIN_CHUNKS_TILE_COUNT]{0, };
 
 		const video::TerrainVertex *_pVertices;
 	};
 
-	Terrain() {}
+	Terrain();
 	~Terrain();
 
 	//Event Related /////////////////////////////////////////////////////
 	void RegisterEvents();
 	void UnRegisterEvents();
-
 	void Handle(const GameObjectFactory::ObjectCreatedEvent &event);
 
 	void SetScene(IScene *pScene) { _pCurrentScene = pScene; }
@@ -173,7 +169,7 @@ public:
 	void AddEntityToSection(const Entity &entity, const Vector3 &position);
 
 	TerrainChunkPos ConvertWorldPosToChunkPos(const Vector3 &worldPos);
-	TerrainTilePos ConvertWorldPostoTilePos(const Vector3 &worldPos);
+	void ConvertWorldPostoTilePos(const Vector3 & worldPos, TerrainTilePos *pOutTilePos);
 
 	//void UpdateTerrainTilePos(TerrainTilePos &tilePos);
 

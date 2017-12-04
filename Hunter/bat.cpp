@@ -90,13 +90,13 @@ bool Bat::CreateFromWorld(World & world, const Vector3 &Pos)
 
 	this->PatrolSet(rand() % 3, transComp.GetWorldPosition(), 5.0f);
 
-	for (int i = 0; i < _moveSegment.size(); i++)
+	for (uint32 i = 0; i < _moveSegment.size(); i++)
 	{
 		_moveSegment[i].y++;
 	}
 
 
-	_delayTime = 180.0f;
+	_delayTime = 180;
 	_delayCount = _delayTime;
 
 	_findDistance = 3.0f;
@@ -178,6 +178,8 @@ void Bat::Update(float deltaTime)
 			Vec3Normalize(&rotateDir, &rotateDir);
 			float distRadian = acos(
 				ClampMinusOnePlusOne(Vec3Dot(&-rotateDir, &transComp.GetForward())));
+
+			//NOTE hyun : 여기서 이걸 해 주는 이유가 뭘까??
 			if (distRadian > D3DX_PI) D3DX_PI * 2 - distRadian;
 			if (distRadian > _rotateSpeed)
 			{
@@ -410,7 +412,7 @@ void Bat::SetupCallbackAndCompression()
 	_callbackData._animtionEnum = (BAT_ANIMATION_ENUM *)&_animationEnum;
 
 	D3DXKEY_CALLBACK warSwingLeftKeys;
-	warSwingLeftKeys.Time = anim0->GetPeriod() / 1.0f * anim0->GetSourceTicksPerSecond();
+	warSwingLeftKeys.Time = (float)anim0->GetPeriod() / 1.0f * (float)anim0->GetSourceTicksPerSecond();
 	warSwingLeftKeys.pCallbackData = (void *)&_callbackData;
 
 	AddCallbackKeysAndCompress(pController, anim0, 1, &warSwingLeftKeys, D3DXCOMPRESS_DEFAULT, 0.1f);

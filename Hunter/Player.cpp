@@ -1,8 +1,6 @@
 #include "stdafx.h"
 #include "Player.h"
 
-#include "PlayerStates.h"
-
 #include "Camera.h"
 
 #define MAX_COMBO_COUNT 3
@@ -38,7 +36,7 @@ bool Player::CreateFromWorld(World & world, const Vector3 &Pos)
    transComp._position = Vector3(0, TERRAIN->GetHeight(0.0f, 0.0f), 0);
    _pTransformComp = &transComp;
 
-   _tilePos = TERRAIN->ConvertWorldPostoTilePos(transComp.GetWorldPosition());
+   TERRAIN->ConvertWorldPostoTilePos(transComp.GetWorldPosition(), &_tilePos);
 
    //transComp.MovePositionWorld();
 
@@ -716,7 +714,7 @@ void Player::MoveAndRotate(float deltaTime)
 		  refTransform.GetWorldPosition().x, 
 		  TERRAIN->GetHeight(refTransform.GetWorldPosition().x, refTransform.GetWorldPosition().z), refTransform.GetWorldPosition().z);
 
-	  _tilePos = TERRAIN->ConvertWorldPostoTilePos(refTransform.GetWorldPosition());
+	  TERRAIN->ConvertWorldPostoTilePos(refTransform.GetWorldPosition(), &_tilePos);
    }
 }
 

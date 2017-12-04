@@ -111,9 +111,6 @@
     <ClCompile Include="PlayerAnimationString.cpp">
       <Filter>Game\GameObjects\Player</Filter>
     </ClCompile>
-    <ClCompile Include="PlayerStates.cpp">
-      <Filter>Game\GameObjects\Player</Filter>
-    </ClCompile>
     <ClCompile Include="Meta.cpp">
       <Filter>Sub\Reflection</Filter>
     </ClCompile>
@@ -436,9 +433,6 @@
       <Filter>Game\GameObjects\Player</Filter>
     </ClInclude>
     <ClInclude Include="PlayerAnimationString.h">
-      <Filter>Game\GameObjects\Player</Filter>
-    </ClInclude>
-    <ClInclude Include="PlayerStates.h">
       <Filter>Game\GameObjects\Player</Filter>
     </ClInclude>
     <ClInclude Include="Meta.h">

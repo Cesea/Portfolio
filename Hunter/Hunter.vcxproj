@@ -179,7 +179,6 @@
     <ClCompile Include="Plane.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="PlayerAnimationString.cpp" />
-    <ClCompile Include="PlayerStates.cpp" />
     <ClCompile Include="Player_CallBack.cpp" />
     <ClCompile Include="PointLight.cpp" />
     <ClCompile Include="QuadTree.cpp" />
@@ -293,7 +292,6 @@
     <ClInclude Include="Plane.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="PlayerAnimationString.h" />
-    <ClInclude Include="PlayerStates.h" />
     <ClInclude Include="PointLight.h" />
     <ClInclude Include="QuadTree.h" />
     <ClInclude Include="Quaternion.h" />
