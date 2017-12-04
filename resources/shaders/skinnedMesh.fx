@@ -337,6 +337,7 @@ struct VS_OUTPUT_RECIVESHADOW
 };
 
 
+
 VS_OUTPUT_RECIVESHADOW vs_ReciveShadow( VS_INPUT_RECIVESHADOW Input, uniform int iNumBones  )
 {
    VS_OUTPUT_RECIVESHADOW Output = (VS_OUTPUT_RECIVESHADOW)0;
@@ -351,14 +352,13 @@ VS_OUTPUT_RECIVESHADOW vs_ReciveShadow( VS_INPUT_RECIVESHADOW Input, uniform int
    Output.Position = mul( worldPos, matViewProjection );
    
    Output.Texcoord = Input.Texcoord;
-   
-   Output.Normal = mul( Input.Normal, (float3x3)matWorld );
-   Output.Binormal = mul( Input.Binormal, (float3x3)matWorld );  
-   Output.Tangent = mul( Input.Tangent, (float3x3)matWorld ); 
-   
+
+   Output.Normal = vso.Normal;
+   Output.Binormal = vso.Binormal;
+   Output.Tangent = vso.Tangent;
+
    Output.viewDir = vEyePos.xyz - worldPos.xyz;
    Output.worldPos = worldPos;
-
 
    Output.FinalPos = Output.Position;		//변환 정보
    Output.LightClipPos = mul( worldPos, matLightViewProjection );	//광원 입장에서 본 위치
@@ -366,7 +366,36 @@ VS_OUTPUT_RECIVESHADOW vs_ReciveShadow( VS_INPUT_RECIVESHADOW Input, uniform int
    return( Output );
 }
 
+struct vs_input_recieve_shadow_static
+{
+   float4 Position : POSITION0;
+   float2 Texcoord : TEXCOORD0;
+   float3 Normal : NORMAL0;
+   float3 Binormal : BINORMAL0;
+   float3 Tangent : TANGENT0;
+};
 
+VS_OUTPUT_RECIVESHADOW vs_recieve_shadow_static( vs_input_recieve_shadow_static input )
+{
+   VS_OUTPUT_RECIVESHADOW Output = (VS_OUTPUT_RECIVESHADOW)0;
+
+   float4 worldPos = mul( input.Position, matWorld );
+   Output.Position = mul( worldPos, matViewProjection );
+   
+   Output.Texcoord = input.Texcoord;
+   
+   Output.Normal = mul( input.Normal, (float3x3)matWorld );
+   Output.Binormal = mul( input.Binormal, (float3x3)matWorld );  
+   Output.Tangent = mul( input.Tangent, (float3x3)matWorld ); 
+   
+   Output.viewDir = vEyePos.xyz - worldPos.xyz;
+   Output.worldPos = worldPos;
+
+   Output.FinalPos = Output.Position;		//변환 정보
+   Output.LightClipPos = mul( worldPos, matLightViewProjection );	//광원 입장에서 본 위치
+
+   return( Output );
+}
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -440,13 +469,22 @@ technique CreateShadowStatic
 	}
 }
 
-technique ReciveShadow
+technique RecieveShadowSkinned
 {
     pass p0
     {
         VertexShader = ( ReciveShadowArr[ CurNumBones ] );
         PixelShader = compile ps_3_0 ps_ReciveShadow();
     }
+}
+
+technique RecieveShadowStaitc
+{
+	pass p0
+	{
+		VertexShader = compile vs_3_0 vs_recieve_shadow_static();
+		PixelShader = compile ps_3_0 ps_ReciveShadow();
+	}
 }
 
 technique ReciveShadowToon
