@@ -93,24 +93,21 @@ sampler2D Terrain2 = sampler_state
    MIPFILTER = LINEAR;
    MAGFILTER = LINEAR;
 };
-texture Terrain3_Tex;
-sampler2D Terrain3 = sampler_state
+
+texture TerrainControl_Tex1;
+sampler2D TerrainControl1 = sampler_state
 {
-   Texture = (Terrain3_Tex);
-   MAGFILTER = LINEAR;
+   Texture = (TerrainControl_Tex1);
    MINFILTER = LINEAR;
    MIPFILTER = LINEAR;
-   MAXANISOTROPY = 0;
 };
 
-texture TerrainControl_Tex;
-sampler2D TerrainControl = sampler_state
+texture TerrainControl_Tex2;
+sampler2D TerrainControl2 = sampler_state
 {
-   Texture = (TerrainControl_Tex);
-   MAGFILTER = ANISOTROPIC;
-   MAXANISOTROPY = 16;
-   MINFILTER = ANISOTROPIC;
-   MIPFILTER = ANISOTROPIC;
+   Texture = (TerrainControl_Tex2);
+   MINFILTER = LINEAR;
+   MIPFILTER = LINEAR;
 };
 
 float4 ps_main( PS_INPUT Input ) : COLOR0
@@ -122,7 +119,7 @@ float4 ps_main( PS_INPUT Input ) : COLOR0
    float3 terrain3 = tex2D( Terrain3, Input.TileUV ).rgb;
   
    //Control Texture 의 컬러를 얻는다.
-   float3 controlColor = tex2D( TerrainControl, Input.ControlUV ).rgb;
+   float4 controlColor = tex2D( TerrainControl, Input.ControlUV );
    
 
    //컨트롤 Texture 에서 색상비율을 얻는다.
@@ -272,7 +269,7 @@ PS_OUTPUT ps_ReciveShadow( VS_OUTPUT_RECIVESHADOW Input )
    float3 terrain3 = tex2D( Terrain3, Input.TileUV ).rgb;
   
    //Control Texture 의 컬러를 얻는다.
-   float3 controlColor = tex2D( TerrainControl, Input.ControlUV ).rgb;
+   float4 controlColor = tex2D( TerrainControl, Input.ControlUV );
    
 
    //컨트롤 Texture 에서 색상비율을 얻는다.

@@ -947,11 +947,11 @@ void Terrain::AddHeightOnCursorPos(const Vector2 &cursorPos, float innerRadius, 
 	Vector3 worldPos;
 	if (IsIntersectRay(ray, &worldPos))
 	{
-		TerrainTilePos tilePos;
-		ConvertWorldPostoTilePos(worldPos, &tilePos);
+		TerrainVertexPos vertexPos;
+		ConvertWorldPostoVertexPos(worldPos, &vertexPos);
 
-		int32 centerX = tilePos._chunkX * TERRAIN_CHUNK_DIM + tilePos._tileX;
-		int32 centerZ = tilePos._chunkZ * TERRAIN_CHUNK_DIM + tilePos._tileZ;
+		int32 centerX = vertexPos._chunkX * TERRAIN_CHUNK_DIM + vertexPos._tileX;
+		int32 centerZ = vertexPos._chunkZ * TERRAIN_CHUNK_DIM + vertexPos._tileZ;
 
 		int32 minX, minZ, maxX, maxZ;
 		minX = centerX - radius;
@@ -965,9 +965,7 @@ void Terrain::AddHeightOnCursorPos(const Vector2 &cursorPos, float innerRadius, 
 		ClampInt(maxZ, 0, _numVertexZ - 1);
 
 		AddHeightGausian(minX, maxX, minZ, maxZ, intensity);
-
 		RebuildSection(minX, maxX, minZ, maxZ);
-
 	}
 }
 
@@ -982,17 +980,17 @@ void Terrain::SmoothOnCursorPos(const Vector2 & cursorPos, float brushRadius)
 
 	if (IsIntersectRay(ray, &worldPos))
 	{
-		TerrainTilePos tilePos;
-		ConvertWorldPostoTilePos(worldPos, &tilePos);
+		TerrainVertexPos vertexPos;
+		ConvertWorldPostoVertexPos(worldPos, &vertexPos);
 
-		int32 centerX = tilePos._chunkX * TERRAIN_CHUNK_DIM + tilePos._tileX;
-		int32 centerZ = tilePos._chunkZ * TERRAIN_CHUNK_DIM + tilePos._tileZ;
+		int32 centerX = vertexPos._chunkX * TERRAIN_CHUNK_DIM + vertexPos._tileX;
+		int32 centerZ = vertexPos._chunkZ * TERRAIN_CHUNK_DIM + vertexPos._tileZ;
 
 		int32 minX, maxX, minZ, maxZ;
-		minX = centerX - radius - 3;
-		maxX = centerX + radius + 3;
-		minZ = centerZ - radius - 3;
-		maxZ = centerZ + radius + 3;
+		minX = centerX - radius - 1;
+		maxX = centerX + radius + 1;
+		minZ = centerZ - radius - 1;
+		maxZ = centerZ + radius + 1;
 
 		ClampInt(minX, 0, _numVertexX);
 		ClampInt(maxX, 0, _numVertexX);
@@ -1116,6 +1114,24 @@ void Terrain::ConvertWorldPostoTilePos(const Vector3 & worldPos, TerrainTilePos 
 
 	pOutTilePos->_relX = (float)(terrainPosX - (float)(chunkStartX + (pOutTilePos->_tileX * TERRAIN_TILE_DIM) ));
 	pOutTilePos->_relZ = (float)(terrainPosZ - (float)(chunkStartZ + (pOutTilePos->_tileZ * TERRAIN_TILE_DIM) ));
+}
+
+void Terrain::ConvertWorldPostoVertexPos(const Vector3 & worldPos, TerrainVertexPos * pOutVertexPos)
+{
+	float terrainPosX = worldPos.x + (float)_terrainHalfSizeX;
+	float terrainPosZ = -worldPos.z + (float)_terrainHalfSizeZ;
+
+	pOutVertexPos->_chunkX = (int32)(terrainPosX / TERRAIN_CHUNK_DIM);
+	pOutVertexPos->_chunkZ = (int32)(terrainPosZ / TERRAIN_CHUNK_DIM);
+
+	int32 chunkStartX = pOutVertexPos->_chunkX * TERRAIN_CHUNK_DIM;
+	int32 chunkStartZ = pOutVertexPos->_chunkZ * TERRAIN_CHUNK_DIM;
+
+	pOutVertexPos->_tileX = ((int32)terrainPosX - (int32)chunkStartX);
+	pOutVertexPos->_tileZ = ((int32)terrainPosZ - (int32)chunkStartZ);
+
+	pOutVertexPos->_relX = (float)(terrainPosX - (float)(chunkStartX + pOutVertexPos->_tileX));
+	pOutVertexPos->_relZ = (float)(terrainPosZ - (float)(chunkStartZ + pOutVertexPos->_tileZ));
 }
 
 void Terrain::EffectSetTexture(LPCSTR handle, LPDIRECT3DTEXTURE9 texture)
@@ -1420,8 +1436,8 @@ void Terrain::AddHeightBlock(int32 minX, int32 maxX, int32 minZ, int32 maxZ, flo
 {
 }
 
-void Terrain::DrawAlphaTextureOnCursorPos(const Vector2 & cursorPos,
-	float innerRadius, float outterRadius, int32 channel)
+void Terrain::DrawAlphaTextureOnCursorPos(const Vector2 & cursorPos, float innerRadius, float outterRadius, 
+	int32 channel, bool32 subtract)
 {
 	Ray ray;
 	_pCurrentScene->_camera.ComputeRay(cursorPos, &ray);
@@ -1430,11 +1446,20 @@ void Terrain::DrawAlphaTextureOnCursorPos(const Vector2 & cursorPos,
 
 	if (IsIntersectRay(ray, &worldPos))
 	{
-		TerrainTilePos tilePos;
-		ConvertWorldPostoTilePos(worldPos, &tilePos);
+		TerrainVertexPos vertexPos;
+		ConvertWorldPostoVertexPos(worldPos, &vertexPos);
 
-		int32 centerX = tilePos._chunkX * TERRAIN_CHUNK_DIM + tilePos._tileX;
-		int32 centerZ = tilePos._chunkZ * TERRAIN_CHUNK_DIM + tilePos._tileZ;
+		int32 centerX = vertexPos._chunkX * TERRAIN_CHUNK_DIM + vertexPos._tileX;
+		int32 centerZ = vertexPos._chunkZ * TERRAIN_CHUNK_DIM + vertexPos._tileZ;
+
+		if (vertexPos._relX > 0.5f)
+		{
+
+		}
+		if (vertexPos._relZ > 0.5f)
+		{
+			centerX
+		}
 
 		//알파 텍스쳐의 1픽셀이 지형에 대해서 얼마의 크기인지를 구한다..
 		float pixelSize = (float)_terrainSizeX / (float)TERRAIN_ALPHA_TEXTURE_SIZE;
@@ -1481,13 +1506,12 @@ void Terrain::DrawAlphaTextureOnCursorPos(const Vector2 & cursorPos,
 					{
 						write = 0xff;
 					}
-					else if(length <= outterRadius)
+					else if(length <= outterRadius + EPSILON)
 					{
 						length -= innerRadius;
 						float range = (float)(outterRadius - innerRadius);
 						write =  (uint8)(((float)(range - length) / (float)(range)) * 0xff);
 
-						int a = 0;
 					}
 					else
 					{
@@ -1495,18 +1519,14 @@ void Terrain::DrawAlphaTextureOnCursorPos(const Vector2 & cursorPos,
 					}
 
 					read = (read < write) ? write : read;
-					for (int32 i = 0; i < 4; ++i)
+
+					if (subtract)
 					{
-						if (i == channel)
-						{
-							pStart[in] = read;
-						}
-						else
-						{
-							pStart[in] = (uint8)((float)pStart[in] * 0.1f);
-							//pStart[in] = 0x00;
-						}
-						in++;
+						pStart[in + channel] = 0;
+					}
+					else
+					{
+						pStart[in + channel] = read;
 					}
 				}
 			}

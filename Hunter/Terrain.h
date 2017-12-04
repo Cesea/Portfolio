@@ -8,7 +8,7 @@ class QuadTree;
 
 constexpr int32 TERRAIN_SHOW_EXTENT = 2;
 constexpr int32 TERRAIN_CHUNK_DIM = 64;
-constexpr int32 TERRAIN_ALPHA_TEXTURE_SIZE = 512;
+constexpr int32 TERRAIN_ALPHA_TEXTURE_SIZE = 1024;
 
 constexpr int32 TERRAIN_TILE_DIM = 8;
 constexpr int32 TERRAIN_TILE_RES = 8;
@@ -28,8 +28,8 @@ struct TerrainChunkPos
 //청크 안에서
 struct TerrainTilePos
 {
-	int32 _chunkX;
-	int32 _chunkZ;
+	int32 _chunkX{};
+	int32 _chunkZ{};
 
 	int32 _tileX{};
 	int32 _tileZ{};
@@ -38,37 +38,17 @@ struct TerrainTilePos
 	float _relZ{};
 };
 
-//bool UpdateTerrainTilePos(TerrainTilePos &tilePos)
-//{
-//	int32 tileXDiff;
-//	int32 tileZDiff;
-//
-//	int32 chunkXDiff;
-//	int32 chunkZDiff;
-//
-//	if (tilePos._relX < 0.0f)
-//	{
-//		tileXDiff -= 1;
-//		tilePos._relX += (float)TERRAIN_TILE_DIM;
-//	}
-//	else if (tilePos._relX > (float)TERRAIN_TILE_DIM)
-//	{
-//		tileXDiff += 1;
-//		tilePos._relX -= (float)TERRAIN_TILE_DIM;
-//	}
-//	
-//	if (tilePos._relZ < 0.0f)
-//	{
-//		tileZDiff -= 1;
-//		tilePos._relZ += (float)TERRAIN_TILE_DIM;
-//	}
-//	else if (tilePos._relZ > (float)TERRAIN_TILE_DIM)
-//	{
-//		tileZDiff += 1;
-//		tilePos._relZ -= (float)TERRAIN_TILE_DIM;
-//	}
-//}
+struct TerrainVertexPos
+{
+	int32 _chunkX{};
+	int32 _chunkZ{};
 
+	int32 _tileX{};
+	int32 _tileZ{};
+
+	float _relX{};
+	float _relZ{};
+};
 
 class Terrain : public SingletonBase<Terrain>
 {
@@ -170,6 +150,7 @@ public:
 
 	TerrainChunkPos ConvertWorldPosToChunkPos(const Vector3 &worldPos);
 	void ConvertWorldPostoTilePos(const Vector3 & worldPos, TerrainTilePos *pOutTilePos);
+	void ConvertWorldPostoVertexPos(const Vector3 &worldPos, TerrainVertexPos *pOutVertexPos);
 
 	//void UpdateTerrainTilePos(TerrainTilePos &tilePos);
 
@@ -218,7 +199,7 @@ private:
 	void SmoothSection(int32 minX, int32 maxX, int32 minZ, int32 maxZ);
 
 	void DrawAlphaTextureOnCursorPos(const Vector2 & cursorPos, float innerRadius,
-		float outterRadius, int32 channel);
+		float outterRadius, int32 channel, bool32 subtract);
 
 	void LoadTextureFromConfig(const Terrain::TerrainConfig &config);
 
@@ -272,7 +253,6 @@ private:
 	video::TextureHandle _tile0Handle{};
 	video::TextureHandle _tile1Handle{};
 	video::TextureHandle _tile2Handle{};
-	video::TextureHandle _tile3Handle{};
 	video::TextureHandle _tileSplatHandle{};
 
 	video::TerrainVertex *_terrainVertices{};

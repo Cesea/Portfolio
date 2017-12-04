@@ -405,7 +405,7 @@ void Editor::InTerrainEditMode()
 		{
 			TERRAIN->DrawAlphaTextureOnCursorPos(Vector2((float)_mx, (float)_my),
 				_terrainEditor._textureBrush._innerRadius, _terrainEditor._textureBrush._outterRadius,
-				_terrainEditor._channel);
+				_terrainEditor._channel, _shiftDown ? true : false);
 		}
 		ImguiUnindent();
 	}
