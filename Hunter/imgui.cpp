@@ -758,6 +758,8 @@ bool ImguiEdit(char * text, int32 width, bool enable)
 		gState._keyboardFocus = id;
 	}
 
+	bool keyInputResult = false;
+
 	if (gState._vkCode && keyResult)
 	{
 		int32 index = strlen(text);
@@ -766,6 +768,7 @@ bool ImguiEdit(char * text, int32 width, bool enable)
 			if (index > 0)
 			{
 				text[index - 1] = '\0';
+				keyInputResult = true;
 			}
 		}
 		else
@@ -779,6 +782,7 @@ bool ImguiEdit(char * text, int32 width, bool enable)
 				}
 			}
 			text[index] = mappedChar;
+			keyInputResult = true;
 		}
 	}
 
@@ -798,7 +802,7 @@ bool ImguiEdit(char * text, int32 width, bool enable)
 			ImguiRGBA(60, 60, 60, 60));
 	}
 
-	return mouseResult;
+	return (mouseResult || keyInputResult || keyResult);
 }
 
 void ImguiDrawText(int32 x, int32 y, int32 align, const char * text, uint32 color)

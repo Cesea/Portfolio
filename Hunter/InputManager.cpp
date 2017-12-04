@@ -79,7 +79,6 @@ void Keyboard::UpdateWithMessage(UINT msg, WPARAM wParam, LPARAM lParam)
 void Keyboard::Update()
 {
 	_vkCode = 0;
-	//_shiftDown = _currentState[VK_SHIFT] ? true : false;
 	for (int32 i = 0; i < 256; ++i)
 	{
 		if (IsDown(i))

@@ -113,8 +113,12 @@ bool IScene::Init()
 
 bool IScene::Update(float deltaTime, const InputManager & input)
 {
+	if (!_editorInput)
+	{
+		_camera.MoveAndRotate(deltaTime, input);
+	}
+	_editorInput = false;
 
-	_camera.MoveAndRotate(deltaTime,input);
 
 	_camera.UpdateMatrix();
 	_camera.UpdateCamToDevice();

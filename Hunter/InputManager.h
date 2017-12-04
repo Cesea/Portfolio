@@ -35,6 +35,8 @@ public :
 	inline bool32 GetShiftDown() const { return _currentState[VK_SHIFT]; }
 	inline void SetCharInput(uint8 ch) { _vkCode = ch; }
 
+	inline bool32 GetAnyDown() { return _anyDown; }
+
 private :
 
 	void UpdateOnKeyUp(WPARAM wParam, LPARAM lParam);
@@ -50,6 +52,8 @@ private :
 
 	WPARAM _wParam{};
 	uint32 _vkCode{};
+
+	bool32 _anyDown{false};
 
 	InputManager *_pParent;
 };

@@ -131,11 +131,6 @@ void Editor::InTerrainEditMode()
 			_terrainEditor._smooth = false;
 		}
 
-		if (ImguiButton("Rebuild QuadTree"))
-		{
-			TERRAIN->ReCreateQuadTree();
-		}
-
 		if (_mouseLeftDown && 
 			!(_mx > 0  && _mx < EDITORSIZEX && _my > 0 && _my < EDITORSIZEX))
 		{
@@ -162,6 +157,12 @@ void Editor::InTerrainEditMode()
 			{
 			}
 		}
+
+		if (_leftButtonReleased)
+		{
+			TERRAIN->ReCreateQuadTree();
+		}
+
 		ImguiUnindent();
 	}
 
@@ -246,7 +247,12 @@ void Editor::InTerrainEditMode()
 			{
 				ImguiDrawTexture(0, 0, 64, 64, TERRAIN->_tile0Handle);
 			}
-			ImguiEdit(_terrainEditor._textureName00, 120);
+
+			if (ImguiEdit(_terrainEditor._textureName00, 120))
+			{
+				_pCurrentScene->_editorInput = true;
+			}
+
 			if (ImguiButton("LoadTexture"))
 			{
 				if (_terrainEditor._textureName00 == TERRAIN->_currentConfig._tile0FileName)
@@ -281,7 +287,12 @@ void Editor::InTerrainEditMode()
 			{
 				ImguiDrawTexture(0, 0, 64, 64, TERRAIN->_tile1Handle);
 			}
-			ImguiEdit(_terrainEditor._textureName01, 120);
+
+			if (ImguiEdit(_terrainEditor._textureName01, 120))
+			{
+				_pCurrentScene->_editorInput = true;
+			}
+
 			if (ImguiButton("LoadTexture"))
 			{
 				if (_terrainEditor._textureName01 == TERRAIN->_currentConfig._tile1FileName)
@@ -316,7 +327,12 @@ void Editor::InTerrainEditMode()
 			{
 				ImguiDrawTexture(0, 0, 64, 64, TERRAIN->_tile2Handle);
 			}
-			ImguiEdit(_terrainEditor._textureName02, 120);
+
+			if (ImguiEdit(_terrainEditor._textureName02, 120))
+			{
+				_pCurrentScene->_editorInput = true;
+			}
+
 			if (ImguiButton("LoadTexture"))
 			{
 				if (_terrainEditor._textureName02 == TERRAIN->_currentConfig._tile2FileName)
@@ -350,7 +366,12 @@ void Editor::InTerrainEditMode()
 			{
 				ImguiDrawTexture(0, 0, 64, 64, TERRAIN->_tile3Handle);
 			}
-			ImguiEdit(_terrainEditor._textureName03, 120);
+
+			if (ImguiEdit(_terrainEditor._textureName03, 120))
+			{
+				_pCurrentScene->_editorInput = true;
+			}
+
 			if (ImguiButton("LoadTexture"))
 			{
 				if (_terrainEditor._textureName03 == TERRAIN->_currentConfig._tile3FileName)
@@ -399,23 +420,28 @@ void Editor::InTerrainEditMode()
 			_terrainEditor._editingTexture = false;
 		}
 	}
+
 	if (_terrainEditor._saveSceneInfo)
 	{
 		ImguiLabel("File Name");
 		ImguiIndent();
-		{
-			ImguiEdit(_terrainEditor._fileName, 120);
-			if (ImguiButton("Save Terrain"))
-			{
-				TERRAIN->SaveTerrain(_terrainEditor._fileName);
-				TERRAIN->_pCurrentScene->_world.SaveEntitiesInWorld("../resources/Test.ed");
-			}
 
-			if (ImguiButton("Load Terrain"))
-			{
-				TERRAIN->LoadTerrain(_terrainEditor._fileName);
-			}
+		if (ImguiEdit(_terrainEditor._fileName, 120))
+		{
+			_pCurrentScene->_editorInput = true;
 		}
+
+		if (ImguiButton("Save Terrain"))
+		{
+			TERRAIN->SaveTerrain(_terrainEditor._fileName);
+			TERRAIN->_pCurrentScene->_world.SaveEntitiesInWorld("../resources/Test.ed");
+		}
+
+		if (ImguiButton("Load Terrain"))
+		{
+			TERRAIN->LoadTerrain(_terrainEditor._fileName);
+		}
+
 		ImguiUnindent();
 
 	}
@@ -785,10 +811,10 @@ void Editor::UpdateInput(const InputManager & input)
 	_mouseRightDown = input.mouse.IsDown(MOUSE_BUTTON_RIGHT);
 
 	_leftButtonPressed = input.mouse.IsPressed(MOUSE_BUTTON_LEFT);
+	_leftButtonReleased = input.mouse.IsReleased(MOUSE_BUTTON_LEFT);
 	_shiftDown = input.keyboard.GetShiftDown();
 	_key = input.keyboard.GetVKCode();
 	_scroll = -(int32)((float)input.mouse.GetWheelDelta() / 120.0f) * 6;
-	//Console::Log("%d\n", _scroll);
 }
 
 void Editor::Init(IScene *pScene)

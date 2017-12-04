@@ -89,6 +89,8 @@ protected :
 	ActionSystem _actionSystem;
 	CollisionSystem _collisionSystem;
 
+	bool32 _editorInput{ false };
+
 public :
 };
 

@@ -210,6 +210,7 @@ public :
 	uint8 _mouseRightDown;
 
 	bool32 _leftButtonPressed{};
+	bool32 _leftButtonReleased{};
 	int32 _scroll;
 	bool32 _shiftDown;
 	uint32 _key;
