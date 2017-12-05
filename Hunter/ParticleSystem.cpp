@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "ParticleSystem.h"
-
+#include "Camera.h"
 ParticleSystem::ParticleSystem()
 {
 }
@@ -9,8 +9,6 @@ ParticleSystem::ParticleSystem()
 ParticleSystem::~ParticleSystem()
 {
 }
-
-
 void ParticleSystem::update(float deltaTime)
 {
 	auto &entities = GetEntities();
@@ -18,7 +16,8 @@ void ParticleSystem::update(float deltaTime)
 	{
 		ParticleComponent & particle = entities[i].GetComponent<ParticleComponent>();
 		TransformComponent & transComp = entities[i].GetComponent<TransformComponent>();
-		particle.update(deltaTime, transComp.GetWorldPosition());
+		particle._particle->setCamera(_cam, _camPos);
+		particle._particle->update(deltaTime);
 	}
 }
 
@@ -29,9 +28,12 @@ void ParticleSystem::render()
 	{
 		ParticleComponent & particle = entities[i].GetComponent<ParticleComponent>();
 		TransformComponent & transComp = entities[i].GetComponent<TransformComponent>();
-
-
-		particle.render(transComp.GetWorldPosition());
-
+		particle._particle->draw();
 	}
+}
+
+void ParticleSystem::setCamera(Camera* camera, Vector3 camPos)
+{
+	_cam = camera;
+	_camPos = camPos;
 }

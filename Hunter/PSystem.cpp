@@ -3,7 +3,7 @@
 #include "Camera.h"
 
 PSystem::PSystem(const std::string & fxName, const std::string & techName,
-	const std::string & texName, const D3DXVECTOR3 & accel, int maxNumParticles, float timePerParticle, D3DXVECTOR3 pos)
+	const std::string & texName, const Vector3 & accel, int maxNumParticles, float timePerParticle, Vector3 pos)
 {
 	mMaxNumParticles = maxNumParticles;
 	mTimePerParticle = timePerParticle;
@@ -197,11 +197,11 @@ void PSystem::draw()
 	}
 }
 
-void PSystem::setPos(D3DXVECTOR3 newPos)
+void PSystem::setPos(Vector3 newPos)
 {
 	Pos = newPos;
 }
-D3DXVECTOR3 PSystem::getPos()
+Vector3 PSystem::getPos()
 {
 	return Pos;
 }

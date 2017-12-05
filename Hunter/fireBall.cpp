@@ -1,16 +1,18 @@
 #include "stdafx.h"
-#include "fireRing.h"
+#include "fireBall.h"
 
 
-fireRing::fireRing(const std::string& fxName,
+fireBall::fireBall(const std::string& fxName,
 	const std::string& techName,
 	const std::string& texName,
 	const Vector3& accel,
 	int maxNumParticles,
-	float timePerParticle, Vector3 pos)
-	: PSystem(fxName, techName, texName, accel,
+	float timePerParticle, Vector3 pos, float radius)
+	:PSystem(fxName, techName, texName, accel,
 		maxNumParticles, timePerParticle, pos)
 {
+	_radius = radius;
+
 	D3DVERTEXELEMENT9 vertElement[8];
 
 	vertElement[0].Stream = 0;
@@ -74,9 +76,11 @@ fireRing::fireRing(const std::string& fxName,
 	vertElement[7] = end;
 
 	gpDevice->CreateVertexDeclaration(vertElement, &Decl);
+
+	direction = accel;
 }
 
 
-fireRing::~fireRing()
+fireBall::~fireBall()
 {
 }

@@ -293,7 +293,19 @@
       <Filter>Game\GameComponents\ParticleComponent</Filter>
     </ClCompile>
     <ClCompile Include="fireRing.cpp">
-      <Filter>Game\Particle</Filter>
+      <Filter>Game\GameComponents\ParticleComponent\Particle</Filter>
+    </ClCompile>
+    <ClCompile Include="fireBall.cpp">
+      <Filter>Game\GameComponents\ParticleComponent\Particle</Filter>
+    </ClCompile>
+    <ClCompile Include="fireBreath.cpp">
+      <Filter>Game\GameComponents\ParticleComponent\Particle</Filter>
+    </ClCompile>
+    <ClCompile Include="charge.cpp">
+      <Filter>Game\GameComponents\ParticleComponent\Particle</Filter>
+    </ClCompile>
+    <ClCompile Include="smoke.cpp">
+      <Filter>Game\GameComponents\ParticleComponent\Particle</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -671,7 +683,22 @@
       <Filter>Game\GameComponents\ParticleComponent</Filter>
     </ClInclude>
     <ClInclude Include="fireRing.h">
-      <Filter>Game\Particle</Filter>
+      <Filter>Game\GameComponents\ParticleComponent\Particle</Filter>
+    </ClInclude>
+    <ClInclude Include="ParticleString.h">
+      <Filter>Game\GameComponents\ParticleComponent</Filter>
+    </ClInclude>
+    <ClInclude Include="fireBreath.h">
+      <Filter>Game\GameComponents\ParticleComponent\Particle</Filter>
+    </ClInclude>
+    <ClInclude Include="fireBall.h">
+      <Filter>Game\GameComponents\ParticleComponent\Particle</Filter>
+    </ClInclude>
+    <ClInclude Include="charge.h">
+      <Filter>Game\GameComponents\ParticleComponent\Particle</Filter>
+    </ClInclude>
+    <ClInclude Include="smoke.h">
+      <Filter>Game\GameComponents\ParticleComponent\Particle</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -840,7 +867,7 @@
     <Filter Include="Game\GameSystems\ParticleSystem">
       <UniqueIdentifier>{511a1096-6ec3-4a89-854b-550cff4781ef}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Game\Particle">
+    <Filter Include="Game\GameComponents\ParticleComponent\Particle">
       <UniqueIdentifier>{f482426c-6cfc-47d6-99be-9cc729b3bf58}</UniqueIdentifier>
     </Filter>
   </ItemGroup>

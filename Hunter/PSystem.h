@@ -33,8 +33,8 @@ public:
 	virtual void draw();
 	bool makeParticle;
 
-	void setPos(D3DXVECTOR3 newPos);
-	D3DXVECTOR3 getPos();
+	void setPos(Vector3 newPos);
+	Vector3 getPos();
 
 protected:
 	float timeAccum;
@@ -57,13 +57,12 @@ protected:
 	D3DXMATRIX mInvWorld;
 
 	float mTime;
-	D3DXVECTOR3 mAccel;
+	Vector3 mAccel;
 	int mMaxNumParticles;
 	float mTimePerParticle;
 
 	LPD3DXEFFECT particle_Effect;
-
-	D3DXVECTOR3 Pos;
+	Vector3 Pos;
 
 	std::vector<Particle> mParticles;
 	std::vector<Particle*> mAliveParticles;
@@ -78,7 +77,7 @@ protected:
 
 public:
 	PSystem(const std::string & fxName, const std::string & techName,
-		const std::string & texName, const D3DXVECTOR3 & accel, int maxNumParticles, float timePerParticle, D3DXVECTOR3 pos);
+		const std::string & texName, const Vector3 & accel, int maxNumParticles, float timePerParticle, Vector3 pos);
 	virtual ~PSystem();
 };
 

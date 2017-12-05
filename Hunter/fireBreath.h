@@ -1,6 +1,6 @@
 #pragma once
 #include "PSystem.h"
-class fireRing :
+class fireBreath :
 	public PSystem
 {
 	void initParticle(Particle& out)override
@@ -10,14 +10,16 @@ class fireRing :
 		out.initialTime = mTime;
 
 		// Flare lives for 2-4 seconds.
-		out.lifeTime = RandFloat(2.0f, 4.0f);
+		out.lifeTime = RandFloat(4.0f, 6.0f);
 
 		// Initial size in pixels.
-		out.initialSize = RandFloat(10.0f, 15.0f);
+		out.initialSize = RandFloat(40.0f, 60.0f);
 
 		// Give a very small initial velocity to give the flares
 		// some randomness.
 		Vector3 rndVec = Vector3(RandFloat(0.0f, 1.0f), RandFloat(0.0f, 1.0f), RandFloat(0.0f, 1.0f));
+		rndVec = -direction * 5 + rndVec;
+		rndVec.y /= 2;
 		out.initialVelocity = rndVec;
 		// Scalar value used in vertex shader as an
 		// amplitude factor.
@@ -27,27 +29,16 @@ class fireRing :
 		// variation.
 		out.initialColor = RandFloat(0.5f, 1.0f)*WHITENESS;
 
-		// Generate random particle on the ring in polar
-		// coordinates: random radius and random angle.
-		float r = RandFloat(10.0f, 14.0f);
-		float t = RandFloat(0, 2.0f*D3DX_PI);
-
-		// Convert to Cartesian coordinates.
-		out.initialPos.x = Pos.x + r*cosf(t);
-		out.initialPos.y = Pos.y + r*sinf(t);
-
-		// Random depth value in [-1, 1] (depth of the ring)
-		out.initialPos.z = Pos.z + RandFloat(-1.0f, 1.0f);
+		out.initialPos = Pos;
 	}
-
+private:
+	Vector3 direction;
 public:
-	fireRing(const std::string& fxName,
+	fireBreath(const std::string& fxName,
 		const std::string& techName,
 		const std::string& texName,
 		const Vector3& accel,
 		int maxNumParticles,
-		float timePerParticle,
-		Vector3 pos);
-	virtual ~fireRing();
+		float timePerParticle, Vector3 pos);
+	~fireBreath();
 };
-

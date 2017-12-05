@@ -1,17 +1,20 @@
 #include "stdafx.h"
-#include "fireRing.h"
+#include "charge.h"
 
 
-fireRing::fireRing(const std::string& fxName,
+charge::charge(const std::string& fxName,
 	const std::string& techName,
 	const std::string& texName,
 	const Vector3& accel,
 	int maxNumParticles,
-	float timePerParticle, Vector3 pos)
-	: PSystem(fxName, techName, texName, accel,
+	float timePerParticle,
+	Vector3 pos, float radius)
+	:PSystem(fxName, techName, texName, accel,
 		maxNumParticles, timePerParticle, pos)
 {
-	D3DVERTEXELEMENT9 vertElement[8];
+	_radius = radius;
+
+	D3DVERTEXELEMENT9 vertElement[9];
 
 	vertElement[0].Stream = 0;
 	vertElement[0].Offset = 0;
@@ -77,6 +80,6 @@ fireRing::fireRing(const std::string& fxName,
 }
 
 
-fireRing::~fireRing()
+charge::~charge()
 {
 }

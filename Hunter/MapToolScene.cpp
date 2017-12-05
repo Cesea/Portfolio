@@ -175,32 +175,15 @@ bool MapToolScene::SceneInit()
 
 
 	//½ÇÇè
-	//trash = _world.CreateEntity();
-	//TransformComponent & trans = trash.AddComponent<TransformComponent>();
-	//trans.SetWorldPosition(Vector3(0, 5.0f, 0));
-	//ParticleComponent & par = trash.AddComponent<ParticleComponent>();
-	//par.EmissionType = ParticleComponent::PARTICLE_EMISSION_TYPE::BOX;
-	//VEC_COLOR colors;
-	//VEC_SCALE scales;
+	trash = _world.CreateEntity();
+	TransformComponent & trans = trash.AddComponent<TransformComponent>();
+	trans.SetWorldPosition(Vector3(0, 5.0f, 0));
+	ParticleComponent & par = trash.AddComponent<ParticleComponent>();
+	par.init(ParticleComponent::PARTICLE_TYPE_SMOKE, 1000, 0.0025, Vector3(1.0f, 0, 0), Vector3(0.0f, 5.0f, 0.0f));
+	par.min = Vector3(0, 0, 0);
+	par.max = Vector3(0, 0, 0);
 
-	//colors.push_back(D3DXCOLOR(0.1f, 1.0f, 1.0f, 1.0f));
-	//colors.push_back(D3DXCOLOR(0.1f, 1.0f, 1.0f, 1.0f));
-	//colors.push_back(D3DXCOLOR(0.1f, 1.0f, 1.0f, 1.0f));
-
-	//scales.push_back(1.0f);
-	//scales.push_back(1.0f);
-	//scales.push_back(1.0f);
-
-	//LPDIRECT3DTEXTURE9 _tex;
-	//D3DXCreateTextureFromFile(gpDevice, "../fireball.JPG", &_tex);
-	//par.Init(1000, 0.025f, 2.0f, 3.0f, Vector3(0, 0, 0), Vector3(1.0f, 1.0f, 1.0f), Vector3(0, 0, 0), Vector3(1.0f, 1.0f, 1.0f), colors, scales, 2.0f, 3.0f, _tex, false);
-
-
-	//trash.Activate();
-
-	_particle = new fireRing("../fireRing.fx", "FireRingTech", "../fire.png",
-		D3DXVECTOR3(0.0f, 0.0f, 0.0f), 6000, 0.0025f, D3DXVECTOR3(0, 0, 0));
-
+	trash.Activate();
 	return result;
 }
 
@@ -235,9 +218,8 @@ bool MapToolScene::SceneUpdate(float deltaTime, const InputManager & input)
 	_transformSystem.PreUpdate(deltaTime);
 	_collisionSystem.Update(deltaTime, 4.0f);
 	_actionSystem.Update(deltaTime);
+	_particleSystem.setCamera(&_camera, _camera.GetEntity().GetComponent<TransformComponent>().GetWorldPosition());
 	_particleSystem.update(deltaTime);
-	_particle->setCamera(&_camera, _camera.GetEntity().GetComponent<TransformComponent>().GetWorldPosition());
-	_particle->update(deltaTime);
 	ReadyShadowMap(TERRAIN);
 
 	return result;
@@ -270,7 +252,6 @@ bool MapToolScene::SceneRender0()
 	_renderSystem.Render(_camera);
 	_particleSystem.render();
 	_collisionSystem.render();
-	_particle->draw();
 	_editor->Render();
 
 	return true;

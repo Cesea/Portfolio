@@ -1,14 +1,14 @@
 #include "stdafx.h"
-#include "fireRing.h"
+#include "fireBreath.h"
 
 
-fireRing::fireRing(const std::string& fxName,
+fireBreath::fireBreath(const std::string& fxName,
 	const std::string& techName,
 	const std::string& texName,
 	const Vector3& accel,
 	int maxNumParticles,
 	float timePerParticle, Vector3 pos)
-	: PSystem(fxName, techName, texName, accel,
+	:PSystem(fxName, techName, texName, accel,
 		maxNumParticles, timePerParticle, pos)
 {
 	D3DVERTEXELEMENT9 vertElement[8];
@@ -74,9 +74,11 @@ fireRing::fireRing(const std::string& fxName,
 	vertElement[7] = end;
 
 	gpDevice->CreateVertexDeclaration(vertElement, &Decl);
+
+	direction = accel;
 }
 
 
-fireRing::~fireRing()
+fireBreath::~fireBreath()
 {
 }

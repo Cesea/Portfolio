@@ -1,18 +1,18 @@
 #include "stdafx.h"
-#include "fireRing.h"
+#include "Smoke.h"
 
 
-fireRing::fireRing(const std::string& fxName,
+Smoke::Smoke(const std::string& fxName,
 	const std::string& techName,
 	const std::string& texName,
 	const Vector3& accel,
 	int maxNumParticles,
-	float timePerParticle, Vector3 pos)
+	float timePerParticle,
+	Vector3 pos, Vector3 Min, Vector3 Max)
 	: PSystem(fxName, techName, texName, accel,
 		maxNumParticles, timePerParticle, pos)
 {
 	D3DVERTEXELEMENT9 vertElement[8];
-
 	vertElement[0].Stream = 0;
 	vertElement[0].Offset = 0;
 	vertElement[0].Type = D3DDECLTYPE_FLOAT3;
@@ -74,9 +74,11 @@ fireRing::fireRing(const std::string& fxName,
 	vertElement[7] = end;
 
 	gpDevice->CreateVertexDeclaration(vertElement, &Decl);
+	AABBMin = Min;
+	AABBMax = Max;
 }
 
 
-fireRing::~fireRing()
+Smoke::~Smoke()
 {
 }
