@@ -56,8 +56,9 @@ bool Player::CreateFromWorld(World & world, const Vector3 &Pos)
    collision._boundingSphere._localCenter = pAnimation->_pSkinnedMesh->_boundInfo._center;
    collision._boundingSphere._radius = pAnimation->_pSkinnedMesh->_boundInfo._radius;
    collision._triggerType = CollisionComponent::TRIGGER_TYPE_PLAYER;
-   collision._isTrigger = false;
+   collision._type = CollisionComponent::COLLISION_TYPE_BOX;
    _pCollisionComp = &collision;
+
 
    ScriptComponent &scriptComponent = _entity.AddComponent<ScriptComponent>();
    scriptComponent.SetScript(MAKE_SCRIPT_DELEGATE(Player, Update, *this));
@@ -76,7 +77,7 @@ bool Player::CreateFromWorld(World & world, const Vector3 &Pos)
    _channel.Broadcast<GameObjectFactory::ObjectCreatedEvent>(
 	   GameObjectFactory::ObjectCreatedEvent(ARCHE_HERO, _entity, transComp.GetWorldPosition()));
 
-   //PlyerÀÇ ¸É¹ö º¯¼öµéÀ» ¼ÂÆÃÇØÁÖÀÚ
+   //Plyerì˜ ë§´ë²„ ë³€ìˆ˜ë“¤ì„ ì…‹íŒ…í•´ì£¼ìž
    _combatToPeaceTimer.Reset(2.0f);
    _moveToStanceTimer.Reset(0.20f);
    _attackToStanceTimer.Reset(0.4f);
@@ -93,7 +94,7 @@ void Player::Update(float deltaTime)
    {
    case Player::PLAYERSTATE_STANCE:
    {
-      //°ø°Ý ¸ðµå°¡ ¾Æ´Ò¶§
+      //ê³µê²© ëª¨ë“œê°€ ì•„ë‹ë•Œ
       if (false == _inCombat)
       {
          if (_currentCommand._type == GAMECOMMAND_MOVE)
@@ -139,7 +140,7 @@ void Player::Update(float deltaTime)
 			 }
 		 }
 	  }
-	  //°ø°Ý ¸ðµå ÀÏ¶§
+	  //ê³µê²© ëª¨ë“œ ì¼ë•Œ
 	  else
 	  {
 		  bool combatToPeace = _combatToPeaceTimer.Tick(deltaTime);
@@ -205,16 +206,16 @@ void Player::Update(float deltaTime)
    case Player::PLAYERSTATE_MOVE:
    {
       bool moveToStance = false;
-      //ÀÎÇ²ÀÌ ¾øÀ»¶§¸¸ MoveToStanceTimer¸¦ ÀÛµ¿½ÃÅ²´Ù....
+      //ì¸í’‹ì´ ì—†ì„ë•Œë§Œ MoveToStanceTimerë¥¼ ìž‘ë™ì‹œí‚¨ë‹¤....
       if (IsMovementNone(_currentCommand._movement))
       {
          moveToStance = _moveToStanceTimer.Tick(deltaTime);
       }
 
-      //°ø°Ý ¸ðµå°¡ ¾Æ´Ò¶§
+      //ê³µê²© ëª¨ë“œê°€ ì•„ë‹ë•Œ
       if (false == _inCombat)
       {
-         //¸¸¾à moveToStance Å¸ÀÌ¸Ó°¡ ¿ï¸®¸é stance»óÅÂ·Î µ¹¾Æ°¡¶ó
+         //ë§Œì•½ moveToStance íƒ€ì´ë¨¸ê°€ ìš¸ë¦¬ë©´ stanceìƒíƒœë¡œ ëŒì•„ê°€ë¼
          if (moveToStance)
          {
             _state = PLAYERSTATE_STANCE;
@@ -267,7 +268,7 @@ void Player::Update(float deltaTime)
 			 }
 		 }
       }
-      //°ø°Ý ¸ðµå ÀÏ¶§
+      //ê³µê²© ëª¨ë“œ ì¼ë•Œ
       else if (true == _inCombat)
       {
          if (moveToStance)
@@ -566,7 +567,7 @@ void Player::MoveAndRotate(float deltaTime)
 		}
 	}
 
-	////¿òÁ÷ÀÌÁö ¾Ê´Â »óÅÂÀÏ¶§´Â Move
+	////ì›€ì§ì´ì§€ ì•ŠëŠ” ìƒíƒœì¼ë•ŒëŠ” Move
 	if (_state == PLAYERSTATE_STANCE ||
 		_state == PLAYERSTATE_ATTACK ||
 		_state == PLAYERSTATE_BLOCK ||
@@ -1125,7 +1126,7 @@ void Player::Handle(const InputManager::MousePressedEvent & event)
    }
 }
 
-//Player°¡ ´çÇÏ´Â ÀÔÀåÀÌ´Ù.
+//Playerê°€ ë‹¹í•˜ëŠ” ìž…ìž¥ì´ë‹¤.
 void Player::Handle(const CollisionSystem::ActorTriggerEvent & event)
 {
 	if (event._entity1 != _entity)
@@ -1152,7 +1153,7 @@ void Player::Handle(const CollisionSystem::ActorTriggerEvent & event)
 		}
 
 	} break;
-	//¿ÀºêÁ§Æ®¿Í Ãæµ¹Çß´Ù
+	//ì˜¤ë¸Œì íŠ¸ì™€ ì¶©ëŒí–ˆë‹¤
 	case CollisionComponent::TRIGGER_TYPE_OBJECT:
 	{
 	} break;
@@ -1171,14 +1172,14 @@ void Player::QueueAction(const Action & action)
 void Player::RepositionEntity(const TerrainTilePos & currentPos, const TerrainTilePos & prevPos)
 {
 	bool32 _chunkMoved = false;
-	//Ã»Å©°¡ ´Ù¸¦¶§..... ÅÍ·¹ÀÎÀÇ ¿£Æ¼Æ¼¸¦ È°¼ºÈ­, ºñÈ°¼ºÈ­ÇÑ´Ù
+	//ì²­í¬ê°€ ë‹¤ë¥¼ë•Œ..... í„°ë ˆì¸ì˜ ì—”í‹°í‹°ë¥¼ í™œì„±í™”, ë¹„í™œì„±í™”í•œë‹¤
 	if (currentPos._chunkX != prevPos._chunkX || currentPos._chunkZ != prevPos._chunkZ)
 	{
 		TERRAIN->ValidateTerrainChunks(currentPos, prevPos);
 		_chunkMoved = true;
 	}
 
-	//Å¸ÀÏÀÌ ´Ù¸¦‹š....... tileÀÇ entityº¤ÅÍ¸¦ Ã³¸®ÇØÁÖÀÚ
+	//íƒ€ì¼ì´ ë‹¤ë¥¼Â‹Âš....... tileì˜ entityë²¡í„°ë¥¼ ì²˜ë¦¬í•´ì£¼ìž
 	if (currentPos._tileX != prevPos._tileX || currentPos._tileZ != prevPos._tileZ)
 	{
 		Terrain::TerrainChunk &refPrevChunk =  TERRAIN->GetChunkAt(prevPos._chunkX, prevPos._chunkZ);

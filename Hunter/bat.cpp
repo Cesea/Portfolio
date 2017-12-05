@@ -52,8 +52,9 @@ bool Bat::CreateFromWorld(World & world, const Vector3 &Pos)
 	collision._boundingSphere._localCenter = pAnimation->_pSkinnedMesh->_boundInfo._center;
 	collision._boundingSphere._radius = pAnimation->_pSkinnedMesh->_boundInfo._radius;
 	collision._locked = false;
-	collision._isTrigger = false;;
+	collision._isTrigger = true;
 	collision._triggerType = CollisionComponent::TRIGGER_TYPE_ENEMY;
+	collision._type = CollisionComponent::COLLISION_TYPE_OBB;
 
 	ScriptComponent &scriptComponent = _entity.AddComponent<ScriptComponent>();
 	scriptComponent.SetScript(MAKE_SCRIPT_DELEGATE(Bat, Update, *this));
@@ -133,6 +134,10 @@ bool Bat::CreateFromWorld(World & world, const Vector3 &Pos)
 	_hurtCount = _hurtTime;
 
 	_hp = 500;
+
+	_isHurt = false;
+	_unBeatableTime = 15;
+	_unBeatableCount = _unBeatableTime;
 
 	//이벤트 등록
 	EventChannel channel;
@@ -363,6 +368,16 @@ void Bat::Update(float deltaTime)
 		}
 	}
 	transComp.SetWorldPosition(transComp.GetWorldPosition().x, TERRAIN->GetHeight(transComp.GetWorldPosition().x, transComp.GetWorldPosition().z)+1.0f, transComp.GetWorldPosition().z);
+
+	if (_isHurt)
+	{
+		_unBeatableCount--;
+		if (_unBeatableCount < 0)
+		{
+			_unBeatableCount = _unBeatableTime;
+			_isHurt = false;
+		}
+	}
 }
 
 void Bat::Handle(const CollisionSystem::ActorTriggerEvent & event)
@@ -376,18 +391,22 @@ void Bat::Handle(const CollisionSystem::ActorTriggerEvent & event)
 	{
 		//플레이어와 충돌했다(내가 가해자)
 	case CollisionComponent::TRIGGER_TYPE_PLAYER:
-		if (_state != BATSTATE_HURT&&_state != BATSTATE_DEATH)
+		if (!_isHurt)
 		{
-			resetAllCount();
-			_state = BATSTATE_HURT;
-			_pStateMachine->ChangeState(META_TYPE(BatHurt1State)->Name());
-			_battle = true;
-			_hp -= 50;
-			if (_hp <= 0)
+			if (_state != BATSTATE_HURT&&_state != BATSTATE_DEATH)
 			{
-				_state = BATSTATE_DEATH;
-				_pStateMachine->ChangeState(META_TYPE(BatDeadState)->Name());
+				resetAllCount();
+				_state = BATSTATE_HURT;
+				_pStateMachine->ChangeState(META_TYPE(BatHurt1State)->Name());
+				_battle = true;
+				_hp -= 50;
+				if (_hp <= 0)
+				{
+					_state = BATSTATE_DEATH;
+					_pStateMachine->ChangeState(META_TYPE(BatDeadState)->Name());
+				}
 			}
+			_isHurt = true;
 		}
 		break;
 		//오브젝트와 충돌했다

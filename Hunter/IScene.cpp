@@ -74,6 +74,7 @@ bool IScene::Init()
 	_world.AddSystem<ActionSystem>(_actionSystem);
 	_world.AddSystem<ScriptSystem>(_scriptSystem);
 	_world.AddSystem<CollisionSystem>(_collisionSystem);
+	_world.AddSystem<ParticleSystem>(_particleSystem);
 
 	//카메라 생성
 	_camera.CreateFromWorld(_world);

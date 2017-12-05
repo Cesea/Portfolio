@@ -92,6 +92,7 @@ protected :
 	ScriptSystem _scriptSystem;
 	ActionSystem _actionSystem;
 	CollisionSystem _collisionSystem;
+	ParticleSystem _particleSystem;
 
 	bool32 _editorInput{ false };
 

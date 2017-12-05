@@ -40,12 +40,12 @@ void Enemy::PatrolSet(int type, Vector3 Position,float range)
 	{
 	case 0:
 	{
-		float first = RandFloat(0.0f, range);
-		float second = RandFloat(0.0f, range);
+		float first = Position.x+RandFloat(0.0f, range);
+		float second = Position.y+RandFloat(0.0f, range);
 		Vector3 a = Vector3(first, TERRAIN->GetHeight(first, second), second);
 
-		first = RandFloat(range, 0.0f);
-		second = RandFloat(range, 0.0f);
+		first = Position.x + RandFloat(range, 0.0f);
+		second = Position.z + RandFloat(range, 0.0f);
 		Vector3 b = Vector3(first, TERRAIN->GetHeight(first, second), second);
 
 		_moveSegment.push_back(a);
@@ -54,16 +54,16 @@ void Enemy::PatrolSet(int type, Vector3 Position,float range)
 	break;
 	case 1:
 	{
-		float first = RandFloat(0.0f, range);
-		float second = RandFloat(0.0f, range);
+		float first = Position.x+RandFloat(0.0f, range);
+		float second = Position.z+RandFloat(0.0f, range);
 		Vector3 a = Vector3(first, TERRAIN->GetHeight(first, second), second);
 
-		first = RandFloat(range, 0.0f);
-		second = RandFloat(range, 0.0f);
+		first = Position.x+RandFloat(range, 0.0f);
+		second = Position.z+RandFloat(range, 0.0f);
 		Vector3 b = Vector3(first, TERRAIN->GetHeight(first, second), second);
 
-		first = RandFloat(range, 0.0f);
-		second = RandFloat(range, 0.0f);
+		first = Position.x + RandFloat(range, 0.0f);
+		second = Position.z + RandFloat(range, 0.0f);
 		Vector3 c = Vector3(first, TERRAIN->GetHeight(first, second), second);
 
 		_moveSegment.push_back(a);
@@ -73,20 +73,20 @@ void Enemy::PatrolSet(int type, Vector3 Position,float range)
 	break;
 	case 2:
 	{
-		float first = RandFloat(0.0f, range);
-		float second = RandFloat(0.0f, range);
+		float first = Position.x + RandFloat(range, 0.0f);
+		float second = Position.z + RandFloat(range, 0.0f);
 		Vector3 a = Vector3(first, TERRAIN->GetHeight(first, second), second);
 
-		first = RandFloat(range, 0.0f);
-		second = RandFloat(range, 0.0f);
+		first = Position.x + RandFloat(range, 0.0f);
+		second = Position.z + RandFloat(range, 0.0f);
 		Vector3 b = Vector3(first, TERRAIN->GetHeight(first, second), second);
 
-		first = RandFloat(range, 0.0f);
-		second = RandFloat(range, 0.0f);
+		first = Position.x + RandFloat(range, 0.0f);
+		second = Position.z + RandFloat(range, 0.0f);
 		Vector3 c = Vector3(first, TERRAIN->GetHeight(first, second), second);
 
-		first = RandFloat(range, 0.0f);
-		second = RandFloat(range, 0.0f);
+		first = Position.x + RandFloat(range, 0.0f);
+		second = Position.z + RandFloat(range, 0.0f);
 		Vector3 d = Vector3(first, TERRAIN->GetHeight(first, second), second);
 
 		_moveSegment.push_back(a);

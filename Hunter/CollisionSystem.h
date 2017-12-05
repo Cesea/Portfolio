@@ -23,6 +23,7 @@ public :
 
 	virtual void OnEntityRemoved(Entity& entity);
 
+	void render();
 	//Event
 	
 	struct ActorTriggerEvent

@@ -277,6 +277,26 @@
     <ClCompile Include="Player_CallBack.cpp">
       <Filter>Game\GameObjects\Player</Filter>
     </ClCompile>
+    <ClCompile Include="ParticleSystem.cpp">
+      <Filter>Game\GameSystems\ParticleSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="PSystem.cpp">
+      <Filter>Game\GameComponents\ParticleComponent</Filter>
+    </ClCompile>
+    <ClCompile Include="fireRing.cpp">
+      <Filter>Game\GameComponents\ParticleComponent\Particle</Filter>
+    </ClCompile>
+    <ClCompile Include="fireBall.cpp">
+      <Filter>Game\GameComponents\ParticleComponent\Particle</Filter>
+    </ClCompile>
+    <ClCompile Include="fireBreath.cpp">
+      <Filter>Game\GameComponents\ParticleComponent\Particle</Filter>
+    </ClCompile>
+    <ClCompile Include="charge.cpp">
+      <Filter>Game\GameComponents\ParticleComponent\Particle</Filter>
+    </ClCompile>
+    <ClCompile Include="smoke.cpp">
+      <Filter>Game\GameComponents\ParticleComponent\Particle</Filter>
     <ClCompile Include="Inventory.cpp">
       <Filter>Game\UI</Filter>
     </ClCompile>
@@ -640,6 +660,29 @@
     <ClInclude Include="UI.h">
       <Filter>Game\UI</Filter>
     </ClInclude>
+    <ClInclude Include="ParticleSystem.h">
+      <Filter>Game\GameSystems\ParticleSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="PSystem.h">
+      <Filter>Game\GameComponents\ParticleComponent</Filter>
+    </ClInclude>
+    <ClInclude Include="fireRing.h">
+      <Filter>Game\GameComponents\ParticleComponent\Particle</Filter>
+    </ClInclude>
+    <ClInclude Include="ParticleString.h">
+      <Filter>Game\GameComponents\ParticleComponent</Filter>
+    </ClInclude>
+    <ClInclude Include="fireBreath.h">
+      <Filter>Game\GameComponents\ParticleComponent\Particle</Filter>
+    </ClInclude>
+    <ClInclude Include="fireBall.h">
+      <Filter>Game\GameComponents\ParticleComponent\Particle</Filter>
+    </ClInclude>
+    <ClInclude Include="charge.h">
+      <Filter>Game\GameComponents\ParticleComponent\Particle</Filter>
+    </ClInclude>
+    <ClInclude Include="smoke.h">
+      <Filter>Game\GameComponents\ParticleComponent\Particle</Filter>
     <ClInclude Include="Inventory.h">
       <Filter>Game\UI</Filter>
     </ClInclude>
@@ -800,6 +843,12 @@
     </Filter>
     <Filter Include="Game\UI">
       <UniqueIdentifier>{f9d4daea-0faa-4308-80d3-c5fb35018809}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\GameSystems\ParticleSystem">
+      <UniqueIdentifier>{511a1096-6ec3-4a89-854b-550cff4781ef}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\GameComponents\ParticleComponent\Particle">
+      <UniqueIdentifier>{f482426c-6cfc-47d6-99be-9cc729b3bf58}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

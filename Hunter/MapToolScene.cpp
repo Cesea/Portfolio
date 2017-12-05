@@ -59,7 +59,7 @@ void LoadEveryStaticResources()
 
 void LoadEverySkinnedResources()
 {
-//∏ﬁΩ¨ ∫“∑Øø¿±‚..
+//Î©îÏâ¨ Î∂àÎü¨Ïò§Í∏∞..
 	Matrix correctionMat;
 	Matrix rotationCorrection;
 	MatrixRotationY(&rotationCorrection, D3DX_PI);
@@ -140,7 +140,7 @@ bool MapToolScene::SceneInit()
 
 	InitAnimations();
 
-	//≈Õ∑π¿Œ ∑ŒµÂ
+	//ÌÑ∞Î†àÏù∏ Î°úÎìú
 	Terrain::TerrainConfig config;
 	config._xChunkCount = 2;
 	config._zChunkCount = 2;
@@ -167,15 +167,26 @@ bool MapToolScene::SceneInit()
 	_channel.Broadcast<GameObjectFactory::CreateObjectOnLocationEvent>(
 		GameObjectFactory::CreateObjectOnLocationEvent(ARCHE_HERO, ResourceHandle(), Vector3(0.0f, 2.0f, 0.0f)));
 
-	//NOTE : GameObjectFactory¿« GetPlayerObject¥¬ ª˝º∫ø° ¿«¡∏º∫¿ª ∞°¡¯¥Ÿ
+	//NOTE : GameObjectFactoryÏùò GetPlayerObjectÎäî ÏÉùÏÑ±Ïóê ÏùòÏ°¥ÏÑ±ÏùÑ Í∞ÄÏßÑÎã§
 	_camera.SetTargetObject((Player *)GAMEOBJECTFACTORY->GetPlayerObject());
 
-	//ø°µ≈Õ ª˝º∫
+	//ÏóêÎîîÌÑ∞ ÏÉùÏÑ±
 	imguiRenderInit();
 	_editor = new Editor;
 	_editor->Init(this);
 	_editor->_pSelectedObject = GAMEOBJECTFACTORY->GetPlayerObject();
 
+
+	//Ïã§Ìóò
+	trash = _world.CreateEntity();
+	TransformComponent & trans = trash.AddComponent<TransformComponent>();
+	trans.SetWorldPosition(Vector3(0, 5.0f, 0));
+	ParticleComponent & par = trash.AddComponent<ParticleComponent>();
+	par.init(ParticleComponent::PARTICLE_TYPE_SMOKE, 1000, 0.0025, Vector3(1.0f, 0, 0), Vector3(0.0f, 5.0f, 0.0f));
+	par.min = Vector3(0, 0, 0);
+	par.max = Vector3(0, 0, 0);
+
+	trash.Activate();
 	return result;
 }
 
@@ -202,8 +213,6 @@ bool MapToolScene::SceneUpdate(float deltaTime, const InputManager & input)
 		{
 			y += 0.02f;
 		}
-
-		//_pMainLight->_entity.GetComponent<TransformComponent>().SetRotateWorld(Vector3(x, y, 0.0f));
 	}
 
 	if (input.keyboard.IsPressed('T'))
@@ -222,7 +231,8 @@ bool MapToolScene::SceneUpdate(float deltaTime, const InputManager & input)
 	_transformSystem.PreUpdate(deltaTime);
 	_collisionSystem.Update(deltaTime, 4.0f);
 	_actionSystem.Update(deltaTime);
-
+	_particleSystem.setCamera(&_camera, _camera.GetEntity().GetComponent<TransformComponent>().GetWorldPosition());
+	_particleSystem.update(deltaTime);
 	ReadyShadowMap(TERRAIN);
 
 	return result;
@@ -239,6 +249,7 @@ bool MapToolScene::SceneRelease()
 	_gameObjects.clear();
 
 	_world.Clear();
+
 	//VIDEO->DestroyEveryVertexBuffers();
 	//VIDEO->DestroyEveryndexBuffers();
 	//VIDEO->DestroyEveryAnimationInstances();
@@ -261,6 +272,8 @@ bool MapToolScene::SceneRender0()
 
 	TERRAIN->Render(_camera, *_pMainLight, _camera);
 	_renderSystem.Render(_camera);
+	_particleSystem.render();
+	_collisionSystem.render();
 	_editor->Render();
 
 	return true;

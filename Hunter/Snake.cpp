@@ -52,8 +52,9 @@ bool Snake::CreateFromWorld(World & world, const Vector3 &Pos)
 	collision._boundingSphere._localCenter = pAnimation->_pSkinnedMesh->_boundInfo._center;
 	collision._boundingSphere._radius = pAnimation->_pSkinnedMesh->_boundInfo._radius;
 	collision._locked = false;
-	collision._isTrigger = false;
+	collision._isTrigger = true;
 	collision._triggerType = CollisionComponent::TRIGGER_TYPE_ENEMY;
+	collision._type = CollisionComponent::COLLISION_TYPE_OBB;
 
 	ScriptComponent &scriptComponent = _entity.AddComponent<ScriptComponent>();
 	scriptComponent.SetScript(MAKE_SCRIPT_DELEGATE(Snake, Update, *this));
@@ -113,6 +114,11 @@ bool Snake::CreateFromWorld(World & world, const Vector3 &Pos)
 
 	_hurtTime = 60;
 	_hurtCount = _hurtTime;
+
+	_isHurt = false;
+	_unBeatableTime = 15;
+	_unBeatableCount = _unBeatableTime;
+
 	//이벤트 등록
 	EventChannel channel;
 
@@ -365,6 +371,16 @@ void Snake::Update(float deltaTime)
 	}
 
 	transComp.SetWorldPosition(transComp.GetWorldPosition().x, TERRAIN->GetHeight(transComp.GetWorldPosition().x, transComp.GetWorldPosition().z), transComp.GetWorldPosition().z); 
+
+	if (_isHurt)
+	{
+		_unBeatableCount--;
+		if (_unBeatableCount < 0)
+		{
+			_unBeatableCount = _unBeatableTime;
+			_isHurt = false;
+		}
+	}
 }
 
 void Snake::Handle(const CollisionSystem::ActorTriggerEvent & event)
@@ -376,17 +392,20 @@ void Snake::Handle(const CollisionSystem::ActorTriggerEvent & event)
 	{
 		//플레이어와 충돌했다(내가 가해자)
 	case CollisionComponent::TRIGGER_TYPE_PLAYER:
-		if (_state != SNAKESTATE_HURT&&_state != SNAKESTATE_DIE)
+		if (!_isHurt)
 		{
-			resetAllCount();
-			_state = SNAKESTATE_HURT;
-			_pStateMachine->ChangeState(META_TYPE(SnakeHurtState)->Name());
-			_battle = true;
-			_hp -= 50;
-			if (_hp <= 0)
+			if (_state != SNAKESTATE_HURT&&_state != SNAKESTATE_DIE)
 			{
-				_state = SNAKESTATE_DIE;
-				_pStateMachine->ChangeState(META_TYPE(SnakeDeadState)->Name());
+				resetAllCount();
+				_state = SNAKESTATE_HURT;
+				_pStateMachine->ChangeState(META_TYPE(SnakeHurtState)->Name());
+				_battle = true;
+				_hp -= 50;
+				if (_hp <= 0)
+				{
+					_state = SNAKESTATE_DIE;
+					_pStateMachine->ChangeState(META_TYPE(SnakeDeadState)->Name());
+				}
 			}
 		}
 		break;

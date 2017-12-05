@@ -142,6 +142,7 @@
     <ClCompile Include="Cat.cpp" />
     <ClCompile Include="CatAnimationString.cpp" />
     <ClCompile Include="CatStates.cpp" />
+    <ClCompile Include="charge.cpp" />
     <ClCompile Include="CollisionComponent.cpp" />
     <ClCompile Include="CollisionUtils.cpp" />
     <ClCompile Include="CommonUtils.cpp" />
@@ -154,6 +155,9 @@
     <ClCompile Include="EntityIDPool.cpp" />
     <ClCompile Include="EnvironmentSphere.cpp" />
     <ClCompile Include="Filter.cpp" />
+    <ClCompile Include="fireBall.cpp" />
+    <ClCompile Include="fireBreath.cpp" />
+    <ClCompile Include="fireRing.cpp" />
     <ClCompile Include="Frustum.cpp" />
     <ClCompile Include="GameCommand.cpp" />
     <ClCompile Include="GameObjectFactory.cpp" />
@@ -176,11 +180,13 @@
     <ClCompile Include="ColiisionSystem.cpp" />
     <ClCompile Include="Particle.cpp" />
     <ClCompile Include="ParticleComponent.cpp" />
+    <ClCompile Include="ParticleSystem.cpp" />
     <ClCompile Include="Plane.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="PlayerAnimationString.cpp" />
     <ClCompile Include="Player_CallBack.cpp" />
     <ClCompile Include="PointLight.cpp" />
+    <ClCompile Include="PSystem.cpp" />
     <ClCompile Include="QuadTree.cpp" />
     <ClCompile Include="Quaternion.cpp" />
     <ClCompile Include="Ray.cpp" />
@@ -190,6 +196,7 @@
     <ClCompile Include="SceneChangeEffectUpDown.cpp" />
     <ClCompile Include="ScriptComponent.cpp" />
     <ClCompile Include="ScriptSystem.cpp" />
+    <ClCompile Include="smoke.cpp" />
     <ClCompile Include="Snake.cpp" />
     <ClCompile Include="SnakeAnimationString.cpp" />
     <ClCompile Include="SnakeStates.cpp" />
@@ -242,6 +249,7 @@
     <ClInclude Include="Cat.h" />
     <ClInclude Include="CatAnimationString.h" />
     <ClInclude Include="CatStates.h" />
+    <ClInclude Include="charge.h" />
     <ClInclude Include="ClassTypeID.h" />
     <ClInclude Include="CollisionUtils.h" />
     <ClInclude Include="Color4F.h" />
@@ -259,6 +267,9 @@
     <ClInclude Include="EntityIDPool.h" />
     <ClInclude Include="EnvironmentSphere.h" />
     <ClInclude Include="Filter.h" />
+    <ClInclude Include="fireBall.h" />
+    <ClInclude Include="fireBreath.h" />
+    <ClInclude Include="fireRing.h" />
     <ClInclude Include="Frustum.h" />
     <ClInclude Include="GameCommand.h" />
     <ClInclude Include="GameComponent.h" />
@@ -289,10 +300,13 @@
     <ClInclude Include="CollisionSystem.h" />
     <ClInclude Include="Particle.h" />
     <ClInclude Include="ParticleComponent.h" />
+    <ClInclude Include="ParticleString.h" />
+    <ClInclude Include="ParticleSystem.h" />
     <ClInclude Include="Plane.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="PlayerAnimationString.h" />
     <ClInclude Include="PointLight.h" />
+    <ClInclude Include="PSystem.h" />
     <ClInclude Include="QuadTree.h" />
     <ClInclude Include="Quaternion.h" />
     <ClInclude Include="Ray.h" />
@@ -303,6 +317,7 @@
     <ClInclude Include="SceneChangeEffectUpDown.h" />
     <ClInclude Include="ScriptComponent.h" />
     <ClInclude Include="ScriptSystem.h" />
+    <ClInclude Include="smoke.h" />
     <ClInclude Include="Snake.h" />
     <ClInclude Include="SnakeAnimationString.h" />
     <ClInclude Include="SnakeStates.h" />
