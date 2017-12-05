@@ -23,6 +23,7 @@ protected :
 	int32 _animationEnum;
 
 	TerrainTilePos _tilePos;
+	TerrainTilePos _prevTilePos;
 };
 
 class GameObjectAnimationCallbackHandler : public ID3DXAnimationCallbackHandler

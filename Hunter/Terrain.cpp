@@ -90,11 +90,20 @@ void Terrain::Handle(const GameObjectFactory::ObjectCreatedEvent & event)
 	ConvertWorldPostoTilePos(event._worldPosition, &tilePos);
 
 	TerrainChunk &refChunk = _pChunks[Index2D(tilePos._chunkX, tilePos._chunkZ, _xChunkCount)];
-	if (event._entity.IsValid())
+	Entity entity = event._entity;
+	if (entity.IsValid())
 	{
-		int32 index = Index2D(tilePos._tileX, tilePos._tileZ, TERRAIN_TILE_RES);
-		refChunk._tiles[index]._entities.push_back(event._entity);
+		int32 tileIndex = Index2D(tilePos._tileX, tilePos._tileZ, TERRAIN_TILE_RES);
+		refChunk._tiles[tileIndex]._entities.push_back(entity);
 		refChunk._numTotalEntity++;
+
+		int32 chunkIndex = Index2D(tilePos._chunkX, tilePos._chunkZ, _xChunkCount);
+		for (uint32 i = 0; i < _activeChunkIndices.size(); ++i)
+		{
+			_activeChunkIndices[i] == chunkIndex;
+			entity.Activate();
+			break;
+		}
 	}
 }
 
@@ -244,7 +253,6 @@ void Terrain::LoadTerrain(const std::string & fileName)
 			CreateTerrainChunk(x, z, _terrainVertices);
 		}
 	}
-
 	//터레인 범위
 	_terrainStartX = _terrainVertices[0]._pos.x;
 	_terrainStartZ = _terrainVertices[0]._pos.z;
@@ -254,7 +262,6 @@ void Terrain::LoadTerrain(const std::string & fileName)
 	//쿼드트리를 만든다.
 	_pQuadTree = new QuadTree;
 	_pQuadTree->Init(_terrainVertices, _numVertexX, _sectionResolution);
-
 
 	LoadTextureFromConfig(_currentConfig);
 
@@ -1130,6 +1137,86 @@ void Terrain::ConvertWorldPostoVertexPos(const Vector3 & worldPos, TerrainVertex
 	pOutVertexPos->_relZ = (float)(terrainPosZ - (float)(chunkStartZ + pOutVertexPos->_tileZ));
 }
 
+//TODO : Loop를 최소한으로 돌게끔 고치자
+void Terrain::ValidateTerrainChunks(const TerrainTilePos & currentPos, const TerrainTilePos & prevPos)
+{
+	int32 currentMinX = currentPos._chunkX - 1;
+	int32 currentMaxX = currentPos._chunkX + 1;
+	int32 currentMinZ = currentPos._chunkZ - 1;
+	int32 currentMaxZ = currentPos._chunkZ + 1;
+
+	ClampInt(currentMinX, 0, _xChunkCount - 1);
+	ClampInt(currentMaxX, 0, _xChunkCount - 1);
+	ClampInt(currentMinZ, 0, _zChunkCount - 1);
+	ClampInt(currentMaxZ, 0, _zChunkCount - 1);
+
+	int32 prevMinX = prevPos._chunkX - 1;
+	int32 prevMaxX = prevPos._chunkX + 1;
+	int32 prevMinZ = prevPos._chunkZ - 1;
+	int32 prevMaxZ = prevPos._chunkZ + 1;
+
+	ClampInt(prevMinX, 0, _zChunkCount - 1);
+	ClampInt(prevMaxX, 0, _zChunkCount - 1);
+	ClampInt(prevMinZ, 0, _zChunkCount - 1);
+	ClampInt(prevMaxZ, 0, _zChunkCount - 1);
+
+	std::vector<int32> toDeactivate{};
+	toDeactivate.reserve(9);
+
+	_activeChunkIndices.clear();
+	_activeChunkIndices.reserve(9);
+
+	for (int32 z = prevMinZ; z <= prevMaxZ; ++z)
+	{
+		for (int32 x = prevMinX; x <= prevMaxX; ++x)
+		{
+			toDeactivate.push_back(Index2D(x, z, _xChunkCount));
+		}
+	}
+
+	for (int32 z = currentMinZ; z <= currentMaxZ; ++z)
+	{
+		for (int32 x = currentMinX; x <= currentMaxX; ++x)
+		{
+			_activeChunkIndices.push_back(Index2D(x, z, _xChunkCount));
+		}
+	}
+
+	for (int32 i = 0; i < toDeactivate.size(); ++i)
+	{
+		bool32 hasValue = false;
+		for (int32 j = 0; j < _activeChunkIndices.size(); ++j)
+		{
+			if (toDeactivate[i] == _activeChunkIndices[j])
+			{
+				hasValue = true;
+			}
+		}
+		if (!hasValue)
+		{
+			_pChunks[toDeactivate[i]].DeactivateEntities();
+		}
+	}
+
+	for (int32 i = 0; i < _activeChunkIndices.size(); ++i)
+	{
+		bool32 hasValue = false;
+		for (int32 j = 0; j < toDeactivate.size(); ++j)
+		{
+			if (_activeChunkIndices[i] == toDeactivate[j])
+			{
+				hasValue = true;
+			}
+		}
+		if (!hasValue)
+		{
+			_pChunks[_activeChunkIndices[i]].ActivateEntities();
+		}
+	}
+	
+	_pCurrentScene->_world.Refresh();
+}
+
 void Terrain::EffectSetTexture(LPCSTR handle, LPDIRECT3DTEXTURE9 texture)
 {
 	VIDEO->GetEffect(_effect)->_ptr->SetTexture(handle, texture);
@@ -1138,11 +1225,6 @@ void Terrain::EffectSetTexture(LPCSTR handle, LPDIRECT3DTEXTURE9 texture)
 void Terrain::EffectSetMatrix(LPCSTR handle, const Matrix & matrix)
 {
 	VIDEO->GetEffect(_effect)->SetMatrix(handle, matrix);
-}
-
-void Terrain::SetMainTilePosLink(const BaseGameObject * pObject)
-{
-	_pMainTilePos = &pObject->GetTilePos();
 }
 
 const Vector3 ConvertChunkPosToWorldPos(const TerrainChunkPos & chunkPos)
@@ -1160,7 +1242,10 @@ void Terrain::TerrainChunk::ActivateEntities()
 {
 	for (int32 i = 0; i < TERRAIN_CHUNKS_TILE_COUNT; ++i)
 	{
-		_tiles[i]._entities[i].Activate();
+		for (auto &entity : _tiles[i]._entities)
+		{
+			entity.Activate();
+		}
 	}
 }
 
@@ -1169,7 +1254,10 @@ void Terrain::TerrainChunk::DeactivateEntities()
 {
 	for (int32 i = 0; i < TERRAIN_CHUNKS_TILE_COUNT; ++i)
 	{
-		_tiles[i]._entities[i].Deactivate();
+		for (auto &entity : _tiles[i]._entities)
+		{
+			entity.Deactivate();
+		}
 	}
 }
 
@@ -1674,5 +1762,30 @@ Terrain::TerrainConfig & Terrain::TerrainConfig::operator=(const TerrainConfig &
 	strncpy(this->_tile2FileName, other._tile2FileName, MAX_FILE_NAME);
 	strncpy(this->_control1Name, other._control1Name, MAX_FILE_NAME);
 	strncpy(this->_control2Name, other._control2Name, MAX_FILE_NAME);
+	return *this;
+}
+
+TerrainTilePos::TerrainTilePos()
+	:_chunkX(), _chunkZ(), 
+	_tileX(), _tileZ(), 
+	_relX(), _relZ()
+{
+}
+
+TerrainTilePos::TerrainTilePos(const TerrainTilePos & other)
+	:_chunkX(other._chunkX), _chunkZ(other._chunkZ), 
+	_tileX(other._tileX), _tileZ(other._tileZ), 
+	_relX(other._relX), _relZ(other._relZ)
+{
+}
+
+TerrainTilePos & TerrainTilePos::operator=(const TerrainTilePos & other)
+{
+	_chunkX = other._chunkX;
+	_chunkZ = other._chunkZ;
+	_tileX = other._tileX;
+	_tileZ = other._tileZ;
+	_relX = other._relX;
+	_relZ = other._relZ;
 	return *this;
 }

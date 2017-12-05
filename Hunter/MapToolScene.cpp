@@ -152,10 +152,12 @@ bool MapToolScene::SceneInit()
 
 	TERRAIN->SetScene(this);
 	TERRAIN->Create(config, true);
-
 	
 	LoadEverySkinnedResources();
 	LoadEveryStaticResources();
+
+	_camera.SetMoveSpeed(6.0f);
+	_camera.SetRotationSpeed(1.8f);
 
 	_pMainLight->SetWorldPosition(Vector3(4.0f, 7.0f, 3.0f));
 	_pMainLight->SetTarget(Vector3(0.0f, 0.0f, 0.0f));
@@ -167,7 +169,6 @@ bool MapToolScene::SceneInit()
 
 	//NOTE : GameObjectFactory의 GetPlayerObject는 생성에 의존성을 가진다
 	_camera.SetTargetObject(GAMEOBJECTFACTORY->GetPlayerObject());
-	TERRAIN->SetMainTilePosLink(GAMEOBJECTFACTORY->GetPlayerObject());
 
 	//에디터 생성
 	imguiRenderInit();
@@ -203,6 +204,15 @@ bool MapToolScene::SceneUpdate(float deltaTime, const InputManager & input)
 		}
 
 		//_pMainLight->_entity.GetComponent<TransformComponent>().SetRotateWorld(Vector3(x, y, 0.0f));
+	}
+
+	if (input.keyboard.IsPressed('T'))
+	{
+		GAMEOBJECTFACTORY->GetPlayerObject()->GetEntity().Deactivate();
+	}
+	else if(input.keyboard.IsPressed('Y'))
+	{
+		GAMEOBJECTFACTORY->GetPlayerObject()->GetEntity().Activate();
 	}
 
 	_editor->Edit(RefVariant(), input);

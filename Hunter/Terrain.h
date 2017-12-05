@@ -28,14 +28,18 @@ struct TerrainChunkPos
 //청크 안에서
 struct TerrainTilePos
 {
-	int32 _chunkX{};
-	int32 _chunkZ{};
+	TerrainTilePos();
+	TerrainTilePos(const TerrainTilePos &other);
+	TerrainTilePos & operator=(const TerrainTilePos &other);
 
-	int32 _tileX{};
-	int32 _tileZ{};
+	int32 _chunkX;
+	int32 _chunkZ;
 
-	float _relX{};
-	float _relZ{};
+	int32 _tileX;
+	int32 _tileZ;
+
+	float _relX;
+	float _relZ;
 };
 
 struct TerrainVertexPos
@@ -82,6 +86,8 @@ public:
 
 	struct TerrainTile
 	{
+		
+
 		int32 _chunkX{};
 		int32 _chunkZ{};
 
@@ -152,6 +158,8 @@ public:
 	void ConvertWorldPostoTilePos(const Vector3 & worldPos, TerrainTilePos *pOutTilePos);
 	void ConvertWorldPostoVertexPos(const Vector3 &worldPos, TerrainVertexPos *pOutVertexPos);
 
+	void ValidateTerrainChunks(const TerrainTilePos &currentPos, const TerrainTilePos &prevPos);
+
 	//void UpdateTerrainTilePos(TerrainTilePos &tilePos);
 
 	//const Vector3 ConvertChunkPosToWorldPos(const TerrainChunkPos &chunkPos);
@@ -159,8 +167,6 @@ public:
 
 	void EffectSetTexture(LPCSTR handle, LPDIRECT3DTEXTURE9 texture);
 	void EffectSetMatrix(LPCSTR handle, const Matrix &matrix);
-
-	void SetMainTilePosLink(const BaseGameObject *pObject);
 
 	inline TerrainChunk &GetChunkAt(int32 x, int32 z) 
 	{ 
@@ -264,8 +270,7 @@ private:
 
 	TerrainChunk *_pChunks{};
 
-	//플레이어의 청크위치를 받으면서 월드를 업데이트 시킨다
-	const TerrainTilePos *_pMainTilePos{};
+	std::vector<int32> _activeChunkIndices;
 };
 
 #define TERRAIN Terrain::GetInstance()

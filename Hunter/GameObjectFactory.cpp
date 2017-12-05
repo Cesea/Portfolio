@@ -52,7 +52,7 @@ void GameObjectFactory::CreateObject(ARCHE_TYPE type, ResourceHandle handle, con
 		collision._locked = true;
 		collision._triggerType = CollisionComponent::TRIGGER_TYPE_OBJECT;
 
-		entity.Activate();
+		//entity.Activate();
 		_channel.Broadcast<GameObjectFactory::ObjectCreatedEvent>(
 			ObjectCreatedEvent(ARCHE_ROCK, entity, transform.GetWorldPosition()));
 
@@ -84,7 +84,7 @@ void GameObjectFactory::CreateObject(ARCHE_TYPE type, ResourceHandle handle, con
 		collision._boundingSphere._radius = pMesh->_meshBoundInfo._radius;
 		collision._locked = true;
 
-		entity.Activate();
+		//entity.Activate();
 
 		_channel.Broadcast<GameObjectFactory::ObjectCreatedEvent>(
 			ObjectCreatedEvent(ARCHE_TREE, entity, transform.GetWorldPosition()));
@@ -117,7 +117,7 @@ void GameObjectFactory::CreateObject(ARCHE_TYPE type, ResourceHandle handle, con
 		collision._boundingSphere._radius = pMesh->_meshBoundInfo._radius;
 		collision._locked = true;
 
-		entity.Activate();
+		//entity.Activate();
 
 		_channel.Broadcast<GameObjectFactory::ObjectCreatedEvent>(
 			ObjectCreatedEvent(ARCHE_TREETRUNK, entity, transform.GetWorldPosition()));
@@ -150,7 +150,7 @@ void GameObjectFactory::CreateObject(ARCHE_TYPE type, ResourceHandle handle, con
 		collision._boundingSphere._radius = pMesh->_meshBoundInfo._radius;
 		collision._locked = true;
 
-		entity.Activate();
+		//entity.Activate();
 
 		_channel.Broadcast<GameObjectFactory::ObjectCreatedEvent>(
 			ObjectCreatedEvent(ARCHE_GRASS, entity, transform.GetWorldPosition()));
@@ -183,7 +183,7 @@ void GameObjectFactory::CreateObject(ARCHE_TYPE type, ResourceHandle handle, con
 		collision._boundingSphere._radius = pMesh->_meshBoundInfo._radius;
 		collision._locked = true;
 
-		entity.Activate();
+		//entity.Activate();
 
 		_channel.Broadcast<GameObjectFactory::ObjectCreatedEvent>(
 			ObjectCreatedEvent(ARCHE_MUSHROOM, entity, transform.GetWorldPosition()));

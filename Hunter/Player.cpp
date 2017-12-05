@@ -538,59 +538,25 @@ void Player::Update(float deltaTime)
 				   _state = PLAYERSTATE_MOVE;
 				   _attackToStanceTimer.Restart();
 				   _comboCount = 0;
-				   if (_currentMovement._horizontal == HORIZONTAL_MOVEMENT_LEFT)
+				   if (_currentCommand._movement._horizontal == HORIZONTAL_MOVEMENT_LEFT)
 				   {
-					   if (_currentCommand._movement._vertical == VERTICAL_MOVEMENT_UP)
-					   {
-						   _currentMovement._vertical = VERTICAL_MOVEMENT_UP;
-						   this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWalk));
-					   }
-					   else if (_currentCommand._movement._vertical == VERTICAL_MOVEMENT_DOWN)
-					   {
-						   _currentMovement._vertical = VERTICAL_MOVEMENT_DOWN;
-						   this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWarRetreat));
-					   }
-					   else if (_currentCommand._movement._horizontal == HORIZONTAL_MOVEMENT_RIGHT)
-					   {
-						   _currentMovement._horizontal = HORIZONTAL_MOVEMENT_RIGHT;
-						   this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWarMovingRight));
-					   }
+					   _currentMovement._horizontal = HORIZONTAL_MOVEMENT_LEFT;
+					   this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWarMovingLeft));
 				   }
-				   else if (_currentMovement._horizontal == HORIZONTAL_MOVEMENT_RIGHT)
+				   else if (_currentCommand._movement._horizontal == HORIZONTAL_MOVEMENT_RIGHT)
 				   {
-					   if (_currentCommand._movement._vertical == VERTICAL_MOVEMENT_UP)
-					   {
-						   _currentMovement._vertical = VERTICAL_MOVEMENT_UP;
-						   this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWalk));
-					   }
-					   else if (_currentCommand._movement._vertical == VERTICAL_MOVEMENT_DOWN)
-					   {
-						   _currentMovement._vertical = VERTICAL_MOVEMENT_DOWN;
-						   this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWarRetreat));
-					   }
-					   else if (_currentCommand._movement._horizontal == HORIZONTAL_MOVEMENT_LEFT)
-					   {
-						   _currentMovement._horizontal = HORIZONTAL_MOVEMENT_LEFT;
-						   this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWarMovingLeft));
-					   }
+					   _currentMovement._horizontal = HORIZONTAL_MOVEMENT_RIGHT;
+					   this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWarMovingRight));
 				   }
-				   else if (_currentMovement._vertical == VERTICAL_MOVEMENT_UP)
+				   else if (_currentCommand._movement._vertical == VERTICAL_MOVEMENT_UP)
 				   {
-					   if (_currentCommand._movement._vertical == VERTICAL_MOVEMENT_DOWN)
-					   {
-						   _currentMovement._vertical = VERTICAL_MOVEMENT_DOWN;
-						   this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWarRetreat));
-					   }
-					   else if (_currentCommand._movement._horizontal == HORIZONTAL_MOVEMENT_LEFT)
-					   {
-						   _currentMovement._horizontal = HORIZONTAL_MOVEMENT_LEFT;
-						   this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWarMovingLeft));
-					   }
-					   else if (_currentCommand._movement._horizontal == HORIZONTAL_MOVEMENT_RIGHT)
-					   {
-						   _currentMovement._horizontal = HORIZONTAL_MOVEMENT_RIGHT;
-						   this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWarMovingRight));
-					   }
+					   _currentMovement._vertical = VERTICAL_MOVEMENT_UP;
+					   this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWalk));
+				   }
+				   else if (_currentCommand._movement._vertical == VERTICAL_MOVEMENT_DOWN)
+				   {
+					   _currentMovement._vertical = VERTICAL_MOVEMENT_DOWN;
+					   this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWarRetreat));
 				   }
 				   break;
 			   }
@@ -714,7 +680,10 @@ void Player::MoveAndRotate(float deltaTime)
 		  refTransform.GetWorldPosition().x, 
 		  TERRAIN->GetHeight(refTransform.GetWorldPosition().x, refTransform.GetWorldPosition().z), refTransform.GetWorldPosition().z);
 
+
+	  _prevTilePos = _tilePos;
 	  TERRAIN->ConvertWorldPostoTilePos(refTransform.GetWorldPosition(), &_tilePos);
+	  RepositionEntity(_tilePos, _prevTilePos);
    }
 }
 
@@ -952,5 +921,36 @@ void Player::QueueAction(const Action & action)
 {
    _pActionComp->_actionQueue.PushAction(action);
    _animationEnum = action._enum;
+}
+
+void Player::RepositionEntity(const TerrainTilePos & currentPos, const TerrainTilePos & prevPos)
+{
+	bool32 _chunkMoved = false;
+	//청크가 다를때..... 터레인의 엔티티를 활성화, 비활성화한다
+	if (currentPos._chunkX != prevPos._chunkX || currentPos._chunkZ != prevPos._chunkZ)
+	{
+		TERRAIN->ValidateTerrainChunks(currentPos, prevPos);
+		_chunkMoved = true;
+	}
+
+	//타일이 다를떄....... tile의 entity벡터를 처리해주자
+	if (currentPos._tileX != prevPos._tileX || currentPos._tileZ != prevPos._tileZ)
+	{
+		Terrain::TerrainChunk &refPrevChunk =  TERRAIN->GetChunkAt(prevPos._chunkX, prevPos._chunkZ);
+		Terrain::TerrainTile &refPrevTile = refPrevChunk._tiles[Index2D(prevPos._tileX, prevPos._tileZ, TERRAIN_TILE_RES)];
+
+		for (uint32 i = 0; i < refPrevTile._entities.size(); ++i)
+		{
+			if (refPrevTile._entities[i] == _entity)
+			{
+				refPrevTile._entities.erase(refPrevTile._entities.begin() + i);
+				break;
+			}
+		}
+
+		Terrain::TerrainChunk &refCurrentChunk =  TERRAIN->GetChunkAt(currentPos._chunkX, currentPos._chunkZ);
+		Terrain::TerrainTile &refCurrentTile = refCurrentChunk._tiles[Index2D(currentPos._tileX, currentPos._tileZ, TERRAIN_TILE_RES)];
+		refCurrentTile._entities.push_back(_entity);
+	}
 }
 

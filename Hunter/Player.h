@@ -73,6 +73,8 @@ private :
 	GameCommand _currentCommand;
 	void QueueAction(const Action &action);
 
+	void RepositionEntity(const TerrainTilePos &currentPos, const TerrainTilePos &prevPos);
+
 	ActionComponent *_pActionComp{};
 	TransformComponent *_pTransformComp{};
 	CollisionComponent *_pCollisionComp{};
@@ -97,6 +99,7 @@ private :
 	StopWatch _attackTriggerTimer;
 
 	bool32 _canCombo{false};
+
 
 public :
 
