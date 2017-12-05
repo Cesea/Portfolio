@@ -101,6 +101,9 @@ private :
 
 	bool32 _canCombo{false};
 
+	bool _verticalInputRecieved{false};
+	bool _horizontalInputRecieved{false};
+
 public :
 
 	struct PlayerImformationEvent

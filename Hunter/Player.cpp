@@ -78,7 +78,7 @@ bool Player::CreateFromWorld(World & world, const Vector3 &Pos)
 
    //Plyer의 맴버 변수들을 셋팅해주자
    _combatToPeaceTimer.Reset(2.0f);
-   _moveToStanceTimer.Reset(0.15f);
+   _moveToStanceTimer.Reset(0.35f);
    _attackToStanceTimer.Reset(0.4f);
    _attackTriggerTimer.Reset(0.08f);
 
@@ -681,23 +681,40 @@ void Player::Handle(const InputManager::KeyDownEvent & event)
    uint32 inputCode = event.code;
    if('J' == inputCode)
    {
+	   if (_currentCommand._movement._horizontal != HORIZONTAL_MOVEMENT_NONE)
+	   {
+		   return;
+	   }
       _currentCommand._type = GAMECOMMAND_MOVE;
       _currentCommand._movement._horizontal = HORIZONTAL_MOVEMENT_LEFT;
    }
 
    if ('L' == inputCode)
    {
+	   if (_currentCommand._movement._horizontal != HORIZONTAL_MOVEMENT_NONE)
+	   {
+		   return;
+	   }
       _currentCommand._type = GAMECOMMAND_MOVE;
       _currentCommand._movement._horizontal = HORIZONTAL_MOVEMENT_RIGHT;
    }
 
    if('I' == inputCode)
    {
+	   if (_currentCommand._movement._vertical != VERTICAL_MOVEMENT_NONE)
+	   {
+		   return;
+	   }
       _currentCommand._type = GAMECOMMAND_MOVE;
       _currentCommand._movement._vertical = VERTICAL_MOVEMENT_UP;
    }
+
    if ('K' == inputCode)
    {
+	   if (_currentCommand._movement._vertical != VERTICAL_MOVEMENT_NONE)
+	   {
+		   return;
+	   }
       _currentCommand._type = GAMECOMMAND_MOVE;
       _currentCommand._movement._vertical = VERTICAL_MOVEMENT_DOWN;
    }
@@ -713,22 +730,40 @@ void Player::Handle(const InputManager::KeyPressedEvent & event)
    uint32 inputCode = event.code;
    if('J' == inputCode)
    {
+	   if (_currentCommand._movement._horizontal != HORIZONTAL_MOVEMENT_NONE)
+	   {
+		   return;
+	   }
       _currentCommand._type = GAMECOMMAND_MOVE;
       _currentCommand._movement._horizontal = HORIZONTAL_MOVEMENT_LEFT;
    }
+
    if ('L' == inputCode)
    {
+	   if (_currentCommand._movement._horizontal != HORIZONTAL_MOVEMENT_NONE)
+	   {
+		   return;
+	   }
       _currentCommand._type = GAMECOMMAND_MOVE;
       _currentCommand._movement._horizontal = HORIZONTAL_MOVEMENT_RIGHT;
    }
 
    if('I' == inputCode)
    {
+	   if (_currentCommand._movement._vertical != VERTICAL_MOVEMENT_NONE)
+	   {
+		   return;
+	   }
       _currentCommand._type = GAMECOMMAND_MOVE;
       _currentCommand._movement._vertical = VERTICAL_MOVEMENT_UP;
    }
+
    if ('K' == inputCode)
    {
+	   if (_currentCommand._movement._vertical != VERTICAL_MOVEMENT_NONE)
+	   {
+		   return;
+	   }
       _currentCommand._type = GAMECOMMAND_MOVE;
       _currentCommand._movement._vertical = VERTICAL_MOVEMENT_DOWN;
    }
@@ -892,6 +927,13 @@ void Player::Handle(const InputManager::KeyReleasedEvent & event)
    } break;
    case Player::PLAYERSTATE_RUN:
    {
+	   if (inputCode == 'I')
+	   {
+		   this->_pActionComp->_actionQueue.ClearQueue();
+		   _state = PLAYERSTATE_STANCE;
+		   MovementStop(_currentMovement);
+		   this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eStandingFree));
+	   }
    } break;
    case Player::PLAYERSTATE_ATTACK:
    {
