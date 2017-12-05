@@ -31,6 +31,9 @@ struct Action
 	bool32 _blocking;
 	bool32 _playOnce{true};
 	bool32 _stop{ false };
+
+	bool32 _cancle{false};
+
 	float _playSpeed;
 
 	float _crossFadeTime;

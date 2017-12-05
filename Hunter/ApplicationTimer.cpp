@@ -32,7 +32,7 @@ void ApplicationTimer::Tick()
 
 	int32 timeToSleep{};
 
-	while (_currentDeltaSecond < _targetFrameSecond)
+	while (_currentDeltaSecond < _targetFrameSecond - (_targetFrameSecond * 0.1f))
 	{
 		QueryPerformanceCounter(&_currentCounter);
 

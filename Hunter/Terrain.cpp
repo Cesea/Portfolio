@@ -3,7 +3,11 @@
 
 #include "QuadTree.h"
 
-#include "BaseScene.h"
+Terrain::Terrain()
+{
+	EventChannel channel;
+	channel.Add<GameObjectFactory::ObjectCreatedEvent, Terrain>(*this);
+}
 
 Terrain::~Terrain()
 {
@@ -71,7 +75,38 @@ bool Terrain::Create(const Terrain::TerrainConfig &config, bool32 inEditMode)
 
 void Terrain::RegisterEvents()
 {
+	EventChannel channel;
+	channel.Add<GameObjectFactory::ObjectCreatedEvent, Terrain>(*this);
+
 }
+
+void Terrain::UnRegisterEvents()
+{
+}
+
+void Terrain::Handle(const GameObjectFactory::ObjectCreatedEvent & event)
+{
+	TerrainTilePos tilePos;
+	ConvertWorldPostoTilePos(event._worldPosition, &tilePos);
+
+	TerrainChunk &refChunk = _pChunks[Index2D(tilePos._chunkX, tilePos._chunkZ, _xChunkCount)];
+	Entity entity = event._entity;
+	if (entity.IsValid())
+	{
+		int32 tileIndex = Index2D(tilePos._tileX, tilePos._tileZ, TERRAIN_TILE_RES);
+		refChunk._tiles[tileIndex]._entities.push_back(entity);
+		refChunk._numTotalEntity++;
+
+		int32 chunkIndex = Index2D(tilePos._chunkX, tilePos._chunkZ, _xChunkCount);
+		for (uint32 i = 0; i < _activeChunkIndices.size(); ++i)
+		{
+			_activeChunkIndices[i] == chunkIndex;
+			entity.Activate();
+			break;
+		}
+	}
+}
+
 
 void Terrain::Destroy()
 {
@@ -90,8 +125,8 @@ void Terrain::Destroy()
 	VIDEO->DestroyTexture(_tile0Handle);
 	VIDEO->DestroyTexture(_tile1Handle);
 	VIDEO->DestroyTexture(_tile2Handle);
-	VIDEO->DestroyTexture(_tile3Handle);
-	VIDEO->DestroyTexture(_tileSplatHandle);
+	VIDEO->DestroyTexture(_tileControl1Handle);
+	VIDEO->DestroyTexture(_tileControl2Handle);
 
 	//VIDEO->DestroyMaterial(_materialHandle);
 
@@ -103,36 +138,31 @@ void Terrain::Destroy()
 void Terrain::SaveTerrain(const std::string & fileName)
 {
 	//로딩 경로에서 파일명만 제거하고 경로만 받는다.
+	std::string fileNameCopy = fileName;
 	std::string path;
 	std::string name;
-	int lastPathIndex = 0;
+	std::string extension;
 
-	lastPathIndex = fileName.find_last_of('/');
-	if (lastPathIndex == -1)
-	{
-		lastPathIndex = fileName.find_last_of('\\');
-	}
-	//경로 구분이 있다면...
-	if (lastPathIndex != -1)
-	{
-		path = fileName.substr(0, lastPathIndex + 1);
-		name = fileName.substr(lastPathIndex + 1, fileName.length() - lastPathIndex);
-	}
+	SplitFilePathToNamePathExtension(fileNameCopy, name, path, extension);
 
 	DataPackage toSave;
 
-	char buffer[MAX_FILE_NAME];
-	ZeroMemory(buffer, sizeof(buffer));
+	char control1[MAX_FILE_NAME];
+	ZeroMemory(control1, sizeof(control1));
+	sprintf(control1, "%s", (path + name).c_str());
+	strncat(control1, "_Splat1.png", strlen("_Splat1.png"));
+	strncpy(_currentConfig._control1Name, control1, MAX_FILE_NAME);
 
-	sprintf(buffer, "%s", path.c_str());
-	strncat(buffer, "Splat.png", strlen("Splat.png"));
-
-	strncpy(_currentConfig._splatFileName, buffer, MAX_FILE_NAME);
-	//_currentConfig._splatFileName = 
+	char control2[MAX_FILE_NAME];
+	ZeroMemory(control2, sizeof(control2));
+	sprintf(control2, "%s", (path + name).c_str());
+	strncat(control2, "_Splat2.png", strlen("_Splat2.png"));
+	strncpy(_currentConfig._control2Name, control2, MAX_FILE_NAME);
 
 	toSave.Create(sizeof(Terrain::TerrainConfig) + (sizeof(video::TerrainVertex) * _numTotalVertex));
 
 	toSave.WriteAs<TerrainConfig>(_currentConfig);
+
 	for (int32 i = 0; i < _numTotalVertex; ++i)
 	{
 		video::TerrainVertex &vertex = _terrainVertices[i];
@@ -140,7 +170,8 @@ void Terrain::SaveTerrain(const std::string & fileName)
 	}
 	toSave.Save(fileName.c_str());
 	
-	VIDEO->SaveTexture(path + "TerrainSplat.png", _tileSplatHandle);
+	VIDEO->SaveTexture(control1, _tileControl1Handle);
+	VIDEO->SaveTexture(control2, _tileControl2Handle);
 }
 
 void Terrain::LoadTerrain(const std::string & fileName)
@@ -169,8 +200,8 @@ void Terrain::LoadTerrain(const std::string & fileName)
 	if (_tile0Handle.IsValid()) { VIDEO->DestroyTexture(_tile0Handle); }
 	if (_tile1Handle.IsValid()) { VIDEO->DestroyTexture(_tile1Handle); }
 	if (_tile2Handle.IsValid()) { VIDEO->DestroyTexture(_tile2Handle); }
-	if (_tile3Handle.IsValid()) { VIDEO->DestroyTexture(_tile3Handle); }
-	if (_tileSplatHandle.IsValid()) { VIDEO->DestroyTexture(_tileSplatHandle); }
+	if (_tileControl1Handle.IsValid()) { VIDEO->DestroyTexture(_tileControl1Handle); }
+	if (_tileControl2Handle.IsValid()) { VIDEO->DestroyTexture(_tileControl2Handle); }
 
 	SAFE_DELETE_ARRAY(_terrainVertices);
 	SAFE_DELETE(_pQuadTree);
@@ -222,7 +253,6 @@ void Terrain::LoadTerrain(const std::string & fileName)
 			CreateTerrainChunk(x, z, _terrainVertices);
 		}
 	}
-
 	//터레인 범위
 	_terrainStartX = _terrainVertices[0]._pos.x;
 	_terrainStartZ = _terrainVertices[0]._pos.z;
@@ -232,7 +262,6 @@ void Terrain::LoadTerrain(const std::string & fileName)
 	//쿼드트리를 만든다.
 	_pQuadTree = new QuadTree;
 	_pQuadTree->Init(_terrainVertices, _numVertexX, _sectionResolution);
-
 
 	LoadTextureFromConfig(_currentConfig);
 
@@ -433,8 +462,8 @@ void Terrain::Render(const Camera &camera, const DirectionalLight &mainLight, co
 	pEffect->SetTexture("Terrain0_Tex", *VIDEO->GetTexture(_tile0Handle));
 	pEffect->SetTexture("Terrain1_Tex", *VIDEO->GetTexture(_tile1Handle));
 	pEffect->SetTexture("Terrain2_Tex", *VIDEO->GetTexture(_tile2Handle));
-	pEffect->SetTexture("Terrain3_Tex", *VIDEO->GetTexture(_tile3Handle));
-	pEffect->SetTexture("TerrainControl_Tex", *VIDEO->GetTexture(_tileSplatHandle));
+	pEffect->SetTexture("TerrainControl_Tex1", *VIDEO->GetTexture(_tileControl1Handle));
+	pEffect->SetTexture("TerrainControl_Tex2", *VIDEO->GetTexture(_tileControl2Handle));
 
 	if (_inEditMode)
 	{
@@ -637,8 +666,8 @@ bool Terrain::CreateTerrain(int32 tileNum)
 	float tileIntervalX = static_cast<float>(tileNum) / _numCellX;
 	float tileIntervalY = static_cast<float>(tileNum) / _numCellZ;
 
-	float terrainStartX = -(_numCellX / 2);
-	float terrainStartZ = (_numCellZ / 2);
+	float terrainStartX = (float)-(_numCellX / 2);
+	float terrainStartZ = (float)(_numCellZ / 2);
 
 	_terrainVertices = new video::TerrainVertex[_numTotalVertex];
 
@@ -801,8 +830,8 @@ void Terrain::RebuildTerrain(const Terrain::TerrainConfig &config)
 	if (_tile0Handle.IsValid()) { VIDEO->DestroyTexture(_tile0Handle); }
 	if (_tile1Handle.IsValid()) { VIDEO->DestroyTexture(_tile1Handle); }
 	if (_tile2Handle.IsValid()) { VIDEO->DestroyTexture(_tile2Handle); }
-	if (_tile3Handle.IsValid()) { VIDEO->DestroyTexture(_tile3Handle); }
-	if (_tileSplatHandle.IsValid()) { VIDEO->DestroyTexture(_tileSplatHandle); }
+	if (_tileControl1Handle.IsValid()) { VIDEO->DestroyTexture(_tileControl1Handle); }
+	if (_tileControl2Handle.IsValid()) { VIDEO->DestroyTexture(_tileControl2Handle); }
 
 	SAFE_DELETE_ARRAY(_terrainVertices);
 	SAFE_DELETE_ARRAY(_chunkIndex);
@@ -824,11 +853,13 @@ bool Terrain::CreateTerrainChunk(int32 x, int32 z, const video::TerrainVertex * 
 {
 	int32 sectionIndex = Index2D(x, z, _xChunkCount);
 
-	TerrainChunk &refSection = _pChunks[sectionIndex];
-	refSection._pVertices = pTerrainVertices;
+	TerrainChunk &refChunk = _pChunks[sectionIndex];
 
-	refSection._chunkX = x;
-	refSection._chunkZ = z;
+
+	refChunk._pVertices = pTerrainVertices;
+
+	refChunk._chunkX = x;
+	refChunk._chunkZ = z;
 
 	int32 globalStartX = x * _sectionResolution;
 	int32 globalStartZ = z * _sectionResolution;
@@ -856,11 +887,11 @@ bool Terrain::CreateTerrainChunk(int32 x, int32 z, const video::TerrainVertex * 
 		}
 	}
 
-	refSection._relStartX = vertices[0]._pos.x;
-	refSection._relStartZ = vertices[0]._pos.z;
+	refChunk._relStartX = vertices[0]._pos.x;
+	refChunk._relStartZ = vertices[0]._pos.z;
 
-	refSection._relEndX = vertices.back()._pos.x;
-	refSection._relEndZ = vertices.back()._pos.z;
+	refChunk._relEndX = vertices.back()._pos.x;
+	refChunk._relEndZ = vertices.back()._pos.z;
 
 	if (_inEditMode)
 	{
@@ -869,18 +900,18 @@ bool Terrain::CreateTerrainChunk(int32 x, int32 z, const video::TerrainVertex * 
 		mem._data = nullptr;
 		mem._size = sizeof(video::TerrainVertex) * _sectionNumVertexX * _sectionNumVertexZ;
 
-		refSection._vHandle = VIDEO->CreateVertexBuffer(&mem, _declHandle);
-		Assert(refSection._vHandle.IsValid());
+		refChunk._vHandle = VIDEO->CreateVertexBuffer(&mem, _declHandle);
+		Assert(refChunk._vHandle.IsValid());
 
 		mem._data = nullptr;
 		mem._size = sizeof(uint32) * _sectionResolution * _sectionResolution * 2 * 3;
 
-		if (!refSection._iHandle.IsValid())
+		if (!refChunk._iHandle.IsValid())
 		{
-			refSection._iHandle = VIDEO->CreateIndexBuffer(&mem, sizeof(uint32));
+			refChunk._iHandle = VIDEO->CreateIndexBuffer(&mem, sizeof(uint32));
 		}
 
-		Assert(refSection._iHandle.IsValid());
+		Assert(refChunk._iHandle.IsValid());
 	}
 	else
 	{
@@ -889,22 +920,22 @@ bool Terrain::CreateTerrainChunk(int32 x, int32 z, const video::TerrainVertex * 
 		mem._data = &vertices[0];
 		mem._size = sizeof(video::TerrainVertex) * _sectionNumVertexX * _sectionNumVertexZ;
 
-		refSection._vHandle = VIDEO->CreateVertexBuffer(&mem, _declHandle);
-		Assert(refSection._vHandle.IsValid());
+		refChunk._vHandle = VIDEO->CreateVertexBuffer(&mem, _declHandle);
+		Assert(refChunk._vHandle.IsValid());
 
 		mem._data = &_chunkIndex[0];
 		mem._size = sizeof(uint32) * _sectionResolution * _sectionResolution * 2 * 3;
 
-		if (!refSection._iHandle.IsValid())
+		if (!refChunk._iHandle.IsValid())
 		{
-			refSection._iHandle = VIDEO->CreateIndexBuffer(&mem, sizeof(uint32));
+			refChunk._iHandle = VIDEO->CreateIndexBuffer(&mem, sizeof(uint32));
 		}
-		Assert(refSection._iHandle.IsValid());
+		Assert(refChunk._iHandle.IsValid());
 	}
 
-	refSection._relCenterX = (refSection._relStartX + refSection._relEndX) * 0.5f;
-	refSection._relCenterZ = (refSection._relStartZ + refSection._relEndZ) * 0.5f;
-	refSection._radius = (refSection._relCenterX - refSection._relStartX) * 1.2f;
+	refChunk._relCenterX = (refChunk._relStartX + refChunk._relEndX) * 0.5f;
+	refChunk._relCenterZ = (refChunk._relStartZ + refChunk._relEndZ) * 0.5f;
+	refChunk._radius = (refChunk._relCenterX - refChunk._relStartX) * 1.2f;
 
 	return true;
 }
@@ -919,10 +950,11 @@ void Terrain::AddHeightOnCursorPos(const Vector2 &cursorPos, float innerRadius, 
 	Vector3 worldPos;
 	if (IsIntersectRay(ray, &worldPos))
 	{
-		TerrainTilePos tilePos =  ConvertWorldPostoTilePos(worldPos);
+		TerrainVertexPos vertexPos;
+		ConvertWorldPostoVertexPos(worldPos, &vertexPos);
 
-		int32 centerX = tilePos._chunkX * TERRAIN_CHUNK_DIM + tilePos._tileX;
-		int32 centerZ = tilePos._chunkZ * TERRAIN_CHUNK_DIM + tilePos._tileZ;
+		int32 centerX = vertexPos._chunkX * TERRAIN_CHUNK_DIM + vertexPos._tileX;
+		int32 centerZ = vertexPos._chunkZ * TERRAIN_CHUNK_DIM + vertexPos._tileZ;
 
 		int32 minX, minZ, maxX, maxZ;
 		minX = centerX - radius;
@@ -936,9 +968,7 @@ void Terrain::AddHeightOnCursorPos(const Vector2 &cursorPos, float innerRadius, 
 		ClampInt(maxZ, 0, _numVertexZ - 1);
 
 		AddHeightGausian(minX, maxX, minZ, maxZ, intensity);
-
 		RebuildSection(minX, maxX, minZ, maxZ);
-
 	}
 }
 
@@ -953,16 +983,17 @@ void Terrain::SmoothOnCursorPos(const Vector2 & cursorPos, float brushRadius)
 
 	if (IsIntersectRay(ray, &worldPos))
 	{
-		TerrainTilePos tilePos = ConvertWorldPostoTilePos(worldPos);
+		TerrainVertexPos vertexPos;
+		ConvertWorldPostoVertexPos(worldPos, &vertexPos);
 
-		int32 centerX = tilePos._chunkX * TERRAIN_CHUNK_DIM + tilePos._tileX;
-		int32 centerZ = tilePos._chunkZ * TERRAIN_CHUNK_DIM + tilePos._tileZ;
+		int32 centerX = vertexPos._chunkX * TERRAIN_CHUNK_DIM + vertexPos._tileX;
+		int32 centerZ = vertexPos._chunkZ * TERRAIN_CHUNK_DIM + vertexPos._tileZ;
 
 		int32 minX, maxX, minZ, maxZ;
-		minX = centerX - radius - 3;
-		maxX = centerX + radius + 3;
-		minZ = centerZ - radius - 3;
-		maxZ = centerZ + radius + 3;
+		minX = centerX - radius - 1;
+		maxX = centerX + radius + 1;
+		minZ = centerZ - radius - 1;
+		maxZ = centerZ + radius + 1;
 
 		ClampInt(minX, 0, _numVertexX);
 		ClampInt(maxX, 0, _numVertexX);
@@ -1070,25 +1101,120 @@ TerrainChunkPos Terrain::ConvertWorldPosToChunkPos(const Vector3 & worldPos)
 	return result;
 }
 
-TerrainTilePos Terrain::ConvertWorldPostoTilePos(const Vector3 & worldPos)
+void Terrain::ConvertWorldPostoTilePos(const Vector3 & worldPos, TerrainTilePos *pOutTilePos)
 {
-	TerrainTilePos result;
-	
 	float terrainPosX = worldPos.x + (float)_terrainHalfSizeX;
 	float terrainPosZ = -worldPos.z + (float)_terrainHalfSizeZ;
 
-	result._chunkX = (int32)(terrainPosX / TERRAIN_CHUNK_DIM);
-	result._chunkZ = (int32)(terrainPosZ / TERRAIN_CHUNK_DIM);
-	int32 chunkStartX = result._chunkX * TERRAIN_CHUNK_DIM;
-	int32 chunkStartZ = result._chunkZ * TERRAIN_CHUNK_DIM;
+	pOutTilePos->_chunkX = (int32)(terrainPosX / TERRAIN_CHUNK_DIM);
+	pOutTilePos->_chunkZ = (int32)(terrainPosZ / TERRAIN_CHUNK_DIM);
 
-	result._tileX = ((int32)terrainPosX - (int32)chunkStartX);
-	result._tileZ = ((int32)terrainPosZ - (int32)chunkStartZ);
+	int32 chunkStartX = pOutTilePos->_chunkX * TERRAIN_CHUNK_DIM;
+	int32 chunkStartZ = pOutTilePos->_chunkZ * TERRAIN_CHUNK_DIM;
 
-	result._relX = (float)(terrainPosX - (float)(chunkStartX + result._tileX));
-	result._relZ = (float)(terrainPosZ - (float)(chunkStartZ + result._tileZ));
+	pOutTilePos->_tileX = ((int32)terrainPosX - (int32)chunkStartX) / TERRAIN_TILE_DIM;
+	pOutTilePos->_tileZ = ((int32)terrainPosZ - (int32)chunkStartZ) / TERRAIN_TILE_DIM;
 
-	return result;
+	pOutTilePos->_relX = (float)(terrainPosX - (float)(chunkStartX + (pOutTilePos->_tileX * TERRAIN_TILE_DIM) ));
+	pOutTilePos->_relZ = (float)(terrainPosZ - (float)(chunkStartZ + (pOutTilePos->_tileZ * TERRAIN_TILE_DIM) ));
+}
+
+void Terrain::ConvertWorldPostoVertexPos(const Vector3 & worldPos, TerrainVertexPos * pOutVertexPos)
+{
+	float terrainPosX = worldPos.x + (float)_terrainHalfSizeX;
+	float terrainPosZ = -worldPos.z + (float)_terrainHalfSizeZ;
+
+	pOutVertexPos->_chunkX = (int32)(terrainPosX / TERRAIN_CHUNK_DIM);
+	pOutVertexPos->_chunkZ = (int32)(terrainPosZ / TERRAIN_CHUNK_DIM);
+
+	int32 chunkStartX = pOutVertexPos->_chunkX * TERRAIN_CHUNK_DIM;
+	int32 chunkStartZ = pOutVertexPos->_chunkZ * TERRAIN_CHUNK_DIM;
+
+	pOutVertexPos->_tileX = ((int32)terrainPosX - (int32)chunkStartX);
+	pOutVertexPos->_tileZ = ((int32)terrainPosZ - (int32)chunkStartZ);
+
+	pOutVertexPos->_relX = (float)(terrainPosX - (float)(chunkStartX + pOutVertexPos->_tileX));
+	pOutVertexPos->_relZ = (float)(terrainPosZ - (float)(chunkStartZ + pOutVertexPos->_tileZ));
+}
+
+//TODO : Loop를 최소한으로 돌게끔 고치자
+void Terrain::ValidateTerrainChunks(const TerrainTilePos & currentPos, const TerrainTilePos & prevPos)
+{
+	int32 currentMinX = currentPos._chunkX - 1;
+	int32 currentMaxX = currentPos._chunkX + 1;
+	int32 currentMinZ = currentPos._chunkZ - 1;
+	int32 currentMaxZ = currentPos._chunkZ + 1;
+
+	ClampInt(currentMinX, 0, _xChunkCount - 1);
+	ClampInt(currentMaxX, 0, _xChunkCount - 1);
+	ClampInt(currentMinZ, 0, _zChunkCount - 1);
+	ClampInt(currentMaxZ, 0, _zChunkCount - 1);
+
+	int32 prevMinX = prevPos._chunkX - 1;
+	int32 prevMaxX = prevPos._chunkX + 1;
+	int32 prevMinZ = prevPos._chunkZ - 1;
+	int32 prevMaxZ = prevPos._chunkZ + 1;
+
+	ClampInt(prevMinX, 0, _zChunkCount - 1);
+	ClampInt(prevMaxX, 0, _zChunkCount - 1);
+	ClampInt(prevMinZ, 0, _zChunkCount - 1);
+	ClampInt(prevMaxZ, 0, _zChunkCount - 1);
+
+	std::vector<int32> toDeactivate{};
+	toDeactivate.reserve(9);
+
+	_activeChunkIndices.clear();
+	_activeChunkIndices.reserve(9);
+
+	for (int32 z = prevMinZ; z <= prevMaxZ; ++z)
+	{
+		for (int32 x = prevMinX; x <= prevMaxX; ++x)
+		{
+			toDeactivate.push_back(Index2D(x, z, _xChunkCount));
+		}
+	}
+
+	for (int32 z = currentMinZ; z <= currentMaxZ; ++z)
+	{
+		for (int32 x = currentMinX; x <= currentMaxX; ++x)
+		{
+			_activeChunkIndices.push_back(Index2D(x, z, _xChunkCount));
+		}
+	}
+
+	for (int32 i = 0; i < toDeactivate.size(); ++i)
+	{
+		bool32 hasValue = false;
+		for (int32 j = 0; j < _activeChunkIndices.size(); ++j)
+		{
+			if (toDeactivate[i] == _activeChunkIndices[j])
+			{
+				hasValue = true;
+			}
+		}
+		if (!hasValue)
+		{
+			_pChunks[toDeactivate[i]].DeactivateEntities();
+		}
+	}
+
+	for (int32 i = 0; i < _activeChunkIndices.size(); ++i)
+	{
+		bool32 hasValue = false;
+		for (int32 j = 0; j < toDeactivate.size(); ++j)
+		{
+			if (_activeChunkIndices[i] == toDeactivate[j])
+			{
+				hasValue = true;
+			}
+		}
+		if (!hasValue)
+		{
+			_pChunks[_activeChunkIndices[i]].ActivateEntities();
+		}
+	}
+	
+	_pCurrentScene->_world.Refresh();
 }
 
 void Terrain::EffectSetTexture(LPCSTR handle, LPDIRECT3DTEXTURE9 texture)
@@ -1111,19 +1237,27 @@ const Vector3 ConvertTilePosToWorldPos(const TerrainTilePos & tilePos)
 	return Vector3();
 }
 
-void Terrain::TerrainChunk::ValidateEntities()
+//플레이어가 접근하면 터레인 청크에 있는 모든 엔티티들을 활성화 시킨다
+void Terrain::TerrainChunk::ActivateEntities()
 {
-	for (int32 i = 0; i < _entities.size(); ++i)
+	for (int32 i = 0; i < TERRAIN_CHUNKS_TILE_COUNT; ++i)
 	{
-		_entities[i].Deactivate();
+		for (auto &entity : _tiles[i]._entities)
+		{
+			entity.Activate();
+		}
 	}
 }
 
-void Terrain::TerrainChunk::InvalidateEntities()
+//플레이어가 청크에서 멀어진다면.... 터레인 청크에 있는 모든 엔티티들을 비활성화 시킨다
+void Terrain::TerrainChunk::DeactivateEntities()
 {
-	for (int32 i = 0; i < _entities.size(); ++i)
+	for (int32 i = 0; i < TERRAIN_CHUNKS_TILE_COUNT; ++i)
 	{
-		_entities[i].Activate();
+		for (auto &entity : _tiles[i]._entities)
+		{
+			entity.Deactivate();
+		}
 	}
 }
 
@@ -1386,8 +1520,8 @@ void Terrain::AddHeightBlock(int32 minX, int32 maxX, int32 minZ, int32 maxZ, flo
 {
 }
 
-void Terrain::DrawAlphaTextureOnCursorPos(const Vector2 & cursorPos,
-	float innerRadius, float outterRadius, int32 channel)
+void Terrain::DrawAlphaTextureOnCursorPos(const Vector2 & cursorPos, float innerRadius, float outterRadius, 
+	int32 layer, bool32 subtract)
 {
 	Ray ray;
 	_pCurrentScene->_camera.ComputeRay(cursorPos, &ray);
@@ -1396,10 +1530,11 @@ void Terrain::DrawAlphaTextureOnCursorPos(const Vector2 & cursorPos,
 
 	if (IsIntersectRay(ray, &worldPos))
 	{
-		TerrainTilePos tilePos = ConvertWorldPostoTilePos(worldPos);
+		TerrainVertexPos vertexPos;
+		ConvertWorldPostoVertexPos(worldPos, &vertexPos);
 
-		int32 centerX = tilePos._chunkX * TERRAIN_CHUNK_DIM + tilePos._tileX;
-		int32 centerZ = tilePos._chunkZ * TERRAIN_CHUNK_DIM + tilePos._tileZ;
+		int32 centerX = vertexPos._chunkX * TERRAIN_CHUNK_DIM + vertexPos._tileX;
+		int32 centerZ = vertexPos._chunkZ * TERRAIN_CHUNK_DIM + vertexPos._tileZ;
 
 		//알파 텍스쳐의 1픽셀이 지형에 대해서 얼마의 크기인지를 구한다..
 		float pixelSize = (float)_terrainSizeX / (float)TERRAIN_ALPHA_TEXTURE_SIZE;
@@ -1423,7 +1558,17 @@ void Terrain::DrawAlphaTextureOnCursorPos(const Vector2 & cursorPos,
 		ClampInt(minPixelY, 0, TERRAIN_ALPHA_TEXTURE_SIZE - 1);
 
 		D3DLOCKED_RECT lockRect{};
-		video::Texture *pTexture = VIDEO->GetTexture(_tileSplatHandle);
+
+		//TODO : 이거 해야한다...
+		video::Texture *pTexture = nullptr;
+		if (layer == 0)
+		{
+			pTexture = VIDEO->GetTexture(_tileControl1Handle);
+		}
+		else if (layer == 1)
+		{
+			pTexture = VIDEO->GetTexture(_tileControl2Handle);
+		}
 		if (SUCCEEDED(pTexture->_ptr->LockRect(0, &lockRect, nullptr, 0)))
 		{
 			uint8 *pStart = (uint8 *)lockRect.pBits;
@@ -1436,7 +1581,7 @@ void Terrain::DrawAlphaTextureOnCursorPos(const Vector2 & cursorPos,
 				{
 					int32 in = (lockRect.Pitch * y) + (x * 4);
 
-					uint8 read = pStart[in + channel];
+					uint8 read = pStart[in + 3];
 
 					Vector3 diff = Vector3(x * pixelSize, 0.0f, y * pixelSize) -
 						Vector3(centerPixelX * pixelSize, 0.0f, centerPixelY * pixelSize);
@@ -1444,35 +1589,42 @@ void Terrain::DrawAlphaTextureOnCursorPos(const Vector2 & cursorPos,
 
 					if (length <= innerRadius)
 					{
-						write = 0xff;
+						if (subtract)
+						{
+							write = 0;
+						}
+						else
+						{
+							write = 0xff;
+						}
 					}
-					else if(length <= outterRadius)
+					else if(length <= outterRadius + EPSILON)
 					{
 						length -= innerRadius;
 						float range = (float)(outterRadius - innerRadius);
-						write =  (uint8)(((float)(range - length) / (float)(range)) * 0xff);
-
-						int a = 0;
+						if (subtract)
+						{
+							write = 255 - (uint8)(((float)(range - length) / (float)(range)) * 0xff);
+						}
+						else
+						{
+							write = (uint8)(((float)(range - length) / (float)(range)) * 0xff);
+						}
 					}
 					else
 					{
 						continue;
 					}
 
-					read = (read < write) ? write : read;
-					for (int32 i = 0; i < 4; ++i)
+					if (subtract)
 					{
-						if (i == channel)
-						{
-							pStart[in] = read;
-						}
-						else
-						{
-							pStart[in] = (uint8)((float)pStart[in] * 0.1f);
-							//pStart[in] = 0x00;
-						}
-						in++;
+						read = (read > write) ? write : read;
 					}
+					else
+					{
+						read = (read < write) ? write : read;
+					}
+					pStart[in + 3] = read;
 				}
 			}
 			pTexture->_ptr->UnlockRect(0);
@@ -1513,41 +1665,39 @@ void Terrain::LoadTextureFromConfig(const Terrain::TerrainConfig & config)
 		_tile2Handle = VIDEO->GetTexture("defaultDiffuse");
 	}
 
-	loadedHandle = VIDEO->CreateTexture(config._tile3FileName, config._tile3FileName);
-	if (loadedHandle.IsValid())
-	{
-		_tile3Handle = loadedHandle;
-	}
-	else
-	{
-		_tile3Handle = VIDEO->GetTexture("defaultDiffuse");
-	}
-
-	bool splatLoaded = false;
+	bool controlLoaded = false;
 	//만약 config에서 Splat 텍스쳐가 넘어왔다면
-	if (strlen(config._splatFileName) > 0)
+	if (strlen(config._control1Name) > 0)
 	{
-		_tileSplatHandle = VIDEO->CreateTexture(config._splatFileName);
-		if (!_tileSplatHandle.IsValid())
+		_tileControl1Handle = VIDEO->CreateTexture(config._control1Name);
+		_tileControl2Handle = VIDEO->CreateTexture(config._control2Name);
+		if (!_tileControl1Handle.IsValid())
 		{
-			_tileSplatHandle = VIDEO->GetTexture("diffuseDefault");
+			_tileControl1Handle = VIDEO->GetTexture("diffuseDefault");
+		}
+
+		if (!_tileControl2Handle.IsValid())
+		{
+			_tileControl2Handle = VIDEO->GetTexture("diffuseDefault");
 		}
 		else
 		{
-			splatLoaded = true;
+			controlLoaded = true;
 		}
 	}
-
-	//만약 config에서 Splat 텍스쳐가 넘어오지 않았다면, 새로운 텍스쳐를 생성하도록 한다...
+	//만약 config에서 Splat 텍스쳐가 넘어오지 않았다면, 새로운 텍스쳐를 두개 생성하도록 한다...
 	//그리고 모든 값을 0x00000000로 채운다.
-	if(!splatLoaded)
+	if(!controlLoaded)
 	{
-		_tileSplatHandle = VIDEO->CreateTexture(TERRAIN_ALPHA_TEXTURE_SIZE, TERRAIN_ALPHA_TEXTURE_SIZE,
+		_tileControl1Handle = VIDEO->CreateTexture(TERRAIN_ALPHA_TEXTURE_SIZE, TERRAIN_ALPHA_TEXTURE_SIZE,
 			D3DFMT_A8R8G8B8, D3DPOOL_MANAGED);
 
-		video::Texture *pTexture = VIDEO->GetTexture(_tileSplatHandle);
+		_tileControl2Handle = VIDEO->CreateTexture(TERRAIN_ALPHA_TEXTURE_SIZE, TERRAIN_ALPHA_TEXTURE_SIZE,
+			D3DFMT_A8R8G8B8, D3DPOOL_MANAGED);
+
+		video::Texture *pControl1= VIDEO->GetTexture(_tileControl1Handle);
 		D3DLOCKED_RECT lockRect{};
-		if (SUCCEEDED(pTexture->_ptr->LockRect(0, &lockRect, nullptr, 0)))
+		if (SUCCEEDED(pControl1->_ptr->LockRect(0, &lockRect, nullptr, 0)))
 		{
 			uint32 *pPixel = (uint32 *)lockRect.pBits;
 			for (int32 y = 0; y < TERRAIN_ALPHA_TEXTURE_SIZE; ++y)
@@ -1558,7 +1708,27 @@ void Terrain::LoadTextureFromConfig(const Terrain::TerrainConfig & config)
 					pPixel++;
 				}
 			}
-			pTexture->_ptr->UnlockRect(0);
+			pControl1->_ptr->UnlockRect(0);
+		}
+		//알파 텍스쳐의 Lock 을 실패하였다...
+		else
+		{
+			Console::Log("Alpha Texture Lock failed\n");
+		}
+
+		video::Texture *pControl2 = VIDEO->GetTexture(_tileControl2Handle);
+		if (SUCCEEDED(pControl2->_ptr->LockRect(0, &lockRect, nullptr, 0)))
+		{
+			uint32 *pPixel = (uint32 *)lockRect.pBits;
+			for (int32 y = 0; y < TERRAIN_ALPHA_TEXTURE_SIZE; ++y)
+			{
+				for (int32 x = 0; x < TERRAIN_ALPHA_TEXTURE_SIZE; ++x)
+				{
+					*pPixel = 0x00000000;
+					pPixel++;
+				}
+			}
+			pControl2->_ptr->UnlockRect(0);
 		}
 		//알파 텍스쳐의 Lock 을 실패하였다...
 		else
@@ -1566,7 +1736,6 @@ void Terrain::LoadTextureFromConfig(const Terrain::TerrainConfig & config)
 			Console::Log("Alpha Texture Lock failed\n");
 		}
 	}
-
 }
 
 Terrain::TerrainConfig::TerrainConfig(const TerrainConfig & other)
@@ -1578,8 +1747,8 @@ Terrain::TerrainConfig::TerrainConfig(const TerrainConfig & other)
 	strncpy(this->_tile0FileName, other._tile0FileName, MAX_FILE_NAME);
 	strncpy(this->_tile1FileName, other._tile1FileName, MAX_FILE_NAME);
 	strncpy(this->_tile2FileName, other._tile2FileName, MAX_FILE_NAME);
-	strncpy(this->_tile3FileName, other._tile3FileName, MAX_FILE_NAME);
-	strncpy(this->_splatFileName, other._splatFileName, MAX_FILE_NAME);
+	strncpy(this->_control1Name, other._control1Name, MAX_FILE_NAME);
+	strncpy(this->_control2Name, other._control2Name, MAX_FILE_NAME);
 }
 
 Terrain::TerrainConfig & Terrain::TerrainConfig::operator=(const TerrainConfig & other)
@@ -1591,7 +1760,32 @@ Terrain::TerrainConfig & Terrain::TerrainConfig::operator=(const TerrainConfig &
 	strncpy(this->_tile0FileName, other._tile0FileName, MAX_FILE_NAME);
 	strncpy(this->_tile1FileName, other._tile1FileName, MAX_FILE_NAME);
 	strncpy(this->_tile2FileName, other._tile2FileName, MAX_FILE_NAME);
-	strncpy(this->_tile3FileName, other._tile3FileName, MAX_FILE_NAME);
-	strncpy(this->_splatFileName, other._splatFileName, MAX_FILE_NAME);
+	strncpy(this->_control1Name, other._control1Name, MAX_FILE_NAME);
+	strncpy(this->_control2Name, other._control2Name, MAX_FILE_NAME);
+	return *this;
+}
+
+TerrainTilePos::TerrainTilePos()
+	:_chunkX(), _chunkZ(), 
+	_tileX(), _tileZ(), 
+	_relX(), _relZ()
+{
+}
+
+TerrainTilePos::TerrainTilePos(const TerrainTilePos & other)
+	:_chunkX(other._chunkX), _chunkZ(other._chunkZ), 
+	_tileX(other._tileX), _tileZ(other._tileZ), 
+	_relX(other._relX), _relZ(other._relZ)
+{
+}
+
+TerrainTilePos & TerrainTilePos::operator=(const TerrainTilePos & other)
+{
+	_chunkX = other._chunkX;
+	_chunkZ = other._chunkZ;
+	_tileX = other._tileX;
+	_tileZ = other._tileZ;
+	_relX = other._relX;
+	_relZ = other._relZ;
 	return *this;
 }

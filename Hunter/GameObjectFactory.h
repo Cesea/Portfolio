@@ -2,7 +2,6 @@
 #define GAME_OBJECT_FACTORY_H
 
 #include "SingletonBase.h"
-#include "GameObjectHandle.h"
 
 class IScene;
 
@@ -50,15 +49,26 @@ public :
 private :
 	IScene *_pCurrentScene;
 
-	void RegisterEvent();
-	void UnRegisterEvent();
-
 	void CreateObject(ARCHE_TYPE type, ResourceHandle handle, const Vector3 &position);
 	//void CreateObject(ARCHE_TYPE type, char *name, const Vector3 &position);
 
 	BaseGameObject *_pPlayer{};
 
 public :
+	//ObjectCreatedEvent///////////////////////////////////////////////////////
+	struct ObjectCreatedEvent
+	{
+		ObjectCreatedEvent(ARCHE_TYPE type, Entity entity, const Vector3 &world)
+			:_type(type), _entity(entity), _worldPosition(world)
+		{}
+
+		ARCHE_TYPE _type;
+		Entity _entity;
+		Vector3 _worldPosition;
+	};
+	/////////////////////////////////////////////////////////////////////////////////////
+
+	//CreateObjectOnClickEvent///////////////////////////////////////////////////////
 	struct CreateObjectOnClickEvent
 	{
 		CreateObjectOnClickEvent(ARCHE_TYPE type, ResourceHandle handle, const Vector2 &cursorPos)
@@ -72,7 +82,9 @@ public :
 		ResourceHandle _handle;
 	};
 	void Handle(const CreateObjectOnClickEvent &event);
+	/////////////////////////////////////////////////////////////////////////////////////
 
+	//CreateObjectFromSaveInfoEvent///////////////////////////////////////////////////////
 	struct CreateObjectFromSaveInfoEvent
 	{
 		CreateObjectFromSaveInfoEvent(ARCHE_TYPE type, const char *key, const Vector3 &position)
@@ -84,7 +96,9 @@ public :
 		Vector3 _position;
 	};
 	void Handle(const CreateObjectFromSaveInfoEvent &event);
+	/////////////////////////////////////////////////////////////////////////////////////
 
+	//CreateObjectOnLocationEvent///////////////////////////////////////////////////////
 	struct CreateObjectOnLocationEvent
 	{
 		CreateObjectOnLocationEvent(ARCHE_TYPE type, ResourceHandle handle, const Vector3 &position)
@@ -96,6 +110,7 @@ public :
 		Vector3 _position;
 	};
 	void Handle(const CreateObjectOnLocationEvent &event);
+	/////////////////////////////////////////////////////////////////////////////////////
 
 	EventChannel _channel;
 };

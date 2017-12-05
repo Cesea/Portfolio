@@ -4,7 +4,7 @@
 class Vector4;
 class Matrix;
 
-constexpr float EPSILON = 0.001f;
+constexpr float EPSILON = 0.01f;
 constexpr float ONE_RAD = 0.017453f;
 
 

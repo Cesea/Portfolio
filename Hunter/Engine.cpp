@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "Engine.h"
 
+#include "GameObjectFactory.h"
+
 #define HUNTER_DEBUG 1
 
 Engine *gEngine;

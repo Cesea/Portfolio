@@ -66,13 +66,13 @@ void CollisionSystem::Update(float deltaTime, float checkRange)
 			if (distance < checkRange)
 			{
 				bool checkCollision = false;
-				//µÑ´Ù °íÁ¤‰çÀ¸¸é °Ë»çÇÏÁö¾ÊÀ½
+				//ë‘˜ë‹¤ ê³ ì •Â‰ç‘›ë§Œ ê²€ì‚¬í•˜ì§€ì•ŠìŒ
 				if (collision2._locked && collision._locked) continue;
-				//µÑÁß ÇÏ³ª°¡ °íÁ¤µÇ¾îÀÖÀ½
+				//ë‘˜ì¤‘ í•˜ë‚˜ê°€ ê³ ì •ë˜ì–´ìžˆìŒ
 				//if ((collision._locked && !collision2._locked) || (!collision._locked && collision2._locked))
 				else
 				{
-					//Ãæµ¹Å¸ÀÔÀÌ ¾î¶»°Ô µÇ´Â°¡
+					//ì¶©ëŒíƒ€ìž…ì´ ì–´ë–»ê²Œ ë˜ëŠ”ê°€
 					switch (collision._type)
 					{
 					case CollisionComponent::COLLISION_TYPE_BOX:
@@ -111,7 +111,7 @@ void CollisionSystem::Update(float deltaTime, float checkRange)
 										break;
 									}
 								}
-								//¿ÀºêÁ§Æ®¿Í Ãæµ¹Çß´Ù¸é ¹Î´Ù
+								//ì˜¤ë¸Œì íŠ¸ì™€ ì¶©ëŒí–ˆë‹¤ë©´ ë¯¼ë‹¤
 								if (collision._triggerType == CollisionComponent::TRIGGER_TYPE_OBJECT)
 								{
 									IsBlocking(&transform, &aabb0, &transform2, &aabb1, 0.0f);
@@ -160,7 +160,7 @@ void CollisionSystem::Update(float deltaTime, float checkRange)
 										break;
 									}
 								}
-								//¿ÀºêÁ§Æ®¿Í Ãæµ¹Çß´Ù¸é ¹Î´Ù
+								//ì˜¤ë¸Œì íŠ¸ì™€ ì¶©ëŒí–ˆë‹¤ë©´ ë¯¼ë‹¤
 								if (collision._triggerType == CollisionComponent::TRIGGER_TYPE_OBJECT)
 								{
 									IsBlocking(&transform, &aabb0, &transform2, &aabb1, 0.0f);
@@ -212,7 +212,7 @@ void CollisionSystem::Update(float deltaTime, float checkRange)
 										break;
 									}
 								}
-								//¿ÀºêÁ§Æ®¿Í Ãæµ¹Çß´Ù¸é ¹Î´Ù
+								//ì˜¤ë¸Œì íŠ¸ì™€ ì¶©ëŒí–ˆë‹¤ë©´ ë¯¼ë‹¤
 								if (collision._triggerType == CollisionComponent::TRIGGER_TYPE_OBJECT)
 								{
 									IsBlocking(&transform, &aabb0, &transform2, &aabb1, 0.0f);
@@ -267,7 +267,7 @@ void CollisionSystem::Update(float deltaTime, float checkRange)
 										break;
 									}
 								}
-								//¿ÀºêÁ§Æ®¿Í Ãæµ¹Çß´Ù¸é ¹Î´Ù
+								//ì˜¤ë¸Œì íŠ¸ì™€ ì¶©ëŒí–ˆë‹¤ë©´ ë¯¼ë‹¤
 								if (collision._triggerType == CollisionComponent::TRIGGER_TYPE_OBJECT)
 								{
 									IsBlocking(&transform, &aabb0, &transform2, &aabb1, 0.0f);

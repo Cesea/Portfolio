@@ -39,6 +39,11 @@ void Editor::ChangeEditState(EditMode mode)
 		_editing = true;
 		gEditorOn = true;
 	} break;
+	case Editor::eSystemEdit :
+	{
+		_editing = true;
+		gEditorOn = true;
+	}
 	}
 	_currentMode = mode;
 }
@@ -131,11 +136,6 @@ void Editor::InTerrainEditMode()
 			_terrainEditor._smooth = false;
 		}
 
-		if (ImguiButton("Rebuild QuadTree"))
-		{
-			TERRAIN->ReCreateQuadTree();
-		}
-
 		if (_mouseLeftDown && 
 			!(_mx > 0  && _mx < EDITORSIZEX && _my > 0 && _my < EDITORSIZEX))
 		{
@@ -162,6 +162,12 @@ void Editor::InTerrainEditMode()
 			{
 			}
 		}
+
+		if (_leftButtonReleased)
+		{
+			TERRAIN->ReCreateQuadTree();
+		}
+
 		ImguiUnindent();
 	}
 
@@ -188,48 +194,22 @@ void Editor::InTerrainEditMode()
 		ImguiLabel("Select Texture");
 		{
 			ImguiIndent();
-			if (ImguiCheck("Texture0", _terrainEditor._r))
+			if (ImguiCheck("Layer1", _terrainEditor._layer1))
 			{
-				_terrainEditor._r = !_terrainEditor._r;
-				if (_terrainEditor._r)
+				_terrainEditor._layer1 = !_terrainEditor._layer1;
+				if (_terrainEditor._layer1)
 				{
-					_terrainEditor._channel = 0;
-					_terrainEditor._g = false;
-					_terrainEditor._b = false;
-					_terrainEditor._a = false;
+					_terrainEditor._layer = 0;
+					_terrainEditor._layer2 = false;
 				}
 			}
-			if (ImguiCheck("Texture1", _terrainEditor._g))
+			if (ImguiCheck("Layer2", _terrainEditor._layer2))
 			{
-				_terrainEditor._g = !_terrainEditor._g;
-				if (_terrainEditor._g)
+				_terrainEditor._layer2 = !_terrainEditor._layer2;
+				if (_terrainEditor._layer2)
 				{
-					_terrainEditor._channel = 1;
-					_terrainEditor._r = false;
-					_terrainEditor._b = false;
-					_terrainEditor._a = false;
-				}
-			}
-			if (ImguiCheck("Texture2", _terrainEditor._b))
-			{
-				_terrainEditor._b = !_terrainEditor._b;
-				if (_terrainEditor._b)
-				{
-					_terrainEditor._channel = 2;
-					_terrainEditor._r = false;
-					_terrainEditor._g = false;
-					_terrainEditor._a = false;
-				}
-			}
-			if (ImguiCheck("Texture3", _terrainEditor._a))
-			{
-				_terrainEditor._a = !_terrainEditor._a;
-				if (_terrainEditor._a)
-				{
-					_terrainEditor._channel = 3;
-					_terrainEditor._r = false;
-					_terrainEditor._g = false;
-					_terrainEditor._b = false;
+					_terrainEditor._layer = 1;
+					_terrainEditor._layer1 = false;
 				}
 			}
 			ImguiUnindent();
@@ -238,7 +218,7 @@ void Editor::InTerrainEditMode()
 		
 #pragma region Texture Load
 		//Tile Texture 0/////////////////////////////////////////////////////
-		ImguiLabel("Texture00");
+		ImguiLabel("Base Texture");
 		{
 			ImguiIndent();
 
@@ -246,7 +226,12 @@ void Editor::InTerrainEditMode()
 			{
 				ImguiDrawTexture(0, 0, 64, 64, TERRAIN->_tile0Handle);
 			}
-			ImguiEdit(_terrainEditor._textureName00, 120);
+
+			if (ImguiEdit(_terrainEditor._textureName00, 120))
+			{
+				_pCurrentScene->_editorInput = true;
+			}
+
 			if (ImguiButton("LoadTexture"))
 			{
 				if (_terrainEditor._textureName00 == TERRAIN->_currentConfig._tile0FileName)
@@ -273,7 +258,7 @@ void Editor::InTerrainEditMode()
 		}
 
 		//Tile Texture 1/////////////////////////////////////////////////////
-		ImguiLabel("Texture01");
+		ImguiLabel("Texture Layer1");
 		{
 			ImguiIndent();
 
@@ -281,7 +266,12 @@ void Editor::InTerrainEditMode()
 			{
 				ImguiDrawTexture(0, 0, 64, 64, TERRAIN->_tile1Handle);
 			}
-			ImguiEdit(_terrainEditor._textureName01, 120);
+
+			if (ImguiEdit(_terrainEditor._textureName01, 120))
+			{
+				_pCurrentScene->_editorInput = true;
+			}
+
 			if (ImguiButton("LoadTexture"))
 			{
 				if (_terrainEditor._textureName01 == TERRAIN->_currentConfig._tile1FileName)
@@ -308,7 +298,7 @@ void Editor::InTerrainEditMode()
 		}
 
 		//Tile Texture 2/////////////////////////////////////////////////////
-		ImguiLabel("Texture02");
+		ImguiLabel("Texture Layer2");
 		{
 			ImguiIndent();
 
@@ -316,7 +306,12 @@ void Editor::InTerrainEditMode()
 			{
 				ImguiDrawTexture(0, 0, 64, 64, TERRAIN->_tile2Handle);
 			}
-			ImguiEdit(_terrainEditor._textureName02, 120);
+
+			if (ImguiEdit(_terrainEditor._textureName02, 120))
+			{
+				_pCurrentScene->_editorInput = true;
+			}
+
 			if (ImguiButton("LoadTexture"))
 			{
 				if (_terrainEditor._textureName02 == TERRAIN->_currentConfig._tile2FileName)
@@ -342,40 +337,6 @@ void Editor::InTerrainEditMode()
 			ImguiUnindent();
 		}
 
-		//Tile Texture 3/////////////////////////////////////////////////////
-		ImguiLabel("Texture03");
-		{
-			ImguiIndent();
-			if (TERRAIN->_tile3Handle.IsValid())
-			{
-				ImguiDrawTexture(0, 0, 64, 64, TERRAIN->_tile3Handle);
-			}
-			ImguiEdit(_terrainEditor._textureName03, 120);
-			if (ImguiButton("LoadTexture"))
-			{
-				if (_terrainEditor._textureName03 == TERRAIN->_currentConfig._tile3FileName)
-				{
-					ZeroMemory(_terrainEditor._textureName03, sizeof(char) * EDITOR_MAX_NAME);
-					strncpy(_terrainEditor._textureName03, "Texture is Same", EDITOR_MAX_NAME);
-					return;
-				}
-				video::TextureHandle loadedTexture = VIDEO->CreateTexture(_terrainEditor._textureName03,
-					_terrainEditor._textureName03);
-				if (loadedTexture.IsValid())
-				{
-					VIDEO->DestroyTexture(TERRAIN->_tile3Handle);
-					TERRAIN->_tile3Handle = loadedTexture;
-					strncpy(TERRAIN->_currentConfig._tile3FileName, _terrainEditor._textureName03, EDITOR_MAX_NAME);
-				}
-				else
-				{
-					ZeroMemory(_terrainEditor._textureName03, sizeof(char) * EDITOR_MAX_NAME);
-					strncpy(_terrainEditor._textureName03, "Texture Not Found", EDITOR_MAX_NAME);
-				}
-			}
-			ImguiUnindent();
-		}
-
 #pragma endregion
 
 		//여기서 선택되어있는 텍스쳐를 그리는 작업을 실행하자...
@@ -384,7 +345,7 @@ void Editor::InTerrainEditMode()
 		{
 			TERRAIN->DrawAlphaTextureOnCursorPos(Vector2((float)_mx, (float)_my),
 				_terrainEditor._textureBrush._innerRadius, _terrainEditor._textureBrush._outterRadius,
-				_terrainEditor._channel);
+				_terrainEditor._layer, _shiftDown ? true : false);
 		}
 		ImguiUnindent();
 	}
@@ -399,23 +360,28 @@ void Editor::InTerrainEditMode()
 			_terrainEditor._editingTexture = false;
 		}
 	}
+
 	if (_terrainEditor._saveSceneInfo)
 	{
 		ImguiLabel("File Name");
 		ImguiIndent();
-		{
-			ImguiEdit(_terrainEditor._fileName, 120);
-			if (ImguiButton("Save Terrain"))
-			{
-				TERRAIN->SaveTerrain(_terrainEditor._fileName);
-				TERRAIN->_pCurrentScene->_world.SaveEntitiesInWorld("../resources/Test.ed");
-			}
 
-			if (ImguiButton("Load Terrain"))
-			{
-				TERRAIN->LoadTerrain(_terrainEditor._fileName);
-			}
+		if (ImguiEdit(_terrainEditor._fileName, 120))
+		{
+			_pCurrentScene->_editorInput = true;
 		}
+
+		if (ImguiButton("Save Terrain"))
+		{
+			TERRAIN->SaveTerrain(_terrainEditor._fileName);
+			TERRAIN->_pCurrentScene->_world.SaveEntitiesInWorld("../resources/Test.ed");
+		}
+
+		if (ImguiButton("Load Terrain"))
+		{
+			TERRAIN->LoadTerrain(_terrainEditor._fileName);
+		}
+
 		ImguiUnindent();
 
 	}
@@ -777,6 +743,129 @@ void Editor::InObjectEditMode()
 	}
 }
 
+void Editor::InSystemEditMode()
+{
+	if (ImguiCollapse("System Edit Mode", nullptr, _editing))
+	{
+		_systemEditor.Reset();
+		ChangeEditState(EditMode::eNone);
+	}
+
+	ImguiIndent();
+	{
+		//Edit Render System ///////////////////////////////////////////////////////////////////
+		if (false == _systemEditor._editRenderSystem)
+		{
+			if (ImguiCollapse("Render System", nullptr, _systemEditor._editRenderSystem))
+			{
+				_systemEditor.Reset();
+				_systemEditor._editRenderSystem = true;
+			}
+		}
+		else
+		{
+			if (ImguiCollapse("Render System", nullptr, _systemEditor._editRenderSystem))
+			{
+				_systemEditor.Reset();
+			}
+			ImguiIndent();
+			{
+				if (ImguiCheck("Render Shadow", _systemEditor._renderShadow))
+				{
+					_systemEditor._renderShadow = !_systemEditor._renderShadow;
+				}
+			}
+			ImguiUnindent();
+		}
+
+		//Edit Script System ///////////////////////////////////////////////////////////////////
+		if (false == _systemEditor._editScrptSystem)
+		{
+			if (ImguiCollapse("Script System", nullptr, _systemEditor._editScrptSystem))
+			{
+				_systemEditor.Reset();
+				_systemEditor._editScrptSystem = true;
+			}
+		}
+		else
+		{
+			if (ImguiCollapse("ScriptSystem", nullptr, _systemEditor._editScrptSystem))
+			{
+				_systemEditor.Reset();
+			}
+			ImguiIndent();
+			{
+				if (ImguiCheck("Script Running", _systemEditor._scriptRunning))
+				{
+					_systemEditor._scriptRunning = !_systemEditor._scriptRunning;
+				}
+			}
+			ImguiUnindent();
+		}
+	}
+	ImguiUnindent();
+
+}
+
+void Editor::ShowStatusWindow()
+{
+	if (false == _showStatus)
+	{
+		if (ImguiFreeCollapse("Show Status", nullptr, _showStatus, WINSIZEX - 400, 0))
+		{
+			_showStatus = !_showStatus;
+		}
+	}
+	else
+	{
+		ImguiBeginScrollArea("Status", WINSIZEX - 400, 0, 400, 600, &_scroll);
+		if (ImguiCollapse("Status", nullptr, _showStatus))
+		{
+			_showStatus = !_showStatus;
+		}
+
+		if (nullptr != _pSelectedObject)
+		{
+			TerrainTilePos tilePos = _pSelectedObject->GetTilePos();
+			ImguiLabel("Player State");
+			{
+				ImguiIndent();
+				sprintf(_statusWindow._chunkPosStr, "ChunkX : %d, ChunkZ : %d", tilePos._chunkX, tilePos._chunkZ);
+				sprintf(_statusWindow._tilePosStr, "TileX : %d, TileZ : %d", tilePos._tileX, tilePos._tileZ);
+				sprintf(_statusWindow._relPosStr, "RelX : %f, RelZ : %f", tilePos._relX, tilePos._relZ);
+
+				ImguiLabel(_statusWindow._chunkPosStr);
+				ImguiLabel(_statusWindow._tilePosStr);
+				ImguiLabel(_statusWindow._relPosStr);
+				ImguiUnindent();
+			}
+
+			ImguiSeparatorLine();
+
+			ImguiLabel("Terrain Chunk State");
+			{
+				ImguiIndent();
+				ImguiLabel(_statusWindow._chunkPosStr);
+
+				const Terrain::TerrainChunk &refChunk = TERRAIN->GetChunkAt(tilePos._chunkX, tilePos._chunkZ);
+				sprintf(_statusWindow._chunkInfoStr, "Total Num Entities : %d", refChunk._numTotalEntity);
+
+				ImguiLabel(_statusWindow._chunkInfoStr);
+
+				sprintf(_statusWindow._tileInfoStr, "Tile Num Entity : %d", 
+					refChunk._tiles[Index2D(tilePos._tileX, tilePos._tileZ, TERRAIN_TILE_DIM)]._entities.size());
+				ImguiLabel(_statusWindow._tileInfoStr);
+
+				ImguiUnindent();
+			}
+
+		}
+
+		ImguiEndScrollArea();
+	}
+}
+
+
 void Editor::UpdateInput(const InputManager & input)
 {
 	_mx = input.mouse.GetCurrentPoint().x;
@@ -785,10 +874,10 @@ void Editor::UpdateInput(const InputManager & input)
 	_mouseRightDown = input.mouse.IsDown(MOUSE_BUTTON_RIGHT);
 
 	_leftButtonPressed = input.mouse.IsPressed(MOUSE_BUTTON_LEFT);
+	_leftButtonReleased = input.mouse.IsReleased(MOUSE_BUTTON_LEFT);
 	_shiftDown = input.keyboard.GetShiftDown();
 	_key = input.keyboard.GetVKCode();
 	_scroll = -(int32)((float)input.mouse.GetWheelDelta() / 120.0f) * 6;
-	//Console::Log("%d\n", _scroll);
 }
 
 void Editor::Init(IScene *pScene)
@@ -796,7 +885,6 @@ void Editor::Init(IScene *pScene)
 	strncpy(_terrainEditor._textureName00, TERRAIN->_currentConfig._tile0FileName, EDITOR_MAX_NAME);
 	strncpy(_terrainEditor._textureName01, TERRAIN->_currentConfig._tile1FileName, EDITOR_MAX_NAME);
 	strncpy(_terrainEditor._textureName02, TERRAIN->_currentConfig._tile2FileName, EDITOR_MAX_NAME);
-	strncpy(_terrainEditor._textureName03, TERRAIN->_currentConfig._tile3FileName, EDITOR_MAX_NAME);
 
 	_terrainEditor._terrainConfig._textureMult = TERRAIN->_currentConfig._textureMult;
 	_terrainEditor._heightBrush.Init();
@@ -807,7 +895,6 @@ void Editor::Init(IScene *pScene)
 	strncpy(_terrainEditor._terrainConfig._tile0FileName, TERRAIN->_currentConfig._tile0FileName, EDITOR_MAX_NAME);
 	strncpy(_terrainEditor._terrainConfig._tile1FileName, TERRAIN->_currentConfig._tile1FileName, EDITOR_MAX_NAME);
 	strncpy(_terrainEditor._terrainConfig._tile2FileName, TERRAIN->_currentConfig._tile2FileName, EDITOR_MAX_NAME);
-	strncpy(_terrainEditor._terrainConfig._tile3FileName, TERRAIN->_currentConfig._tile3FileName, EDITOR_MAX_NAME);
 
 	_pCurrentScene = pScene;
 }
@@ -817,7 +904,7 @@ void Editor::Shutdown()
 	_pCurrentScene = nullptr;
 }
 
-bool Editor::Edit(RefVariant &object, const InputManager &input)
+void Editor::Edit(RefVariant &object, const InputManager &input)
 {
 	UpdateInput(input);
 
@@ -838,6 +925,10 @@ bool Editor::Edit(RefVariant &object, const InputManager &input)
 		if (ImguiCollapse("Object Editor", nullptr, _editing))
 		{
 			ChangeEditState(EditMode::eObjectEdit);
+		}
+		if (ImguiCollapse("System Editor", nullptr, _editing))
+		{
+			ChangeEditState(EditMode::eSystemEdit);
 		}
 	} break;
 	
@@ -867,21 +958,27 @@ bool Editor::Edit(RefVariant &object, const InputManager &input)
 
 	case Editor::eObjectEdit:
 	{
-		ImguiBeginScrollArea("ObjectE ditor", EDITORX, EDITORY, EDITORSIZEX, EDITORSIZEY, &_scroll);
+		ImguiBeginScrollArea("ObjectE Editor", EDITORX, EDITORY, EDITORSIZEX, EDITORSIZEY, &_scroll);
 		InObjectEditMode();
 		ImguiEndScrollArea();
 	} break;
+	case Editor ::eSystemEdit :
+	{
+		ImguiBeginScrollArea("System Editor", EDITORX, EDITORY, EDITORSIZEX, EDITORSIZEY, &_scroll);
+		InSystemEditMode();
+		ImguiEndScrollArea();
+	}break;
 	}
 
-	ImguiEndFrame();
+	ShowStatusWindow();
 
-	return true;
+
+	ImguiEndFrame();
 }
 
 void Editor::SetEdittingEntity(Entity & entity)
 {
 	_objectEditor.OnNewSelection(entity);
-	//_objectEditor._pSelectingEntity = &entity;
 }
 
 void Editor::Render()
@@ -941,6 +1038,9 @@ void ObjectEditor::OnNewSelection(Entity entity)
 
 void TerrainEditor::Reset()
 {
+	_layer = 0;
+	_layer1 = false;
+	_layer2 = false;
 }
 
 bool Brush::Init()

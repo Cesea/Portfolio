@@ -229,7 +229,7 @@ sampler2D ShadowSampler = sampler_state
 
 float bias = 0.01f;
 
-
+static const float SMAP_SIZE = 2048.0f;
 
 struct PS_INPUT_RECIVESHADOW
 {
@@ -244,7 +244,6 @@ struct PS_INPUT_RECIVESHADOW
 	float4 LightClipPos : TEXCOORD7;		//광원 입장에서 바라본 위치
 };
 
-
 PS_OUTPUT ps_ReciveShadow(PS_INPUT_RECIVESHADOW Input)
 {
 	PS_OUTPUT Output = (PS_OUTPUT)0;
@@ -258,7 +257,7 @@ PS_OUTPUT ps_ReciveShadow(PS_INPUT_RECIVESHADOW Input)
 	//Shadow 맵의 UV 추적
 	//( -1 ~ 1 )
 	float2 shadowUV = Input.LightClipPos.xy / Input.LightClipPos.w;
-		shadowUV.y = -shadowUV.y;		//y반전...
+	shadowUV.y = -shadowUV.y;		//y반전...
 	//0 ~ 1 의 범위
 	shadowUV = (shadowUV * 0.5f) + 0.5f;
 
@@ -343,27 +342,13 @@ PS_OUTPUT ps_ReciveShadow(PS_INPUT_RECIVESHADOW Input)
 		finalSpecular += addSpecular;
 	}
 
-
-	//
-	// Diffuse
-	//
 	float3 diffuseColor = diffTex.rgb * finalDiffuse;
 
-	//
-	// Specular 
-	//
 	float3 specularColor = tex2D(Specular, Input.Texcoord).rgb * finalSpecular;
 
-	//
-	// Emission
-	//
 	float3 emissionColor = tex2D(Emission, Input.Texcoord).rgb;
 
-	//
-	// Final Color 
-	//
 	float3 finalColor = diffuseColor + specularColor + emissionColor;
-
 
 	//행렬변환을 거친 값 z 에 행렬변환에서 얻는 가중치 w 를 나누면 0 ~ 1 사이의 깊이 값이 된다.
 	float depth = Input.FinalPos.z / Input.FinalPos.w;
@@ -381,6 +366,100 @@ PS_OUTPUT ps_ReciveShadow(PS_INPUT_RECIVESHADOW Input)
 	return Output;
 }
 
+struct ps_input_recieve_shadow_foliage
+{
+	float2 Texcoord : TEXCOORD0;
+	float3 Normal : TEXCOORD1;
+	float3 worldPos : TEXCOORD2;
+	float4 FinalPos : TEXCOORD3;
+	float4 LightClipPos : TEXCOORD4;		//광원 입장에서 바라본 위치
+};
+
+PS_OUTPUT ps_recieve_shadow_foliage(ps_input_recieve_shadow_foliage input)
+{
+	PS_OUTPUT Output = (PS_OUTPUT)0;
+
+	float4 diffTex = tex2D(Diffuse, input.Texcoord);
+	clip(diffTex.a - 0.1f);
+
+	//광원 입장에서 바라본 위치의 뎁스 값 ( 라이트 행렬을 직교이기때문에 선형으로 안핀다 )
+	float lightDepth = input.LightClipPos.z / input.LightClipPos.w;
+
+	//Shadow 맵의 UV 추적
+	//( -1 ~ 1 )
+	float2 shadowUV = input.LightClipPos.xy / input.LightClipPos.w;
+	shadowUV.y = -shadowUV.y;		//y반전...
+	//0 ~ 1 의 범위
+	shadowUV = (shadowUV * 0.5f) + 0.5f;
+
+	//현제 그려지는 놈이 위치에 DirectionLight 입장에서 써진 깊이값...
+	float shadowDepth = tex2D(ShadowSampler, shadowUV).r;
+
+	//그림자가 그려지는 상황은 shadowDepth + bias 값 보다 lightDepth 가 큰경우이다.
+
+	//최종 색
+	float3 finalDiffuse = float3(0, 0, 0);
+	float3 finalSpecular = float3(0, 0, 0);
+	//기본 라이팅 처리
+
+	//광원의 방향
+	float3 dir = float3(baseDirectionalLight._21, baseDirectionalLight._22, baseDirectionalLight._23);
+	float3 lightDir = -dir;
+
+	//광원의 컬러
+	float3 lightColor = float3(baseDirectionalLight._31, baseDirectionalLight._32, baseDirectionalLight._33) * baseDirectionalLight._34;
+
+	float NdotL = dot(lightDir, input.Normal);
+
+	float diff = NdotL;
+
+	//그림자가 그려져야 한다면 diff 는 무조건 음수가 된다 
+	if (shadowDepth + bias < lightDepth && lightDepth < 1.0f)
+		diff = abs(diff) * -1.0f;
+
+	if (diff < 0.0)
+		diff = abs(diff) * 0.3f;
+
+	//기본 광원 적용
+	finalDiffuse = lightColor * diff;
+
+	//추가되는 광원
+	float3 addDiffuse = float3(0, 0, 0);
+	//for (int i = 0; i < LightNum; i++)
+	//{
+	//	//i 인덱스의 광원이 계산되어 addDiffuse, addSpecular 에 대입된다.
+	//	ComputeLight(
+	//		addDiffuse,
+	//		addSpecular,
+	//		input.worldPos,
+	//		input.Normal,
+	//		viewDir,
+	//		i);
+
+	//	//최종 광원 량에 쌓인다.
+	//	finalDiffuse += addDiffuse;
+	//	finalSpecular += addSpecular;
+	//}
+
+	float3 diffuseColor = diffTex.rgb * finalDiffuse;
+
+	float3 finalColor = diffuseColor ;
+
+	//행렬변환을 거친 값 z 에 행렬변환에서 얻는 가중치 w 를 나누면 0 ~ 1 사이의 깊이 값이 된다.
+	float depth = input.FinalPos.z / input.FinalPos.w;
+
+	//위의 depth 값을 카메라의 near 와 far 를 이용하여 선형으로 펴준다....
+	//Perspective Projection Linear Depth
+	float z = depth;
+	float a = camFar / (camFar - camNear);
+	float b = -camNear / (camFar - camNear);
+	depth = b / (z - a);
+
+	Output.baseColor = float4(finalColor, 1);
+	Output.normalDepth = float4(input.Normal, depth);		//alpha 값에 뎁스를 썼다.
+
+	return Output;
+}
 
 
 

@@ -111,9 +111,6 @@
     <ClCompile Include="PlayerAnimationString.cpp">
       <Filter>Game\GameObjects\Player</Filter>
     </ClCompile>
-    <ClCompile Include="PlayerStates.cpp">
-      <Filter>Game\GameObjects\Player</Filter>
-    </ClCompile>
     <ClCompile Include="Meta.cpp">
       <Filter>Sub\Reflection</Filter>
     </ClCompile>
@@ -237,9 +234,6 @@
     <ClCompile Include="TransformSystem.cpp">
       <Filter>Game\GameSystems\TransformSystem</Filter>
     </ClCompile>
-    <ClCompile Include="BaseScene.cpp">
-      <Filter>Game\GameScenes\BaseScene</Filter>
-    </ClCompile>
     <ClCompile Include="MapToolScene.cpp">
       <Filter>Game\GameScenes\MapToolScene</Filter>
     </ClCompile>
@@ -260,9 +254,6 @@
     </ClCompile>
     <ClCompile Include="LizardStates.cpp">
       <Filter>Game\GameObjects\Lizard</Filter>
-    </ClCompile>
-    <ClCompile Include="GameScene.cpp">
-      <Filter>Game\GameScenes\GameScene</Filter>
     </ClCompile>
     <ClCompile Include="GameObjects.cpp" />
     <ClCompile Include="SceneChangeEffect.cpp">
@@ -306,6 +297,8 @@
     </ClCompile>
     <ClCompile Include="smoke.cpp">
       <Filter>Game\GameComponents\ParticleComponent\Particle</Filter>
+    <ClCompile Include="Inventory.cpp">
+      <Filter>Game\UI</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -460,9 +453,6 @@
       <Filter>Game\GameObjects\Player</Filter>
     </ClInclude>
     <ClInclude Include="PlayerAnimationString.h">
-      <Filter>Game\GameObjects\Player</Filter>
-    </ClInclude>
-    <ClInclude Include="PlayerStates.h">
       <Filter>Game\GameObjects\Player</Filter>
     </ClInclude>
     <ClInclude Include="Meta.h">
@@ -631,9 +621,6 @@
     <ClInclude Include="TransformSystem.h">
       <Filter>Game\GameSystems\TransformSystem</Filter>
     </ClInclude>
-    <ClInclude Include="BaseScene.h">
-      <Filter>Game\GameScenes\BaseScene</Filter>
-    </ClInclude>
     <ClInclude Include="MapToolScene.h">
       <Filter>Game\GameScenes\MapToolScene</Filter>
     </ClInclude>
@@ -654,9 +641,6 @@
     </ClInclude>
     <ClInclude Include="LizardStates.h">
       <Filter>Game\GameObjects\Lizard</Filter>
-    </ClInclude>
-    <ClInclude Include="GameScene.h">
-      <Filter>Game\GameScenes\GameScene</Filter>
     </ClInclude>
     <ClInclude Include="GameObjects.h">
       <Filter>Game\GameObjects</Filter>
@@ -699,6 +683,8 @@
     </ClInclude>
     <ClInclude Include="smoke.h">
       <Filter>Game\GameComponents\ParticleComponent\Particle</Filter>
+    <ClInclude Include="Inventory.h">
+      <Filter>Game\UI</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -804,9 +790,6 @@
     <Filter Include="Game\GameScenes\MapToolScene">
       <UniqueIdentifier>{96689cec-aa77-4b9a-acb0-39ce381becac}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Game\GameScenes\BaseScene">
-      <UniqueIdentifier>{adda8028-c28e-4720-b75d-2c2aae4e1b3a}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Sub\Dlelegate">
       <UniqueIdentifier>{a0fa6769-5acf-42cc-9648-79a4e1c13837}</UniqueIdentifier>
     </Filter>
@@ -845,9 +828,6 @@
     </Filter>
     <Filter Include="Game\GameSystems\TransformSystem">
       <UniqueIdentifier>{9b5cb8a1-0ff3-4d80-b327-297416fc5ab8}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Game\GameScenes\GameScene">
-      <UniqueIdentifier>{e5cb61c6-f7d2-4895-8f96-74274a3ca6f4}</UniqueIdentifier>
     </Filter>
     <Filter Include="Game\GameObjects\Hydra">
       <UniqueIdentifier>{8dba6765-7a19-4924-ac01-9d7a785be573}</UniqueIdentifier>

@@ -1,5 +1,7 @@
 #include "stdafx.h"
 
+#include "BaseGameObject.h"
+
 IScene::IScene()
 	:_world(4096)
 {
@@ -24,12 +26,6 @@ IScene::IScene()
 	_screenIndices[5] = 2;
 
 
-    //WORD    Stream;     // Stream index
-    //WORD    Offset;     // Offset in the stream in bytes
-    //BYTE    Type;       // Data type
-    //BYTE    Method;     // Processing method
-    //BYTE    Usage;      // Semantics
-    //BYTE    UsageIndex; // Semantic index
 
 	video::VertexDecl decl;
 	decl.Begin();
@@ -67,6 +63,7 @@ IScene::IScene()
 	video::IndexBufferHandle iBufferHandle = VIDEO->CreateIndexBuffer(&mem, sizeof(uint16), "Scene");
 
 	_pScreenIndexBuffer = VIDEO->GetIndexBuffer(iBufferHandle);
+
 }
 
 bool IScene::Init()
@@ -83,19 +80,19 @@ bool IScene::Init()
 	_camera.CreateFromWorld(_world);
 	_camera.SetRotationSpeed(2.0f);
 	_camera.SetMoveSpeed(3.0f);
-	_camera.GetEntity().GetComponent<TransformComponent>().MovePositionWorld(Vector3(0.0f, 4.0f, -6.0f));
+	//_camera.GetEntity().GetComponent<TransformComponent>().MovePositionWorld(Vector3(0.0f, 4.0f, -6.0f));
 	//메인카메라 RenderToTexture 준비
 	_camera.ReadyRenderToTexture( WINSIZEX, WINSIZEY );
 
 
-	_shadowDistance = 50.0f;
+	_shadowDistance = 30.0f;
 	_shadowCamera.CreateFromWorld(_world);
 	_shadowCamera._ortho = true;
 	_shadowCamera._camNear = 0.1f;
 	_shadowCamera._camFar = _shadowDistance * 2.0f;
 	_shadowCamera._aspect = 1;
-	_shadowCamera._orthoSize = _shadowDistance * 1.5f;	//투영크기는 그림자크기로...
-	_shadowCamera.ReadyShadowTexture(2048);
+	_shadowCamera._orthoSize = _shadowDistance * 1.0f;	//투영크기는 그림자크기로...
+	_shadowCamera.ReadyShadowTexture(1024);
 
 
 	//라이트 생성
@@ -114,8 +111,12 @@ bool IScene::Init()
 
 bool IScene::Update(float deltaTime, const InputManager & input)
 {
+	if (!_editorInput)
+	{
+		_camera.MoveAndRotate(deltaTime, input);
+	}
+	_editorInput = false;
 
-	_camera.MoveAndRotate(deltaTime,input);
 
 	_camera.UpdateMatrix();
 	_camera.UpdateCamToDevice();
@@ -248,11 +249,11 @@ void IScene::ReadyShadowMap(Terrain *pTerrain)
 	}
 
 	//쉐도우 Texture
-	//VIDEO->GetEffect(video::StaticXMesh::_sEffectHandle)->_ptr->SetTexture( "ShadowTexture", _shadowCamera.GetRenderTexture());
-	//VIDEO->GetEffect(video::StaticXMesh::_sEffectHandle)->SetMatrix( "matLightViewProjection", _shadowCamera.GetViewProjectionMatrix());
-	//
-	//VIDEO->GetEffect(video::SkinnedXMesh::_sEffectHandle)->_ptr->SetTexture( "ShadowTexture", _shadowCamera.GetRenderTexture());
-	//VIDEO->GetEffect(video::SkinnedXMesh::_sEffectHandle)->SetMatrix( "matLightViewProjection", _shadowCamera.GetViewProjectionMatrix());
+	VIDEO->GetEffect(video::StaticXMesh::_sEffectHandle)->_ptr->SetTexture( "ShadowTexture", _shadowCamera.GetRenderTexture());
+	VIDEO->GetEffect(video::StaticXMesh::_sEffectHandle)->SetMatrix( "matLightViewProjection", _shadowCamera.GetViewProjectionMatrix());
+	
+	VIDEO->GetEffect(video::SkinnedXMesh::_sEffectHandle)->_ptr->SetTexture( "ShadowTexture", _shadowCamera.GetRenderTexture());
+	VIDEO->GetEffect(video::SkinnedXMesh::_sEffectHandle)->SetMatrix( "matLightViewProjection", _shadowCamera.GetViewProjectionMatrix());
 }
 
 LPDIRECT3DTEXTURE9 IScene::GetSceneTexture()

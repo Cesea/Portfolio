@@ -121,6 +121,9 @@ bool Snake::CreateFromWorld(World & world, const Vector3 &Pos)
 
 	//이벤트 등록
 	EventChannel channel;
+
+	channel.Broadcast<GameObjectFactory::ObjectCreatedEvent>(
+		GameObjectFactory::ObjectCreatedEvent(ARCHE_SNAKE, _entity, transComp.GetWorldPosition()));
 	channel.Add<CollisionSystem::ActorTriggerEvent, Snake>(*this);
 	setEvent();
 	return true;
@@ -160,7 +163,11 @@ void Snake::Update(float deltaTime)
 			Vec3Normalize(&rotateDir, &rotateDir);
 			float distRadian = acos(
 				ClampMinusOnePlusOne(Vec3Dot(&-rotateDir, &transComp.GetForward())));
-			if (distRadian > D3DX_PI) D3DX_PI * 2 - distRadian;
+			if (distRadian > D3DX_PI)
+			{
+				distRadian = D3DX_PI * 2 - distRadian;
+			}
+
 			if (distRadian > _rotateSpeed)
 			{
 				transComp.LookDirection(-rotateDir, _rotateSpeed);

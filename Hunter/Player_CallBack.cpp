@@ -82,6 +82,19 @@ void Player::SetupCallbackAndCompression()
 
 	   AddCallbackKeysAndCompress(pController, anim, 1, &key, D3DXCOMPRESS_DEFAULT, 0.1f);
    }
+
+
+   //War Block
+   {
+	   ID3DXKeyframedAnimationSet *anim;
+	   pController->GetAnimationSetByName(PlayerAnimationString[PlayerAnimationEnum::eWarShieldBlock], (ID3DXAnimationSet **)&anim);
+
+	   D3DXKEY_CALLBACK key;
+	   key.Time = anim->GetPeriod() / 1.5f * anim->GetSourceTicksPerSecond();
+	   key.pCallbackData = (void *)&_callbackData;
+
+	   AddCallbackKeysAndCompress(pController, anim, 1, &key, D3DXCOMPRESS_DEFAULT, 0.1f);
+   }
 }
 
 HRESULT PlayerCallbackHandler::HandleCallback(UINT Track, LPVOID pCallbackData)
@@ -96,28 +109,39 @@ HRESULT PlayerCallbackHandler::HandleCallback(UINT Track, LPVOID pCallbackData)
 	case PlayerAnimationEnum::eWarSwingLeft:
 	{
 		_pPlayer->_canCombo = true;
+		_pPlayer->_pCollisionComp->_isTrigger = true;
 	}break;
 	case PlayerAnimationEnum::eWarSwingRight:
 	{
 		_pPlayer->_canCombo = true;
+		_pPlayer->_pCollisionComp->_isTrigger = true;
 	}break;
 	case PlayerAnimationEnum::eWarThrustMid :
 	{
 		_pPlayer->_canCombo = true;
+		_pPlayer->_pCollisionComp->_isTrigger = true;
 	}break;
 	case PlayerAnimationEnum::eWarWalkSwingLeft:
 	{
 		_pPlayer->_canCombo = true;
+		_pPlayer->_pCollisionComp->_isTrigger = true;
 	}break;
 	case PlayerAnimationEnum::eWarWalkSwingRight:
 	{
 		_pPlayer->_canCombo = true;
+		_pPlayer->_pCollisionComp->_isTrigger = true;
 	}break;
 	case PlayerAnimationEnum::eWarWalkThrust:
 	{
 		_pPlayer->_canCombo = true;
+		_pPlayer->_pCollisionComp->_isTrigger = true;
 	}break;
 
+	//Shield
+	case PlayerAnimationEnum::eWarShieldBlock :
+	{
+		_pPlayer->_canCombo = true;
+	}
 
 	//case PlayerAnimationEnum::eWar:
 	//{

@@ -134,7 +134,6 @@
     <ClCompile Include="Allocators.cpp" />
     <ClCompile Include="ApplicationTimer.cpp" />
     <ClCompile Include="BaseLight.cpp" />
-    <ClCompile Include="BaseScene.cpp" />
     <ClCompile Include="BaseSystem.cpp" />
     <ClCompile Include="bat.cpp" />
     <ClCompile Include="batAnimationString.cpp" />
@@ -163,13 +162,13 @@
     <ClCompile Include="GameCommand.cpp" />
     <ClCompile Include="GameObjectFactory.cpp" />
     <ClCompile Include="GameObjects.cpp" />
-    <ClCompile Include="GameScene.cpp" />
     <ClCompile Include="GizmoManager.cpp" />
     <ClCompile Include="Hydra.cpp" />
     <ClCompile Include="HydraAnimationString.cpp" />
     <ClCompile Include="HydraStates.cpp" />
     <ClCompile Include="imgui.cpp" />
     <ClCompile Include="imguiRenderer.cpp" />
+    <ClCompile Include="Inventory.cpp" />
     <ClCompile Include="IScene.cpp" />
     <ClCompile Include="Lizard.cpp" />
     <ClCompile Include="LizardAnimationString.cpp" />
@@ -185,7 +184,6 @@
     <ClCompile Include="Plane.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="PlayerAnimationString.cpp" />
-    <ClCompile Include="PlayerStates.cpp" />
     <ClCompile Include="Player_CallBack.cpp" />
     <ClCompile Include="PointLight.cpp" />
     <ClCompile Include="PSystem.cpp" />
@@ -243,7 +241,6 @@
     <ClInclude Include="ApplicationTimer.h" />
     <ClInclude Include="BaseGameObject.h" />
     <ClInclude Include="BaseLight.h" />
-    <ClInclude Include="BaseScene.h" />
     <ClInclude Include="BaseSystem.h" />
     <ClInclude Include="bat.h" />
     <ClInclude Include="batAnimationString.h" />
@@ -279,7 +276,6 @@
     <ClInclude Include="GameObjectFactory.h" />
     <ClInclude Include="GameObjectHandle.h" />
     <ClInclude Include="GameObjects.h" />
-    <ClInclude Include="GameScene.h" />
     <ClInclude Include="GameSystems.h" />
     <ClInclude Include="GameUtils.h" />
     <ClInclude Include="GizmoManager.h" />
@@ -289,6 +285,7 @@
     <ClInclude Include="imgui.h" />
     <ClInclude Include="Allocators.h" />
     <ClInclude Include="imguiRenderer.h" />
+    <ClInclude Include="Inventory.h" />
     <ClInclude Include="Lights.h" />
     <ClInclude Include="Lizard.h" />
     <ClInclude Include="LizardAnimationString.h" />
@@ -308,7 +305,6 @@
     <ClInclude Include="Plane.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="PlayerAnimationString.h" />
-    <ClInclude Include="PlayerStates.h" />
     <ClInclude Include="PointLight.h" />
     <ClInclude Include="PSystem.h" />
     <ClInclude Include="QuadTree.h" />

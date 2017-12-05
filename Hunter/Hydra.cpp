@@ -139,6 +139,8 @@ bool Hydra::CreateFromWorld(World & world, const Vector3 &Pos)
 
 	//이벤트 등록
 	EventChannel channel;
+	channel.Broadcast<GameObjectFactory::ObjectCreatedEvent>(
+		GameObjectFactory::ObjectCreatedEvent(ARCHE_HYDRA, _entity, transComp.GetWorldPosition()));
 	channel.Add<CollisionSystem::ActorTriggerEvent, Hydra>(*this);
 	setEvent();
 
@@ -571,8 +573,9 @@ void Hydra::Update(float deltaTime)
 void Hydra::Handle(const CollisionSystem::ActorTriggerEvent & event)
 {
 	if (event._entity1 != _entity) return;
-	CollisionComponent & _collision = event._entity2.GetComponent<CollisionComponent>();
-	switch (_collision._triggerType)
+	CollisionComponent & collision = event._entity2.GetComponent<CollisionComponent>();
+
+	switch (collision._triggerType)
 	{
 		//플레이어와 충돌했다(내가 가해자)
 	case CollisionComponent::TRIGGER_TYPE_PLAYER:
@@ -588,12 +591,20 @@ void Hydra::Handle(const CollisionSystem::ActorTriggerEvent & event)
 			_hp -= 50;
 			if (_hp <= 0)
 			{
-				_state = HYDRASTATE_DEATH;
-				_pStateMachine->ChangeState(META_TYPE(HydraDeadState)->Name());
+				resetAllCount();
+				_state = HYDRASTATE_HURT;
+				_pStateMachine->ChangeState(META_TYPE(HydraHurt1State)->Name());
+				_battle = true;
+				_hp -= 50;
+				if (_hp <= 0)
+				{
+					_state = HYDRASTATE_DEATH;
+					_pStateMachine->ChangeState(META_TYPE(HydraDeadState)->Name());
+				}
 			}
 			_isHurt = true;
 		}
-		break;
+	} break;
 		//오브젝트와 충돌했다
 	case CollisionComponent::TRIGGER_TYPE_OBJECT:
 		break;

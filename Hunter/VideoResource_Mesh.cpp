@@ -678,8 +678,17 @@ namespace video
 		pEffect->SetMatrix("matWorld", matWorld);
 
 		//Effect 로 그리기 시작
-		HRESULT result = pEffect->SetTechnique(ArcheToString(type));
-		//HRESULT result = pEffect->SetTechnique("Base");
+		//HRESULT result = pEffect->SetTechnique(ArcheToString(type));
+		HRESULT  result;
+		if (type == ARCHE_GRASS)
+		{
+			result = pEffect->SetTechnique("ReciveShadowFoliage");
+		}
+		else
+		{
+			result = pEffect->SetTechnique("ReciveShadow");
+		}
+
 
 		uint32 passNum = pEffect->BeginEffect();
 
@@ -725,7 +734,8 @@ namespace video
 
 			for (uint32 m = 0; m < this->_numMaterial; m++) 
 			{
-
+				pEffect->SetTexture("DiffuseTexture", *VIDEO->GetTexture(_diffuseTextures[m]));
+				pEffect->CommitChanges();
 				_pMesh->DrawSubset(m);
 			}
 			pEffect->EndPass();
@@ -943,7 +953,7 @@ namespace video
 			if (nullptr != pBoneMesh->BufBoneCombos)
 			{
 				video::Effect *pEffect = VIDEO->GetEffect(_sEffectHandle);
-				pEffect->SetTechnique("Skinned");
+				pEffect->SetTechnique("RecieveShadowSkinned");
 
 				LPD3DXBONECOMBINATION pBoneComb =
 					(LPD3DXBONECOMBINATION)(pBoneMesh->BufBoneCombos->GetBufferPointer());
@@ -988,7 +998,7 @@ namespace video
 			else
 			{
 				video::Effect *pEffect = VIDEO->GetEffect(_sEffectHandle);
-				pEffect->SetTechnique("Static");
+				pEffect->SetTechnique("RecieveShadowStaitc");
 				pEffect->SetMatrix("matWorld", pBone->CombinedTransformationMatrix);
 				for (DWORD i = 0; i < pBoneMesh->NumAttributesGroup; i++)
 				{
@@ -1087,7 +1097,7 @@ namespace video
 				pEffect->SetMatrix("matWorld", pBone->CombinedTransformationMatrix);
 				for (DWORD i = 0; i < pBoneMesh->NumAttributesGroup; i++)
 				{
-					//pEffect->SetTexture("DiffuseTexture", *VIDEO->GetTexture(pBoneMesh->_diffuseTextures[i]));
+					pEffect->SetTexture("DiffuseTexture", *VIDEO->GetTexture(pBoneMesh->_diffuseTextures[i]));
 					//pEffect->SetTexture("SpecularTexture", *VIDEO->GetTexture(pBoneMesh->_specularTextures[i]));
 					//pEffect->SetTexture("NormalTexture", *VIDEO->GetTexture(pBoneMesh->_normalTextures[i]));
 					//pEffect->SetTexture("EmissionTexture", *VIDEO->GetTexture(pBoneMesh->_emissionTexture[i]));

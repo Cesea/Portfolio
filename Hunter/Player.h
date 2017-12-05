@@ -5,9 +5,7 @@
 #include "PlayerAnimationString.h"
 
 class Camera;
-
 class Player;
-class PlayerStateMachine;
 
 struct PlayerCallbackData
 {
@@ -26,8 +24,8 @@ private :
 
 class Player : public BaseGameObject
 {
-	friend class PlayerStateMachine;
 	friend class PlayerCallbackHandler;
+	friend class Camera;
 public :
 	friend class PlayerStanceState;
 public :
@@ -42,6 +40,8 @@ public :
 	void Handle(const InputManager::KeyPressedEvent &event);
 	void Handle(const InputManager::MousePressedEvent &event);
 
+	void Handle(const CollisionSystem::ActorTriggerEvent &event);
+
 	void SetLinkCamera(Camera* camera) { _camera = camera; }
 
 public:
@@ -53,6 +53,8 @@ public:
 		PLAYERSTATE_ATTACK,
 		PLAYERSTATE_BLOCK,
 		PLAYERSTATE_MOVEATTACK,
+		PLAYERSTATE_HURT,
+		PLAYERSTATE_DEAD,
 	};
 private :
 	PLAYERSTATE _state;
@@ -66,20 +68,24 @@ private :
 	void MoveAndRotate(float deltaTime);
 
 	PlayerCallbackData _callbackData;
-	PlayerStateMachine *_pStateMachine;
 	GameCommand _currentCommand;
-	ActionComponent *_pActionComp{};
-	TransformComponent *_pTransformComp{};
+	GameCommand _prevCommand;
 	void QueueAction(const Action &action);
 
-	TerrainTilePos _tilePos;
+	void RepositionEntity(const TerrainTilePos &currentPos, const TerrainTilePos &prevPos);
+
+	ActionComponent *_pActionComp{};
+	TransformComponent *_pTransformComp{};
+	CollisionComponent *_pCollisionComp{};
 
 private :
 	EventChannel _channel;
 	float _walkSpeed{2.0f};
 	float _runSpeed{5.0f};
-	float _rotationSpeed{ 0.05f };
-	float _backRotationSpeed{ 0.03f };
+
+	float _rotationSpeed{ 6.0f };
+
+	int32 _hp{ 400 };
 
 	//int32 _stamina{ 100 };
 
@@ -91,7 +97,14 @@ private :
 	StopWatch _attackToStanceTimer;
 	int32 _comboCount{};
 
+	StopWatch _attackTriggerTimer;
+
 	bool32 _canCombo{false};
+
+	float _targetRotation{};
+	float _currentRotation{};
+
+	bool32 _camRotated{false};
 
 public :
 

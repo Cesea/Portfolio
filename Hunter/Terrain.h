@@ -7,19 +7,13 @@ class IScene;
 class QuadTree;
 
 constexpr int32 TERRAIN_SHOW_EXTENT = 2;
-
 constexpr int32 TERRAIN_CHUNK_DIM = 64;
+constexpr int32 TERRAIN_ALPHA_TEXTURE_SIZE = 1024;
 
-constexpr int32 TERRAIN_ALPHA_TEXTURE_SIZE = 512;
+constexpr int32 TERRAIN_TILE_DIM = 8;
+constexpr int32 TERRAIN_TILE_RES = 8;
+constexpr int32 TERRAIN_CHUNKS_TILE_COUNT = 64;
 
-#define MAX_FILE_NAME 256
-
-//constexpr int32 TERRAIN_HORI_SIZE = 1024;
-//constexpr int32 TERRAIN_VERT_SIZE = 1024;
-//constexpr int32 TERRAIN_HORI_HALF_SIZE = TERRAIN_HORI_SIZE / 2;
-//constexpr int32 TERRAIN_VERT_HALF_SIZE = TERRAIN_VERT_SIZE / 2;
-//constexpr int32 TERRAIN_HORI_CHUNK_COUNT = TERRAIN_HORI_SIZE / TERRAIN_CHUNK_DIM;
-//constexpr int32 TERRAIN_VERT_CHUNK_COUNT = TERRAIN_VERT_SIZE / TERRAIN_CHUNK_DIM;
 
 //터레인 하나의 청크에 대한 위치이다
 struct TerrainChunkPos
@@ -31,29 +25,33 @@ struct TerrainChunkPos
 	float _relZ{};
 };
 
-
 //청크 안에서
 struct TerrainTilePos
 {
+	TerrainTilePos();
+	TerrainTilePos(const TerrainTilePos &other);
+	TerrainTilePos & operator=(const TerrainTilePos &other);
+
 	int32 _chunkX;
 	int32 _chunkZ;
+
+	int32 _tileX;
+	int32 _tileZ;
+
+	float _relX;
+	float _relZ;
+};
+
+struct TerrainVertexPos
+{
+	int32 _chunkX{};
+	int32 _chunkZ{};
 
 	int32 _tileX{};
 	int32 _tileZ{};
 
 	float _relX{};
 	float _relZ{};
-};
-
-struct TerrainGrid
-{
-	int32 _chunkX{};
-	int32 _chunkZ{};
-
-	int32 _gridX{};
-	int32 _gridZ{};
-
-	std::vector<ResourceHandle> _objects;
 };
 
 class Terrain : public SingletonBase<Terrain>
@@ -72,24 +70,37 @@ public:
 
 		float _textureMult{};
 
-		char _tile0FileName[MAX_FILE_NAME]{0, };
-		char _tile1FileName[MAX_FILE_NAME]{0, };
-		char _tile2FileName[MAX_FILE_NAME]{0, };
-		char _tile3FileName[MAX_FILE_NAME]{0, };
-		char _splatFileName[MAX_FILE_NAME]{0, };
+		char _tile0FileName[MAX_FILE_NAME]{ 0, };
+		char _tile1FileName[MAX_FILE_NAME]{ 0, };
+		char _tile2FileName[MAX_FILE_NAME]{ 0, };
+		char _control1Name[MAX_FILE_NAME]{ 0, };
+		char _control2Name[MAX_FILE_NAME]{ 0, };
 	};
 
-	struct TerrainFace 
+	struct TerrainFace
 	{
 		uint32 i0;
 		uint32 i1;
 		uint32 i2;
 	};
 
+	struct TerrainTile
+	{
+		
+
+		int32 _chunkX{};
+		int32 _chunkZ{};
+
+		int32 _tileX{};
+		int32 _tileZ{};
+
+		std::vector<Entity> _entities{};
+	};
+
 	struct TerrainChunk
 	{
-		void ValidateEntities();
-		void InvalidateEntities();
+		void ActivateEntities();
+		void DeactivateEntities();
 
 		TerrainChunkPos _chunkPos;
 
@@ -110,23 +121,23 @@ public:
 		video::VertexBufferHandle _vHandle{};
 		video::IndexBufferHandle _iHandle{};
 
-		//만약에 터레인 에디터에서 버텍스 정보가 변경되었다면 dirty를 true로 바꾸고....
-		//smoothing을 가하는 정보로 사용한다??
-		bool32 _dirty{false};
+		int32 _numTotalEntity{};
 
-		//QuadTree* _pQuadTree{};  //쿼드 트리
+		TerrainTile _tiles[TERRAIN_CHUNKS_TILE_COUNT]{0, };
+
 		const video::TerrainVertex *_pVertices;
-
-		std::vector<Entity> _entities;
 	};
 
-	Terrain() {}
+	Terrain();
 	~Terrain();
+
+	//Event Related /////////////////////////////////////////////////////
+	void RegisterEvents();
+	void UnRegisterEvents();
+	void Handle(const GameObjectFactory::ObjectCreatedEvent &event);
 
 	void SetScene(IScene *pScene) { _pCurrentScene = pScene; }
 	bool Create(const Terrain::TerrainConfig &config, bool32 inEditMode);
-
-	void RegisterEvents();
 
 	void Destroy();
 
@@ -144,13 +155,32 @@ public:
 	void AddEntityToSection(const Entity &entity, const Vector3 &position);
 
 	TerrainChunkPos ConvertWorldPosToChunkPos(const Vector3 &worldPos);
-	TerrainTilePos ConvertWorldPostoTilePos(const Vector3 &worldPos);
+	void ConvertWorldPostoTilePos(const Vector3 & worldPos, TerrainTilePos *pOutTilePos);
+	void ConvertWorldPostoVertexPos(const Vector3 &worldPos, TerrainVertexPos *pOutVertexPos);
+
+	void ValidateTerrainChunks(const TerrainTilePos &currentPos, const TerrainTilePos &prevPos);
+
+	//void UpdateTerrainTilePos(TerrainTilePos &tilePos);
 
 	//const Vector3 ConvertChunkPosToWorldPos(const TerrainChunkPos &chunkPos);
-	const Vector3 ConvertTilePosToWorldPos(const TerrainTilePos &tilePos);
+	//const Vector3 ConvertTilePosToWorldPos(const TerrainTilePos &tilePos);
 
 	void EffectSetTexture(LPCSTR handle, LPDIRECT3DTEXTURE9 texture);
 	void EffectSetMatrix(LPCSTR handle, const Matrix &matrix);
+
+	inline TerrainChunk &GetChunkAt(int32 x, int32 z) 
+	{ 
+		Assert(x >= 0 && x < _xChunkCount ); Assert(z >= 0 && z < _zChunkCount ); 
+		return _pChunks[Index2D(x, z, _xChunkCount)]; 
+	}
+	inline TerrainChunk &GetChunkAt(int32 index) 
+	{
+		Assert(index > 0 && index < (_xChunkCount * _zChunkCount) ); 
+		return _pChunks[index]; 
+	}
+
+	inline int32 GetXChunkCount() { return _xChunkCount; }
+	inline int32 GetZChunkCount() { return _zChunkCount; }
 
 private:
 	//bool CreateInGame(const Terrain::TerrainConfig &config);
@@ -174,8 +204,8 @@ private:
 
 	void SmoothSection(int32 minX, int32 maxX, int32 minZ, int32 maxZ);
 
-	void DrawAlphaTextureOnCursorPos(const Vector2 & cursorPos, float innerRadius, 
-		float outterRadius, int32 channel);
+	void DrawAlphaTextureOnCursorPos(const Vector2 & cursorPos, float innerRadius,
+		float outterRadius, int32 layer, bool32 subtract);
 
 	void LoadTextureFromConfig(const Terrain::TerrainConfig &config);
 
@@ -203,7 +233,7 @@ private:
 	int32 _totalCellNum{}; //총 셀수
 	int32 _numTotalFace{};		//삼각형 갯수
 
-	int32 _sectionResolution{64};
+	int32 _sectionResolution{ 64 };
 	int32 _sectionNumCellX;
 	int32 _sectionNumCellZ;
 	int32 _sectionNumVertexX;
@@ -229,8 +259,8 @@ private:
 	video::TextureHandle _tile0Handle{};
 	video::TextureHandle _tile1Handle{};
 	video::TextureHandle _tile2Handle{};
-	video::TextureHandle _tile3Handle{};
-	video::TextureHandle _tileSplatHandle{};
+	video::TextureHandle _tileControl1Handle{};
+	video::TextureHandle _tileControl2Handle{};
 
 	video::TerrainVertex *_terrainVertices{};
 	TerrainFace *_chunkIndex{};
@@ -240,8 +270,7 @@ private:
 
 	TerrainChunk *_pChunks{};
 
-	//플레이어의 청크위치를 받으면서 월드를 업데이트 시킨다
-	TerrainTilePos *_mainTilePos;
+	std::vector<int32> _activeChunkIndices;
 };
 
 #define TERRAIN Terrain::GetInstance()

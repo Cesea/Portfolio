@@ -16,10 +16,14 @@ public :
 	virtual bool CreateFromWorld(World &world, const Vector3 &pos) = 0;
 	Entity &GetEntity() { return _entity; }
 
+	const TerrainTilePos &GetTilePos() const { return _tilePos; }
 
 protected :
 	Entity _entity;
 	int32 _animationEnum;
+
+	TerrainTilePos _tilePos;
+	TerrainTilePos _prevTilePos;
 };
 
 class GameObjectAnimationCallbackHandler : public ID3DXAnimationCallbackHandler

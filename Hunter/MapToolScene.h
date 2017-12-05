@@ -1,17 +1,13 @@
 #ifndef MAP_TOOL_SCENE_H
 #define MAP_TOOL_SCENE_H
 
-#include "TransformSystem.h"
-#include "RenderSystem.h"
-#include "ScriptSystem.h"
-#include "ActionSystem.h"
-#include "CollisionSystem.h"
-#include "ParticleSystem.h"
 #include "IScene.h"
 
 #include "WorldEditor.h"
 #include "Player.h"
 #include "Snake.h"
+
+#include "UI.h"
 
 class MapToolScene : public IScene
 {
@@ -35,8 +31,6 @@ public:
 	virtual const char *GetSceneName();
 protected :
 	Editor *_editor{};
-
-	Entity trash;
 
 public:
 	virtual void Handle(const Editor::GetObjectFromSceneEvent &event);

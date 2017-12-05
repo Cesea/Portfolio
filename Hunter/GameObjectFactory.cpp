@@ -20,6 +20,7 @@ void GameObjectFactory::Release()
 	_pPlayer = nullptr;
 }
 
+//NOTE : ëª¨ë“  ì˜¤ë¸Œì íŠ¸ë¥¼ ìƒì„±í•˜ë©´ ObjectCreated Eventë¥¼ ë°œìƒì‹œí‚¨ë‹¤
 void GameObjectFactory::CreateObject(ARCHE_TYPE type, ResourceHandle handle, const Vector3 & position)
 {
 	switch (type)
@@ -50,8 +51,10 @@ void GameObjectFactory::CreateObject(ARCHE_TYPE type, ResourceHandle handle, con
 		collision._boundingSphere._radius = pMesh->_meshBoundInfo._radius;
 		collision._locked = true;
 		collision._triggerType = CollisionComponent::TRIGGER_TYPE_OBJECT;
-		collision._type = CollisionComponent::COLLISION_TYPE_BOX;
-		entity.Activate();
+
+		//entity.Activate();
+		_channel.Broadcast<GameObjectFactory::ObjectCreatedEvent>(
+			ObjectCreatedEvent(ARCHE_ROCK, entity, transform.GetWorldPosition()));
 
 	}break;
 	case ARCHE_TREE:
@@ -80,8 +83,11 @@ void GameObjectFactory::CreateObject(ARCHE_TYPE type, ResourceHandle handle, con
 		collision._boundingSphere._localCenter = pMesh->_meshBoundInfo._center;
 		collision._boundingSphere._radius = pMesh->_meshBoundInfo._radius;
 		collision._locked = true;
-		collision._type = CollisionComponent::COLLISION_TYPE_BOX;
-		entity.Activate();
+
+		//entity.Activate();
+
+		_channel.Broadcast<GameObjectFactory::ObjectCreatedEvent>(
+			ObjectCreatedEvent(ARCHE_TREE, entity, transform.GetWorldPosition()));
 	}break;
 
 	case ARCHE_TREETRUNK :
@@ -110,9 +116,9 @@ void GameObjectFactory::CreateObject(ARCHE_TYPE type, ResourceHandle handle, con
 		collision._boundingSphere._localCenter = pMesh->_meshBoundInfo._center;
 		collision._boundingSphere._radius = pMesh->_meshBoundInfo._radius;
 		collision._locked = true;
-		collision._type = CollisionComponent::COLLISION_TYPE_BOX;
-		entity.Activate();
 
+		_channel.Broadcast<GameObjectFactory::ObjectCreatedEvent>(
+			ObjectCreatedEvent(ARCHE_TREETRUNK, entity, transform.GetWorldPosition()));
 	}break;
 
 	case ARCHE_GRASS:
@@ -143,7 +149,8 @@ void GameObjectFactory::CreateObject(ARCHE_TYPE type, ResourceHandle handle, con
 		collision._type = CollisionComponent::COLLISION_TYPE_BOX;
 		collision._locked = true;
 
-		entity.Activate();
+		_channel.Broadcast<GameObjectFactory::ObjectCreatedEvent>(
+			ObjectCreatedEvent(ARCHE_GRASS, entity, transform.GetWorldPosition()));
 	}break;
 
 	case ARCHE_MUSHROOM :
@@ -174,18 +181,21 @@ void GameObjectFactory::CreateObject(ARCHE_TYPE type, ResourceHandle handle, con
 		collision._type = CollisionComponent::COLLISION_TYPE_BOX;
 		collision._locked = true;
 
-		entity.Activate();
+		//entity.Activate();
+
+		_channel.Broadcast<GameObjectFactory::ObjectCreatedEvent>(
+			ObjectCreatedEvent(ARCHE_MUSHROOM, entity, transform.GetWorldPosition()));
 	}break;
 
 	case ARCHE_HERO :
 	{
-		//NOTE : SetLinkCamera¸¦ ÀÌ·¸°Ô ÇÒ¶§ MultiThreadedLoadingÀ» ÇÒ¶§ ÅÍÁú ¼ö ÀÖ´Ù
+		//NOTE : SetLinkCameraë¥¼ ì´ë ‡ê²Œ í• ë•Œ MultiThreadedLoadingì„ í• ë•Œ í„°ì§ˆ ìˆ˜ ìžˆë‹¤
 		Player* _player = new Player();
 		_player->SetLinkCamera(&_pCurrentScene->_camera);
 		_pCurrentScene->_gameObjects.push_back(_player);
 		BaseGameObject *pBack = _pCurrentScene->_gameObjects.back();
 		pBack->CreateFromWorld(_pCurrentScene->_world,Vector3(0,0,0));
-		//NOTE : ¿©±â¼­ ÇÃ·¹ÀÌ¾îÀÇ Æ÷ÀÎÅÍ¸¦ ÀúÀåÇÏ°í´Â ÀÖÁö¸¸, ³ªÁß¿¡´Â Å°°ªÀ¸·Î Ã£À» ¼ö ÀÖ°Ô²û ¹Ù²ã¾ß ÇÑ´Ù...
+		//NOTE : ì—¬ê¸°ì„œ í”Œë ˆì´ì–´ì˜ í¬ì¸í„°ë¥¼ ì €ìž¥í•˜ê³ ëŠ” ìžˆì§€ë§Œ, ë‚˜ì¤‘ì—ëŠ” í‚¤ê°’ìœ¼ë¡œ ì°¾ì„ ìˆ˜ ìžˆê²Œë” ë°”ê¿”ì•¼ í•œë‹¤...
 		_pPlayer = pBack;
 	}break;
 	case ARCHE_BAT :
@@ -193,36 +203,42 @@ void GameObjectFactory::CreateObject(ARCHE_TYPE type, ResourceHandle handle, con
 		_pCurrentScene->_gameObjects.push_back(new Bat());
 		BaseGameObject *pBack = _pCurrentScene->_gameObjects.back();
 		pBack->CreateFromWorld(_pCurrentScene->_world, position);
+
 	}break;
 	case ARCHE_CAT :
 	{
 		_pCurrentScene->_gameObjects.push_back(new Cat());
 		BaseGameObject *pBack = _pCurrentScene->_gameObjects.back();
 		pBack->CreateFromWorld(_pCurrentScene->_world, position);
+
 	}break;
 	case ARCHE_LIZARD:
 	{
 		_pCurrentScene->_gameObjects.push_back(new Lizard());
 		BaseGameObject *pBack = _pCurrentScene->_gameObjects.back();
 		pBack->CreateFromWorld(_pCurrentScene->_world, position);
+
 	}break;
 	case ARCHE_SNAKE:
 	{
 		_pCurrentScene->_gameObjects.push_back(new Snake());
 		BaseGameObject *pBack = _pCurrentScene->_gameObjects.back();
 		pBack->CreateFromWorld(_pCurrentScene->_world, position);
+
 	}break;
 	case ARCHE_TURTLE :
 	{
 		_pCurrentScene->_gameObjects.push_back(new Turtle());
 		BaseGameObject *pBack = _pCurrentScene->_gameObjects.back();
 		pBack->CreateFromWorld(_pCurrentScene->_world, position);
+
 	}break;
 	case ARCHE_HYDRA :
 	{
 		_pCurrentScene->_gameObjects.push_back(new Hydra());
 		BaseGameObject *pBack = _pCurrentScene->_gameObjects.back();
 		pBack->CreateFromWorld(_pCurrentScene->_world, position);
+
 	}break;
 	}
 }

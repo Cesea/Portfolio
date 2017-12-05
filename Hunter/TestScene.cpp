@@ -162,7 +162,7 @@ bool TestScene::SceneInit()
 	_camera.SetRotationSpeed(10.0f);
 	_camera.SetMoveSpeed(20.0f);
 	_camera.GetEntity().GetComponent<TransformComponent>().MovePositionWorld(Vector3(0.0f, 4.0f, -6.0f));
-	_camera.SetTargetObject(GAMEOBJECTFACTORY->GetPlayerObject());
+	//_camera.SetTargetObject(GAMEOBJECTFACTORY->GetPlayerObject());
 
 	//_channel.Broadcast<GameObjectFactory::CreateObjectOnLocationEvent>(
 	//	GameObjectFactory::CreateObjectOnLocationEvent(ARCHE_SNAKE, ResourceHandle(), Vector3(0.0f, 5.0f, 0.0f)));

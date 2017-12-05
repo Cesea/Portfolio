@@ -2,12 +2,16 @@
 #define I_SCENE_H
 
 #include "World.h"
-#include "Terrain.h"
 #include "Camera.h"
-#include "BaseGameObject.h"
-#include "GameSystems.h"
+
+#include "TransformSystem.h"
+#include "RenderSystem.h"
+#include "ActionSystem.h"
+#include "ScriptSystem.h"
+#include "CollisionSystem.h"
 
 class EnvironmentSphere;
+class BaseGameObject;
 
 namespace video
 {
@@ -44,8 +48,8 @@ public :
 	void Release();
 	bool Render();
 
-	//PostEffect±îÁö ¸ğµÎ ·»´õ ÇÑ´Ù...
-	//¸ŞÀÎ Ä«¸Ş¶óÀÇ RenderToTexture ¸¸ ¾÷µ¥ÀÌÆ®ÇÑ´Ù.
+	//PostEffectê¹Œì§€ ëª¨ë‘ ë Œë” í•œë‹¤...
+	//ë©”ì¸ ì¹´ë©”ë¼ì˜ RenderToTexture ë§Œ ì—…ë°ì´íŠ¸í•œë‹¤.
 	bool RenderToMainCamTexture();
 
 	void ReadyShadowMap(Terrain *pTerrain);
@@ -89,6 +93,8 @@ protected :
 	ActionSystem _actionSystem;
 	CollisionSystem _collisionSystem;
 	ParticleSystem _particleSystem;
+
+	bool32 _editorInput{ false };
 
 public :
 };
