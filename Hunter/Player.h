@@ -102,6 +102,8 @@ private :
 	bool _verticalInputRecieved{false};
 	bool _horizontalInputRecieved{false};
 
+	float _targetRotation{};
+
 public :
 
 	struct PlayerImformationEvent

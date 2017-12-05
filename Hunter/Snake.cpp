@@ -157,7 +157,11 @@ void Snake::Update(float deltaTime)
 			Vec3Normalize(&rotateDir, &rotateDir);
 			float distRadian = acos(
 				ClampMinusOnePlusOne(Vec3Dot(&-rotateDir, &transComp.GetForward())));
-			if (distRadian > D3DX_PI) D3DX_PI * 2 - distRadian;
+			if (distRadian > D3DX_PI)
+			{
+				distRadian = D3DX_PI * 2 - distRadian;
+			}
+
 			if (distRadian > _rotateSpeed)
 			{
 				transComp.LookDirection(-rotateDir, _rotateSpeed);

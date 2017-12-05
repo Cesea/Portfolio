@@ -78,7 +78,7 @@ bool Player::CreateFromWorld(World & world, const Vector3 &Pos)
 
    //Plyer의 맴버 변수들을 셋팅해주자
    _combatToPeaceTimer.Reset(2.0f);
-   _moveToStanceTimer.Reset(0.35f);
+   _moveToStanceTimer.Reset(0.20f);
    _attackToStanceTimer.Reset(0.4f);
    _attackTriggerTimer.Reset(0.08f);
 
@@ -244,12 +244,6 @@ void Player::Update(float deltaTime)
 					_currentMovement._horizontal = HORIZONTAL_MOVEMENT_RIGHT;
 					this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eStrafeRight));
 				}
-				else if (_currentCommand._movement._vertical == VERTICAL_MOVEMENT_DOWN)
-				{
-					_currentMovement._vertical = VERTICAL_MOVEMENT_DOWN;
-					_currentMovement._horizontal = HORIZONTAL_MOVEMENT_NONE;
-					this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWalkingBack));
-				}
 			}
 			else if (_currentMovement._horizontal == HORIZONTAL_MOVEMENT_RIGHT)
 			{
@@ -257,12 +251,6 @@ void Player::Update(float deltaTime)
 				{
 					_currentMovement._horizontal = HORIZONTAL_MOVEMENT_LEFT;
 					this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eStrafeLeft));
-				}
-				else if (_currentCommand._movement._vertical == VERTICAL_MOVEMENT_DOWN)
-				{
-					_currentMovement._vertical = VERTICAL_MOVEMENT_DOWN;
-					_currentMovement._horizontal = HORIZONTAL_MOVEMENT_NONE;
-					this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWalkingBack));
 				}
 			}
 
@@ -311,12 +299,6 @@ void Player::Update(float deltaTime)
 					_currentMovement._horizontal = HORIZONTAL_MOVEMENT_RIGHT;
 					this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWarMovingRight));
 				}
-				else if (_currentCommand._movement._vertical == VERTICAL_MOVEMENT_DOWN)
-				{
-					_currentMovement._vertical = VERTICAL_MOVEMENT_DOWN;
-					_currentMovement._horizontal = HORIZONTAL_MOVEMENT_NONE;
-					this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWarRetreat));
-				}
 			}
 			else if (_currentMovement._horizontal == HORIZONTAL_MOVEMENT_RIGHT)
 			{
@@ -324,12 +306,6 @@ void Player::Update(float deltaTime)
 				{
 					_currentMovement._horizontal = HORIZONTAL_MOVEMENT_LEFT;
 					this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWarMovingLeft));
-				}
-				else if (_currentCommand._movement._vertical == VERTICAL_MOVEMENT_DOWN)
-				{
-					_currentMovement._vertical = VERTICAL_MOVEMENT_DOWN;
-					_currentMovement._horizontal = HORIZONTAL_MOVEMENT_NONE;
-					this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWarRetreat));
 				}
 			}
          }
@@ -689,22 +665,85 @@ void Player::Handle(const InputManager::KeyPressedEvent & event)
 	   {
 		   if (inputCode == 'J')
 		   {
-			   _pTransformComp->LookDirection(-_pTransformComp->GetRight(), +0.5f);
+			   _pTransformComp->LookDirection(-_pTransformComp->GetRight(), PI_DIV_4);
 		   }
 		   else if (inputCode == 'L')
 		   {
-			   _pTransformComp->LookDirection(-_pTransformComp->GetRight(), -0.5f);
+			   _pTransformComp->LookDirection(-_pTransformComp->GetRight(), -PI_DIV_4);
 		   }
 	   }
 	   else if(_animationEnum == PlayerAnimationEnum::eWalkingBack ||
 		   _animationEnum == PlayerAnimationEnum::eWarRetreat)
 	   {
-
+		   if (inputCode == 'J')
+		   {
+			   _pTransformComp->LookDirection(-_pTransformComp->GetRight(), -PI_DIV_4);
+		   }
+		   else if (inputCode == 'L')
+		   {
+			   _pTransformComp->LookDirection(-_pTransformComp->GetRight(), +PI_DIV_4);
+		   }
+	   }
+	   else if (_animationEnum == PlayerAnimationEnum::eStrafeLeft || 
+		   _animationEnum == PlayerAnimationEnum::eWarMovingLeft)
+	   {
+		   if (inputCode == 'I')
+		   {
+			   _currentMovement._vertical = VERTICAL_MOVEMENT_UP;
+			   this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWalk));
+			   _pTransformComp->LookDirection(-_pTransformComp->GetRight(), +PI_DIV_4);
+		   }
+		   else if (inputCode == 'K')
+		   {
+			   _currentMovement._vertical = VERTICAL_MOVEMENT_DOWN;
+			   if (_inCombat)
+			   {
+				   this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWarRetreat));
+			   }
+			   else
+			   {
+				   this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWalkingBack));
+			   }
+			   _pTransformComp->LookDirection(-_pTransformComp->GetRight(), -PI_DIV_4);
+		   }
+	   }
+	   else if (_animationEnum == PlayerAnimationEnum::eStrafeRight ||
+		   _animationEnum == PlayerAnimationEnum::eWarMovingRight)
+	   {
+		   if (inputCode == 'I')
+		   {
+			   _currentMovement._vertical = VERTICAL_MOVEMENT_UP;
+			   this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWalk));
+			   _pTransformComp->LookDirection(-_pTransformComp->GetRight(), -PI_DIV_4);
+		   }
+		   else if (inputCode == 'K')
+		   {
+			   _currentMovement._vertical = VERTICAL_MOVEMENT_DOWN;
+			   if (_inCombat)
+			   {
+				   this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWarRetreat));
+			   }
+			   else
+			   {
+				   this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWalkingBack));
+			   }
+			   _pTransformComp->LookDirection(-_pTransformComp->GetRight(), +PI_DIV_4);
+		   }
 	   }
 
    } break;
    case Player::PLAYERSTATE_RUN:
-	   break;
+   {
+	   if (inputCode == 'J')
+	   {
+		   _pTransformComp->LookDirection(-_pTransformComp->GetRight(), PI_DIV_4);
+	   }
+	   else if (inputCode == 'L')
+	   {
+		   _pTransformComp->LookDirection(-_pTransformComp->GetRight(), -PI_DIV_4);
+	   }
+
+   } break;
    case Player::PLAYERSTATE_ATTACK:
 	   break;
    case Player::PLAYERSTATE_BLOCK:
@@ -719,45 +758,6 @@ void Player::Handle(const InputManager::KeyPressedEvent & event)
 	   break;
    }
 
-   if('J' == inputCode)
-   {
-	   if (_currentCommand._movement._horizontal != HORIZONTAL_MOVEMENT_NONE)
-	   {
-		   return;
-	   }
-      _currentCommand._type = GAMECOMMAND_MOVE;
-      _currentCommand._movement._horizontal = HORIZONTAL_MOVEMENT_LEFT;
-   }
-
-   if ('L' == inputCode)
-   {
-	   if (_currentCommand._movement._horizontal != HORIZONTAL_MOVEMENT_NONE)
-	   {
-		   return;
-	   }
-      _currentCommand._type = GAMECOMMAND_MOVE;
-      _currentCommand._movement._horizontal = HORIZONTAL_MOVEMENT_RIGHT;
-   }
-
-   if('I' == inputCode)
-   {
-	   if (_currentCommand._movement._vertical != VERTICAL_MOVEMENT_NONE)
-	   {
-		   return;
-	   }
-      _currentCommand._type = GAMECOMMAND_MOVE;
-      _currentCommand._movement._vertical = VERTICAL_MOVEMENT_UP;
-   }
-
-   if ('K' == inputCode)
-   {
-	   if (_currentCommand._movement._vertical != VERTICAL_MOVEMENT_NONE)
-	   {
-		   return;
-	   }
-      _currentCommand._type = GAMECOMMAND_MOVE;
-      _currentCommand._movement._vertical = VERTICAL_MOVEMENT_DOWN;
-   }
 }
 
 void Player::Handle(const InputManager::KeyReleasedEvent & event)
@@ -771,148 +771,234 @@ void Player::Handle(const InputManager::KeyReleasedEvent & event)
    } break;
    case Player::PLAYERSTATE_MOVE:
    {
+	   //if (inputCode == 'I')
+	   //{
+		  // if (_currentMovement._vertical == VERTICAL_MOVEMENT_UP)
+		  // {
+			 //  if (_currentCommand._movement._vertical == VERTICAL_MOVEMENT_DOWN)
+			 //  {
+				//   _currentMovement._vertical = VERTICAL_MOVEMENT_DOWN;
+				//   if (_inCombat) { this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWarRetreat)); }
+				//   else { this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWalkingBack)); }
+			 //  }
+			 //  else if(_currentCommand._movement._horizontal == HORIZONTAL_MOVEMENT_NONE)
+			 //  {
+				//   _currentMovement._vertical = VERTICAL_MOVEMENT_NONE;
+				//   _state = PLAYERSTATE_STANCE;
+				//   if (_inCombat) { this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWarCombatMode)); }
+				//   else { this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eStandingFree)); }
+			 //  }
+		  // }
+	   //}
+	   //else if (inputCode == 'K')
+	   //{
+		  // if (_currentMovement._vertical == VERTICAL_MOVEMENT_DOWN)
+		  // {
+			 //  if (_currentCommand._movement._vertical == VERTICAL_MOVEMENT_UP)
+			 //  {
+				//   _currentMovement._vertical = VERTICAL_MOVEMENT_UP;
+				//   this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWalk));
+			 //  }
+			 //  else if(_currentCommand._movement._horizontal == HORIZONTAL_MOVEMENT_NONE)
+			 //  {
+				//   _currentMovement._vertical = VERTICAL_MOVEMENT_NONE;
+				//   _state = PLAYERSTATE_STANCE;
+				//   if (_inCombat) { this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWarCombatMode)); }
+				//   else { this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eStandingFree)); }
+			 //  }
+		  // }
+		  // if (_currentCommand._movement._horizontal == HORIZONTAL_MOVEMENT_LEFT)
+		  // {
+			 //  if (false == _inCombat)
+			 //  {
+				//   _currentMovement._horizontal = HORIZONTAL_MOVEMENT_LEFT;
+				//   this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eStrafeLeft));
+			 //  }
+			 //  else
+			 //  {
+				//   _currentMovement._horizontal = HORIZONTAL_MOVEMENT_LEFT;
+				//   this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWarMovingLeft));
+			 //  }
+		  // }
+		  // else if (_currentCommand._movement._horizontal == HORIZONTAL_MOVEMENT_RIGHT)
+		  // {
+			 //  if (false == _inCombat)
+			 //  {
+				//   _currentMovement._horizontal = HORIZONTAL_MOVEMENT_RIGHT;
+				//   this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eStrafeRight));
+			 //  }
+			 //  else
+			 //  {
+				//   _currentMovement._horizontal = HORIZONTAL_MOVEMENT_RIGHT;
+				//   this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWarMovingRight));
+			 //  }
+		  // }
+	   //}
 	   if (inputCode == 'I')
 	   {
-		   if (_currentMovement._vertical == VERTICAL_MOVEMENT_UP)
+		   if (_currentCommand._movement._horizontal == HORIZONTAL_MOVEMENT_LEFT)
 		   {
-			   if (_currentCommand._movement._vertical == VERTICAL_MOVEMENT_DOWN)
-			   {
-				   _currentMovement._vertical = VERTICAL_MOVEMENT_DOWN;
+			   _currentMovement._vertical = VERTICAL_MOVEMENT_NONE;
+			   _currentMovement._horizontal = HORIZONTAL_MOVEMENT_LEFT;
+			   _pTransformComp->LookDirection(-_pTransformComp->GetRight(), -PI_DIV_4);
 
-				   if (_inCombat) { this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWarRetreat)); }
-				   else { this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWalkingBack)); }
-			   }
-			   else if(_currentCommand._movement._horizontal == HORIZONTAL_MOVEMENT_NONE)
+			   if (_inCombat)
 			   {
-				   _currentMovement._vertical = VERTICAL_MOVEMENT_NONE;
-				   _state = PLAYERSTATE_STANCE;
-				   if (_inCombat) { this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWarCombatMode)); }
-				   else { this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eStandingFree)); }
+				   this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWarMovingLeft));
+			   }
+			   else
+			   {
+				   this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eStrafeLeft));
+			   }
+		   }
+		   else if (_currentCommand._movement._horizontal == HORIZONTAL_MOVEMENT_RIGHT)
+		   {
+			   _currentMovement._vertical = VERTICAL_MOVEMENT_NONE;
+			   _currentMovement._horizontal = HORIZONTAL_MOVEMENT_RIGHT;
+
+			   _pTransformComp->LookDirection(-_pTransformComp->GetRight(), +PI_DIV_4);
+
+			   if (_inCombat)
+			   {
+				   this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWarMovingRight));
+			   }
+			   else
+			   {
+				   this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eStrafeRight));
 			   }
 		   }
 	   }
 	   else if (inputCode == 'K')
 	   {
-		   if (_currentMovement._vertical == VERTICAL_MOVEMENT_DOWN)
-		   {
-			   if (_currentCommand._movement._vertical == VERTICAL_MOVEMENT_UP)
-			   {
-				   _currentMovement._vertical = VERTICAL_MOVEMENT_UP;
-
-				   this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWalk));
-			   }
-			   else if(_currentCommand._movement._horizontal == HORIZONTAL_MOVEMENT_NONE)
-			   {
-				   _currentMovement._vertical = VERTICAL_MOVEMENT_NONE;
-				   _state = PLAYERSTATE_STANCE;
-				   if (_inCombat) { this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWarCombatMode)); }
-				   else { this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eStandingFree)); }
-			   }
-		   }
-
 		   if (_currentCommand._movement._horizontal == HORIZONTAL_MOVEMENT_LEFT)
 		   {
-			   if (false == _inCombat)
+			   _currentMovement._vertical = VERTICAL_MOVEMENT_NONE;
+			   _currentMovement._horizontal = HORIZONTAL_MOVEMENT_LEFT;
+			   _pTransformComp->LookDirection(-_pTransformComp->GetRight(), +PI_DIV_4);
+
+			   if (_inCombat)
 			   {
-				   _currentMovement._horizontal = HORIZONTAL_MOVEMENT_LEFT;
-				   this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eStrafeLeft));
+				   this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWarMovingLeft));
 			   }
 			   else
 			   {
-				   _currentMovement._horizontal = HORIZONTAL_MOVEMENT_LEFT;
-				   this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWarMovingLeft));
+				   this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eStrafeLeft));
 			   }
 		   }
 		   else if (_currentCommand._movement._horizontal == HORIZONTAL_MOVEMENT_RIGHT)
 		   {
-			   if (false == _inCombat)
+			   _currentMovement._vertical = VERTICAL_MOVEMENT_NONE;
+			   _currentMovement._horizontal = HORIZONTAL_MOVEMENT_RIGHT;
+
+			   _pTransformComp->LookDirection(-_pTransformComp->GetRight(), -PI_DIV_4);
+
+			   if (_inCombat)
 			   {
-				   _currentMovement._horizontal = HORIZONTAL_MOVEMENT_RIGHT;
-				   this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eStrafeRight));
+				   this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWarMovingRight));
 			   }
 			   else
 			   {
-				   _currentMovement._horizontal = HORIZONTAL_MOVEMENT_RIGHT;
-				   this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWarMovingRight));
+				   this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eStrafeRight));
 			   }
 		   }
 	   }
 
 	   if (inputCode == 'J')
 	   {
-		   if (_currentMovement._horizontal == HORIZONTAL_MOVEMENT_LEFT)
+		   if (_animationEnum == PlayerAnimationEnum::eWalk)
 		   {
-			   if (_currentCommand._movement._vertical == VERTICAL_MOVEMENT_UP)
-			   {
-				   _currentMovement._vertical = VERTICAL_MOVEMENT_UP;
-				   _currentMovement._horizontal = HORIZONTAL_MOVEMENT_NONE;
-				   this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWalk));
-			   }
-			   else if (_currentCommand._movement._vertical == VERTICAL_MOVEMENT_DOWN)
-			   {
-				   _currentMovement._vertical = VERTICAL_MOVEMENT_DOWN;
-				   _currentMovement._horizontal = HORIZONTAL_MOVEMENT_NONE;
-				   if (_inCombat)
-				   {
-					   this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWarRetreat));
-				   }
-				   else
-				   {
-					   this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWalkingBack));
-				   }
-			   }
-			   else if(_currentCommand._movement._vertical == VERTICAL_MOVEMENT_NONE)
-			   {
-				   MovementStop(_currentMovement);
-				   _state = PLAYERSTATE_STANCE;
-				   if (_inCombat)
-				   {
-					   this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWarCombatMode));
-				   }
-				   else
-				   {
-					   this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eStandingFree));
-				   }
-			   }
+			   _pTransformComp->LookDirection(-_pTransformComp->GetRight(), -PI_DIV_4);
 		   }
+		   else if (_animationEnum == PlayerAnimationEnum::eWalkingBack ||
+			   _animationEnum == PlayerAnimationEnum::eWarRetreat)
+		   {
+			   _pTransformComp->LookDirection(-_pTransformComp->GetRight(), PI_DIV_4);
+		   }
+
+		   //if (_currentMovement._horizontal == HORIZONTAL_MOVEMENT_LEFT)
+		   //{
+			  // if (_currentCommand._movement._vertical == VERTICAL_MOVEMENT_UP)
+			  // {
+				 //  _currentMovement._vertical = VERTICAL_MOVEMENT_UP;
+				 //  _currentMovement._horizontal = HORIZONTAL_MOVEMENT_NONE;
+				 //  this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWalk));
+			  // }
+			  // else if (_currentCommand._movement._vertical == VERTICAL_MOVEMENT_DOWN)
+			  // {
+				 //  _currentMovement._vertical = VERTICAL_MOVEMENT_DOWN;
+				 //  _currentMovement._horizontal = HORIZONTAL_MOVEMENT_NONE;
+				 //  if (_inCombat)
+				 //  {
+					//   this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWarRetreat));
+				 //  }
+				 //  else
+				 //  {
+					//   this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWalkingBack));
+				 //  }
+			  // }
+			  // else if(_currentCommand._movement._vertical == VERTICAL_MOVEMENT_NONE)
+			  // {
+				 //  MovementStop(_currentMovement);
+				 //  _state = PLAYERSTATE_STANCE;
+				 //  if (_inCombat)
+				 //  {
+					//   this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWarCombatMode));
+				 //  }
+				 //  else
+				 //  {
+					//   this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eStandingFree));
+				 //  }
+			  // }
+		   //}
 	   }
 	   else if (inputCode == 'L')
 	   {
-		   if (_currentMovement._horizontal == HORIZONTAL_MOVEMENT_RIGHT)
+		   if (_animationEnum == PlayerAnimationEnum::eWalk)
 		   {
-			   if (_currentCommand._movement._vertical == VERTICAL_MOVEMENT_UP)
-			   {
-				   _currentMovement._vertical = VERTICAL_MOVEMENT_UP;
-				   _currentMovement._horizontal = HORIZONTAL_MOVEMENT_NONE;
-				   this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWalk));
-			   }
-			   else if (_currentCommand._movement._vertical == VERTICAL_MOVEMENT_DOWN)
-			   {
-				   _currentMovement._vertical = VERTICAL_MOVEMENT_DOWN;
-				   _currentMovement._horizontal = HORIZONTAL_MOVEMENT_NONE;
-				   if (_inCombat)
-				   {
-					   this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWarRetreat));
-				   }
-				   else
-				   {
-					   this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWalkingBack));
-				   }
-			   }
-			   else if(_currentCommand._movement._vertical == VERTICAL_MOVEMENT_NONE)
-			   {
-				   MovementStop(_currentMovement);
-				   _state = PLAYERSTATE_STANCE;
-				   if (_inCombat)
-				   {
-					   this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWarCombatMode));
-				   }
-				   else
-				   {
-					   this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eStandingFree));
-				   }
-			   }
+			   _pTransformComp->LookDirection(-_pTransformComp->GetRight(), PI_DIV_4);
 		   }
+		   else if (_animationEnum == PlayerAnimationEnum::eWalkingBack ||
+			   _animationEnum == PlayerAnimationEnum::eWarRetreat)
+		   {
+			   _pTransformComp->LookDirection(-_pTransformComp->GetRight(), -PI_DIV_4);
+		   }
+
+
+		   //if (_currentMovement._horizontal == HORIZONTAL_MOVEMENT_RIGHT)
+		   //{
+			  // if (_currentCommand._movement._vertical == VERTICAL_MOVEMENT_UP)
+			  // {
+				 //  _currentMovement._vertical = VERTICAL_MOVEMENT_UP;
+				 //  _currentMovement._horizontal = HORIZONTAL_MOVEMENT_NONE;
+				 //  this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWalk));
+			  // }
+			  // else if (_currentCommand._movement._vertical == VERTICAL_MOVEMENT_DOWN)
+			  // {
+				 //  _currentMovement._vertical = VERTICAL_MOVEMENT_DOWN;
+				 //  _currentMovement._horizontal = HORIZONTAL_MOVEMENT_NONE;
+				 //  if (_inCombat)
+				 //  {
+					//   this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWarRetreat));
+				 //  }
+				 //  else
+				 //  {
+					//   this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWalkingBack));
+				 //  }
+			  // }
+			  // else if(_currentCommand._movement._vertical == VERTICAL_MOVEMENT_NONE)
+			  // {
+				 //  MovementStop(_currentMovement);
+				 //  _state = PLAYERSTATE_STANCE;
+				 //  if (_inCombat)
+				 //  {
+					//   this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWarCombatMode));
+				 //  }
+				 //  else
+				 //  {
+					//   this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eStandingFree));
+				 //  }
+			  // }
+		   //}
 	   }
    } break;
    case Player::PLAYERSTATE_RUN:
@@ -924,6 +1010,15 @@ void Player::Handle(const InputManager::KeyReleasedEvent & event)
 		   MovementStop(_currentMovement);
 		   this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eStandingFree));
 	   }
+	   else if (inputCode == 'J')
+	   {
+		   _pTransformComp->LookDirection(-_pTransformComp->GetRight(), -PI_DIV_4);
+	   }
+	   else if (inputCode == 'L')
+	   {
+		   _pTransformComp->LookDirection(-_pTransformComp->GetRight(), +PI_DIV_4);
+	   }
+
    } break;
    case Player::PLAYERSTATE_ATTACK:
    {
