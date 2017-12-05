@@ -37,23 +37,22 @@ void Particle::updateParticle(float timeDelta)
 	_vel += _vel + _accel*timeDelta;
 }
 
-PARTICLE_VERTEX Particle::GetParticleVertex(const VEC_COLOR & colors, const VEC_SCALE & scales)
+void Particle::GetParticleVertex(LPPARTICLE_VERTEX pOut, const VEC_COLOR & colors, const VEC_SCALE & scales)
 {
-	PARTICLE_VERTEX out;
-	out.pos = _pos;
+	pOut->pos = _pos;
 
 	float t = _time / _maxTime;
 	if (t >= 1)
 	{
-		out.color = colors[colors.size() - 1];
-		out.size = _scale * scales[scales.size() - 1];
-		return out;
+		pOut->color = colors[colors.size() - 1];
+		pOut->size = _scale * scales[scales.size() - 1];
+		return;
 	}
 	else if (t == 0)
 	{
-		out.color = colors[0];
-		out.size = _scale * scales[0];
-		return out;
+		pOut->color = colors[0];
+		pOut->size = _scale * scales[0];
+		return;
 	}
 
 	float finalSize = 0.0f;
@@ -71,7 +70,7 @@ PARTICLE_VERTEX Particle::GetParticleVertex(const VEC_COLOR & colors, const VEC_
 	float fN = position - startIndex;
 
 	finalSize = scales[startIndex] + interval*fN;
-	out.size = _scale * finalSize;
+	pOut->size = _scale * finalSize;	
 
 
 	//컬러 보간
@@ -84,8 +83,5 @@ PARTICLE_VERTEX Particle::GetParticleVertex(const VEC_COLOR & colors, const VEC_
 	//색상 보간
 	D3DXCOLOR color;
 	D3DXColorLerp(	&color,&colors[startIndex],&colors[endIndex],fN);
-	out.color = (DWORD)color;
-
-
-	return out;
+	pOut->color = (DWORD)color;
 }

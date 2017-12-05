@@ -286,9 +286,6 @@
     <ClCompile Include="Player_CallBack.cpp">
       <Filter>Game\GameObjects\Player</Filter>
     </ClCompile>
-    <ClCompile Include="ParticleSystem.cpp">
-      <Filter>Game\GameSystems\ParticleSystem</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Lights.h" />
@@ -658,9 +655,6 @@
     <ClInclude Include="UI.h">
       <Filter>Game\UI</Filter>
     </ClInclude>
-    <ClInclude Include="ParticleSystem.h">
-      <Filter>Game\GameSystems\ParticleSystem</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Hunter.rc" />
@@ -824,9 +818,6 @@
     </Filter>
     <Filter Include="Game\UI">
       <UniqueIdentifier>{f9d4daea-0faa-4308-80d3-c5fb35018809}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Game\GameSystems\ParticleSystem">
-      <UniqueIdentifier>{511a1096-6ec3-4a89-854b-550cff4781ef}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>
