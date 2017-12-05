@@ -83,6 +83,8 @@ private :
 	float _walkSpeed{2.0f};
 	float _runSpeed{5.0f};
 
+	float _rotationSpeed{ 5.0f };
+
 	int32 _hp{ 400 };
 
 	//int32 _stamina{ 100 };
@@ -99,10 +101,11 @@ private :
 
 	bool32 _canCombo{false};
 
-	bool _verticalInputRecieved{false};
-	bool _horizontalInputRecieved{false};
+	//bool _verticalInputRecieved{false};
+	//bool _horizontalInputRecieved{false};
 
 	float _targetRotation{};
+	float _currentRotation{};
 
 public :
 

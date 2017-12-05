@@ -524,6 +524,58 @@ void Player::Update(float deltaTime)
 
 void Player::MoveAndRotate(float deltaTime)
 {
+	//if (_currentRotation < 0.0f)
+	//{
+	//	_currentRotation += D3DX_PI * 2.0f;
+	//}
+	//else if (_currentRotation > D3DX_PI * 2.0f)
+	//{
+	//	_currentRotation -= D3DX_PI * 2.0f;
+	//}
+
+	//if (_targetRotation < 0.0f)
+	//{
+	//	_targetRotation += D3DX_PI * 2.0f;
+	//}
+	//else if (_targetRotation > D3DX_PI * 2.0f)
+	//{
+	//	_targetRotation -= D3DX_PI * 2.0f;
+	//}
+
+	float absMinus = absFloat(_targetRotation) - absFloat(_currentRotation);
+
+	Console::Log("%f, %f\n", _currentRotation, _targetRotation);
+	if (!FloatZero(absMinus * 0.2f))
+	{
+		if (_targetRotation < 0.0f)
+		{
+			_pTransformComp->LookDirection(-_pTransformComp->GetRight(), -_rotationSpeed * deltaTime);
+			_currentRotation -= _rotationSpeed * deltaTime;
+		}
+		else if (_targetRotation > 0.0f)
+		{
+			_pTransformComp->LookDirection(-_pTransformComp->GetRight(), _rotationSpeed * deltaTime);
+			_currentRotation += _rotationSpeed * deltaTime;
+		}
+		else if (_targetRotation == 0.0f)
+		{
+			if (_currentRotation < 0.0f)
+			{
+				_pTransformComp->LookDirection(-_pTransformComp->GetRight(), _rotationSpeed * deltaTime);
+				_currentRotation += _rotationSpeed * deltaTime;
+			}
+			else if (_currentRotation > 0.0f)
+			{
+				_pTransformComp->LookDirection(-_pTransformComp->GetRight(), -_rotationSpeed * deltaTime);
+				_currentRotation -= _rotationSpeed * deltaTime;
+			}
+		}
+	}
+	else
+	{
+		_currentRotation = _targetRotation;
+	}
+
 	////움직이지 않는 상태일때는 Move
 	if (_state == PLAYERSTATE_STANCE ||
 		_state == PLAYERSTATE_ATTACK ||
@@ -665,11 +717,11 @@ void Player::Handle(const InputManager::KeyPressedEvent & event)
 	   {
 		   if (inputCode == 'J')
 		   {
-			   _pTransformComp->LookDirection(-_pTransformComp->GetRight(), PI_DIV_4);
+			   _targetRotation = PI_DIV_4;
 		   }
 		   else if (inputCode == 'L')
 		   {
-			   _pTransformComp->LookDirection(-_pTransformComp->GetRight(), -PI_DIV_4);
+			   _targetRotation = -PI_DIV_4;
 		   }
 	   }
 	   else if(_animationEnum == PlayerAnimationEnum::eWalkingBack ||
@@ -677,11 +729,11 @@ void Player::Handle(const InputManager::KeyPressedEvent & event)
 	   {
 		   if (inputCode == 'J')
 		   {
-			   _pTransformComp->LookDirection(-_pTransformComp->GetRight(), -PI_DIV_4);
+			   _targetRotation = -PI_DIV_4;
 		   }
 		   else if (inputCode == 'L')
 		   {
-			   _pTransformComp->LookDirection(-_pTransformComp->GetRight(), +PI_DIV_4);
+			   _targetRotation = PI_DIV_4;
 		   }
 	   }
 	   else if (_animationEnum == PlayerAnimationEnum::eStrafeLeft || 
@@ -691,7 +743,8 @@ void Player::Handle(const InputManager::KeyPressedEvent & event)
 		   {
 			   _currentMovement._vertical = VERTICAL_MOVEMENT_UP;
 			   this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWalk));
-			   _pTransformComp->LookDirection(-_pTransformComp->GetRight(), +PI_DIV_4);
+
+			   _targetRotation = PI_DIV_4;
 		   }
 		   else if (inputCode == 'K')
 		   {
@@ -704,7 +757,7 @@ void Player::Handle(const InputManager::KeyPressedEvent & event)
 			   {
 				   this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWalkingBack));
 			   }
-			   _pTransformComp->LookDirection(-_pTransformComp->GetRight(), -PI_DIV_4);
+			   _targetRotation = -PI_DIV_4;
 		   }
 	   }
 	   else if (_animationEnum == PlayerAnimationEnum::eStrafeRight ||
@@ -714,7 +767,7 @@ void Player::Handle(const InputManager::KeyPressedEvent & event)
 		   {
 			   _currentMovement._vertical = VERTICAL_MOVEMENT_UP;
 			   this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWalk));
-			   _pTransformComp->LookDirection(-_pTransformComp->GetRight(), -PI_DIV_4);
+			   _targetRotation = -PI_DIV_4;
 		   }
 		   else if (inputCode == 'K')
 		   {
@@ -727,7 +780,7 @@ void Player::Handle(const InputManager::KeyPressedEvent & event)
 			   {
 				   this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWalkingBack));
 			   }
-			   _pTransformComp->LookDirection(-_pTransformComp->GetRight(), +PI_DIV_4);
+			   _targetRotation = PI_DIV_4;
 		   }
 	   }
 
@@ -736,11 +789,11 @@ void Player::Handle(const InputManager::KeyPressedEvent & event)
    {
 	   if (inputCode == 'J')
 	   {
-		   _pTransformComp->LookDirection(-_pTransformComp->GetRight(), PI_DIV_4);
+		   _targetRotation = PI_DIV_4;
 	   }
 	   else if (inputCode == 'L')
 	   {
-		   _pTransformComp->LookDirection(-_pTransformComp->GetRight(), -PI_DIV_4);
+		   _targetRotation = -PI_DIV_4;
 	   }
 
    } break;
@@ -840,8 +893,8 @@ void Player::Handle(const InputManager::KeyReleasedEvent & event)
 		   {
 			   _currentMovement._vertical = VERTICAL_MOVEMENT_NONE;
 			   _currentMovement._horizontal = HORIZONTAL_MOVEMENT_LEFT;
-			   _pTransformComp->LookDirection(-_pTransformComp->GetRight(), -PI_DIV_4);
 
+			   _targetRotation = 0.0f;
 			   if (_inCombat)
 			   {
 				   this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWarMovingLeft));
@@ -856,8 +909,7 @@ void Player::Handle(const InputManager::KeyReleasedEvent & event)
 			   _currentMovement._vertical = VERTICAL_MOVEMENT_NONE;
 			   _currentMovement._horizontal = HORIZONTAL_MOVEMENT_RIGHT;
 
-			   _pTransformComp->LookDirection(-_pTransformComp->GetRight(), +PI_DIV_4);
-
+			   _targetRotation = 0.0f;
 			   if (_inCombat)
 			   {
 				   this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWarMovingRight));
@@ -874,7 +926,7 @@ void Player::Handle(const InputManager::KeyReleasedEvent & event)
 		   {
 			   _currentMovement._vertical = VERTICAL_MOVEMENT_NONE;
 			   _currentMovement._horizontal = HORIZONTAL_MOVEMENT_LEFT;
-			   _pTransformComp->LookDirection(-_pTransformComp->GetRight(), +PI_DIV_4);
+			   _targetRotation = 0.0f;
 
 			   if (_inCombat)
 			   {
@@ -890,7 +942,7 @@ void Player::Handle(const InputManager::KeyReleasedEvent & event)
 			   _currentMovement._vertical = VERTICAL_MOVEMENT_NONE;
 			   _currentMovement._horizontal = HORIZONTAL_MOVEMENT_RIGHT;
 
-			   _pTransformComp->LookDirection(-_pTransformComp->GetRight(), -PI_DIV_4);
+			   _targetRotation = 0.0f;
 
 			   if (_inCombat)
 			   {
@@ -907,12 +959,12 @@ void Player::Handle(const InputManager::KeyReleasedEvent & event)
 	   {
 		   if (_animationEnum == PlayerAnimationEnum::eWalk)
 		   {
-			   _pTransformComp->LookDirection(-_pTransformComp->GetRight(), -PI_DIV_4);
+			   _targetRotation = 0.0f;
 		   }
 		   else if (_animationEnum == PlayerAnimationEnum::eWalkingBack ||
 			   _animationEnum == PlayerAnimationEnum::eWarRetreat)
 		   {
-			   _pTransformComp->LookDirection(-_pTransformComp->GetRight(), PI_DIV_4);
+			   _targetRotation = 0.0f;
 		   }
 
 		   //if (_currentMovement._horizontal == HORIZONTAL_MOVEMENT_LEFT)
@@ -955,12 +1007,12 @@ void Player::Handle(const InputManager::KeyReleasedEvent & event)
 	   {
 		   if (_animationEnum == PlayerAnimationEnum::eWalk)
 		   {
-			   _pTransformComp->LookDirection(-_pTransformComp->GetRight(), PI_DIV_4);
+			   _targetRotation = 0.0f;
 		   }
 		   else if (_animationEnum == PlayerAnimationEnum::eWalkingBack ||
 			   _animationEnum == PlayerAnimationEnum::eWarRetreat)
 		   {
-			   _pTransformComp->LookDirection(-_pTransformComp->GetRight(), -PI_DIV_4);
+			   _targetRotation = 0.0f;
 		   }
 
 
@@ -1012,11 +1064,11 @@ void Player::Handle(const InputManager::KeyReleasedEvent & event)
 	   }
 	   else if (inputCode == 'J')
 	   {
-		   _pTransformComp->LookDirection(-_pTransformComp->GetRight(), -PI_DIV_4);
+		   _targetRotation = 0.0f;
 	   }
 	   else if (inputCode == 'L')
 	   {
-		   _pTransformComp->LookDirection(-_pTransformComp->GetRight(), +PI_DIV_4);
+		   _targetRotation = 0.0f;
 	   }
 
    } break;
