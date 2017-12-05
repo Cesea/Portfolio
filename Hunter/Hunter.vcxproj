@@ -177,6 +177,7 @@
     <ClCompile Include="ColiisionSystem.cpp" />
     <ClCompile Include="Particle.cpp" />
     <ClCompile Include="ParticleComponent.cpp" />
+    <ClCompile Include="ParticleSystem.cpp" />
     <ClCompile Include="Plane.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="PlayerAnimationString.cpp" />
@@ -292,6 +293,7 @@
     <ClInclude Include="CollisionSystem.h" />
     <ClInclude Include="Particle.h" />
     <ClInclude Include="ParticleComponent.h" />
+    <ClInclude Include="ParticleSystem.h" />
     <ClInclude Include="Plane.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="PlayerAnimationString.h" />

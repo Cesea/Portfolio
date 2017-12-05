@@ -6,7 +6,7 @@
 #include "ScriptSystem.h"
 #include "ActionSystem.h"
 #include "CollisionSystem.h"
-
+#include "ParticleSystem.h"
 #include "IScene.h"
 
 #include "WorldEditor.h"
@@ -36,6 +36,7 @@ public:
 protected :
 	Editor *_editor{};
 
+	Entity trash;
 
 public:
 	virtual void Handle(const Editor::GetObjectFromSceneEvent &event);
