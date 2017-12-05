@@ -71,6 +71,7 @@ private :
 	PlayerCallbackData _callbackData;
 	PlayerStateMachine *_pStateMachine;
 	GameCommand _currentCommand;
+	GameCommand _prevCommand;
 	void QueueAction(const Action &action);
 
 	void RepositionEntity(const TerrainTilePos &currentPos, const TerrainTilePos &prevPos);
@@ -99,7 +100,6 @@ private :
 	StopWatch _attackTriggerTimer;
 
 	bool32 _canCombo{false};
-
 
 public :
 

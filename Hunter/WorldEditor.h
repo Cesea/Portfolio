@@ -142,15 +142,22 @@ struct ObjectEditor
 	Quaternion _zRotation;
 };
 
-struct SceneEditor
+struct SystemEditor
 {
 	void Reset()
 	{
 		_editScrptSystem = false;
 		_editRenderSystem = false;
+		_editActionSystem = false;
+		_editCollisionSystem = false;
 	}
 	bool32 _editScrptSystem;
+	bool32 _editCollisionSystem;
 	bool32 _editRenderSystem;
+	bool32 _editActionSystem;
+
+	bool32 _scriptRunning{ true };
+	bool32 _renderShadow{true};
 };
 
 //일단은 StatusWindow는 Player만 사용할 수 있게끔 한다..
@@ -220,13 +227,15 @@ public :
 		eNone,
 		eTerrainEdit,
 		eObjectLocate,
-		eObjectEdit
+		eObjectEdit,
+		eSystemEdit,
 	};
 	void ChangeEditState(EditMode mode);
 
 	void InTerrainEditMode();
 	void InObjectLocateMode();
 	void InObjectEditMode();
+	void InSystemEditMode();
 
 	void ShowStatusWindow();
 
@@ -253,6 +262,8 @@ public :
 	TerrainEditor _terrainEditor;
 	ObjectLocator _objectLocator;
 	ObjectEditor _objectEditor;
+
+	SystemEditor _systemEditor;
 
 	StatusWindow _statusWindow;
 

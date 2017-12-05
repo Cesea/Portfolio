@@ -39,6 +39,11 @@ void Editor::ChangeEditState(EditMode mode)
 		_editing = true;
 		gEditorOn = true;
 	} break;
+	case Editor::eSystemEdit :
+	{
+		_editing = true;
+		gEditorOn = true;
+	}
 	}
 	_currentMode = mode;
 }
@@ -738,6 +743,70 @@ void Editor::InObjectEditMode()
 	}
 }
 
+void Editor::InSystemEditMode()
+{
+	if (ImguiCollapse("System Edit Mode", nullptr, _editing))
+	{
+		_systemEditor.Reset();
+		ChangeEditState(EditMode::eNone);
+	}
+
+	ImguiIndent();
+	{
+		//Edit Render System ///////////////////////////////////////////////////////////////////
+		if (false == _systemEditor._editRenderSystem)
+		{
+			if (ImguiCollapse("Render System", nullptr, _systemEditor._editRenderSystem))
+			{
+				_systemEditor.Reset();
+				_systemEditor._editRenderSystem = true;
+			}
+		}
+		else
+		{
+			if (ImguiCollapse("Render System", nullptr, _systemEditor._editRenderSystem))
+			{
+				_systemEditor.Reset();
+			}
+			ImguiIndent();
+			{
+				if (ImguiCheck("Render Shadow", _systemEditor._renderShadow))
+				{
+					_systemEditor._renderShadow = !_systemEditor._renderShadow;
+				}
+			}
+			ImguiUnindent();
+		}
+
+		//Edit Script System ///////////////////////////////////////////////////////////////////
+		if (false == _systemEditor._editScrptSystem)
+		{
+			if (ImguiCollapse("Script System", nullptr, _systemEditor._editScrptSystem))
+			{
+				_systemEditor.Reset();
+				_systemEditor._editScrptSystem = true;
+			}
+		}
+		else
+		{
+			if (ImguiCollapse("ScriptSystem", nullptr, _systemEditor._editScrptSystem))
+			{
+				_systemEditor.Reset();
+			}
+			ImguiIndent();
+			{
+				if (ImguiCheck("Script Running", _systemEditor._scriptRunning))
+				{
+					_systemEditor._scriptRunning = !_systemEditor._scriptRunning;
+				}
+			}
+			ImguiUnindent();
+		}
+	}
+	ImguiUnindent();
+
+}
+
 void Editor::ShowStatusWindow()
 {
 	if (false == _showStatus)
@@ -857,6 +926,10 @@ void Editor::Edit(RefVariant &object, const InputManager &input)
 		{
 			ChangeEditState(EditMode::eObjectEdit);
 		}
+		if (ImguiCollapse("System Editor", nullptr, _editing))
+		{
+			ChangeEditState(EditMode::eSystemEdit);
+		}
 	} break;
 	
 	case Editor::eTerrainEdit :
@@ -885,10 +958,16 @@ void Editor::Edit(RefVariant &object, const InputManager &input)
 
 	case Editor::eObjectEdit:
 	{
-		ImguiBeginScrollArea("ObjectE ditor", EDITORX, EDITORY, EDITORSIZEX, EDITORSIZEY, &_scroll);
+		ImguiBeginScrollArea("ObjectE Editor", EDITORX, EDITORY, EDITORSIZEX, EDITORSIZEY, &_scroll);
 		InObjectEditMode();
 		ImguiEndScrollArea();
 	} break;
+	case Editor ::eSystemEdit :
+	{
+		ImguiBeginScrollArea("System Editor", EDITORX, EDITORY, EDITORSIZEX, EDITORSIZEY, &_scroll);
+		InSystemEditMode();
+		ImguiEndScrollArea();
+	}break;
 	}
 
 	ShowStatusWindow();
