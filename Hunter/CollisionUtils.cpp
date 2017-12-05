@@ -116,10 +116,10 @@ bool Time_RayToOBB(const Vector3 & rayPos, Vector3 & rayDir, Vector3 & OBBPos, V
 	return false;
 }
 
-bool IsBlocking(TransformComponent * pTransA, CollisionComponent::BoundingBox * pBoundA, TransformComponent * pTransB, CollisionComponent::BoundingBox * pBoundB, float moveFactor)
+bool IsBlocking(TransformComponent * pTransA,AABB * pBoundA, TransformComponent * pTransB, AABB * pBoundB, float moveFactor)
 {
 	//둘이 충돌되지 않았으면 할필요없다
-	if (Collision_AABBToAABB(pBoundA->_localMinPos, pBoundA->_localMaxPos,pBoundB->_localMinPos,pBoundB->_localMaxPos) == false)
+	if (Collision_AABBToAABB(pBoundA->_min, pBoundA->_max,pBoundB->_min,pBoundB->_max) == false)
 		return false;
 
 	moveFactor = Clamp01(moveFactor);
@@ -127,12 +127,12 @@ bool IsBlocking(TransformComponent * pTransA, CollisionComponent::BoundingBox * 
 	//둘이 부디쳤스니 밀어내야한다...
 
 	//A의 Min Max
-	Vector3 minA = pBoundA->_localMinPos;
-	Vector3 maxA = pBoundA->_localMaxPos;
+	Vector3 minA = pBoundA->_min;
+	Vector3 maxA = pBoundA->_max;
 
 	//B의 Min Max
-	Vector3 minB = pBoundB->_localMinPos;
-	Vector3 maxB = pBoundB->_localMaxPos;
+	Vector3 minB = pBoundB->_min;
+	Vector3 maxB = pBoundB->_max;
 
 	//B 의 로컬 사각 8 점
 
@@ -154,34 +154,34 @@ bool IsBlocking(TransformComponent * pTransA, CollisionComponent::BoundingBox * 
 	pos[7] = Vector3(maxB.x, minB.y, maxB.z);
 
 
-	//A 의 월드 역행렬
-	Matrix matWorldAInv;
-	MatrixInverse(&matWorldAInv, NULL, &pTransA->GetFinalMatrix());
+	////A 의 월드 역행렬
+	//Matrix matWorldAInv;
+	//MatrixInverse(&matWorldAInv, NULL, &pTransA->GetFinalMatrix());
 
-	//B 의 월드 행렬
-	Matrix matWorldB = pTransB->GetFinalMatrix();
+	////B 의 월드 행렬
+	//Matrix matWorldB = pTransB->GetFinalMatrix();
 
-	//B 월드 만큼 가고 A 의 역으로 다시 움직인 행렬
-	Matrix mat = matWorldB * matWorldAInv;
+	////B 월드 만큼 가고 A 의 역으로 다시 움직인 행렬
+	//Matrix mat = matWorldB * matWorldAInv;
 
-	//B pos 에 적용
-	for (int i = 0; i < 8; i++)
-		D3DXVec3TransformCoord(&pos[i], &pos[i], &mat);
+	////B pos 에 적용
+	//for (int i = 0; i < 8; i++)
+	//	D3DXVec3TransformCoord(&pos[i], &pos[i], &mat);
 
-	//이이후 Pos 들은 A 대한 B 의 상대적인 위치값들이된다.
+	////이이후 Pos 들은 A 대한 B 의 상대적인 위치값들이된다.
 
 
-	//최종적으로 적용된 B pos 를 가지고 min max 를 갱신 하자
-	minB = pos[0];
-	maxB = pos[0];
-	for (int i = 1; i < 8; i++) {
-		if (pos[i].x < minB.x) minB.x = pos[i].x;
-		if (pos[i].y < minB.y) minB.y = pos[i].y;
-		if (pos[i].z < minB.z) minB.z = pos[i].z;
-		if (pos[i].x > maxB.x) maxB.x = pos[i].x;
-		if (pos[i].y > maxB.y) maxB.y = pos[i].y;
-		if (pos[i].z > maxB.z) maxB.z = pos[i].z;
-	}
+	////최종적으로 적용된 B pos 를 가지고 min max 를 갱신 하자
+	//minB = pos[0];
+	//maxB = pos[0];
+	//for (int i = 1; i < 8; i++) {
+	//	if (pos[i].x < minB.x) minB.x = pos[i].x;
+	//	if (pos[i].y < minB.y) minB.y = pos[i].y;
+	//	if (pos[i].z < minB.z) minB.z = pos[i].z;
+	//	if (pos[i].x > maxB.x) maxB.x = pos[i].x;
+	//	if (pos[i].y > maxB.y) maxB.y = pos[i].y;
+	//	if (pos[i].z > maxB.z) maxB.z = pos[i].z;
+	//}
 
 	//사각 형 구조체
 	struct fRect {
@@ -266,12 +266,12 @@ bool IsBlocking(TransformComponent * pTransA, CollisionComponent::BoundingBox * 
 	float moveLengthB = 0.0f;
 
 	//A의 Min Max
-	minA = pBoundA->_localMinPos;
-	maxA = pBoundA->_localMaxPos;
+	minA = pBoundA->_min;
+	maxA = pBoundA->_max;
 
 	//B의 Min Max
-	minB = pBoundB->_localMinPos;
-	maxB = pBoundB->_localMaxPos;
+	minB = pBoundB->_min;
+	maxB = pBoundB->_max;
 
 	//B 의 로컬 사각 8 점
 
@@ -292,30 +292,30 @@ bool IsBlocking(TransformComponent * pTransA, CollisionComponent::BoundingBox * 
 	pos[7] = Vector3(maxA.x, minA.y, maxA.z);
 
 	//B 의 월드 역행렬
-	Matrix matWorldBInv;
-	D3DXMatrixInverse(&matWorldBInv, NULL, &pTransB->GetFinalMatrix());
+	//Matrix matWorldBInv;
+	//D3DXMatrixInverse(&matWorldBInv, NULL, &pTransB->GetFinalMatrix());
 
-	//A 의 월드 행렬
-	D3DXMATRIXA16 matWorldA = pTransA->GetFinalMatrix();
+	////A 의 월드 행렬
+	//D3DXMATRIXA16 matWorldA = pTransA->GetFinalMatrix();
 
-	//A 월드 만큼 가고 B 의 역으로 다시 움직인 행렬
-	mat = matWorldA * matWorldBInv;
+	////A 월드 만큼 가고 B 의 역으로 다시 움직인 행렬
+	//mat = matWorldA * matWorldBInv;
 
-	//A pos 에 적용
-	for (int i = 0; i < 8; i++)
-		D3DXVec3TransformCoord(&pos[i], &pos[i], &mat);
+	////A pos 에 적용
+	//for (int i = 0; i < 8; i++)
+	//	D3DXVec3TransformCoord(&pos[i], &pos[i], &mat);
 
-	//최종적으로 적용된 A pos 를 가지고 min max 를 갱신 하자
-	minA = pos[0];
-	maxA = pos[0];
-	for (int i = 1; i < 8; i++) {
-		if (pos[i].x < minA.x) minA.x = pos[i].x;
-		if (pos[i].y < minA.y) minA.y = pos[i].y;
-		if (pos[i].z < minA.z) minA.z = pos[i].z;
-		if (pos[i].x > maxA.x) maxA.x = pos[i].x;
-		if (pos[i].y > maxA.y) maxA.y = pos[i].y;
-		if (pos[i].z > maxA.z) maxA.z = pos[i].z;
-	}
+	////최종적으로 적용된 A pos 를 가지고 min max 를 갱신 하자
+	//minA = pos[0];
+	//maxA = pos[0];
+	//for (int i = 1; i < 8; i++) {
+	//	if (pos[i].x < minA.x) minA.x = pos[i].x;
+	//	if (pos[i].y < minA.y) minA.y = pos[i].y;
+	//	if (pos[i].z < minA.z) minA.z = pos[i].z;
+	//	if (pos[i].x > maxA.x) maxA.x = pos[i].x;
+	//	if (pos[i].y > maxA.y) maxA.y = pos[i].y;
+	//	if (pos[i].z > maxA.z) maxA.z = pos[i].z;
+	//}
 	//rcA = { minA.x, maxA.x, minA.y, maxA.y, minA.z, maxA.z };
 	//rcB = { minB.x, maxB.x, minB.y, maxB.y, minB.z, maxB.z };
 	rcA.left = minA.x;		rcA.right = maxA.x;			rcA.bottom = minA.y;			rcA.top = maxA.y;			rcA.back = minA.z;			rcA.front = maxA.z;
@@ -374,12 +374,6 @@ bool IsBlocking(TransformComponent * pTransA, CollisionComponent::BoundingBox * 
 	}
 
 
-	//여기까지온다면 아래의 4 개의 변수가 계산된 것이다....
-	//D3DXVECTOR3 moveDirA( 0, 0, 0 );
-	//float moveLengthA = minInter;
-	//D3DXVECTOR3 moveDirB( 0, 0, 0 );
-	//float moveLengthB = 0.0f;
-
 
 	//밀량이 작은쪽으로...
 	if (moveLengthB > moveLengthA)
@@ -406,8 +400,6 @@ bool IsBlocking(TransformComponent * pTransA, CollisionComponent::BoundingBox * 
 
 
 	}
-
-
 	else
 	{
 		//A 와 B 의 스케일 적용

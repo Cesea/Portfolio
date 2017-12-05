@@ -111,6 +111,15 @@ void CollisionSystem::Update(float deltaTime, float checkRange)
 										break;
 									}
 								}
+								//오브젝트와 충돌했다면 민다
+								if (collision._triggerType == CollisionComponent::TRIGGER_TYPE_OBJECT)
+								{
+									IsBlocking(&transform, &aabb0, &transform2, &aabb1, 0.0f);
+								}
+								if (collision2._triggerType == CollisionComponent::TRIGGER_TYPE_OBJECT)
+								{
+									IsBlocking(&transform, &aabb0, &transform2, &aabb1, 1.0f);
+								}
 
 							}
 						}
@@ -150,6 +159,15 @@ void CollisionSystem::Update(float deltaTime, float checkRange)
 										_channel.Broadcast<ObjectTriggerEvent>(ObjectTriggerEvent(entities[j], entities[i]));
 										break;
 									}
+								}
+								//오브젝트와 충돌했다면 민다
+								if (collision._triggerType == CollisionComponent::TRIGGER_TYPE_OBJECT)
+								{
+									IsBlocking(&transform, &aabb0, &transform2, &aabb1, 0.0f);
+								}
+								if (collision2._triggerType == CollisionComponent::TRIGGER_TYPE_OBJECT)
+								{
+									IsBlocking(&transform, &aabb0, &transform2, &aabb1, 1.0f);
 								}
 							}
 						}
@@ -193,6 +211,15 @@ void CollisionSystem::Update(float deltaTime, float checkRange)
 										_channel.Broadcast<ObjectTriggerEvent>(ObjectTriggerEvent(entities[j], entities[i]));
 										break;
 									}
+								}
+								//오브젝트와 충돌했다면 민다
+								if (collision._triggerType == CollisionComponent::TRIGGER_TYPE_OBJECT)
+								{
+									IsBlocking(&transform, &aabb0, &transform2, &aabb1, 0.0f);
+								}
+								if (collision2._triggerType == CollisionComponent::TRIGGER_TYPE_OBJECT)
+								{
+									IsBlocking(&transform, &aabb0, &transform2, &aabb1, 1.0f);
 								}
 							}
 						}
@@ -240,7 +267,16 @@ void CollisionSystem::Update(float deltaTime, float checkRange)
 										break;
 									}
 								}
-							}
+								//오브젝트와 충돌했다면 민다
+								if (collision._triggerType == CollisionComponent::TRIGGER_TYPE_OBJECT)
+								{
+									IsBlocking(&transform, &aabb0, &transform2, &aabb1, 0.0f);
+								}
+								if (collision2._triggerType == CollisionComponent::TRIGGER_TYPE_OBJECT)
+								{
+									IsBlocking(&transform, &aabb0, &transform2, &aabb1, 1.0f);
+								}
+							} 
 						}
 					}
 						break;
