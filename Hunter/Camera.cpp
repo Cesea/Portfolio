@@ -126,7 +126,9 @@ void Camera::MoveAndRotate(float deltaTime, const InputManager & input)
 
 		if (deltaY != 0)
 		{
+			_verticalAngle += _rotationSpeed * deltaTime * (-deltaY / 10.0f);
 		}
+
 		if (_horizontalAngle < 0.0f)
 		{
 			_horizontalAngle += D3DX_PI * 2;
@@ -137,13 +139,17 @@ void Camera::MoveAndRotate(float deltaTime, const InputManager & input)
 			_horizontalAngle -= D3DX_PI * 2;
 		}
 
+		ClampFloat(_verticalAngle, 0.1f, PI_DIV_2 - 0.1f);
+
+		Console::Log("%f\n", _verticalAngle);
+
 		Vector3 camPosition;
 		Vector3 targetPosition = refTargetTransform.GetWorldPosition();
 
-		camPosition.x = cosf(_horizontalAngle) * _targetRadius + targetPosition.x;
-		camPosition.y = targetPosition.y + 3.0f;
+		camPosition.x = cosf(_verticalAngle) * cosf(_horizontalAngle) * _targetRadius + targetPosition.x;
+		camPosition.y = targetPosition.y + 3.0f + sinf(_verticalAngle);
 		targetPosition.y += 1.6f;
-		camPosition.z = sinf(_horizontalAngle) * _targetRadius + targetPosition.z;
+		camPosition.z = cosf(_verticalAngle) * sinf(_horizontalAngle) * _targetRadius + targetPosition.z;
 		refTransform.SetWorldPosition(camPosition);
 		refTransform.LookPosition(targetPosition);
 

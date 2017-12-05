@@ -83,7 +83,7 @@ private :
 	float _walkSpeed{2.0f};
 	float _runSpeed{5.0f};
 
-	float _rotationSpeed{ 6.0f };
+	float _rotationSpeed{ 6.8f };
 
 	int32 _hp{ 400 };
 
