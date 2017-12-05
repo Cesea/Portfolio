@@ -4,13 +4,15 @@
 #include "TransformComponent.h"
 #include "Frustum.h"
 
-class BaseGameObject;
+class Player;
 
 enum CAMERA_STATE
 {
 	CAMERASTATE_CREATE,
 	CAMERASTATE_INGAME,
 };
+
+constexpr float CAMERA_TARGET_DEFAULT_RADIUS = 8.0f;
 
 //카메라 클래스는 예외적으로 texture를 가지고 있다
 class Camera
@@ -38,7 +40,7 @@ public:
 	void UpdateCamToDevice();
 	void UpdateFrustum();
 
-	void SetTargetObject(BaseGameObject *pTargetObject = nullptr);
+	void SetTargetObject(Player *pTargetObject = nullptr);
 
 	void SetMoveSpeed(float speed) { _moveSpeed = speed; }
 	void SetRotationSpeed(float speed) { _rotationSpeed = speed; }
@@ -87,11 +89,13 @@ protected:
 	float _moveSpeed{1.0f};
 	float _rotationSpeed{0.1f};
 
+	float _targetRadius{CAMERA_TARGET_DEFAULT_RADIUS};
+
 	float _verticalAngle{};
 	float _horizontalAngle{};
 
 	Frustum _frustum;
-	BaseGameObject *_pTargetObject{};
+	Player *_pTargetObject{};
 
 	float _offsetForwardMult{};
 	float _offsetUpMult{};

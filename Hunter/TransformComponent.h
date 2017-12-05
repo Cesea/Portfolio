@@ -67,7 +67,6 @@ struct TransformComponent : public Component
 	void RotateLocal(float angleX, float angleY, float angleZ);
 	void RotateLocal(const Vector3 &angle);
 
-
 	//사원수를 이용한 특정 회전값으로 회전량을 가져라....
 	void SetRotateWorld(float eAngleX, float eAngleY, float aAngleZ);
 	void SetRotateLocal(float eAngleX, float eAngleY, float aAngleZ);
@@ -100,6 +99,8 @@ struct TransformComponent : public Component
 
 	// 자신의 모든 정보를 from 과 to 사이의 정보만큼 보간 하여 적용
 	void Interpolate(const TransformComponent& from, const TransformComponent& to, float t);
+
+	void UpdateTransform();
 
 	///내꺼
 	void SetForward(const Vector3 &forward);

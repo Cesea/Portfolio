@@ -79,7 +79,7 @@ bool IScene::Init()
 	_camera.CreateFromWorld(_world);
 	_camera.SetRotationSpeed(2.0f);
 	_camera.SetMoveSpeed(3.0f);
-	_camera.GetEntity().GetComponent<TransformComponent>().MovePositionWorld(Vector3(0.0f, 4.0f, -6.0f));
+	//_camera.GetEntity().GetComponent<TransformComponent>().MovePositionWorld(Vector3(0.0f, 4.0f, -6.0f));
 	//메인카메라 RenderToTexture 준비
 	_camera.ReadyRenderToTexture( WINSIZEX, WINSIZEY );
 

@@ -5,7 +5,6 @@ constexpr float MAX_VERT_ANGLE = 85.0f;
 constexpr float MIN_VERT_ANGLE = -85.0f;
 
 //constexpr float CAMERA_LOOKDOWN_ANGLE = D3DX_PI /
-
 Camera::Camera()
 {
 	//기본 화각 설정
@@ -32,6 +31,8 @@ Camera::Camera()
 	_ortho = false;
 	_aspect = (float)(WINSIZEX) / (float)(WINSIZEY);
 	_orthoSize = 10;
+
+	_targetRadius = 4.0f;
 }
 
 Camera::~Camera()
@@ -48,37 +49,6 @@ void Camera::CreateFromWorld(World & world)
 	_entity.Activate();
 }
 
-	//case cNormal:
-	//	POINT pt;
-	//	GetCursorPos(&pt);
-	//	if (_curDist >= PLAYER_TO_CAMERA_DIST)
-	//	{
-	//		if (move(pt) == true)
-	//		{
-	//			float screenCenterX = 892;
-	//			float screenCenterY = 519;
-	//			float deltaTime = APPTIMER->GetTargetTime();
-	//			POINT mousePos = GetMousePos();
-	//			mousePos.x = mousePos.x + WINSTARTX;
-	//			mousePos.y = mousePos.y + WINSTARTY;
-	//			//이동량 ( 중앙에서 멀어진 량 )
-	//			int deltaX = mousePos.x - screenCenterX;
-	//			int deltaY = mousePos.y - screenCenterY;
-	//			if (deltaX != 0)
-	//			{
-	//				_horizontalAngle += _rotationSpeed * deltaTime * (float)deltaX;
-	//			}
-	//			if (deltaY != 0)
-	//			{
-	//				_verticalAngle += _rotationSpeed * deltaTime * (float)deltaY;
-	//			}
-	//			ClampFloat(_verticalAngle, MIN_VERT_ANGLE, MAX_VERT_ANGLE);
-	//			SetCursorPos(CLIENTCENTERX, CLIENTCENTERY);
-	//		}
-	//	}		break;
-	//}
-	//
-
 void Camera::MoveAndRotate(float deltaTime, const InputManager & input)
 {
 	TransformComponent &refTransform = _entity.GetComponent<TransformComponent>();
@@ -93,15 +63,22 @@ void Camera::MoveAndRotate(float deltaTime, const InputManager & input)
 	if (input.keyboard.IsPressed('1'))
 	{
 		_cameraState = CAMERASTATE_CREATE;
-		refTransform.LookDirection(Vector3(0.0f, 0.0f, 1.0f));
+		_horizontalAngle = 0.0f;
+		_verticalAngle = 0.0f;
+		_targetRadius = CAMERA_TARGET_DEFAULT_RADIUS;
 		//ShowCursor(true);
 	}
 	else if (input.keyboard.IsPressed('2'))
 	{
 		Assert(_pTargetObject);
 		_cameraState = CAMERASTATE_INGAME;
+		Vector3 camPosition;
+		Vector3 targetPosition = refTargetTransform.GetWorldPosition();
 
-		//ShowCursor(false);
+		camPosition.x = cosf(_horizontalAngle) * _targetRadius + targetPosition.x;
+		//camPosition.y = ;
+		camPosition.z = sinf(_horizontalAngle) * _targetRadius + targetPosition.z;
+		refTransform.SetWorldPosition(camPosition);
 	}
 
 	//Mouse Move//////////////////////////////////////////////
@@ -138,24 +115,56 @@ void Camera::MoveAndRotate(float deltaTime, const InputManager & input)
 		mousePoint.y += WINSTARTY;
 
 		int32 deltaX = mousePoint.x - (CLIENTCENTERX - 1);
-		//int32 deltaY = mousePoint.y - CLIENTCENTERY;
+		int32 deltaY = mousePoint.y - (CLIENTCENTERY - 1);
+
+		float xRoate{};
+		float yRotate{};
 
 		if (deltaX != 0)
 		{
-			_horizontalAngle += _rotationSpeed * deltaTime * (float)deltaX;
+			_horizontalAngle += _rotationSpeed * deltaTime * (-deltaX / 10.0f);
 		}
 
-		//if (deltaY != 0)
-		//{
-		//	_verticalAngle += _rotationSpeed * deltaTime * (float)deltaY;
-		//}
+		if (deltaY != 0)
+		{
+		}
+		if (_horizontalAngle < 0.0f)
+		{
+			_horizontalAngle += D3DX_PI * 2;
 
-		//ClampFloat(_verticalAngle, MIN_VERT_ANGLE, MAX_VERT_ANGLE);
-		refTransform.SetRotateWorld(10 *  ONE_RAD, _horizontalAngle * ONE_RAD, 0.0f);
+		}
+		else if (_horizontalAngle > D3DX_PI * 2)
+		{
+			_horizontalAngle -= D3DX_PI * 2;
+		}
 
-		Vector3 planerForward = _entity.GetComponent<TransformComponent>().GetForward();
-		planerForward.y = 0.0f;
-		refTargetTransform.LookDirection(planerForward);
+		Vector3 camPosition;
+		Vector3 targetPosition = refTargetTransform.GetWorldPosition();
+
+		camPosition.x = cosf(_horizontalAngle) * _targetRadius + targetPosition.x;
+		camPosition.y = targetPosition.y + 3.0f;
+		targetPosition.y += 1.6f;
+		camPosition.z = sinf(_horizontalAngle) * _targetRadius + targetPosition.z;
+		refTransform.SetWorldPosition(camPosition);
+		refTransform.LookPosition(targetPosition);
+
+		if (_pTargetObject->_state == Player::PLAYERSTATE_STANCE ||
+			_pTargetObject->_state == Player::PLAYERSTATE_BLOCK ||
+			_pTargetObject->_state == Player::PLAYERSTATE_ATTACK)
+		{
+			if (!IsMovementNone(_pTargetObject->_currentCommand._movement))
+			{
+				Vector3 camPlanerForward = refTransform.GetForward();
+				camPlanerForward.y = 0.0f;
+				refTargetTransform.SetForward(camPlanerForward);
+			}
+		}
+		else if (_pTargetObject->_state == Player::PLAYERSTATE_MOVE)
+		{
+		}
+		else if (_pTargetObject->_state == Player::PLAYERSTATE_RUN)
+		{
+		}
 
 		SetCursorPos(CLIENTCENTERX, CLIENTCENTERY);
 	} break;
@@ -186,11 +195,6 @@ void Camera::MoveAndRotate(float deltaTime, const InputManager & input)
 
 	case CAMERASTATE_INGAME:
 	{
-		Vector3 offsetVector;
-		offsetVector += refTargetTransform.GetForward() * _offsetForwardMult;
-		offsetVector += refTargetTransform.GetUp() * _offsetUpMult;
-
-		refTransform.SetWorldPosition(refTargetTransform.GetWorldPosition() + offsetVector);
 	} break;
 	}
 
@@ -213,24 +217,6 @@ void Camera::MoveAndRotate(float deltaTime, const InputManager & input)
 
 void Camera::UpdateMatrix()
 {
-	//if (_cameraState == cNormal)
-	//{
-	//	Vector3 tPos = targetTransform->GetWorldPosition();
-	//	tPos.y = targetTransform->GetWorldPosition().y + 1.5f;
-	//	
-	//	dummyTransform->SetWorldPosition(
-	//		targetTransform->GetWorldPosition().x, 
-	//		targetTransform->GetWorldPosition().y + 2.5, 
-	//		targetTransform->GetWorldPosition().z);
-	//	if (_curDist < PLAYER_TO_CAMERA_DIST)
-	//	{
-	//		Vector3 dir = tPos - cameraTransform->GetWorldPosition();
-	//		Vec3Normalize(&dir, &dir);
-	//		cameraTransform->SetForward(dir);
-	//		NormalCameraUpdate();
-	//	}
-	//}
-
 	if (_ortho)
 	{
 		MatrixOrthoLH(&_matProjection, _aspect * _orthoSize, _orthoSize, _camNear, _camFar);
@@ -243,7 +229,7 @@ void Camera::UpdateMatrix()
 	}
 
 	//뷰행렬 카메라 월드위치에 대한 역행렬이다.
-	MatrixInverse(&_matView, nullptr, &_entity.GetComponent<TransformComponent>()._matFinal);
+	MatrixInverse(&_matView, nullptr, &_entity.GetComponent<TransformComponent>().GetFinalMatrix());
 
 	_matViewProjection = _matView * _matProjection;
 }
@@ -259,7 +245,7 @@ void Camera::UpdateFrustum()
 	_frustum.UpdateFrustum(*this);
 }
 
-void Camera::SetTargetObject(BaseGameObject * pTargetObject)
+void Camera::SetTargetObject(Player * pTargetObject)
 {
 	if (nullptr == pTargetObject)
 	{

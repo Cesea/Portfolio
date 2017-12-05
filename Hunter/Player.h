@@ -5,7 +5,6 @@
 #include "PlayerAnimationString.h"
 
 class Camera;
-
 class Player;
 
 struct PlayerCallbackData
@@ -25,8 +24,8 @@ private :
 
 class Player : public BaseGameObject
 {
-	friend class PlayerStateMachine;
 	friend class PlayerCallbackHandler;
+	friend class Camera;
 public :
 	friend class PlayerStanceState;
 public :
@@ -69,7 +68,6 @@ private :
 	void MoveAndRotate(float deltaTime);
 
 	PlayerCallbackData _callbackData;
-	PlayerStateMachine *_pStateMachine;
 	GameCommand _currentCommand;
 	GameCommand _prevCommand;
 	void QueueAction(const Action &action);

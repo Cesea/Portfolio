@@ -15,6 +15,10 @@ void TransformSystem::PreUpdate(float deltaTime)
 	for (int32 i = 0; i < entities.size(); ++i)
 	{
 		TransformComponent &refTransform = entities[i].GetComponent<TransformComponent>();
+		if (refTransform._pParent != nullptr)
+		{
+			continue;
+		}
 		UpdateTransform(refTransform);
 	}
 }

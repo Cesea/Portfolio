@@ -609,17 +609,11 @@ void Player::MoveAndRotate(float deltaTime)
 
 	if (_currentCommand._movement._horizontal == HORIZONTAL_MOVEMENT_LEFT)
 	{
-		if (_animationEnum != PlayerAnimationEnum::eRun)
-		{
-			toMove -= right;
-		}
+		toMove -= right;
 	}
 	else if (_currentCommand._movement._horizontal == HORIZONTAL_MOVEMENT_RIGHT)
 	{
-		if (_animationEnum != PlayerAnimationEnum::eRun)
-		{
-			toMove += right;
-		}
+		toMove += right;
 	}
 
 	if (_currentCommand._movement._vertical == VERTICAL_MOVEMENT_UP)
@@ -642,9 +636,6 @@ void Player::MoveAndRotate(float deltaTime)
 
 	   switch (_state)
 	   {
-	   //case Player::PLAYERSTATE_STANCE:
-	   //{
-	   //} break;
 	   case Player::PLAYERSTATE_MOVE:
 	   {
 		   refTransform.MovePositionWorld(toMove * _walkSpeed);
