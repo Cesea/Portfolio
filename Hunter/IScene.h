@@ -9,6 +9,7 @@
 #include "ActionSystem.h"
 #include "ScriptSystem.h"
 #include "CollisionSystem.h"
+#include "ParticleSystem.h"
 
 class EnvironmentSphere;
 class BaseGameObject;

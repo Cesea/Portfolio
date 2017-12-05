@@ -177,16 +177,16 @@ bool MapToolScene::SceneInit()
 	_editor->_pSelectedObject = GAMEOBJECTFACTORY->GetPlayerObject();
 
 
-	//실험
-	trash = _world.CreateEntity();
-	TransformComponent & trans = trash.AddComponent<TransformComponent>();
-	trans.SetWorldPosition(Vector3(0, 5.0f, 0));
-	ParticleComponent & par = trash.AddComponent<ParticleComponent>();
-	par.init(ParticleComponent::PARTICLE_TYPE_SMOKE, 1000, 0.0025, Vector3(1.0f, 0, 0), Vector3(0.0f, 5.0f, 0.0f));
-	par.min = Vector3(0, 0, 0);
-	par.max = Vector3(0, 0, 0);
+	////실험
+	//trash = _world.CreateEntity();
+	//TransformComponent & trans = trash.AddComponent<TransformComponent>();
+	//trans.SetWorldPosition(Vector3(0, 5.0f, 0));
+	//ParticleComponent & par = trash.AddComponent<ParticleComponent>();
+	//par.init(ParticleComponent::PARTICLE_TYPE_SMOKE, 1000, 0.0025, Vector3(1.0f, 0, 0), Vector3(0.0f, 5.0f, 0.0f));
+	//par.min = Vector3(0, 0, 0);
+	//par.max = Vector3(0, 0, 0);
+	//trash.Activate();
 
-	trash.Activate();
 	return result;
 }
 

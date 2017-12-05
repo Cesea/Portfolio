@@ -604,7 +604,7 @@ void Hydra::Handle(const CollisionSystem::ActorTriggerEvent & event)
 			}
 			_isHurt = true;
 		}
-	} break;
+	 break;
 		//오브젝트와 충돌했다
 	case CollisionComponent::TRIGGER_TYPE_OBJECT:
 		break;

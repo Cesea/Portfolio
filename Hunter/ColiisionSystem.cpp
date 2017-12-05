@@ -58,7 +58,6 @@ void CollisionSystem::Update(float deltaTime, float checkRange)
 			TransformComponent& transform2 = entities[j].GetComponent<TransformComponent>();
 			CollisionComponent & collision2 = entities[j].GetComponent<CollisionComponent>();
 
-			
 			aabb1 = SetAABB(collision2._boundingBox._xSize, collision2._boundingBox._ySize, collision2._boundingBox._zSize, transform2.GetWorldPosition());
 
 			Vector3 distanceVec = transform.GetWorldPosition() - transform2.GetWorldPosition();
@@ -66,7 +65,6 @@ void CollisionSystem::Update(float deltaTime, float checkRange)
 			if (distance < checkRange)
 			{
 				bool checkCollision = false;
-				//둘다 고정瑛만 검사하지않음
 				if (collision2._locked && collision._locked) continue;
 				//둘중 하나가 고정되어있음
 				//if ((collision._locked && !collision2._locked) || (!collision._locked && collision2._locked))

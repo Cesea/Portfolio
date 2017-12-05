@@ -232,8 +232,6 @@
     <ClCompile Include="VideoVertexFormat.cpp" />
     <ClCompile Include="World.cpp" />
     <ClCompile Include="WorldEditor.cpp" />
-    <ClCompile Include="XMLManager.cpp" />
-    <ClCompile Include="XmlSerializer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ActionComponent.h" />
@@ -274,7 +272,6 @@
     <ClInclude Include="GameCommand.h" />
     <ClInclude Include="GameComponent.h" />
     <ClInclude Include="GameObjectFactory.h" />
-    <ClInclude Include="GameObjectHandle.h" />
     <ClInclude Include="GameObjects.h" />
     <ClInclude Include="GameSystems.h" />
     <ClInclude Include="GameUtils.h" />
@@ -312,7 +309,6 @@
     <ClInclude Include="Ray.h" />
     <ClInclude Include="RenderComponent.h" />
     <ClInclude Include="RenderSystem.h" />
-    <ClInclude Include="resource.h" />
     <ClInclude Include="SceneChangeEffect.h" />
     <ClInclude Include="SceneChangeEffectUpDown.h" />
     <ClInclude Include="ScriptComponent.h" />
@@ -365,11 +361,6 @@
     <ClInclude Include="VideoVertexFormat.h" />
     <ClInclude Include="World.h" />
     <ClInclude Include="WorldEditor.h" />
-    <ClInclude Include="XMLManager.h" />
-    <ClInclude Include="XmlSerializer.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ResourceCompile Include="Hunter.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
