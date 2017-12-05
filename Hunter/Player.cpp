@@ -524,27 +524,8 @@ void Player::Update(float deltaTime)
 
 void Player::MoveAndRotate(float deltaTime)
 {
-	//if (_currentRotation < 0.0f)
-	//{
-	//	_currentRotation += D3DX_PI * 2.0f;
-	//}
-	//else if (_currentRotation > D3DX_PI * 2.0f)
-	//{
-	//	_currentRotation -= D3DX_PI * 2.0f;
-	//}
-
-	//if (_targetRotation < 0.0f)
-	//{
-	//	_targetRotation += D3DX_PI * 2.0f;
-	//}
-	//else if (_targetRotation > D3DX_PI * 2.0f)
-	//{
-	//	_targetRotation -= D3DX_PI * 2.0f;
-	//}
-
 	float absMinus = absFloat(_targetRotation) - absFloat(_currentRotation);
 
-	Console::Log("%f, %f\n", _currentRotation, _targetRotation);
 	if (!FloatZero(absMinus * 0.2f))
 	{
 		if (_targetRotation < 0.0f)
@@ -573,14 +554,23 @@ void Player::MoveAndRotate(float deltaTime)
 	}
 	else
 	{
-		_currentRotation = _targetRotation;
+		if (_camRotated)
+		{
+			_targetRotation = 0.0f;
+			_currentRotation = 0.0f;
+			_camRotated = false;
+		}
+		else
+		{
+			_currentRotation = _targetRotation;
+		}
 	}
 
 	////움직이지 않는 상태일때는 Move
 	if (_state == PLAYERSTATE_STANCE ||
 		_state == PLAYERSTATE_ATTACK ||
 		_state == PLAYERSTATE_BLOCK ||
-		_state == PLAYERSTATE_DEAD || 
+		_state == PLAYERSTATE_DEAD ||
 		_state == PLAYERSTATE_HURT ||
 		(_state == PLAYERSTATE_MOVEATTACK && _currentMovement._vertical == VERTICAL_MOVEMENT_DOWN))
 	{
@@ -592,32 +582,66 @@ void Player::MoveAndRotate(float deltaTime)
 	Vector3 forward = refTransform.GetForward();
 	Vector3 right = refTransform.GetRight();
 
+	//Console::Log("%f, %f, %f\n", right.x, right.y, right.z);
+
 	Vector3 toMove;
 
-	if (_currentCommand._movement._horizontal == HORIZONTAL_MOVEMENT_LEFT)
+	bool rightAdded{ false };
+	bool forwardAdded{ false };
+
+	if (_animationEnum == PlayerAnimationEnum::eStrafeLeft ||
+		_animationEnum == PlayerAnimationEnum::eWarMovingLeft)
 	{
 		toMove -= right;
 	}
-	else if (_currentCommand._movement._horizontal == HORIZONTAL_MOVEMENT_RIGHT)
+	else if (_animationEnum == PlayerAnimationEnum::eStrafeRight ||
+		_animationEnum == PlayerAnimationEnum::eWarMovingRight)
 	{
 		toMove += right;
 	}
-
-	if (_currentCommand._movement._vertical == VERTICAL_MOVEMENT_UP)
+	else
 	{
-		toMove += forward;
-	}
-	else if (_currentCommand._movement._vertical == VERTICAL_MOVEMENT_DOWN)
-	{
-		if (_animationEnum != PlayerAnimationEnum::eRun)
+		if (_currentMovement._vertical == VERTICAL_MOVEMENT_UP)
+		{
+			toMove += forward;
+		}
+		else if (_currentMovement._vertical == VERTICAL_MOVEMENT_DOWN)
 		{
 			toMove -= forward;
 		}
 	}
 
+	//if (_currentCommand._movement._horizontal == HORIZONTAL_MOVEMENT_LEFT)
+	//{
+	//	toMove -= right;
+	//	rightAdded = true;
+	//}
+	//else if (_currentCommand._movement._horizontal == HORIZONTAL_MOVEMENT_RIGHT)
+	//{
+	//	toMove += right;
+	//	rightAdded = true;
+	//}
+	//if (_currentCommand._movement._vertical == VERTICAL_MOVEMENT_UP)
+	//{
+	//	toMove += forward;
+	//	forwardAdded = true;
+	//}
+	//else if (_currentCommand._movement._vertical == VERTICAL_MOVEMENT_DOWN)
+	//{
+	//	if (_animationEnum != PlayerAnimationEnum::eRun)
+	//	{
+	//		toMove -= forward;
+	//		forwardAdded = true;
+	//	}
+	//}
+	//if (rightAdded && forwardAdded)
+	//{
+	//	Console::Log("TADA\n");
+	//}
+
    if (!toMove.IsZero())
    {
-	   Vec3Normalize(&toMove, &toMove);
+	   //Vec3Normalize(&toMove, &toMove);
 
 	   toMove *= deltaTime;
 
@@ -646,7 +670,6 @@ void Player::MoveAndRotate(float deltaTime)
       refTransform.SetWorldPosition(
 		  refTransform.GetWorldPosition().x, 
 		  TERRAIN->GetHeight(refTransform.GetWorldPosition().x, refTransform.GetWorldPosition().z), refTransform.GetWorldPosition().z);
-
 
 	  _prevTilePos = _tilePos;
 	  TERRAIN->ConvertWorldPostoTilePos(refTransform.GetWorldPosition(), &_tilePos);

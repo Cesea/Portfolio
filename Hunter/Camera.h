@@ -12,7 +12,7 @@ enum CAMERA_STATE
 	CAMERASTATE_INGAME,
 };
 
-constexpr float CAMERA_TARGET_DEFAULT_RADIUS = 8.0f;
+constexpr float CAMERA_TARGET_DEFAULT_RADIUS = 5.0f;
 
 //카메라 클래스는 예외적으로 texture를 가지고 있다
 class Camera
