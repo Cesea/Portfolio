@@ -88,6 +88,7 @@ protected :
 	ScriptSystem _scriptSystem;
 	ActionSystem _actionSystem;
 	CollisionSystem _collisionSystem;
+	ParticleSystem _particleSystem;
 
 public :
 };

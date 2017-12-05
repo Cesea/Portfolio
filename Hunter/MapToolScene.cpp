@@ -165,19 +165,6 @@ bool MapToolScene::SceneInit()
 	_channel.Broadcast<GameObjectFactory::CreateObjectOnLocationEvent>(
 		GameObjectFactory::CreateObjectOnLocationEvent(ARCHE_HERO, ResourceHandle(), Vector3(0.0f, 2.0f, 0.0f)));
 
-	//_channel.Broadcast<GameObjectFactory::CreateObjectOnLocationEvent>(
-	//	GameObjectFactory::CreateObjectOnLocationEvent(ARCHE_SNAKE, ResourceHandle(), Vector3(3.0f, 2.0f, 0.0f)));
-	//_channel.Broadcast<GameObjectFactory::CreateObjectOnLocationEvent>(
-	//	GameObjectFactory::CreateObjectOnLocationEvent(ARCHE_CAT, ResourceHandle(), Vector3(6.0f, 2.0f, 0.0f)));
-	//_channel.Broadcast<GameObjectFactory::CreateObjectOnLocationEvent>(
-	//	GameObjectFactory::CreateObjectOnLocationEvent(ARCHE_HYDRA, ResourceHandle(), Vector3(9.0f, 2.0f, 0.0f)));
-	//_channel.Broadcast<GameObjectFactory::CreateObjectOnLocationEvent>(
-	//	GameObjectFactory::CreateObjectOnLocationEvent(ARCHE_TURTLE, ResourceHandle(), Vector3(12.0f, 2.0f, 0.0f)));
-	//_channel.Broadcast<GameObjectFactory::CreateObjectOnLocationEvent>(
-	//	GameObjectFactory::CreateObjectOnLocationEvent(ARCHE_LIZARD, ResourceHandle(), Vector3(15.0f, 2.0f, 0.0f)));
-	//_channel.Broadcast<GameObjectFactory::CreateObjectOnLocationEvent>(
-	//	GameObjectFactory::CreateObjectOnLocationEvent(ARCHE_BAT, ResourceHandle(), Vector3(18.0f, 2.0f, 0.0f)));
-
 	//NOTE : GameObjectFactory의 GetPlayerObject는 생성에 의존성을 가진다
 	_camera.SetTargetObject(GAMEOBJECTFACTORY->GetPlayerObject());
 
@@ -185,6 +172,33 @@ bool MapToolScene::SceneInit()
 	imguiRenderInit();
 	_editor = new Editor;
 	_editor->Init(this);
+
+
+	//실험
+	trash = _world.CreateEntity();
+	TransformComponent & trans = trash.AddComponent<TransformComponent>();
+	trans.SetWorldPosition(Vector3(0, 5.0f, 0));
+	ParticleComponent & par = trash.AddComponent<ParticleComponent>();
+	par.EmissionType = ParticleComponent::PARTICLE_EMISSION_TYPE::BOX;
+	VEC_COLOR colors;
+	VEC_SCALE scales;
+
+	colors.push_back(D3DXCOLOR(0.1f, 1.0f, 1.0f, 1.0f));
+	colors.push_back(D3DXCOLOR(0.1f, 1.0f, 1.0f, 1.0f));
+	colors.push_back(D3DXCOLOR(0.1f, 1.0f, 1.0f, 1.0f));
+
+	scales.push_back(1.0f);
+	scales.push_back(1.0f);
+	scales.push_back(1.0f);
+
+	//RESOURCE_TEXTURE->GetResource("../Resources/Testures/particle_0.png");
+	//video::TextureHandle pTex = VIDEO->CreateTexture("../fireball.JPG");
+	LPDIRECT3DTEXTURE9 _tex;
+	D3DXCreateTextureFromFile(gpDevice, "../fireball.JPG", &_tex);
+	par.Init(1000, 0.025f, 2.0f, 3.0f, Vector3(0, 0, 0), Vector3(1.0f, 1.0f, 1.0f), Vector3(0, 0, 0), Vector3(1.0f, 1.0f, 1.0f), colors, scales, 2.0f, 3.0f, _tex, false);
+
+
+	trash.Activate();
 
 	return result;
 }
@@ -222,6 +236,7 @@ bool MapToolScene::SceneUpdate(float deltaTime, const InputManager & input)
 	_transformSystem.PreUpdate(deltaTime);
 	_collisionSystem.Update(deltaTime, 4.0f);
 	_actionSystem.Update(deltaTime);
+	_particleSystem.update(deltaTime);
 
 	ReadyShadowMap(TERRAIN);
 
@@ -260,6 +275,7 @@ bool MapToolScene::SceneRender0()
 
 	TERRAIN->Render(_camera, *_pMainLight, _camera);
 	_renderSystem.Render(_camera);
+	_particleSystem.render();
 	_collisionSystem.render();
 	_editor->Render();
 
