@@ -97,6 +97,10 @@ bool Turtle::CreateFromWorld(World & world, const Vector3 &Pos)
 	_hurtTime = 60;
 	_hurtCount = _hurtTime;
 
+	_isHurt = false;
+	_unBeatableTime = 15;
+	_unBeatableCount = _unBeatableTime;
+
 	//이벤트 등록
 	EventChannel channel;
 	channel.Add<CollisionSystem::ActorTriggerEvent, Turtle>(*this);
@@ -302,6 +306,16 @@ void Turtle::Update(float deltaTime)
 	}
 
 	transComp.SetWorldPosition(transComp.GetWorldPosition().x, TERRAIN->GetHeight(transComp.GetWorldPosition().x, transComp.GetWorldPosition().z), transComp.GetWorldPosition().z);
+
+	if (_isHurt)
+	{
+		_unBeatableCount--;
+		if (_unBeatableCount < 0)
+		{
+			_unBeatableCount = _unBeatableTime;
+			_isHurt = false;
+		}
+	}
 }
 
 void Turtle::Handle(const CollisionSystem::ActorTriggerEvent & event)
@@ -312,18 +326,22 @@ void Turtle::Handle(const CollisionSystem::ActorTriggerEvent & event)
 	{
 		//플레이어와 충돌했다(내가 가해자)
 	case CollisionComponent::TRIGGER_TYPE_PLAYER:
-		if (_state != TURTLESTATE_HURT&&_state != TURTLESTATE_DEATH)
+		if (!_isHurt)
 		{
-			resetAllCount();
-			_state = TURTLESTATE_HURT;
-			_pStateMachine->ChangeState(META_TYPE(TurtleHurt1State)->Name());
-			_battle = true;
-			_hp -= 50;
-			if (_hp <= 0)
+			if (_state != TURTLESTATE_HURT&&_state != TURTLESTATE_DEATH)
 			{
-				_state = TURTLESTATE_DEATH;
-				_pStateMachine->ChangeState(META_TYPE(TurtleDeadState)->Name());
+				resetAllCount();
+				_state = TURTLESTATE_HURT;
+				_pStateMachine->ChangeState(META_TYPE(TurtleHurt1State)->Name());
+				_battle = true;
+				_hp -= 50;
+				if (_hp <= 0)
+				{
+					_state = TURTLESTATE_DEATH;
+					_pStateMachine->ChangeState(META_TYPE(TurtleDeadState)->Name());
+				}
 			}
+			_isHurt = true;
 		}
 		break;
 		//오브젝트와 충돌했다

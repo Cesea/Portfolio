@@ -51,6 +51,10 @@ protected:
 	//hurt
 	int _hurtTime;
 	int _hurtCount;
+	//isHurt
+	bool _isHurt;
+	int _unBeatableTime;
+	int _unBeatableCount;
 	//플레이어 정보
 public:
     Vector3 _playerPos;

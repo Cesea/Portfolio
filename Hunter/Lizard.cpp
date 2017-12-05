@@ -108,6 +108,10 @@ bool Lizard::CreateFromWorld(World & world, const Vector3 &Pos)
 
 	_hp = 1000;
 
+	_isHurt = false;
+	_unBeatableTime = 15;
+	_unBeatableCount = _unBeatableTime;
+
 	//이벤트 등록
 	EventChannel channel;
 	channel.Add<CollisionSystem::ActorTriggerEvent, Lizard>(*this);
@@ -360,6 +364,16 @@ void Lizard::Update(float deltaTime)
 		}
 	}
 	transComp.SetWorldPosition(transComp.GetWorldPosition().x, TERRAIN->GetHeight(transComp.GetWorldPosition().x, transComp.GetWorldPosition().z), transComp.GetWorldPosition().z);
+
+	if (_isHurt)
+	{
+		_unBeatableCount--;
+		if (_unBeatableCount < 0)
+		{
+			_unBeatableCount = _unBeatableTime;
+			_isHurt = false;
+		}
+	}
 }
 
 void Lizard::Handle(const CollisionSystem::ActorTriggerEvent & event)
@@ -370,18 +384,23 @@ void Lizard::Handle(const CollisionSystem::ActorTriggerEvent & event)
 	{
 		//플레이어와 충돌했다(내가 가해자)
 	case CollisionComponent::TRIGGER_TYPE_PLAYER:
-		if (_state != LIZARDSTATE_HURT&&_state != LIZARDSTATE_DEATH)
+		if (!_isHurt)
 		{
-			resetAllCount();
-			_state = LIZARDSTATE_HURT;
-			_pStateMachine->ChangeState(META_TYPE(LizardHurt1State)->Name());
-			_battle = true;
+			//일반공격중엔 무적으로
+			if (_state != LIZARDSTATE_HURT&&_state != LIZARDSTATE_DEATH&&_state != LIZARDSTATE_ATK1&&_state != LIZARDSTATE_ATK2)
+			{
+				resetAllCount();
+				_state = LIZARDSTATE_HURT;
+				_pStateMachine->ChangeState(META_TYPE(LizardHurt1State)->Name());
+				_battle = true;
+			}
 			_hp -= 50;
 			if (_hp <= 0)
 			{
 				_state = LIZARDSTATE_DEATH;
 				_pStateMachine->ChangeState(META_TYPE(LizardDeadState)->Name());
 			}
+			_isHurt = true;
 		}
 		break;
 		//오브젝트와 충돌했다
