@@ -289,6 +289,12 @@
     <ClCompile Include="ParticleSystem.cpp">
       <Filter>Game\GameSystems\ParticleSystem</Filter>
     </ClCompile>
+    <ClCompile Include="PSystem.cpp">
+      <Filter>Game\GameComponents\ParticleComponent</Filter>
+    </ClCompile>
+    <ClCompile Include="fireRing.cpp">
+      <Filter>Game\Particle</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Lights.h" />
@@ -661,6 +667,12 @@
     <ClInclude Include="ParticleSystem.h">
       <Filter>Game\GameSystems\ParticleSystem</Filter>
     </ClInclude>
+    <ClInclude Include="PSystem.h">
+      <Filter>Game\GameComponents\ParticleComponent</Filter>
+    </ClInclude>
+    <ClInclude Include="fireRing.h">
+      <Filter>Game\Particle</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Hunter.rc" />
@@ -827,6 +839,9 @@
     </Filter>
     <Filter Include="Game\GameSystems\ParticleSystem">
       <UniqueIdentifier>{511a1096-6ec3-4a89-854b-550cff4781ef}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\Particle">
+      <UniqueIdentifier>{f482426c-6cfc-47d6-99be-9cc729b3bf58}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

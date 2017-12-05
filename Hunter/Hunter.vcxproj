@@ -155,6 +155,7 @@
     <ClCompile Include="EntityIDPool.cpp" />
     <ClCompile Include="EnvironmentSphere.cpp" />
     <ClCompile Include="Filter.cpp" />
+    <ClCompile Include="fireRing.cpp" />
     <ClCompile Include="Frustum.cpp" />
     <ClCompile Include="GameCommand.cpp" />
     <ClCompile Include="GameObjectFactory.cpp" />
@@ -184,6 +185,7 @@
     <ClCompile Include="PlayerStates.cpp" />
     <ClCompile Include="Player_CallBack.cpp" />
     <ClCompile Include="PointLight.cpp" />
+    <ClCompile Include="PSystem.cpp" />
     <ClCompile Include="QuadTree.cpp" />
     <ClCompile Include="Quaternion.cpp" />
     <ClCompile Include="Ray.cpp" />
@@ -263,6 +265,7 @@
     <ClInclude Include="EntityIDPool.h" />
     <ClInclude Include="EnvironmentSphere.h" />
     <ClInclude Include="Filter.h" />
+    <ClInclude Include="fireRing.h" />
     <ClInclude Include="Frustum.h" />
     <ClInclude Include="GameCommand.h" />
     <ClInclude Include="GameComponent.h" />
@@ -299,6 +302,7 @@
     <ClInclude Include="PlayerAnimationString.h" />
     <ClInclude Include="PlayerStates.h" />
     <ClInclude Include="PointLight.h" />
+    <ClInclude Include="PSystem.h" />
     <ClInclude Include="QuadTree.h" />
     <ClInclude Include="Quaternion.h" />
     <ClInclude Include="Ray.h" />

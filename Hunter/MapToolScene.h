@@ -13,6 +13,9 @@
 #include "Player.h"
 #include "Snake.h"
 
+#include "PSystem.h"
+#include "fireRing.h"
+
 class MapToolScene : public IScene
 {
 	friend class Terrain;
@@ -36,7 +39,7 @@ public:
 protected :
 	Editor *_editor{};
 
-	Entity trash;
+	PSystem * _particle;
 
 public:
 	virtual void Handle(const Editor::GetObjectFromSceneEvent &event);
