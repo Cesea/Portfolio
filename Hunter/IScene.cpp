@@ -116,7 +116,6 @@ bool IScene::Update(float deltaTime, const InputManager & input)
 	}
 	_editorInput = false;
 
-
 	_camera.UpdateMatrix();
 	_camera.UpdateCamToDevice();
 	_camera.UpdateFrustum();
