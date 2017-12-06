@@ -70,18 +70,18 @@ bool Snake::CreateFromWorld(World & world, const Vector3 &Pos)
 
 	_entity.Activate();
 
-	_pStateMachine = new SnakeStateMachine;
-	_pStateMachine->Init(this);
-	_pStateMachine->RegisterState(META_TYPE(SnakeIdleState)->Name(), new SnakeIdleState());
-	_pStateMachine->RegisterState(META_TYPE(SnakeMoveState)->Name(), new SnakeMoveState());
-	_pStateMachine->RegisterState(META_TYPE(SnakeFindState)->Name(), new SnakeFindState());
-	_pStateMachine->RegisterState(META_TYPE(SnakeAttackState)->Name(), new SnakeAttackState());
-	_pStateMachine->RegisterState(META_TYPE(SnakeAttack2State)->Name(), new SnakeAttack2State());
-	_pStateMachine->RegisterState(META_TYPE(SnakeAttack3State)->Name(), new SnakeAttack3State());
-	_pStateMachine->RegisterState(META_TYPE(SnakeStandState)->Name(), new SnakeStandState());
-	_pStateMachine->RegisterState(META_TYPE(SnakeDeadState)->Name(), new SnakeDeadState());
-	_pStateMachine->RegisterState(META_TYPE(SnakeHurtState)->Name(), new SnakeHurtState());
-	_pStateMachine->ChangeState(META_TYPE(SnakeMoveState)->Name());
+	//_pStateMachine = new SnakeStateMachine;
+	//_pStateMachine->Init(this);
+	//_pStateMachine->RegisterState(META_TYPE(SnakeIdleState)->Name(), new SnakeIdleState());
+	//_pStateMachine->RegisterState(META_TYPE(SnakeMoveState)->Name(), new SnakeMoveState());
+	//_pStateMachine->RegisterState(META_TYPE(SnakeFindState)->Name(), new SnakeFindState());
+	//_pStateMachine->RegisterState(META_TYPE(SnakeAttackState)->Name(), new SnakeAttackState());
+	//_pStateMachine->RegisterState(META_TYPE(SnakeAttack2State)->Name(), new SnakeAttack2State());
+	//_pStateMachine->RegisterState(META_TYPE(SnakeAttack3State)->Name(), new SnakeAttack3State());
+	//_pStateMachine->RegisterState(META_TYPE(SnakeStandState)->Name(), new SnakeStandState());
+	//_pStateMachine->RegisterState(META_TYPE(SnakeDeadState)->Name(), new SnakeDeadState());
+	//_pStateMachine->RegisterState(META_TYPE(SnakeHurtState)->Name(), new SnakeHurtState());
+	//this->QueueAction(SNAKE_ANIM(SNAKE_MOVE))
 	_state = SNAKESTATE_PATROL;
 	
 	_hp = 500;
@@ -131,7 +131,6 @@ bool Snake::CreateFromWorld(World & world, const Vector3 &Pos)
 
 void Snake::Update(float deltaTime)
 {
-	_pStateMachine->Update(deltaTime, _currentCommand);
 	TransformComponent &transComp = _entity.GetComponent<TransformComponent>();
 	switch (_state)
 	{
@@ -141,13 +140,14 @@ void Snake::Update(float deltaTime)
 		{
 			_delayCount = _delayTime;
 			_state = SNAKESTATE_PATROL;
-			_pStateMachine->ChangeState(META_TYPE(SnakeMoveState)->Name());
+
+			this->QueueAction(SNAKE_ANIM(SNAKE_MOVE));
 		}
 		break;
 	case SNAKESTATE_PATROL:
 		if (_moveSegment.empty())
 		{
-			_pStateMachine->ChangeState(META_TYPE(SnakeIdleState)->Name());
+			this->QueueAction(SNAKE_ANIM(SNAKE_IDLE));
 			_state = SNAKESTATE_IDLE;
 		}
 		else
@@ -181,7 +181,7 @@ void Snake::Update(float deltaTime)
 			    _patrolIndex++;
 				if (_patrolIndex > _moveSegment.size() - 1) _patrolIndex = 0;
 				//IDLE 애니메이션 실행
-				_pStateMachine->ChangeState(META_TYPE(SnakeIdleState)->Name());
+				this->QueueAction(SNAKE_ANIM(SNAKE_IDLE));
 				_state = SNAKESTATE_IDLE;
 			}
 			//아니면 이동속도만큼 이동
@@ -199,7 +199,7 @@ void Snake::Update(float deltaTime)
 		{
 			_roarCount = _roarTime;
 			_state = SNAKESTATE_RUN;
-			_pStateMachine->ChangeState(META_TYPE(SnakeMoveState)->Name());
+			this->QueueAction(SNAKE_ANIM(SNAKE_MOVE));
 		}
 		break;
 	case SNAKESTATE_RUN:
@@ -218,15 +218,15 @@ void Snake::Update(float deltaTime)
 			{
 			case SNAKESKINSTATE_RED:
 				_state = SNAKESTATE_ATK2;
-				_pStateMachine->ChangeState(META_TYPE(SnakeAttack2State)->Name());
+				this->QueueAction(SNAKE_ANIM(SNAKE_ATTACK2));
 				break;
 			case SNAKESKINSTATE_CYAN:
 				_state = SNAKESTATE_ATK3;
-				_pStateMachine->ChangeState(META_TYPE(SnakeAttack3State)->Name());
+				this->QueueAction(SNAKE_ANIM(SNAKE_ATTACK3));
 				break;
 			case SNAKESKINSTATE_BLACK:
 				_state = SNAKESTATE_ATK1;
-				_pStateMachine->ChangeState(META_TYPE(SnakeAttackState)->Name());
+				this->QueueAction(SNAKE_ANIM(SNAKE_ATTACK1));
 				break;
 			}
 		}
@@ -250,7 +250,7 @@ void Snake::Update(float deltaTime)
 			{
 				_battle = false;
 				_state = SNAKESTATE_IDLE;
-				_pStateMachine->ChangeState(META_TYPE(SnakeIdleState)->Name());
+				this->QueueAction(SNAKE_ANIM(SNAKE_IDLE));
 			}
 			Vector3 rotatePos = _playerPos;
 			rotatePos.y = transComp.GetWorldPosition().y;
@@ -273,7 +273,7 @@ void Snake::Update(float deltaTime)
 			{
 				_battle = false;
 				_state = SNAKESTATE_IDLE;
-				_pStateMachine->ChangeState(META_TYPE(SnakeIdleState)->Name());
+				this->QueueAction(SNAKE_ANIM(SNAKE_IDLE));
 			}
 			Vector3 rotatePos = _playerPos;
 			rotatePos.y = transComp.GetWorldPosition().y;
@@ -296,7 +296,7 @@ void Snake::Update(float deltaTime)
 			{
 				_battle = false;
 				_state = SNAKESTATE_IDLE;
-				_pStateMachine->ChangeState(META_TYPE(SnakeIdleState)->Name());
+				this->QueueAction(SNAKE_ANIM(SNAKE_IDLE));
 			}
 			Vector3 rotatePos = _playerPos;
 			rotatePos.y = transComp.GetWorldPosition().y;
@@ -311,7 +311,7 @@ void Snake::Update(float deltaTime)
 		{
 			_standCount = _standTime;
 			_state = SNAKESTATE_PATROL;
-			_pStateMachine->ChangeState(META_TYPE(SnakeMoveState)->Name());
+			this->QueueAction(SNAKE_ANIM(SNAKE_MOVE));
 		}
 		break;
 	case SNAKESTATE_HURT:
@@ -326,7 +326,7 @@ void Snake::Update(float deltaTime)
 			if (distance < _atkRange)
 			{
 				_state = SNAKESTATE_ATK1;
-				_pStateMachine->ChangeState(META_TYPE(SnakeAttackState)->Name());
+				this->QueueAction(SNAKE_ANIM(SNAKE_ATTACK1));
 			}
 			else
 			{
@@ -334,7 +334,7 @@ void Snake::Update(float deltaTime)
 				if (_battle)
 				{
 					_state = SNAKESTATE_RUN;
-					_pStateMachine->ChangeState(META_TYPE(SnakeMoveState)->Name());
+					this->QueueAction(SNAKE_ANIM(SNAKE_MOVE));
 				}
 				//비전투인데 맞았다?
 				else
@@ -342,7 +342,7 @@ void Snake::Update(float deltaTime)
 					// 추격
 					_battle = true;
 					_state = SNAKESTATE_FIND;
-					_pStateMachine->ChangeState(META_TYPE(SnakeFindState)->Name());
+					this->QueueAction(SNAKE_ANIM(SNAKE_ROAR));
 					Vector3 distance = _playerPos - transComp.GetWorldPosition();
 					Vec3Normalize(&distance, &distance);
 					transComp.LookDirection(-distance, D3DX_PI * 2);
@@ -361,7 +361,7 @@ void Snake::Update(float deltaTime)
 			//찾으면 FIND가 되며 battle상태가 됌
 			_battle = true;
 			_state = SNAKESTATE_FIND;
-			_pStateMachine->ChangeState(META_TYPE(SnakeFindState)->Name());
+			this->QueueAction(SNAKE_ANIM(SNAKE_ROAR));
 			Vector3 rotatePos = _playerPos;
 			rotatePos.y = transComp.GetWorldPosition().y;
 			Vector3 distance = rotatePos - transComp.GetWorldPosition();
@@ -398,13 +398,13 @@ void Snake::Handle(const CollisionSystem::ActorTriggerEvent & event)
 			{
 				resetAllCount();
 				_state = SNAKESTATE_HURT;
-				_pStateMachine->ChangeState(META_TYPE(SnakeHurtState)->Name());
+				this->QueueAction(SNAKE_ANIM(SNAKE_HIT1));
 				_battle = true;
 				_hp -= 50;
 				if (_hp <= 0)
 				{
 					_state = SNAKESTATE_DIE;
-					_pStateMachine->ChangeState(META_TYPE(SnakeDeadState)->Name());
+					this->QueueAction(SNAKE_ANIM(SNAKE_DEATH));
 				}
 			}
 		}
@@ -438,9 +438,11 @@ void Snake::SetupCallbackAndCompression()
 	AddCallbackKeysAndCompress(pController, anim0, 1, &warSwingLeftKeys, D3DXCOMPRESS_DEFAULT, 0.1f);
 }
 
-void Snake::QueueAction(const Action & action)
+void Snake::QueueAction(Action & action, bool cancle)
 {
-	_pActionComp->_actionQueue.PushAction(action);
+	action._cancle = cancle;
+   _pActionComp->_actionQueue.PushAction(action);
+   _animationEnum = action._enum;
 }
 
 bool Snake::findPlayer(Vector3 forward, Vector3 playerPos, Vector3 myPos, float range1, float range2, float findRadian)
