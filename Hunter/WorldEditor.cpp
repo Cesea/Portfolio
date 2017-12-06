@@ -151,7 +151,7 @@ void Editor::InTerrainEditMode()
 				TERRAIN->AddHeightOnCursorPos(Vector2((float)_mx, (float)_my), 
 					_terrainEditor._heightBrush._innerRadius,
 					_terrainEditor._heightBrush._outterRadius,
-					_terrainEditor._heightBrush._intensity);
+					-1.0f -_terrainEditor._heightBrush._intensity);
 			}
 			else if (_terrainEditor._smooth)
 			{
@@ -383,7 +383,6 @@ void Editor::InTerrainEditMode()
 		}
 
 		ImguiUnindent();
-
 	}
 	ImguiUnindent();
 }
@@ -397,12 +396,27 @@ void Editor::InObjectLocateMode()
 
 	ImguiIndent();
 
-	ImguiSlider("Num Object To Paint", (float *)&_objectLocator._numObjectToPaint, 0.0f, 5.0f, 1.0f);
+	ImguiSlider("Object Scale Min Factor", &_objectLocator._scaleMin, 0.1f, 2.0f, 0.1f);
+	ImguiSlider("Object Scale Max Factor", &_objectLocator._scaleMax, 0.1f, 2.0f, 0.1f);
+	if (_objectLocator._scaleMin >= _objectLocator._scaleMax)
+	{
+		_objectLocator._scaleMin = _objectLocator._scaleMax - 0.1f;
+	}
+	if (_objectLocator._scaleMax <= _objectLocator._scaleMin)
+	{
+		_objectLocator._scaleMax = _objectLocator._scaleMin + 0.1f;
+	}
 
-	ImguiSlider("Brush Inner Radius", &_objectLocator._objectPaintBrush._innerRadius, 0.0f, 5.0f, 0.1f);
-	_terrainEditor._textureBrush.SetInnerRadius(_objectLocator._objectPaintBrush._innerRadius);
-	ImguiSlider("Brush Outter Radius", &_objectLocator._objectPaintBrush._outterRadius, 0.0f, 5.0f, 0.1f);
-	_terrainEditor._textureBrush.SetOutterRadius(_objectLocator._objectPaintBrush._outterRadius);
+	ImguiSlider("Object Rotation Min Factor", &_objectLocator._rotationMin, -0.9f, 0.9f, 0.05f);
+	ImguiSlider("Object Rotation Max Factor", &_objectLocator._rotationMax, -0.9f, 0.9f, 0.05f);
+	if (_objectLocator._rotationMin >= _objectLocator._rotationMax)
+	{
+		_objectLocator._rotationMin = _objectLocator._rotationMax - 0.1f;
+	}
+	if (_objectLocator._rotationMax <= _objectLocator._rotationMin)
+	{
+		_objectLocator._rotationMax = _objectLocator._rotationMin + 0.1f;
+	}
 
 	if (!_objectLocator._currentStaticHandle.IsValid())
 	{
@@ -575,32 +589,26 @@ void Editor::InObjectLocateMode()
 		ImguiIndent();
 		if (ImguiButton("Bat"))
 		{
-			//_objectLocator._currentSkinnedHandle = VIDEO->GetSkinnedXMesh("Bat");
 			_objectLocator._typeToLocate = ARCHE_BAT;
 		}
 		if (ImguiButton("Cat"))
 		{
-			//_objectLocator._currentSkinnedHandle = VIDEO->GetSkinnedXMesh("Cat");
 			_objectLocator._typeToLocate = ARCHE_CAT;
 		}
 		if (ImguiButton("Hydra"))
 		{
-			//_objectLocator._currentSkinnedHandle = VIDEO->GetSkinnedXMesh("Hydra");
 			_objectLocator._typeToLocate = ARCHE_HYDRA;
 		}
 		if (ImguiButton("Lizard"))
 		{
-			//_objectLocator._currentSkinnedHandle = VIDEO->GetSkinnedXMesh("Lizard");
 			_objectLocator._typeToLocate = ARCHE_LIZARD;
 		}
 		if (ImguiButton("Snake"))
 		{
-			//_objectLocator._currentSkinnedHandle = VIDEO->GetSkinnedXMesh("Snake");
 			_objectLocator._typeToLocate = ARCHE_SNAKE;
 		}
 		if (ImguiButton("Turtle"))
 		{
-			//_objectLocator._currentSkinnedHandle = VIDEO->GetSkinnedXMesh("Turtle");
 			_objectLocator._typeToLocate = ARCHE_TURTLE;
 		}
 		//if (ImguiButton("Dragon"))
@@ -609,11 +617,6 @@ void Editor::InObjectLocateMode()
 		//}
 		ImguiUnindent();
 	}
-
-
-	//if ((_objectLocator._currentStaticHandle.IsValid() || _objectLocator._currentSkinnedHandle.IsValid()) &&
-	//	_leftButtonPressed &&
-	//	!(_mx > 0 && _mx < EDITORX + EDITORSIZEX && _my >= 0 && _my < EDITORY + EDITORSIZEY))
 
 	if ((_objectLocator._currentStaticHandle.IsValid() || _objectLocator._typeToLocate != ARCHE_NONE) &&
 		_leftButtonPressed &&
@@ -632,8 +635,11 @@ void Editor::InObjectLocateMode()
 		}
 
 		_channel.Broadcast<GameObjectFactory::CreateObjectOnClickEvent>(
-			GameObjectFactory::CreateObjectOnClickEvent(_objectLocator._typeToLocate, resourceHandle, 
-				Vector2((float)_mx, (float)_my)));
+			GameObjectFactory::CreateObjectOnClickEvent(_objectLocator._typeToLocate, 
+				resourceHandle, 
+				Vector2((float)_mx, (float)_my),
+			RandFloat(_objectLocator._scaleMin, _objectLocator._scaleMax),
+			RandFloat(_objectLocator._rotationMin, _objectLocator._rotationMax)));
 	}
 }
 
@@ -695,25 +701,23 @@ void Editor::InObjectEditMode()
 
 			ImguiLabel("Orientation");
 			{
-				Quaternion test;
+				Quaternion quat;
 				Matrix rotation = _objectEditor._pTransform->_matFinal;
 				rotation._41 = 0;
 				rotation._42 = 0;
 				rotation._43 = 0;
 
-				QuaternionRotationMatrix(&test, &rotation);
-
-				Console::Log("%f %f %f %f\n", test.x, test.y, test.z, test.w);
+				QuaternionRotationMatrix(&quat, &rotation);
 
 				ImguiIndent();
 
-				ImguiSlider("X", &test.x, 0.0f, 1.0f, 0.01f);
-				ImguiSlider("Y", &test.y, 0.0f, 1.0f, 0.01f);
-				ImguiSlider("Z", &test.z, 0.0f, 1.0f, 0.01f);
+				ImguiSlider("X", &quat.x, 0.0f, 1.0f, 0.01f);
+				ImguiSlider("Y", &quat.y, -0.9f, 0.9f, 0.01f);
+				ImguiSlider("Z", &quat.z, 0.0f, 1.0f, 0.01f);
 
-				QuaternionNormalize(&test, &test);
+				QuaternionNormalize(&quat, &quat);
 
-				_objectEditor._pTransform->SetRotateWorld(test);
+				_objectEditor._pTransform->SetRotateWorld(quat);
 
 				ImguiUnindent();
 			}
@@ -824,10 +828,43 @@ void Editor::ShowStatusWindow()
 			_showStatus = !_showStatus;
 		}
 
+		ImguiLabel("World State");
+		{
+			ImguiIndent();
+			sprintf(_statusWindow._worldTerrainInfoStr, "XChunkCount : %d, ZChunkCount : %d", 
+				TERRAIN->GetXChunkCount(), TERRAIN->GetZChunkCount());
+			//sprintf(_statusWindow._worldObjectInfoStr, "");
+
+			ImguiLabel(_statusWindow._worldTerrainInfoStr);
+			//ImguiLabel(_statusWindow._worldObjectInfoStr);
+
+			ImguiUnindent();
+		}
+
+
 		if (nullptr != _pSelectedObject)
 		{
 			TerrainTilePos tilePos = _pSelectedObject->GetTilePos();
-			ImguiLabel("Player State");
+			ImguiLabel("Terrain Chunk State");
+			{
+				ImguiIndent();
+				ImguiLabel(_statusWindow._chunkPosStr);
+
+				const Terrain::TerrainChunk &refChunk = TERRAIN->GetChunkAt(tilePos._chunkX, tilePos._chunkZ);
+
+				sprintf(_statusWindow._chunkInfoStr, "Total Num Entities : %d", refChunk._numTotalEntity);
+				sprintf(_statusWindow._tileInfoStr, "Tile Num Entity : %d", 
+					refChunk._tiles[Index2D(tilePos._tileX, tilePos._tileZ, TERRAIN_TILE_DIM)]._entities.size());
+
+				ImguiLabel(_statusWindow._chunkInfoStr);
+				ImguiLabel(_statusWindow._tileInfoStr);
+
+				ImguiUnindent();
+			}
+
+			ImguiSeparatorLine();
+
+			ImguiLabel("Player Pos");
 			{
 				ImguiIndent();
 				sprintf(_statusWindow._chunkPosStr, "ChunkX : %d, ChunkZ : %d", tilePos._chunkX, tilePos._chunkZ);
@@ -840,25 +877,35 @@ void Editor::ShowStatusWindow()
 				ImguiUnindent();
 			}
 
-			ImguiSeparatorLine();
-
-			ImguiLabel("Terrain Chunk State");
+			ImguiLabel("Cursor Pos");
 			{
 				ImguiIndent();
-				ImguiLabel(_statusWindow._chunkPosStr);
+				Ray ray;
+				_pCurrentScene->_camera.ComputeRay(Vector2((float)_mx, (float)_my), &ray);
+				Vector3 rayHitPos;
+				if (TERRAIN->IsIntersectRay(ray, &rayHitPos))
+				{
+					TerrainTilePos cursorTilePos;
+					TERRAIN->ConvertWorldPostoTilePos(rayHitPos, &cursorTilePos);
 
-				const Terrain::TerrainChunk &refChunk = TERRAIN->GetChunkAt(tilePos._chunkX, tilePos._chunkZ);
-				sprintf(_statusWindow._chunkInfoStr, "Total Num Entities : %d", refChunk._numTotalEntity);
+					const Terrain::TerrainChunk &refCursorChunk = 
+						TERRAIN->GetChunkAt(cursorTilePos._chunkX, cursorTilePos._chunkZ);
 
-				ImguiLabel(_statusWindow._chunkInfoStr);
+					sprintf(_statusWindow._cursorWorldPosStr, "Cursor World X : %f, Y : %f, Z : %f",
+						rayHitPos.x, rayHitPos.y, rayHitPos.z);
+					sprintf(_statusWindow._cursorChunkInfoStr, "Chunk Total Num Entities : %d",
+						refCursorChunk._numTotalEntity);
+					sprintf(_statusWindow._cursorTileInfoStr, "Tile Num Entity : %d",
+						refCursorChunk.
+						_tiles[Index2D(cursorTilePos._tileX, cursorTilePos._tileZ, TERRAIN_TILE_DIM)].
+						_entities.size());
 
-				sprintf(_statusWindow._tileInfoStr, "Tile Num Entity : %d", 
-					refChunk._tiles[Index2D(tilePos._tileX, tilePos._tileZ, TERRAIN_TILE_DIM)]._entities.size());
-				ImguiLabel(_statusWindow._tileInfoStr);
-
+					ImguiLabel(_statusWindow._cursorWorldPosStr);
+					ImguiLabel(_statusWindow._cursorChunkInfoStr);
+					ImguiLabel(_statusWindow._cursorTileInfoStr);
+				}
 				ImguiUnindent();
 			}
-
 		}
 
 		ImguiEndScrollArea();
@@ -998,6 +1045,7 @@ void Editor::Render()
 	} break;
 	case Editor::eObjectLocate:
 	{
+		_objectLocator._objectPaintBrush.Render();
 
 	} break;
 	case Editor::eObjectEdit:

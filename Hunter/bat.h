@@ -63,8 +63,6 @@ protected:
 
 	BatCallbackData _callbackData;
 
-	BatStateMachine *_pStateMachine;
-
 	GameCommand _currentCommand;
 
 	ActionComponent *_pActionComp{};

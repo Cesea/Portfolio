@@ -62,8 +62,6 @@ void Camera::MoveAndRotate(float deltaTime, const InputManager & input)
 	if (input.keyboard.IsPressed('1'))
 	{
 		_cameraState = CAMERASTATE_CREATE;
-		_horizontalAngle = 0.0f;
-		_verticalAngle = 0.0f;
 		_targetRadius = CAMERA_TARGET_DEFAULT_RADIUS;
 		//ShowCursor(true);
 	}
@@ -92,12 +90,12 @@ void Camera::MoveAndRotate(float deltaTime, const InputManager & input)
 
 			if (deltaX != 0)
 			{
-				_horizontalAngle += _rotationSpeed * deltaTime * (float)deltaX;
+				_horizontalAngle += 3.0f * deltaTime * (float)deltaX;
 			}
 
 			if (deltaY != 0)
 			{
-				_verticalAngle += _rotationSpeed * deltaTime * (float)deltaY;
+				_verticalAngle += 3.0f * deltaTime * (float)deltaY;
 			}
 
 			ClampFloat(_verticalAngle, MIN_VERT_ANGLE, MAX_VERT_ANGLE);
@@ -126,24 +124,27 @@ void Camera::MoveAndRotate(float deltaTime, const InputManager & input)
 
 		if (deltaY != 0)
 		{
+			_verticalAngle += _rotationSpeed * deltaTime * (-deltaY / 10.0f);
 		}
+
 		if (_horizontalAngle < 0.0f)
 		{
 			_horizontalAngle += D3DX_PI * 2;
-
 		}
 		else if (_horizontalAngle > D3DX_PI * 2)
 		{
 			_horizontalAngle -= D3DX_PI * 2;
 		}
 
+		ClampFloat(_verticalAngle, 0.1f, PI_DIV_2 - 0.1f);
+
 		Vector3 camPosition;
 		Vector3 targetPosition = refTargetTransform.GetWorldPosition();
 
-		camPosition.x = cosf(_horizontalAngle) * _targetRadius + targetPosition.x;
-		camPosition.y = targetPosition.y + 3.0f;
+		camPosition.x = cosf(_verticalAngle) * cosf(_horizontalAngle) * _targetRadius + targetPosition.x;
+		camPosition.y = targetPosition.y + 3.0f + sinf(_verticalAngle);
 		targetPosition.y += 1.6f;
-		camPosition.z = sinf(_horizontalAngle) * _targetRadius + targetPosition.z;
+		camPosition.z = cosf(_verticalAngle) * sinf(_horizontalAngle) * _targetRadius + targetPosition.z;
 		refTransform.SetWorldPosition(camPosition);
 		refTransform.LookPosition(targetPosition);
 
@@ -172,7 +173,6 @@ void Camera::MoveAndRotate(float deltaTime, const InputManager & input)
 		else if (_pTargetObject->_state == Player::PLAYERSTATE_RUN)
 		{
 		}
-
 		SetCursorPos(CLIENTCENTERX, CLIENTCENTERY);
 	} break;
 	}

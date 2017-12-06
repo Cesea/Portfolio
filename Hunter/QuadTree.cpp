@@ -74,7 +74,7 @@ QuadTree::~QuadTree()
 }
 
 
-bool QuadTree::Init(video::TerrainVertex *pVertices, uint32 verNumEdge, int32 sectionRes)
+bool QuadTree::Init(video::TerrainVertex *pVertices, uint32 verNumEdge, int32 minRadius)
 {
 	_pTerrainVertices = pVertices;
 
@@ -83,6 +83,7 @@ bool QuadTree::Init(video::TerrainVertex *pVertices, uint32 verNumEdge, int32 se
 	_corners[eCornerLB] = (verNumEdge - 1) * verNumEdge;
 	_corners[eCornerRB] = verNumEdge * verNumEdge - 1;
 
+	_minRadius = minRadius;
 
 	CreateChildTree();
 
@@ -105,7 +106,7 @@ void QuadTree::CreateChildTree()
 	_radius = sqrt(prevLength);
 
 	//자식이 있다.
-	if ((_corners[eCornerRT] - _corners[eCornerLT]) > 1)
+	if ((_corners[eCornerRT] - _corners[eCornerLT]) > _minRadius)
 	{
 		//센터 인덱스 계산
 		_center = (_corners[0] + _corners[1] + _corners[2] + _corners[3]) / 4;
@@ -122,6 +123,7 @@ void QuadTree::CreateChildTree()
 		_pChilds[eCornerLT]->_corners[eCornerLB] = leftCenter;
 		_pChilds[eCornerLT]->_corners[eCornerRB] = _center;
 		_pChilds[eCornerLT]->_pTerrainVertices = _pTerrainVertices;
+		_pChilds[eCornerLT]->_minRadius = _minRadius;
 		_pChilds[eCornerLT]->CreateChildTree();
 
 		//우상단 자식
@@ -131,6 +133,7 @@ void QuadTree::CreateChildTree()
 		_pChilds[eCornerRT]->_corners[eCornerLB] = _center;
 		_pChilds[eCornerRT]->_corners[eCornerRB] = rightCenter;
 		_pChilds[eCornerRT]->_pTerrainVertices = _pTerrainVertices;
+		_pChilds[eCornerRT]->_minRadius = _minRadius;
 		_pChilds[eCornerRT]->CreateChildTree();
 
 		//좌하단 자식
@@ -140,6 +143,7 @@ void QuadTree::CreateChildTree()
 		_pChilds[eCornerLB]->_corners[eCornerLB] = _corners[eCornerLB];
 		_pChilds[eCornerLB]->_corners[eCornerRB] = bottomCenter;
 		_pChilds[eCornerLB]->_pTerrainVertices = _pTerrainVertices;
+		_pChilds[eCornerLB]->_minRadius = _minRadius;
 		_pChilds[eCornerLB]->CreateChildTree();
 
 		//우하단 자식
@@ -149,6 +153,7 @@ void QuadTree::CreateChildTree()
 		_pChilds[eCornerRB]->_corners[eCornerLB] = bottomCenter;
 		_pChilds[eCornerRB]->_corners[eCornerRB] = _corners[eCornerRB];
 		_pChilds[eCornerRB]->_pTerrainVertices = _pTerrainVertices;
+		_pChilds[eCornerRB]->_minRadius = _minRadius;
 		_pChilds[eCornerRB]->CreateChildTree();
 	}
 	else
@@ -163,7 +168,7 @@ void QuadTree::GetRayHits(const Ray &ray, std::vector<Vector3> *pOutHit)
 	if (IsRayHitBoundSphere(ray, _centerPos, _radius, NULL, NULL))
 	{
 		//자식이 있냐?
-		if ((_corners[eCornerRT] - _corners[eCornerLT]) > 1)
+		if ((_corners[eCornerRT] - _corners[eCornerLT]) > _minRadius)
 		{
 			//자식 재귀
 			for (int32 i = 0; i < 4; i++)

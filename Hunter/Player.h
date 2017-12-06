@@ -32,7 +32,7 @@ public :
 	Player();
 	virtual ~Player();
 
-	virtual bool CreateFromWorld(World &world, const Vector3 &Pos);
+	virtual bool CreateFromWorld(World &world, const Vector3 &pos);
 	void Update(float deltaTime);
 
 	void Handle(const InputManager::KeyDownEvent &event);
@@ -77,13 +77,12 @@ private :
 	ActionComponent *_pActionComp{};
 	TransformComponent *_pTransformComp{};
 	CollisionComponent *_pCollisionComp{};
-
 private :
 	EventChannel _channel;
-	float _walkSpeed{2.0f};
-	float _runSpeed{5.0f};
+	float _walkSpeed{1.6f};
+	float _runSpeed{5.5f};
 
-	float _rotationSpeed{ 6.0f };
+	float _rotationSpeed{ 7.0f };
 
 	int32 _hp{ 400 };
 
