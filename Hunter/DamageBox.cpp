@@ -35,4 +35,6 @@ bool DamageBox::CreateFromWorld(World & world, const Vector3 & Pos)
 
 void DamageBox::Update(float deltaTime)
 {
+	CollisionComponent &collision = _entity.GetComponent<CollisionComponent>();
+	collision._duration -= deltaTime;
 }

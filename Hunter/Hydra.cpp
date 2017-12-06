@@ -229,7 +229,7 @@ void Hydra::Update(float deltaTime)
 		{
 			EventChannel _channel;
 			_channel.Broadcast<GameObjectFactory::DamageBoxEvent>(GameObjectFactory::DamageBoxEvent(transComp.GetWorldPosition()-Vector3(-1,-1,-1), transComp.GetWorldPosition() - Vector3(1, 1, 1),
-				10.0f,CollisionComponent::TRIGGER_TYPE_ENEMY_DMGBOX,0.0f,0.0f));
+				10.0f,CollisionComponent::TRIGGER_TYPE_ENEMY_DMGBOX,0.0f,0.0f,1.0f));
 			switch (_skinType)
 			{
 			case HYDRASKINSTATE_GREEN:

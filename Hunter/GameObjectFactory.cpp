@@ -336,6 +336,7 @@ void GameObjectFactory::Handle(const DamageBoxEvent & event)
 	collision._dmg = event._dmg;
 	collision._velocity = event._velocity;
 	collision._triggerType = event._type;
+	collision._duration = event._duration;
 }
 const char * ArcheToString(ARCHE_TYPE type)
 {
