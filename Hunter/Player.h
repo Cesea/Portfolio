@@ -85,7 +85,7 @@ private :
 
 	float _rotationSpeed{ 7.0f };
 
-	int32 _hp{ 400 };
+	int32 _hp{ INT_MAX };
 
 	//int32 _stamina{ 100 };
 
@@ -105,6 +105,8 @@ private :
 	float _currentRotation{};
 
 	bool32 _camRotated{false};
+	bool32 _superArmor = true;
+	StopWatch _superArmorTimer;
 
 public :
 

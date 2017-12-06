@@ -83,6 +83,8 @@ bool Player::CreateFromWorld(World & world, const Vector3 &pos)
    _attackToStanceTimer.Reset(0.4f);
    _attackTriggerTimer.Reset(0.08f);
 
+   _superArmorTimer.Reset(1.0f);
+
    return true;
 }
 
@@ -560,6 +562,30 @@ void Player::Update(float deltaTime)
 
    case Player::PLAYERSTATE_HURT :
    {
+	   if(_superArmor == true)
+	   {
+		   if (_superArmorTimer.Tick(deltaTime))
+		   {
+			   _superArmor = false;
+			   _superArmorTimer.Restart();
+
+			   this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWarCombatMode));
+			   _state = PLAYERSTATE_STANCE;
+		   }
+		   else if (_currentCommand._type == GAMECOMMAND_ACTION)
+		   {
+			   if (_currentCommand._behavior._type == BEHAVIOR_ATTACK &&
+				   _currentMovement._vertical != VERTICAL_MOVEMENT_DOWN)
+			   {
+				   _state = PLAYERSTATE_ATTACK;
+				   _pActionComp->_actionQueue.ClearQueue();
+				   this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWarSwingLeft));
+				   _superArmor = false;
+				   _superArmorTimer.Restart();
+				   break;
+			   }
+		   }
+	   }
 
    }break;
 
@@ -1166,6 +1192,7 @@ void Player::Handle(const CollisionSystem::ActorTriggerEvent & event)
 	{
 		if (_state != PLAYERSTATE_HURT && _state != PLAYERSTATE_DEAD)
 		{
+			_collision._valid = false;
 			MovementStop(_currentMovement);
 			_state = PLAYERSTATE_HURT;
 			_hp -= 50;

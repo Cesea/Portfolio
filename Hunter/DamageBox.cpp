@@ -37,9 +37,10 @@ void DamageBox::Update(float deltaTime)
 {
 	CollisionComponent &collision = _entity.GetComponent<CollisionComponent>();
 	collision._duration -= deltaTime;
-	if (collision._duration < 0.0f || !collision._valid)
+	if (collision._duration < 0.0f || collision._valid == false)
 	{
 		EventChannel channel;
+		_valid = false;
 		channel.Broadcast<IScene::SceneDirty>(IScene::SceneDirty());
 	}
 }
