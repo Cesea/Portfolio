@@ -3,7 +3,6 @@
 #include "TurtleAnimationString.h"
 
 class Turtle;
-class TurtleStateMachine;
 
 struct TurtleCallbackData
 {
@@ -68,13 +67,11 @@ protected:
 
 	TurtleCallbackData _callbackData;
 
-	TurtleStateMachine *_pStateMachine;
-
 	GameCommand _currentCommand;
 
 	ActionComponent *_pActionComp{};
 
-	void QueueAction(const Action &action);
+	void QueueAction(Action &action, bool cancle = false);
 
 	bool Turtle::findPlayer(Vector3 forward, Vector3 playerPos, Vector3 myPos, float range1, float range2, float findRadian);
 };
