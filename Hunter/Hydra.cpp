@@ -209,9 +209,11 @@ void Hydra::Update(float deltaTime)
 		transComp.LookDirection(-rotateDir, D3DX_PI);
 		if (distance < _atkRange)
 		{
+
 			EventChannel _channel;
 			_channel.Broadcast<GameObjectFactory::DamageBoxEvent>(GameObjectFactory::DamageBoxEvent(transComp.GetWorldPosition() - Vector3(1,1,1), transComp.GetWorldPosition() + Vector3(1, 1, 1),
 				10.0f, CollisionComponent::TRIGGER_TYPE_ENEMY_DMGBOX, 0.0f, 0.0f, 1.0f));
+
 			switch (_skinType)
 			{
 			case HYDRASKINSTATE_GREEN:
@@ -241,6 +243,13 @@ void Hydra::Update(float deltaTime)
 	break;
 	case HYDRASTATE_ATK1:
 		_atkCount--;
+		if (_atkCount == 40)
+		{
+			Vector3 targetPos = transComp.GetWorldPosition() + transComp.GetForward()*_atkRange / 2;
+			EventChannel _channel;
+			_channel.Broadcast<GameObjectFactory::DamageBoxEvent>(GameObjectFactory::DamageBoxEvent(targetPos - Vector3(_atkRange / 2, _atkRange / 2, _atkRange / 2),
+				targetPos + Vector3(_atkRange / 2, _atkRange / 2, _atkRange / 2), 10.0f, CollisionComponent::TRIGGER_TYPE_ENEMY_DMGBOX, 0.0f, 0.0f, 1.0f));
+		}
 		if (_atkCount < 0)
 		{
 			_atkCount = _atkTime;
@@ -270,6 +279,13 @@ void Hydra::Update(float deltaTime)
 		break;
 	case HYDRASTATE_ATK2:
 		_atkCount--;
+		if (_atkCount == 40)
+		{
+			Vector3 targetPos = transComp.GetWorldPosition() + transComp.GetForward()*_atkRange / 2;
+			EventChannel _channel;
+			_channel.Broadcast<GameObjectFactory::DamageBoxEvent>(GameObjectFactory::DamageBoxEvent(targetPos - Vector3(_atkRange / 2, _atkRange / 2, _atkRange / 2),
+				targetPos + Vector3(_atkRange / 2, _atkRange / 2, _atkRange / 2), 10.0f, CollisionComponent::TRIGGER_TYPE_ENEMY_DMGBOX, 0.0f, 0.0f, 1.0f));
+		}
 		if (_atkCount < 0)
 		{
 			_atkCount = _atkTime;
@@ -300,6 +316,13 @@ void Hydra::Update(float deltaTime)
 		break;
 	case HYDRASTATE_ATK3:
 		_atkCount--;
+		if (_atkCount == 40)
+		{
+			Vector3 targetPos = transComp.GetWorldPosition() + transComp.GetForward()*_atkRange / 2;
+			EventChannel _channel;
+			_channel.Broadcast<GameObjectFactory::DamageBoxEvent>(GameObjectFactory::DamageBoxEvent(targetPos - Vector3(_atkRange / 2, _atkRange / 2, _atkRange / 2),
+				targetPos + Vector3(_atkRange / 2, _atkRange / 2, _atkRange / 2), 10.0f, CollisionComponent::TRIGGER_TYPE_ENEMY_DMGBOX, 0.0f, 0.0f, 1.0f));
+		}
 		if (_atkCount < 0)
 		{
 			_atkCount = _atkTime;
@@ -378,6 +401,13 @@ void Hydra::Update(float deltaTime)
 		break;
 	case HYDRASTATE_SP_ATK1:
 		_atkCount--;
+		if (_atkCount == 20)
+		{
+			Vector3 targetPos = transComp.GetWorldPosition() + transComp.GetForward()*_atkRange / 2;
+			EventChannel _channel;
+			_channel.Broadcast<GameObjectFactory::DamageBoxEvent>(GameObjectFactory::DamageBoxEvent(targetPos - Vector3(_atkRange / 2, _atkRange / 2, _atkRange / 2),
+				targetPos + Vector3(_atkRange / 2, _atkRange / 2, _atkRange / 2), 10.0f, CollisionComponent::TRIGGER_TYPE_ENEMY_DMGBOX, 0.0f, 0.0f, 1.0f));
+		}
 		if (_atkCount < 0)
 		{
 			_atkCount = _atkTime;
@@ -402,6 +432,13 @@ void Hydra::Update(float deltaTime)
 		break;
 	case HYDRASTATE_SP_ATK2:
 		_atkCount--;
+		if (_atkCount == 20)
+		{
+			Vector3 targetPos = transComp.GetWorldPosition() + transComp.GetForward()*_atkRange / 2;
+			EventChannel _channel;
+			_channel.Broadcast<GameObjectFactory::DamageBoxEvent>(GameObjectFactory::DamageBoxEvent(targetPos - Vector3(_atkRange / 2, _atkRange / 2, _atkRange / 2),
+				targetPos + Vector3(_atkRange / 2, _atkRange / 2, _atkRange / 2), 10.0f, CollisionComponent::TRIGGER_TYPE_ENEMY_DMGBOX, 0.0f, 0.0f, 1.0f));
+		}
 		if (_atkCount < 0)
 		{
 			_atkCount = _atkTime;
@@ -421,6 +458,13 @@ void Hydra::Update(float deltaTime)
 	case HYDRASTATE_BREATH1:
 	{
 		_atkCount--;
+		if (_atkCount == 40)
+		{
+			Vector3 targetPos = transComp.GetWorldPosition() + transComp.GetForward()*_atkRange / 2;
+			EventChannel _channel;
+			_channel.Broadcast<GameObjectFactory::DamageBoxEvent>(GameObjectFactory::DamageBoxEvent(targetPos - Vector3(_atkRange / 2, _atkRange / 2, _atkRange / 2),
+				targetPos + Vector3(_atkRange / 2, _atkRange / 2, _atkRange / 2), 10.0f, CollisionComponent::TRIGGER_TYPE_ENEMY_DMGBOX, 0.0f, 0.0f, 2.0f));
+		}
 		if (_atkCount < 0)
 		{
 			_atkCount = _atkTime2;
@@ -453,6 +497,13 @@ void Hydra::Update(float deltaTime)
 	case HYDRASTATE_BREATH2:
 	{
 		_atkCount--;
+		if (_atkCount == 40)
+		{
+			Vector3 targetPos = transComp.GetWorldPosition() + transComp.GetForward()*_atkRange / 2;
+			EventChannel _channel;
+			_channel.Broadcast<GameObjectFactory::DamageBoxEvent>(GameObjectFactory::DamageBoxEvent(targetPos - Vector3(_atkRange / 2, _atkRange / 2, _atkRange / 2),
+				targetPos + Vector3(_atkRange / 2, _atkRange / 2, _atkRange / 2), 10.0f, CollisionComponent::TRIGGER_TYPE_ENEMY_DMGBOX, 0.0f, 0.0f, 2.0f));
+		}
 		if (_atkCount < 0)
 		{
 			_atkCount = _atkTime2;
@@ -485,6 +536,13 @@ void Hydra::Update(float deltaTime)
 	case HYDRASTATE_BREATH3:
 	{
 		_atkCount--;
+		if (_atkCount == 40)
+		{
+			Vector3 targetPos = transComp.GetWorldPosition() + transComp.GetForward()*_atkRange / 2;
+			EventChannel _channel;
+			_channel.Broadcast<GameObjectFactory::DamageBoxEvent>(GameObjectFactory::DamageBoxEvent(targetPos - Vector3(_atkRange / 2, _atkRange / 2, _atkRange / 2),
+				targetPos + Vector3(_atkRange / 2, _atkRange / 2, _atkRange / 2), 10.0f, CollisionComponent::TRIGGER_TYPE_ENEMY_DMGBOX, 0.0f, 0.0f, 2.0f));
+		}
 		if (_atkCount < 0)
 		{
 			_atkCount = _atkTime2;
@@ -496,7 +554,7 @@ void Hydra::Update(float deltaTime)
 			if (distance < _atkRange)
 			{
 				_state = HYDRASTATE_BREATH1;
-this->QueueAction(HYDRA_ANIM(HYDRA_BREATH_FIRE1));
+                this->QueueAction(HYDRA_ANIM(HYDRA_BREATH_FIRE1));
 			}
 			//공격범위를 벗어났다?
 			else
@@ -553,6 +611,17 @@ this->QueueAction(HYDRA_ANIM(HYDRA_BREATH_FIRE1));
 			_isHurt = false;
 		}
 	}
+
+	if (_isDie)
+	{
+		_dieCount--;
+		if (_dieCount <= 0)
+		{
+			this->_valid = false;
+			EventChannel channel;
+			channel.Broadcast<IScene::SceneDirty>(IScene::SceneDirty());
+		}
+	}
 }
 
 void Hydra::Handle(const CollisionSystem::ActorTriggerEvent & event)
@@ -569,7 +638,9 @@ void Hydra::Handle(const CollisionSystem::ActorTriggerEvent & event)
 	case CollisionComponent::TRIGGER_TYPE_OBJECT:
 		break;
 	case CollisionComponent::TRIGGER_TYPE_PLAYER_DMGBOX:
-	//case CollisionComponent::TRIGGER_TYPE_ENEMY_DMGBOX:
+
+		if (_isDie) break;
+
 		if (!_isHurt)
 		{
 			if (_state == HYDRASTATE_IDLE || _state == HYDRASTATE_STAND)
@@ -591,12 +662,11 @@ void Hydra::Handle(const CollisionSystem::ActorTriggerEvent & event)
 				{
 					_state = HYDRASTATE_DEATH;
 					this->QueueAction(HYDRA_ANIM(HYDRA_DEATH));
-					this->_valid = false;
-					EventChannel channel;
-					channel.Broadcast<IScene::SceneDirty>(IScene::SceneDirty());
+					_isDie = true;
 				}
 			}
 			_isHurt = true;
+			_collision._valid = false;
 		}
 		break;
 	}

@@ -255,6 +255,13 @@ void Bat::Update(float deltaTime)
 	break;
 	case BATSTATE_ATK1:
 		_atkCount--;
+		if (_atkCount == 50)
+		{
+			Vector3 targetPos = transComp.GetWorldPosition() + transComp.GetForward()*_atkRange/2;
+			EventChannel _channel;
+			_channel.Broadcast<GameObjectFactory::DamageBoxEvent>(GameObjectFactory::DamageBoxEvent(targetPos - Vector3(_atkRange / 2, _atkRange / 2, _atkRange / 2),
+				targetPos + Vector3(_atkRange / 2, _atkRange / 2, _atkRange / 2),10.0f, CollisionComponent::TRIGGER_TYPE_ENEMY_DMGBOX, 0.0f, 0.0f, 1.0f));
+		}
 		if (_atkCount < 0)
 		{
 			_atkCount = _atkTime2;
@@ -274,6 +281,13 @@ void Bat::Update(float deltaTime)
 		break;
 	case BATSTATE_ATK2:
 		_atkCount--;
+		if (_atkCount == 50)
+		{
+			Vector3 targetPos = transComp.GetWorldPosition() + transComp.GetForward()*_atkRange / 2;
+			EventChannel _channel;
+			_channel.Broadcast<GameObjectFactory::DamageBoxEvent>(GameObjectFactory::DamageBoxEvent(targetPos - Vector3(_atkRange / 2, _atkRange / 2, _atkRange / 2),
+				targetPos + Vector3(_atkRange / 2, _atkRange / 2, _atkRange / 2), 10.0f, CollisionComponent::TRIGGER_TYPE_ENEMY_DMGBOX, 0.0f, 0.0f, 1.0f));
+		}
 		if (_atkCount < 0)
 		{
 			_atkCount = _atkTime3;
@@ -293,6 +307,13 @@ void Bat::Update(float deltaTime)
 		break;
 	case BATSTATE_ATK3:
 		_atkCount--;
+		if (_atkCount == 40)
+		{
+			Vector3 targetPos = transComp.GetWorldPosition() + transComp.GetForward()*_atkRange / 2;
+			EventChannel _channel;
+			_channel.Broadcast<GameObjectFactory::DamageBoxEvent>(GameObjectFactory::DamageBoxEvent(targetPos - Vector3(_atkRange / 2, _atkRange / 2, _atkRange / 2),
+				targetPos + Vector3(_atkRange / 2, _atkRange / 2, _atkRange / 2), 10.0f, CollisionComponent::TRIGGER_TYPE_ENEMY_DMGBOX, 0.0f, 0.0f, 1.0f));
+		}
 		if (_atkCount < 0)
 		{
 			_atkCount = _atkTime;
@@ -376,6 +397,17 @@ void Bat::Update(float deltaTime)
 			_isHurt = false;
 		}
 	}
+
+	if (_isDie)
+	{
+		_dieCount--;
+		if (_dieCount <= 0)
+		{
+			this->_valid = false;
+			EventChannel channel;
+			channel.Broadcast<IScene::SceneDirty>(IScene::SceneDirty());
+		}
+	}
 }
 
 void Bat::Handle(const CollisionSystem::ActorTriggerEvent & event)
@@ -395,6 +427,7 @@ void Bat::Handle(const CollisionSystem::ActorTriggerEvent & event)
 		break;
 		//플레이어의 공격과 충돌했다
 	case CollisionComponent::TRIGGER_TYPE_PLAYER_DMGBOX:
+		if (_isDie) break;
 		if (!_isHurt)
 		{
 			if (_state != BATSTATE_HURT&&_state != BATSTATE_DEATH)
@@ -408,9 +441,11 @@ void Bat::Handle(const CollisionSystem::ActorTriggerEvent & event)
 				{
 					_state = BATSTATE_DEATH;
 					this->QueueAction(BAT_ANIM(BAT_DEATH));
+					_isDie = true;
 				}
 			}
 			_isHurt = true;
+			_collision._valid = false;
 		}
 		break;
 	}
