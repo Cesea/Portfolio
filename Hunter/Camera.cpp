@@ -140,8 +140,6 @@ void Camera::MoveAndRotate(float deltaTime, const InputManager & input)
 
 		ClampFloat(_verticalAngle, 0.1f, PI_DIV_2 - 0.1f);
 
-		Console::Log("%f\n", _verticalAngle);
-
 		Vector3 camPosition;
 		Vector3 targetPosition = refTargetTransform.GetWorldPosition();
 
@@ -177,7 +175,6 @@ void Camera::MoveAndRotate(float deltaTime, const InputManager & input)
 		else if (_pTargetObject->_state == Player::PLAYERSTATE_RUN)
 		{
 		}
-
 		SetCursorPos(CLIENTCENTERX, CLIENTCENTERY);
 	} break;
 	}

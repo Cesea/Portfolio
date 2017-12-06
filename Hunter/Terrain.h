@@ -182,6 +182,8 @@ public:
 	inline int32 GetXChunkCount() { return _xChunkCount; }
 	inline int32 GetZChunkCount() { return _zChunkCount; }
 
+	inline std::vector<int32> &GetActiveTerrainChunkIndices() { return _activeChunkIndices; }
+
 private:
 	//bool CreateInGame(const Terrain::TerrainConfig &config);
 	//bool CreateEdit(const Terrain::TerrainConfig &config);

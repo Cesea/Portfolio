@@ -143,16 +143,17 @@ bool MapToolScene::SceneInit()
 
 	//터레인 로드
 	Terrain::TerrainConfig config;
-	config._xChunkCount = 2;
-	config._zChunkCount = 2;
+	config._xChunkCount = 4;
+	config._zChunkCount = 4;
 	strncpy(config._tile0FileName, "../resources/Terrain/TerrainTexture01.jpg", MAX_FILE_NAME);
 	strncpy(config._tile1FileName, "../resources/Terrain/TerrainTexture02.jpg", MAX_FILE_NAME);
 	strncpy(config._tile2FileName, "../resources/Terrain/TerrainTexture03.png", MAX_FILE_NAME);
 
-	config._textureMult = 200;
+	//TextureMult는 하나의 TerrainChun에 대한 Multiplier값이다.
+	config._textureMult = 25;
 
 	TERRAIN->SetScene(this);
-	TERRAIN->Create(config, true);
+	TERRAIN->Create(config, false);
 	
 	LoadEverySkinnedResources();
 	LoadEveryStaticResources();
@@ -166,7 +167,8 @@ bool MapToolScene::SceneInit()
 	_pEnvironmentSphere->Create("../resources/Textures/grassenvmap1024.dds");
 
 	_channel.Broadcast<GameObjectFactory::CreateObjectOnLocationEvent>(
-		GameObjectFactory::CreateObjectOnLocationEvent(ARCHE_HERO, ResourceHandle(), Vector3(0.0f, 2.0f, 0.0f)));
+		GameObjectFactory::CreateObjectOnLocationEvent(ARCHE_HERO, ResourceHandle(), 
+			Vector3(-TERRAIN_CHUNK_DIM * 2, 0, TERRAIN_CHUNK_DIM * 2)));
 
 	//NOTE : GameObjectFactory의 GetPlayerObject는 생성에 의존성을 가진다
 	_camera.SetTargetObject((Player *)GAMEOBJECTFACTORY->GetPlayerObject());

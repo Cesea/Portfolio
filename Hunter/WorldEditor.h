@@ -186,6 +186,8 @@ struct StatusWindow
 	ARCHE_TYPE _selectingType{ARCHE_NONE};
 	int32 _selectingState{0};
 
+	char _worldInfoStr[EDITOR_MAX_NAME];
+
 	char _worldPosStr[EDITOR_MAX_NAME];
 	char _chunkPosStr[EDITOR_MAX_NAME];
 	char _tilePosStr[EDITOR_MAX_NAME];

@@ -51,7 +51,7 @@ bool Terrain::Create(const Terrain::TerrainConfig &config, bool32 inEditMode)
 	_sectionNumVertexX = _sectionNumCellX + 1;
 	_sectionNumVertexZ = _sectionNumCellZ + 1;
 
-	if (!(CreateTerrain(config._textureMult)))
+	if (!(CreateTerrain(config._textureMult * _xChunkCount)))
 	{
 		Destroy();
 		return false;
@@ -1137,7 +1137,6 @@ void Terrain::ConvertWorldPostoVertexPos(const Vector3 & worldPos, TerrainVertex
 	pOutVertexPos->_relZ = (float)(terrainPosZ - (float)(chunkStartZ + pOutVertexPos->_tileZ));
 }
 
-//TODO : Loop를 최소한으로 돌게끔 고치자
 void Terrain::ValidateTerrainChunks(const TerrainTilePos & currentPos, const TerrainTilePos & prevPos)
 {
 	int32 currentMinX = currentPos._chunkX - 1;

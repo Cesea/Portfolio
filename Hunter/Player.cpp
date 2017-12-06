@@ -20,7 +20,7 @@ Player::~Player()
 {
 }
 
-bool Player::CreateFromWorld(World & world, const Vector3 &Pos)
+bool Player::CreateFromWorld(World & world, const Vector3 &pos)
 {
    EventChannel channel;
    channel.Add<InputManager::KeyDownEvent, Player>(*this);
@@ -33,7 +33,7 @@ bool Player::CreateFromWorld(World & world, const Vector3 &Pos)
    _entity = world.CreateEntity();
 
    TransformComponent &transComp = _entity.AddComponent<TransformComponent>();
-   transComp._position = Vector3(0, TERRAIN->GetHeight(0.0f, 0.0f), 0);
+   transComp._position = Vector3(pos.x, TERRAIN->GetHeight(pos.x, pos.z), pos.z);
    _pTransformComp = &transComp;
 
    TERRAIN->ConvertWorldPostoTilePos(transComp.GetWorldPosition(), &_tilePos);

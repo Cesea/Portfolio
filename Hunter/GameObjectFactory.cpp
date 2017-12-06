@@ -434,9 +434,30 @@ void GameObjectFactory::CreateObject(ARCHE_TYPE type,
 		_player->SetLinkCamera(&_pCurrentScene->_camera);
 		_pCurrentScene->_gameObjects.push_back(_player);
 		BaseGameObject *pBack = _pCurrentScene->_gameObjects.back();
-		pBack->CreateFromWorld(_pCurrentScene->_world,Vector3(0,0,0));
+		pBack->CreateFromWorld(_pCurrentScene->_world, position);
 		//NOTE : 여기서 플레이어의 포인터를 저장하고는 있지만, 나중에는 키값으로 찾을 수 있게끔 바꿔야 한다...
 		_pPlayer = pBack;
+
+		TerrainTilePos tilePos;
+		TERRAIN->ConvertWorldPostoTilePos(position, &tilePos);
+		std::vector<int32> &activeChunks = TERRAIN->GetActiveTerrainChunkIndices();
+		int32 minX = tilePos._chunkX - 1;
+		int32 maxX = tilePos._chunkX + 1;
+		int32 minZ = tilePos._chunkZ - 1;
+		int32 maxZ = tilePos._chunkZ + 1;
+
+		ClampInt(minX, 0, TERRAIN->GetXChunkCount() - 1);
+		ClampInt(maxX, 0, TERRAIN->GetXChunkCount() - 1);
+		ClampInt(minZ, 0, TERRAIN->GetXChunkCount() - 1);
+		ClampInt(maxZ, 0, TERRAIN->GetXChunkCount() - 1);
+
+		for (int32 z = minZ; z < maxZ; ++z)
+		{
+			for (int32 x = minX; x < maxX; ++x)
+			{
+				activeChunks.push_back(Index2D(x, z, TERRAIN->GetXChunkCount()));
+			}
+		}
 	}break;
 	case ARCHE_BAT :
 	{
