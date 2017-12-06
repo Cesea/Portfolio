@@ -592,8 +592,8 @@ void Hydra::Handle(const CollisionSystem::ActorTriggerEvent & event)
 			if (_state == HYDRASTATE_IDLE || _state == HYDRASTATE_STAND)
 			{
 				resetAllCount();
-				//_state = HYDRASTATE_HURT;
-				//this->QueueAction(HYDRA_ANIM(HYDRA_HIT1));
+				_state = HYDRASTATE_HURT;
+				this->QueueAction(HYDRA_ANIM(HYDRA_HIT1));
 				_battle = true;
 			}
 			_hp -= 50;
