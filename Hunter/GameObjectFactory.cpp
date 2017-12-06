@@ -518,7 +518,9 @@ void GameObjectFactory::Handle(const CreateObjectOnClickEvent & event)
 
 void GameObjectFactory::Handle(const CreateObjectOnLocationEvent & event)
 {
-	CreateObject(event._type, event._handle, event._position);
+	Vector3 position = event._position;
+	position.y = TERRAIN->GetHeight(position.x, position.z);
+	CreateObject(event._type, event._handle, position);
 }
 
 void GameObjectFactory::Handle(const CreateObjectFromSaveInfoEvent & event)

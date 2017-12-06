@@ -973,10 +973,10 @@ bool Terrain::CreateTerrainChunk(int32 x, int32 z, const video::TerrainVertex * 
 			refTile._tileZ = tz;
 
 			refTile._startX = refChunk._startX + tileGap * (float)tx;
-			refTile._startZ = refChunk._startZ + tileGap * (float)tz;
+			refTile._startZ = refChunk._startZ - (tileGap * (float)tz);
 
 			refTile._endX = refTile._startX + tileGap;
-			refTile._endZ = refTile._startZ + tileGap;
+			refTile._endZ = refTile._startZ - tileGap;
 
 			refTile._centerX = (refTile._endX + refTile._startX) * 0.5f;
 			refTile._centerZ = (refTile._endZ + refTile._startZ) * 0.5f;

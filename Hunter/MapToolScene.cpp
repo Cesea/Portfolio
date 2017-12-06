@@ -179,7 +179,44 @@ bool MapToolScene::SceneInit()
 	_editor->Init(this);
 	_editor->_pSelectedObject = GAMEOBJECTFACTORY->GetPlayerObject();
 
+	//Test
+	for (int32 i = 0; i < 60; ++i)
+	{
+		float randX = RandFloat(-config._xChunkCount * TERRAIN_CHUNK_DIM * 0.5f,
+			config._xChunkCount * TERRAIN_CHUNK_DIM * 0.5f);
+		float randz = RandFloat(-config._zChunkCount * TERRAIN_CHUNK_DIM * 0.5f,  
+			config._zChunkCount * TERRAIN_CHUNK_DIM * 0.5f);
+		ARCHE_TYPE type = (ARCHE_TYPE)RandInt(2, 7);
 
+		ResourceHandle handle;
+		switch (type)
+		{
+		case ARCHE_ROCK:
+		{
+			handle = VIDEO->GetStaticXMesh("Rock01");
+		} break;
+		case ARCHE_GRASS:
+		{
+			handle = VIDEO->GetStaticXMesh("Grass01");
+		} break;
+		case ARCHE_TREE:
+		{
+			handle = VIDEO->GetStaticXMesh("Tree01");
+		} break;
+		case ARCHE_TREETRUNK:
+		{
+			handle = VIDEO->GetStaticXMesh("TreeTrunk01");
+		} break;
+		case ARCHE_MUSHROOM:
+		{
+			handle = VIDEO->GetStaticXMesh("Mushroom01");
+		} break;
+		}
+
+		_channel.Broadcast<GameObjectFactory::CreateObjectOnLocationEvent>(
+			GameObjectFactory::CreateObjectOnLocationEvent(type, handle,
+				Vector3(randX, 0, randz)));
+	}
 	////실험
 	//trash = _world.CreateEntity();
 	//TransformComponent & trans = trash.AddComponent<TransformComponent>();

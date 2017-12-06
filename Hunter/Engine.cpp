@@ -99,9 +99,13 @@ void Engine::Run()
 
 //#if defined (DEBUG) || defined (_DEBUG)
 		static uint64 counter = 0;
+		static float aveMS = 0;
+		aveMS += APPTIMER->GetDeltaMS();
 		if ((counter % 60) == 0)
 		{
-			Console::Log("DeltaMS : %d\n", APPTIMER->GetDeltaMS());
+			aveMS /= 60.0f;
+			Console::Log("DeltaMS : %f\n", aveMS);
+			aveMS = 0.0f;
 		}
 		counter++;
 //#endif

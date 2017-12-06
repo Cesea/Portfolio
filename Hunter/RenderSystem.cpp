@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "RenderSystem.h"
 
+//#define RENDER_TILE_TEST
+
 RenderSystem::RenderSystem()
 {
 }
@@ -27,24 +29,51 @@ void RenderSystem::UpdateAnimations(float deltaTime)
 
 void RenderSystem::Render(const Camera &camera)
 {
-	auto &entities = GetEntities();
-	Matrix worldMatrix;
+	static int32 count = 0;
+	static int32 renderCount = 0;
 
-	std::vector<Entity> entitas;
+#if defined (RENDER_TILE_TEST)
 
-	std::vector<int32> activeChunks = TERRAIN->GetActiveTerrainChunkIndices();
-	for (uint32 i = 0; i < activeChunks.size(); ++i)
+	std::vector<Terrain::TerrainTile *> &visibleTiles = TERRAIN->GetVisibleTerrainTiles();
+	for (auto &tile : visibleTiles)
 	{
-		Terrain::TerrainChunk &refChunk = TERRAIN->GetChunkAt(activeChunks[i]);
-		//NOTE : 이거 마무리를 하자.....
-		//if (camera.GetFrustum().IsSphereInFrustum())
-		//{
-		//	for (int32 j = 0; j < TERRAIN_TILE_RES * TERRAIN_TILE_RES; ++j)
-		//	{
-		//		//refChunk._tiles[j].
-		//	}
-		//}
+		for (uint32 i = 0; i < tile->_entities.size(); ++i)
+		{
+			TransformComponent &refTransformComponent = tile->_entities[i].GetComponent<TransformComponent>();
+			RenderComponent &refRenderComponent = tile->_entities[i].GetComponent<RenderComponent>();
+			if (refRenderComponent._type == RenderComponent::Type::eBuffer)
+			{
+			}
+			else if (refRenderComponent._type == RenderComponent::Type::eStatic)
+			{
+				video::StaticXMesh *pMesh = VIDEO->GetStaticXMesh(refRenderComponent._static);
+				pMesh->Render(refRenderComponent._arche, refTransformComponent);
+
+#if defined (DEBUG) || defined (_DEBUG)
+				/*CollisionComponent &refCollisionComp = entities[i].GetComponent<CollisionComponent>();
+				refCollisionComp.RenderBoxGizmo(refTransformComponent);*/
+#endif
+				renderCount++;
+			}
+			else if (refRenderComponent._type == RenderComponent::Type::eSkinned)
+			{
+				video::AnimationInstance *pAnimation = VIDEO->GetAnimationInstance(refRenderComponent._skinned);
+				ActionComponent &actionComp = tile->_entities[i].GetComponent<ActionComponent>();
+				actionComp._pAnimationController->AdvanceTime(actionComp._animDelta, actionComp._pCallbackHandler);
+				pAnimation->_pSkinnedMesh->Update(&refTransformComponent.GetFinalMatrix());
+				pAnimation->_pSkinnedMesh->Render(refTransformComponent);
+
+#if defined (DEBUG) || defined (_DEBUG)
+				/*CollisionComponent &refCollisionComp = entities[i].GetComponent<CollisionComponent>();
+				refCollisionComp.RenderBoxGizmo(refTransformComponent);*/
+#endif
+				renderCount++;
+			}
+		}
 	}
+
+#else
+	auto &entities = GetEntities();
 
 	for (uint32 i = 0; i < entities.size(); ++i)
 	{
@@ -73,6 +102,7 @@ void RenderSystem::Render(const Camera &camera)
 			/*CollisionComponent &refCollisionComp = entities[i].GetComponent<CollisionComponent>();
 			refCollisionComp.RenderBoxGizmo(refTransformComponent);*/
 #endif
+			renderCount++;
 		}
 		else if (refRenderComponent._type == RenderComponent::Type::eSkinned)
 		{
@@ -86,9 +116,17 @@ void RenderSystem::Render(const Camera &camera)
 			/*CollisionComponent &refCollisionComp = entities[i].GetComponent<CollisionComponent>();
 			refCollisionComp.RenderBoxGizmo(refTransformComponent);*/
 #endif
-
+			renderCount;
 		}
 	}
+#endif
+	
+	if (count % 60 == 0)
+	{
+		Console::Log("Render Count : %d\n", renderCount);
+		renderCount = 0;
+	}
+	count++;
 }
 
 void RenderSystem::RenderShadow(const Camera & camera)
