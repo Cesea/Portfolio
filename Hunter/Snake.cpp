@@ -385,7 +385,6 @@ void Snake::Update(float deltaTime)
 
 void Snake::Handle(const CollisionSystem::ActorTriggerEvent & event)
 {
-
 	if (event._entity1 != _entity) return;
 	CollisionComponent & _collision = event._entity2.GetComponent<CollisionComponent>();
 	switch (_collision._triggerType)
