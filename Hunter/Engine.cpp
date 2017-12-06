@@ -3,6 +3,8 @@
 
 #include "GameObjectFactory.h"
 
+#include <time.h>
+
 #define HUNTER_DEBUG 1
 
 Engine *gEngine;
@@ -182,6 +184,9 @@ bool Engine::InitializePlatform(HINSTANCE instanceHandle)
 
 	ShowWindow(_windowHandle, SW_SHOW);
 	UpdateWindow(_windowHandle);
+
+
+	srand(time(NULL));
 
 	return true;
 }

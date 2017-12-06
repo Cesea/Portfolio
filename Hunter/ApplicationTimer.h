@@ -13,7 +13,7 @@ public :
 
 	void Tick();
 
-	inline float GetDeltaTime() { return _currentDeltaSecond; }
+	inline float GetDeltaTime() { return (float)_currentDeltaSecond; }
 	inline int32 GetDeltaMS() { return _currentDeltaMS; }
 
 	inline float GetTargetTime() { return _targetFramePerMS / 1000.0f; }

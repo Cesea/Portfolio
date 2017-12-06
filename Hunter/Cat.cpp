@@ -1,6 +1,5 @@
 #include "stdafx.h"
 #include "Cat.h"
-#include "CatStates.h"
 
 Cat::Cat()
 {
@@ -51,20 +50,20 @@ bool Cat::CreateFromWorld(World & world, const Vector3 &Pos)
 
 	_entity.Activate();
 
-	_pStateMachine = new CatStateMachine;
-	_pStateMachine->Init(this);
-	_pStateMachine->RegisterState(META_TYPE(CatIdleState)->Name(), new CatIdleState());
-	_pStateMachine->RegisterState(META_TYPE(CatMoveState)->Name(), new CatMoveState());
-	_pStateMachine->RegisterState(META_TYPE(CatAttackState)->Name(), new CatAttackState());
-	_pStateMachine->RegisterState(META_TYPE(CatAttack2State)->Name(), new CatAttack2State());
-	_pStateMachine->RegisterState(META_TYPE(CatAttack3State)->Name(), new CatAttack3State());
-	_pStateMachine->RegisterState(META_TYPE(CatAttack4State)->Name(), new CatAttack4State());
-	_pStateMachine->RegisterState(META_TYPE(CatAttack5State)->Name(), new CatAttack5State());
-	_pStateMachine->RegisterState(META_TYPE(CatStandState)->Name(), new CatStandState());
-	_pStateMachine->RegisterState(META_TYPE(CatHurt1State)->Name(), new CatHurt1State());
-	_pStateMachine->RegisterState(META_TYPE(CatHurt2State)->Name(), new CatHurt2State());
-	_pStateMachine->RegisterState(META_TYPE(CatDeadState)->Name(), new CatDeadState());
-	_pStateMachine->ChangeState(META_TYPE(CatIdleState)->Name());
+	//_pStateMachine = new CatStateMachine;
+	//_pStateMachine->Init(this);
+	//_pStateMachine->RegisterState(META_TYPE(CatIdleState)->Name(), new CatIdleState());
+	//_pStateMachine->RegisterState(META_TYPE(CatMoveState)->Name(), new CatMoveState());
+	//_pStateMachine->RegisterState(META_TYPE(CatAttackState)->Name(), new CatAttackState());
+	//_pStateMachine->RegisterState(META_TYPE(CatAttack2State)->Name(), new CatAttack2State());
+	//_pStateMachine->RegisterState(META_TYPE(CatAttack3State)->Name(), new CatAttack3State());
+	//_pStateMachine->RegisterState(META_TYPE(CatAttack4State)->Name(), new CatAttack4State());
+	//_pStateMachine->RegisterState(META_TYPE(CatAttack5State)->Name(), new CatAttack5State());
+	//_pStateMachine->RegisterState(META_TYPE(CatStandState)->Name(), new CatStandState());
+	//_pStateMachine->RegisterState(META_TYPE(CatHurt1State)->Name(), new CatHurt1State());
+	//_pStateMachine->RegisterState(META_TYPE(CatHurt2State)->Name(), new CatHurt2State());
+	//_pStateMachine->RegisterState(META_TYPE(CatDeadState)->Name(), new CatDeadState());
+	//this->QueueAction(CAT_ANIM(CAT_IDLE));
 
 	_speed = 5.0f;
 	_rotateSpeed = D3DX_PI / 64;
@@ -112,7 +111,6 @@ bool Cat::CreateFromWorld(World & world, const Vector3 &Pos)
 
 void Cat::Update(float deltaTime)
 {
-	_pStateMachine->Update(deltaTime, _currentCommand);
 	TransformComponent &transComp = _entity.GetComponent<TransformComponent>();
 	switch (_state)
 	{
@@ -122,13 +120,13 @@ void Cat::Update(float deltaTime)
 		{
 			_delayCount = _delayTime;
 			_state = CATSTATE_PATROL;
-			_pStateMachine->ChangeState(META_TYPE(CatMoveState)->Name());
+			this->QueueAction(CAT_ANIM(CAT_RUN));
 		}
 		break;
 	case CATSTATE_PATROL:
 		if (_moveSegment.empty())
 		{
-			_pStateMachine->ChangeState(META_TYPE(CatStandState)->Name());
+			this->QueueAction(CAT_ANIM(CAT_STAND));
 			_state = CATSTATE_IDLE;
 		}
 		else
@@ -158,7 +156,7 @@ void Cat::Update(float deltaTime)
 				_patrolIndex++;
 				if (_patrolIndex > _moveSegment.size() - 1) _patrolIndex = 0;
 				//IDLE 애니메이션 실행
-				_pStateMachine->ChangeState(META_TYPE(CatStandState)->Name());
+				this->QueueAction(CAT_ANIM(CAT_STAND));
 				_state = CATSTATE_IDLE;
 			}
 			//아니면 이동속도만큼 이동
@@ -176,7 +174,7 @@ void Cat::Update(float deltaTime)
 		{
 			_roarCount = _roarTime;
 			_state = CATSTATE_RUN;
-			_pStateMachine->ChangeState(META_TYPE(CatMoveState)->Name());
+			this->QueueAction(CAT_ANIM(CAT_RUN));
 		}
 		break;
 	case CATSTATE_RUN:
@@ -192,7 +190,7 @@ void Cat::Update(float deltaTime)
 		if (distance < _atkRange)
 		{
 			_state = CATSTATE_ATK1;
-			_pStateMachine->ChangeState(META_TYPE(CatAttackState)->Name());
+			this->QueueAction(CAT_ANIM(CAT_ATTACK1));
 		}
 		else
 		{
@@ -212,7 +210,7 @@ void Cat::Update(float deltaTime)
 			if (distance < _atkRange)
 			{
 				_state = CATSTATE_ATK2;
-				_pStateMachine->ChangeState(META_TYPE(CatAttack2State)->Name());
+				this->QueueAction(CAT_ANIM(CAT_ATTACK2));
 			}
 			//공격범위를 벗어났다?
 			else
@@ -220,7 +218,7 @@ void Cat::Update(float deltaTime)
 				//배틀을 멈추고 기본자세 (다시추적시작)
 				_battle = false;
 				_state = CATSTATE_IDLE;
-				_pStateMachine->ChangeState(META_TYPE(CatStandState)->Name());
+				this->QueueAction(CAT_ANIM(CAT_STAND));
 			}
 		}
 		break;
@@ -236,7 +234,7 @@ void Cat::Update(float deltaTime)
 			if (distance < _atkRange)
 			{
 				_state = CATSTATE_ATK3;
-				_pStateMachine->ChangeState(META_TYPE(CatAttack3State)->Name());
+				this->QueueAction(CAT_ANIM(CAT_ATTACK3));
 			}
 			//공격범위를 벗어났다?
 			else
@@ -244,7 +242,7 @@ void Cat::Update(float deltaTime)
 				//배틀을 멈추고 기본자세 (다시추적시작)
 				_battle = false;
 				_state = CATSTATE_IDLE;
-				_pStateMachine->ChangeState(META_TYPE(CatStandState)->Name());
+				this->QueueAction(CAT_ANIM(CAT_STAND));
 			}
 		}
 		break;
@@ -260,7 +258,7 @@ void Cat::Update(float deltaTime)
 			if (distance < _atkRange)
 			{
 				_state = CATSTATE_ATK5;
-				_pStateMachine->ChangeState(META_TYPE(CatAttack5State)->Name());
+				this->QueueAction(CAT_ANIM(CAT_ATTACK5));
 			}
 			//공격범위를 벗어났다?
 			else
@@ -268,7 +266,7 @@ void Cat::Update(float deltaTime)
 				//배틀을 멈추고 기본자세 (다시추적시작)
 				_battle = false;
 				_state = CATSTATE_IDLE;
-				_pStateMachine->ChangeState(META_TYPE(CatStandState)->Name());
+				this->QueueAction(CAT_ANIM(CAT_STAND));
 			}
 		}
 		break;
@@ -286,7 +284,7 @@ void Cat::Update(float deltaTime)
 			if (distance < _atkRange)
 			{
 				_state = CATSTATE_ATK1;
-				_pStateMachine->ChangeState(META_TYPE(CatAttackState)->Name());
+				this->QueueAction(CAT_ANIM(CAT_ATTACK1));
 				_playerPos = Vector3(RandFloat(-5.0, 5.0), 7.0f, RandFloat(-5.0, 5.0));
 			}
 			//공격범위를 벗어났다?
@@ -295,7 +293,7 @@ void Cat::Update(float deltaTime)
 				//배틀을 멈추고 기본자세 (다시추적시작)
 				_battle = false;
 				_state = CATSTATE_IDLE;
-				_pStateMachine->ChangeState(META_TYPE(CatStandState)->Name());
+				this->QueueAction(CAT_ANIM(CAT_STAND));
 			}
 		}
 		break;
@@ -305,7 +303,7 @@ void Cat::Update(float deltaTime)
 		{
 			_standCount = _standTime;
 			_state = CATSTATE_PATROL;
-			_pStateMachine->ChangeState(META_TYPE(CatMoveState)->Name());
+			this->QueueAction(CAT_ANIM(CAT_RUN));
 		}
 		break;
 	case CATSTATE_HURT:
@@ -320,7 +318,7 @@ void Cat::Update(float deltaTime)
 			if (distance < _atkRange)
 			{
 				_state = CATSTATE_ATK1;
-				_pStateMachine->ChangeState(META_TYPE(CatAttackState)->Name());
+				this->QueueAction(CAT_ANIM(CAT_ATTACK1));
 			}
 			else
 			{
@@ -328,7 +326,7 @@ void Cat::Update(float deltaTime)
 				if (_battle)
 				{
 					_state = CATSTATE_RUN;
-					_pStateMachine->ChangeState(META_TYPE(CatMoveState)->Name());
+					this->QueueAction(CAT_ANIM(CAT_RUN));
 				}
 				//비전투인데 맞았다?
 				else
@@ -336,7 +334,7 @@ void Cat::Update(float deltaTime)
 					// 추격
 					_battle = true;
 					_state = CATSTATE_FIND;
-					_pStateMachine->ChangeState(META_TYPE(CatIdleState)->Name());
+					this->QueueAction(CAT_ANIM(CAT_IDLE));
 					Vector3 distance = _playerPos - transComp.GetWorldPosition();
 					Vec3Normalize(&distance, &distance);
 					transComp.LookDirection(-distance, D3DX_PI * 2);
@@ -355,7 +353,7 @@ void Cat::Update(float deltaTime)
 			//찾으면 FIND가 되며 battle상태가 
 			_battle = true;
 			_state = CATSTATE_FIND;
-			_pStateMachine->ChangeState(META_TYPE(CatIdleState)->Name());
+			this->QueueAction(CAT_ANIM(CAT_IDLE));
 			Vector3 rotatePos = _playerPos;
 			rotatePos.y = transComp.GetWorldPosition().y;
 			Vector3 distance = rotatePos - transComp.GetWorldPosition();
@@ -394,13 +392,13 @@ void Cat::Handle(const CollisionSystem::ActorTriggerEvent & event)
 			{
 				resetAllCount();
 				_state = CATSTATE_HURT;
-				_pStateMachine->ChangeState(META_TYPE(CatHurt1State)->Name());
+				this->QueueAction(CAT_ANIM(CAT_HIT1));
 				_battle = true;
 				_hp -= 50;
 				if (_hp <= 0)
 				{
 					_state = CATSTATE_DEATH;
-					_pStateMachine->ChangeState(META_TYPE(CatDeadState)->Name());
+					this->QueueAction(CAT_ANIM(CAT_DEATH));
 				}
 			}
 			_isHurt = true;
@@ -429,9 +427,11 @@ void Cat::SetupCallbackAndCompression()
 	AddCallbackKeysAndCompress(pController, anim0, 1, &warSwingLeftKeys, D3DXCOMPRESS_DEFAULT, 0.1f);
 }
 
-void Cat::QueueAction(const Action & action)
+void Cat::QueueAction(Action & action, bool cancle)
 {
+	action._cancle = cancle;
 	_pActionComp->_actionQueue.PushAction(action);
+	_animationEnum = action._enum;
 }
 
 bool Cat::findPlayer(Vector3 forward, Vector3 playerPos, Vector3 myPos, float range1, float range2, float findRadian)

@@ -137,11 +137,9 @@
     <ClCompile Include="BaseSystem.cpp" />
     <ClCompile Include="bat.cpp" />
     <ClCompile Include="batAnimationString.cpp" />
-    <ClCompile Include="batStates.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="Cat.cpp" />
     <ClCompile Include="CatAnimationString.cpp" />
-    <ClCompile Include="CatStates.cpp" />
     <ClCompile Include="charge.cpp" />
     <ClCompile Include="CollisionComponent.cpp" />
     <ClCompile Include="CollisionUtils.cpp" />
@@ -166,14 +164,12 @@
     <ClCompile Include="GizmoManager.cpp" />
     <ClCompile Include="Hydra.cpp" />
     <ClCompile Include="HydraAnimationString.cpp" />
-    <ClCompile Include="HydraStates.cpp" />
     <ClCompile Include="imgui.cpp" />
     <ClCompile Include="imguiRenderer.cpp" />
     <ClCompile Include="Inventory.cpp" />
     <ClCompile Include="IScene.cpp" />
     <ClCompile Include="Lizard.cpp" />
     <ClCompile Include="LizardAnimationString.cpp" />
-    <ClCompile Include="LizardStates.cpp" />
     <ClCompile Include="LoadingScene00.cpp" />
     <ClCompile Include="MapToolScene.cpp" />
     <ClCompile Include="MathUtils.cpp" />
@@ -200,7 +196,6 @@
     <ClCompile Include="smoke.cpp" />
     <ClCompile Include="Snake.cpp" />
     <ClCompile Include="SnakeAnimationString.cpp" />
-    <ClCompile Include="SnakeStates.cpp" />
     <ClCompile Include="SpriteManager.cpp" />
     <ClCompile Include="Terrain.cpp" />
     <ClCompile Include="TestScene.cpp" />
@@ -220,7 +215,6 @@
     <ClCompile Include="TransformSystem.cpp" />
     <ClCompile Include="Turtle.cpp" />
     <ClCompile Include="TurtleAnimationString.cpp" />
-    <ClCompile Include="TurtleStates.cpp" />
     <ClCompile Include="UI.cpp" />
     <ClCompile Include="Variant.cpp" />
     <ClCompile Include="VariantBase.cpp" />
@@ -243,11 +237,9 @@
     <ClInclude Include="BaseSystem.h" />
     <ClInclude Include="bat.h" />
     <ClInclude Include="batAnimationString.h" />
-    <ClInclude Include="batStates.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Cat.h" />
     <ClInclude Include="CatAnimationString.h" />
-    <ClInclude Include="CatStates.h" />
     <ClInclude Include="charge.h" />
     <ClInclude Include="ClassTypeID.h" />
     <ClInclude Include="CollisionUtils.h" />
@@ -280,7 +272,6 @@
     <ClInclude Include="GizmoManager.h" />
     <ClInclude Include="Hydra.h" />
     <ClInclude Include="HydraAnimationString.h" />
-    <ClInclude Include="HydraStates.h" />
     <ClInclude Include="imgui.h" />
     <ClInclude Include="Allocators.h" />
     <ClInclude Include="imguiRenderer.h" />
@@ -288,7 +279,6 @@
     <ClInclude Include="Lights.h" />
     <ClInclude Include="Lizard.h" />
     <ClInclude Include="LizardAnimationString.h" />
-    <ClInclude Include="LizardStates.h" />
     <ClInclude Include="LoadingScene00.h" />
     <ClInclude Include="MapToolScene.h" />
     <ClInclude Include="Math.h" />
@@ -318,7 +308,6 @@
     <ClInclude Include="smoke.h" />
     <ClInclude Include="Snake.h" />
     <ClInclude Include="SnakeAnimationString.h" />
-    <ClInclude Include="SnakeStates.h" />
     <ClInclude Include="SpriteManager.h" />
     <ClInclude Include="State.h" />
     <ClInclude Include="StateMachine.h" />
@@ -346,7 +335,6 @@
     <ClInclude Include="TransformSystem.h" />
     <ClInclude Include="Turtle.h" />
     <ClInclude Include="TurtleAnimationString.h" />
-    <ClInclude Include="TurtleStates.h" />
     <ClInclude Include="Typedefs.h" />
     <ClInclude Include="TypeTraits.h" />
     <ClInclude Include="UI.h" />

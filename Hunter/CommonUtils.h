@@ -145,6 +145,19 @@ inline void ClampInt(int32 &value, int32 min, int32 max)
 	}
 }
 
+template <typename T>
+inline bool VectorHasItem(const std::vector<T> &vector, const T &value)
+{
+	for (uint32 i = 0; i < vector.size(); ++i)
+	{
+		if (vector[i] == value)
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
 POINT PointMake(int x, int y);
 
 POINT AddPoint(const POINT &p1, const POINT &p2);

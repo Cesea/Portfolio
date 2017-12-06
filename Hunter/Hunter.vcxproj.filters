@@ -18,16 +18,10 @@
     <ClCompile Include="batAnimationString.cpp">
       <Filter>Game\GameObjects\Enemy\Bat</Filter>
     </ClCompile>
-    <ClCompile Include="batStates.cpp">
-      <Filter>Game\GameObjects\Enemy\Bat</Filter>
-    </ClCompile>
     <ClCompile Include="Cat.cpp">
       <Filter>Game\GameObjects\Enemy\Cat</Filter>
     </ClCompile>
     <ClCompile Include="CatAnimationString.cpp">
-      <Filter>Game\GameObjects\Enemy\Cat</Filter>
-    </ClCompile>
-    <ClCompile Include="CatStates.cpp">
       <Filter>Game\GameObjects\Enemy\Cat</Filter>
     </ClCompile>
     <ClCompile Include="DataPackage.cpp">
@@ -54,25 +48,16 @@
     <ClCompile Include="HydraAnimationString.cpp">
       <Filter>Game\GameObjects\Enemy\Hydra</Filter>
     </ClCompile>
-    <ClCompile Include="HydraStates.cpp">
-      <Filter>Game\GameObjects\Enemy\Hydra</Filter>
-    </ClCompile>
     <ClCompile Include="Lizard.cpp">
       <Filter>Game\GameObjects\Enemy\Lizard</Filter>
     </ClCompile>
     <ClCompile Include="LizardAnimationString.cpp">
       <Filter>Game\GameObjects\Enemy\Lizard</Filter>
     </ClCompile>
-    <ClCompile Include="LizardStates.cpp">
-      <Filter>Game\GameObjects\Enemy\Lizard</Filter>
-    </ClCompile>
     <ClCompile Include="Turtle.cpp">
       <Filter>Game\GameObjects\Enemy\Turtle</Filter>
     </ClCompile>
     <ClCompile Include="TurtleAnimationString.cpp">
-      <Filter>Game\GameObjects\Enemy\Turtle</Filter>
-    </ClCompile>
-    <ClCompile Include="TurtleStates.cpp">
       <Filter>Game\GameObjects\Enemy\Turtle</Filter>
     </ClCompile>
     <ClCompile Include="GameObjectFactory.cpp">
@@ -123,16 +108,7 @@
     <ClCompile Include="GizmoManager.cpp">
       <Filter>Manager</Filter>
     </ClCompile>
-    <ClCompile Include="LoadingScene00.cpp">
-      <Filter>Game\GameScenes</Filter>
-    </ClCompile>
     <ClCompile Include="IScene.cpp">
-      <Filter>Game\GameScenes</Filter>
-    </ClCompile>
-    <ClCompile Include="MapToolScene.cpp">
-      <Filter>Game\GameScenes</Filter>
-    </ClCompile>
-    <ClCompile Include="TestScene.cpp">
       <Filter>Game\GameScenes</Filter>
     </ClCompile>
     <ClCompile Include="Meta.cpp">
@@ -169,9 +145,6 @@
       <Filter>Game\GameObjects\Enemy\Snake</Filter>
     </ClCompile>
     <ClCompile Include="SnakeAnimationString.cpp">
-      <Filter>Game\GameObjects\Enemy\Snake</Filter>
-    </ClCompile>
-    <ClCompile Include="SnakeStates.cpp">
       <Filter>Game\GameObjects\Enemy\Snake</Filter>
     </ClCompile>
     <ClCompile Include="ActionComponent.cpp">
@@ -264,9 +237,6 @@
     <ClCompile Include="PlayerAnimationString.cpp">
       <Filter>Game\GameObjects\Player</Filter>
     </ClCompile>
-    <ClCompile Include="QuadTree.cpp">
-      <Filter>Game\GameUtils</Filter>
-    </ClCompile>
     <ClCompile Include="Quaternion.cpp">
       <Filter>Math</Filter>
     </ClCompile>
@@ -297,7 +267,18 @@
     <ClCompile Include="Inventory.cpp">
       <Filter>UI</Filter>
     </ClCompile>
-    <ClCompile Include="DamageBox.cpp" />
+    <ClCompile Include="MapToolScene.cpp">
+      <Filter>Game\GameScenes\MapToolScene</Filter>
+    </ClCompile>
+    <ClCompile Include="LoadingScene00.cpp">
+      <Filter>Game\GameScenes\LoadingScenes</Filter>
+    </ClCompile>
+    <ClCompile Include="TestScene.cpp">
+      <Filter>Game\GameScenes\TestScene</Filter>
+    </ClCompile>
+    <ClCompile Include="QuadTree.cpp">
+      <Filter>Game\GameUtils\QaudTrees</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ClassTypeID.h" />
@@ -320,16 +301,10 @@
     <ClInclude Include="batAnimationString.h">
       <Filter>Game\GameObjects\Enemy\Bat</Filter>
     </ClInclude>
-    <ClInclude Include="batStates.h">
-      <Filter>Game\GameObjects\Enemy\Bat</Filter>
-    </ClInclude>
     <ClInclude Include="Cat.h">
       <Filter>Game\GameObjects\Enemy\Cat</Filter>
     </ClInclude>
     <ClInclude Include="CatAnimationString.h">
-      <Filter>Game\GameObjects\Enemy\Cat</Filter>
-    </ClInclude>
-    <ClInclude Include="CatStates.h">
       <Filter>Game\GameObjects\Enemy\Cat</Filter>
     </ClInclude>
     <ClInclude Include="Delegate.h">
@@ -383,25 +358,16 @@
     <ClInclude Include="HydraAnimationString.h">
       <Filter>Game\GameObjects\Enemy\Hydra</Filter>
     </ClInclude>
-    <ClInclude Include="HydraStates.h">
-      <Filter>Game\GameObjects\Enemy\Hydra</Filter>
-    </ClInclude>
     <ClInclude Include="Lizard.h">
       <Filter>Game\GameObjects\Enemy\Lizard</Filter>
     </ClInclude>
     <ClInclude Include="LizardAnimationString.h">
       <Filter>Game\GameObjects\Enemy\Lizard</Filter>
     </ClInclude>
-    <ClInclude Include="LizardStates.h">
-      <Filter>Game\GameObjects\Enemy\Lizard</Filter>
-    </ClInclude>
     <ClInclude Include="Turtle.h">
       <Filter>Game\GameObjects\Enemy\Turtle</Filter>
     </ClInclude>
     <ClInclude Include="TurtleAnimationString.h">
-      <Filter>Game\GameObjects\Enemy\Turtle</Filter>
-    </ClInclude>
-    <ClInclude Include="TurtleStates.h">
       <Filter>Game\GameObjects\Enemy\Turtle</Filter>
     </ClInclude>
     <ClInclude Include="GameObjectFactory.h">
@@ -464,16 +430,7 @@
     <ClInclude Include="GameComponent.h">
       <Filter>Game\GameComponents</Filter>
     </ClInclude>
-    <ClInclude Include="LoadingScene00.h">
-      <Filter>Game\GameScenes</Filter>
-    </ClInclude>
     <ClInclude Include="IScene.h">
-      <Filter>Game\GameScenes</Filter>
-    </ClInclude>
-    <ClInclude Include="MapToolScene.h">
-      <Filter>Game\GameScenes</Filter>
-    </ClInclude>
-    <ClInclude Include="TestScene.h">
       <Filter>Game\GameScenes</Filter>
     </ClInclude>
     <ClInclude Include="Meta.h">
@@ -528,9 +485,6 @@
       <Filter>Game\GameObjects\Enemy\Snake</Filter>
     </ClInclude>
     <ClInclude Include="SnakeAnimationString.h">
-      <Filter>Game\GameObjects\Enemy\Snake</Filter>
-    </ClInclude>
-    <ClInclude Include="SnakeStates.h">
       <Filter>Game\GameObjects\Enemy\Snake</Filter>
     </ClInclude>
     <ClInclude Include="ActionComponent.h">
@@ -632,9 +586,6 @@
     <ClInclude Include="PlayerAnimationString.h">
       <Filter>Game\GameObjects\Player</Filter>
     </ClInclude>
-    <ClInclude Include="QuadTree.h">
-      <Filter>Game\GameUtils</Filter>
-    </ClInclude>
     <ClInclude Include="Quaternion.h">
       <Filter>Math</Filter>
     </ClInclude>
@@ -675,7 +626,18 @@
     <ClInclude Include="Inventory.h">
       <Filter>UI</Filter>
     </ClInclude>
-    <ClInclude Include="DamageBox.h" />
+    <ClInclude Include="MapToolScene.h">
+      <Filter>Game\GameScenes\MapToolScene</Filter>
+    </ClInclude>
+    <ClInclude Include="LoadingScene00.h">
+      <Filter>Game\GameScenes\LoadingScenes</Filter>
+    </ClInclude>
+    <ClInclude Include="TestScene.h">
+      <Filter>Game\GameScenes\TestScene</Filter>
+    </ClInclude>
+    <ClInclude Include="QuadTree.h">
+      <Filter>Game\GameUtils\QaudTrees</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Core">
@@ -818,6 +780,18 @@
     </Filter>
     <Filter Include="Game\WorldEditor">
       <UniqueIdentifier>{79d079f2-dba9-4baa-a8de-db4260d76d32}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\GameScenes\MapToolScene">
+      <UniqueIdentifier>{351ad06e-6b1e-409b-9da4-62950bd0989b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\GameScenes\LoadingScenes">
+      <UniqueIdentifier>{74036f0d-6082-4a3a-8879-194e6915b666}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\GameScenes\TestScene">
+      <UniqueIdentifier>{bf32ef81-342f-45c8-8fff-965979591ad1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\GameUtils\QaudTrees">
+      <UniqueIdentifier>{3e32031f-0555-4a04-bf0a-4cedb72f5786}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

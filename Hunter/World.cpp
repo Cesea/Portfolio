@@ -235,7 +235,6 @@ bool World::DoesSystemExist(TypeID systemTypeID) const
 	return _systems.find(systemTypeID) != _systems.end();
 }
 
-
 //Scene Entity Description file Format
 //int32 : numEntitySaved
 //for (numEntitySaved)
@@ -270,7 +269,10 @@ bool World::SaveEntitiesInWorld(const std::string & fileName)
 		if (entity.HasComponent<RenderComponent>())
 		{
 			RenderComponent &refRender = entity.GetComponent<RenderComponent>();
+			//ARCHE_TYPE을 저장한다
 			saveInfo._archeType = refRender._arche;
+
+			//리소스 정보를 저장한다
 			switch (refRender._type)
 			{
 			case RenderComponent::Type::eBuffer:
@@ -292,8 +294,19 @@ bool World::SaveEntitiesInWorld(const std::string & fileName)
 				strncpy(saveInfo._resourceName, resourceName.c_str(), resourceName.length());
 			}break;
 			}
-			saveInfo._resourceName;
-			saveInfo._position = entity.GetComponent<TransformComponent>()._position;
+
+			//Transform과 관련된 정보들을 저장한다
+			saveInfo._position = entity.GetComponent<TransformComponent>().GetWorldPosition();
+			saveInfo._scale = entity.GetComponent<TransformComponent>().GetScale();
+			Quaternion quat;
+			Matrix rotation = entity.GetComponent<TransformComponent>().GetFinalMatrix();
+			rotation._41 = 0;
+			rotation._42 = 0;
+			rotation._43 = 0;
+			QuaternionRotationMatrix(&quat, &rotation);
+			saveInfo._orientation.x = quat.x;
+			saveInfo._orientation.y = quat.y;
+			saveInfo._orientation.z = quat.z;
 
 			package.WriteAs<EntitySaveInfo>(saveInfo);
 
