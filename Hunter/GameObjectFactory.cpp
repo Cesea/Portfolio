@@ -9,6 +9,7 @@ void GameObjectFactory::Init()
 	_channel.Add<GameObjectFactory::CreateObjectOnClickEvent, GameObjectFactory>(*this);
 	_channel.Add<GameObjectFactory::CreateObjectOnLocationEvent, GameObjectFactory>(*this);
 	_channel.Add<GameObjectFactory::CreateObjectFromSaveInfoEvent, GameObjectFactory>(*this);
+	_channel.Add<GameObjectFactory::DamageBoxEvent, GameObjectFactory>(*this);
 }
 
 void GameObjectFactory::Release()
@@ -16,6 +17,7 @@ void GameObjectFactory::Release()
 	_channel.Remove<GameObjectFactory::CreateObjectOnClickEvent, GameObjectFactory>(*this);
 	_channel.Remove<GameObjectFactory::CreateObjectOnLocationEvent, GameObjectFactory>(*this);
 	_channel.Remove<GameObjectFactory::CreateObjectFromSaveInfoEvent, GameObjectFactory>(*this);
+	_channel.Remove<GameObjectFactory::DamageBoxEvent, GameObjectFactory>(*this);
 	_pCurrentScene = nullptr;
 	_pPlayer = nullptr;
 }
@@ -578,6 +580,20 @@ void GameObjectFactory::Handle(const CreateObjectFromSaveInfoEvent & event)
 	}
 }
 
+void GameObjectFactory::Handle(const DamageBoxEvent & event)
+{
+	_pCurrentScene->_gameObjects.push_back(new DamageBox());
+	BaseGameObject *pBack = _pCurrentScene->_gameObjects.back();
+	pBack->CreateFromWorld(_pCurrentScene->_world, (event._min+event._max)/2);
+	//이벤트설정
+	Entity _entity = pBack->GetEntity();
+	CollisionComponent & collision = _entity.GetComponent<CollisionComponent>();
+	collision._boundingBox.Init(event._min, event._max);
+	collision._accel = event._accel;
+	collision._dmg = event._dmg;
+	collision._velocity = event._velocity;
+	collision._triggerType = event._type;
+}
 const char * ArcheToString(ARCHE_TYPE type)
 {
 	switch (type)

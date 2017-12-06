@@ -1181,9 +1181,6 @@ void Player::Handle(const CollisionSystem::ActorTriggerEvent & event)
 	case CollisionComponent::TRIGGER_TYPE_OBJECT:
 	{
 	} break;
-	case CollisionComponent::TRIGGER_TYPE_DEFAULT:
-	{
-	} break;
 	}
 }
 
