@@ -71,23 +71,23 @@ bool Hydra::CreateFromWorld(World & world, const Vector3 &Pos)
 
 	_entity.Activate();
 
-	_pStateMachine = new HydraStateMachine;
-	_pStateMachine->Init(this);
-	_pStateMachine->RegisterState(META_TYPE(HydraIdleState)->Name(), new HydraIdleState());
-	_pStateMachine->RegisterState(META_TYPE(HydraMoveState)->Name(), new HydraMoveState());
-	_pStateMachine->RegisterState(META_TYPE(HydraStandState)->Name(), new HydraStandState());
-	_pStateMachine->RegisterState(META_TYPE(HydraAttackState)->Name(), new HydraAttackState());
-	_pStateMachine->RegisterState(META_TYPE(HydraAttack2State)->Name(), new HydraAttack2State());
-	_pStateMachine->RegisterState(META_TYPE(HydraAttack3State)->Name(), new HydraAttack3State());
-	_pStateMachine->RegisterState(META_TYPE(HydraHurt1State)->Name(), new HydraHurt1State());
-	_pStateMachine->RegisterState(META_TYPE(HydraHurt2State)->Name(), new HydraHurt2State());
-	_pStateMachine->RegisterState(META_TYPE(HydraDeadState)->Name(), new HydraDeadState());
-	_pStateMachine->RegisterState(META_TYPE(HydraSpecialAttack1State)->Name(), new HydraSpecialAttack1State());
-	_pStateMachine->RegisterState(META_TYPE(HydraSpecialAttack2State)->Name(), new HydraSpecialAttack2State());
-	_pStateMachine->RegisterState(META_TYPE(HydraBreath1State)->Name(), new HydraBreath1State());
-	_pStateMachine->RegisterState(META_TYPE(HydraBreath2State)->Name(), new HydraBreath2State());
-	_pStateMachine->RegisterState(META_TYPE(HydraBreath3State)->Name(), new HydraBreath3State());
-	_pStateMachine->ChangeState(META_TYPE(HydraStandState)->Name());
+	//_pStateMachine = new HydraStateMachine;
+	//_pStateMachine->Init(this);
+	//_pStateMachine->RegisterState(META_TYPE(HydraIdleState)->Name(), new HydraIdleState());
+	//_pStateMachine->RegisterState(META_TYPE(HydraMoveState)->Name(), new HydraMoveState());
+	//_pStateMachine->RegisterState(META_TYPE(HydraStandState)->Name(), new HydraStandState());
+	//_pStateMachine->RegisterState(META_TYPE(HydraAttackState)->Name(), new HydraAttackState());
+	//_pStateMachine->RegisterState(META_TYPE(HydraAttack2State)->Name(), new HydraAttack2State());
+	//_pStateMachine->RegisterState(META_TYPE(HydraAttack3State)->Name(), new HydraAttack3State());
+	//_pStateMachine->RegisterState(META_TYPE(HydraHurt1State)->Name(), new HydraHurt1State());
+	//_pStateMachine->RegisterState(META_TYPE(HydraHurt2State)->Name(), new HydraHurt2State());
+	//_pStateMachine->RegisterState(META_TYPE(HydraDeadState)->Name(), new HydraDeadState());
+	//_pStateMachine->RegisterState(META_TYPE(HydraSpecialAttack1State)->Name(), new HydraSpecialAttack1State());
+	//_pStateMachine->RegisterState(META_TYPE(HydraSpecialAttack2State)->Name(), new HydraSpecialAttack2State());
+	//_pStateMachine->RegisterState(META_TYPE(HydraBreath1State)->Name(), new HydraBreath1State());
+	//_pStateMachine->RegisterState(META_TYPE(HydraBreath2State)->Name(), new HydraBreath2State());
+	//_pStateMachine->RegisterState(META_TYPE(HydraBreath3State)->Name(), new HydraBreath3State());
+	//this->QueueAction(HYDRA_ANIM(HYDRA_STAND));
 
 	_speed = 2.0f;
 	_rotateSpeed = D3DX_PI / 256;
@@ -149,7 +149,7 @@ bool Hydra::CreateFromWorld(World & world, const Vector3 &Pos)
 
 void Hydra::Update(float deltaTime)
 {
-	_pStateMachine->Update(deltaTime, _currentCommand);
+	//_pStateMachine->Update(deltaTime, _currentCommand);
 	TransformComponent &transComp = _entity.GetComponent<TransformComponent>();
 	switch (_state)
 	{
@@ -159,13 +159,13 @@ void Hydra::Update(float deltaTime)
 		{
 			_delayCount = _delayTime;
 			_state = HYDRASTATE_PATROL;
-			_pStateMachine->ChangeState(META_TYPE(HydraMoveState)->Name());
+			this->QueueAction(HYDRA_ANIM(HYDRA_RUN));
 		}
 		break;
 	case HYDRASTATE_PATROL:
 		if (_moveSegment.empty())
 		{
-			_pStateMachine->ChangeState(META_TYPE(HydraStandState)->Name());
+			this->QueueAction(HYDRA_ANIM(HYDRA_STAND));
 			_state = HYDRASTATE_IDLE;
 		}
 		else
@@ -195,7 +195,7 @@ void Hydra::Update(float deltaTime)
 				_patrolIndex++;
 				if (_patrolIndex > _moveSegment.size() - 1) _patrolIndex = 0;
 				//IDLE 애니메이션 실행
-				_pStateMachine->ChangeState(META_TYPE(HydraStandState)->Name());
+				this->QueueAction(HYDRA_ANIM(HYDRA_STAND));
 				_state = HYDRASTATE_IDLE;
 			}
 			//아니면 이동속도만큼 이동
@@ -212,7 +212,7 @@ void Hydra::Update(float deltaTime)
 		{
 			_roarCount = _roarTime;
 			_state = HYDRASTATE_RUN;
-			_pStateMachine->ChangeState(META_TYPE(HydraMoveState)->Name());
+			this->QueueAction(HYDRA_ANIM(HYDRA_RUN));
 		}
 		break;
 	case HYDRASTATE_RUN:
@@ -231,20 +231,20 @@ void Hydra::Update(float deltaTime)
 			{
 			case HYDRASKINSTATE_GREEN:
 				_state = HYDRASTATE_ATK1;
-				_pStateMachine->ChangeState(META_TYPE(HydraAttackState)->Name());
+				this->QueueAction(HYDRA_ANIM(HYDRA_BITE1));
 				break;
 			case HYDRASKINSTATE_RED:
 				_state = HYDRASTATE_BREATH1;
-				_pStateMachine->ChangeState(META_TYPE(HydraBreath1State)->Name());
+				this->QueueAction(HYDRA_ANIM(HYDRA_BREATH_FIRE1));
 				_atkCount = _atkTime2;
 				break;
 			case HYDRASKINSTATE_BLACK:
 				_state = HYDRASTATE_SP_ATK1;
-				_pStateMachine->ChangeState(META_TYPE(HydraSpecialAttack1State)->Name());
+				this->QueueAction(HYDRA_ANIM(HYDRA_WHIP_HEAD));
 				break;
 			case HYDRASKINSTATE_GOLD:
 				_state = HYDRASTATE_ATK1;
-				_pStateMachine->ChangeState(META_TYPE(HydraAttackState)->Name());
+				this->QueueAction(HYDRA_ANIM(HYDRA_BITE1));
 				break;
 			}
 		}
@@ -266,7 +266,7 @@ void Hydra::Update(float deltaTime)
 			if (distance < _atkRange)
 			{
 				_state = HYDRASTATE_ATK2;
-				_pStateMachine->ChangeState(META_TYPE(HydraAttack2State)->Name());
+				this->QueueAction(HYDRA_ANIM(HYDRA_BITE2));
 			}
 			//공격범위를 벗어났다?
 			else
@@ -274,7 +274,7 @@ void Hydra::Update(float deltaTime)
 				//배틀을 멈추고 기본자세 (다시추적시작)
 				_battle = false;
 				_state = HYDRASTATE_IDLE;
-				_pStateMachine->ChangeState(META_TYPE(HydraStandState)->Name());
+				this->QueueAction(HYDRA_ANIM(HYDRA_STAND));
 			}
 			Vector3 rotatePos = _playerPos;
 			rotatePos.y = transComp.GetWorldPosition().y;
@@ -295,7 +295,7 @@ void Hydra::Update(float deltaTime)
 			if (distance < _atkRange)
 			{
 				_state = HYDRASTATE_ATK3;
-				_pStateMachine->ChangeState(META_TYPE(HydraAttack3State)->Name());
+				this->QueueAction(HYDRA_ANIM(HYDRA_BITE3));
 				//_playerPos = Vector3(RandFloat(-5.0, 5.0), 8.0f, RandFloat(-5.0, 5.0));
 			}
 			//공격범위를 벗어났다?
@@ -304,7 +304,7 @@ void Hydra::Update(float deltaTime)
 				//배틀을 멈추고 기본자세 (다시추적시작)
 				_battle = false;
 				_state = HYDRASTATE_IDLE;
-				_pStateMachine->ChangeState(META_TYPE(HydraStandState)->Name());
+				this->QueueAction(HYDRA_ANIM(HYDRA_STAND));
 			}
 			Vector3 rotatePos = _playerPos;
 			rotatePos.y = transComp.GetWorldPosition().y;
@@ -325,7 +325,7 @@ void Hydra::Update(float deltaTime)
 			if (distance < _atkRange)
 			{
 				_state = HYDRASTATE_ATK1;
-				_pStateMachine->ChangeState(META_TYPE(HydraAttackState)->Name());
+				this->QueueAction(HYDRA_ANIM(HYDRA_BITE1));
 			}
 			//공격범위를 벗어났다?
 			else
@@ -333,7 +333,7 @@ void Hydra::Update(float deltaTime)
 				//배틀을 멈추고 기본자세 (다시추적시작)
 				_battle = false;
 				_state = HYDRASTATE_IDLE;
-				_pStateMachine->ChangeState(META_TYPE(HydraStandState)->Name());
+				this->QueueAction(HYDRA_ANIM(HYDRA_STAND));
 			}
 			Vector3 rotatePos = _playerPos;
 			rotatePos.y = transComp.GetWorldPosition().y;
@@ -348,7 +348,7 @@ void Hydra::Update(float deltaTime)
 		{
 			_standCount = _standTime;
 			_state = HYDRASTATE_PATROL;
-			_pStateMachine->ChangeState(META_TYPE(HydraMoveState)->Name());
+			this->QueueAction(HYDRA_ANIM(HYDRA_RUN));
 		}
 		break;
 	case HYDRASTATE_HURT:
@@ -363,7 +363,7 @@ void Hydra::Update(float deltaTime)
 			if (distance < _atkRange)
 			{
 				_state = HYDRASTATE_ATK1;
-				_pStateMachine->ChangeState(META_TYPE(HydraAttackState)->Name());
+				this->QueueAction(HYDRA_ANIM(HYDRA_BITE1));
 			}
 			else
 			{
@@ -371,7 +371,7 @@ void Hydra::Update(float deltaTime)
 				if (_battle)
 				{
 					_state = HYDRASTATE_RUN;
-					_pStateMachine->ChangeState(META_TYPE(HydraMoveState)->Name());
+					this->QueueAction(HYDRA_ANIM(HYDRA_RUN));
 				}
 				//비전투인데 맞았다?
 				else
@@ -379,7 +379,7 @@ void Hydra::Update(float deltaTime)
 					// 추격
 					_battle = true;
 					_state = HYDRASTATE_FIND;
-					_pStateMachine->ChangeState(META_TYPE(HydraIdleState)->Name());
+					this->QueueAction(HYDRA_ANIM(HYDRA_IDLE));
 					Vector3 rotatePos = _playerPos;
 					rotatePos.y = transComp.GetWorldPosition().y;
 					Vector3 rotateDir = rotatePos - transComp.GetWorldPosition();
@@ -406,7 +406,7 @@ void Hydra::Update(float deltaTime)
 				//배틀을 멈추고 기본자세 (다시추적시작)
 				_battle = false;
 				_state = HYDRASTATE_IDLE;
-				_pStateMachine->ChangeState(META_TYPE(HydraStandState)->Name());
+				this->QueueAction(HYDRA_ANIM(HYDRA_STAND));
 			}
 			Vector3 rotatePos = _playerPos;
 			rotatePos.y = transComp.GetWorldPosition().y;
@@ -425,7 +425,7 @@ void Hydra::Update(float deltaTime)
 			float distance = Vec3Length(&direction);
 			Vec3Normalize(&direction, &direction);
 			_state = HYDRASTATE_RUN;
-			_pStateMachine->ChangeState(META_TYPE(HydraMoveState)->Name());
+			this->QueueAction(HYDRA_ANIM(HYDRA_RUN));
 			Vector3 rotatePos = _playerPos;
 			rotatePos.y = transComp.GetWorldPosition().y;
 			Vector3 rotateDir = rotatePos - transComp.GetWorldPosition();
@@ -447,7 +447,7 @@ void Hydra::Update(float deltaTime)
 			if (distance < _atkRange)
 			{
 				_state = HYDRASTATE_BREATH2;
-				_pStateMachine->ChangeState(META_TYPE(HydraBreath2State)->Name());
+				this->QueueAction(HYDRA_ANIM(HYDRA_BREATH_FIRE2));
 			}
 			//공격범위를 벗어났다?
 			else
@@ -455,7 +455,7 @@ void Hydra::Update(float deltaTime)
 				//배틀을 멈추고 기본자세 (다시추적시작)
 				_battle = false;
 				_state = HYDRASTATE_IDLE;
-				_pStateMachine->ChangeState(META_TYPE(HydraStandState)->Name());
+				this->QueueAction(HYDRA_ANIM(HYDRA_STAND));
 			}
 		}
 		Vector3 rotatePos = _playerPos;
@@ -479,7 +479,7 @@ void Hydra::Update(float deltaTime)
 			if (distance < _atkRange)
 			{
 				_state = HYDRASTATE_BREATH3;
-				_pStateMachine->ChangeState(META_TYPE(HydraBreath3State)->Name());
+				this->QueueAction(HYDRA_ANIM(HYDRA_BREATH_FIRE3));
 			}
 			//공격범위를 벗어났다?
 			else
@@ -487,7 +487,7 @@ void Hydra::Update(float deltaTime)
 				//배틀을 멈추고 기본자세 (다시추적시작)
 				_battle = false;
 				_state = HYDRASTATE_IDLE;
-				_pStateMachine->ChangeState(META_TYPE(HydraStandState)->Name());
+				this->QueueAction(HYDRA_ANIM(HYDRA_STAND));
 			}
 		}
 		Vector3 rotatePos = _playerPos;
@@ -511,7 +511,7 @@ void Hydra::Update(float deltaTime)
 			if (distance < _atkRange)
 			{
 				_state = HYDRASTATE_BREATH1;
-				_pStateMachine->ChangeState(META_TYPE(HydraBreath1State)->Name());
+this->QueueAction(HYDRA_ANIM(HYDRA_BREATH_FIRE1));
 			}
 			//공격범위를 벗어났다?
 			else
@@ -519,7 +519,7 @@ void Hydra::Update(float deltaTime)
 				//배틀을 멈추고 기본자세 (다시추적시작)
 				_battle = false;
 				_state = HYDRASTATE_IDLE;
-				_pStateMachine->ChangeState(META_TYPE(HydraStandState)->Name());
+				this->QueueAction(HYDRA_ANIM(HYDRA_STAND));
 			}
 		}
 		Vector3 rotatePos = _playerPos;
@@ -546,12 +546,12 @@ void Hydra::Update(float deltaTime)
 			if (distRadian > D3DX_PI / 4 * 3)
 			{
 				_state = HYDRASTATE_SP_ATK2;
-				_pStateMachine->ChangeState(META_TYPE(HydraSpecialAttack2State)->Name());
+				this->QueueAction(HYDRA_ANIM(HYDRA_WHIP_TAIL));
 			}
 			else
 			{
 				_state = HYDRASTATE_FIND;
-				_pStateMachine->ChangeState(META_TYPE(HydraIdleState)->Name());
+				this->QueueAction(HYDRA_ANIM(HYDRA_IDLE));
 				transComp.LookDirection(-rotateDir, D3DX_PI * 2);
 			}
 			//찾으면 FIND가 되며 battle상태가 ROAR가 됌
@@ -585,7 +585,7 @@ void Hydra::Handle(const CollisionSystem::ActorTriggerEvent & event)
 			{
 				resetAllCount();
 				//_state = HYDRASTATE_HURT;
-				//_pStateMachine->ChangeState(META_TYPE(HydraHurt1State)->Name());
+				//this->QueueAction(HYDRA_ANIM(HYDRA_HIT1));
 				_battle = true;
 			}
 			_hp -= 50;
@@ -593,13 +593,13 @@ void Hydra::Handle(const CollisionSystem::ActorTriggerEvent & event)
 			{
 				resetAllCount();
 				_state = HYDRASTATE_HURT;
-				_pStateMachine->ChangeState(META_TYPE(HydraHurt1State)->Name());
+				this->QueueAction(HYDRA_ANIM(HYDRA_HIT1));
 				_battle = true;
 				_hp -= 50;
 				if (_hp <= 0)
 				{
 					_state = HYDRASTATE_DEATH;
-					_pStateMachine->ChangeState(META_TYPE(HydraDeadState)->Name());
+					this->QueueAction(HYDRA_ANIM(HYDRA_DEATH));
 				}
 			}
 			_isHurt = true;
@@ -633,10 +633,11 @@ void Hydra::SetupCallbackAndCompression()
 	AddCallbackKeysAndCompress(pController, anim0, 1, &warSwingLeftKeys, D3DXCOMPRESS_DEFAULT, 0.1f);
 }
 
-void Hydra::QueueAction(const Action & action)
+void Hydra::QueueAction(Action & action, bool cancle)
 {
+	action._cancle = cancle;
 	_pActionComp->_actionQueue.PushAction(action);
-
+	_animationEnum = action._enum;
 }
 
 bool Hydra::findPlayer(Vector3 forward, Vector3 playerPos, Vector3 myPos, float range1, float range2, float findRadian)
