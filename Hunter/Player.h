@@ -80,8 +80,8 @@ private :
 
 private :
 	EventChannel _channel;
-	float _walkSpeed{2.0f};
-	float _runSpeed{5.0f};
+	float _walkSpeed{1.6f};
+	float _runSpeed{5.5f};
 
 	float _rotationSpeed{ 7.0f };
 

@@ -30,7 +30,8 @@ struct EntitySaveInfo
 	ARCHE_TYPE _archeType{};
 	char _resourceName[MAX_FILE_NAME];
 	Vector3 _position;
-	//Quaternion _orientation;
+	Vector3 _scale;
+	Vector3 _orientation;
 };
 
 class GameObjectFactory : public SingletonBase<GameObjectFactory>
@@ -41,15 +42,16 @@ public :
 
 	void SetCurrentScene(IScene *pScene) { _pCurrentScene = pScene; }
 
-	//void CreateObject(ArcheType type, const Vector3 &position);
-	//void CreateObject();
-
 	BaseGameObject *GetPlayerObject() { return _pPlayer; }
 
 private :
 	IScene *_pCurrentScene;
 
-	void CreateObject(ARCHE_TYPE type, ResourceHandle handle, const Vector3 &position);
+	//void CreateObject(ARCHE_TYPE type, ResourceHandle handle, const Vector3 &position);
+
+	void CreateObject(ARCHE_TYPE type, ResourceHandle handle, const Vector3 &position,
+		const Vector3 &scale = Vector3(1.0f, 1.0f, 1.0f),
+		const Vector3 &orientation = Vector3(0.0f, 0.0f, 0.0f));
 	//void CreateObject(ARCHE_TYPE type, char *name, const Vector3 &position);
 
 	BaseGameObject *_pPlayer{};
@@ -92,13 +94,19 @@ public :
 	//CreateObjectFromSaveInfoEvent///////////////////////////////////////////////////////
 	struct CreateObjectFromSaveInfoEvent
 	{
-		CreateObjectFromSaveInfoEvent(ARCHE_TYPE type, const char *key, const Vector3 &position)
-			:_type(type), _key(key), _position(position)
+		CreateObjectFromSaveInfoEvent(ARCHE_TYPE type, const char *key, 
+			const Vector3 &position, 
+			const Vector3 &scale = Vector3(1.0f, 1.0f, 1.0f),
+			const Vector3 &orientation = Vector3(0.0f, 0.0f, 0.0f))
+			:_type(type), _key(key), 
+			_position(position), _scale(scale), _orientation(orientation)
 		{
 		}
 		ARCHE_TYPE _type;
 		const char *_key;
 		Vector3 _position;
+		Vector3 _scale;
+		Vector3 _orientation;
 	};
 	void Handle(const CreateObjectFromSaveInfoEvent &event);
 	/////////////////////////////////////////////////////////////////////////////////////

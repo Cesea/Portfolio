@@ -1,6 +1,5 @@
 #include "stdafx.h"
 #include "Cat.h"
-#include "CatStates.h"
 
 Cat::Cat()
 {

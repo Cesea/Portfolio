@@ -383,7 +383,6 @@ void Editor::InTerrainEditMode()
 		}
 
 		ImguiUnindent();
-
 	}
 	ImguiUnindent();
 }
@@ -702,25 +701,23 @@ void Editor::InObjectEditMode()
 
 			ImguiLabel("Orientation");
 			{
-				Quaternion test;
+				Quaternion quat;
 				Matrix rotation = _objectEditor._pTransform->_matFinal;
 				rotation._41 = 0;
 				rotation._42 = 0;
 				rotation._43 = 0;
 
-				QuaternionRotationMatrix(&test, &rotation);
-
-				Console::Log("%f %f %f %f\n", test.x, test.y, test.z, test.w);
+				QuaternionRotationMatrix(&quat, &rotation);
 
 				ImguiIndent();
 
-				ImguiSlider("X", &test.x, 0.0f, 1.0f, 0.01f);
-				ImguiSlider("Y", &test.y, -0.9f, 0.9f, 0.01f);
-				ImguiSlider("Z", &test.z, 0.0f, 1.0f, 0.01f);
+				ImguiSlider("X", &quat.x, 0.0f, 1.0f, 0.01f);
+				ImguiSlider("Y", &quat.y, -0.9f, 0.9f, 0.01f);
+				ImguiSlider("Z", &quat.z, 0.0f, 1.0f, 0.01f);
 
-				QuaternionNormalize(&test, &test);
+				QuaternionNormalize(&quat, &quat);
 
-				_objectEditor._pTransform->SetRotateWorld(test);
+				_objectEditor._pTransform->SetRotateWorld(quat);
 
 				ImguiUnindent();
 			}

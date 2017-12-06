@@ -1,7 +1,6 @@
 #include "stdafx.h"
 #include "Snake.h"
-#include "SnakeStates.h"
-#include <time.h>
+
 Snake::Snake()
 {
 }
@@ -12,8 +11,6 @@ Snake::~Snake()
 
 bool Snake::CreateFromWorld(World & world, const Vector3 &Pos)
 {
-	srand(time(NULL));
-	
 	_entity = world.CreateEntity();
 	TransformComponent &transComp = _entity.AddComponent<TransformComponent>();
 

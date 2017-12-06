@@ -18,16 +18,10 @@
     <ClCompile Include="batAnimationString.cpp">
       <Filter>Game\GameObjects\Enemy\Bat</Filter>
     </ClCompile>
-    <ClCompile Include="batStates.cpp">
-      <Filter>Game\GameObjects\Enemy\Bat</Filter>
-    </ClCompile>
     <ClCompile Include="Cat.cpp">
       <Filter>Game\GameObjects\Enemy\Cat</Filter>
     </ClCompile>
     <ClCompile Include="CatAnimationString.cpp">
-      <Filter>Game\GameObjects\Enemy\Cat</Filter>
-    </ClCompile>
-    <ClCompile Include="CatStates.cpp">
       <Filter>Game\GameObjects\Enemy\Cat</Filter>
     </ClCompile>
     <ClCompile Include="DataPackage.cpp">
@@ -54,25 +48,16 @@
     <ClCompile Include="HydraAnimationString.cpp">
       <Filter>Game\GameObjects\Enemy\Hydra</Filter>
     </ClCompile>
-    <ClCompile Include="HydraStates.cpp">
-      <Filter>Game\GameObjects\Enemy\Hydra</Filter>
-    </ClCompile>
     <ClCompile Include="Lizard.cpp">
       <Filter>Game\GameObjects\Enemy\Lizard</Filter>
     </ClCompile>
     <ClCompile Include="LizardAnimationString.cpp">
       <Filter>Game\GameObjects\Enemy\Lizard</Filter>
     </ClCompile>
-    <ClCompile Include="LizardStates.cpp">
-      <Filter>Game\GameObjects\Enemy\Lizard</Filter>
-    </ClCompile>
     <ClCompile Include="Turtle.cpp">
       <Filter>Game\GameObjects\Enemy\Turtle</Filter>
     </ClCompile>
     <ClCompile Include="TurtleAnimationString.cpp">
-      <Filter>Game\GameObjects\Enemy\Turtle</Filter>
-    </ClCompile>
-    <ClCompile Include="TurtleStates.cpp">
       <Filter>Game\GameObjects\Enemy\Turtle</Filter>
     </ClCompile>
     <ClCompile Include="GameObjectFactory.cpp">
@@ -160,9 +145,6 @@
       <Filter>Game\GameObjects\Enemy\Snake</Filter>
     </ClCompile>
     <ClCompile Include="SnakeAnimationString.cpp">
-      <Filter>Game\GameObjects\Enemy\Snake</Filter>
-    </ClCompile>
-    <ClCompile Include="SnakeStates.cpp">
       <Filter>Game\GameObjects\Enemy\Snake</Filter>
     </ClCompile>
     <ClCompile Include="ActionComponent.cpp">
@@ -319,16 +301,10 @@
     <ClInclude Include="batAnimationString.h">
       <Filter>Game\GameObjects\Enemy\Bat</Filter>
     </ClInclude>
-    <ClInclude Include="batStates.h">
-      <Filter>Game\GameObjects\Enemy\Bat</Filter>
-    </ClInclude>
     <ClInclude Include="Cat.h">
       <Filter>Game\GameObjects\Enemy\Cat</Filter>
     </ClInclude>
     <ClInclude Include="CatAnimationString.h">
-      <Filter>Game\GameObjects\Enemy\Cat</Filter>
-    </ClInclude>
-    <ClInclude Include="CatStates.h">
       <Filter>Game\GameObjects\Enemy\Cat</Filter>
     </ClInclude>
     <ClInclude Include="Delegate.h">
@@ -382,25 +358,16 @@
     <ClInclude Include="HydraAnimationString.h">
       <Filter>Game\GameObjects\Enemy\Hydra</Filter>
     </ClInclude>
-    <ClInclude Include="HydraStates.h">
-      <Filter>Game\GameObjects\Enemy\Hydra</Filter>
-    </ClInclude>
     <ClInclude Include="Lizard.h">
       <Filter>Game\GameObjects\Enemy\Lizard</Filter>
     </ClInclude>
     <ClInclude Include="LizardAnimationString.h">
       <Filter>Game\GameObjects\Enemy\Lizard</Filter>
     </ClInclude>
-    <ClInclude Include="LizardStates.h">
-      <Filter>Game\GameObjects\Enemy\Lizard</Filter>
-    </ClInclude>
     <ClInclude Include="Turtle.h">
       <Filter>Game\GameObjects\Enemy\Turtle</Filter>
     </ClInclude>
     <ClInclude Include="TurtleAnimationString.h">
-      <Filter>Game\GameObjects\Enemy\Turtle</Filter>
-    </ClInclude>
-    <ClInclude Include="TurtleStates.h">
       <Filter>Game\GameObjects\Enemy\Turtle</Filter>
     </ClInclude>
     <ClInclude Include="GameObjectFactory.h">
@@ -518,9 +485,6 @@
       <Filter>Game\GameObjects\Enemy\Snake</Filter>
     </ClInclude>
     <ClInclude Include="SnakeAnimationString.h">
-      <Filter>Game\GameObjects\Enemy\Snake</Filter>
-    </ClInclude>
-    <ClInclude Include="SnakeStates.h">
       <Filter>Game\GameObjects\Enemy\Snake</Filter>
     </ClInclude>
     <ClInclude Include="ActionComponent.h">

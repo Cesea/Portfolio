@@ -1,6 +1,5 @@
 #include "stdafx.h"
 #include "Hydra.h"
-#include "HydraStates.h"
 
 Hydra::Hydra()
 {

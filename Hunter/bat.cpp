@@ -1,6 +1,5 @@
 #include "stdafx.h"
 #include "Bat.h"
-#include "BatStates.h"
 
 Bat::Bat()
 {

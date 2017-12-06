@@ -635,7 +635,6 @@ void Player::MoveAndRotate(float deltaTime)
 	Vector3 forward = refTransform.GetForward();
 	Vector3 right = refTransform.GetRight();
 
-
 	Vector3 toMove;
 
 	bool rightAdded{ false };
@@ -644,29 +643,42 @@ void Player::MoveAndRotate(float deltaTime)
 	if (_animationEnum == PlayerAnimationEnum::eStrafeLeft ||
 		_animationEnum == PlayerAnimationEnum::eWarMovingLeft)
 	{
-		toMove -= right;
+		toMove -= right * _walkSpeed;
 	}
 	else if (_animationEnum == PlayerAnimationEnum::eStrafeRight ||
 		_animationEnum == PlayerAnimationEnum::eWarMovingRight)
 	{
-		toMove += right;
+		toMove += right * _walkSpeed;;
 	}
 	else
 	{
-		if (_currentMovement._vertical == VERTICAL_MOVEMENT_UP)
+		if (_animationEnum == PlayerAnimationEnum::eWarCharging)
 		{
-			toMove += forward;
+			if (_currentMovement._vertical == VERTICAL_MOVEMENT_UP)
+			{
+				toMove += forward * _runSpeed;
+			}
+			else if (_currentMovement._vertical == VERTICAL_MOVEMENT_DOWN)
+			{
+				toMove -= forward * _runSpeed;
+			}
 		}
-		else if (_currentMovement._vertical == VERTICAL_MOVEMENT_DOWN)
+		else
 		{
-			toMove -= forward;
+			if (_currentMovement._vertical == VERTICAL_MOVEMENT_UP)
+			{
+				toMove += forward * _walkSpeed;
+			}
+			else if (_currentMovement._vertical == VERTICAL_MOVEMENT_DOWN)
+			{
+				toMove -= forward * _walkSpeed;
+			}
 		}
 	}
 
-
    if (!toMove.IsZero())
    {
-	   //Vec3Normalize(&toMove, &toMove);
+	   Vec3Normalize(&toMove, &toMove);
 
 	   toMove *= deltaTime;
 
@@ -1093,11 +1105,6 @@ void Player::Handle(const InputManager::KeyReleasedEvent & event)
 			   _camRotated = true;
 			   _targetRotation = PI_DIV_4;
 		   }
-		   //else if (_currentCommand._movement._horizontal == HORIZONTAL_MOVEMENT_RIGHT)
-		   //{
-			  // _camRotated = true;
-			  // _targetRotation = -D3DX_PI;
-		   //}
 	   }
 	   else if (inputCode == 'L')
 	   {
@@ -1111,29 +1118,7 @@ void Player::Handle(const InputManager::KeyReleasedEvent & event)
 			   _camRotated = true;
 			   _targetRotation = -PI_DIV_4;
 		   }
-		   //else if (_currentCommand._movement._horizontal == HORIZONTAL_MOVEMENT_LEFT)
-		   //{
-			  // _camRotated = true;
-			  // _targetRotation = D3DX_PI;
-		   //}
 	   }
-
-	   //if (inputCode == 'I')
-	   //{
-		  // this->_pActionComp->_actionQueue.ClearQueue();
-		  // _state = PLAYERSTATE_STANCE;
-		  // MovementStop(_currentMovement);
-		  // this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eStandingFree));
-	   //}
-	   //else if (inputCode == 'J')
-	   //{
-		  // _targetRotation = 0.0f;
-	   //}
-	   //else if (inputCode == 'L')
-	   //{
-		  // _targetRotation = 0.0f;
-	   //}
-
    } break;
    case Player::PLAYERSTATE_ATTACK:
    {

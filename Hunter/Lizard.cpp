@@ -1,6 +1,5 @@
 #include "stdafx.h"
 #include "Lizard.h"
-#include "LizardStates.h"
 
 Lizard::Lizard()
 {

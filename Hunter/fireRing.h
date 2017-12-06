@@ -25,7 +25,7 @@ class fireRing :
 
 		// Start color at 50-100% intensity when born for
 		// variation.
-		out.initialColor = RandFloat(0.5f, 1.0f)*WHITENESS;
+		out.initialColor = RandFloat(0.5f, 1.0f) * WHITENESS;
 
 		// Generate random particle on the ring in polar
 		// coordinates: random radius and random angle.
