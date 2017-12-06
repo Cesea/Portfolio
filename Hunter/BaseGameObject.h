@@ -17,7 +17,6 @@ public :
 	Entity &GetEntity() { return _entity; }
 
 	const TerrainTilePos &GetTilePos() const { return _tilePos; }
-
 protected :
 	Entity _entity;
 	int32 _animationEnum;

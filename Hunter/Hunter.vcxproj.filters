@@ -297,6 +297,7 @@
     <ClCompile Include="Inventory.cpp">
       <Filter>UI</Filter>
     </ClCompile>
+    <ClCompile Include="DamageBox.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ClassTypeID.h" />
@@ -674,6 +675,7 @@
     <ClInclude Include="Inventory.h">
       <Filter>UI</Filter>
     </ClInclude>
+    <ClInclude Include="DamageBox.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Core">

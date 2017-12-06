@@ -386,12 +386,17 @@ void Snake::Update(float deltaTime)
 void Snake::Handle(const CollisionSystem::ActorTriggerEvent & event)
 {
 
-	if (event._entity1 != _entity) return;
-	CollisionComponent & _collision = event._entity2.GetComponent<CollisionComponent>();
+	if (event._entity2 != _entity) return;
+	CollisionComponent & _collision = event._entity1.GetComponent<CollisionComponent>();
 	switch (_collision._triggerType)
 	{
 		//플레이어와 충돌했다(내가 가해자)
 	case CollisionComponent::TRIGGER_TYPE_PLAYER:
+		break;
+		//오브젝트와 충돌했다
+	case CollisionComponent::TRIGGER_TYPE_OBJECT:
+		break;
+	case CollisionComponent::TRIGGER_TYPE_PLAYER_DMGBOX:
 		if (!_isHurt)
 		{
 			if (_state != SNAKESTATE_HURT&&_state != SNAKESTATE_DIE)
@@ -408,11 +413,6 @@ void Snake::Handle(const CollisionSystem::ActorTriggerEvent & event)
 				}
 			}
 		}
-		break;
-		//오브젝트와 충돌했다
-	case CollisionComponent::TRIGGER_TYPE_OBJECT:
-		break;
-	case CollisionComponent::TRIGGER_TYPE_DEFAULT:
 		break;
 	}
 

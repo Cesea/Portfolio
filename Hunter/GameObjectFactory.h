@@ -112,6 +112,22 @@ public :
 	void Handle(const CreateObjectOnLocationEvent &event);
 	/////////////////////////////////////////////////////////////////////////////////////
 
+	//DMG BOX 생성 이벤트
+	struct DamageBoxEvent
+	{
+		DamageBoxEvent(Vector3 min, Vector3 max, float dmg, CollisionComponent::TRIGGER_TYPE type,float accel,float vel) 
+			: _min(min), _max(max), _dmg(dmg), _type(type),_velocity(vel),_accel(accel) {}
+		Vector3 _min;
+		Vector3 _max;
+		float _dmg;
+		float _velocity;
+		float _accel;
+		CollisionComponent::TRIGGER_TYPE _type;
+	};
+	//Receive Enemy DmgBox Event
+	void Handle(const DamageBoxEvent &event);
+	///////////////////////////////////////////////////////////////////////////////////////
+
 	EventChannel _channel;
 };
 
