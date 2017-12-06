@@ -123,16 +123,7 @@
     <ClCompile Include="GizmoManager.cpp">
       <Filter>Manager</Filter>
     </ClCompile>
-    <ClCompile Include="LoadingScene00.cpp">
-      <Filter>Game\GameScenes</Filter>
-    </ClCompile>
     <ClCompile Include="IScene.cpp">
-      <Filter>Game\GameScenes</Filter>
-    </ClCompile>
-    <ClCompile Include="MapToolScene.cpp">
-      <Filter>Game\GameScenes</Filter>
-    </ClCompile>
-    <ClCompile Include="TestScene.cpp">
       <Filter>Game\GameScenes</Filter>
     </ClCompile>
     <ClCompile Include="Meta.cpp">
@@ -296,6 +287,15 @@
     </ClCompile>
     <ClCompile Include="Inventory.cpp">
       <Filter>UI</Filter>
+    </ClCompile>
+    <ClCompile Include="MapToolScene.cpp">
+      <Filter>Game\GameScenes\MapToolScene</Filter>
+    </ClCompile>
+    <ClCompile Include="LoadingScene00.cpp">
+      <Filter>Game\GameScenes\LoadingScenes</Filter>
+    </ClCompile>
+    <ClCompile Include="TestScene.cpp">
+      <Filter>Game\GameScenes\TestScene</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -463,16 +463,7 @@
     <ClInclude Include="GameComponent.h">
       <Filter>Game\GameComponents</Filter>
     </ClInclude>
-    <ClInclude Include="LoadingScene00.h">
-      <Filter>Game\GameScenes</Filter>
-    </ClInclude>
     <ClInclude Include="IScene.h">
-      <Filter>Game\GameScenes</Filter>
-    </ClInclude>
-    <ClInclude Include="MapToolScene.h">
-      <Filter>Game\GameScenes</Filter>
-    </ClInclude>
-    <ClInclude Include="TestScene.h">
       <Filter>Game\GameScenes</Filter>
     </ClInclude>
     <ClInclude Include="Meta.h">
@@ -674,6 +665,15 @@
     <ClInclude Include="Inventory.h">
       <Filter>UI</Filter>
     </ClInclude>
+    <ClInclude Include="MapToolScene.h">
+      <Filter>Game\GameScenes\MapToolScene</Filter>
+    </ClInclude>
+    <ClInclude Include="LoadingScene00.h">
+      <Filter>Game\GameScenes\LoadingScenes</Filter>
+    </ClInclude>
+    <ClInclude Include="TestScene.h">
+      <Filter>Game\GameScenes\TestScene</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Core">
@@ -816,6 +816,15 @@
     </Filter>
     <Filter Include="Game\WorldEditor">
       <UniqueIdentifier>{79d079f2-dba9-4baa-a8de-db4260d76d32}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\GameScenes\MapToolScene">
+      <UniqueIdentifier>{351ad06e-6b1e-409b-9da4-62950bd0989b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\GameScenes\LoadingScenes">
+      <UniqueIdentifier>{74036f0d-6082-4a3a-8879-194e6915b666}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\GameScenes\TestScene">
+      <UniqueIdentifier>{bf32ef81-342f-45c8-8fff-965979591ad1}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>
