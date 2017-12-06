@@ -25,8 +25,6 @@ IScene::IScene()
 	_screenIndices[4] = 1;
 	_screenIndices[5] = 2;
 
-
-
 	video::VertexDecl decl;
 	decl.Begin();
 	D3DVERTEXELEMENT9 elements;
@@ -63,7 +61,6 @@ IScene::IScene()
 	video::IndexBufferHandle iBufferHandle = VIDEO->CreateIndexBuffer(&mem, sizeof(uint16), "Scene");
 
 	_pScreenIndexBuffer = VIDEO->GetIndexBuffer(iBufferHandle);
-
 }
 
 bool IScene::Init()
@@ -94,7 +91,6 @@ bool IScene::Init()
 	_shadowCamera._orthoSize = _shadowDistance * 1.0f;	//투영크기는 그림자크기로...
 	_shadowCamera.ReadyShadowTexture(1024);
 
-
 	//라이트 생성
 	_pMainLight = new DirectionalLight();
 	_pMainLight->CreateFromWorld(_world);
@@ -106,6 +102,9 @@ bool IScene::Init()
 	{
 		return false;
 	}
+
+	_channel.Add<IScene::SceneDirty, IScene>(*this);
+
 	return true;
 }
 
@@ -135,6 +134,24 @@ bool IScene::Update(float deltaTime, const InputManager & input)
 	_shadowCamera.GetEntity().GetComponent<TransformComponent>().LookDirection(lightDir);
 
 	SceneUpdate(deltaTime, input);
+
+	if (_gameObjectDirty)
+	{
+		for (std::vector<BaseGameObject *>::iterator iter = _gameObjects.begin();
+			iter != _gameObjects.end(); )
+		{
+			if (false == (*iter)->GetValid())
+			{
+				(*iter)->GetEntity().Kill();
+				iter = _gameObjects.erase(iter);
+			}
+			else
+			{
+				++iter;
+			}
+		}
+		_gameObjectDirty = false;
+	}
 	return true;
 }
 

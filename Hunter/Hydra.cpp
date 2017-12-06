@@ -586,6 +586,7 @@ void Hydra::Handle(const CollisionSystem::ActorTriggerEvent & event)
 	case CollisionComponent::TRIGGER_TYPE_OBJECT:
 		break;
 	case CollisionComponent::TRIGGER_TYPE_PLAYER_DMGBOX:
+	case CollisionComponent::TRIGGER_TYPE_ENEMY_DMGBOX:
 		if (!_isHurt)
 		{
 			if (_state == HYDRASTATE_IDLE || _state == HYDRASTATE_STAND)
@@ -607,6 +608,9 @@ void Hydra::Handle(const CollisionSystem::ActorTriggerEvent & event)
 				{
 					_state = HYDRASTATE_DEATH;
 					this->QueueAction(HYDRA_ANIM(HYDRA_DEATH));
+					this->_valid = false;
+					EventChannel channel;
+					channel.Broadcast<IScene::SceneDirty>(IScene::SceneDirty());
 				}
 			}
 			_isHurt = true;
