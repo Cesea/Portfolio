@@ -55,7 +55,9 @@ protected:
 	bool _isHurt;
 	int _unBeatableTime;
 	int _unBeatableCount;
-	//플레이어 정보
+	//Die
+	bool _isDie{ false };
+	int _dieCount{ 240 };
 public:
     Vector3 _playerPos;
 	Vector3 _playerForward;

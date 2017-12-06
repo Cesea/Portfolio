@@ -29,6 +29,8 @@ bool DamageBox::CreateFromWorld(World & world, const Vector3 & Pos)
 	ScriptComponent &scriptComponent = _entity.AddComponent<ScriptComponent>();
 	scriptComponent.SetScript(MAKE_SCRIPT_DELEGATE(DamageBox,Update, *this));
 
+	collision._valid = true;
+
 	_entity.Activate();
 	return true;
 }
@@ -37,4 +39,9 @@ void DamageBox::Update(float deltaTime)
 {
 	CollisionComponent &collision = _entity.GetComponent<CollisionComponent>();
 	collision._duration -= deltaTime;
+	if (collision._duration < 0.0f || !collision._valid)
+	{
+		EventChannel channel;
+		channel.Broadcast<IScene::SceneDirty>(IScene::SceneDirty());
+	}
 }

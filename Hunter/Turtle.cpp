@@ -302,6 +302,18 @@ void Turtle::Update(float deltaTime)
 			_isHurt = false;
 		}
 	}
+
+	if (_isDie)
+	{
+		_dieCount--;
+		if (_dieCount <= 0)
+		{
+			this->_valid = false;
+			EventChannel channel;
+			channel.Broadcast<IScene::SceneDirty>(IScene::SceneDirty());
+		}
+	}
+
 }
 
 void Turtle::Handle(const CollisionSystem::ActorTriggerEvent & event)
@@ -317,6 +329,7 @@ void Turtle::Handle(const CollisionSystem::ActorTriggerEvent & event)
 	case CollisionComponent::TRIGGER_TYPE_OBJECT:
 		break;
 	case CollisionComponent::TRIGGER_TYPE_PLAYER_DMGBOX:
+		if (_isDie) break;
 		if (!_isHurt)
 		{
 			if (_state != TURTLESTATE_HURT&&_state != TURTLESTATE_DEATH)
@@ -330,9 +343,11 @@ void Turtle::Handle(const CollisionSystem::ActorTriggerEvent & event)
 				{
 					_state = TURTLESTATE_DEATH;
 					this->QueueAction(TURTLE_ANIM(TURTLE_ANIMATION_ENUM::TURTLE_DEATH));
+					_isDie = true;
 				}
 			}
 			_isHurt = true;
+			_collision._valid = false;
 		}
 		break;
 	}

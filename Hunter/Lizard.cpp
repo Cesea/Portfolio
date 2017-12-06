@@ -209,6 +209,13 @@ void Lizard::Update(float deltaTime)
 	break;
 	case LIZARDSTATE_ATK1:
 		_atkCount--;
+		if (_atkCount == 60)
+		{
+			Vector3 targetPos = transComp.GetWorldPosition() + transComp.GetForward()*_atkRange / 2;
+			EventChannel _channel;
+			_channel.Broadcast<GameObjectFactory::DamageBoxEvent>(GameObjectFactory::DamageBoxEvent(targetPos - Vector3(_atkRange / 2, _atkRange / 2, _atkRange / 2),
+				targetPos + Vector3(_atkRange / 2, _atkRange / 2, _atkRange / 2), 10.0f, CollisionComponent::TRIGGER_TYPE_ENEMY_DMGBOX, 0.0f, 0.0f, 1.0f));
+		}
 		if (_atkCount < 0)
 		{
 			_atkCount = _atkTime;
@@ -233,6 +240,13 @@ void Lizard::Update(float deltaTime)
 		break;
 	case LIZARDSTATE_ATK2:
 		_atkCount--;
+		if (_atkCount == 50)
+		{
+			Vector3 targetPos = transComp.GetWorldPosition() + transComp.GetForward()*_atkRange / 2;
+			EventChannel _channel;
+			_channel.Broadcast<GameObjectFactory::DamageBoxEvent>(GameObjectFactory::DamageBoxEvent(targetPos - Vector3(_atkRange / 2, _atkRange / 2, _atkRange / 2),
+				targetPos + Vector3(_atkRange / 2, _atkRange / 2, _atkRange / 2), 10.0f, CollisionComponent::TRIGGER_TYPE_ENEMY_DMGBOX, 0.0f, 0.0f, 1.0f));
+		}
 		if (_atkCount < 0)
 		{
 			_atkCount = _atkTime;
@@ -363,6 +377,17 @@ void Lizard::Update(float deltaTime)
 			_isHurt = false;
 		}
 	}
+
+	if (_isDie)
+	{
+		_dieCount--;
+		if (_dieCount <= 0)
+		{
+			this->_valid = false;
+			EventChannel channel;
+			channel.Broadcast<IScene::SceneDirty>(IScene::SceneDirty());
+		}
+	}
 }
 
 void Lizard::Handle(const CollisionSystem::ActorTriggerEvent & event)
@@ -378,6 +403,7 @@ void Lizard::Handle(const CollisionSystem::ActorTriggerEvent & event)
 	case CollisionComponent::TRIGGER_TYPE_OBJECT:
 		break;
 	case CollisionComponent::TRIGGER_TYPE_PLAYER_DMGBOX:
+		if (_isDie) break;
 		if (!_isHurt)
 		{
 			//일반공격중엔 무적으로
@@ -393,8 +419,10 @@ void Lizard::Handle(const CollisionSystem::ActorTriggerEvent & event)
 			{
 				_state = LIZARDSTATE_DEATH;
 				this->QueueAction(LIZARD_ANIM(LIZARD_DEATH));
+				_isDie = true;
 			}
 			_isHurt = true;
+			_collision._valid = false;
 		}
 		break;
 	}

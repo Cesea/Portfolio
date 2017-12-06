@@ -200,6 +200,13 @@ void Cat::Update(float deltaTime)
 	break;
 	case CATSTATE_ATK1:
 		_atkCount--;
+		if (_atkCount == 40)
+		{
+			Vector3 targetPos = transComp.GetWorldPosition() + transComp.GetForward()*_atkRange / 2;
+			EventChannel _channel;
+			_channel.Broadcast<GameObjectFactory::DamageBoxEvent>(GameObjectFactory::DamageBoxEvent(targetPos - Vector3(_atkRange / 2, _atkRange / 2, _atkRange / 2),
+				targetPos + Vector3(_atkRange / 2, _atkRange / 2, _atkRange / 2), 10.0f, CollisionComponent::TRIGGER_TYPE_ENEMY_DMGBOX, 0.0f, 0.0f, 1.0f));
+		}
 		if (_atkCount < 0)
 		{
 			_atkCount = _atkTime;
@@ -224,6 +231,13 @@ void Cat::Update(float deltaTime)
 		break;
 	case CATSTATE_ATK2:
 		_atkCount--;
+		if (_atkCount == 40)
+		{
+			Vector3 targetPos = transComp.GetWorldPosition() + transComp.GetForward()*_atkRange / 2;
+			EventChannel _channel;
+			_channel.Broadcast<GameObjectFactory::DamageBoxEvent>(GameObjectFactory::DamageBoxEvent(targetPos - Vector3(_atkRange / 2, _atkRange / 2, _atkRange / 2),
+				targetPos + Vector3(_atkRange / 2, _atkRange / 2, _atkRange / 2), 10.0f, CollisionComponent::TRIGGER_TYPE_ENEMY_DMGBOX, 0.0f, 0.0f, 1.0f));
+		}
 		if (_atkCount < 0)
 		{
 			_atkCount = _atkTime;
@@ -248,6 +262,13 @@ void Cat::Update(float deltaTime)
 		break;
 	case CATSTATE_ATK3:
 		_atkCount--;
+		if (_atkCount == 40)
+		{
+			Vector3 targetPos = transComp.GetWorldPosition() + transComp.GetForward()*_atkRange / 2;
+			EventChannel _channel;
+			_channel.Broadcast<GameObjectFactory::DamageBoxEvent>(GameObjectFactory::DamageBoxEvent(targetPos - Vector3(_atkRange / 2, _atkRange / 2, _atkRange / 2),
+				targetPos + Vector3(_atkRange / 2, _atkRange / 2, _atkRange / 2), 10.0f, CollisionComponent::TRIGGER_TYPE_ENEMY_DMGBOX, 0.0f, 0.0f, 1.0f));
+		}
 		if (_atkCount < 0)
 		{
 			_atkCount = _atkTime;
@@ -274,6 +295,13 @@ void Cat::Update(float deltaTime)
 		break;
 	case CATSTATE_ATK5:
 		_atkCount--;
+		if (_atkCount == 40)
+		{
+			Vector3 targetPos = transComp.GetWorldPosition() + transComp.GetForward()*_atkRange / 2;
+			EventChannel _channel;
+			_channel.Broadcast<GameObjectFactory::DamageBoxEvent>(GameObjectFactory::DamageBoxEvent(targetPos - Vector3(_atkRange / 2, _atkRange / 2, _atkRange / 2),
+				targetPos + Vector3(_atkRange / 2, _atkRange / 2, _atkRange / 2), 10.0f, CollisionComponent::TRIGGER_TYPE_ENEMY_DMGBOX, 0.0f, 0.0f, 1.0f));
+		}
 		if (_atkCount < 0)
 		{
 			_atkCount = _atkTime;
@@ -371,6 +399,18 @@ void Cat::Update(float deltaTime)
 			_isHurt = false;
 		}
 	}
+
+	if (_isDie)
+	{
+		_dieCount--;
+		if (_dieCount <= 0)
+		{
+			this->_valid = false;
+			EventChannel channel;
+			channel.Broadcast<IScene::SceneDirty>(IScene::SceneDirty());
+		}
+	}
+
 }
 
 void Cat::Handle(const CollisionSystem::ActorTriggerEvent & event)
@@ -386,6 +426,7 @@ void Cat::Handle(const CollisionSystem::ActorTriggerEvent & event)
 	case CollisionComponent::TRIGGER_TYPE_OBJECT:
 		break;
 	case CollisionComponent::TRIGGER_TYPE_PLAYER_DMGBOX:
+		if (_isDie) break;
 		if (!_isHurt)
 		{
 			if (_state != CATSTATE_HURT&&_state != CATSTATE_DEATH)
@@ -399,9 +440,11 @@ void Cat::Handle(const CollisionSystem::ActorTriggerEvent & event)
 				{
 					_state = CATSTATE_DEATH;
 					this->QueueAction(CAT_ANIM(CAT_DEATH));
+					_isDie = true;
 				}
 			}
 			_isHurt = true;
+			_collision._valid = false;
 		}
 		break;
 	}
