@@ -152,7 +152,7 @@ void Camera::MoveAndRotate(float deltaTime, const InputManager & input)
 			/*_pTargetObject->_state == Player::PLAYERSTATE_BLOCK ||
 			_pTargetObject->_state == Player::PLAYERSTATE_ATTACK*/)
 		{
-			if (!IsMovementNone(_pTargetObject->_prevCommand._movement))
+			if (!IsMovementNone(_pTargetObject->_currentCommand._movement))
 			{
 				Vector3 camPlanerForward = refTransform.GetForward();
 				camPlanerForward.y = 0.0f;

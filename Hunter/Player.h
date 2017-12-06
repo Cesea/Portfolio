@@ -7,14 +7,6 @@
 class Camera;
 class Player;
 
-struct KeyConfig
-{
-	uint32 _up;
-	uint32 _down;
-	uint32 _left;
-	uint32 _right;
-};
-
 struct PlayerCallbackData
 {
 	PlayerAnimationEnum *_animtionEnum;
@@ -115,14 +107,6 @@ private :
 	bool32 _camRotated{false};
 	bool32 _superArmor = true;
 	StopWatch _superArmorTimer;
-
-	Vector3 _startForward;
-	Vector3 _targetForward;
-
-	bool _horizontalRecieved{false};
-	bool _verticalRecieved{false};
-	
-	KeyConfig _keyConfig;
 
 public :
 

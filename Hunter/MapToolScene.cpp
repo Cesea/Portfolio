@@ -165,13 +165,9 @@ bool MapToolScene::SceneInit()
 
 	_pEnvironmentSphere->Create("../resources/Textures/grassenvmap1024.dds");
 
-	/*_channel.Broadcast<GameObjectFactory::CreateObjectOnLocationEvent>(
-		GameObjectFactory::CreateObjectOnLocationEvent(ARCHE_HERO, ResourceHandle(), 
-			Vector3(-TERRAIN_CHUNK_DIM * 2, 0, TERRAIN_CHUNK_DIM * 2)));*/
-
 	_channel.Broadcast<GameObjectFactory::CreateObjectOnLocationEvent>(
 		GameObjectFactory::CreateObjectOnLocationEvent(ARCHE_HERO, ResourceHandle(), 
-			Vector3(0.0f, 0.0f, 0.0f)));
+			Vector3(-TERRAIN_CHUNK_DIM * 2, 0, TERRAIN_CHUNK_DIM * 2)));
 
 	//NOTE : GameObjectFactory의 GetPlayerObject는 생성에 의존성을 가진다
 	_camera.SetTargetObject((Player *)GAMEOBJECTFACTORY->GetPlayerObject());
@@ -216,9 +212,9 @@ bool MapToolScene::SceneInit()
 		} break;
 		}
 
-		//_channel.Broadcast<GameObjectFactory::CreateObjectOnLocationEvent>(
-		//	GameObjectFactory::CreateObjectOnLocationEvent(type, handle,
-		//		Vector3(randX, 0, randz)));
+		_channel.Broadcast<GameObjectFactory::CreateObjectOnLocationEvent>(
+			GameObjectFactory::CreateObjectOnLocationEvent(type, handle,
+				Vector3(randX, 0, randz)));
 	}
 	////실험
 	//trash = _world.CreateEntity();
