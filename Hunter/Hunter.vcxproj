@@ -145,6 +145,7 @@
     <ClCompile Include="CollisionUtils.cpp" />
     <ClCompile Include="CommonUtils.cpp" />
     <ClCompile Include="Console.cpp" />
+    <ClCompile Include="DamageBox.cpp" />
     <ClCompile Include="DataPackage.cpp" />
     <ClCompile Include="DirectionalLight.cpp" />
     <ClCompile Include="Enemy.cpp" />
@@ -247,6 +248,7 @@
     <ClInclude Include="Component.h" />
     <ClInclude Include="Console.h" />
     <ClInclude Include="ContainerCheck.h" />
+    <ClInclude Include="DamageBox.h" />
     <ClInclude Include="DataPackage.h" />
     <ClInclude Include="Delegate.h" />
     <ClInclude Include="DirectionalLight.h" />

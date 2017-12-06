@@ -116,7 +116,7 @@ bool Snake::CreateFromWorld(World & world, const Vector3 &Pos)
 	_unBeatableTime = 15;
 	_unBeatableCount = _unBeatableTime;
 
-	//ÀÌº¥Æ® µî·Ï
+	//ì´ë²¤íŠ¸ ë“±ë¡
 	EventChannel channel;
 
 	channel.Broadcast<GameObjectFactory::ObjectCreatedEvent>(
@@ -149,11 +149,11 @@ void Snake::Update(float deltaTime)
 		}
 		else
 		{
-			//´ÙÀ½ ÀÎµ¦½º·Î ¹æÇâÀ» ¾ò°í
+			//ë‹¤ìŒ ì¸ë±ìŠ¤ë¡œ ë°©í–¥ì„ ì–»ê³ 
 			Vector3 direction = _moveSegment[_patrolIndex] - transComp.GetWorldPosition();
 			float distance = Vec3Length(&direction);
 			Vec3Normalize(&direction, &direction);
-			//¸öÀÌ ´ú µ¹¾Æ°¬´Â°¡?
+			//ëª¸ì´ ëœ ëŒì•„ê°”ëŠ”ê°€?
 			Vector3 rotatePos = _moveSegment[_patrolIndex];
 			rotatePos.y = transComp.GetWorldPosition().y;
 			Vector3 rotateDir = rotatePos - transComp.GetWorldPosition();
@@ -170,18 +170,18 @@ void Snake::Update(float deltaTime)
 				transComp.LookDirection(-rotateDir, _rotateSpeed);
 				break;
 			}
-			//ÀÌµ¿¼Óµµº¸´Ù °¡±î¿ò?
+			//ì´ë™ì†ë„ë³´ë‹¤ ê°€ê¹Œì›€?
 			if (distance < _speed*deltaTime)
 			{
-				//°Å¸®¸¸Å­ ¿òÁ÷ÀÌ°í patrolIndexº¯°æ
+				//ê±°ë¦¬ë§Œí¼ ì›€ì§ì´ê³  patrolIndexë³€ê²½
 				transComp.SetWorldPosition(transComp.GetWorldPosition() + direction*distance);
 			    _patrolIndex++;
 				if (_patrolIndex > _moveSegment.size() - 1) _patrolIndex = 0;
-				//IDLE ¾Ö´Ï¸ŞÀÌ¼Ç ½ÇÇà
+				//IDLE ì• ë‹ˆë©”ì´ì…˜ ì‹¤í–‰
 				this->QueueAction(SNAKE_ANIM(SNAKE_IDLE));
 				_state = SNAKESTATE_IDLE;
 			}
-			//¾Æ´Ï¸é ÀÌµ¿¼Óµµ¸¸Å­ ÀÌµ¿
+			//ì•„ë‹ˆë©´ ì´ë™ì†ë„ë§Œí¼ ì´ë™
 			else
 			{
 				transComp.SetWorldPosition(transComp.GetWorldPosition() + direction*_speed*deltaTime);
@@ -190,7 +190,7 @@ void Snake::Update(float deltaTime)
 		}
 		break;
 	case SNAKESTATE_FIND:
-		//roar°¡ ³¡³ª¸é ÇÃ·¹ÀÌ¾î¸¦ ÃßÀûÇÏ´Â RUNÀ¸·Î
+		//roarê°€ ëë‚˜ë©´ í”Œë ˆì´ì–´ë¥¼ ì¶”ì í•˜ëŠ” RUNìœ¼ë¡œ
 		_roarCount -= 1;
 		if (_roarCount < 0)
 		{
@@ -238,11 +238,11 @@ void Snake::Update(float deltaTime)
 		if (_atkCount < 0)
 		{
 			_atkCount = _atkTime;
-			//°ø°İÀ» ¸¶ÃÆÀ¸¸é ´Ù½ÃÇÑ¹ø°Ë»ç
+			//ê³µê²©ì„ ë§ˆì³¤ìœ¼ë©´ ë‹¤ì‹œí•œë²ˆê²€ì‚¬
 			Vector3 direction = _playerPos - transComp.GetWorldPosition();
 			float distance = Vec3Length(&direction);
 			Vec3Normalize(&direction, &direction);
-			//°ø°İ¹üÀ§¸¦ ¹ş¾î³µ´Ù?
+			//ê³µê²©ë²”ìœ„ë¥¼ ë²—ì–´ë‚¬ë‹¤?
 			if (distance > _atkRange)
 			{
 				_battle = false;
@@ -261,11 +261,11 @@ void Snake::Update(float deltaTime)
 		if (_atkCount < 0)
 		{
 			_atkCount = _atkTime;
-			//°ø°İÀ» ¸¶ÃÆÀ¸¸é ´Ù½ÃÇÑ¹ø°Ë»ç
+			//ê³µê²©ì„ ë§ˆì³¤ìœ¼ë©´ ë‹¤ì‹œí•œë²ˆê²€ì‚¬
 			Vector3 direction = _playerPos - transComp.GetWorldPosition();
 			float distance = Vec3Length(&direction);
 			Vec3Normalize(&direction, &direction);
-			//°ø°İ¹üÀ§¸¦ ¹ş¾î³µ´Ù?
+			//ê³µê²©ë²”ìœ„ë¥¼ ë²—ì–´ë‚¬ë‹¤?
 			if (distance > _atkRange)
 			{
 				_battle = false;
@@ -284,11 +284,11 @@ void Snake::Update(float deltaTime)
 		if (_atkCount < 0)
 		{
 			_atkCount = _atkTime;
-			//°ø°İÀ» ¸¶ÃÆÀ¸¸é ´Ù½ÃÇÑ¹ø°Ë»ç
+			//ê³µê²©ì„ ë§ˆì³¤ìœ¼ë©´ ë‹¤ì‹œí•œë²ˆê²€ì‚¬
 			Vector3 direction = _playerPos - transComp.GetWorldPosition();
 			float distance = Vec3Length(&direction);
 			Vec3Normalize(&direction, &direction);
-			//°ø°İ¹üÀ§¸¦ ¹ş¾î³µ´Ù?
+			//ê³µê²©ë²”ìœ„ë¥¼ ë²—ì–´ë‚¬ë‹¤?
 			if (distance > _atkRange)
 			{
 				_battle = false;
@@ -316,7 +316,7 @@ void Snake::Update(float deltaTime)
 		if (_hurtCount < 0)
 		{
 			_hurtCount = _hurtTime;
-			//°Å¸®¸¦ °è»êÇØ¼­ °¡±î¿î»óÅÂ¸é ¾îÅÃ
+			//ê±°ë¦¬ë¥¼ ê³„ì‚°í•´ì„œ ê°€ê¹Œìš´ìƒíƒœë©´ ì–´íƒ
 			Vector3 direction = _playerPos - transComp.GetWorldPosition();
 			float distance = Vec3Length(&direction);
 			Vec3Normalize(&direction, &direction);
@@ -327,16 +327,16 @@ void Snake::Update(float deltaTime)
 			}
 			else
 			{
-				//ÀüÅõÁß¿¡ °Å¸®°¡¹ú¾îÁø°Å¶ó¸é roar¾øÀÌ µ¹°İ
+				//ì „íˆ¬ì¤‘ì— ê±°ë¦¬ê°€ë²Œì–´ì§„ê±°ë¼ë©´ roarì—†ì´ ëŒê²©
 				if (_battle)
 				{
 					_state = SNAKESTATE_RUN;
 					this->QueueAction(SNAKE_ANIM(SNAKE_MOVE));
 				}
-				//ºñÀüÅõÀÎµ¥ ¸Â¾Ò´Ù?
+				//ë¹„ì „íˆ¬ì¸ë° ë§ì•˜ë‹¤?
 				else
 				{
-					// Ãß°İ
+					// ì¶”ê²©
 					_battle = true;
 					_state = SNAKESTATE_FIND;
 					this->QueueAction(SNAKE_ANIM(SNAKE_ROAR));
@@ -350,12 +350,12 @@ void Snake::Update(float deltaTime)
 	case SNAKESTATE_DIE:
 		break;
 	}
-	//ÀüÅõ»óÅÂ°¡ ¾Æ´Ï¶ó¸é Ç×½Ã ÇÃ·¹ÀÌ¾î¸¦ ¼ö»öÇÑ´Ù.
+	//ì „íˆ¬ìƒíƒœê°€ ì•„ë‹ˆë¼ë©´ í•­ì‹œ í”Œë ˆì´ì–´ë¥¼ ìˆ˜ìƒ‰í•œë‹¤.
 	if (!_battle)
 	{
 		if (findPlayer(transComp.GetForward(), _playerPos, transComp.GetWorldPosition(), _findStareDistance, _findDistance, _findRadian))
 		{
-			//Ã£À¸¸é FIND°¡ µÇ¸ç battle»óÅÂ°¡ ‰Î
+			//ì°¾ìœ¼ë©´ FINDê°€ ë˜ë©° battleìƒíƒœê°€ Â‰
 			_battle = true;
 			_state = SNAKESTATE_FIND;
 			this->QueueAction(SNAKE_ANIM(SNAKE_ROAR));
@@ -382,12 +382,19 @@ void Snake::Update(float deltaTime)
 
 void Snake::Handle(const CollisionSystem::ActorTriggerEvent & event)
 {
-	if (event._entity1 != _entity) return;
-	CollisionComponent & _collision = event._entity2.GetComponent<CollisionComponent>();
+
+	if (event._entity2 != _entity) return;
+	CollisionComponent & _collision = event._entity1.GetComponent<CollisionComponent>();
+
 	switch (_collision._triggerType)
 	{
-		//ÇÃ·¹ÀÌ¾î¿Í Ãæµ¹Çß´Ù(³»°¡ °¡ÇØÀÚ)
+		//í”Œë ˆì´ì–´ì™€ ì¶©ëŒí–ˆë‹¤(ë‚´ê°€ ê°€í•´ì)
 	case CollisionComponent::TRIGGER_TYPE_PLAYER:
+		break;
+		//ì˜¤ë¸Œì íŠ¸ì™€ ì¶©ëŒí–ˆë‹¤
+	case CollisionComponent::TRIGGER_TYPE_OBJECT:
+		break;
+	case CollisionComponent::TRIGGER_TYPE_PLAYER_DMGBOX:
 		if (!_isHurt)
 		{
 			if (_state != SNAKESTATE_HURT&&_state != SNAKESTATE_DIE)
@@ -404,11 +411,6 @@ void Snake::Handle(const CollisionSystem::ActorTriggerEvent & event)
 				}
 			}
 		}
-		break;
-		//¿ÀºêÁ§Æ®¿Í Ãæµ¹Çß´Ù
-	case CollisionComponent::TRIGGER_TYPE_OBJECT:
-		break;
-	case CollisionComponent::TRIGGER_TYPE_DEFAULT:
 		break;
 	}
 
@@ -450,7 +452,7 @@ bool Snake::findPlayer(Vector3 forward, Vector3 playerPos, Vector3 myPos, float 
 	float distRadian = acos(
 		ClampMinusOnePlusOne(Vec3Dot(&forward, &-toPlayer)));
 	if (distRadian > D3DX_PI) D3DX_PI * 2 - distRadian;
-	//½Ã¾ß°¢ÀÇ 1/2º¸´Ù ÀÛ´Ù¸é range1 ¼­Ä¡
+	//ì‹œì•¼ê°ì˜ 1/2ë³´ë‹¤ ì‘ë‹¤ë©´ range1 ì„œì¹˜
 	if (distRadian < findRadian / 2)
 	{
 		if (distance < range1)
@@ -458,7 +460,7 @@ bool Snake::findPlayer(Vector3 forward, Vector3 playerPos, Vector3 myPos, float 
 			return true;
 		}
 	}
-	//¾Æ´Ï¶ó¸é range2 ¼­Ä¡
+	//ì•„ë‹ˆë¼ë©´ range2 ì„œì¹˜
 	else
 	{
 		if (distance < range2)

@@ -367,12 +367,17 @@ void Lizard::Update(float deltaTime)
 
 void Lizard::Handle(const CollisionSystem::ActorTriggerEvent & event)
 {
-	if (event._entity1 != _entity) return;
-	CollisionComponent & _collision = event._entity2.GetComponent<CollisionComponent>();
+	if (event._entity2 != _entity) return;
+	CollisionComponent & _collision = event._entity1.GetComponent<CollisionComponent>();
 	switch (_collision._triggerType)
 	{
 		//플레이어와 충돌했다(내가 가해자)
 	case CollisionComponent::TRIGGER_TYPE_PLAYER:
+		break;
+		//오브젝트와 충돌했다
+	case CollisionComponent::TRIGGER_TYPE_OBJECT:
+		break;
+	case CollisionComponent::TRIGGER_TYPE_PLAYER_DMGBOX:
 		if (!_isHurt)
 		{
 			//일반공격중엔 무적으로
@@ -391,11 +396,6 @@ void Lizard::Handle(const CollisionSystem::ActorTriggerEvent & event)
 			}
 			_isHurt = true;
 		}
-		break;
-		//오브젝트와 충돌했다
-	case CollisionComponent::TRIGGER_TYPE_OBJECT:
-		break;
-	case CollisionComponent::TRIGGER_TYPE_DEFAULT:
 		break;
 	}
 }
