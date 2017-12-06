@@ -186,7 +186,8 @@ struct StatusWindow
 	ARCHE_TYPE _selectingType{ARCHE_NONE};
 	int32 _selectingState{0};
 
-	char _worldInfoStr[EDITOR_MAX_NAME];
+	char _worldTerrainInfoStr[EDITOR_MAX_NAME];
+	char _worldObjectInfoStr[EDITOR_MAX_NAME];
 
 	char _worldPosStr[EDITOR_MAX_NAME];
 	char _chunkPosStr[EDITOR_MAX_NAME];
@@ -195,6 +196,11 @@ struct StatusWindow
 
 	char _chunkInfoStr[EDITOR_MAX_NAME];
 	char _tileInfoStr[EDITOR_MAX_NAME];
+
+	char _cursorWorldPosStr[EDITOR_MAX_NAME];
+	//char _cursorChunkPosInfo[EDITOR_MAX_NAME];
+	char _cursorChunkInfoStr[EDITOR_MAX_NAME];
+	char _cursorTileInfoStr[EDITOR_MAX_NAME];
 };
 
 //Editor에서는 Scene의 포인터를 가지고 있어서 몬스터들의 스크립트나, 액션 시스템을 비 활성화 할 수 있다.

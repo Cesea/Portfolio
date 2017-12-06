@@ -62,8 +62,6 @@ void Camera::MoveAndRotate(float deltaTime, const InputManager & input)
 	if (input.keyboard.IsPressed('1'))
 	{
 		_cameraState = CAMERASTATE_CREATE;
-		_horizontalAngle = 0.0f;
-		_verticalAngle = 0.0f;
 		_targetRadius = CAMERA_TARGET_DEFAULT_RADIUS;
 		//ShowCursor(true);
 	}
@@ -92,12 +90,12 @@ void Camera::MoveAndRotate(float deltaTime, const InputManager & input)
 
 			if (deltaX != 0)
 			{
-				_horizontalAngle += _rotationSpeed * deltaTime * (float)deltaX;
+				_horizontalAngle += 3.0f * deltaTime * (float)deltaX;
 			}
 
 			if (deltaY != 0)
 			{
-				_verticalAngle += _rotationSpeed * deltaTime * (float)deltaY;
+				_verticalAngle += 3.0f * deltaTime * (float)deltaY;
 			}
 
 			ClampFloat(_verticalAngle, MIN_VERT_ANGLE, MAX_VERT_ANGLE);

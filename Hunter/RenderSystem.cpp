@@ -28,8 +28,23 @@ void RenderSystem::UpdateAnimations(float deltaTime)
 void RenderSystem::Render(const Camera &camera)
 {
 	auto &entities = GetEntities();
-	//renderView.SetViewProjection(camera.GetViewMatrix(), camera.GetProjectionMatrix());
 	Matrix worldMatrix;
+
+	std::vector<Entity> entitas;
+
+	std::vector<int32> activeChunks = TERRAIN->GetActiveTerrainChunkIndices();
+	for (uint32 i = 0; i < activeChunks.size(); ++i)
+	{
+		Terrain::TerrainChunk &refChunk = TERRAIN->GetChunkAt(activeChunks[i]);
+		//NOTE : 이거 마무리를 하자.....
+		//if (camera.GetFrustum().IsSphereInFrustum())
+		//{
+		//	for (int32 j = 0; j < TERRAIN_TILE_RES * TERRAIN_TILE_RES; ++j)
+		//	{
+		//		//refChunk._tiles[j].
+		//	}
+		//}
+	}
 
 	for (uint32 i = 0; i < entities.size(); ++i)
 	{

@@ -100,9 +100,11 @@ void Terrain::Handle(const GameObjectFactory::ObjectCreatedEvent & event)
 		int32 chunkIndex = Index2D(tilePos._chunkX, tilePos._chunkZ, _xChunkCount);
 		for (uint32 i = 0; i < _activeChunkIndices.size(); ++i)
 		{
-			_activeChunkIndices[i] == chunkIndex;
-			entity.Activate();
-			break;
+			if (_activeChunkIndices[i] == chunkIndex)
+			{
+				entity.Activate();
+				break;
+			}
 		}
 	}
 }
@@ -472,7 +474,7 @@ void Terrain::Render(const Camera &camera, const DirectionalLight &mainLight, co
 			for (int32 x = 0; x < _xChunkCount; ++x)
 			{
 				TerrainChunk &refChunk = _pChunks[Index2D(x, z, _xChunkCount)];
-				if (camera.GetFrustum().IsSphereInFrustum( Vector3(refChunk._relCenterX, 0.0f, refChunk._relCenterZ), refChunk._radius))
+				if (camera.GetFrustum().IsSphereInFrustum( Vector3(refChunk._centerX, 0.0f, refChunk._centerZ), refChunk._radius))
 				{
 					video::VertexBuffer *vBuffer = VIDEO->GetVertexBuffer(refChunk._vHandle);
 					video::IndexBuffer *iBuffer = VIDEO->GetIndexBuffer(refChunk._iHandle);
@@ -528,7 +530,7 @@ void Terrain::Render(const Camera &camera, const DirectionalLight &mainLight, co
 		{
 			TerrainChunk &refChunk = _pChunks[i];
 			if (camera.GetFrustum().IsSphereInFrustum(
-				Vector3(refChunk._relCenterX, 0.0f, refChunk._relCenterZ), refChunk._radius))
+				Vector3(refChunk._centerX, 0.0f, refChunk._centerZ), refChunk._radius))
 			{
 				video::VertexBuffer *vBuffer = VIDEO->GetVertexBuffer(refChunk._vHandle);
 				video::IndexBuffer *iBuffer = VIDEO->GetIndexBuffer(refChunk._iHandle);
@@ -573,7 +575,7 @@ void Terrain::RenderShadow(const Camera & camera)
 			for (int32 x = 0; x < _xChunkCount; ++x)
 			{
 				TerrainChunk &refChunk = _pChunks[Index2D(x, z, _xChunkCount)];
-				if (camera.GetFrustum().IsSphereInFrustum( Vector3(refChunk._relCenterX, 0.0f, refChunk._relCenterZ), refChunk._radius))
+				if (camera.GetFrustum().IsSphereInFrustum( Vector3(refChunk._centerX, 0.0f, refChunk._centerZ), refChunk._radius))
 				{
 					video::VertexBuffer *vBuffer = VIDEO->GetVertexBuffer(refChunk._vHandle);
 					video::IndexBuffer *iBuffer = VIDEO->GetIndexBuffer(refChunk._iHandle);
@@ -629,7 +631,7 @@ void Terrain::RenderShadow(const Camera & camera)
 		{
 			TerrainChunk &refChunk = _pChunks[i];
 			if (camera.GetFrustum().IsSphereInFrustum(
-				Vector3(refChunk._relCenterX, 0.0f, refChunk._relCenterZ), refChunk._radius))
+				Vector3(refChunk._centerX, 0.0f, refChunk._centerZ), refChunk._radius))
 			{
 				video::VertexBuffer *vBuffer = VIDEO->GetVertexBuffer(refChunk._vHandle);
 				video::IndexBuffer *iBuffer = VIDEO->GetIndexBuffer(refChunk._iHandle);
@@ -855,7 +857,6 @@ bool Terrain::CreateTerrainChunk(int32 x, int32 z, const video::TerrainVertex * 
 
 	TerrainChunk &refChunk = _pChunks[sectionIndex];
 
-
 	refChunk._pVertices = pTerrainVertices;
 
 	refChunk._chunkX = x;
@@ -887,11 +888,11 @@ bool Terrain::CreateTerrainChunk(int32 x, int32 z, const video::TerrainVertex * 
 		}
 	}
 
-	refChunk._relStartX = vertices[0]._pos.x;
-	refChunk._relStartZ = vertices[0]._pos.z;
+	refChunk._startX = vertices[0]._pos.x;
+	refChunk._startZ = vertices[0]._pos.z;
 
-	refChunk._relEndX = vertices.back()._pos.x;
-	refChunk._relEndZ = vertices.back()._pos.z;
+	refChunk._endX = vertices.back()._pos.x;
+	refChunk._endZ = vertices.back()._pos.z;
 
 	if (_inEditMode)
 	{
@@ -933,9 +934,29 @@ bool Terrain::CreateTerrainChunk(int32 x, int32 z, const video::TerrainVertex * 
 		Assert(refChunk._iHandle.IsValid());
 	}
 
-	refChunk._relCenterX = (refChunk._relStartX + refChunk._relEndX) * 0.5f;
-	refChunk._relCenterZ = (refChunk._relStartZ + refChunk._relEndZ) * 0.5f;
-	refChunk._radius = (refChunk._relCenterX - refChunk._relStartX) * 1.2f;
+	refChunk._centerX = (refChunk._startX + refChunk._endX) * 0.5f;
+	refChunk._centerZ = (refChunk._startZ + refChunk._endZ) * 0.5f;
+	refChunk._radius = (refChunk._centerX - refChunk._startX) * 1.2f;
+
+	float tileGap = (float)TERRAIN_CHUNK_DIM / (float)TERRAIN_TILE_RES;
+
+	for (int32 z = 0; z < TERRAIN_TILE_RES; ++z)
+	{
+		for (int32 x = 0; x < TERRAIN_TILE_RES; ++x)
+		{
+			Terrain::TerrainTile &refTile = refChunk._tiles[Index2D(x, z, TERRAIN_TILE_RES)];
+			refTile._startX = refChunk._startX + tileGap * (float)x;
+			refTile._startZ = refChunk._startZ + tileGap * (float)z;
+
+			refTile._endX = refTile._startX + tileGap;
+			refTile._endZ = refTile._startZ + tileGap;
+
+			refTile._centerX = (refTile._endX - refTile._startX) * 0.5f;
+			refTile._centerZ = (refTile._endZ - refTile._startZ) * 0.5f;
+
+			refTile._radius = (refTile._centerX - refTile._startX) * 1.2f;
+		}
+	}
 
 	return true;
 }

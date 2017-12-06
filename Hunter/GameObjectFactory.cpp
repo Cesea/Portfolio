@@ -448,12 +448,12 @@ void GameObjectFactory::CreateObject(ARCHE_TYPE type,
 
 		ClampInt(minX, 0, TERRAIN->GetXChunkCount() - 1);
 		ClampInt(maxX, 0, TERRAIN->GetXChunkCount() - 1);
-		ClampInt(minZ, 0, TERRAIN->GetXChunkCount() - 1);
-		ClampInt(maxZ, 0, TERRAIN->GetXChunkCount() - 1);
+		ClampInt(minZ, 0, TERRAIN->GetZChunkCount() - 1);
+		ClampInt(maxZ, 0, TERRAIN->GetZChunkCount() - 1);
 
-		for (int32 z = minZ; z < maxZ; ++z)
+		for (int32 z = minZ; z <= maxZ; ++z)
 		{
-			for (int32 x = minX; x < maxX; ++x)
+			for (int32 x = minX; x <= maxX; ++x)
 			{
 				activeChunks.push_back(Index2D(x, z, TERRAIN->GetXChunkCount()));
 			}

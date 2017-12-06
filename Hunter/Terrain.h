@@ -86,13 +86,22 @@ public:
 
 	struct TerrainTile
 	{
-		
-
 		int32 _chunkX{};
 		int32 _chunkZ{};
 
 		int32 _tileX{};
 		int32 _tileZ{};
+
+		float _startX{};
+		float _startZ{};
+
+		float _endX{};
+		float _endZ{};
+
+		float _centerX{};
+		float _centerZ{};
+
+		float _radius{};
 
 		std::vector<Entity> _entities{};
 	};
@@ -107,14 +116,14 @@ public:
 		int32 _chunkX{};
 		int32 _chunkZ{};
 
-		float _relStartX{};
-		float _relStartZ{};
+		float _startX{};
+		float _startZ{};
 
-		float _relEndX{};
-		float _relEndZ{};
+		float _endX{};
+		float _endZ{};
 
-		float _relCenterX{};
-		float _relCenterZ{};
+		float _centerX{};
+		float _centerZ{};
 
 		float _radius{};
 
@@ -161,7 +170,6 @@ public:
 	void ValidateTerrainChunks(const TerrainTilePos &currentPos, const TerrainTilePos &prevPos);
 
 	//void UpdateTerrainTilePos(TerrainTilePos &tilePos);
-
 	//const Vector3 ConvertChunkPosToWorldPos(const TerrainChunkPos &chunkPos);
 	//const Vector3 ConvertTilePosToWorldPos(const TerrainTilePos &tilePos);
 
@@ -175,7 +183,7 @@ public:
 	}
 	inline TerrainChunk &GetChunkAt(int32 index) 
 	{
-		Assert(index > 0 && index < (_xChunkCount * _zChunkCount) ); 
+		Assert(index >= 0 && index < ((_xChunkCount) * (_zChunkCount)));
 		return _pChunks[index]; 
 	}
 
@@ -216,7 +224,6 @@ private:
 	video::EffectHandle _effect{};
 
 private:
-
 	////높이스케일(픽셀컬러가 255 일때 높이) 높이맵 y축 사이 간격 크기
 	float _heightScale{};
 
@@ -255,8 +262,8 @@ private:
 	float	_terrainEndX{};
 	float	_terrainEndZ{};
 
-	//LOD비율
-	float _lodRatio{};
+	////LOD비율
+	//float _lodRatio{};
 
 	video::TextureHandle _tile0Handle{};
 	video::TextureHandle _tile1Handle{};
