@@ -71,8 +71,9 @@ public :
 	//CreateObjectOnClickEvent///////////////////////////////////////////////////////
 	struct CreateObjectOnClickEvent
 	{
-		CreateObjectOnClickEvent(ARCHE_TYPE type, ResourceHandle handle, const Vector2 &cursorPos)
-			:_type(type), _cursorPos(cursorPos), _handle(handle)
+		CreateObjectOnClickEvent(ARCHE_TYPE type, ResourceHandle handle, 
+			const Vector2 &cursorPos, float scale = 1.0f, float yRotation = 0.0f)
+			:_type(type), _cursorPos(cursorPos), _handle(handle), _scale(scale), _yRotation(yRotation)
 		{
 		}
 
@@ -80,6 +81,10 @@ public :
 		Vector2 _cursorPos;
 
 		ResourceHandle _handle;
+
+		float _scale;
+		float _yRotation;
+
 	};
 	void Handle(const CreateObjectOnClickEvent &event);
 	/////////////////////////////////////////////////////////////////////////////////////

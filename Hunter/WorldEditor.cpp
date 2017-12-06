@@ -151,7 +151,7 @@ void Editor::InTerrainEditMode()
 				TERRAIN->AddHeightOnCursorPos(Vector2((float)_mx, (float)_my), 
 					_terrainEditor._heightBrush._innerRadius,
 					_terrainEditor._heightBrush._outterRadius,
-					_terrainEditor._heightBrush._intensity);
+					-1.0f -_terrainEditor._heightBrush._intensity);
 			}
 			else if (_terrainEditor._smooth)
 			{
@@ -397,12 +397,27 @@ void Editor::InObjectLocateMode()
 
 	ImguiIndent();
 
-	ImguiSlider("Num Object To Paint", (float *)&_objectLocator._numObjectToPaint, 0.0f, 5.0f, 1.0f);
+	ImguiSlider("Object Scale Min Factor", &_objectLocator._scaleMin, 0.1f, 2.0f, 0.1f);
+	ImguiSlider("Object Scale Max Factor", &_objectLocator._scaleMax, 0.1f, 2.0f, 0.1f);
+	if (_objectLocator._scaleMin >= _objectLocator._scaleMax)
+	{
+		_objectLocator._scaleMin = _objectLocator._scaleMax - 0.1f;
+	}
+	if (_objectLocator._scaleMax <= _objectLocator._scaleMin)
+	{
+		_objectLocator._scaleMax = _objectLocator._scaleMin + 0.1f;
+	}
 
-	ImguiSlider("Brush Inner Radius", &_objectLocator._objectPaintBrush._innerRadius, 0.0f, 5.0f, 0.1f);
-	_terrainEditor._textureBrush.SetInnerRadius(_objectLocator._objectPaintBrush._innerRadius);
-	ImguiSlider("Brush Outter Radius", &_objectLocator._objectPaintBrush._outterRadius, 0.0f, 5.0f, 0.1f);
-	_terrainEditor._textureBrush.SetOutterRadius(_objectLocator._objectPaintBrush._outterRadius);
+	ImguiSlider("Object Rotation Min Factor", &_objectLocator._rotationMin, -0.9f, 0.9f, 0.05f);
+	ImguiSlider("Object Rotation Max Factor", &_objectLocator._rotationMax, -0.9f, 0.9f, 0.05f);
+	if (_objectLocator._rotationMin >= _objectLocator._rotationMax)
+	{
+		_objectLocator._rotationMin = _objectLocator._rotationMax - 0.1f;
+	}
+	if (_objectLocator._rotationMax <= _objectLocator._rotationMin)
+	{
+		_objectLocator._rotationMax = _objectLocator._rotationMin + 0.1f;
+	}
 
 	if (!_objectLocator._currentStaticHandle.IsValid())
 	{
@@ -575,32 +590,26 @@ void Editor::InObjectLocateMode()
 		ImguiIndent();
 		if (ImguiButton("Bat"))
 		{
-			//_objectLocator._currentSkinnedHandle = VIDEO->GetSkinnedXMesh("Bat");
 			_objectLocator._typeToLocate = ARCHE_BAT;
 		}
 		if (ImguiButton("Cat"))
 		{
-			//_objectLocator._currentSkinnedHandle = VIDEO->GetSkinnedXMesh("Cat");
 			_objectLocator._typeToLocate = ARCHE_CAT;
 		}
 		if (ImguiButton("Hydra"))
 		{
-			//_objectLocator._currentSkinnedHandle = VIDEO->GetSkinnedXMesh("Hydra");
 			_objectLocator._typeToLocate = ARCHE_HYDRA;
 		}
 		if (ImguiButton("Lizard"))
 		{
-			//_objectLocator._currentSkinnedHandle = VIDEO->GetSkinnedXMesh("Lizard");
 			_objectLocator._typeToLocate = ARCHE_LIZARD;
 		}
 		if (ImguiButton("Snake"))
 		{
-			//_objectLocator._currentSkinnedHandle = VIDEO->GetSkinnedXMesh("Snake");
 			_objectLocator._typeToLocate = ARCHE_SNAKE;
 		}
 		if (ImguiButton("Turtle"))
 		{
-			//_objectLocator._currentSkinnedHandle = VIDEO->GetSkinnedXMesh("Turtle");
 			_objectLocator._typeToLocate = ARCHE_TURTLE;
 		}
 		//if (ImguiButton("Dragon"))
@@ -609,11 +618,6 @@ void Editor::InObjectLocateMode()
 		//}
 		ImguiUnindent();
 	}
-
-
-	//if ((_objectLocator._currentStaticHandle.IsValid() || _objectLocator._currentSkinnedHandle.IsValid()) &&
-	//	_leftButtonPressed &&
-	//	!(_mx > 0 && _mx < EDITORX + EDITORSIZEX && _my >= 0 && _my < EDITORY + EDITORSIZEY))
 
 	if ((_objectLocator._currentStaticHandle.IsValid() || _objectLocator._typeToLocate != ARCHE_NONE) &&
 		_leftButtonPressed &&
@@ -632,8 +636,11 @@ void Editor::InObjectLocateMode()
 		}
 
 		_channel.Broadcast<GameObjectFactory::CreateObjectOnClickEvent>(
-			GameObjectFactory::CreateObjectOnClickEvent(_objectLocator._typeToLocate, resourceHandle, 
-				Vector2((float)_mx, (float)_my)));
+			GameObjectFactory::CreateObjectOnClickEvent(_objectLocator._typeToLocate, 
+				resourceHandle, 
+				Vector2((float)_mx, (float)_my),
+			RandFloat(_objectLocator._scaleMin, _objectLocator._scaleMax),
+			RandFloat(_objectLocator._rotationMin, _objectLocator._rotationMax)));
 	}
 }
 
@@ -708,7 +715,7 @@ void Editor::InObjectEditMode()
 				ImguiIndent();
 
 				ImguiSlider("X", &test.x, 0.0f, 1.0f, 0.01f);
-				ImguiSlider("Y", &test.y, 0.0f, 1.0f, 0.01f);
+				ImguiSlider("Y", &test.y, -0.9f, 0.9f, 0.01f);
 				ImguiSlider("Z", &test.z, 0.0f, 1.0f, 0.01f);
 
 				QuaternionNormalize(&test, &test);
@@ -998,6 +1005,7 @@ void Editor::Render()
 	} break;
 	case Editor::eObjectLocate:
 	{
+		_objectLocator._objectPaintBrush.Render();
 
 	} break;
 	case Editor::eObjectEdit:

@@ -635,7 +635,6 @@ void Player::MoveAndRotate(float deltaTime)
 	Vector3 forward = refTransform.GetForward();
 	Vector3 right = refTransform.GetRight();
 
-	//Console::Log("%f, %f, %f\n", right.x, right.y, right.z);
 
 	Vector3 toMove;
 
@@ -854,6 +853,11 @@ void Player::Handle(const InputManager::KeyPressedEvent & event)
 			   _camRotated = true;
 			   _targetRotation = -D3DX_PI;
 		   }
+		   else
+		   {
+			   _camRotated = true;
+			   _targetRotation = -PI_DIV_2;
+		   }
 	   }
 	   else if (inputCode == 'L')
 	   {
@@ -871,6 +875,11 @@ void Player::Handle(const InputManager::KeyPressedEvent & event)
 		   {
 			   _camRotated = true;
 			   _targetRotation = D3DX_PI;
+		   }
+		   else
+		   {
+			   _camRotated = true;
+			   _targetRotation = PI_DIV_2;
 		   }
 	   }
 	   else if (inputCode == 'I')

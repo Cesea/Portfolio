@@ -102,6 +102,11 @@ struct ObjectLocator
 	bool32 _locateMushroom{};
 	bool32 _locateMonster{};
 
+	float _scaleMin{0.1f};
+	float _scaleMax{1.9f};
+	float _rotationMin{-0.9f};
+	float _rotationMax{0.9f};
+
 	video::StaticXMeshHandle _currentStaticHandle;
 	video::SkinnedXMeshHandle _currentSkinnedHandle;
 

@@ -1428,14 +1428,7 @@ void Terrain::AddHeightGausian(int32 minX, int32 maxX, int32 minZ, int32 maxZ, f
 	int32 numVertX = maxX - minX + 1;
 	int32 numVertZ = maxZ - minZ + 1;
 
-	float* smooth = new float[numVertX * numVertZ];
-
-	//int32 kernel[3][3] = 
-	//{
-	//	{1, 2, 1},
-	//	{2, 4, 2},
-	//	{1, 2, 1}
-	//};
+	float *smooth = new float[numVertX * numVertZ];
 
 	int32 counter = 0;
 	for (int32 z = minZ; z < maxZ; z++)
@@ -1499,7 +1492,7 @@ void Terrain::AddHeightGausian(int32 minX, int32 maxX, int32 minZ, int32 maxZ, f
 			totalSections += _terrainVertices[Index2D(x, z, _numVertexX)]._pos.y * 4.0f;
 			adjacentSections += 4;
 
-			smooth[counter++] = (totalSections / (float)adjacentSections) * mult;
+			smooth[counter++] = (totalSections / (float)adjacentSections) * (1.0f + mult);
 		}
 	}
 

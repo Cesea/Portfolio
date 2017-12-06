@@ -132,7 +132,6 @@ void Camera::MoveAndRotate(float deltaTime, const InputManager & input)
 		if (_horizontalAngle < 0.0f)
 		{
 			_horizontalAngle += D3DX_PI * 2;
-
 		}
 		else if (_horizontalAngle > D3DX_PI * 2)
 		{
