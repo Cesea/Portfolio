@@ -28,7 +28,7 @@ bool Player::CreateFromWorld(World & world, const Vector3 &pos)
    channel.Add<InputManager::KeyPressedEvent, Player>(*this);
    channel.Add<InputManager::MousePressedEvent, Player>(*this);
 
-   //channel.Add<CollisionSystem::ActorTriggerEvent, Player>(*this);
+   channel.Add<CollisionSystem::ActorTriggerEvent, Player>(*this);
 
    _entity = world.CreateEntity();
 
@@ -1153,29 +1153,34 @@ void Player::Handle(const InputManager::MousePressedEvent & event)
 //Player가 당하는 입장이다.
 void Player::Handle(const CollisionSystem::ActorTriggerEvent & event)
 {
-	if (event._entity1 != _entity)
+	if (event._entity2 != _entity)
 	{
 		return;
 	}
-	CollisionComponent & _collision = event._entity2.GetComponent<CollisionComponent>();
+
+	CollisionComponent & _collision = event._entity1.GetComponent<CollisionComponent>();
 	switch (_collision._triggerType)
 	{
-	case CollisionComponent::TRIGGER_TYPE_ENEMY :
+	case CollisionComponent::TRIGGER_TYPE_ENEMY_DMGBOX :
+	//case CollisionComponent::TRIGGER_TYPE_ENEMY :
 	{
 		if (_state != PLAYERSTATE_HURT && _state != PLAYERSTATE_DEAD)
 		{
+			MovementStop(_currentMovement);
 			_state = PLAYERSTATE_HURT;
-			this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWarTakingHit));
-			_inCombat = true;
 			_hp -= 50;
-			if (_hp <= 0)
+			_inCombat = true;
+			if (_hp > 0)
+			{
+				this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWarTakingHit));
+			}
+			else
 			{
 				_state = PLAYERSTATE_DEAD;
 				this->_pActionComp->_actionQueue.ClearQueue();
 				this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWarDying));
 			}
 		}
-
 	} break;
 	//오브젝트와 충돌했다
 	case CollisionComponent::TRIGGER_TYPE_OBJECT:
@@ -1184,8 +1189,9 @@ void Player::Handle(const CollisionSystem::ActorTriggerEvent & event)
 	}
 }
 
-void Player::QueueAction(const Action & action)
+void Player::QueueAction(Action & action, bool cancle)
 {
+	action._cancle = cancle;
    _pActionComp->_actionQueue.PushAction(action);
    _animationEnum = action._enum;
 }

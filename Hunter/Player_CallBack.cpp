@@ -83,7 +83,6 @@ void Player::SetupCallbackAndCompression()
 	   AddCallbackKeysAndCompress(pController, anim, 1, &key, D3DXCOMPRESS_DEFAULT, 0.1f);
    }
 
-
    //War Block
    {
 	   ID3DXKeyframedAnimationSet *anim;
@@ -95,6 +94,20 @@ void Player::SetupCallbackAndCompression()
 
 	   AddCallbackKeysAndCompress(pController, anim, 1, &key, D3DXCOMPRESS_DEFAULT, 0.1f);
    }
+
+   //Talking hit
+   {
+	   ID3DXKeyframedAnimationSet *anim;
+	   pController->GetAnimationSetByName(PlayerAnimationString[PlayerAnimationEnum::eWarTakingHit],
+		   (ID3DXAnimationSet **)&anim);
+
+	   D3DXKEY_CALLBACK key;
+	   key.Time = anim->GetPeriod() / 1.0f * anim->GetSourceTicksPerSecond();
+	   key.pCallbackData = (void *)&_callbackData;
+
+	   AddCallbackKeysAndCompress(pController, anim, 1, &key, D3DXCOMPRESS_DEFAULT, 0.1f);
+   }
+
 }
 
 HRESULT PlayerCallbackHandler::HandleCallback(UINT Track, LPVOID pCallbackData)
@@ -104,45 +117,36 @@ HRESULT PlayerCallbackHandler::HandleCallback(UINT Track, LPVOID pCallbackData)
 	{
 		return S_OK;
 	}
+
 	switch (*pData->_animtionEnum)
 	{
 	case PlayerAnimationEnum::eWarSwingLeft:
-	{
-		_pPlayer->_canCombo = true;
-		_pPlayer->_pCollisionComp->_isTrigger = true;
-	}break;
 	case PlayerAnimationEnum::eWarSwingRight:
-	{
-		_pPlayer->_canCombo = true;
-		_pPlayer->_pCollisionComp->_isTrigger = true;
-	}break;
 	case PlayerAnimationEnum::eWarThrustMid :
-	{
-		_pPlayer->_canCombo = true;
-		_pPlayer->_pCollisionComp->_isTrigger = true;
-	}break;
 	case PlayerAnimationEnum::eWarWalkSwingLeft:
-	{
-		_pPlayer->_canCombo = true;
-		_pPlayer->_pCollisionComp->_isTrigger = true;
-	}break;
 	case PlayerAnimationEnum::eWarWalkSwingRight:
-	{
-		_pPlayer->_canCombo = true;
-		_pPlayer->_pCollisionComp->_isTrigger = true;
-	}break;
 	case PlayerAnimationEnum::eWarWalkThrust:
 	{
 		_pPlayer->_canCombo = true;
 		_pPlayer->_pCollisionComp->_isTrigger = true;
+
+		_channel.Broadcast<GameObjectFactory::DamageBoxEvent>(
+			GameObjectFactory::DamageBoxEvent(_pPlayer->_pTransformComp->GetWorldPosition() - Vector3(-1, -1, -1),
+				_pPlayer->_pTransformComp->GetWorldPosition() - Vector3(1, 1, 1),
+			10.0f, CollisionComponent::TRIGGER_TYPE_PLAYER_DMGBOX, 0.0f, 0.0f, 0.3f));
 	}break;
 
-	//Shield
+	case PlayerAnimationEnum::eWarTakingHit :
+	{
+		_pPlayer->_state = Player::PLAYERSTATE_STANCE;
+		_pPlayer->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWarTakingHit));
+
+	}break;
+
 	case PlayerAnimationEnum::eWarShieldBlock :
 	{
 		_pPlayer->_canCombo = true;
 	}
-
 	//case PlayerAnimationEnum::eWar:
 	//{
 	//	//_pPlayer->_canCombo = true;

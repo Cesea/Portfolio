@@ -20,6 +20,7 @@ public :
 	HRESULT CALLBACK HandleCallback(THIS_ UINT Track, LPVOID pCallbackData);
 private :
 	Player *_pPlayer{};
+	EventChannel _channel;
 };
 
 class Player : public BaseGameObject
@@ -70,7 +71,7 @@ private :
 	PlayerCallbackData _callbackData;
 	GameCommand _currentCommand;
 	GameCommand _prevCommand;
-	void QueueAction(const Action &action);
+	void QueueAction(Action &action, bool cancle = false);
 
 	void RepositionEntity(const TerrainTilePos &currentPos, const TerrainTilePos &prevPos);
 

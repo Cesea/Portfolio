@@ -584,7 +584,9 @@ void GameObjectFactory::Handle(const DamageBoxEvent & event)
 {
 	_pCurrentScene->_gameObjects.push_back(new DamageBox());
 	BaseGameObject *pBack = _pCurrentScene->_gameObjects.back();
+
 	pBack->CreateFromWorld(_pCurrentScene->_world, (event._min/2+event._max/2));
+
 	//이벤트설정
 	Entity _entity = pBack->GetEntity();
 	CollisionComponent & collision = _entity.GetComponent<CollisionComponent>();

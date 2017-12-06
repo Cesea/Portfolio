@@ -279,6 +279,9 @@
     <ClCompile Include="QuadTree.cpp">
       <Filter>Game\GameUtils\QaudTrees</Filter>
     </ClCompile>
+    <ClCompile Include="DamageBox.cpp">
+      <Filter>Game\GameObjects</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ClassTypeID.h" />
@@ -637,6 +640,9 @@
     </ClInclude>
     <ClInclude Include="QuadTree.h">
       <Filter>Game\GameUtils\QaudTrees</Filter>
+    </ClInclude>
+    <ClInclude Include="DamageBox.h">
+      <Filter>Game\GameObjects</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
