@@ -70,20 +70,20 @@ bool Bat::CreateFromWorld(World & world, const Vector3 &Pos)
 
 	_entity.Activate();
 
-	_pStateMachine = new BatStateMachine;
-	_pStateMachine->Init(this);
-	_pStateMachine->RegisterState(META_TYPE(BatIdleState)->Name(), new BatIdleState());
-	_pStateMachine->RegisterState(META_TYPE(BatMoveState)->Name(), new BatMoveState());
-	_pStateMachine->RegisterState(META_TYPE(BatAttackState)->Name(), new BatAttackState());
-	_pStateMachine->RegisterState(META_TYPE(BatAttack2State)->Name(), new BatAttack2State());
-	_pStateMachine->RegisterState(META_TYPE(BatAttack3State)->Name(), new BatAttack3State());
-	_pStateMachine->RegisterState(META_TYPE(BatFindState)->Name(), new BatFindState());
-	_pStateMachine->RegisterState(META_TYPE(BatHurt1State)->Name(), new BatHurt1State());
-	_pStateMachine->RegisterState(META_TYPE(BatHurt2State)->Name(), new BatHurt2State());
-	_pStateMachine->RegisterState(META_TYPE(BatDeadState)->Name(), new BatDeadState());
-	_pStateMachine->ChangeState(META_TYPE(BatIdleState)->Name());
+	//_pStateMachine = new BatStateMachine;
+	//_pStateMachine->Init(this);
+	//_pStateMachine->RegisterState(META_TYPE(BatIdleState)->Name(), new BatIdleState());
+	//_pStateMachine->RegisterState(META_TYPE(BatMoveState)->Name(), new BatMoveState());
+	//_pStateMachine->RegisterState(META_TYPE(BatAttackState)->Name(), new BatAttackState());
+	//_pStateMachine->RegisterState(META_TYPE(BatAttack2State)->Name(), new BatAttack2State());
+	//_pStateMachine->RegisterState(META_TYPE(BatAttack3State)->Name(), new BatAttack3State());
+	//_pStateMachine->RegisterState(META_TYPE(BatFindState)->Name(), new BatFindState());
+	//_pStateMachine->RegisterState(META_TYPE(BatHurt1State)->Name(), new BatHurt1State());
+	//_pStateMachine->RegisterState(META_TYPE(BatHurt2State)->Name(), new BatHurt2State());
+	//_pStateMachine->RegisterState(META_TYPE(BatDeadState)->Name(), new BatDeadState());
+	//this->QueueAction(BAT_ANIM(BAT_IDLE));
 
-	_state = BATSTATE_IDLE;;
+	_state = BATSTATE_IDLE;
 
 	_speed = 4.0f;
 	_rotateSpeed = D3DX_PI / 64;
@@ -150,7 +150,6 @@ bool Bat::CreateFromWorld(World & world, const Vector3 &Pos)
 
 void Bat::Update(float deltaTime)
 {
-	_pStateMachine->Update(deltaTime, _currentCommand);
 	_playerPos.y += 1.0f;
 	TransformComponent &transComp = _entity.GetComponent<TransformComponent>();
 	switch (_state)
@@ -161,13 +160,13 @@ void Bat::Update(float deltaTime)
 		{
 			_delayCount = _delayTime;
 			_state = BATSTATE_PATROL;
-			_pStateMachine->ChangeState(META_TYPE(BatMoveState)->Name());
+			this->QueueAction(BAT_ANIM(BAT_FORWARD));
 		}
 		break;
 	case BATSTATE_PATROL:
 		if (_moveSegment.empty())
 		{
-			_pStateMachine->ChangeState(META_TYPE(BatIdleState)->Name());
+			this->QueueAction(BAT_ANIM(BAT_IDLE));
 			_state = BATSTATE_IDLE;
 		}
 		else
@@ -199,7 +198,7 @@ void Bat::Update(float deltaTime)
 				_patrolIndex++;
 				if (_patrolIndex > _moveSegment.size() - 1) _patrolIndex = 0;
 				//IDLE 애니메이션 실행
-				_pStateMachine->ChangeState(META_TYPE(BatIdleState)->Name());
+				this->QueueAction(BAT_ANIM(BAT_IDLE));
 				_state = BATSTATE_IDLE;
 			}
 			//아니면 이동속도만큼 이동
@@ -217,7 +216,7 @@ void Bat::Update(float deltaTime)
 		{
 			_roarCount = _roarTime;
 			_state = BATSTATE_RUN;
-			_pStateMachine->ChangeState(META_TYPE(BatMoveState)->Name());
+			this->QueueAction(BAT_ANIM(BAT_FORWARD));
 		}
 		break;
 	case BATSTATE_RUN:
@@ -237,15 +236,15 @@ void Bat::Update(float deltaTime)
 			{
 			case BATSKINSTATE_RED:
 				_state = BATSTATE_ATK1;
-				_pStateMachine->ChangeState(META_TYPE(BatAttackState)->Name());
+				this->QueueAction(BAT_ANIM(BAT_ATTACK1));
 				break;
 			case BATSKINSTATE_BLACK:
 				_state = BATSTATE_ATK2;
-				_pStateMachine->ChangeState(META_TYPE(BatAttack2State)->Name());
+				this->QueueAction(BAT_ANIM(BAT_ATTACK2));
 				break;
 			case BATSKINSTATE_GOLD:
 				_state = BATSTATE_ATK3;
-				_pStateMachine->ChangeState(META_TYPE(BatAttack3State)->Name());
+				this->QueueAction(BAT_ANIM(BAT_ATTACK3));
 				break;
 			}
 		}
@@ -270,7 +269,7 @@ void Bat::Update(float deltaTime)
 				//배틀을 멈추고 기본자세 (다시추적시작)
 				_battle = false;
 				_state = BATSTATE_IDLE;
-				_pStateMachine->ChangeState(META_TYPE(BatIdleState)->Name());
+				this->QueueAction(BAT_ANIM(BAT_IDLE));
 			}
 		}
 		break;
@@ -289,7 +288,7 @@ void Bat::Update(float deltaTime)
 				//배틀을 멈추고 기본자세 (다시추적시작)
 				_battle = false;
 				_state = BATSTATE_IDLE;
-				_pStateMachine->ChangeState(META_TYPE(BatIdleState)->Name());
+				this->QueueAction(BAT_ANIM(BAT_IDLE));
 			}
 		}
 		break;
@@ -308,7 +307,7 @@ void Bat::Update(float deltaTime)
 				//배틀을 멈추고 기본자세 (다시추적시작)
 				_battle = false;
 				_state = BATSTATE_IDLE;
-				_pStateMachine->ChangeState(META_TYPE(BatIdleState)->Name());
+				this->QueueAction(BAT_ANIM(BAT_IDLE));
 			}
 		}
 		break;
@@ -324,7 +323,7 @@ void Bat::Update(float deltaTime)
 			if (distance < _atkRange)
 			{
 				_state = BATSTATE_ATK1;
-				_pStateMachine->ChangeState(META_TYPE(BatAttackState)->Name());
+				this->QueueAction(BAT_ANIM(BAT_ATTACK1));
 			}
 			else
 			{
@@ -332,7 +331,7 @@ void Bat::Update(float deltaTime)
 				if (_battle)
 				{
 					_state = BATSTATE_RUN;
-					_pStateMachine->ChangeState(META_TYPE(BatMoveState)->Name());
+					this->QueueAction(BAT_ANIM(BAT_FORWARD));
 				}
 				//비전투인데 맞았다?
 				else
@@ -340,7 +339,7 @@ void Bat::Update(float deltaTime)
 					// 추격
 					_battle = true;
 					_state = BATSTATE_FIND;
-					_pStateMachine->ChangeState(META_TYPE(BatIdleState)->Name());
+					this->QueueAction(BAT_ANIM(BAT_IDLE));
 					Vector3 distance = _playerPos - transComp.GetWorldPosition();
 					Vec3Normalize(&distance, &distance);
 					transComp.LookDirection(-distance, D3DX_PI * 2);
@@ -359,7 +358,7 @@ void Bat::Update(float deltaTime)
 			//찾으면 FIND가 되며 battle상태가 
 			_battle = true;
 			_state = BATSTATE_FIND;
-			_pStateMachine->ChangeState(META_TYPE(BatFindState)->Name());
+			this->QueueAction(BAT_ANIM(BAT_ROAR));
 			Vector3 rotatePos = _playerPos;
 			rotatePos.y = transComp.GetWorldPosition().y;
 			Vector3 distance = rotatePos - transComp.GetWorldPosition();
@@ -397,13 +396,13 @@ void Bat::Handle(const CollisionSystem::ActorTriggerEvent & event)
 			{
 				resetAllCount();
 				_state = BATSTATE_HURT;
-				_pStateMachine->ChangeState(META_TYPE(BatHurt1State)->Name());
+				this->QueueAction(BAT_ANIM(BAT_HIT1));
 				_battle = true;
 				_hp -= 50;
 				if (_hp <= 0)
 				{
 					_state = BATSTATE_DEATH;
-					_pStateMachine->ChangeState(META_TYPE(BatDeadState)->Name());
+					this->QueueAction(BAT_ANIM(BAT_DEATH));
 				}
 			}
 			_isHurt = true;
