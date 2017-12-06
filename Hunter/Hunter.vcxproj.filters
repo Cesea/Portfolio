@@ -237,9 +237,6 @@
     <ClCompile Include="PlayerAnimationString.cpp">
       <Filter>Game\GameObjects\Player</Filter>
     </ClCompile>
-    <ClCompile Include="QuadTree.cpp">
-      <Filter>Game\GameUtils</Filter>
-    </ClCompile>
     <ClCompile Include="Quaternion.cpp">
       <Filter>Math</Filter>
     </ClCompile>
@@ -278,6 +275,9 @@
     </ClCompile>
     <ClCompile Include="TestScene.cpp">
       <Filter>Game\GameScenes\TestScene</Filter>
+    </ClCompile>
+    <ClCompile Include="QuadTree.cpp">
+      <Filter>Game\GameUtils\QaudTrees</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -586,9 +586,6 @@
     <ClInclude Include="PlayerAnimationString.h">
       <Filter>Game\GameObjects\Player</Filter>
     </ClInclude>
-    <ClInclude Include="QuadTree.h">
-      <Filter>Game\GameUtils</Filter>
-    </ClInclude>
     <ClInclude Include="Quaternion.h">
       <Filter>Math</Filter>
     </ClInclude>
@@ -637,6 +634,9 @@
     </ClInclude>
     <ClInclude Include="TestScene.h">
       <Filter>Game\GameScenes\TestScene</Filter>
+    </ClInclude>
+    <ClInclude Include="QuadTree.h">
+      <Filter>Game\GameUtils\QaudTrees</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -789,6 +789,9 @@
     </Filter>
     <Filter Include="Game\GameScenes\TestScene">
       <UniqueIdentifier>{bf32ef81-342f-45c8-8fff-965979591ad1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\GameUtils\QaudTrees">
+      <UniqueIdentifier>{3e32031f-0555-4a04-bf0a-4cedb72f5786}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

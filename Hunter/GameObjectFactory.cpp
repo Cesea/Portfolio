@@ -267,8 +267,6 @@ void GameObjectFactory::CreateObject(ARCHE_TYPE type,
 		render._type = RenderComponent::Type::eStatic;
 		render._arche = ARCHE_ROCK;
 
-		TERRAIN->AddEntityToSection(entity, position);
-
 		video::StaticXMeshHandle meshHandle;
 		meshHandle.count = handle.count;
 		meshHandle.index = handle.index;
@@ -297,8 +295,6 @@ void GameObjectFactory::CreateObject(ARCHE_TYPE type,
 		transform._position = position;
 		transform.SetScale(scale);
 		transform.SetRotateWorld(Quaternion(orientation.x, orientation.y, orientation.z, 1.0f));
-
-		TERRAIN->AddEntityToSection(entity, position);
 
 		RenderComponent &render = entity.AddComponent<RenderComponent>();
 		render._type = RenderComponent::Type::eStatic;
@@ -333,8 +329,6 @@ void GameObjectFactory::CreateObject(ARCHE_TYPE type,
 		transform.SetScale(scale);
 		transform.SetRotateWorld(Quaternion(orientation.x, orientation.y, orientation.z, 1.0f));
 
-		TERRAIN->AddEntityToSection(entity, position);
-
 		RenderComponent &render = entity.AddComponent<RenderComponent>();
 		render._type = RenderComponent::Type::eStatic;
 		render._arche = ARCHE_TREETRUNK;
@@ -365,8 +359,6 @@ void GameObjectFactory::CreateObject(ARCHE_TYPE type,
 		transform._position = position;
 		transform.SetScale(scale);
 		transform.SetRotateWorld(Quaternion(orientation.x, orientation.y, orientation.z, 1.0f));
-
-		TERRAIN->AddEntityToSection(entity, position);
 
 		RenderComponent &render = entity.AddComponent<RenderComponent>();
 		render._type = RenderComponent::Type::eStatic;
@@ -399,8 +391,6 @@ void GameObjectFactory::CreateObject(ARCHE_TYPE type,
 		transform._position = position;
 		transform.SetScale(scale);
 		transform.SetRotateWorld(Quaternion(orientation.x, orientation.y, orientation.z, 1.0f));
-
-		TERRAIN->AddEntityToSection(entity, position);
 
 		RenderComponent &render = entity.AddComponent<RenderComponent>();
 		render._type = RenderComponent::Type::eStatic;

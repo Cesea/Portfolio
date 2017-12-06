@@ -29,7 +29,7 @@ public:
 	~QuadTree();
 
 	//쿼드 트리 초기화
-	bool Init(video::TerrainVertex *pVertices, uint32 verNumEdge, int32 sectionRes); 
+	bool Init(video::TerrainVertex *pVertices, uint32 verNumEdge, int32 minRadius); 
 
 	void CreateChildTree();
 
@@ -68,6 +68,8 @@ private :
 
 	Vector3 _centerPos; //자신의 쿼드트리 중심 위치
 	float _radius; //자신의 쿼드트리 영역 반지름
+
+	int32 _minRadius{};
 	//bool32 _culled{false};
 };
 #endif

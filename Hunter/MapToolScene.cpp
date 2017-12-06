@@ -153,7 +153,7 @@ bool MapToolScene::SceneInit()
 	config._textureMult = 25;
 
 	TERRAIN->SetScene(this);
-	TERRAIN->Create(config, false);
+	TERRAIN->Create(config, true);
 	
 	LoadEverySkinnedResources();
 	LoadEveryStaticResources();

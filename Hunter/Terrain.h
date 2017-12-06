@@ -161,8 +161,6 @@ public:
 	void Render(const Camera &camera, const DirectionalLight &mainLight, const Camera &lightCameera);
 	void RenderShadow(const Camera &camera);
 
-	void AddEntityToSection(const Entity &entity, const Vector3 &position);
-
 	TerrainChunkPos ConvertWorldPosToChunkPos(const Vector3 &worldPos);
 	void ConvertWorldPostoTilePos(const Vector3 & worldPos, TerrainTilePos *pOutTilePos);
 	void ConvertWorldPostoVertexPos(const Vector3 &worldPos, TerrainVertexPos *pOutVertexPos);
@@ -191,6 +189,7 @@ public:
 	inline int32 GetZChunkCount() { return _zChunkCount; }
 
 	inline std::vector<int32> &GetActiveTerrainChunkIndices() { return _activeChunkIndices; }
+	inline std::vector<Terrain::TerrainTile *> &GetVisibleTerrainTiles() { return _visibleTiles; }
 
 private:
 	//bool CreateInGame(const Terrain::TerrainConfig &config);
@@ -280,6 +279,10 @@ private:
 	TerrainChunk *_pChunks{};
 
 	std::vector<int32> _activeChunkIndices;
+	std::vector<Terrain::TerrainChunk *> _visibleChunks;
+	std::vector<Terrain::TerrainTile *> _visibleTiles;
+
+	std::vector<Terrain::TerrainChunk *> _shadowVisibleChunks;
 };
 
 #define TERRAIN Terrain::GetInstance()
