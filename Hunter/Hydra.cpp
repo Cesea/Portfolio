@@ -53,7 +53,7 @@ bool Hydra::CreateFromWorld(World & world, const Vector3 &Pos)
 	collision._boundingSphere._radius = pAnimation->_pSkinnedMesh->_boundInfo._radius;
 	collision._locked = false;
 	collision._triggerType = CollisionComponent::TRIGGER_TYPE_ENEMY;
-	collision._isTrigger = true;
+	collision._isTrigger = false;
 	collision._type = CollisionComponent::COLLISION_TYPE_OBB;
 
 	ScriptComponent &scriptComponent = _entity.AddComponent<ScriptComponent>();
@@ -70,23 +70,6 @@ bool Hydra::CreateFromWorld(World & world, const Vector3 &Pos)
 
 	_entity.Activate();
 
-	//_pStateMachine = new HydraStateMachine;
-	//_pStateMachine->Init(this);
-	//_pStateMachine->RegisterState(META_TYPE(HydraIdleState)->Name(), new HydraIdleState());
-	//_pStateMachine->RegisterState(META_TYPE(HydraMoveState)->Name(), new HydraMoveState());
-	//_pStateMachine->RegisterState(META_TYPE(HydraStandState)->Name(), new HydraStandState());
-	//_pStateMachine->RegisterState(META_TYPE(HydraAttackState)->Name(), new HydraAttackState());
-	//_pStateMachine->RegisterState(META_TYPE(HydraAttack2State)->Name(), new HydraAttack2State());
-	//_pStateMachine->RegisterState(META_TYPE(HydraAttack3State)->Name(), new HydraAttack3State());
-	//_pStateMachine->RegisterState(META_TYPE(HydraHurt1State)->Name(), new HydraHurt1State());
-	//_pStateMachine->RegisterState(META_TYPE(HydraHurt2State)->Name(), new HydraHurt2State());
-	//_pStateMachine->RegisterState(META_TYPE(HydraDeadState)->Name(), new HydraDeadState());
-	//_pStateMachine->RegisterState(META_TYPE(HydraSpecialAttack1State)->Name(), new HydraSpecialAttack1State());
-	//_pStateMachine->RegisterState(META_TYPE(HydraSpecialAttack2State)->Name(), new HydraSpecialAttack2State());
-	//_pStateMachine->RegisterState(META_TYPE(HydraBreath1State)->Name(), new HydraBreath1State());
-	//_pStateMachine->RegisterState(META_TYPE(HydraBreath2State)->Name(), new HydraBreath2State());
-	//_pStateMachine->RegisterState(META_TYPE(HydraBreath3State)->Name(), new HydraBreath3State());
-	//this->QueueAction(HYDRA_ANIM(HYDRA_STAND));
 
 	_speed = 2.0f;
 	_rotateSpeed = D3DX_PI / 256;
@@ -227,8 +210,8 @@ void Hydra::Update(float deltaTime)
 		if (distance < _atkRange)
 		{
 			EventChannel _channel;
-			_channel.Broadcast<GameObjectFactory::DamageBoxEvent>(GameObjectFactory::DamageBoxEvent(transComp.GetWorldPosition()-Vector3(-1,-1,-1), transComp.GetWorldPosition() - Vector3(1, 1, 1),
-				10.0f,CollisionComponent::TRIGGER_TYPE_ENEMY_DMGBOX,0.0f,0.0f,1.0f));
+			_channel.Broadcast<GameObjectFactory::DamageBoxEvent>(GameObjectFactory::DamageBoxEvent(transComp.GetWorldPosition() - Vector3(1,1,1), transComp.GetWorldPosition() + Vector3(1, 1, 1),
+				10.0f, CollisionComponent::TRIGGER_TYPE_ENEMY_DMGBOX, 0.0f, 0.0f, 1.0f));
 			switch (_skinType)
 			{
 			case HYDRASKINSTATE_GREEN:
@@ -586,7 +569,7 @@ void Hydra::Handle(const CollisionSystem::ActorTriggerEvent & event)
 	case CollisionComponent::TRIGGER_TYPE_OBJECT:
 		break;
 	case CollisionComponent::TRIGGER_TYPE_PLAYER_DMGBOX:
-	case CollisionComponent::TRIGGER_TYPE_ENEMY_DMGBOX:
+	//case CollisionComponent::TRIGGER_TYPE_ENEMY_DMGBOX:
 		if (!_isHurt)
 		{
 			if (_state == HYDRASTATE_IDLE || _state == HYDRASTATE_STAND)

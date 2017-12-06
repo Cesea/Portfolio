@@ -1,8 +1,6 @@
 #include "stdafx.h"
 #include "DamageBox.h"
 
-
-
 DamageBox::DamageBox()
 {
 }
