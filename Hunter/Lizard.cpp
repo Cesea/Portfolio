@@ -19,7 +19,9 @@ bool Lizard::CreateFromWorld(World & world, const Vector3 &Pos)
 	static int32 animCount = 0;
 	RenderComponent &renderComp = _entity.AddComponent<RenderComponent>();
 	renderComp._type = RenderComponent::Type::eSkinned;
-	switch (rand()%2)
+
+	int a = 1;
+	switch (a)
 	{
 	case 0:
 		_skinType = LIZARDSKINSTATE_NORMAL;
@@ -81,7 +83,7 @@ bool Lizard::CreateFromWorld(World & world, const Vector3 &Pos)
 	_atkRange = 1.6f;
 	if (_skinType == LIZARDSKINSTATE_BLACK)
 	{
-		_atkRange = 2.0f;
+		_atkRange = 8.0f;
 	}
 	_atkTime = 80;
 	_atkTime2 = 90;
@@ -275,6 +277,15 @@ void Lizard::Update(float deltaTime)
 	case LIZARDSTATE_ATK3:
 	{
 		_atkCount--;
+		if (_atkCount == 30)
+		{
+			EventChannel _channel;
+			Vector3 startPos = transComp.GetWorldPosition() - transComp.GetForward() * 3 / 2 + Vector3(0, 1, 0);
+			Vector3 direction = startPos - (_playerPos + Vector3(0, 1, 0));
+			Vec3Normalize(&direction, &direction);
+			_channel.Broadcast<GameObjectFactory::CreateNFireBall>(GameObjectFactory::CreateNFireBall(startPos, -direction,10.0f));
+		}
+
 		if (_atkCount < 0)
 		{
 			_atkCount = _atkTime2;

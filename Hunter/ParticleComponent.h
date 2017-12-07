@@ -17,7 +17,9 @@ public:
 		PARTICLE_TYPE_SMOKE,
 		PARTICLE_TYPE_BLOOD_FOG,
 		PARTICLE_TYPE_BLOOD_PARTICLE,
-		PARTICLE_TYPE_NORMALBREATH
+		PARTICLE_TYPE_NORMALBREATH,
+		PARTICLE_TYPE_NORMALFIREBALL,
+		PARTICLE_TYPE_NORMALFIREBALL2
 	};
 	PARTICLE_TYPE _type;
 
@@ -29,6 +31,10 @@ public:
 	float duration{ 0.0f };
 	float delay{ 0.0f };
 	bool isEmission{ true };
+	
+	//움직이는 파티클들
+	bool canMove{ false };
+	Vector3 velocity;
 
 	ParticleComponent();
 	virtual ~ParticleComponent();

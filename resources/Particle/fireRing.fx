@@ -267,7 +267,7 @@ OutputVS FireBall2VS(float3 posL  : POSITION0,
 	outVS.posH = mul(float4(posL, 1.0f), gWVP);
 
 
-	size = t*t*2;
+	size -= t*t*10;
 
 	float d = distance(posL, gEyePosL);
 	outVS.size = gViewportHeight*size / (1.0f + 8.0f*d);

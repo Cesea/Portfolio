@@ -161,7 +161,32 @@ public :
 		Vector3 _pos;
 		Vector3 _direction;
 	};
+	//Receive NormalFireBall Event
 	void Handle(const CreateBreath & event);
+
+	//Create NormalFireBall Event
+	struct CreateNFireBall
+	{
+		CreateNFireBall(Vector3 pos,Vector3 velocity,float dmg):_pos(pos),_velocity(velocity),_dmg(dmg) { }
+		Vector3 _pos;
+		Vector3 _velocity;
+		float _dmg;
+	};
+	//Receive NormalFireBall Event
+	void Handle(const CreateNFireBall & event);
+
+	//CreateNormalFireBall2 Event
+	struct CreateNFireBall2
+	{
+		CreateNFireBall2(Vector3 pos, Vector3 velocity, float dmg) :_pos(pos), _velocity(velocity), _dmg(dmg) { }
+		Vector3 _pos;
+		Vector3 _velocity;
+		float _dmg;
+	};
+	//Receive NormalFireBall2 Event
+	void Handle(const CreateNFireBall2 & event);
+
+
 	/////////////////////////////////////////////
 
 

@@ -291,6 +291,9 @@
     <ClCompile Include="normalBreath.cpp">
       <Filter>Game\GameComponents\ParticleComponent</Filter>
     </ClCompile>
+    <ClCompile Include="normalFireBall.cpp">
+      <Filter>Game\GameComponents\ParticleComponent</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ClassTypeID.h" />
@@ -660,6 +663,9 @@
       <Filter>Game\GameComponents\ParticleComponent</Filter>
     </ClInclude>
     <ClInclude Include="normalBreath.h">
+      <Filter>Game\GameComponents\ParticleComponent</Filter>
+    </ClInclude>
+    <ClInclude Include="normalFireBall.h">
       <Filter>Game\GameComponents\ParticleComponent</Filter>
     </ClInclude>
   </ItemGroup>

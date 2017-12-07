@@ -12,6 +12,8 @@ void GameObjectFactory::Init()
 	_channel.Add<GameObjectFactory::DamageBoxEvent, GameObjectFactory>(*this);
 	_channel.Add<GameObjectFactory::CreateBlood, GameObjectFactory>(*this);
 	_channel.Add<GameObjectFactory::CreateBreath, GameObjectFactory>(*this);
+	_channel.Add<GameObjectFactory::CreateNFireBall, GameObjectFactory>(*this);
+	_channel.Add<GameObjectFactory::CreateNFireBall2, GameObjectFactory>(*this);
 }
 
 void GameObjectFactory::Release()
@@ -22,6 +24,8 @@ void GameObjectFactory::Release()
 	_channel.Remove<GameObjectFactory::DamageBoxEvent, GameObjectFactory>(*this);
 	_channel.Remove<GameObjectFactory::CreateBlood, GameObjectFactory>(*this);
 	_channel.Remove<GameObjectFactory::CreateBreath, GameObjectFactory>(*this);
+	_channel.Remove<GameObjectFactory::CreateNFireBall, GameObjectFactory>(*this);
+	_channel.Remove<GameObjectFactory::CreateNFireBall2, GameObjectFactory>(*this);
 	_pCurrentScene = nullptr;
 	_pPlayer = nullptr;
 }
@@ -421,6 +425,56 @@ void GameObjectFactory::Handle(const CreateBreath & event)
 	particle.duration = 1.0f;
 	particle.delay = 0.0f;
 	particle.init(ParticleComponent::PARTICLE_TYPE_NORMALBREATH, 4500, 0.0025f, event._direction/3, event._pos);
+
+	entity.Activate();
+}
+
+void GameObjectFactory::Handle(const CreateNFireBall & event)
+{
+	Entity &entity = _pCurrentScene->_world.CreateEntity();
+	TransformComponent &transform = entity.AddComponent<TransformComponent>();
+	transform._position = event._pos;
+	ParticleComponent &particle = entity.AddComponent<ParticleComponent>();
+	particle.min = Vector3(-0.1f, -0.1f, -0.1f);
+	particle.max = Vector3(0.1f, 0.1f, 0.1f);
+	particle.isEmission = true;
+	particle.duration = 5.0f;
+	particle.delay = 0.0f;
+	particle.init(ParticleComponent::PARTICLE_TYPE_NORMALFIREBALL, 450, 0.025f, Vector3(0, 0, 0), event._pos);
+	particle.canMove = true;
+	particle.velocity = event._velocity;
+	CollisionComponent &collision = entity.AddComponent<CollisionComponent>();
+	collision._boundingBox.Init(Vector3(-1, -1, -1), Vector3(1, 1, 1));
+	collision._dmg = event._dmg;
+	collision._triggerType = CollisionComponent::TRIGGER_TYPE_ENEMY_DMGBOX;
+	collision._type = CollisionComponent::COLLISION_TYPE_BOX;
+	collision._isTrigger = true;
+	collision._locked = false;
+
+	entity.Activate();
+}
+
+void GameObjectFactory::Handle(const CreateNFireBall2 & event)
+{
+	Entity &entity = _pCurrentScene->_world.CreateEntity();
+	TransformComponent &transform = entity.AddComponent<TransformComponent>();
+	transform._position = event._pos;
+	ParticleComponent &particle = entity.AddComponent<ParticleComponent>();
+	particle.min = Vector3(-0.1f, -0.1f, -0.1f);
+	particle.max = Vector3(0.1f, 0.1f, 0.1f);
+	particle.isEmission = true;
+	particle.duration = 5.0f;
+	particle.delay = 0.0f;
+	particle.init(ParticleComponent::PARTICLE_TYPE_NORMALFIREBALL2, 450, 0.025f, Vector3(0, 0, 0), event._pos);
+	particle.canMove = true;
+	particle.velocity = event._velocity;
+	CollisionComponent &collision = entity.AddComponent<CollisionComponent>();
+	collision._boundingBox.Init(Vector3(-1, -1, -1), Vector3(1, 1, 1));
+	collision._dmg = event._dmg;
+	collision._triggerType = CollisionComponent::TRIGGER_TYPE_ENEMY_DMGBOX;
+	collision._type = CollisionComponent::COLLISION_TYPE_BOX;
+	collision._isTrigger = true;
+	collision._locked = false;
 
 	entity.Activate();
 }
