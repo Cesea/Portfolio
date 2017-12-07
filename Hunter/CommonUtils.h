@@ -82,6 +82,11 @@ inline float Uint32ToFloat(uint32 ms)
 	return (float)ms * 0.001f;
 }
 
+inline float GetAngleDiffXZ(const Vector3 &v1, const Vector3 &v2)
+{
+	return -atan2(v1.x * v2.z - v1.z * v2.x, v1.x * v2.x + v1.z * v2.z);
+}
+
 
 inline int32 RectWidth(const RECT &rect)
 {

@@ -17,7 +17,7 @@ void Player::SetupCallbackAndCompression()
 	   pController->GetAnimationSetByName(PlayerAnimationString[PlayerAnimationEnum::eWarSwingLeft], (ID3DXAnimationSet **)&anim);
 
 	   D3DXKEY_CALLBACK key;
-	   key.Time =anim->GetPeriod() / 1.8f * anim->GetSourceTicksPerSecond();
+	   key.Time =anim->GetPeriod() / 2.0f * anim->GetSourceTicksPerSecond();
 	   key.pCallbackData = (void *)&_callbackData;
 
 	   AddCallbackKeysAndCompress(pController, anim, 1, &key, D3DXCOMPRESS_DEFAULT, 0.1f);
@@ -29,7 +29,7 @@ void Player::SetupCallbackAndCompression()
 	   pController->GetAnimationSetByName(PlayerAnimationString[PlayerAnimationEnum::eWarSwingRight], (ID3DXAnimationSet **)&anim);
 
 	   D3DXKEY_CALLBACK key;
-	   key.Time = anim->GetPeriod() / 1.8f * anim->GetSourceTicksPerSecond();
+	   key.Time = anim->GetPeriod() / 2.0f * anim->GetSourceTicksPerSecond();
 	   key.pCallbackData = (void *)&_callbackData;
 
 	   AddCallbackKeysAndCompress(pController, anim, 1, &key, D3DXCOMPRESS_DEFAULT, 0.1f);
@@ -41,7 +41,7 @@ void Player::SetupCallbackAndCompression()
 	   pController->GetAnimationSetByName(PlayerAnimationString[PlayerAnimationEnum::eWarThrustMid], (ID3DXAnimationSet **)&anim);
 
 	   D3DXKEY_CALLBACK key;
-	   key.Time = anim->GetPeriod() / 1.8f * anim->GetSourceTicksPerSecond();
+	   key.Time = anim->GetPeriod() / 2.0f * anim->GetSourceTicksPerSecond();
 	   key.pCallbackData = (void *)&_callbackData;
 
 	   AddCallbackKeysAndCompress(pController, anim, 1, &key, D3DXCOMPRESS_DEFAULT, 0.1f);
@@ -53,7 +53,7 @@ void Player::SetupCallbackAndCompression()
 	   pController->GetAnimationSetByName(PlayerAnimationString[PlayerAnimationEnum::eWarWalkSwingLeft], (ID3DXAnimationSet **)&anim);
 
 	   D3DXKEY_CALLBACK key;
-	   key.Time =anim->GetPeriod() / 1.8f * anim->GetSourceTicksPerSecond();
+	   key.Time =anim->GetPeriod() / 2.0f * anim->GetSourceTicksPerSecond();
 	   key.pCallbackData = (void *)&_callbackData;
 
 	   AddCallbackKeysAndCompress(pController, anim, 1, &key, D3DXCOMPRESS_DEFAULT, 0.1f);
@@ -65,7 +65,7 @@ void Player::SetupCallbackAndCompression()
 	   pController->GetAnimationSetByName(PlayerAnimationString[PlayerAnimationEnum::eWarWalkSwingRight], (ID3DXAnimationSet **)&anim);
 
 	   D3DXKEY_CALLBACK key;
-	   key.Time =anim->GetPeriod() / 1.8f * anim->GetSourceTicksPerSecond();
+	   key.Time =anim->GetPeriod() / 2.0f * anim->GetSourceTicksPerSecond();
 	   key.pCallbackData = (void *)&_callbackData;
 
 	   AddCallbackKeysAndCompress(pController, anim, 1, &key, D3DXCOMPRESS_DEFAULT, 0.1f);
@@ -77,7 +77,7 @@ void Player::SetupCallbackAndCompression()
 	   pController->GetAnimationSetByName(PlayerAnimationString[PlayerAnimationEnum::eWarWalkThrust], (ID3DXAnimationSet **)&anim);
 
 	   D3DXKEY_CALLBACK key;
-	   key.Time =anim->GetPeriod() / 1.8f * anim->GetSourceTicksPerSecond();
+	   key.Time =anim->GetPeriod() / 2.0f * anim->GetSourceTicksPerSecond();
 	   key.pCallbackData = (void *)&_callbackData;
 
 	   AddCallbackKeysAndCompress(pController, anim, 1, &key, D3DXCOMPRESS_DEFAULT, 0.1f);
@@ -130,15 +130,17 @@ HRESULT PlayerCallbackHandler::HandleCallback(UINT Track, LPVOID pCallbackData)
 		_pPlayer->_canCombo = true;
 		_pPlayer->_pCollisionComp->_isTrigger = true;
 
-		_channel.Broadcast<GameObjectFactory::DamageBoxEvent>(
-			GameObjectFactory::DamageBoxEvent(_pPlayer->_pTransformComp->GetWorldPosition() - Vector3(-1, -1, -1),
-				_pPlayer->_pTransformComp->GetWorldPosition() - Vector3(1, 1, 1),
-			10.0f, CollisionComponent::TRIGGER_TYPE_PLAYER_DMGBOX, 0.0f, 0.0f, 0.3f));
+		_channel.Broadcast<GameObjectFactory::PlayerDamageBoxEvent>(
+			GameObjectFactory::PlayerDamageBoxEvent(Vector3(1, 1, 1),
+				_pPlayer->_pTransformComp->GetWorldPosition() + _pPlayer->_pTransformComp->GetForward(),
+			10.0f, CollisionComponent::TRIGGER_TYPE_PLAYER_DMGBOX, 0.0f, 0.0f, 0.4f));
 	}break;
 
 	case PlayerAnimationEnum::eWarTakingHit :
 	{
 		_pPlayer->_superArmor = true;
+		_pPlayer->_state = Player::PLAYERSTATE_STANCE;
+		_pPlayer->QueueAction(PLAYER_ANIM(eWarCombatMode));
 		//_pPlayer->_state = Player::PLAYERSTATE_STANCE;
 		//_pPlayer->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWarTakingHit));
 

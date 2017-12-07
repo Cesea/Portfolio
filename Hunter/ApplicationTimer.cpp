@@ -43,7 +43,7 @@ void ApplicationTimer::Tick()
 		}
 		else
 		{
-			Sleep(1);
+			//Sleep(1);
 		}
 	}
 	_prevCounter = _currentCounter;

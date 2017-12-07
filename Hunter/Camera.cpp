@@ -158,9 +158,7 @@ void Camera::MoveAndRotate(float deltaTime, const InputManager & input)
 				Vec3Normalize(&camPlanerForward, &camPlanerForward);
 				Vector3 targetForward = refTargetTransform.GetForward();
 
-				float angleDiff = -atan2(camPlanerForward.x * targetForward.z - camPlanerForward.z * targetForward.x,
-					camPlanerForward.x * targetForward.x + camPlanerForward.z * targetForward.z);
-				//float angleDiff = camPlanerForward
+				float angleDiff = GetAngleDiffXZ(camPlanerForward, targetForward);
 				_pTargetObject->_targetRotation = angleDiff;
 				_pTargetObject->_camRotated = true;
 				_pTargetObject->_startForward.ToZero();

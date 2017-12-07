@@ -115,6 +115,7 @@ private :
 	StopWatch _superArmorTimer;
 
 	Vector3 _startForward;
+	Vector3 _runStartForward;
 
 	KeyConfig _keyConfig;
 

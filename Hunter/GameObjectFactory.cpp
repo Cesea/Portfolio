@@ -10,6 +10,7 @@ void GameObjectFactory::Init()
 	_channel.Add<GameObjectFactory::CreateObjectOnLocationEvent, GameObjectFactory>(*this);
 	_channel.Add<GameObjectFactory::CreateObjectFromSaveInfoEvent, GameObjectFactory>(*this);
 	_channel.Add<GameObjectFactory::DamageBoxEvent, GameObjectFactory>(*this);
+	_channel.Add<GameObjectFactory::PlayerDamageBoxEvent, GameObjectFactory>(*this);
 }
 
 void GameObjectFactory::Release()
@@ -18,6 +19,7 @@ void GameObjectFactory::Release()
 	_channel.Remove<GameObjectFactory::CreateObjectOnLocationEvent, GameObjectFactory>(*this);
 	_channel.Remove<GameObjectFactory::CreateObjectFromSaveInfoEvent, GameObjectFactory>(*this);
 	_channel.Remove<GameObjectFactory::DamageBoxEvent, GameObjectFactory>(*this);
+	_channel.Remove<GameObjectFactory::PlayerDamageBoxEvent, GameObjectFactory>(*this);
 	_pCurrentScene = nullptr;
 	_pPlayer = nullptr;
 }
@@ -585,7 +587,7 @@ void GameObjectFactory::Handle(const DamageBoxEvent & event)
 	_pCurrentScene->_gameObjects.push_back(new DamageBox());
 	BaseGameObject *pBack = _pCurrentScene->_gameObjects.back();
 
-	pBack->CreateFromWorld(_pCurrentScene->_world, (event._min/2+event._max/2));
+	pBack->CreateFromWorld(_pCurrentScene->_world, (event._min / 2) + (event._max / 2) );
 
 	//이벤트설정
 	Entity _entity = pBack->GetEntity();
@@ -597,6 +599,26 @@ void GameObjectFactory::Handle(const DamageBoxEvent & event)
 	collision._triggerType = event._type;
 	collision._duration = event._duration;
 }
+
+void GameObjectFactory::Handle(const PlayerDamageBoxEvent & event)
+{
+	_pCurrentScene->_gameObjects.push_back(new DamageBox());
+	BaseGameObject *pBack = _pCurrentScene->_gameObjects.back();
+
+	pBack->CreateFromWorld(_pCurrentScene->_world, event._position);
+
+	//이벤트설정
+	Entity _entity = pBack->GetEntity();
+	CollisionComponent & collision = _entity.GetComponent<CollisionComponent>();
+	collision._boundingBox.Init(-event._size, event._size);
+
+	collision._accel = event._accel;
+	collision._dmg = event._dmg;
+	collision._velocity = event._velocity;
+	collision._triggerType = event._type;
+	collision._duration = event._duration;
+}
+
 const char * ArcheToString(ARCHE_TYPE type)
 {
 	switch (type)
