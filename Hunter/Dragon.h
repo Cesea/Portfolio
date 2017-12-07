@@ -36,7 +36,7 @@ public:
 protected:
 	void SetupCallbackAndCompression();
 
-	HydraCallbackData _callbackData;
+	DragonCallbackData _callbackData;
 
 	GameCommand _currentCommand;
 

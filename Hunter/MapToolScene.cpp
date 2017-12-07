@@ -126,6 +126,10 @@ void LoadEverySkinnedResources()
 	MatrixScaling(&correctionMat, 1.0f, 1.0f, 1.0f);
 	video::SkinnedXMeshHandle LizardMesh2 = VIDEO->CreateSkinnedXMesh(
 		"../resources/Models/Lizard/Lizard_Black.X", &correctionMat, "Lizard2");
+
+	MatrixScaling(&correctionMat, 1.0f, 1.0f, 1.0f);
+	video::SkinnedXMeshHandle Dragon = VIDEO->CreateSkinnedXMesh(
+		"../resources/Models/DragonBoss/DragonBoss.X", &correctionMat, "Dragon");
 }
 
 bool MapToolScene::SceneInit()

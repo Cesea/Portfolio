@@ -275,6 +275,12 @@ void GameObjectFactory::CreateObject(ARCHE_TYPE type,
 		pBack->CreateFromWorld(_pCurrentScene->_world, position);
 
 	}break;
+	case ARCHE_DRAGON:
+	{
+		_pCurrentScene->_gameObjects.push_back(new Dragon());
+		BaseGameObject *pBack = _pCurrentScene->_gameObjects.back();
+		pBack->CreateFromWorld(_pCurrentScene->_world, position);
+	}break;
 	}
 }
 
@@ -358,6 +364,10 @@ void GameObjectFactory::Handle(const CreateObjectFromSaveInfoEvent & event)
 	case ARCHE_HYDRA:
 	{
 		CreateObject(ARCHE_HYDRA, ResourceHandle(), event._position);
+	}break;
+	case ARCHE_DRAGON:
+	{
+		CreateObject(ARCHE_DRAGON, ResourceHandle(), event._position);
 	}break;
 	}
 }
