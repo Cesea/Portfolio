@@ -1077,18 +1077,24 @@ void Player::RepositionEntity(const TerrainTilePos & currentPos, const TerrainTi
 		Terrain::TerrainChunk &refPrevChunk =  TERRAIN->GetChunkAt(prevPos._chunkX, prevPos._chunkZ);
 		Terrain::TerrainTile &refPrevTile = refPrevChunk._tiles[Index2D(prevPos._tileX, prevPos._tileZ, TERRAIN_TILE_RES)];
 
+		bool removed = false;
 		for (uint32 i = 0; i < refPrevTile._entities.size(); ++i)
 		{
 			if (refPrevTile._entities[i] == _entity)
 			{
 				refPrevTile._entities.erase(refPrevTile._entities.begin() + i);
+				removed = true;
 				break;
 			}
 		}
 
-		Terrain::TerrainChunk &refCurrentChunk =  TERRAIN->GetChunkAt(currentPos._chunkX, currentPos._chunkZ);
-		Terrain::TerrainTile &refCurrentTile = refCurrentChunk._tiles[Index2D(currentPos._tileX, currentPos._tileZ, TERRAIN_TILE_RES)];
-		refCurrentTile._entities.push_back(_entity);
+		if (removed)
+		{
+			Terrain::TerrainChunk &refCurrentChunk = TERRAIN->GetChunkAt(currentPos._chunkX, currentPos._chunkZ);
+			Terrain::TerrainTile &refCurrentTile = refCurrentChunk._tiles[Index2D(currentPos._tileX, currentPos._tileZ, TERRAIN_TILE_RES)];
+			refCurrentTile._entities.push_back(_entity);
+			
+		}
 	}
 }
 

@@ -212,9 +212,9 @@ bool MapToolScene::SceneInit()
 		} break;
 		}
 
-		_channel.Broadcast<GameObjectFactory::CreateObjectOnLocationEvent>(
-			GameObjectFactory::CreateObjectOnLocationEvent(type, handle,
-				Vector3(randX, 0, randz)));
+		//_channel.Broadcast<GameObjectFactory::CreateObjectOnLocationEvent>(
+		//	GameObjectFactory::CreateObjectOnLocationEvent(type, handle,
+		//		Vector3(randX, 0, randz)));
 	}
 	////실험
 	//trash = _world.CreateEntity();
@@ -311,7 +311,7 @@ bool MapToolScene::SceneRender0()
 
 	TERRAIN->Render(_camera, *_pMainLight, _camera);
 	_renderSystem.Render(_camera);
-	_particleSystem.render();
+	//_particleSystem.render();
 	_collisionSystem.render();
 	_editor->Render();
 
