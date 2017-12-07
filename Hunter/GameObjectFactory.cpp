@@ -372,6 +372,21 @@ void GameObjectFactory::Handle(const DamageBoxEvent & event)
 	collision._duration = event._duration;
 }
 
+void GameObjectFactory::Handle(const CreateBlood & event)
+{
+	Entity &entity = _pCurrentScene->_world.CreateEntity();
+
+	TransformComponent &transform = entity.AddComponent<TransformComponent>();
+	transform._position = event._pos;
+
+	ParticleComponent &particle = entity.AddComponent<ParticleComponent>();
+	particle.min = Vector3(-0.1f, -0.1f, -0.1f);
+	particle.max = Vector3(0.1f, 0.1f, 0.1f);
+	particle.init(ParticleComponent::PARTICLE_TYPE_BLOOD_FOG, 1500, 0.005f, Vector3(0, 0, 0), event._pos);
+
+	entity.Activate();
+}
+
 const char * ArcheToString(ARCHE_TYPE type)
 {
 	switch (type)
