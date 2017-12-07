@@ -137,6 +137,8 @@
     <ClCompile Include="BaseSystem.cpp" />
     <ClCompile Include="bat.cpp" />
     <ClCompile Include="batAnimationString.cpp" />
+    <ClCompile Include="bloodFog.cpp" />
+    <ClCompile Include="bloodParticle.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="Cat.cpp" />
     <ClCompile Include="CatAnimationString.cpp" />
@@ -237,6 +239,8 @@
     <ClInclude Include="BaseSystem.h" />
     <ClInclude Include="bat.h" />
     <ClInclude Include="batAnimationString.h" />
+    <ClInclude Include="bloodFog.h" />
+    <ClInclude Include="bloodParticle.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Cat.h" />
     <ClInclude Include="CatAnimationString.h" />

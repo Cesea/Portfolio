@@ -14,7 +14,9 @@ public:
 		PARTICLE_TYPE_FIREBALL,
 		PARTICLE_TYPE_FIREBREATH,
 		PARTICLE_TYPE_CHARGE,
-		PARTICLE_TYPE_SMOKE
+		PARTICLE_TYPE_SMOKE,
+		PARTICLE_TYPE_BLOOD_FOG,
+		PARTICLE_TYPE_BLOOD_PARTICLE
 	};
 	PARTICLE_TYPE _type;
 
@@ -23,6 +25,9 @@ public:
 
 	Vector3 min;
 	Vector3 max;
+	float duration{ 0.0f };
+	float delay{ 0.0f };
+	bool isEmission{ true };
 
 	ParticleComponent();
 	virtual ~ParticleComponent();

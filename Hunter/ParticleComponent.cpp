@@ -34,5 +34,13 @@ void ParticleComponent::init(PARTICLE_TYPE type, int maxParticleNum, float emiss
 		_particle = new Smoke("../resources/Particle/Smoke.fx", "SmokeTech", "../resources/Particle/2.png",
 			accel, maxParticleNum, emission, pos, min, max);
 		break;
+	case PARTICLE_TYPE_BLOOD_FOG:
+		_particle = new bloodFog("../resources/Particle/blood.fx", "BloodFogTech", "../resources/Particle/bloodFog.jpg",
+			accel, maxParticleNum, emission, pos, min, max);
+		break;
+	case PARTICLE_TYPE_BLOOD_PARTICLE:
+		_particle = new BloodParticle("../resources/Particle/blood.fx", "BloodParticleTech", "../resources/Particle/bloodTex.png",
+			accel, maxParticleNum, emission, pos, min, max);
+		break;
 	}
 }

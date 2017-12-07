@@ -145,6 +145,17 @@ public :
 	void Handle(const DamageBoxEvent &event);
 	///////////////////////////////////////////////////////////////////////////////////////
 
+	//Create Particle Event
+	struct CreateBlood
+	{
+		CreateBlood(const Vector3 pos): _pos(pos){}
+		Vector3 _pos;
+	};
+	//Receive Blood Particle Event
+	void Handle(const CreateBlood & event);
+
+	/////////////////////////////////////////////
+
 
 	EventChannel _channel;
 };
