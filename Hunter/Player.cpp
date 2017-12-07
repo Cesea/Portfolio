@@ -173,7 +173,7 @@ void Player::Update(float deltaTime)
 			   _attackToStanceTimer.Restart();
 			   _comboCount = 0;
 			   _canCombo = false;
-			   this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWarCombatMode));
+			   //this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWarCombatMode));
 		   }
 	   }
    } break;
@@ -186,8 +186,8 @@ void Player::Update(float deltaTime)
 		   {
 			   _state = PLAYERSTATE_STANCE;
 			   _attackToStanceTimer.Restart();
-			   _pActionComp->_actionQueue.ClearQueue();
-			   this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWarCombatMode));
+			   //_pActionComp->_actionQueue.ClearQueue();
+			   //this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWarCombatMode));
 		   }
 	   }
    } break;
@@ -208,22 +208,22 @@ void Player::Update(float deltaTime)
 			   if (_currentCommand._movement._vertical == VERTICAL_MOVEMENT_UP)
 			   {
 				   _state = PLAYERSTATE_MOVE;
-				   this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWalk));
+				   //this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWalk));
 			   }
 			   else if (_currentCommand._movement._vertical == VERTICAL_MOVEMENT_DOWN)
 			   {
 				   _state = PLAYERSTATE_MOVE;
-				   this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWarRetreat));
+				   //this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWarRetreat));
 			   }
 			   else if (_currentCommand._movement._horizontal == HORIZONTAL_MOVEMENT_LEFT)
 			   {
 				   _state = PLAYERSTATE_MOVE;
-				   this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWarMovingLeft));
+				   //this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWarMovingLeft));
 			   }
 			   else if (_currentCommand._movement._horizontal == HORIZONTAL_MOVEMENT_RIGHT)
 			   {
 				   _state = PLAYERSTATE_MOVE;
-				   this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWarMovingRight));
+				   //this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWarMovingRight));
 			   }
 			   else if (IsMovementNone(_currentCommand._movement))
 			   {
@@ -246,6 +246,7 @@ void Player::Update(float deltaTime)
    _currentCommand.Reset();
 
    TransformComponent &refDamageTrans = _pDamageBox->GetEntity().GetComponent<TransformComponent>();
+   //Console::Log("%d\n", (int32)_pDamageBox->GetEntity().GetComponent<CollisionComponent>()._valid);
    _worldSwordPos = refDamageTrans.GetWorldPosition();
    Matrix forwardTrans;
    MatrixTranslation(&forwardTrans, -60.0f, 0.0f, 0.0f);
@@ -399,7 +400,6 @@ void Player::MoveAndRotate(float deltaTime)
 	  TERRAIN->ConvertWorldPostoTilePos(refTransform.GetWorldPosition(), &_tilePos);
 	  RepositionEntity(_tilePos, _prevTilePos);
 
-	  //RepositionDamageBox(_tilePos, _prevTilePos);
    }
 }
 
@@ -1026,11 +1026,11 @@ void Player::Handle(const CollisionSystem::ActorTriggerEvent & event)
 	switch (_collision._triggerType)
 	{
 	case CollisionComponent::TRIGGER_TYPE_ENEMY_DMGBOX :
-	//case CollisionComponent::TRIGGER_TYPE_ENEMY :
 	{
 		if (_state != PLAYERSTATE_HURT && _state != PLAYERSTATE_DEAD && !_superArmor)
 		{
 			_collision._valid = false;
+			_collision._duration = -1.0f;
 			MovementStop(_currentMovement);
 			_state = PLAYERSTATE_HURT;
 			_hp -= 50;
@@ -1092,26 +1092,4 @@ void Player::RepositionEntity(const TerrainTilePos & currentPos, const TerrainTi
 	}
 }
 
-void Player::RepositionDamageBox(const TerrainTilePos & currentPos, const TerrainTilePos & prevPos)
-{
-	//타일이 다를....... tile의 entity벡터를 처리해주자
-	if (currentPos._tileX != prevPos._tileX || currentPos._tileZ != prevPos._tileZ)
-	{
-		Terrain::TerrainChunk &refPrevChunk =  TERRAIN->GetChunkAt(prevPos._chunkX, prevPos._chunkZ);
-		Terrain::TerrainTile &refPrevTile = refPrevChunk._tiles[Index2D(prevPos._tileX, prevPos._tileZ, TERRAIN_TILE_RES)];
-
-		for (uint32 i = 0; i < refPrevTile._entities.size(); ++i)
-		{
-			if (refPrevTile._entities[i] == _pDamageBox->GetEntity())
-			{
-				refPrevTile._entities.erase(refPrevTile._entities.begin() + i);
-				break;
-			}
-		}
-
-		Terrain::TerrainChunk &refCurrentChunk =  TERRAIN->GetChunkAt(currentPos._chunkX, currentPos._chunkZ);
-		Terrain::TerrainTile &refCurrentTile = refCurrentChunk._tiles[Index2D(currentPos._tileX, currentPos._tileZ, TERRAIN_TILE_RES)];
-		refCurrentTile._entities.push_back(_pDamageBox->GetEntity());
-	}
-}
 

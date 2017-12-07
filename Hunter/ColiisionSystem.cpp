@@ -67,6 +67,7 @@ void CollisionSystem::Update(float deltaTime, float checkRange)
 				TerrainTilePos testTilePos = tilePos1;
 				testTilePos._tileX += x;
 				testTilePos._tileZ += z;
+				TERRAIN->ReTilelizeTilePosition(testTilePos);
 
 				if (TERRAIN->IsTerrainTilePosValid(testTilePos))
 				{
@@ -117,17 +118,18 @@ void CollisionSystem::Update(float deltaTime, float checkRange)
 												case CollisionComponent::TRIGGER_TYPE_ENEMY:
 												case CollisionComponent::TRIGGER_TYPE_PLAYER:
 													_channel.Broadcast<ActorTriggerEvent>(
-														ActorTriggerEvent(entities[i], entities[j]));
+														ActorTriggerEvent(entities[i], refTileEntitiies[j]));
 													break;
 												case CollisionComponent::TRIGGER_TYPE_OBJECT:
 													_channel.Broadcast<ObjectTriggerEvent>(
-														ObjectTriggerEvent(entities[i], entities[j]));
+														ObjectTriggerEvent(entities[i], refTileEntitiies[j]));
 													break;
 												case CollisionComponent::TRIGGER_TYPE_PLAYER_DMGBOX:
-													_channel.Broadcast<ActorTriggerEvent>(ActorTriggerEvent(entities[i], entities[j]));
-													break;
+												{
+													_channel.Broadcast<ActorTriggerEvent>(ActorTriggerEvent(entities[i], refTileEntitiies[j]));
+												} break;
 												case CollisionComponent::TRIGGER_TYPE_ENEMY_DMGBOX:
-													_channel.Broadcast<ActorTriggerEvent>(ActorTriggerEvent(entities[i], entities[j]));
+													_channel.Broadcast<ActorTriggerEvent>(ActorTriggerEvent(entities[i], refTileEntitiies[j]));
 													break;
 												}
 
@@ -135,22 +137,22 @@ void CollisionSystem::Update(float deltaTime, float checkRange)
 											if (collision2._isTrigger &&
 												collision2._valid && collision._valid)
 											{
-												switch (collision._triggerType)
+												switch (collision2._triggerType)
 												{
 												case CollisionComponent::TRIGGER_TYPE_ENEMY:
 												case CollisionComponent::TRIGGER_TYPE_PLAYER:
 													_channel.Broadcast<ActorTriggerEvent>(
-														ActorTriggerEvent(entities[j], entities[i]));
+														ActorTriggerEvent(refTileEntitiies[j], entities[i]));
 													break;
 												case CollisionComponent::TRIGGER_TYPE_OBJECT:
 													_channel.Broadcast<ObjectTriggerEvent>(
-														ObjectTriggerEvent(entities[j], entities[i]));
+														ObjectTriggerEvent(refTileEntitiies[j], entities[i]));
 													break;
 												case CollisionComponent::TRIGGER_TYPE_PLAYER_DMGBOX:
-													_channel.Broadcast<ActorTriggerEvent>(ActorTriggerEvent(entities[i], entities[j]));
+													_channel.Broadcast<ActorTriggerEvent>(ActorTriggerEvent(refTileEntitiies[j], entities[i]));
 													break;
 												case CollisionComponent::TRIGGER_TYPE_ENEMY_DMGBOX:
-													_channel.Broadcast<ActorTriggerEvent>(ActorTriggerEvent(entities[i], entities[j]));
+													_channel.Broadcast<ActorTriggerEvent>(ActorTriggerEvent(refTileEntitiies[j], entities[i]));
 													break;
 												}
 											}
@@ -186,39 +188,39 @@ void CollisionSystem::Update(float deltaTime, float checkRange)
 												case CollisionComponent::TRIGGER_TYPE_ENEMY:
 												case CollisionComponent::TRIGGER_TYPE_PLAYER:
 													_channel.Broadcast<ActorTriggerEvent>(
-														ActorTriggerEvent(entities[i], entities[j]));
+														ActorTriggerEvent(entities[i], refTileEntitiies[j]));
 													break;
 												case CollisionComponent::TRIGGER_TYPE_OBJECT:
 													_channel.Broadcast<ObjectTriggerEvent>(
-														ObjectTriggerEvent(entities[i], entities[j]));
+														ObjectTriggerEvent(entities[i], refTileEntitiies[j]));
 													break;
 												case CollisionComponent::TRIGGER_TYPE_PLAYER_DMGBOX:
-													_channel.Broadcast<ActorTriggerEvent>(ActorTriggerEvent(entities[i], entities[j]));
+													_channel.Broadcast<ActorTriggerEvent>(ActorTriggerEvent(entities[i], refTileEntitiies[j]));
 													break;
 												case CollisionComponent::TRIGGER_TYPE_ENEMY_DMGBOX:
-													_channel.Broadcast<ActorTriggerEvent>(ActorTriggerEvent(entities[i], entities[j]));
+													_channel.Broadcast<ActorTriggerEvent>(ActorTriggerEvent(entities[i], refTileEntitiies[j]));
 													break;
 												}
 											}
 											if (collision2._isTrigger &&
 												collision2._valid && collision._valid)
 											{
-												switch (collision._triggerType)
+												switch (collision2._triggerType)
 												{
 												case CollisionComponent::TRIGGER_TYPE_ENEMY:
 												case CollisionComponent::TRIGGER_TYPE_PLAYER:
 													_channel.Broadcast<ActorTriggerEvent>(
-														ActorTriggerEvent(entities[j], entities[i]));
+														ActorTriggerEvent(refTileEntitiies[j], entities[i]));
 													break;
 												case CollisionComponent::TRIGGER_TYPE_OBJECT:
 													_channel.Broadcast<ObjectTriggerEvent>(
-														ObjectTriggerEvent(entities[j], entities[i]));
+														ObjectTriggerEvent(refTileEntitiies[j], entities[i]));
 													break;
 												case CollisionComponent::TRIGGER_TYPE_PLAYER_DMGBOX:
-													_channel.Broadcast<ActorTriggerEvent>(ActorTriggerEvent(entities[i], entities[j]));
+													_channel.Broadcast<ActorTriggerEvent>(ActorTriggerEvent(refTileEntitiies[j], entities[i]));
 													break;
 												case CollisionComponent::TRIGGER_TYPE_ENEMY_DMGBOX:
-													_channel.Broadcast<ActorTriggerEvent>(ActorTriggerEvent(entities[i], entities[j]));
+													_channel.Broadcast<ActorTriggerEvent>(ActorTriggerEvent(refTileEntitiies[j], entities[i]));
 													break;
 												}
 											}
@@ -254,16 +256,16 @@ void CollisionSystem::Update(float deltaTime, float checkRange)
 												{
 												case CollisionComponent::TRIGGER_TYPE_ENEMY:
 												case CollisionComponent::TRIGGER_TYPE_PLAYER:
-													_channel.Broadcast<ActorTriggerEvent>(ActorTriggerEvent(entities[i], entities[j]));
+													_channel.Broadcast<ActorTriggerEvent>(ActorTriggerEvent(entities[i], refTileEntitiies[j]));
 													break;
 												case CollisionComponent::TRIGGER_TYPE_OBJECT:
-													_channel.Broadcast<ObjectTriggerEvent>(ObjectTriggerEvent(entities[i], entities[j]));
+													_channel.Broadcast<ObjectTriggerEvent>(ObjectTriggerEvent(entities[i], refTileEntitiies[j]));
 													break;
 												case CollisionComponent::TRIGGER_TYPE_PLAYER_DMGBOX:
-													_channel.Broadcast<ActorTriggerEvent>(ActorTriggerEvent(entities[i], entities[j]));
+													_channel.Broadcast<ActorTriggerEvent>(ActorTriggerEvent(entities[i], refTileEntitiies[j]));
 													break;
 												case CollisionComponent::TRIGGER_TYPE_ENEMY_DMGBOX:
-													_channel.Broadcast<ActorTriggerEvent>(ActorTriggerEvent(entities[i], entities[j]));
+													_channel.Broadcast<ActorTriggerEvent>(ActorTriggerEvent(entities[i], refTileEntitiies[j]));
 													break;
 												}
 
@@ -271,20 +273,20 @@ void CollisionSystem::Update(float deltaTime, float checkRange)
 											if (collision2._isTrigger &&
 												collision2._valid && collision._valid)
 											{
-												switch (collision._triggerType)
+												switch (collision2._triggerType)
 												{
 												case CollisionComponent::TRIGGER_TYPE_ENEMY:
 												case CollisionComponent::TRIGGER_TYPE_PLAYER:
-													_channel.Broadcast<ActorTriggerEvent>(ActorTriggerEvent(entities[j], entities[i]));
+													_channel.Broadcast<ActorTriggerEvent>(ActorTriggerEvent(refTileEntitiies[j], entities[i]));
 													break;
 												case CollisionComponent::TRIGGER_TYPE_OBJECT:
-													_channel.Broadcast<ObjectTriggerEvent>(ObjectTriggerEvent(entities[j], entities[i]));
+													_channel.Broadcast<ObjectTriggerEvent>(ObjectTriggerEvent(refTileEntitiies[j], entities[i]));
 													break;
 												case CollisionComponent::TRIGGER_TYPE_PLAYER_DMGBOX:
-													_channel.Broadcast<ActorTriggerEvent>(ActorTriggerEvent(entities[i], entities[j]));
+													_channel.Broadcast<ActorTriggerEvent>(ActorTriggerEvent(refTileEntitiies[j], entities[i]));
 													break;
 												case CollisionComponent::TRIGGER_TYPE_ENEMY_DMGBOX:
-													_channel.Broadcast<ActorTriggerEvent>(ActorTriggerEvent(entities[i], entities[j]));
+													_channel.Broadcast<ActorTriggerEvent>(ActorTriggerEvent(refTileEntitiies[j], entities[i]));
 													break;
 												}
 											}
@@ -340,7 +342,7 @@ void CollisionSystem::Update(float deltaTime, float checkRange)
 											if (collision2._isTrigger &&
 												collision2._valid)
 											{
-												switch (collision._triggerType)
+												switch (collision2._triggerType)
 												{
 												case CollisionComponent::TRIGGER_TYPE_ENEMY:
 												case CollisionComponent::TRIGGER_TYPE_PLAYER:

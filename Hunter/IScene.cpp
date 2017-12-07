@@ -141,6 +141,7 @@ bool IScene::Update(float deltaTime, const InputManager & input)
 		{
 			if (false == (*iter)->GetValid())
 			{
+				TERRAIN->RemoveEntityInTile((*iter)->GetEntity(), (*iter)->GetTilePos());
 				(*iter)->GetEntity().Kill();
 				iter = _gameObjects.erase(iter);
 			}

@@ -39,35 +39,38 @@ void RenderSystem::Render(const Camera &camera)
 	{
 		for (uint32 i = 0; i < tile->_entities.size(); ++i)
 		{
-			TransformComponent &refTransformComponent = tile->_entities[i].GetComponent<TransformComponent>();
-			RenderComponent &refRenderComponent = tile->_entities[i].GetComponent<RenderComponent>();
-			if (refRenderComponent._type == RenderComponent::Type::eBuffer)
+			if (tile->_entities[i].HasComponent<RenderComponent>())
 			{
-			}
-			else if (refRenderComponent._type == RenderComponent::Type::eStatic)
-			{
-				video::StaticXMesh *pMesh = VIDEO->GetStaticXMesh(refRenderComponent._static);
-				pMesh->Render(refRenderComponent._arche, refTransformComponent);
+				TransformComponent &refTransformComponent = tile->_entities[i].GetComponent<TransformComponent>();
+				RenderComponent &refRenderComponent = tile->_entities[i].GetComponent<RenderComponent>();
+				if (refRenderComponent._type == RenderComponent::Type::eBuffer)
+				{
+				}
+				else if (refRenderComponent._type == RenderComponent::Type::eStatic)
+				{
+					video::StaticXMesh *pMesh = VIDEO->GetStaticXMesh(refRenderComponent._static);
+					pMesh->Render(refRenderComponent._arche, refTransformComponent);
 
 #if defined (DEBUG) || defined (_DEBUG)
-				/*CollisionComponent &refCollisionComp = entities[i].GetComponent<CollisionComponent>();
-				refCollisionComp.RenderBoxGizmo(refTransformComponent);*/
+					/*CollisionComponent &refCollisionComp = entities[i].GetComponent<CollisionComponent>();
+					refCollisionComp.RenderBoxGizmo(refTransformComponent);*/
 #endif
-				renderCount++;
-			}
-			else if (refRenderComponent._type == RenderComponent::Type::eSkinned)
-			{
-				video::AnimationInstance *pAnimation = VIDEO->GetAnimationInstance(refRenderComponent._skinned);
-				ActionComponent &actionComp = tile->_entities[i].GetComponent<ActionComponent>();
-				actionComp._pAnimationController->AdvanceTime(actionComp._animDelta, actionComp._pCallbackHandler);
-				pAnimation->_pSkinnedMesh->Update(&refTransformComponent.GetFinalMatrix());
-				pAnimation->_pSkinnedMesh->Render(refTransformComponent);
+					renderCount++;
+				}
+				else if (refRenderComponent._type == RenderComponent::Type::eSkinned)
+				{
+					video::AnimationInstance *pAnimation = VIDEO->GetAnimationInstance(refRenderComponent._skinned);
+					ActionComponent &actionComp = tile->_entities[i].GetComponent<ActionComponent>();
+					actionComp._pAnimationController->AdvanceTime(actionComp._animDelta, actionComp._pCallbackHandler);
+					pAnimation->_pSkinnedMesh->Update(&refTransformComponent.GetFinalMatrix());
+					pAnimation->_pSkinnedMesh->Render(refTransformComponent);
 
 #if defined (DEBUG) || defined (_DEBUG)
-				/*CollisionComponent &refCollisionComp = entities[i].GetComponent<CollisionComponent>();
-				refCollisionComp.RenderBoxGizmo(refTransformComponent);*/
+					/*CollisionComponent &refCollisionComp = entities[i].GetComponent<CollisionComponent>();
+					refCollisionComp.RenderBoxGizmo(refTransformComponent);*/
 #endif
-				renderCount++;
+					renderCount++;
+				}
 			}
 		}
 	}
@@ -136,21 +139,24 @@ void RenderSystem::RenderShadow(const Camera & camera)
 	{
 		for (uint32 i = 0; i < tile->_entities.size(); ++i)
 		{
-			TransformComponent &refTransformComponent = tile->_entities[i].GetComponent<TransformComponent>();
-			RenderComponent &refRenderComponent = tile->_entities[i].GetComponent<RenderComponent>();
-			if (refRenderComponent._type == RenderComponent::Type::eBuffer)
+			if (tile->_entities[i].HasComponent<RenderComponent>())
 			{
-			}
-			else if (refRenderComponent._type == RenderComponent::Type::eStatic)
-			{
-				video::StaticXMesh *pMesh = VIDEO->GetStaticXMesh(refRenderComponent._static);
-				pMesh->RenderShadow(refTransformComponent);
-			}
-			else if (refRenderComponent._type == RenderComponent::Type::eSkinned)
-			{
-				video::AnimationInstance *pAnimation = VIDEO->GetAnimationInstance(refRenderComponent._skinned);
-				pAnimation->_pSkinnedMesh->RenderShadow();
+				TransformComponent &refTransformComponent = tile->_entities[i].GetComponent<TransformComponent>();
+				RenderComponent &refRenderComponent = tile->_entities[i].GetComponent<RenderComponent>();
+				if (refRenderComponent._type == RenderComponent::Type::eBuffer)
+				{
+				}
+				else if (refRenderComponent._type == RenderComponent::Type::eStatic)
+				{
+					video::StaticXMesh *pMesh = VIDEO->GetStaticXMesh(refRenderComponent._static);
+					pMesh->RenderShadow(refTransformComponent);
+				}
+				else if (refRenderComponent._type == RenderComponent::Type::eSkinned)
+				{
+					video::AnimationInstance *pAnimation = VIDEO->GetAnimationInstance(refRenderComponent._skinned);
+					pAnimation->_pSkinnedMesh->RenderShadow();
 
+				}
 			}
 		}
 	}

@@ -101,10 +101,10 @@ bool Bat::CreateFromWorld(World & world, const Vector3 &Pos)
 		_atkRange = 1.0f;
 		break;
 	case BATSKINSTATE_BLACK:
-		_atkRange = 1.5f;
+		_atkRange = 1.3f;
 		break;
 	case BATSKINSTATE_GOLD:
-		_atkRange = 2.0f;
+		_atkRange = 1.3f;
 		break;
 	}
 
@@ -400,8 +400,6 @@ void Bat::Update(float deltaTime)
 			channel.Broadcast<IScene::SceneDirty>(IScene::SceneDirty());
 		}
 	}
-
-
 }
 
 void Bat::Handle(const CollisionSystem::ActorTriggerEvent & event)
@@ -422,13 +420,16 @@ void Bat::Handle(const CollisionSystem::ActorTriggerEvent & event)
 		//플레이어의 공격과 충돌했다
 	case CollisionComponent::TRIGGER_TYPE_PLAYER_DMGBOX:
 		if (_isDie) break;
+
 		if (!_isHurt)
 		{
 			if (_state != BATSTATE_HURT&&_state != BATSTATE_DEATH)
 			{
+				Console::Log("tatata\n");
 				resetAllCount();
 				_state = BATSTATE_HURT;
 				this->QueueAction(BAT_ANIM(BAT_HIT1));
+				_collision._valid = false;
 				_battle = true;
 				_hp -= 50;
 				if (_hp <= 0)

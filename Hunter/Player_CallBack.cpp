@@ -20,7 +20,7 @@ void Player::SetupCallbackAndCompression()
 	   key.Time =anim->GetPeriod() / 3.0f * anim->GetSourceTicksPerSecond();
 	   key.pCallbackData = (void *)&_callbackData;
 
-	   AddCallbackKeysAndCompress(pController, anim, 1, &key, D3DXCOMPRESS_DEFAULT, 0.3f);
+	   AddCallbackKeysAndCompress(pController, anim, 1, &key, D3DXCOMPRESS_DEFAULT, 0.1f);
    }
 
    //War Swing Right

@@ -179,7 +179,7 @@ bool MapToolScene::SceneInit()
 	_editor->_pSelectedObject = GAMEOBJECTFACTORY->GetPlayerObject();
 
 	//Test
-	for (int32 i = 0; i < 600; ++i)
+	for (int32 i = 0; i < 100; ++i)
 	{
 		float randX = RandFloat(-config._xChunkCount * TERRAIN_CHUNK_DIM * 0.5f,
 			config._xChunkCount * TERRAIN_CHUNK_DIM * 0.5f);

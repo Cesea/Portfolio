@@ -46,8 +46,6 @@ public:
 		{
 			return Value() == other.Value();
 		}
-
-
 	};
 
 	Entity();

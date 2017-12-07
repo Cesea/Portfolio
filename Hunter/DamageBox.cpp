@@ -1,4 +1,4 @@
-#include "stdafx.h"
+ï»¿#include "stdafx.h"
 #include "DamageBox.h"
 
 DamageBox::DamageBox()
@@ -8,6 +8,29 @@ DamageBox::DamageBox()
 
 DamageBox::~DamageBox()
 {
+}
+
+void DamageBox::RepositionEntity(const TerrainTilePos & currentPos, const TerrainTilePos & prevPos)
+{
+	//íƒ€ì¼ì´ ë‹¤ë¥¼Â‹Âš....... tileì˜ entityë²¡í„°ë¥¼ ì²˜ë¦¬í•´ì£¼ìž
+	if (currentPos._tileX != prevPos._tileX || currentPos._tileZ != prevPos._tileZ)
+	{
+		Terrain::TerrainChunk &refPrevChunk =  TERRAIN->GetChunkAt(prevPos._chunkX, prevPos._chunkZ);
+		Terrain::TerrainTile &refPrevTile = refPrevChunk._tiles[Index2D(prevPos._tileX, prevPos._tileZ, TERRAIN_TILE_RES)];
+
+		for (uint32 i = 0; i < refPrevTile._entities.size(); ++i)
+		{
+			if (refPrevTile._entities[i] == _entity)
+			{
+				refPrevTile._entities.erase(refPrevTile._entities.begin() + i);
+				break;
+			}
+		}
+
+		Terrain::TerrainChunk &refCurrentChunk =  TERRAIN->GetChunkAt(currentPos._chunkX, currentPos._chunkZ);
+		Terrain::TerrainTile &refCurrentTile = refCurrentChunk._tiles[Index2D(currentPos._tileX, currentPos._tileZ, TERRAIN_TILE_RES)];
+		refCurrentTile._entities.push_back(_entity);
+	}
 }
 
 
@@ -29,6 +52,10 @@ bool DamageBox::CreateFromWorld(World & world, const Vector3 & Pos)
 
 	collision._valid = true;
 
+	EventChannel channel;
+	channel.Broadcast<GameObjectFactory::ObjectCreatedEvent>(GameObjectFactory::ObjectCreatedEvent(
+		ARCHE_NONE, _entity, Pos));
+
 	_entity.Activate();
 	return true;
 }
@@ -38,13 +65,15 @@ void DamageBox::Update(float deltaTime)
 	CollisionComponent &collision = _entity.GetComponent<CollisionComponent>();
 	TransformComponent &refTrans = _entity.GetComponent<TransformComponent>();
 	collision._duration -= deltaTime;
-	//À§Ä¡°ª ¾÷µ¥ÀÌÆ®....
+	//ìœ„ì¹˜ê°’ ì—…ë°ì´íŠ¸....
 
-	//À§Ä¡°ªÀ» ¸ðµÎ ¾÷µ¥ÀÌÆ® ÇØ ÁØ ÈÄ¿¡...
-	_tilePos = _prevTilePos;
+	//ìœ„ì¹˜ê°’ì„ ëª¨ë‘ ì—…ë°ì´íŠ¸ í•´ ì¤€ í›„ì—...
+	_prevTilePos = _tilePos;
 	TERRAIN->ConvertWorldPostoTilePos(refTrans.GetWorldPosition(), &_tilePos);
 
-	if (collision._duration < 0.0f || collision._valid == false)
+	RepositionEntity(_tilePos, _prevTilePos);
+
+	if (collision._duration < 0.0f)
 	{
 		EventChannel channel;
 		_valid = false;

@@ -711,7 +711,7 @@ void Terrain::RemoveEntityInTile(Entity entity, const TerrainTilePos & tilePos)
 	{
 		if (iter->GetID() == entity.GetID())
 		{
-			(*iter).Kill();
+			refTile._entities.erase(iter);
 			break;
 		}
 		else
