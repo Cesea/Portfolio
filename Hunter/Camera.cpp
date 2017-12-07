@@ -148,11 +148,9 @@ void Camera::MoveAndRotate(float deltaTime, const InputManager & input)
 		refTransform.SetWorldPosition(camPosition);
 		refTransform.LookPosition(targetPosition);
 
-		if (_pTargetObject->_state == Player::PLAYERSTATE_STANCE 
-			/*_pTargetObject->_state == Player::PLAYERSTATE_BLOCK ||
-			_pTargetObject->_state == Player::PLAYERSTATE_ATTACK*/)
+		if (_pTargetObject->_state == Player::PLAYERSTATE_MOVE)
 		{
-			if (!IsMovementNone(_pTargetObject->_currentCommand._movement))
+			if (!_pTargetObject->_startForward.IsZero())
 			{
 				Vector3 camPlanerForward = refTransform.GetForward();
 				camPlanerForward.y = 0.0f;
@@ -165,14 +163,15 @@ void Camera::MoveAndRotate(float deltaTime, const InputManager & input)
 				//float angleDiff = camPlanerForward
 				_pTargetObject->_targetRotation = angleDiff;
 				_pTargetObject->_camRotated = true;
+				_pTargetObject->_startForward.ToZero();
 			}
 		}
-		else if (_pTargetObject->_state == Player::PLAYERSTATE_MOVE)
-		{
-		}
-		else if (_pTargetObject->_state == Player::PLAYERSTATE_RUN)
-		{
-		}
+		//else if (_pTargetObject->_state == Player::PLAYERSTATE_MOVE)
+		//{
+		//}
+		//else if (_pTargetObject->_state == Player::PLAYERSTATE_RUN)
+		//{
+		//}
 		SetCursorPos(CLIENTCENTERX, CLIENTCENTERY);
 	} break;
 	}
