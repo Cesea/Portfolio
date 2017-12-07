@@ -431,7 +431,7 @@ void Bat::Handle(const CollisionSystem::ActorTriggerEvent & event)
 				this->QueueAction(BAT_ANIM(BAT_HIT1));
 				_collision._valid = false;
 				_battle = true;
-				_hp -= 50;
+				_hp -= _collision._dmg;
 				if (_hp <= 0)
 				{
 					_state = BATSTATE_DEATH;
@@ -443,7 +443,7 @@ void Bat::Handle(const CollisionSystem::ActorTriggerEvent & event)
 			_collision._valid = false;
 			EventChannel channel;
 			channel.Broadcast<GameObjectFactory::CreateBlood>(
-				GameObjectFactory::CreateBlood(_playerPos));
+				GameObjectFactory::CreateBlood(_playerSwordPos));
 		}
 		break;
 	}

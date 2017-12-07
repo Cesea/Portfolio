@@ -54,6 +54,7 @@ void Enemy::Handle(const Player::PlayerImformationEvent & event)
 	_playerPos = event._position;
 	_playerForward = event._forward;
 	_playerState = event._state;
+	_playerSwordPos = event._swordPos;
 }
 
 void Enemy::PatrolSet(int type, Vector3 Position,float range)

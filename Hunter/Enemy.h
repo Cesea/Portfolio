@@ -63,7 +63,9 @@ protected:
 public:
     Vector3 _playerPos;
 	Vector3 _playerForward;
+	Vector3 _playerSwordPos;
 	Player::PLAYERSTATE _playerState;
+
 	enum PATROLSET
 	{
 		PATROLSET_LINE,

@@ -405,7 +405,6 @@ void GameObjectFactory::Handle(const CreateBlood & event)
 
 	entity.Activate();
 	entity2.Activate();
-
 }
 
 const char * ArcheToString(ARCHE_TYPE type)
