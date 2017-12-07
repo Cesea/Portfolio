@@ -61,7 +61,6 @@ void CollisionSystem::Update(float deltaTime, float checkRange)
 
 		//std::vector<Terrain::TerrainTile *> adjacent = TERRAIN->GetAdjacentTerrainTile(tilePos1);
 
-
 		for (uint32 j = 0; j < entities.size(); ++j)
 		{
 			if (i == j)
@@ -96,7 +95,8 @@ void CollisionSystem::Update(float deltaTime, float checkRange)
 								aabb1._min,
 								aabb1._max))
 							{
-								if (collision._isTrigger)
+								if (collision._isTrigger && 
+									collision._valid && collision2._valid)
 								{
 									//behind : someone that send  front : someone that receive
 									switch (collision._triggerType)
@@ -119,7 +119,8 @@ void CollisionSystem::Update(float deltaTime, float checkRange)
 									}
 
 								}
-								if (collision2._isTrigger)
+								if (collision2._isTrigger && 
+									collision2._valid && collision._valid)
 								{
 									switch (collision._triggerType)
 									{
@@ -164,7 +165,8 @@ void CollisionSystem::Update(float deltaTime, float checkRange)
 								-xVec, yVec, -zVec, 
 								aabb1._xSize, aabb1._ySize, aabb1._zSize))
 							{
-								if (collision._isTrigger)
+								if (collision._isTrigger && 
+									collision._valid && collision2._valid)
 								{
 									switch (collision._triggerType)
 									{
@@ -186,7 +188,8 @@ void CollisionSystem::Update(float deltaTime, float checkRange)
 									}
 
 								}
-								if (collision2._isTrigger)
+								if (collision2._isTrigger && 
+									collision2._valid && collision._valid)
 								{
 									switch (collision._triggerType)
 									{
@@ -234,7 +237,8 @@ void CollisionSystem::Update(float deltaTime, float checkRange)
 							{
 								if (collision._isTrigger)
 								{
-									switch (collision._triggerType)
+									switch (collision._triggerType && 
+										collision._valid && collision2._valid)
 									{
 									case CollisionComponent::TRIGGER_TYPE_ENEMY:
 									case CollisionComponent::TRIGGER_TYPE_PLAYER:
@@ -252,7 +256,8 @@ void CollisionSystem::Update(float deltaTime, float checkRange)
 									}
 
 								}
-								if (collision2._isTrigger)
+								if (collision2._isTrigger && 
+									collision2._valid && collision._valid)
 								{
 									switch (collision._triggerType)
 									{
@@ -299,7 +304,8 @@ void CollisionSystem::Update(float deltaTime, float checkRange)
 
 							if (Collision_OBBToOBB(aabb0._center,-xVec,yVec,-zVec,aabb0._xSize, aabb0._ySize, aabb0._zSize,aabb1._center,-xVec2, yVec2, -zVec2,aabb1._xSize,aabb1._ySize,aabb1._zSize))
 							{
-								if (collision._isTrigger)
+								if (collision._isTrigger &&
+									collision._valid)
 								{
 									switch (collision._triggerType)
 									{
@@ -319,7 +325,8 @@ void CollisionSystem::Update(float deltaTime, float checkRange)
 									}
 
 								}
-								if (collision2._isTrigger)
+								if (collision2._isTrigger && 
+									collision2._valid)
 								{
 									switch (collision._triggerType)
 									{

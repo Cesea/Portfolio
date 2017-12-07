@@ -90,10 +90,10 @@ bool Hydra::CreateFromWorld(World & world, const Vector3 &Pos)
 	switch (_skinType)
 	{
 	case HYDRASKINSTATE_GREEN:
-		_atkRange = 3.0f;
+		_atkRange = 2.0f;
 		break;
 	case HYDRASKINSTATE_RED:
-		_atkRange = 5.0f;
+		_atkRange = 3.0f;
 		break;
 	case HYDRASKINSTATE_BLACK:
 		_atkRange = 2.0f;

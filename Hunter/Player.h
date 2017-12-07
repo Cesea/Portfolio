@@ -6,6 +6,7 @@
 
 class Camera;
 class Player;
+class DamageBox;
 
 struct KeyConfig
 {
@@ -118,6 +119,10 @@ private :
 	Vector3 _runStartForward;
 
 	KeyConfig _keyConfig;
+
+	DamageBox *_pDamageBox;
+	Bone *_pSwordFrame;
+	Vector3 _worldSwordPos;
 
 public :
 

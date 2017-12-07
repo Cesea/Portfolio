@@ -3,6 +3,8 @@
 
 #include "Camera.h"
 
+#include "DamageBox.h"
+
 #define MAX_COMBO_COUNT 3
 
 //#include "stdafx.h"
@@ -59,7 +61,6 @@ bool Player::CreateFromWorld(World & world, const Vector3 &pos)
    collision._type = CollisionComponent::COLLISION_TYPE_BOX;
    _pCollisionComp = &collision;
 
-
    ScriptComponent &scriptComponent = _entity.AddComponent<ScriptComponent>();
    scriptComponent.SetScript(MAKE_SCRIPT_DELEGATE(Player, Update, *this));
 
@@ -77,10 +78,33 @@ bool Player::CreateFromWorld(World & world, const Vector3 &pos)
    _channel.Broadcast<GameObjectFactory::ObjectCreatedEvent>(
 	   GameObjectFactory::ObjectCreatedEvent(ARCHE_HERO, _entity, transComp.GetWorldPosition()));
 
+
+   _pSwordFrame = (Bone *)D3DXFrameFind(pAnimation->_pSkinnedMesh->_pRootBone, "_1H_sword01");
+   if (_pSwordFrame  &&
+	   _pSwordFrame->pMeshContainer)
+   {
+	   _pDamageBox = new DamageBox;
+
+	   _pDamageBox->CreateFromWorld(world, pos);
+	   TransformComponent &damageTrans = _pDamageBox->GetEntity().GetComponent<TransformComponent>();
+	   CollisionComponent &damageCollision = _pDamageBox->GetEntity().GetComponent<CollisionComponent>();
+
+	   transComp.AddChild(&damageTrans);
+
+	   damageCollision._triggerType = CollisionComponent::TRIGGER_TYPE::TRIGGER_TYPE_PLAYER_DMGBOX;
+	   damageCollision._duration = 100000.0f;
+	   damageCollision._valid = false;
+
+	   float range = 0.8f;
+
+	   damageCollision._boundingBox.Init(Vector3(-range, -range, -range), Vector3(range, range, range));
+	   damageCollision._dmg = 40;
+   }
+
    //Plyer의 맴버 변수들을 셋팅해주자
    _combatToPeaceTimer.Reset(3.0f);
    _moveToStanceTimer.Reset(0.13f);
-   _attackToStanceTimer.Reset(0.4f);
+   _attackToStanceTimer.Reset(0.9f);
 
    _superArmorTimer.Reset(1.5f);
 
@@ -104,6 +128,9 @@ void Player::Update(float deltaTime)
 		   _superArmorTimer.Restart();
 	   }
    }
+   CollisionComponent &damageCol = _pDamageBox->GetEntity().GetComponent<CollisionComponent>();
+
+   Console::Log("valid %d\n", (int32)damageCol._valid);
 
    switch (_state)
    {
@@ -144,6 +171,7 @@ void Player::Update(float deltaTime)
 			   _attackToStanceTimer.Tick(deltaTime))
 		   {
 			   _state = PLAYERSTATE_STANCE;
+			   _pDamageBox->GetEntity().GetComponent<CollisionComponent>()._valid = false;
 			   _attackToStanceTimer.Restart();
 			   _comboCount = 0;
 			   _canCombo = false;
@@ -173,7 +201,9 @@ void Player::Update(float deltaTime)
 		   if (_canCombo &&
 			   _attackToStanceTimer.Tick(deltaTime))
 		   {
-			   Console::Log("gigi\n");
+
+			   _pDamageBox->GetEntity().GetComponent<CollisionComponent>()._valid = false;
+
 			   _state = PLAYERSTATE_STANCE;
 			   _attackToStanceTimer.Restart();
 			   _pActionComp->_actionQueue.ClearQueue();
@@ -220,6 +250,15 @@ void Player::Update(float deltaTime)
 
    _channel.Broadcast<PlayerImformationEvent>(
 	   PlayerImformationEvent(_pTransformComp->GetWorldPosition(), _state, _pTransformComp->GetForward()));
+
+   TransformComponent &refDamageTrans = _pDamageBox->GetEntity().GetComponent<TransformComponent>();
+   _worldSwordPos = refDamageTrans.GetWorldPosition();
+   Matrix forwardTrans;
+   MatrixTranslation(&forwardTrans, -60.0f, 0.0f, 0.0f);
+   MatrixMultiply(&forwardTrans,  &forwardTrans,  &_pSwordFrame->CombinedTransformationMatrix);
+   Vec3TransformCoord(&_worldSwordPos, &_worldSwordPos, &forwardTrans);
+
+   refDamageTrans.SetWorldPosition(_worldSwordPos);
 }
 
 void Player::MoveAndRotate(float deltaTime)
@@ -297,10 +336,8 @@ void Player::MoveAndRotate(float deltaTime)
 		toMove += right;
 	}
 	else if (_animationEnum == PlayerAnimationEnum::eWalk ||
-		_animationEnum == PlayerAnimationEnum::eWarCharging ||
-		_animationEnum == PlayerAnimationEnum::eWarWalkThrust)
+		_animationEnum == PlayerAnimationEnum::eWarCharging)
 	{
-		Console::Log("tt\n");
 		toMove += forward;
 	}
 	else if (_animationEnum == PlayerAnimationEnum::eWalkingBack ||
@@ -842,8 +879,6 @@ void Player::Handle(const InputManager::KeyReleasedEvent & event)
 	   //}
    } break;
    }
-
-
 }
 
 void Player::Handle(const InputManager::MousePressedEvent & event)
@@ -938,20 +973,27 @@ void Player::Handle(const InputManager::MousePressedEvent & event)
 	   {
 		   if (_canCombo)
 		   {
-			   _attackToStanceTimer.Restart();
-			   _canCombo = false;
+			   if (IsMovementNone(_currentCommand._movement))
+			   {
+				   _state = PLAYERSTATE_ATTACK;
+			   }
+			   else
+			   {
+				   _attackToStanceTimer.Restart();
+				   _canCombo = false;
 
-			   if (_comboCount == 0)
-			   {
-				   this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWarWalkSwingRight));
+				   if (_comboCount == 0)
+				   {
+					   this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWarWalkSwingRight));
+				   }
+				   else if (_comboCount == 1)
+				   {
+					   this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWarWalkThrust));
+					   _comboCount = 0;
+					   break;
+				   }
+				   _comboCount++;
 			   }
-			   else if (_comboCount == 1)
-			   {
-				   this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWarWalkThrust));
-				   _comboCount = 0;
-				   break;
-			   }
-			   _comboCount++;
 		   }
 	   }
 
