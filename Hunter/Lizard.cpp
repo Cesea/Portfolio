@@ -433,6 +433,9 @@ void Lizard::Handle(const CollisionSystem::ActorTriggerEvent & event)
 			}
 			_isHurt = true;
 			_collision._valid = false;
+			EventChannel channel;
+			channel.Broadcast<GameObjectFactory::CreateBlood>(
+				GameObjectFactory::CreateBlood(_playerPos));
 		}
 		break;
 	}

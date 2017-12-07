@@ -282,10 +282,10 @@
     <ClCompile Include="DamageBox.cpp">
       <Filter>Game\GameObjects</Filter>
     </ClCompile>
-    <ClCompile Include="bloodFog.cpp">
+    <ClCompile Include="bloodParticle.cpp">
       <Filter>Game\GameComponents\ParticleComponent</Filter>
     </ClCompile>
-    <ClCompile Include="bloodParticle.cpp">
+    <ClCompile Include="bloodFog.cpp">
       <Filter>Game\GameComponents\ParticleComponent</Filter>
     </ClCompile>
   </ItemGroup>
@@ -650,10 +650,10 @@
     <ClInclude Include="DamageBox.h">
       <Filter>Game\GameObjects</Filter>
     </ClInclude>
-    <ClInclude Include="bloodFog.h">
+    <ClInclude Include="bloodParticle.h">
       <Filter>Game\GameComponents\ParticleComponent</Filter>
     </ClInclude>
-    <ClInclude Include="bloodParticle.h">
+    <ClInclude Include="bloodFog.h">
       <Filter>Game\GameComponents\ParticleComponent</Filter>
     </ClInclude>
   </ItemGroup>

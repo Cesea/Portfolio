@@ -8,6 +8,10 @@ class bloodFog :
 
 		out.initialTime = mTime;
 
+		//out.lifeTime = RandomFloatRange(1.0f, 2.0f);
+
+		//out.initialSize = RandomFloatRange(6.0f, 8.0f);
+
 		out.lifeTime = RandFloat(1.0f, 2.0f);
 
 		out.initialSize = RandFloat(6.0f, 8.0f);
@@ -20,9 +24,10 @@ class bloodFog :
 
 		out.initialColor = WHITENESS;
 
-		out.initialPos.x = RandFloat(AABBMin.x, AABBMax.x);
-		out.initialPos.y = RandFloat(AABBMin.y, AABBMax.y);
-		out.initialPos.z = RandFloat(AABBMin.z, AABBMax.z);
+		out.initialPos.x = Pos.x + RandFloat(AABBMin.x, AABBMax.x);
+		out.initialPos.y = Pos.y + RandFloat(AABBMin.y, AABBMax.y);
+		out.initialPos.z = Pos.z + RandFloat(AABBMin.z, AABBMax.z);
+
 	}
 public:
 	bloodFog(const std::string& fxName,

@@ -25,6 +25,9 @@ public:
 
 	Vector3 min;
 	Vector3 max;
+	float duration{ 0.0f };
+	float delay{ 0.0f };
+	bool isEmission{ true };
 
 	ParticleComponent();
 	virtual ~ParticleComponent();

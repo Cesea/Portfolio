@@ -19,7 +19,7 @@ PSystem::PSystem(const std::string & fxName, const std::string & techName,
 	for (int i = 0; i < mMaxNumParticles; ++i)
 	{
 		mParticles[i].lifeTime = 0.0f;
-		mParticles[i].initialTime = 1.0f;
+		mParticles[i].initialTime = 0.0f;
 	}
 
 	D3DXCreateTextureFromFile(gpDevice, mhTex, &mTex);

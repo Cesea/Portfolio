@@ -10,6 +10,7 @@ void GameObjectFactory::Init()
 	_channel.Add<GameObjectFactory::CreateObjectOnLocationEvent, GameObjectFactory>(*this);
 	_channel.Add<GameObjectFactory::CreateObjectFromSaveInfoEvent, GameObjectFactory>(*this);
 	_channel.Add<GameObjectFactory::DamageBoxEvent, GameObjectFactory>(*this);
+	_channel.Add<GameObjectFactory::CreateBlood, GameObjectFactory>(*this);
 }
 
 void GameObjectFactory::Release()
@@ -18,6 +19,7 @@ void GameObjectFactory::Release()
 	_channel.Remove<GameObjectFactory::CreateObjectOnLocationEvent, GameObjectFactory>(*this);
 	_channel.Remove<GameObjectFactory::CreateObjectFromSaveInfoEvent, GameObjectFactory>(*this);
 	_channel.Remove<GameObjectFactory::DamageBoxEvent, GameObjectFactory>(*this);
+	_channel.Remove<GameObjectFactory::CreateBlood, GameObjectFactory>(*this);
 	_pCurrentScene = nullptr;
 	_pPlayer = nullptr;
 }
@@ -382,9 +384,28 @@ void GameObjectFactory::Handle(const CreateBlood & event)
 	ParticleComponent &particle = entity.AddComponent<ParticleComponent>();
 	particle.min = Vector3(-0.1f, -0.1f, -0.1f);
 	particle.max = Vector3(0.1f, 0.1f, 0.1f);
-	particle.init(ParticleComponent::PARTICLE_TYPE_BLOOD_FOG, 1500, 0.005f, Vector3(0, 0, 0), event._pos);
+	particle.isEmission = true;
+	particle.duration = 0.5f;
+	particle.delay = 0.0f;
+	particle.init(ParticleComponent::PARTICLE_TYPE_BLOOD_FOG, 1500, 0.005f, Vector3(1, 0, 0), event._pos+ Vector3(0, 1.0f, 1.0f));
+
+	Entity &entity2 = _pCurrentScene->_world.CreateEntity();
+
+	TransformComponent &transform2 = entity2.AddComponent<TransformComponent>();
+	transform2._position = event._pos;
+
+
+	ParticleComponent &particle2 = entity2.AddComponent<ParticleComponent>();
+	particle2.min = Vector3(-0.1f, -0.1f, -0.1f);
+	particle2.max = Vector3(0.1f, 0.1f, 0.1f);
+	particle.isEmission = true;
+	particle2.duration = 0.5f;
+	particle2.delay = 0.0f;
+	particle2.init(ParticleComponent::PARTICLE_TYPE_BLOOD_PARTICLE, 50, 0.005f, Vector3(1, 0, 0), event._pos+ Vector3(0, 1.0f, 1.0f));
 
 	entity.Activate();
+	entity2.Activate();
+
 }
 
 const char * ArcheToString(ARCHE_TYPE type)
