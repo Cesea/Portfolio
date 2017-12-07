@@ -248,9 +248,6 @@ void Player::Update(float deltaTime)
    _prevCommand = _currentCommand;
    _currentCommand.Reset();
 
-   _channel.Broadcast<PlayerImformationEvent>(
-	   PlayerImformationEvent(_pTransformComp->GetWorldPosition(), _state, _pTransformComp->GetForward()));
-
    TransformComponent &refDamageTrans = _pDamageBox->GetEntity().GetComponent<TransformComponent>();
    _worldSwordPos = refDamageTrans.GetWorldPosition();
    Matrix forwardTrans;
@@ -259,6 +256,9 @@ void Player::Update(float deltaTime)
    Vec3TransformCoord(&_worldSwordPos, &_worldSwordPos, &forwardTrans);
 
    refDamageTrans.SetWorldPosition(_worldSwordPos);
+
+   _channel.Broadcast<PlayerImformationEvent>(
+	   PlayerImformationEvent(_pTransformComp->GetWorldPosition(), _state, _pTransformComp->GetForward(), _worldSwordPos));
 }
 
 void Player::MoveAndRotate(float deltaTime)

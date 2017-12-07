@@ -186,7 +186,6 @@ void CollisionSystem::Update(float deltaTime, float checkRange)
 										_channel.Broadcast<ActorTriggerEvent>(ActorTriggerEvent(entities[i], entities[j]));
 										break;
 									}
-
 								}
 								if (collision2._isTrigger && 
 									collision2._valid && collision._valid)

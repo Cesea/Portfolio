@@ -128,15 +128,17 @@ public :
 
 	struct PlayerImformationEvent
 	{
-		PlayerImformationEvent(const Vector3 &position,const PLAYERSTATE &state,const Vector3 &forward)
-			:_position(position),
-			_state(state),
-			_forward(forward)
+		PlayerImformationEvent(const Vector3 &position, 
+			const PLAYERSTATE &state,
+			const Vector3 &forward, 
+			const Vector3 &swordPos) 
+			: _position(position), _state(state), _forward(forward), _swordPos(swordPos)
 		{
 		}
 		Vector3 _position;
 		PLAYERSTATE _state;
 		Vector3 _forward;
+		Vector3 _swordPos;
 	};
 
 };
