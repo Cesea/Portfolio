@@ -50,21 +50,6 @@ bool Cat::CreateFromWorld(World & world, const Vector3 &Pos)
 
 	_entity.Activate();
 
-	//_pStateMachine = new CatStateMachine;
-	//_pStateMachine->Init(this);
-	//_pStateMachine->RegisterState(META_TYPE(CatIdleState)->Name(), new CatIdleState());
-	//_pStateMachine->RegisterState(META_TYPE(CatMoveState)->Name(), new CatMoveState());
-	//_pStateMachine->RegisterState(META_TYPE(CatAttackState)->Name(), new CatAttackState());
-	//_pStateMachine->RegisterState(META_TYPE(CatAttack2State)->Name(), new CatAttack2State());
-	//_pStateMachine->RegisterState(META_TYPE(CatAttack3State)->Name(), new CatAttack3State());
-	//_pStateMachine->RegisterState(META_TYPE(CatAttack4State)->Name(), new CatAttack4State());
-	//_pStateMachine->RegisterState(META_TYPE(CatAttack5State)->Name(), new CatAttack5State());
-	//_pStateMachine->RegisterState(META_TYPE(CatStandState)->Name(), new CatStandState());
-	//_pStateMachine->RegisterState(META_TYPE(CatHurt1State)->Name(), new CatHurt1State());
-	//_pStateMachine->RegisterState(META_TYPE(CatHurt2State)->Name(), new CatHurt2State());
-	//_pStateMachine->RegisterState(META_TYPE(CatDeadState)->Name(), new CatDeadState());
-	//this->QueueAction(CAT_ANIM(CAT_IDLE));
-
 	_speed = 5.0f;
 	_rotateSpeed = D3DX_PI / 64;
 	_patrolIndex = 0;
@@ -82,7 +67,7 @@ bool Cat::CreateFromWorld(World & world, const Vector3 &Pos)
 	_battle = false;
 
 
-	_atkRange = 0.5f;
+	_atkRange = 1.0f;
 	_atkTime = 70;
 	_atkCount = _atkTime;
 
@@ -202,10 +187,10 @@ void Cat::Update(float deltaTime)
 		_atkCount--;
 		if (_atkCount == 40)
 		{
-			Vector3 targetPos = transComp.GetWorldPosition() - transComp.GetForward()*_atkRange / 2;
+			Vector3 targetPos = transComp.GetWorldPosition() - transComp.GetForward();
 			EventChannel _channel;
-			_channel.Broadcast<GameObjectFactory::DamageBoxEvent>(GameObjectFactory::DamageBoxEvent(targetPos - Vector3(_atkRange / 2, _atkRange / 2, _atkRange / 2),
-				targetPos + Vector3(_atkRange / 2, _atkRange / 2, _atkRange / 2), 10.0f, CollisionComponent::TRIGGER_TYPE_ENEMY_DMGBOX, 0.0f, 0.0f, 1.0f));
+			_channel.Broadcast<GameObjectFactory::DamageBoxEvent>(GameObjectFactory::DamageBoxEvent(targetPos,
+				Vector3(_atkRange * 0.5f, _atkRange * 0.5f, _atkRange * 0.5f), 10.0f, CollisionComponent::TRIGGER_TYPE_ENEMY_DMGBOX, 0.0f, 0.0f, 1.0f));
 		}
 		if (_atkCount < 0)
 		{
@@ -233,10 +218,10 @@ void Cat::Update(float deltaTime)
 		_atkCount--;
 		if (_atkCount == 40)
 		{
-			Vector3 targetPos = transComp.GetWorldPosition() - transComp.GetForward()*_atkRange / 2;
+			Vector3 targetPos = transComp.GetWorldPosition() - transComp.GetForward();
 			EventChannel _channel;
-			_channel.Broadcast<GameObjectFactory::DamageBoxEvent>(GameObjectFactory::DamageBoxEvent(targetPos - Vector3(_atkRange / 2, _atkRange / 2, _atkRange / 2),
-				targetPos + Vector3(_atkRange / 2, _atkRange / 2, _atkRange / 2), 10.0f, CollisionComponent::TRIGGER_TYPE_ENEMY_DMGBOX, 0.0f, 0.0f, 1.0f));
+			_channel.Broadcast<GameObjectFactory::DamageBoxEvent>(GameObjectFactory::DamageBoxEvent(targetPos,
+				Vector3(_atkRange * 0.5f, _atkRange * 0.5f, _atkRange * 0.5f), 10.0f, CollisionComponent::TRIGGER_TYPE_ENEMY_DMGBOX, 0.0f, 0.0f, 1.0f));
 		}
 		if (_atkCount < 0)
 		{
@@ -264,10 +249,10 @@ void Cat::Update(float deltaTime)
 		_atkCount--;
 		if (_atkCount == 40)
 		{
-			Vector3 targetPos = transComp.GetWorldPosition() - transComp.GetForward()*_atkRange / 2;
+			Vector3 targetPos = transComp.GetWorldPosition() - transComp.GetForward();
 			EventChannel _channel;
-			_channel.Broadcast<GameObjectFactory::DamageBoxEvent>(GameObjectFactory::DamageBoxEvent(targetPos - Vector3(_atkRange / 2, _atkRange / 2, _atkRange / 2),
-				targetPos + Vector3(_atkRange / 2, _atkRange / 2, _atkRange / 2), 10.0f, CollisionComponent::TRIGGER_TYPE_ENEMY_DMGBOX, 0.0f, 0.0f, 1.0f));
+			_channel.Broadcast<GameObjectFactory::DamageBoxEvent>(GameObjectFactory::DamageBoxEvent(targetPos,
+				Vector3(_atkRange * 0.5f, _atkRange * 0.5f, _atkRange * 0.5f), 10.0f, CollisionComponent::TRIGGER_TYPE_ENEMY_DMGBOX, 0.0f, 0.0f, 1.0f));
 		}
 		if (_atkCount < 0)
 		{
@@ -297,10 +282,10 @@ void Cat::Update(float deltaTime)
 		_atkCount--;
 		if (_atkCount == 40)
 		{
-			Vector3 targetPos = transComp.GetWorldPosition() - transComp.GetForward()*_atkRange / 2;
+			Vector3 targetPos = transComp.GetWorldPosition() - transComp.GetForward();
 			EventChannel _channel;
-			_channel.Broadcast<GameObjectFactory::DamageBoxEvent>(GameObjectFactory::DamageBoxEvent(targetPos - Vector3(_atkRange / 2, _atkRange / 2, _atkRange / 2),
-				targetPos + Vector3(_atkRange / 2, _atkRange / 2, _atkRange / 2), 10.0f, CollisionComponent::TRIGGER_TYPE_ENEMY_DMGBOX, 0.0f, 0.0f, 1.0f));
+			_channel.Broadcast<GameObjectFactory::DamageBoxEvent>(GameObjectFactory::DamageBoxEvent(targetPos,
+				Vector3(_atkRange * 0.5f, _atkRange * 0.5f, _atkRange * 0.5f), 10.0f, CollisionComponent::TRIGGER_TYPE_ENEMY_DMGBOX, 0.0f, 0.0f, 1.0f));
 		}
 		if (_atkCount < 0)
 		{
@@ -389,7 +374,14 @@ void Cat::Update(float deltaTime)
 			transComp.LookDirection(-distance, D3DX_PI * 2);
 		}
 	}
-	transComp.SetWorldPosition(transComp.GetWorldPosition().x, TERRAIN->GetHeight(transComp.GetWorldPosition().x, transComp.GetWorldPosition().z), transComp.GetWorldPosition().z);
+	transComp.SetWorldPosition(transComp.GetWorldPosition().x, 
+		TERRAIN->GetHeight(transComp.GetWorldPosition().x, transComp.GetWorldPosition().z), 
+		transComp.GetWorldPosition().z);
+
+	_prevTilePos = _tilePos;
+	TERRAIN->ConvertWorldPostoTilePos(transComp.GetWorldPosition(), &_tilePos);
+	RepositionEntity(_tilePos, _prevTilePos);
+
 	if (_isHurt)
 	{
 		_unBeatableCount--;

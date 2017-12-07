@@ -101,8 +101,11 @@ bool Snake::CreateFromWorld(World & world, const Vector3 &Pos)
 
 	_playerPos = Vector3(5.0f, 5.0f, 5.0f);
 	
-	_atkRange = 0.5f;
-	if (_skinType == SNAKESKINSTATE_RED) _atkRange = 8.0f;
+	_atkRange = 1.0f;
+	if (_skinType == SNAKESKINSTATE_RED)
+	{
+		_atkRange = 1.5f;
+	}
 	_atkTime = 60;
 	_atkCount = _atkTime;
 
@@ -237,10 +240,10 @@ void Snake::Update(float deltaTime)
 		_atkCount--;
 		if (_atkCount == 30)
 		{
-			Vector3 targetPos = transComp.GetWorldPosition() - transComp.GetForward()*_atkRange / 2;
+			Vector3 targetPos = transComp.GetWorldPosition() - transComp.GetForward();
 			EventChannel _channel;
-			_channel.Broadcast<GameObjectFactory::DamageBoxEvent>(GameObjectFactory::DamageBoxEvent(targetPos - Vector3(_atkRange / 2, _atkRange / 2, _atkRange / 2),
-				targetPos + Vector3(_atkRange / 2, _atkRange / 2, _atkRange / 2), 10.0f, CollisionComponent::TRIGGER_TYPE_ENEMY_DMGBOX, 0.0f, 0.0f, 1.0f));
+			_channel.Broadcast<GameObjectFactory::DamageBoxEvent>(GameObjectFactory::DamageBoxEvent(targetPos,
+				Vector3(_atkRange * 0.5f, _atkRange * 0.5f, _atkRange * 0.5f), 10.0f, CollisionComponent::TRIGGER_TYPE_ENEMY_DMGBOX, 0.0f, 0.0f, 1.0f));
 		}
 		if (_atkCount < 0)
 		{
@@ -291,10 +294,10 @@ void Snake::Update(float deltaTime)
 
 		if (_atkCount == 30)
 		{
-			Vector3 targetPos = transComp.GetWorldPosition() - transComp.GetForward()*_atkRange / 2;
+			Vector3 targetPos = transComp.GetWorldPosition() - transComp.GetForward();
 			EventChannel _channel;
-			_channel.Broadcast<GameObjectFactory::DamageBoxEvent>(GameObjectFactory::DamageBoxEvent(targetPos - Vector3(_atkRange / 2, _atkRange / 2, _atkRange / 2),
-				targetPos + Vector3(_atkRange / 2, _atkRange / 2, _atkRange / 2), 10.0f, CollisionComponent::TRIGGER_TYPE_ENEMY_DMGBOX, 0.0f, 0.0f, 1.0f));
+			_channel.Broadcast<GameObjectFactory::DamageBoxEvent>(GameObjectFactory::DamageBoxEvent(targetPos,
+				Vector3(_atkRange * 0.5f, _atkRange * 0.5f, _atkRange * 0.5f), 10.0f, CollisionComponent::TRIGGER_TYPE_ENEMY_DMGBOX, 0.0f, 0.0f, 1.0f));
 		}
 
 		if (_atkCount < 0)
@@ -383,7 +386,13 @@ void Snake::Update(float deltaTime)
 		}
 	}
 
-	transComp.SetWorldPosition(transComp.GetWorldPosition().x, TERRAIN->GetHeight(transComp.GetWorldPosition().x, transComp.GetWorldPosition().z), transComp.GetWorldPosition().z); 
+	transComp.SetWorldPosition(transComp.GetWorldPosition().x, 
+		TERRAIN->GetHeight(transComp.GetWorldPosition().x, transComp.GetWorldPosition().z), 
+		transComp.GetWorldPosition().z);
+
+	_prevTilePos = _tilePos;
+	TERRAIN->ConvertWorldPostoTilePos(transComp.GetWorldPosition(), &_tilePos);
+	RepositionEntity(_tilePos, _prevTilePos);
 
 	if (_isHurt)
 	{

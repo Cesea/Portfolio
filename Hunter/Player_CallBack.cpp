@@ -102,7 +102,7 @@ void Player::SetupCallbackAndCompression()
 		   (ID3DXAnimationSet **)&anim);
 
 	   D3DXKEY_CALLBACK key;
-	   key.Time = anim->GetPeriod() / 1.0f * anim->GetSourceTicksPerSecond();
+	   key.Time = anim->GetPeriod() / 1.2f * anim->GetSourceTicksPerSecond();
 	   key.pCallbackData = (void *)&_callbackData;
 
 	   AddCallbackKeysAndCompress(pController, anim, 1, &key, D3DXCOMPRESS_DEFAULT, 0.1f);
@@ -130,10 +130,9 @@ HRESULT PlayerCallbackHandler::HandleCallback(UINT Track, LPVOID pCallbackData)
 		_pPlayer->_canCombo = true;
 		_pPlayer->_pCollisionComp->_isTrigger = true;
 
-		_channel.Broadcast<GameObjectFactory::PlayerDamageBoxEvent>(
-			GameObjectFactory::PlayerDamageBoxEvent(Vector3(1, 1, 1),
-				_pPlayer->_pTransformComp->GetWorldPosition() + _pPlayer->_pTransformComp->GetForward(),
-			10.0f, CollisionComponent::TRIGGER_TYPE_PLAYER_DMGBOX, 0.0f, 0.0f, 0.4f));
+		_channel.Broadcast<GameObjectFactory::DamageBoxEvent>( GameObjectFactory::DamageBoxEvent(_pPlayer->_pTransformComp->GetWorldPosition() + 
+			_pPlayer->_pTransformComp->GetForward(), Vector3(1, 1, 1),
+			50.0f, CollisionComponent::TRIGGER_TYPE_PLAYER_DMGBOX, 0.0f, 0.0f, 0.4f));
 	}break;
 
 	case PlayerAnimationEnum::eWarTakingHit :

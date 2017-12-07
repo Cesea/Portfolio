@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "Enemy.h"
 #include "TransformComponent.h"
 
@@ -18,6 +18,29 @@ void Enemy::resetAllCount()
 	_atkCount = _atkTime;
 	_standCount = _standTime;
 	_hurtCount = _hurtTime;
+}
+
+void Enemy::RepositionEntity(const TerrainTilePos & currentPos, const TerrainTilePos & prevPos)
+{
+	//타일이 다를....... tile의 entity벡터를 처리해주자
+	if (currentPos._tileX != prevPos._tileX || currentPos._tileZ != prevPos._tileZ)
+	{
+		Terrain::TerrainChunk &refPrevChunk =  TERRAIN->GetChunkAt(prevPos._chunkX, prevPos._chunkZ);
+		Terrain::TerrainTile &refPrevTile = refPrevChunk._tiles[Index2D(prevPos._tileX, prevPos._tileZ, TERRAIN_TILE_RES)];
+
+		for (uint32 i = 0; i < refPrevTile._entities.size(); ++i)
+		{
+			if (refPrevTile._entities[i] == _entity)
+			{
+				refPrevTile._entities.erase(refPrevTile._entities.begin() + i);
+				break;
+			}
+		}
+
+		Terrain::TerrainChunk &refCurrentChunk =  TERRAIN->GetChunkAt(currentPos._chunkX, currentPos._chunkZ);
+		Terrain::TerrainTile &refCurrentTile = refCurrentChunk._tiles[Index2D(currentPos._tileX, currentPos._tileZ, TERRAIN_TILE_RES)];
+		refCurrentTile._entities.push_back(_entity);
+	}
 }
 
 void Enemy::setEvent()

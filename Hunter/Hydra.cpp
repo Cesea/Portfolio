@@ -90,16 +90,16 @@ bool Hydra::CreateFromWorld(World & world, const Vector3 &Pos)
 	switch (_skinType)
 	{
 	case HYDRASKINSTATE_GREEN:
-		_atkRange = 5.0f;
+		_atkRange = 3.0f;
 		break;
 	case HYDRASKINSTATE_RED:
-		_atkRange = 8.0f;
+		_atkRange = 5.0f;
 		break;
 	case HYDRASKINSTATE_BLACK:
-		_atkRange = 4.0f;
+		_atkRange = 2.0f;
 		break;
 	case HYDRASKINSTATE_GOLD:
-		_atkRange = 4.0f;
+		_atkRange = 2.0f;
 		break;
 	}
 
@@ -240,10 +240,10 @@ void Hydra::Update(float deltaTime)
 		_atkCount--;
 		if (_atkCount == 40)
 		{
-			Vector3 targetPos = transComp.GetWorldPosition() - transComp.GetForward()*_atkRange / 2;
+			Vector3 targetPos = transComp.GetWorldPosition() - transComp.GetForward();
 			EventChannel _channel;
-			_channel.Broadcast<GameObjectFactory::DamageBoxEvent>(GameObjectFactory::DamageBoxEvent(targetPos - Vector3(_atkRange / 2, _atkRange / 2, _atkRange / 2),
-				targetPos + Vector3(_atkRange / 2, _atkRange / 2, _atkRange / 2), 10.0f, CollisionComponent::TRIGGER_TYPE_ENEMY_DMGBOX, 0.0f, 0.0f, 1.0f));
+			_channel.Broadcast<GameObjectFactory::DamageBoxEvent>(GameObjectFactory::DamageBoxEvent(targetPos,
+				Vector3(_atkRange * 0.5f, _atkRange * 0.5f, _atkRange * 0.5f), 10.0f, CollisionComponent::TRIGGER_TYPE_ENEMY_DMGBOX, 0.0f, 0.0f, 1.0f));
 		}
 		if (_atkCount < 0)
 		{
@@ -276,10 +276,10 @@ void Hydra::Update(float deltaTime)
 		_atkCount--;
 		if (_atkCount == 40)
 		{
-			Vector3 targetPos = transComp.GetWorldPosition() - transComp.GetForward()*_atkRange / 2;
+			Vector3 targetPos = transComp.GetWorldPosition() - transComp.GetForward();
 			EventChannel _channel;
-			_channel.Broadcast<GameObjectFactory::DamageBoxEvent>(GameObjectFactory::DamageBoxEvent(targetPos - Vector3(_atkRange / 2, _atkRange / 2, _atkRange / 2),
-				targetPos + Vector3(_atkRange / 2, _atkRange / 2, _atkRange / 2), 10.0f, CollisionComponent::TRIGGER_TYPE_ENEMY_DMGBOX, 0.0f, 0.0f, 1.0f));
+			_channel.Broadcast<GameObjectFactory::DamageBoxEvent>(GameObjectFactory::DamageBoxEvent(targetPos,
+				Vector3(_atkRange * 0.5f, _atkRange * 0.5f, _atkRange * 0.5f), 10.0f, CollisionComponent::TRIGGER_TYPE_ENEMY_DMGBOX, 0.0f, 0.0f, 1.0f));
 		}
 		if (_atkCount < 0)
 		{
@@ -313,10 +313,10 @@ void Hydra::Update(float deltaTime)
 		_atkCount--;
 		if (_atkCount == 40)
 		{
-			Vector3 targetPos = transComp.GetWorldPosition() - transComp.GetForward()*_atkRange / 2;
+			Vector3 targetPos = transComp.GetWorldPosition() - transComp.GetForward();
 			EventChannel _channel;
-			_channel.Broadcast<GameObjectFactory::DamageBoxEvent>(GameObjectFactory::DamageBoxEvent(targetPos - Vector3(_atkRange / 2, _atkRange / 2, _atkRange / 2),
-				targetPos + Vector3(_atkRange / 2, _atkRange / 2, _atkRange / 2), 10.0f, CollisionComponent::TRIGGER_TYPE_ENEMY_DMGBOX, 0.0f, 0.0f, 1.0f));
+			_channel.Broadcast<GameObjectFactory::DamageBoxEvent>(GameObjectFactory::DamageBoxEvent(targetPos,
+				Vector3(_atkRange * 0.5f, _atkRange * 0.5f, _atkRange * 0.5f), 10.0f, CollisionComponent::TRIGGER_TYPE_ENEMY_DMGBOX, 0.0f, 0.0f, 1.0f));
 		}
 		if (_atkCount < 0)
 		{
@@ -398,10 +398,10 @@ void Hydra::Update(float deltaTime)
 		_atkCount--;
 		if (_atkCount == 20)
 		{
-			Vector3 targetPos = transComp.GetWorldPosition() - transComp.GetForward()*_atkRange / 2;
+			Vector3 targetPos = transComp.GetWorldPosition() - transComp.GetForward();
 			EventChannel _channel;
-			_channel.Broadcast<GameObjectFactory::DamageBoxEvent>(GameObjectFactory::DamageBoxEvent(targetPos - Vector3(_atkRange / 2, _atkRange / 2, _atkRange / 2),
-				targetPos + Vector3(_atkRange / 2, _atkRange / 2, _atkRange / 2), 10.0f, CollisionComponent::TRIGGER_TYPE_ENEMY_DMGBOX, 0.0f, 0.0f, 1.0f));
+			_channel.Broadcast<GameObjectFactory::DamageBoxEvent>(GameObjectFactory::DamageBoxEvent(targetPos,
+				Vector3(_atkRange * 0.5f, _atkRange * 0.5f, _atkRange * 0.5f), 10.0f, CollisionComponent::TRIGGER_TYPE_ENEMY_DMGBOX, 0.0f, 0.0f, 1.0f));
 		}
 		if (_atkCount < 0)
 		{
@@ -429,10 +429,10 @@ void Hydra::Update(float deltaTime)
 		_atkCount--;
 		if (_atkCount == 20)
 		{
-			Vector3 targetPos = transComp.GetWorldPosition() + transComp.GetForward()*_atkRange / 2;
+			Vector3 targetPos = transComp.GetWorldPosition() - transComp.GetForward();
 			EventChannel _channel;
-			_channel.Broadcast<GameObjectFactory::DamageBoxEvent>(GameObjectFactory::DamageBoxEvent(targetPos - Vector3(_atkRange / 2, _atkRange / 2, _atkRange / 2),
-				targetPos + Vector3(_atkRange / 2, _atkRange / 2, _atkRange / 2), 10.0f, CollisionComponent::TRIGGER_TYPE_ENEMY_DMGBOX, 0.0f, 0.0f, 1.0f));
+			_channel.Broadcast<GameObjectFactory::DamageBoxEvent>(GameObjectFactory::DamageBoxEvent(targetPos,
+				Vector3(_atkRange * 0.5f, _atkRange * 0.5f, _atkRange * 0.5f), 10.0f, CollisionComponent::TRIGGER_TYPE_ENEMY_DMGBOX, 0.0f, 0.0f, 1.0f));
 		}
 		if (_atkCount < 0)
 		{
@@ -455,10 +455,10 @@ void Hydra::Update(float deltaTime)
 		_atkCount--;
 		if (_atkCount == 40)
 		{
-			Vector3 targetPos = transComp.GetWorldPosition() - transComp.GetForward()*_atkRange / 2;
+			Vector3 targetPos = transComp.GetWorldPosition() - transComp.GetForward();
 			EventChannel _channel;
-			_channel.Broadcast<GameObjectFactory::DamageBoxEvent>(GameObjectFactory::DamageBoxEvent(targetPos - Vector3(_atkRange / 2, _atkRange / 2, _atkRange / 2),
-				targetPos + Vector3(_atkRange / 2, _atkRange / 2, _atkRange / 2), 10.0f, CollisionComponent::TRIGGER_TYPE_ENEMY_DMGBOX, 0.0f, 0.0f, 2.0f));
+			_channel.Broadcast<GameObjectFactory::DamageBoxEvent>(GameObjectFactory::DamageBoxEvent(targetPos,
+				Vector3(_atkRange * 0.5f, _atkRange * 0.5f, _atkRange * 0.5f), 10.0f, CollisionComponent::TRIGGER_TYPE_ENEMY_DMGBOX, 0.0f, 0.0f, 1.0f));
 		}
 		if (_atkCount < 0)
 		{
@@ -494,10 +494,10 @@ void Hydra::Update(float deltaTime)
 		_atkCount--;
 		if (_atkCount == 40)
 		{
-			Vector3 targetPos = transComp.GetWorldPosition() - transComp.GetForward()*_atkRange / 2;
+			Vector3 targetPos = transComp.GetWorldPosition() - transComp.GetForward();
 			EventChannel _channel;
-			_channel.Broadcast<GameObjectFactory::DamageBoxEvent>(GameObjectFactory::DamageBoxEvent(targetPos - Vector3(_atkRange / 2, _atkRange / 2, _atkRange / 2),
-				targetPos + Vector3(_atkRange / 2, _atkRange / 2, _atkRange / 2), 10.0f, CollisionComponent::TRIGGER_TYPE_ENEMY_DMGBOX, 0.0f, 0.0f, 2.0f));
+			_channel.Broadcast<GameObjectFactory::DamageBoxEvent>(GameObjectFactory::DamageBoxEvent(targetPos,
+				Vector3(_atkRange * 0.5f, _atkRange * 0.5f, _atkRange * 0.5f), 10.0f, CollisionComponent::TRIGGER_TYPE_ENEMY_DMGBOX, 0.0f, 0.0f, 1.0f));
 		}
 		if (_atkCount < 0)
 		{
@@ -533,10 +533,10 @@ void Hydra::Update(float deltaTime)
 		_atkCount--;
 		if (_atkCount == 40)
 		{
-			Vector3 targetPos = transComp.GetWorldPosition() - transComp.GetForward()*_atkRange / 2;
+			Vector3 targetPos = transComp.GetWorldPosition() - transComp.GetForward();
 			EventChannel _channel;
-			_channel.Broadcast<GameObjectFactory::DamageBoxEvent>(GameObjectFactory::DamageBoxEvent(targetPos - Vector3(_atkRange / 2, _atkRange / 2, _atkRange / 2),
-				targetPos + Vector3(_atkRange / 2, _atkRange / 2, _atkRange / 2), 10.0f, CollisionComponent::TRIGGER_TYPE_ENEMY_DMGBOX, 0.0f, 0.0f, 2.0f));
+			_channel.Broadcast<GameObjectFactory::DamageBoxEvent>(GameObjectFactory::DamageBoxEvent(targetPos,
+				Vector3(_atkRange * 0.5f, _atkRange * 0.5f, _atkRange * 0.5f), 10.0f, CollisionComponent::TRIGGER_TYPE_ENEMY_DMGBOX, 0.0f, 0.0f, 1.0f));
 		}
 		if (_atkCount < 0)
 		{
@@ -595,7 +595,14 @@ void Hydra::Update(float deltaTime)
 			//찾으면 FIND가 되며 battle상태가 ROAR가 됌
 		}
 	}
-	transComp.SetWorldPosition(transComp.GetWorldPosition().x, TERRAIN->GetHeight(transComp.GetWorldPosition().x, transComp.GetWorldPosition().z), transComp.GetWorldPosition().z);
+
+	transComp.SetWorldPosition(transComp.GetWorldPosition().x, 
+		TERRAIN->GetHeight(transComp.GetWorldPosition().x, transComp.GetWorldPosition().z), 
+		transComp.GetWorldPosition().z);
+
+	_prevTilePos = _tilePos;
+	TERRAIN->ConvertWorldPostoTilePos(transComp.GetWorldPosition(), &_tilePos);
+	RepositionEntity(_tilePos, _prevTilePos);
 
 	if (_isHurt)
 	{

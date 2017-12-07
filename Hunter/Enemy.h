@@ -58,6 +58,8 @@ protected:
 	//Die
 	bool _isDie{ false };
 	int _dieCount{ 240 };
+
+	void RepositionEntity(const TerrainTilePos & currentPos, const TerrainTilePos & prevPos);
 public:
     Vector3 _playerPos;
 	Vector3 _playerForward;

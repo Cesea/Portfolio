@@ -179,7 +179,7 @@ bool MapToolScene::SceneInit()
 	_editor->_pSelectedObject = GAMEOBJECTFACTORY->GetPlayerObject();
 
 	//Test
-	for (int32 i = 0; i < 60; ++i)
+	for (int32 i = 0; i < 10; ++i)
 	{
 		float randX = RandFloat(-config._xChunkCount * TERRAIN_CHUNK_DIM * 0.5f,
 			config._xChunkCount * TERRAIN_CHUNK_DIM * 0.5f);
@@ -212,9 +212,9 @@ bool MapToolScene::SceneInit()
 		} break;
 		}
 
-		//_channel.Broadcast<GameObjectFactory::CreateObjectOnLocationEvent>(
-		//	GameObjectFactory::CreateObjectOnLocationEvent(type, handle,
-		//		Vector3(randX, 0, randz)));
+		_channel.Broadcast<GameObjectFactory::CreateObjectOnLocationEvent>(
+			GameObjectFactory::CreateObjectOnLocationEvent(type, handle,
+				Vector3(randX, 0, randz)));
 	}
 	////실험
 	//trash = _world.CreateEntity();

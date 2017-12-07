@@ -10,7 +10,6 @@ void GameObjectFactory::Init()
 	_channel.Add<GameObjectFactory::CreateObjectOnLocationEvent, GameObjectFactory>(*this);
 	_channel.Add<GameObjectFactory::CreateObjectFromSaveInfoEvent, GameObjectFactory>(*this);
 	_channel.Add<GameObjectFactory::DamageBoxEvent, GameObjectFactory>(*this);
-	_channel.Add<GameObjectFactory::PlayerDamageBoxEvent, GameObjectFactory>(*this);
 }
 
 void GameObjectFactory::Release()
@@ -19,236 +18,9 @@ void GameObjectFactory::Release()
 	_channel.Remove<GameObjectFactory::CreateObjectOnLocationEvent, GameObjectFactory>(*this);
 	_channel.Remove<GameObjectFactory::CreateObjectFromSaveInfoEvent, GameObjectFactory>(*this);
 	_channel.Remove<GameObjectFactory::DamageBoxEvent, GameObjectFactory>(*this);
-	_channel.Remove<GameObjectFactory::PlayerDamageBoxEvent, GameObjectFactory>(*this);
 	_pCurrentScene = nullptr;
 	_pPlayer = nullptr;
 }
-
-//NOTE : 모든 오브젝트를 생성하면 ObjectCreated Event를 발생시킨다
-#pragma region Create Object
-//void GameObjectFactory::CreateObject(ARCHE_TYPE type, ResourceHandle handle, const Vector3 & position)
-//{
-//	switch (type)
-//	{
-//	case ARCHE_ROCK:
-//	{
-//		Entity &entity = _pCurrentScene->_world.CreateEntity();
-//
-//		TransformComponent &transform = entity.AddComponent<TransformComponent>();
-//		transform._position = position;
-//		RenderComponent &render = entity.AddComponent<RenderComponent>();
-//		render._type = RenderComponent::Type::eStatic;
-//		render._arche = ARCHE_ROCK;
-//
-//		TERRAIN->AddEntityToSection(entity, position);
-//
-//		video::StaticXMeshHandle meshHandle;
-//		meshHandle.count = handle.count;
-//		meshHandle.index = handle.index;
-//		Assert(meshHandle.IsValid());
-//		render._static = meshHandle;
-//
-//		video::StaticXMesh *pMesh = VIDEO->GetStaticXMesh(meshHandle);
-//
-//		CollisionComponent &collision = entity.AddComponent<CollisionComponent>();
-//		collision._boundingBox.Init(pMesh->_meshBoundInfo._min, pMesh->_meshBoundInfo._max);
-//		collision._boundingSphere._localCenter = pMesh->_meshBoundInfo._center;
-//		collision._boundingSphere._radius = pMesh->_meshBoundInfo._radius;
-//		collision._locked = true;
-//		collision._triggerType = CollisionComponent::TRIGGER_TYPE_OBJECT;
-//
-//		//entity.Activate();
-//		_channel.Broadcast<GameObjectFactory::ObjectCreatedEvent>(
-//			ObjectCreatedEvent(ARCHE_ROCK, entity, transform.GetWorldPosition()));
-//
-//	}break;
-//	case ARCHE_TREE:
-//	{
-//		Entity &entity = _pCurrentScene->_world.CreateEntity();
-//
-//		TransformComponent &transform = entity.AddComponent<TransformComponent>();
-//		transform._position = position;
-//
-//		TERRAIN->AddEntityToSection(entity, position);
-//
-//		RenderComponent &render = entity.AddComponent<RenderComponent>();
-//		render._type = RenderComponent::Type::eStatic;
-//		render._arche = ARCHE_TREE;
-//
-//		video::StaticXMeshHandle meshHandle;
-//		meshHandle.count = handle.count;
-//		meshHandle.index = handle.index;
-//		Assert(meshHandle.IsValid());
-//		render._static = meshHandle;
-//
-//		video::StaticXMesh *pMesh = VIDEO->GetStaticXMesh(render._static);
-//
-//		CollisionComponent &collision = entity.AddComponent<CollisionComponent>();
-//		collision._boundingBox.Init(pMesh->_meshBoundInfo._min, pMesh->_meshBoundInfo._max);
-//		collision._boundingSphere._localCenter = pMesh->_meshBoundInfo._center;
-//		collision._boundingSphere._radius = pMesh->_meshBoundInfo._radius;
-//		collision._locked = true;
-//
-//		//entity.Activate();
-//
-//		_channel.Broadcast<GameObjectFactory::ObjectCreatedEvent>(
-//			ObjectCreatedEvent(ARCHE_TREE, entity, transform.GetWorldPosition()));
-//	}break;
-//
-//	case ARCHE_TREETRUNK :
-//	{
-//		Entity &entity = _pCurrentScene->_world.CreateEntity();
-//
-//		TransformComponent &transform = entity.AddComponent<TransformComponent>();
-//		transform._position = position;
-//
-//		TERRAIN->AddEntityToSection(entity, position);
-//
-//		RenderComponent &render = entity.AddComponent<RenderComponent>();
-//		render._type = RenderComponent::Type::eStatic;
-//		render._arche = ARCHE_TREETRUNK;
-//
-//		video::StaticXMeshHandle meshHandle;
-//		meshHandle.count = handle.count;
-//		meshHandle.index = handle.index;
-//		Assert(meshHandle.IsValid());
-//		render._static = meshHandle;
-//
-//		video::StaticXMesh *pMesh = VIDEO->GetStaticXMesh(render._static);
-//
-//		CollisionComponent &collision = entity.AddComponent<CollisionComponent>();
-//		collision._boundingBox.Init(pMesh->_meshBoundInfo._min, pMesh->_meshBoundInfo._max);
-//		collision._boundingSphere._localCenter = pMesh->_meshBoundInfo._center;
-//		collision._boundingSphere._radius = pMesh->_meshBoundInfo._radius;
-//		collision._locked = true;
-//
-//		_channel.Broadcast<GameObjectFactory::ObjectCreatedEvent>(
-//			ObjectCreatedEvent(ARCHE_TREETRUNK, entity, transform.GetWorldPosition()));
-//	}break;
-//
-//	case ARCHE_GRASS:
-//	{
-//		Entity &entity = _pCurrentScene->_world.CreateEntity();
-//
-//		TransformComponent &transform = entity.AddComponent<TransformComponent>();
-//		transform._position = position;
-//
-//		TERRAIN->AddEntityToSection(entity, position);
-//
-//		RenderComponent &render = entity.AddComponent<RenderComponent>();
-//		render._type = RenderComponent::Type::eStatic;
-//		render._arche = ARCHE_GRASS;
-//
-//		video::StaticXMeshHandle meshHandle;
-//		meshHandle.count = handle.count;
-//		meshHandle.index = handle.index;
-//		Assert(meshHandle.IsValid());
-//		render._static = meshHandle;
-//
-//		video::StaticXMesh *pMesh = VIDEO->GetStaticXMesh(render._static);
-//
-//		CollisionComponent &collision = entity.AddComponent<CollisionComponent>();
-//		collision._boundingBox.Init(pMesh->_meshBoundInfo._min, pMesh->_meshBoundInfo._max);
-//		collision._boundingSphere._localCenter = pMesh->_meshBoundInfo._center;
-//		collision._boundingSphere._radius = pMesh->_meshBoundInfo._radius;
-//		collision._type = CollisionComponent::COLLISION_TYPE_BOX;
-//		collision._locked = true;
-//
-//		_channel.Broadcast<GameObjectFactory::ObjectCreatedEvent>(
-//			ObjectCreatedEvent(ARCHE_GRASS, entity, transform.GetWorldPosition()));
-//	}break;
-//
-//	case ARCHE_MUSHROOM :
-//	{
-//		Entity &entity = _pCurrentScene->_world.CreateEntity();
-//
-//		TransformComponent &transform = entity.AddComponent<TransformComponent>();
-//		transform._position = position;
-//
-//		TERRAIN->AddEntityToSection(entity, position);
-//
-//		RenderComponent &render = entity.AddComponent<RenderComponent>();
-//		render._type = RenderComponent::Type::eStatic;
-//		render._arche = ARCHE_MUSHROOM;
-//
-//		video::StaticXMeshHandle meshHandle;
-//		meshHandle.count = handle.count;
-//		meshHandle.index = handle.index;
-//		Assert(meshHandle.IsValid());
-//		render._static = meshHandle;
-//
-//		video::StaticXMesh *pMesh = VIDEO->GetStaticXMesh(render._static);
-//
-//		CollisionComponent &collision = entity.AddComponent<CollisionComponent>();
-//		collision._boundingBox.Init(pMesh->_meshBoundInfo._min, pMesh->_meshBoundInfo._max);
-//		collision._boundingSphere._localCenter = pMesh->_meshBoundInfo._center;
-//		collision._boundingSphere._radius = pMesh->_meshBoundInfo._radius;
-//		collision._type = CollisionComponent::COLLISION_TYPE_BOX;
-//		collision._locked = true;
-//
-//		//entity.Activate();
-//
-//		_channel.Broadcast<GameObjectFactory::ObjectCreatedEvent>(
-//			ObjectCreatedEvent(ARCHE_MUSHROOM, entity, transform.GetWorldPosition()));
-//	}break;
-//
-//	case ARCHE_HERO :
-//	{
-//		//NOTE : SetLinkCamera를 이렇게 할때 MultiThreadedLoading을 할때 터질 수 있다
-//		Player* _player = new Player();
-//		_player->SetLinkCamera(&_pCurrentScene->_camera);
-//		_pCurrentScene->_gameObjects.push_back(_player);
-//		BaseGameObject *pBack = _pCurrentScene->_gameObjects.back();
-//		pBack->CreateFromWorld(_pCurrentScene->_world,Vector3(0,0,0));
-//		//NOTE : 여기서 플레이어의 포인터를 저장하고는 있지만, 나중에는 키값으로 찾을 수 있게끔 바꿔야 한다...
-//		_pPlayer = pBack;
-//	}break;
-//	case ARCHE_BAT :
-//	{
-//		_pCurrentScene->_gameObjects.push_back(new Bat());
-//		BaseGameObject *pBack = _pCurrentScene->_gameObjects.back();
-//		pBack->CreateFromWorld(_pCurrentScene->_world, position);
-//
-//	}break;
-//	case ARCHE_CAT :
-//	{
-//		_pCurrentScene->_gameObjects.push_back(new Cat());
-//		BaseGameObject *pBack = _pCurrentScene->_gameObjects.back();
-//		pBack->CreateFromWorld(_pCurrentScene->_world, position);
-//
-//	}break;
-//	case ARCHE_LIZARD:
-//	{
-//		_pCurrentScene->_gameObjects.push_back(new Lizard());
-//		BaseGameObject *pBack = _pCurrentScene->_gameObjects.back();
-//		pBack->CreateFromWorld(_pCurrentScene->_world, position);
-//
-//	}break;
-//	case ARCHE_SNAKE:
-//	{
-//		_pCurrentScene->_gameObjects.push_back(new Snake());
-//		BaseGameObject *pBack = _pCurrentScene->_gameObjects.back();
-//		pBack->CreateFromWorld(_pCurrentScene->_world, position);
-//
-//	}break;
-//	case ARCHE_TURTLE :
-//	{
-//		_pCurrentScene->_gameObjects.push_back(new Turtle());
-//		BaseGameObject *pBack = _pCurrentScene->_gameObjects.back();
-//		pBack->CreateFromWorld(_pCurrentScene->_world, position);
-//
-//	}break;
-//	case ARCHE_HYDRA :
-//	{
-//		_pCurrentScene->_gameObjects.push_back(new Hydra());
-//		BaseGameObject *pBack = _pCurrentScene->_gameObjects.back();
-//		pBack->CreateFromWorld(_pCurrentScene->_world, position);
-//
-//	}break;
-//	}
-//}
-#pragma endregion
-
 
 void GameObjectFactory::CreateObject(ARCHE_TYPE type, 
 	ResourceHandle handle, 
@@ -587,31 +359,12 @@ void GameObjectFactory::Handle(const DamageBoxEvent & event)
 	_pCurrentScene->_gameObjects.push_back(new DamageBox());
 	BaseGameObject *pBack = _pCurrentScene->_gameObjects.back();
 
-	pBack->CreateFromWorld(_pCurrentScene->_world, (event._min / 2) + (event._max / 2) );
-
-	//이벤트설정
-	Entity _entity = pBack->GetEntity();
-	CollisionComponent & collision = _entity.GetComponent<CollisionComponent>();
-	collision._boundingBox.Init(event._min, event._max);
-	collision._accel = event._accel;
-	collision._dmg = event._dmg;
-	collision._velocity = event._velocity;
-	collision._triggerType = event._type;
-	collision._duration = event._duration;
-}
-
-void GameObjectFactory::Handle(const PlayerDamageBoxEvent & event)
-{
-	_pCurrentScene->_gameObjects.push_back(new DamageBox());
-	BaseGameObject *pBack = _pCurrentScene->_gameObjects.back();
-
 	pBack->CreateFromWorld(_pCurrentScene->_world, event._position);
 
 	//이벤트설정
 	Entity _entity = pBack->GetEntity();
 	CollisionComponent & collision = _entity.GetComponent<CollisionComponent>();
 	collision._boundingBox.Init(-event._size, event._size);
-
 	collision._accel = event._accel;
 	collision._dmg = event._dmg;
 	collision._velocity = event._velocity;

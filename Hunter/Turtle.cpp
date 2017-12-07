@@ -71,7 +71,7 @@ bool Turtle::CreateFromWorld(World & world, const Vector3 &Pos)
 
 	_playerPos = Vector3(-5.0f, 6.0f, 5.0f);
 
-	_atkRange = 0.5f;
+	_atkRange = 0.8f;
 	_atkTime = 90;
 	_atkCount = _atkTime;
 
@@ -291,7 +291,13 @@ void Turtle::Update(float deltaTime)
 		}
 	}
 
-	transComp.SetWorldPosition(transComp.GetWorldPosition().x, TERRAIN->GetHeight(transComp.GetWorldPosition().x, transComp.GetWorldPosition().z), transComp.GetWorldPosition().z);
+	transComp.SetWorldPosition(transComp.GetWorldPosition().x, 
+		TERRAIN->GetHeight(transComp.GetWorldPosition().x, transComp.GetWorldPosition().z), 
+		transComp.GetWorldPosition().z);
+
+	_prevTilePos = _tilePos;
+	TERRAIN->ConvertWorldPostoTilePos(transComp.GetWorldPosition(), &_tilePos);
+	RepositionEntity(_tilePos, _prevTilePos);
 
 	if (_isHurt)
 	{

@@ -47,12 +47,20 @@ void CollisionSystem::Update(float deltaTime, float checkRange)
 	//}
 	//counter++;
 
+	TerrainTilePos tilePos1;
+	TerrainTilePos tilePos2;
+
 	for (uint32 i = 0; i < entities.size(); ++i)
 	{
 		TransformComponent & transform = entities[i].GetComponent<TransformComponent>();
 		CollisionComponent & collision = entities[i].GetComponent<CollisionComponent>();
 
+		TERRAIN->ConvertWorldPostoTilePos(transform.GetWorldPosition(), &tilePos1);
+
 		aabb0 = SetAABB(collision._boundingBox._xSize, collision._boundingBox._ySize, collision._boundingBox._zSize, transform.GetWorldPosition());
+
+		//std::vector<Terrain::TerrainTile *> adjacent = TERRAIN->GetAdjacentTerrainTile(tilePos1);
+
 
 		for (uint32 j = 0; j < entities.size(); ++j)
 		{

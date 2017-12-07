@@ -128,24 +128,11 @@ public :
 	//DMG BOX 생성 이벤트
 	struct DamageBoxEvent
 	{
-		DamageBoxEvent(Vector3 min, Vector3 max, float dmg, CollisionComponent::TRIGGER_TYPE type, float accel, float vel, float duration)
-			: _min(min), _max(max), _dmg(dmg), _type(type),_velocity(vel),_accel(accel),_duration(duration) {}
-		Vector3 _min;
-		Vector3 _max;
-		float _dmg;
-		float _velocity;
-		float _accel;
-		float _duration;
-		CollisionComponent::TRIGGER_TYPE _type;
-	};
-	//Receive Enemy DmgBox Event
-	void Handle(const DamageBoxEvent &event);
-	///////////////////////////////////////////////////////////////////////////////////////
-
-	struct PlayerDamageBoxEvent
-	{
-		PlayerDamageBoxEvent(const Vector3 &size, const Vector3 &position, float dmg, CollisionComponent::TRIGGER_TYPE type, float accel, float vel, float duration)
-			: _size(size), _position(position), _dmg(dmg), _type(type),_velocity(vel),_accel(accel),_duration(duration) {}
+		DamageBoxEvent(const Vector3 &position, const Vector3 &size, float dmg, 
+			CollisionComponent::TRIGGER_TYPE type, float accel, float vel, float duration)
+			:  _position(position), _size(size), _dmg(dmg), _type(type),_velocity(vel),_accel(accel),_duration(duration) 
+		{
+		}
 		Vector3 _size;
 		Vector3 _position;
 		float _dmg;
@@ -155,9 +142,8 @@ public :
 		CollisionComponent::TRIGGER_TYPE _type;
 	};
 	//Receive Enemy DmgBox Event
-	void Handle(const PlayerDamageBoxEvent &event);
+	void Handle(const DamageBoxEvent &event);
 	///////////////////////////////////////////////////////////////////////////////////////
-
 
 
 	EventChannel _channel;
