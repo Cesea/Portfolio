@@ -672,7 +672,7 @@ void Hydra::Handle(const CollisionSystem::ActorTriggerEvent & event)
 			collision._valid = false;
 			EventChannel channel;
 			channel.Broadcast<GameObjectFactory::CreateBlood>(
-				GameObjectFactory::CreateBlood(_playerPos));
+				GameObjectFactory::CreateBlood(_playerSwordPos));
 		}
 		break;
 	}
