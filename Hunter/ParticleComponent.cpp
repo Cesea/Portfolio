@@ -42,5 +42,9 @@ void ParticleComponent::init(PARTICLE_TYPE type, int maxParticleNum, float emiss
 		_particle = new BloodParticle("../resources/Particle/blood.fx", "BloodParticleTech", "../resources/Particle/bloodTex.png",
 			accel, maxParticleNum, emission, pos, min, max);
 		break;
+	case PARTICLE_TYPE_NORMALBREATH:
+		_particle = new normalBreath("../resources/Particle/fireRing.fx", "NormalBreathTech", "../resources/Particle/fire.PNG",
+			accel, maxParticleNum, emission, pos);
+		break;
 	}
 }

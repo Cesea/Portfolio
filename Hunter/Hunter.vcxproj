@@ -177,6 +177,7 @@
     <ClCompile Include="MathUtils.cpp" />
     <ClCompile Include="Matrix.cpp" />
     <ClCompile Include="ColiisionSystem.cpp" />
+    <ClCompile Include="normalBreath.cpp" />
     <ClCompile Include="Particle.cpp" />
     <ClCompile Include="ParticleComponent.cpp" />
     <ClCompile Include="ParticleSystem.cpp" />
@@ -291,6 +292,7 @@
     <ClInclude Include="Memory.h" />
     <ClInclude Include="CollisionComponent.h" />
     <ClInclude Include="CollisionSystem.h" />
+    <ClInclude Include="normalBreath.h" />
     <ClInclude Include="Particle.h" />
     <ClInclude Include="ParticleComponent.h" />
     <ClInclude Include="ParticleString.h" />

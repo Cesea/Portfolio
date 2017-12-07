@@ -11,6 +11,7 @@ void GameObjectFactory::Init()
 	_channel.Add<GameObjectFactory::CreateObjectFromSaveInfoEvent, GameObjectFactory>(*this);
 	_channel.Add<GameObjectFactory::DamageBoxEvent, GameObjectFactory>(*this);
 	_channel.Add<GameObjectFactory::CreateBlood, GameObjectFactory>(*this);
+	_channel.Add<GameObjectFactory::CreateBreath, GameObjectFactory>(*this);
 }
 
 void GameObjectFactory::Release()
@@ -20,6 +21,7 @@ void GameObjectFactory::Release()
 	_channel.Remove<GameObjectFactory::CreateObjectFromSaveInfoEvent, GameObjectFactory>(*this);
 	_channel.Remove<GameObjectFactory::DamageBoxEvent, GameObjectFactory>(*this);
 	_channel.Remove<GameObjectFactory::CreateBlood, GameObjectFactory>(*this);
+	_channel.Remove<GameObjectFactory::CreateBreath, GameObjectFactory>(*this);
 	_pCurrentScene = nullptr;
 	_pPlayer = nullptr;
 }
@@ -405,6 +407,22 @@ void GameObjectFactory::Handle(const CreateBlood & event)
 
 	entity.Activate();
 	entity2.Activate();
+}
+
+void GameObjectFactory::Handle(const CreateBreath & event)
+{
+	Entity &entity = _pCurrentScene->_world.CreateEntity();
+	TransformComponent &transform = entity.AddComponent<TransformComponent>();
+	transform._position = event._pos;
+	ParticleComponent &particle = entity.AddComponent<ParticleComponent>();
+	particle.min = Vector3(-0.1f, -0.1f, -0.1f);
+	particle.max = Vector3(0.1f, 0.1f, 0.1f);
+	particle.isEmission = true;
+	particle.duration = 1.0f;
+	particle.delay = 0.0f;
+	particle.init(ParticleComponent::PARTICLE_TYPE_NORMALBREATH, 4500, 0.0025f, event._direction/3, event._pos);
+
+	entity.Activate();
 }
 
 const char * ArcheToString(ARCHE_TYPE type)

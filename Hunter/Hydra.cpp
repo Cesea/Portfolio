@@ -19,7 +19,8 @@ bool Hydra::CreateFromWorld(World & world, const Vector3 &Pos)
 	static int32 animCount = 0;
 	RenderComponent &renderComp = _entity.AddComponent<RenderComponent>();
 	renderComp._type = RenderComponent::Type::eSkinned;
-	switch (rand()%4)
+	int a = 1;
+	switch (a)
 	{
 	case 0:
 		_skinType = HYDRASKINSTATE_GREEN;
@@ -93,7 +94,7 @@ bool Hydra::CreateFromWorld(World & world, const Vector3 &Pos)
 		_atkRange = 2.0f;
 		break;
 	case HYDRASKINSTATE_RED:
-		_atkRange = 3.0f;
+		_atkRange = 6.0f;
 		break;
 	case HYDRASKINSTATE_BLACK:
 		_atkRange = 2.0f;
@@ -453,9 +454,25 @@ void Hydra::Update(float deltaTime)
 	case HYDRASTATE_BREATH1:
 	{
 		_atkCount--;
-		if (_atkCount == 40)
+		if (_atkCount > 110)
 		{
-			Vector3 targetPos = transComp.GetWorldPosition() - transComp.GetForward();
+			Vector3 rotatePos = _playerPos;
+			rotatePos.y = transComp.GetWorldPosition().y;
+			Vector3 rotateDir = rotatePos - transComp.GetWorldPosition();
+			Vec3Normalize(&rotateDir, &rotateDir);
+			transComp.LookDirection(-rotateDir, _rotateSpeed);
+		}
+		if (_atkCount == 110)
+		{
+			EventChannel _channel;
+			Vector3 startPos = transComp.GetWorldPosition() + Vector3(0, 3.0f, 0) - transComp.GetForward()*3/2 - transComp.GetRight()/2;
+			Vector3 direction = startPos - _playerPos;
+			Vec3Normalize(&direction, &direction);
+			_channel.Broadcast<GameObjectFactory::CreateBreath>(GameObjectFactory::CreateBreath(startPos, direction));
+		}
+		if (_atkCount == 100)
+		{
+			Vector3 targetPos = transComp.GetWorldPosition() - transComp.GetForward()*_atkRange;
 			EventChannel _channel;
 			_channel.Broadcast<GameObjectFactory::DamageBoxEvent>(GameObjectFactory::DamageBoxEvent(targetPos,
 				Vector3(_atkRange * 0.5f, _atkRange * 0.5f, _atkRange * 0.5f), 10.0f, CollisionComponent::TRIGGER_TYPE_ENEMY_DMGBOX, 0.0f, 0.0f, 1.0f));
@@ -482,19 +499,30 @@ void Hydra::Update(float deltaTime)
 				this->QueueAction(HYDRA_ANIM(HYDRA_STAND));
 			}
 		}
-		Vector3 rotatePos = _playerPos;
-		rotatePos.y = transComp.GetWorldPosition().y;
-		Vector3 rotateDir = rotatePos - transComp.GetWorldPosition();
-		Vec3Normalize(&rotateDir, &rotateDir);
-		transComp.LookDirection(-rotateDir, _rotateSpeed);
 	}
 	break;
 	case HYDRASTATE_BREATH2:
 	{
 		_atkCount--;
-		if (_atkCount == 40)
+		if (_atkCount > 100)
 		{
-			Vector3 targetPos = transComp.GetWorldPosition() - transComp.GetForward();
+			Vector3 rotatePos = _playerPos;
+			rotatePos.y = transComp.GetWorldPosition().y;
+			Vector3 rotateDir = rotatePos - transComp.GetWorldPosition();
+			Vec3Normalize(&rotateDir, &rotateDir);
+			transComp.LookDirection(-rotateDir, _rotateSpeed);
+		}
+		if (_atkCount == 100)
+		{
+			EventChannel _channel;
+			Vector3 startPos = transComp.GetWorldPosition() + Vector3(0, 3.0f, 0) - transComp.GetForward() * 3 / 2;
+			Vector3 direction = startPos - _playerPos;
+			Vec3Normalize(&direction, &direction);
+			_channel.Broadcast<GameObjectFactory::CreateBreath>(GameObjectFactory::CreateBreath(startPos, direction));
+		}
+		if (_atkCount == 80)
+		{
+			Vector3 targetPos = transComp.GetWorldPosition() - transComp.GetForward()*_atkRange;
 			EventChannel _channel;
 			_channel.Broadcast<GameObjectFactory::DamageBoxEvent>(GameObjectFactory::DamageBoxEvent(targetPos,
 				Vector3(_atkRange * 0.5f, _atkRange * 0.5f, _atkRange * 0.5f), 10.0f, CollisionComponent::TRIGGER_TYPE_ENEMY_DMGBOX, 0.0f, 0.0f, 1.0f));
@@ -521,19 +549,30 @@ void Hydra::Update(float deltaTime)
 				this->QueueAction(HYDRA_ANIM(HYDRA_STAND));
 			}
 		}
-		Vector3 rotatePos = _playerPos;
-		rotatePos.y = transComp.GetWorldPosition().y;
-		Vector3 rotateDir = rotatePos - transComp.GetWorldPosition();
-		Vec3Normalize(&rotateDir, &rotateDir);
-		transComp.LookDirection(-rotateDir, _rotateSpeed);
 	}
 	break;
 	case HYDRASTATE_BREATH3:
 	{
 		_atkCount--;
-		if (_atkCount == 40)
+		if (_atkCount > 90)
 		{
-			Vector3 targetPos = transComp.GetWorldPosition() - transComp.GetForward();
+			Vector3 rotatePos = _playerPos;
+			rotatePos.y = transComp.GetWorldPosition().y;
+			Vector3 rotateDir = rotatePos - transComp.GetWorldPosition();
+			Vec3Normalize(&rotateDir, &rotateDir);
+			transComp.LookDirection(-rotateDir, _rotateSpeed);
+		}
+		if (_atkCount == 90)
+		{
+			EventChannel _channel;
+			Vector3 startPos = transComp.GetWorldPosition() + Vector3(0, 2.5f, 0) - transComp.GetForward() * 3 / 2 + transComp.GetRight() / 2;
+			Vector3 direction = startPos - _playerPos;
+			Vec3Normalize(&direction, &direction);
+			_channel.Broadcast<GameObjectFactory::CreateBreath>(GameObjectFactory::CreateBreath(startPos, direction));
+		}
+		if (_atkCount == 70)
+		{
+			Vector3 targetPos = transComp.GetWorldPosition() - transComp.GetForward()*_atkRange;
 			EventChannel _channel;
 			_channel.Broadcast<GameObjectFactory::DamageBoxEvent>(GameObjectFactory::DamageBoxEvent(targetPos,
 				Vector3(_atkRange * 0.5f, _atkRange * 0.5f, _atkRange * 0.5f), 10.0f, CollisionComponent::TRIGGER_TYPE_ENEMY_DMGBOX, 0.0f, 0.0f, 1.0f));
@@ -560,11 +599,6 @@ void Hydra::Update(float deltaTime)
 				this->QueueAction(HYDRA_ANIM(HYDRA_STAND));
 			}
 		}
-		Vector3 rotatePos = _playerPos;
-		rotatePos.y = transComp.GetWorldPosition().y;
-		Vector3 rotateDir = rotatePos - transComp.GetWorldPosition();
-		Vec3Normalize(&rotateDir, &rotateDir);
-		transComp.LookDirection(-rotateDir, _rotateSpeed);
 	}
 		break;
 	}

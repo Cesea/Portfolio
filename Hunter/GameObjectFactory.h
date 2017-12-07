@@ -154,6 +154,14 @@ public :
 	//Receive Blood Particle Event
 	void Handle(const CreateBlood & event);
 
+	//Create NormalBreath Event
+	struct CreateBreath
+	{
+		CreateBreath(Vector3 pos,Vector3 direction): _pos(pos),_direction(direction) {}
+		Vector3 _pos;
+		Vector3 _direction;
+	};
+	void Handle(const CreateBreath & event);
 	/////////////////////////////////////////////
 
 
