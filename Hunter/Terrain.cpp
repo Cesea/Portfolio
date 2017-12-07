@@ -591,6 +591,7 @@ void Terrain::RenderShadow(const Camera & camera)
 	pEffect->SetTechnique("CreateShadow");
 
 	_shadowVisibleChunks.clear();
+	_shadowVisibleTiles.clear();
 	for (int32 i = 0; i < _xChunkCount * _zChunkCount; ++i)
 	{
 		TerrainChunk &refChunk = _pChunks[i];
@@ -598,7 +599,22 @@ void Terrain::RenderShadow(const Camera & camera)
 			refChunk._radius))
 		{
 			_shadowVisibleChunks.push_back(&refChunk);
+			//카메라에 보이는 청크가 현재 활성화 되어있는 청크라면.....
+			if (VectorHasItem(_activeChunkIndices, i))
+			{
+				for (int32 t = 0; t < TERRAIN_TILE_RES * TERRAIN_TILE_RES; ++t)
+				{
+					TerrainTile &refTile = refChunk._tiles[t];
+					if (camera.GetFrustum().IsSphereInFrustum(
+						Vector3(refTile._centerX, 0.0f, refTile._centerZ),
+						refTile._radius))
+					{
+						_shadowVisibleTiles.push_back(&refTile);
+					}
+				}
+			}
 		}
+
 	}
 
 	video::VertexBuffer *vBuffer = nullptr;
@@ -683,6 +699,69 @@ void Terrain::RenderShadow(const Camera & camera)
 			pEffect->EndEffect();
 		}
 	}
+}
+
+
+void Terrain::RemoveEntityInTile(Entity entity, const TerrainTilePos & tilePos)
+{
+	Terrain::TerrainChunk &refChunk = _pChunks[Index2D(tilePos._chunkX, tilePos._chunkZ, _xChunkCount)];
+	Terrain::TerrainTile &refTile = refChunk._tiles[Index2D(tilePos._tileX, tilePos._tileZ, TERRAIN_TILE_RES)];
+
+	for (auto iter = refTile._entities.begin(); iter != refTile._entities.end();)
+	{
+		if (iter->GetID() == entity.GetID())
+		{
+			(*iter).Kill();
+			break;
+		}
+		else
+		{
+			++iter;
+		}
+	}
+}
+
+void Terrain::ReTilelizeTilePosition(TerrainTilePos & tilePos)
+{
+	if (tilePos._tileX < 0)
+	{
+		tilePos._chunkX -= 1;
+		//Clamp(tilePos._chunkX, 0, _xChunkCount - 1);
+		tilePos._tileX += TERRAIN_TILE_RES;
+	}
+	else if (tilePos._tileX > TERRAIN_TILE_RES - 1)
+	{
+		tilePos._chunkX += 1;
+		//Clamp(tilePos._chunkX, 0, _xChunkCount - 1);
+		tilePos._tileX -= TERRAIN_TILE_RES;
+	}
+
+	if (tilePos._tileZ < 0)
+	{
+		tilePos._chunkZ -= 1;
+		//Clamp(tilePos._chunkZ, 0, _zChunkCount - 1);
+		tilePos._tileZ += TERRAIN_TILE_RES;
+	}
+	else if (tilePos._tileZ > TERRAIN_TILE_RES - 1)
+	{
+		tilePos._chunkZ += 1;
+		//Clamp(tilePos._chunkZ, 0, _zChunkCount - 1);
+		tilePos._tileZ -= TERRAIN_TILE_RES;
+	}
+}
+
+bool Terrain::IsTerrainTilePosValid(const TerrainTilePos & tilePos)
+{
+	if (tilePos._chunkX < 0 || tilePos._chunkZ < 0)
+	{
+		return false;
+	}
+	if (tilePos._chunkX > _xChunkCount - 1 || tilePos._chunkZ > _zChunkCount - 1)
+	{
+		return false;
+	}
+
+	return true;
 }
 
 
@@ -1475,6 +1554,14 @@ void Terrain::AddHeightGausian(int32 minX, int32 maxX, int32 minZ, int32 maxZ, f
 	int32 numVertX = maxX - minX + 1;
 	int32 numVertZ = maxZ - minZ + 1;
 
+	if (mult > 0)
+	{
+		mult *= 0.04f;
+	}
+	else
+	{
+		mult *= 0.2f;
+	}
 	float *smooth = new float[numVertX * numVertZ];
 
 	int32 counter = 0;

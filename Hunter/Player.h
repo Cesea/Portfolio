@@ -83,6 +83,7 @@ private :
 	void QueueAction(Action &action, bool cancle = false);
 
 	void RepositionEntity(const TerrainTilePos &currentPos, const TerrainTilePos &prevPos);
+	void RepositionDamageBox(const TerrainTilePos &currentPos, const TerrainTilePos &prevPos);
 
 	ActionComponent *_pActionComp{};
 	TransformComponent *_pTransformComp{};

@@ -98,7 +98,7 @@ bool Player::CreateFromWorld(World & world, const Vector3 &pos)
 	   float range = 0.8f;
 
 	   damageCollision._boundingBox.Init(Vector3(-range, -range, -range), Vector3(range, range, range));
-	   damageCollision._dmg = 40;
+	   damageCollision._dmg = 100;
    }
 
    //Plyer의 맴버 변수들을 셋팅해주자
@@ -129,8 +129,6 @@ void Player::Update(float deltaTime)
 	   }
    }
    CollisionComponent &damageCol = _pDamageBox->GetEntity().GetComponent<CollisionComponent>();
-
-   Console::Log("valid %d\n", (int32)damageCol._valid);
 
    switch (_state)
    {
@@ -201,7 +199,6 @@ void Player::Update(float deltaTime)
 		   if (_canCombo &&
 			   _attackToStanceTimer.Tick(deltaTime))
 		   {
-
 			   _pDamageBox->GetEntity().GetComponent<CollisionComponent>()._valid = false;
 
 			   _state = PLAYERSTATE_STANCE;
@@ -401,6 +398,8 @@ void Player::MoveAndRotate(float deltaTime)
 	  _prevTilePos = _tilePos;
 	  TERRAIN->ConvertWorldPostoTilePos(refTransform.GetWorldPosition(), &_tilePos);
 	  RepositionEntity(_tilePos, _prevTilePos);
+
+	  //RepositionDamageBox(_tilePos, _prevTilePos);
    }
 }
 
@@ -1090,6 +1089,29 @@ void Player::RepositionEntity(const TerrainTilePos & currentPos, const TerrainTi
 		Terrain::TerrainChunk &refCurrentChunk =  TERRAIN->GetChunkAt(currentPos._chunkX, currentPos._chunkZ);
 		Terrain::TerrainTile &refCurrentTile = refCurrentChunk._tiles[Index2D(currentPos._tileX, currentPos._tileZ, TERRAIN_TILE_RES)];
 		refCurrentTile._entities.push_back(_entity);
+	}
+}
+
+void Player::RepositionDamageBox(const TerrainTilePos & currentPos, const TerrainTilePos & prevPos)
+{
+	//타일이 다를....... tile의 entity벡터를 처리해주자
+	if (currentPos._tileX != prevPos._tileX || currentPos._tileZ != prevPos._tileZ)
+	{
+		Terrain::TerrainChunk &refPrevChunk =  TERRAIN->GetChunkAt(prevPos._chunkX, prevPos._chunkZ);
+		Terrain::TerrainTile &refPrevTile = refPrevChunk._tiles[Index2D(prevPos._tileX, prevPos._tileZ, TERRAIN_TILE_RES)];
+
+		for (uint32 i = 0; i < refPrevTile._entities.size(); ++i)
+		{
+			if (refPrevTile._entities[i] == _pDamageBox->GetEntity())
+			{
+				refPrevTile._entities.erase(refPrevTile._entities.begin() + i);
+				break;
+			}
+		}
+
+		Terrain::TerrainChunk &refCurrentChunk =  TERRAIN->GetChunkAt(currentPos._chunkX, currentPos._chunkZ);
+		Terrain::TerrainTile &refCurrentTile = refCurrentChunk._tiles[Index2D(currentPos._tileX, currentPos._tileZ, TERRAIN_TILE_RES)];
+		refCurrentTile._entities.push_back(_pDamageBox->GetEntity());
 	}
 }
 

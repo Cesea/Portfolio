@@ -33,6 +33,8 @@ CollisionSystem::~CollisionSystem()
 //	terrainGrid.
 //}
 
+#define COLLISION_OPTIMIZE_TEST
+
 void CollisionSystem::Update(float deltaTime, float checkRange)	
 {
 	auto &entities = GetEntities();
@@ -48,7 +50,6 @@ void CollisionSystem::Update(float deltaTime, float checkRange)
 	//counter++;
 
 	TerrainTilePos tilePos1;
-	TerrainTilePos tilePos2;
 
 	for (uint32 i = 0; i < entities.size(); ++i)
 	{
@@ -59,306 +60,322 @@ void CollisionSystem::Update(float deltaTime, float checkRange)
 
 		aabb0 = SetAABB(collision._boundingBox._xSize, collision._boundingBox._ySize, collision._boundingBox._zSize, transform.GetWorldPosition());
 
-		//std::vector<Terrain::TerrainTile *> adjacent = TERRAIN->GetAdjacentTerrainTile(tilePos1);
-
-		for (uint32 j = 0; j < entities.size(); ++j)
+		for (int32 z = -1; z <= 1; ++z)
 		{
-			if (i == j)
+			for (int32 x = -1; x <= 1; ++x)
 			{
-				continue;
-			}
+				TerrainTilePos testTilePos = tilePos1;
+				testTilePos._tileX += x;
+				testTilePos._tileZ += z;
 
-			TransformComponent& transform2 = entities[j].GetComponent<TransformComponent>();
-			CollisionComponent & collision2 = entities[j].GetComponent<CollisionComponent>();
-
-			aabb1 = SetAABB(collision2._boundingBox._xSize, collision2._boundingBox._ySize, collision2._boundingBox._zSize, transform2.GetWorldPosition());
-
-			Vector3 distanceVec = transform.GetWorldPosition() - transform2.GetWorldPosition();
-			float distance = Vec3Length(&distanceVec);
-			if (distance < checkRange)
-			{
-				bool checkCollision = false;
-				if (collision2._locked && collision._locked) continue;
-				//둘중 하나가 고정되어있음
-				//if ((collision._locked && !collision2._locked) || (!collision._locked && collision2._locked))
-				else
+				if (TERRAIN->IsTerrainTilePosValid(testTilePos))
 				{
-					//충돌타입이 어떻게 되는가
-					switch (collision._type)
+					Terrain::TerrainTile *pCurrentTile = TERRAIN->GetTileAt(tilePos1);
+					std::vector<Entity> &refTileEntitiies = pCurrentTile->_entities;
+
+					for (uint32 j = 0; j < refTileEntitiies.size(); ++j)
 					{
-					case CollisionComponent::COLLISION_TYPE_BOX:
-					{
-						if (collision2._type == CollisionComponent::COLLISION_TYPE_BOX)
+						if (entities[i].GetID() == refTileEntitiies[j].GetID() ||
+							!refTileEntitiies[j].HasComponent<CollisionComponent>())
 						{
-							if (Collision_AABBToAABB(aabb0._min,
-								aabb0._max,
-								aabb1._min,
-								aabb1._max))
+							continue;
+						}
+						TransformComponent& transform2 = refTileEntitiies[j].GetComponent<TransformComponent>();
+						CollisionComponent & collision2 = refTileEntitiies[j].GetComponent<CollisionComponent>();
+
+
+						aabb1 = SetAABB(collision2._boundingBox._xSize, collision2._boundingBox._ySize, collision2._boundingBox._zSize, transform2.GetWorldPosition());
+
+						Vector3 distanceVec = transform.GetWorldPosition() - transform2.GetWorldPosition();
+						float distance = Vec3Length(&distanceVec);
+						if (distance < checkRange)
+						{
+							bool checkCollision = false;
+							if (collision2._locked && collision._locked) continue;
+							//둘중 하나가 고정되어있음
+							//if ((collision._locked && !collision2._locked) || (!collision._locked && collision2._locked))
+							else
 							{
-								if (collision._isTrigger && 
-									collision._valid && collision2._valid)
+								//충돌타입이 어떻게 되는가
+								switch (collision._type)
 								{
-									//behind : someone that send  front : someone that receive
-									switch (collision._triggerType)
+								case CollisionComponent::COLLISION_TYPE_BOX:
+								{
+									if (collision2._type == CollisionComponent::COLLISION_TYPE_BOX)
 									{
-									case CollisionComponent::TRIGGER_TYPE_ENEMY:
-									case CollisionComponent::TRIGGER_TYPE_PLAYER:
-										_channel.Broadcast<ActorTriggerEvent>(
-											ActorTriggerEvent(entities[i], entities[j]));
-										break;
-									case CollisionComponent::TRIGGER_TYPE_OBJECT:
-										_channel.Broadcast<ObjectTriggerEvent>(
-											ObjectTriggerEvent(entities[i], entities[j]));
-										break;
-									case CollisionComponent::TRIGGER_TYPE_PLAYER_DMGBOX:
-										_channel.Broadcast<ActorTriggerEvent>(ActorTriggerEvent(entities[i], entities[j]));
-										break;
-									case CollisionComponent::TRIGGER_TYPE_ENEMY_DMGBOX:
-										_channel.Broadcast<ActorTriggerEvent>(ActorTriggerEvent(entities[i], entities[j]));
-										break;
-									}
+										if (Collision_AABBToAABB(aabb0._min,
+											aabb0._max,
+											aabb1._min,
+											aabb1._max))
+										{
+											if (collision._isTrigger &&
+												collision._valid && collision2._valid)
+											{
+												//behind : someone that send  front : someone that receive
+												switch (collision._triggerType)
+												{
+												case CollisionComponent::TRIGGER_TYPE_ENEMY:
+												case CollisionComponent::TRIGGER_TYPE_PLAYER:
+													_channel.Broadcast<ActorTriggerEvent>(
+														ActorTriggerEvent(entities[i], entities[j]));
+													break;
+												case CollisionComponent::TRIGGER_TYPE_OBJECT:
+													_channel.Broadcast<ObjectTriggerEvent>(
+														ObjectTriggerEvent(entities[i], entities[j]));
+													break;
+												case CollisionComponent::TRIGGER_TYPE_PLAYER_DMGBOX:
+													_channel.Broadcast<ActorTriggerEvent>(ActorTriggerEvent(entities[i], entities[j]));
+													break;
+												case CollisionComponent::TRIGGER_TYPE_ENEMY_DMGBOX:
+													_channel.Broadcast<ActorTriggerEvent>(ActorTriggerEvent(entities[i], entities[j]));
+													break;
+												}
 
-								}
-								if (collision2._isTrigger && 
-									collision2._valid && collision._valid)
-								{
-									switch (collision._triggerType)
+											}
+											if (collision2._isTrigger &&
+												collision2._valid && collision._valid)
+											{
+												switch (collision._triggerType)
+												{
+												case CollisionComponent::TRIGGER_TYPE_ENEMY:
+												case CollisionComponent::TRIGGER_TYPE_PLAYER:
+													_channel.Broadcast<ActorTriggerEvent>(
+														ActorTriggerEvent(entities[j], entities[i]));
+													break;
+												case CollisionComponent::TRIGGER_TYPE_OBJECT:
+													_channel.Broadcast<ObjectTriggerEvent>(
+														ObjectTriggerEvent(entities[j], entities[i]));
+													break;
+												case CollisionComponent::TRIGGER_TYPE_PLAYER_DMGBOX:
+													_channel.Broadcast<ActorTriggerEvent>(ActorTriggerEvent(entities[i], entities[j]));
+													break;
+												case CollisionComponent::TRIGGER_TYPE_ENEMY_DMGBOX:
+													_channel.Broadcast<ActorTriggerEvent>(ActorTriggerEvent(entities[i], entities[j]));
+													break;
+												}
+											}
+											//오브젝트와 충돌했다면 민다
+											if (collision._triggerType == CollisionComponent::TRIGGER_TYPE_OBJECT)
+											{
+												IsBlocking(&transform, &aabb0, &transform2, &aabb1, 0.0f);
+											}
+											if (collision2._triggerType == CollisionComponent::TRIGGER_TYPE_OBJECT)
+											{
+												IsBlocking(&transform, &aabb0, &transform2, &aabb1, 1.0f);
+											}
+
+										}
+									}
+									else if (collision2._type == CollisionComponent::COLLISION_TYPE_OBB)
 									{
-									case CollisionComponent::TRIGGER_TYPE_ENEMY:
-									case CollisionComponent::TRIGGER_TYPE_PLAYER:
-										_channel.Broadcast<ActorTriggerEvent>(
-											ActorTriggerEvent(entities[j], entities[i]));
-										break;
-									case CollisionComponent::TRIGGER_TYPE_OBJECT:
-										_channel.Broadcast<ObjectTriggerEvent>(
-											ObjectTriggerEvent(entities[j], entities[i]));
-										break;
-									case CollisionComponent::TRIGGER_TYPE_PLAYER_DMGBOX:
-										_channel.Broadcast<ActorTriggerEvent>(ActorTriggerEvent(entities[i], entities[j]));
-										break;
-									case CollisionComponent::TRIGGER_TYPE_ENEMY_DMGBOX:
-										_channel.Broadcast<ActorTriggerEvent>(ActorTriggerEvent(entities[i], entities[j]));
-										break;
+										Matrix a = transform2.GetFinalMatrix();
+										float b;
+										MatrixInverse(&a, &b, &a);
+										Vector3 xVec = Vector3(a._11, a._21, a._31);
+										Vector3 yVec = Vector3(a._12, a._22, a._32);
+										Vector3 zVec = Vector3(a._13, a._23, a._33);
+										if (Collision_AABBToOBB(aabb0._min, aabb0._max, aabb1._center,
+											-xVec, yVec, -zVec,
+											aabb1._xSize, aabb1._ySize, aabb1._zSize))
+										{
+											if (collision._isTrigger &&
+												collision._valid && collision2._valid)
+											{
+												switch (collision._triggerType)
+												{
+												case CollisionComponent::TRIGGER_TYPE_ENEMY:
+												case CollisionComponent::TRIGGER_TYPE_PLAYER:
+													_channel.Broadcast<ActorTriggerEvent>(
+														ActorTriggerEvent(entities[i], entities[j]));
+													break;
+												case CollisionComponent::TRIGGER_TYPE_OBJECT:
+													_channel.Broadcast<ObjectTriggerEvent>(
+														ObjectTriggerEvent(entities[i], entities[j]));
+													break;
+												case CollisionComponent::TRIGGER_TYPE_PLAYER_DMGBOX:
+													_channel.Broadcast<ActorTriggerEvent>(ActorTriggerEvent(entities[i], entities[j]));
+													break;
+												case CollisionComponent::TRIGGER_TYPE_ENEMY_DMGBOX:
+													_channel.Broadcast<ActorTriggerEvent>(ActorTriggerEvent(entities[i], entities[j]));
+													break;
+												}
+											}
+											if (collision2._isTrigger &&
+												collision2._valid && collision._valid)
+											{
+												switch (collision._triggerType)
+												{
+												case CollisionComponent::TRIGGER_TYPE_ENEMY:
+												case CollisionComponent::TRIGGER_TYPE_PLAYER:
+													_channel.Broadcast<ActorTriggerEvent>(
+														ActorTriggerEvent(entities[j], entities[i]));
+													break;
+												case CollisionComponent::TRIGGER_TYPE_OBJECT:
+													_channel.Broadcast<ObjectTriggerEvent>(
+														ObjectTriggerEvent(entities[j], entities[i]));
+													break;
+												case CollisionComponent::TRIGGER_TYPE_PLAYER_DMGBOX:
+													_channel.Broadcast<ActorTriggerEvent>(ActorTriggerEvent(entities[i], entities[j]));
+													break;
+												case CollisionComponent::TRIGGER_TYPE_ENEMY_DMGBOX:
+													_channel.Broadcast<ActorTriggerEvent>(ActorTriggerEvent(entities[i], entities[j]));
+													break;
+												}
+											}
+											//오브젝트와 충돌했다면 민다
+											if (collision._triggerType == CollisionComponent::TRIGGER_TYPE_OBJECT)
+											{
+												IsBlocking(&transform, &aabb0, &transform2, &aabb1, 0.0f);
+											}
+											if (collision2._triggerType == CollisionComponent::TRIGGER_TYPE_OBJECT)
+											{
+												IsBlocking(&transform, &aabb0, &transform2, &aabb1, 1.0f);
+											}
+										}
 									}
 								}
-								//오브젝트와 충돌했다면 민다
-								if (collision._triggerType == CollisionComponent::TRIGGER_TYPE_OBJECT)
+								break;
+								case CollisionComponent::COLLISION_TYPE_OBB:
 								{
-									IsBlocking(&transform, &aabb0, &transform2, &aabb1, 0.0f);
-								}
-								if (collision2._triggerType == CollisionComponent::TRIGGER_TYPE_OBJECT)
-								{
-									IsBlocking(&transform, &aabb0, &transform2, &aabb1, 1.0f);
-								}
+									if (collision2._type == CollisionComponent::COLLISION_TYPE_BOX)
+									{
+										Matrix a = transform.GetFinalMatrix();
+										float b;
+										MatrixInverse(&a, &b, &a);
+										Vector3 xVec = Vector3(a._11, a._21, a._31);
+										Vector3 yVec = Vector3(a._12, a._22, a._32);
+										Vector3 zVec = Vector3(a._13, a._23, a._33);
+										if (Collision_AABBToOBB(aabb1._min, aabb1._max, aabb0._center, -xVec, yVec, -zVec, aabb0._xSize, aabb0._ySize, aabb0._zSize))
+										{
+											if (collision._isTrigger)
+											{
+												switch (collision._triggerType &&
+													collision._valid && collision2._valid)
+												{
+												case CollisionComponent::TRIGGER_TYPE_ENEMY:
+												case CollisionComponent::TRIGGER_TYPE_PLAYER:
+													_channel.Broadcast<ActorTriggerEvent>(ActorTriggerEvent(entities[i], entities[j]));
+													break;
+												case CollisionComponent::TRIGGER_TYPE_OBJECT:
+													_channel.Broadcast<ObjectTriggerEvent>(ObjectTriggerEvent(entities[i], entities[j]));
+													break;
+												case CollisionComponent::TRIGGER_TYPE_PLAYER_DMGBOX:
+													_channel.Broadcast<ActorTriggerEvent>(ActorTriggerEvent(entities[i], entities[j]));
+													break;
+												case CollisionComponent::TRIGGER_TYPE_ENEMY_DMGBOX:
+													_channel.Broadcast<ActorTriggerEvent>(ActorTriggerEvent(entities[i], entities[j]));
+													break;
+												}
 
+											}
+											if (collision2._isTrigger &&
+												collision2._valid && collision._valid)
+											{
+												switch (collision._triggerType)
+												{
+												case CollisionComponent::TRIGGER_TYPE_ENEMY:
+												case CollisionComponent::TRIGGER_TYPE_PLAYER:
+													_channel.Broadcast<ActorTriggerEvent>(ActorTriggerEvent(entities[j], entities[i]));
+													break;
+												case CollisionComponent::TRIGGER_TYPE_OBJECT:
+													_channel.Broadcast<ObjectTriggerEvent>(ObjectTriggerEvent(entities[j], entities[i]));
+													break;
+												case CollisionComponent::TRIGGER_TYPE_PLAYER_DMGBOX:
+													_channel.Broadcast<ActorTriggerEvent>(ActorTriggerEvent(entities[i], entities[j]));
+													break;
+												case CollisionComponent::TRIGGER_TYPE_ENEMY_DMGBOX:
+													_channel.Broadcast<ActorTriggerEvent>(ActorTriggerEvent(entities[i], entities[j]));
+													break;
+												}
+											}
+											//오브젝트와 충돌했다면 민다
+											if (collision._triggerType == CollisionComponent::TRIGGER_TYPE_OBJECT)
+											{
+												IsBlocking(&transform, &aabb0, &transform2, &aabb1, 0.0f);
+											}
+											if (collision2._triggerType == CollisionComponent::TRIGGER_TYPE_OBJECT)
+											{
+												IsBlocking(&transform, &aabb0, &transform2, &aabb1, 1.0f);
+											}
+										}
+									}
+									else if (collision2._type == CollisionComponent::COLLISION_TYPE_OBB)
+									{
+										Matrix a = transform.GetFinalMatrix();
+										float b;
+										MatrixInverse(&a, &b, &a);
+										Vector3 xVec = Vector3(a._11, a._21, a._31);
+										Vector3 yVec = Vector3(a._12, a._22, a._32);
+										Vector3 zVec = Vector3(a._13, a._23, a._33);
+
+										a = transform2.GetFinalMatrix();
+										MatrixInverse(&a, &b, &a);
+										Vector3 xVec2 = Vector3(a._11, a._21, a._31);
+										Vector3 yVec2 = Vector3(a._12, a._22, a._32);
+										Vector3 zVec2 = Vector3(a._13, a._23, a._33);
+
+										if (Collision_OBBToOBB(aabb0._center, -xVec, yVec, -zVec, aabb0._xSize, aabb0._ySize, aabb0._zSize, aabb1._center, -xVec2, yVec2, -zVec2, aabb1._xSize, aabb1._ySize, aabb1._zSize))
+										{
+											if (collision._isTrigger &&
+												collision._valid)
+											{
+												switch (collision._triggerType)
+												{
+												case CollisionComponent::TRIGGER_TYPE_ENEMY:
+												case CollisionComponent::TRIGGER_TYPE_PLAYER:
+													_channel.Broadcast<ActorTriggerEvent>(ActorTriggerEvent(entities[i], entities[j]));
+													break;
+												case CollisionComponent::TRIGGER_TYPE_OBJECT:
+													_channel.Broadcast<ObjectTriggerEvent>(ObjectTriggerEvent(entities[i], entities[j]));
+													break;
+												case CollisionComponent::TRIGGER_TYPE_PLAYER_DMGBOX:
+													_channel.Broadcast<ActorTriggerEvent>(ActorTriggerEvent(entities[i], entities[j]));
+													break;
+												case CollisionComponent::TRIGGER_TYPE_ENEMY_DMGBOX:
+													_channel.Broadcast<ActorTriggerEvent>(ActorTriggerEvent(entities[i], entities[j]));
+													break;
+												}
+
+											}
+											if (collision2._isTrigger &&
+												collision2._valid)
+											{
+												switch (collision._triggerType)
+												{
+												case CollisionComponent::TRIGGER_TYPE_ENEMY:
+												case CollisionComponent::TRIGGER_TYPE_PLAYER:
+													_channel.Broadcast<ActorTriggerEvent>(ActorTriggerEvent(entities[j], entities[i]));
+													break;
+												case CollisionComponent::TRIGGER_TYPE_OBJECT:
+													_channel.Broadcast<ObjectTriggerEvent>(ObjectTriggerEvent(entities[j], entities[i]));
+													break;
+												case CollisionComponent::TRIGGER_TYPE_PLAYER_DMGBOX:
+													_channel.Broadcast<ActorTriggerEvent>(ActorTriggerEvent(entities[i], entities[j]));
+													break;
+												case CollisionComponent::TRIGGER_TYPE_ENEMY_DMGBOX:
+													_channel.Broadcast<ActorTriggerEvent>(ActorTriggerEvent(entities[i], entities[j]));
+													break;
+												}
+											}
+											//오브젝트와 충돌했다면 민다
+											if (collision._triggerType == CollisionComponent::TRIGGER_TYPE_OBJECT)
+											{
+												IsBlocking(&transform, &aabb0, &transform2, &aabb1, 0.0f);
+											}
+											if (collision2._triggerType == CollisionComponent::TRIGGER_TYPE_OBJECT)
+											{
+												IsBlocking(&transform, &aabb0, &transform2, &aabb1, 1.0f);
+											}
+										}
+									}
+								}
+								break;
+								}
 							}
 						}
-						else if(collision2._type == CollisionComponent::COLLISION_TYPE_OBB)
-						{
-							Matrix a = transform2.GetFinalMatrix();
-							float b;
-							MatrixInverse(&a, &b, &a);
-							Vector3 xVec = Vector3(a._11, a._21, a._31);
-							Vector3 yVec = Vector3(a._12, a._22, a._32);
-							Vector3 zVec = Vector3(a._13, a._23, a._33);
-							if (Collision_AABBToOBB(aabb0._min, aabb0._max, aabb1._center, 
-								-xVec, yVec, -zVec, 
-								aabb1._xSize, aabb1._ySize, aabb1._zSize))
-							{
-								if (collision._isTrigger && 
-									collision._valid && collision2._valid)
-								{
-									switch (collision._triggerType)
-									{
-									case CollisionComponent::TRIGGER_TYPE_ENEMY:
-									case CollisionComponent::TRIGGER_TYPE_PLAYER:
-										_channel.Broadcast<ActorTriggerEvent>(
-											ActorTriggerEvent(entities[i], entities[j]));
-										break;
-									case CollisionComponent::TRIGGER_TYPE_OBJECT:
-										_channel.Broadcast<ObjectTriggerEvent>(
-											ObjectTriggerEvent(entities[i], entities[j]));
-										break;
-									case CollisionComponent::TRIGGER_TYPE_PLAYER_DMGBOX:
-										_channel.Broadcast<ActorTriggerEvent>(ActorTriggerEvent(entities[i], entities[j]));
-										break;
-									case CollisionComponent::TRIGGER_TYPE_ENEMY_DMGBOX:
-										_channel.Broadcast<ActorTriggerEvent>(ActorTriggerEvent(entities[i], entities[j]));
-										break;
-									}
-								}
-								if (collision2._isTrigger && 
-									collision2._valid && collision._valid)
-								{
-									switch (collision._triggerType)
-									{
-									case CollisionComponent::TRIGGER_TYPE_ENEMY:
-									case CollisionComponent::TRIGGER_TYPE_PLAYER:
-										_channel.Broadcast<ActorTriggerEvent>(
-											ActorTriggerEvent(entities[j], entities[i]));
-										break;
-									case CollisionComponent::TRIGGER_TYPE_OBJECT:
-										_channel.Broadcast<ObjectTriggerEvent>(
-											ObjectTriggerEvent(entities[j], entities[i]));
-										break;
-									case CollisionComponent::TRIGGER_TYPE_PLAYER_DMGBOX:
-										_channel.Broadcast<ActorTriggerEvent>(ActorTriggerEvent(entities[i], entities[j]));
-										break;
-									case CollisionComponent::TRIGGER_TYPE_ENEMY_DMGBOX:
-										_channel.Broadcast<ActorTriggerEvent>(ActorTriggerEvent(entities[i], entities[j]));
-										break;
-									}
-								}
-								//오브젝트와 충돌했다면 민다
-								if (collision._triggerType == CollisionComponent::TRIGGER_TYPE_OBJECT)
-								{
-									IsBlocking(&transform, &aabb0, &transform2, &aabb1, 0.0f);
-								}
-								if (collision2._triggerType == CollisionComponent::TRIGGER_TYPE_OBJECT)
-								{
-									IsBlocking(&transform, &aabb0, &transform2, &aabb1, 1.0f);
-								}
-							}
-						}
-					}
-						break;
-					case CollisionComponent::COLLISION_TYPE_OBB:
-					{
-						if (collision2._type == CollisionComponent::COLLISION_TYPE_BOX)
-						{
-							Matrix a = transform.GetFinalMatrix();
-							float b;
-							MatrixInverse(&a, &b, &a);
-							Vector3 xVec = Vector3(a._11, a._21, a._31);
-							Vector3 yVec = Vector3(a._12, a._22, a._32);
-							Vector3 zVec = Vector3(a._13, a._23, a._33);
-							if (Collision_AABBToOBB(aabb1._min, aabb1._max, aabb0._center, -xVec, yVec, -zVec, aabb0._xSize, aabb0._ySize, aabb0._zSize))
-							{
-								if (collision._isTrigger)
-								{
-									switch (collision._triggerType && 
-										collision._valid && collision2._valid)
-									{
-									case CollisionComponent::TRIGGER_TYPE_ENEMY:
-									case CollisionComponent::TRIGGER_TYPE_PLAYER:
-										_channel.Broadcast<ActorTriggerEvent>(ActorTriggerEvent(entities[i], entities[j]));
-										break;
-									case CollisionComponent::TRIGGER_TYPE_OBJECT:
-										_channel.Broadcast<ObjectTriggerEvent>(ObjectTriggerEvent(entities[i], entities[j]));
-										break;
-									case CollisionComponent::TRIGGER_TYPE_PLAYER_DMGBOX:
-										_channel.Broadcast<ActorTriggerEvent>(ActorTriggerEvent(entities[i], entities[j]));
-										break;
-									case CollisionComponent::TRIGGER_TYPE_ENEMY_DMGBOX:
-										_channel.Broadcast<ActorTriggerEvent>(ActorTriggerEvent(entities[i], entities[j]));
-										break;
-									}
-
-								}
-								if (collision2._isTrigger && 
-									collision2._valid && collision._valid)
-								{
-									switch (collision._triggerType)
-									{
-									case CollisionComponent::TRIGGER_TYPE_ENEMY:
-									case CollisionComponent::TRIGGER_TYPE_PLAYER:
-										_channel.Broadcast<ActorTriggerEvent>(ActorTriggerEvent(entities[j], entities[i]));
-										break;
-									case CollisionComponent::TRIGGER_TYPE_OBJECT:
-										_channel.Broadcast<ObjectTriggerEvent>(ObjectTriggerEvent(entities[j], entities[i]));
-										break;
-									case CollisionComponent::TRIGGER_TYPE_PLAYER_DMGBOX:
-										_channel.Broadcast<ActorTriggerEvent>(ActorTriggerEvent(entities[i], entities[j]));
-										break;
-									case CollisionComponent::TRIGGER_TYPE_ENEMY_DMGBOX:
-										_channel.Broadcast<ActorTriggerEvent>(ActorTriggerEvent(entities[i], entities[j]));
-										break;
-									}
-								}
-								//오브젝트와 충돌했다면 민다
-								if (collision._triggerType == CollisionComponent::TRIGGER_TYPE_OBJECT)
-								{
-									IsBlocking(&transform, &aabb0, &transform2, &aabb1, 0.0f);
-								}
-								if (collision2._triggerType == CollisionComponent::TRIGGER_TYPE_OBJECT)
-								{
-									IsBlocking(&transform, &aabb0, &transform2, &aabb1, 1.0f);
-								}
-							}
-						}
-						else if (collision2._type == CollisionComponent::COLLISION_TYPE_OBB)
-						{
-							Matrix a = transform.GetFinalMatrix();
-							float b;
-							MatrixInverse(&a, &b, &a);
-							Vector3 xVec = Vector3(a._11, a._21, a._31);
-							Vector3 yVec = Vector3(a._12, a._22, a._32);
-							Vector3 zVec = Vector3(a._13, a._23, a._33);
-
-							a = transform2.GetFinalMatrix();
-							MatrixInverse(&a, &b, &a);
-							Vector3 xVec2 = Vector3(a._11, a._21, a._31);
-							Vector3 yVec2 = Vector3(a._12, a._22, a._32);
-							Vector3 zVec2 = Vector3(a._13, a._23, a._33);
-
-							if (Collision_OBBToOBB(aabb0._center,-xVec,yVec,-zVec,aabb0._xSize, aabb0._ySize, aabb0._zSize,aabb1._center,-xVec2, yVec2, -zVec2,aabb1._xSize,aabb1._ySize,aabb1._zSize))
-							{
-								if (collision._isTrigger &&
-									collision._valid)
-								{
-									switch (collision._triggerType)
-									{
-									case CollisionComponent::TRIGGER_TYPE_ENEMY:
-									case CollisionComponent::TRIGGER_TYPE_PLAYER:
-										_channel.Broadcast<ActorTriggerEvent>(ActorTriggerEvent(entities[i], entities[j]));
-										break;
-									case CollisionComponent::TRIGGER_TYPE_OBJECT:
-										_channel.Broadcast<ObjectTriggerEvent>(ObjectTriggerEvent(entities[i], entities[j]));
-										break;
-									case CollisionComponent::TRIGGER_TYPE_PLAYER_DMGBOX:
-										_channel.Broadcast<ActorTriggerEvent>(ActorTriggerEvent(entities[i], entities[j]));
-										break;
-									case CollisionComponent::TRIGGER_TYPE_ENEMY_DMGBOX:
-										_channel.Broadcast<ActorTriggerEvent>(ActorTriggerEvent(entities[i], entities[j]));
-										break;
-									}
-
-								}
-								if (collision2._isTrigger && 
-									collision2._valid)
-								{
-									switch (collision._triggerType)
-									{
-									case CollisionComponent::TRIGGER_TYPE_ENEMY:
-									case CollisionComponent::TRIGGER_TYPE_PLAYER:
-										_channel.Broadcast<ActorTriggerEvent>(ActorTriggerEvent(entities[j], entities[i]));
-										break;
-									case CollisionComponent::TRIGGER_TYPE_OBJECT:
-										_channel.Broadcast<ObjectTriggerEvent>(ObjectTriggerEvent(entities[j], entities[i]));
-										break;
-									case CollisionComponent::TRIGGER_TYPE_PLAYER_DMGBOX:
-										_channel.Broadcast<ActorTriggerEvent>(ActorTriggerEvent(entities[i], entities[j]));
-										break;
-									case CollisionComponent::TRIGGER_TYPE_ENEMY_DMGBOX:
-										_channel.Broadcast<ActorTriggerEvent>(ActorTriggerEvent(entities[i], entities[j]));
-										break;
-									}
-								}
-								//오브젝트와 충돌했다면 민다
-								if (collision._triggerType == CollisionComponent::TRIGGER_TYPE_OBJECT)
-								{
-									IsBlocking(&transform, &aabb0, &transform2, &aabb1, 0.0f);
-								}
-								if (collision2._triggerType == CollisionComponent::TRIGGER_TYPE_OBJECT)
-								{
-									IsBlocking(&transform, &aabb0, &transform2, &aabb1, 1.0f);
-								}
-							} 
-						}
-					}
-						break;
 					}
 				}
+
 			}
 		}
 	}

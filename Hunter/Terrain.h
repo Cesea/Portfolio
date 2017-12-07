@@ -191,6 +191,17 @@ public:
 	inline std::vector<int32> &GetActiveTerrainChunkIndices() { return _activeChunkIndices; }
 	inline std::vector<Terrain::TerrainTile *> &GetVisibleTerrainTiles() { return _visibleTiles; }
 
+	void RemoveEntityInTile(Entity entity, const TerrainTilePos &tilePos);
+
+	void ReTilelizeTilePosition(TerrainTilePos &tilePos);
+	bool IsTerrainTilePosValid(const TerrainTilePos &tilePos);
+
+	inline Terrain::TerrainTile *GetTileAt(const TerrainTilePos &tilePos)
+	{
+		Terrain::TerrainChunk &refChunk = _pChunks[Index2D(tilePos._chunkX, tilePos._chunkZ, _xChunkCount)];
+		return &refChunk._tiles[Index2D(tilePos._tileX, tilePos._tileZ, TERRAIN_TILE_RES)];
+	}
+
 private:
 	//bool CreateInGame(const Terrain::TerrainConfig &config);
 	//bool CreateEdit(const Terrain::TerrainConfig &config);
@@ -283,6 +294,7 @@ private:
 	std::vector<Terrain::TerrainTile *> _visibleTiles;
 
 	std::vector<Terrain::TerrainChunk *> _shadowVisibleChunks;
+	std::vector<Terrain::TerrainTile *> _shadowVisibleTiles;
 };
 
 #define TERRAIN Terrain::GetInstance()

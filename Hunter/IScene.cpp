@@ -82,7 +82,7 @@ bool IScene::Init()
 	_camera.ReadyRenderToTexture( WINSIZEX, WINSIZEY );
 
 
-	_shadowDistance = 30.0f;
+	_shadowDistance = 50.0f;
 	_shadowCamera.CreateFromWorld(_world);
 	_shadowCamera._ortho = true;
 	_shadowCamera._camNear = 0.1f;

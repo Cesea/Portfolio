@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "RenderSystem.h"
 
-//#define RENDER_TILE_TEST
+#define RENDER_TILE_TEST
 
 RenderSystem::RenderSystem()
 {
@@ -131,52 +131,54 @@ void RenderSystem::Render(const Camera &camera)
 
 void RenderSystem::RenderShadow(const Camera & camera)
 {
-	auto &entities = GetEntities();
-	//renderView.SetViewProjection(camera.GetViewMatrix(), camera.GetProjectionMatrix());
-
-	for (uint32 i = 0; i < entities.size(); ++i)
+	std::vector<Terrain::TerrainTile *> &visibleTiles = TERRAIN->GetVisibleTerrainTiles();
+	for (auto &tile : visibleTiles)
 	{
-		TransformComponent &refTransformComponent = entities[i].GetComponent<TransformComponent>();
-		RenderComponent &refRenderComponent = entities[i].GetComponent<RenderComponent>();
-
-		if (refRenderComponent._type == RenderComponent::Type::eBuffer)
+		for (uint32 i = 0; i < tile->_entities.size(); ++i)
 		{
-			//video::RenderCommand &refCommand = renderView.GetCommand();
-			//refCommand._vHandle = refRenderComponent._vHandle;
-			//refCommand._iHandle = refRenderComponent._iHandle;
-			//refCommand._materialHandle = refRenderComponent._material;
-			//refCommand._effectHandle = refRenderComponent._effect;
+			TransformComponent &refTransformComponent = tile->_entities[i].GetComponent<TransformComponent>();
+			RenderComponent &refRenderComponent = tile->_entities[i].GetComponent<RenderComponent>();
+			if (refRenderComponent._type == RenderComponent::Type::eBuffer)
+			{
+			}
+			else if (refRenderComponent._type == RenderComponent::Type::eStatic)
+			{
+				video::StaticXMesh *pMesh = VIDEO->GetStaticXMesh(refRenderComponent._static);
+				pMesh->RenderShadow(refTransformComponent);
+			}
+			else if (refRenderComponent._type == RenderComponent::Type::eSkinned)
+			{
+				video::AnimationInstance *pAnimation = VIDEO->GetAnimationInstance(refRenderComponent._skinned);
+				pAnimation->_pSkinnedMesh->RenderShadow();
 
-			//worldMatrix = refTransformComponent.GetFinalMatrix();
-			//video::MatrixCache::CacheRange range = renderView._matrixCache.Add(&refTransformComponent.GetFinalMatrix());
-
-			//refCommand._cacheRange = range;
-		}
-		else if (refRenderComponent._type == RenderComponent::Type::eStatic)
-		{
-			video::StaticXMesh *pMesh = VIDEO->GetStaticXMesh(refRenderComponent._static);
-			pMesh->RenderShadow(refTransformComponent);
-			
-//#if defined (DEBUG) || defined (_DEBUG)
-//			CollisionComponent &refCollisionComp = entities[i].GetComponent<CollisionComponent>();
-//			refCollisionComp.RenderBoxGizmo(refTransformComponent);
-//#endif
-		}
-		else if (refRenderComponent._type == RenderComponent::Type::eSkinned)
-		{
-			video::AnimationInstance *pAnimation = VIDEO->GetAnimationInstance(refRenderComponent._skinned);
-			//ActionComponent &actionComp = entities[i].GetComponent<ActionComponent>();
-			//actionComp._pAnimationController->AdvanceTime(actionComp._animDelta, actionComp._pCallbackHandler);
-			//pAnimation->_pSkinnedMesh->Update(&refTransformComponent.GetFinalMatrix());
-			pAnimation->_pSkinnedMesh->RenderShadow();
-
-//#if defined (DEBUG) || defined (_DEBUG)
-//			CollisionComponent &refCollisionComp = entities[i].GetComponent<CollisionComponent>();
-//			refCollisionComp.RenderBoxGizmo(refTransformComponent);
-//#endif
-
+			}
 		}
 	}
+
+
+//	auto &entities = GetEntities();
+//	//renderView.SetViewProjection(camera.GetViewMatrix(), camera.GetProjectionMatrix());
+//
+//	for (uint32 i = 0; i < entities.size(); ++i)
+//	{
+//		TransformComponent &refTransformComponent = entities[i].GetComponent<TransformComponent>();
+//		RenderComponent &refRenderComponent = entities[i].GetComponent<RenderComponent>();
+//
+//		if (refRenderComponent._type == RenderComponent::Type::eBuffer)
+//		{
+//		}
+//		else if (refRenderComponent._type == RenderComponent::Type::eStatic)
+//		{
+//			video::StaticXMesh *pMesh = VIDEO->GetStaticXMesh(refRenderComponent._static);
+//			pMesh->RenderShadow(refTransformComponent);
+//			
+//		}
+//		else if (refRenderComponent._type == RenderComponent::Type::eSkinned)
+//		{
+//			video::AnimationInstance *pAnimation = VIDEO->GetAnimationInstance(refRenderComponent._skinned);
+//			pAnimation->_pSkinnedMesh->RenderShadow();
+//		}
+//	}
 }
 
 void RenderSystem::Initialize()

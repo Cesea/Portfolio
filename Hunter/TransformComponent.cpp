@@ -20,10 +20,9 @@ DEFINE_META(TransformComponent)
 
 TransformComponent::TransformComponent()
 {
-
-	this->_pParent = NULL;
-	this->_pFirstChild = NULL;
-	this->_pNextSibling = NULL;
+	this->_pParent = nullptr;
+	this->_pFirstChild = nullptr;
+	this->_pNextSibling = nullptr;
 
 	this->_transformDirty = false;
 
@@ -1079,7 +1078,8 @@ Vector3 TransformComponent::GetWorldPosition() const
 {
 	Vector3 pos = this->_position;
 
-	if (this->_pParent) {
+	if (this->_pParent) 
+	{
 		Vec3TransformCoord(&pos, &pos, &this->_pParent->_matFinal);
 	}
 

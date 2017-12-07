@@ -621,6 +621,7 @@ void Hydra::Update(float deltaTime)
 		{
 			this->_valid = false;
 			EventChannel channel;
+			TERRAIN->RemoveEntityInTile(_entity, _tilePos);
 			channel.Broadcast<IScene::SceneDirty>(IScene::SceneDirty());
 		}
 	}
