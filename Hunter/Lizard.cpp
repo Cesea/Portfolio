@@ -212,7 +212,7 @@ void Lizard::Update(float deltaTime)
 	break;
 	case LIZARDSTATE_ATK1:
 		_atkCount--;
-		if (_atkCount == 60)
+		if (_atkCount == 30)
 		{
 			Vector3 targetPos = transComp.GetWorldPosition() - transComp.GetForward();
 			EventChannel _channel;
@@ -243,7 +243,7 @@ void Lizard::Update(float deltaTime)
 		break;
 	case LIZARDSTATE_ATK2:
 		_atkCount--;
-		if (_atkCount == 50)
+		if (_atkCount == 40)
 		{
 			Vector3 targetPos = transComp.GetWorldPosition() - transComp.GetForward();
 			EventChannel _channel;

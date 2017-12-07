@@ -242,7 +242,7 @@ void Bat::Update(float deltaTime)
 	break;
 	case BATSTATE_ATK1:
 		_atkCount--;
-		if (_atkCount == 50)
+		if (_atkCount == 30)
 		{
 			Vector3 targetPos = transComp.GetWorldPosition() - transComp.GetForward();
 			EventChannel _channel;
@@ -268,7 +268,7 @@ void Bat::Update(float deltaTime)
 		break;
 	case BATSTATE_ATK2:
 		_atkCount--;
-		if (_atkCount == 50)
+		if (_atkCount == 122)
 		{
 			Vector3 targetPos = transComp.GetWorldPosition() - transComp.GetForward();
 			EventChannel _channel;
@@ -294,7 +294,7 @@ void Bat::Update(float deltaTime)
 		break;
 	case BATSTATE_ATK3:
 		_atkCount--;
-		if (_atkCount == 40)
+		if (_atkCount == 60)
 		{
 			Vector3 targetPos = transComp.GetWorldPosition() - transComp.GetForward();
 			EventChannel _channel;

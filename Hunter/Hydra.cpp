@@ -239,7 +239,7 @@ void Hydra::Update(float deltaTime)
 	break;
 	case HYDRASTATE_ATK1:
 		_atkCount--;
-		if (_atkCount == 40)
+		if (_atkCount == 20)
 		{
 			Vector3 targetPos = transComp.GetWorldPosition() - transComp.GetForward();
 			EventChannel _channel;
@@ -275,7 +275,7 @@ void Hydra::Update(float deltaTime)
 		break;
 	case HYDRASTATE_ATK2:
 		_atkCount--;
-		if (_atkCount == 40)
+		if (_atkCount == 20)
 		{
 			Vector3 targetPos = transComp.GetWorldPosition() - transComp.GetForward();
 			EventChannel _channel;
@@ -312,7 +312,7 @@ void Hydra::Update(float deltaTime)
 		break;
 	case HYDRASTATE_ATK3:
 		_atkCount--;
-		if (_atkCount == 40)
+		if (_atkCount == 20)
 		{
 			Vector3 targetPos = transComp.GetWorldPosition() - transComp.GetForward();
 			EventChannel _channel;
@@ -397,7 +397,7 @@ void Hydra::Update(float deltaTime)
 		break;
 	case HYDRASTATE_SP_ATK1:
 		_atkCount--;
-		if (_atkCount == 20)
+		if (_atkCount == 40)
 		{
 			Vector3 targetPos = transComp.GetWorldPosition() - transComp.GetForward();
 			EventChannel _channel;
@@ -428,7 +428,7 @@ void Hydra::Update(float deltaTime)
 		break;
 	case HYDRASTATE_SP_ATK2:
 		_atkCount--;
-		if (_atkCount == 20)
+		if (_atkCount == 40)
 		{
 			Vector3 targetPos = transComp.GetWorldPosition() - transComp.GetForward();
 			EventChannel _channel;
