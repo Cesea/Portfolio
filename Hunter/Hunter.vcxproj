@@ -139,6 +139,7 @@
     <ClCompile Include="bat.cpp" />
     <ClCompile Include="batAnimationString.cpp" />
     <ClCompile Include="batStates.cpp" />
+    <ClCompile Include="BmpFont.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="Cat.cpp" />
     <ClCompile Include="CatAnimationString.cpp" />
@@ -242,6 +243,7 @@
     <ClInclude Include="bat.h" />
     <ClInclude Include="batAnimationString.h" />
     <ClInclude Include="batStates.h" />
+    <ClInclude Include="BmpFont.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Cat.h" />
     <ClInclude Include="CatAnimationString.h" />

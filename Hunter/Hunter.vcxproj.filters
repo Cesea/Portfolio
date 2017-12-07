@@ -289,6 +289,9 @@
     <ClCompile Include="Inventory.cpp">
       <Filter>Game\UI</Filter>
     </ClCompile>
+    <ClCompile Include="BmpFont.cpp">
+      <Filter>Game\UI</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Lights.h" />
@@ -659,6 +662,9 @@
       <Filter>Game\UI</Filter>
     </ClInclude>
     <ClInclude Include="Inventory.h">
+      <Filter>Game\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="BmpFont.h">
       <Filter>Game\UI</Filter>
     </ClInclude>
   </ItemGroup>
