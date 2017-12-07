@@ -294,6 +294,12 @@
     <ClCompile Include="normalFireBall.cpp">
       <Filter>Game\GameComponents\ParticleComponent</Filter>
     </ClCompile>
+    <ClCompile Include="Dragon.cpp">
+      <Filter>Game\GameObjects\Enemy</Filter>
+    </ClCompile>
+    <ClCompile Include="DragonAnimationString.cpp">
+      <Filter>Game\GameObjects\Enemy</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ClassTypeID.h" />
@@ -667,6 +673,12 @@
     </ClInclude>
     <ClInclude Include="normalFireBall.h">
       <Filter>Game\GameComponents\ParticleComponent</Filter>
+    </ClInclude>
+    <ClInclude Include="Dragon.h">
+      <Filter>Game\GameObjects\Enemy</Filter>
+    </ClInclude>
+    <ClInclude Include="DragonAnimationString.h">
+      <Filter>Game\GameObjects\Enemy</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
