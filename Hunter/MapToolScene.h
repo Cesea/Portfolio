@@ -6,7 +6,7 @@
 #include "WorldEditor.h"
 #include "Player.h"
 #include "Snake.h"
-
+#include "Dragon.h"
 #include "UI.h"
 
 class MapToolScene : public IScene
@@ -40,6 +40,7 @@ private :
 	void RenderMinimap();
 
 	Camera _minimapCamera;
+	Dragon * _Dragon;
 
 public:
 	virtual void Handle(const Editor::GetObjectFromSceneEvent &event);

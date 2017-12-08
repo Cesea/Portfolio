@@ -22,7 +22,7 @@ bool Dragon::CreateFromWorld(World & world, const Vector3 & Pos)
 	RenderComponent &renderComp = _entity.AddComponent<RenderComponent>();
 	renderComp._type = RenderComponent::Type::eSkinned;
 	renderComp._skinned = VIDEO->CreateAnimationInstance(VIDEO->GetSkinnedXMesh("Dragon"),
-		"Hydra_" + std::to_string(animCount));
+		"_Dragon" + std::to_string(animCount));
 	renderComp._arche = ARCHE_DRAGON;
 
 	video::AnimationInstance *pAnimation = VIDEO->GetAnimationInstance(renderComp._skinned);
@@ -51,7 +51,11 @@ bool Dragon::CreateFromWorld(World & world, const Vector3 & Pos)
 
 	_entity.Activate();
 
-	return false;
+	EventChannel channel;
+	channel.Broadcast<GameObjectFactory::ObjectCreatedEvent>(
+		GameObjectFactory::ObjectCreatedEvent(ARCHE_HYDRA, _entity, transComp.GetWorldPosition()));
+
+	return true;
 }
 
 void Dragon::Update(float deltaTime)
