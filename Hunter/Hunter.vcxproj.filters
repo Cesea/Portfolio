@@ -292,7 +292,7 @@
       <Filter>Manager\SoundManager</Filter>
     </ClCompile>
     <ClCompile Include="BmpFont.cpp">
-      <Filter>Game\UI</Filter>
+      <Filter>UI</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -666,9 +666,9 @@
       <Filter>Core\Memory</Filter>
     </ClInclude>
     <ClInclude Include="BmpFont.h">
-      <Filter>Game\UI</Filter>
+      <Filter>UI</Filter>
     </ClInclude>
-  </ItemGroup
+  </ItemGroup>
   <ItemGroup>
     <Filter Include="Core">
       <UniqueIdentifier>{71a9cdd4-a560-4984-8531-b9adc5b0bdbc}</UniqueIdentifier>

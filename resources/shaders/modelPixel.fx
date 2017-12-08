@@ -1,7 +1,7 @@
 #include "AddLight.fx"
 
-float camNear;			//Ä«¸Ş¶ó ±Ù°Å¸® Æò¸é
-float camFar;			//Ä«¸Ş¶ó ¿ø°Å¸® Æò¸é
+float camNear;			//ì¹´ë©”ë¼ ê·¼ê±°ë¦¬ í‰ë©´
+float camFar;			//ì¹´ë©”ë¼ ì›ê±°ë¦¬ í‰ë©´
 
 texture DiffuseTexture;
 sampler2D Diffuse = sampler_state
@@ -39,7 +39,7 @@ sampler2D Emission = sampler_state
 	MINFILTER = LINEAR;
 };
 
-float4x4 baseDirectionalLight;			//±âº»¶óÀÌÆÃ Çà·Ä
+float4x4 baseDirectionalLight;			//ê¸°ë³¸ë¼ì´íŒ… í–‰ë ¬
 
 struct PS_INPUT
 {
@@ -60,15 +60,15 @@ struct ps_diffuse_input
 	float4 FinalPos : TEXCOORD3;
 };
 
-//ÇÈ¼¿¼ÎÀÌ´õ Ãâ·Â ±¸Á¶Ã¼
+//í”½ì…€ì…°ì´ë” ì¶œë ¥ êµ¬ì¡°ì²´
 struct PS_OUTPUT
 {
-	float4 baseColor : COLOR0;			//0¹ø ½ºÅ×ÀÌÁö ÄÃ·¯
-	float4 normalDepth : COLOR1;		//1¹ø ½ºÅ×ÀÌÁö ÄÃ·¯ ( RGB ³ë¸», A µª½º )
+	float4 baseColor : COLOR0;			//0ë²ˆ ìŠ¤í…Œì´ì§€ ì»¬ëŸ¬
+	float4 normalDepth : COLOR1;		//1ë²ˆ ìŠ¤í…Œì´ì§€ ì»¬ëŸ¬ ( RGB ë…¸ë§, A ëìŠ¤ )
 };
 
 //---------------------------------------------------------------
-// Render Base °ü·Ã
+// Render Base ê´€ë ¨
 //---------------------------------------------------------------
 
 float4 ps_diffuse(ps_diffuse_input input) : COLOR
@@ -78,11 +78,11 @@ float4 ps_diffuse(ps_diffuse_input input) : COLOR
 
 	float3 finalDiffuse = float3(0.0f, 0.0f, 0.0f);
 
-	//±¤¿øÀÇ ¹æÇâ
+	//ê´‘ì›ì˜ ë°©í–¥
 	float3 dir = float3(baseDirectionalLight._21, baseDirectionalLight._22, baseDirectionalLight._23);
 	float3 lightDir = -dir;
 
-	//±¤¿øÀÇ ÄÃ·¯
+	//ê´‘ì›ì˜ ì»¬ëŸ¬
 	float3 lightColor = float3(baseDirectionalLight._31, baseDirectionalLight._32, baseDirectionalLight._33) * baseDirectionalLight._34;
 
 	float NdotL = dot(lightDir, input.normal);
@@ -122,17 +122,17 @@ float4 ps_main(PS_INPUT Input) : COLOR
 		float3 worldNormal = mul(spaceNor, TBN);
 		float3 viewDir = normalize(Input.viewDir);
 
-		//ÃÖÁ¾ »ö
+		//ìµœì¢… ìƒ‰
 		float3 finalDiffuse = float3(0, 0, 0);
 		float3 finalSpecular = float3(0, 0, 0);
 
-		//±âº» ¶óÀÌÆÃ Ã³¸®
+		//ê¸°ë³¸ ë¼ì´íŒ… ì²˜ë¦¬
 
-		//±¤¿øÀÇ ¹æÇâ
+		//ê´‘ì›ì˜ ë°©í–¥
 		float3 dir = float3(baseDirectionalLight._21, baseDirectionalLight._22, baseDirectionalLight._23);
 		float3 lightDir = -dir;
 
-		//±¤¿øÀÇ ÄÃ·¯
+		//ê´‘ì›ì˜ ì»¬ëŸ¬
 		float3 lightColor = float3(baseDirectionalLight._31, baseDirectionalLight._32, baseDirectionalLight._33) * baseDirectionalLight._34;
 
 		float NdotL = dot(lightDir, worldNormal);
@@ -148,25 +148,25 @@ float4 ps_main(PS_INPUT Input) : COLOR
 		diff = abs(NdotL) * 0.3f;
 	}
 
-	//¶óÀÌÆ® ¹İ»ç
+	//ë¼ì´íŠ¸ ë°˜ì‚¬
 	float3 lightRefl = normalize(dir + 2.0f * NdotL * worldNormal);
 		float spec = saturate(dot(lightRefl, viewDir));
 	spec = pow(spec, fSpecPower);
 
-	//±âº» ±¤¿ø Àû¿ë
+	//ê¸°ë³¸ ê´‘ì› ì ìš©
 	finalDiffuse = lightColor * diff;
-	finalSpecular = lightColor * spec * diff;		//Specular ¿¡ diff ¾È°öÇÏ¸é Specular ¿¡ ÀÇÇÑ ¿ª±¤ÀÌ ³ª¿Â´Ù...
+	finalSpecular = lightColor * spec * diff;		//Specular ì— diff ì•ˆê³±í•˜ë©´ Specular ì— ì˜í•œ ì—­ê´‘ì´ ë‚˜ì˜¨ë‹¤...
 
-	//Ãß°¡µÇ´Â ±¤¿ø
+	//ì¶”ê°€ë˜ëŠ” ê´‘ì›
 	//float3 addDiffuse = float3(0, 0, 0);
 //		float3 addSpecular = float3(0, 0, 0);
 //	for (int i = 0; i < LightNum; i++)
 //	{
-		//i ÀÎµ¦½ºÀÇ ±¤¿øÀÌ °è»êµÇ¾î addDiffuse, addSpecular ¿¡ ´ëÀÔµÈ´Ù.
+		//i ì¸ë±ìŠ¤ì˜ ê´‘ì›ì´ ê³„ì‚°ë˜ì–´ addDiffuse, addSpecular ì— ëŒ€ì…ëœë‹¤.
 		//AddLingt.fx
 		//ComputeLight( addDiffuse, addSpecular, Input.worldPos, worldNormal, viewDir, i);
 
-		//ÃÖÁ¾ ±¤¿ø ·®¿¡ ½×ÀÎ´Ù.
+		//ìµœì¢… ê´‘ì› ëŸ‰ì— ìŒ“ì¸ë‹¤.
 		//finalDiffuse += addDiffuse;
 		//finalSpecular += addSpecular;
 	//}
@@ -190,7 +190,7 @@ float4 ps_main(PS_INPUT Input) : COLOR
 
 
 //---------------------------------------------------------------
-// CreateShadow °ü·Ã
+// CreateShadow ê´€ë ¨
 //---------------------------------------------------------------
 
 struct PS_INPUT_SHADOW
@@ -201,7 +201,7 @@ struct PS_INPUT_SHADOW
 
 float4 ps_CreateShadow(PS_INPUT_SHADOW Input) : COLOR0
 {
-	//Çà·Äº¯È¯À» °ÅÄ£ °ª z ¿¡ Çà·Äº¯È¯¿¡¼­ ¾ò´Â °¡ÁßÄ¡ w ¸¦ ³ª´©¸é 0 ~ 1 »çÀÌÀÇ ±íÀÌ °ªÀÌ µÈ´Ù.
+	//í–‰ë ¬ë³€í™˜ì„ ê±°ì¹œ ê°’ z ì— í–‰ë ¬ë³€í™˜ì—ì„œ ì–»ëŠ” ê°€ì¤‘ì¹˜ w ë¥¼ ë‚˜ëˆ„ë©´ 0 ~ 1 ì‚¬ì´ì˜ ê¹Šì´ ê°’ì´ ëœë‹¤.
 	float depth = Input.FinalPos.z / Input.FinalPos.w;
 
 	float4 diffTex = tex2D(Diffuse, Input.Texcoord);
@@ -215,9 +215,9 @@ float4 ps_CreateShadow(PS_INPUT_SHADOW Input) : COLOR0
 //--------------------------------------------------------------//
 
 
-float4x4 matLightViewProjection;			//¹æÇâ¼º ±¤¿ø ViewProjection Çà·Ä
+float4x4 matLightViewProjection;			//ë°©í–¥ì„± ê´‘ì› ViewProjection í–‰ë ¬
 
-//½¦µµ¿ì Texture
+//ì‰ë„ìš° Texture
 texture ShadowTexture;
 sampler2D ShadowSampler = sampler_state
 {
@@ -229,7 +229,7 @@ sampler2D ShadowSampler = sampler_state
 
 float bias = 0.01f;
 
-
+static const float SMAP_SIZE = 2048.0f;
 
 struct PS_INPUT_RECIVESHADOW
 {
@@ -241,9 +241,8 @@ struct PS_INPUT_RECIVESHADOW
 	float3 worldPos : TEXCOORD5;
 
 	float4 FinalPos : TEXCOORD6;
-	float4 LightClipPos : TEXCOORD7;		//±¤¿ø ÀÔÀå¿¡¼­ ¹Ù¶óº» À§Ä¡
+	float4 LightClipPos : TEXCOORD7;		//ê´‘ì› ì…ì¥ì—ì„œ ë°”ë¼ë³¸ ìœ„ì¹˜
 };
-
 
 PS_OUTPUT ps_ReciveShadow(PS_INPUT_RECIVESHADOW Input)
 {
@@ -252,20 +251,20 @@ PS_OUTPUT ps_ReciveShadow(PS_INPUT_RECIVESHADOW Input)
 	float4 diffTex = tex2D(Diffuse, Input.Texcoord);
 	clip(diffTex.a - 0.1f);
 
-	//±¤¿ø ÀÔÀå¿¡¼­ ¹Ù¶óº» À§Ä¡ÀÇ µª½º °ª ( ¶óÀÌÆ® Çà·ÄÀ» Á÷±³ÀÌ±â¶§¹®¿¡ ¼±ÇüÀ¸·Î ¾ÈÇÉ´Ù )
+	//ê´‘ì› ì…ì¥ì—ì„œ ë°”ë¼ë³¸ ìœ„ì¹˜ì˜ ëìŠ¤ ê°’ ( ë¼ì´íŠ¸ í–‰ë ¬ì„ ì§êµì´ê¸°ë•Œë¬¸ì— ì„ í˜•ìœ¼ë¡œ ì•ˆí•€ë‹¤ )
 	float lightDepth = Input.LightClipPos.z / Input.LightClipPos.w;
 
-	//Shadow ¸ÊÀÇ UV ÃßÀû
+	//Shadow ë§µì˜ UV ì¶”ì 
 	//( -1 ~ 1 )
 	float2 shadowUV = Input.LightClipPos.xy / Input.LightClipPos.w;
-		shadowUV.y = -shadowUV.y;		//y¹İÀü...
-	//0 ~ 1 ÀÇ ¹üÀ§
+	shadowUV.y = -shadowUV.y;		//yë°˜ì „...
+	//0 ~ 1 ì˜ ë²”ìœ„
 	shadowUV = (shadowUV * 0.5f) + 0.5f;
 
-	//ÇöÁ¦ ±×·ÁÁö´Â ³ğÀÌ À§Ä¡¿¡ DirectionLight ÀÔÀå¿¡¼­ ½áÁø ±íÀÌ°ª...
+	//í˜„ì œ ê·¸ë ¤ì§€ëŠ” ë†ˆì´ ìœ„ì¹˜ì— DirectionLight ì…ì¥ì—ì„œ ì¨ì§„ ê¹Šì´ê°’...
 	float shadowDepth = tex2D(ShadowSampler, shadowUV).r;
 
-	//±×¸²ÀÚ°¡ ±×·ÁÁö´Â »óÈ²Àº shadowDepth + bias °ª º¸´Ù lightDepth °¡ Å«°æ¿ìÀÌ´Ù.
+	//ê·¸ë¦¼ìê°€ ê·¸ë ¤ì§€ëŠ” ìƒí™©ì€ shadowDepth + bias ê°’ ë³´ë‹¤ lightDepth ê°€ í°ê²½ìš°ì´ë‹¤.
 
 	//TBN Matrix
 	float3x3 TBN = float3x3(
@@ -285,17 +284,17 @@ PS_OUTPUT ps_ReciveShadow(PS_INPUT_RECIVESHADOW Input)
 	worldNormal = normalize(worldNormal);
 	float3 viewDir = normalize(Input.viewDir);
 
-	//ÃÖÁ¾ »ö
+	//ìµœì¢… ìƒ‰
 	float3 finalDiffuse = float3(0, 0, 0);
 	float3 finalSpecular = float3(0, 0, 0);
 
-	//±âº» ¶óÀÌÆÃ Ã³¸®
+	//ê¸°ë³¸ ë¼ì´íŒ… ì²˜ë¦¬
 
-	//±¤¿øÀÇ ¹æÇâ
+	//ê´‘ì›ì˜ ë°©í–¥
 	float3 dir = float3(baseDirectionalLight._21, baseDirectionalLight._22, baseDirectionalLight._23);
 	float3 lightDir = -dir;
 
-	//±¤¿øÀÇ ÄÃ·¯
+	//ê´‘ì›ì˜ ì»¬ëŸ¬
 	float3 lightColor = float3(baseDirectionalLight._31, baseDirectionalLight._32, baseDirectionalLight._33) * baseDirectionalLight._34;
 
 	float NdotL = dot(lightDir, worldNormal);
@@ -307,29 +306,29 @@ PS_OUTPUT ps_ReciveShadow(PS_INPUT_RECIVESHADOW Input)
 
 	float diff = NdotL;
 
-	//±×¸²ÀÚ°¡ ±×·ÁÁ®¾ß ÇÑ´Ù¸é diff ´Â ¹«Á¶°Ç À½¼ö°¡ µÈ´Ù 
+	//ê·¸ë¦¼ìê°€ ê·¸ë ¤ì ¸ì•¼ í•œë‹¤ë©´ diff ëŠ” ë¬´ì¡°ê±´ ìŒìˆ˜ê°€ ëœë‹¤ 
 	if (shadowDepth + bias < lightDepth && lightDepth < 1.0f)
 		diff = abs(diff) * -1.0f;
 
 	if (diff < 0.0)
 		diff = abs(diff) * 0.3f;
 
-	//¶óÀÌÆ® ¹İ»ç
+	//ë¼ì´íŠ¸ ë°˜ì‚¬
 	float3 lightRefl = normalize(dir + 2.0f * NdotL * worldNormal);
 		float spec = saturate(dot(lightRefl, viewDir));
 	spec = pow(spec, fSpecPower);
 
-	//±âº» ±¤¿ø Àû¿ë
+	//ê¸°ë³¸ ê´‘ì› ì ìš©
 	finalDiffuse = lightColor * diff;
-	finalSpecular = lightColor * spec * diff;		//Specular ¿¡ diff ¾È°öÇÏ¸é Specular ¿¡ ÀÇÇÑ ¿ª±¤ÀÌ ³ª¿Â´Ù...
+	finalSpecular = lightColor * spec * diff;		//Specular ì— diff ì•ˆê³±í•˜ë©´ Specular ì— ì˜í•œ ì—­ê´‘ì´ ë‚˜ì˜¨ë‹¤...
 
 
-	//Ãß°¡µÇ´Â ±¤¿ø
+	//ì¶”ê°€ë˜ëŠ” ê´‘ì›
 	float3 addDiffuse = float3(0, 0, 0);
 		float3 addSpecular = float3(0, 0, 0);
 	for (int i = 0; i < LightNum; i++)
 	{
-		//i ÀÎµ¦½ºÀÇ ±¤¿øÀÌ °è»êµÇ¾î addDiffuse, addSpecular ¿¡ ´ëÀÔµÈ´Ù.
+		//i ì¸ë±ìŠ¤ì˜ ê´‘ì›ì´ ê³„ì‚°ë˜ì–´ addDiffuse, addSpecular ì— ëŒ€ì…ëœë‹¤.
 		ComputeLight(
 			addDiffuse,
 			addSpecular,
@@ -338,37 +337,23 @@ PS_OUTPUT ps_ReciveShadow(PS_INPUT_RECIVESHADOW Input)
 			viewDir,
 			i);
 
-		//ÃÖÁ¾ ±¤¿ø ·®¿¡ ½×ÀÎ´Ù.
+		//ìµœì¢… ê´‘ì› ëŸ‰ì— ìŒ“ì¸ë‹¤.
 		finalDiffuse += addDiffuse;
 		finalSpecular += addSpecular;
 	}
 
-
-	//
-	// Diffuse
-	//
 	float3 diffuseColor = diffTex.rgb * finalDiffuse;
 
-	//
-	// Specular 
-	//
 	float3 specularColor = tex2D(Specular, Input.Texcoord).rgb * finalSpecular;
 
-	//
-	// Emission
-	//
 	float3 emissionColor = tex2D(Emission, Input.Texcoord).rgb;
 
-	//
-	// Final Color 
-	//
 	float3 finalColor = diffuseColor + specularColor + emissionColor;
 
-
-	//Çà·Äº¯È¯À» °ÅÄ£ °ª z ¿¡ Çà·Äº¯È¯¿¡¼­ ¾ò´Â °¡ÁßÄ¡ w ¸¦ ³ª´©¸é 0 ~ 1 »çÀÌÀÇ ±íÀÌ °ªÀÌ µÈ´Ù.
+	//í–‰ë ¬ë³€í™˜ì„ ê±°ì¹œ ê°’ z ì— í–‰ë ¬ë³€í™˜ì—ì„œ ì–»ëŠ” ê°€ì¤‘ì¹˜ w ë¥¼ ë‚˜ëˆ„ë©´ 0 ~ 1 ì‚¬ì´ì˜ ê¹Šì´ ê°’ì´ ëœë‹¤.
 	float depth = Input.FinalPos.z / Input.FinalPos.w;
 
-	//À§ÀÇ depth °ªÀ» Ä«¸Ş¶óÀÇ near ¿Í far ¸¦ ÀÌ¿ëÇÏ¿© ¼±ÇüÀ¸·Î ÆìÁØ´Ù....
+	//ìœ„ì˜ depth ê°’ì„ ì¹´ë©”ë¼ì˜ near ì™€ far ë¥¼ ì´ìš©í•˜ì—¬ ì„ í˜•ìœ¼ë¡œ í´ì¤€ë‹¤....
 	//Perspective Projection Linear Depth
 	float z = depth;
 	float a = camFar / (camFar - camNear);
@@ -376,11 +361,105 @@ PS_OUTPUT ps_ReciveShadow(PS_INPUT_RECIVESHADOW Input)
 	depth = b / (z - a);
 
 	Output.baseColor = float4(finalColor, 1);
-	Output.normalDepth = float4(worldNormal, depth);		//alpha °ª¿¡ µª½º¸¦ ½è´Ù.
+	Output.normalDepth = float4(worldNormal, depth);		//alpha ê°’ì— ëìŠ¤ë¥¼ ì¼ë‹¤.
 
 	return Output;
 }
 
+struct ps_input_recieve_shadow_foliage
+{
+	float2 Texcoord : TEXCOORD0;
+	float3 Normal : TEXCOORD1;
+	float3 worldPos : TEXCOORD2;
+	float4 FinalPos : TEXCOORD3;
+	float4 LightClipPos : TEXCOORD4;		//ê´‘ì› ì…ì¥ì—ì„œ ë°”ë¼ë³¸ ìœ„ì¹˜
+};
+
+PS_OUTPUT ps_recieve_shadow_foliage(ps_input_recieve_shadow_foliage input)
+{
+	PS_OUTPUT Output = (PS_OUTPUT)0;
+
+	float4 diffTex = tex2D(Diffuse, input.Texcoord);
+	clip(diffTex.a - 0.1f);
+
+	//ê´‘ì› ì…ì¥ì—ì„œ ë°”ë¼ë³¸ ìœ„ì¹˜ì˜ ëìŠ¤ ê°’ ( ë¼ì´íŠ¸ í–‰ë ¬ì„ ì§êµì´ê¸°ë•Œë¬¸ì— ì„ í˜•ìœ¼ë¡œ ì•ˆí•€ë‹¤ )
+	float lightDepth = input.LightClipPos.z / input.LightClipPos.w;
+
+	//Shadow ë§µì˜ UV ì¶”ì 
+	//( -1 ~ 1 )
+	float2 shadowUV = input.LightClipPos.xy / input.LightClipPos.w;
+	shadowUV.y = -shadowUV.y;		//yë°˜ì „...
+	//0 ~ 1 ì˜ ë²”ìœ„
+	shadowUV = (shadowUV * 0.5f) + 0.5f;
+
+	//í˜„ì œ ê·¸ë ¤ì§€ëŠ” ë†ˆì´ ìœ„ì¹˜ì— DirectionLight ì…ì¥ì—ì„œ ì¨ì§„ ê¹Šì´ê°’...
+	float shadowDepth = tex2D(ShadowSampler, shadowUV).r;
+
+	//ê·¸ë¦¼ìê°€ ê·¸ë ¤ì§€ëŠ” ìƒí™©ì€ shadowDepth + bias ê°’ ë³´ë‹¤ lightDepth ê°€ í°ê²½ìš°ì´ë‹¤.
+
+	//ìµœì¢… ìƒ‰
+	float3 finalDiffuse = float3(0, 0, 0);
+	float3 finalSpecular = float3(0, 0, 0);
+	//ê¸°ë³¸ ë¼ì´íŒ… ì²˜ë¦¬
+
+	//ê´‘ì›ì˜ ë°©í–¥
+	float3 dir = float3(baseDirectionalLight._21, baseDirectionalLight._22, baseDirectionalLight._23);
+	float3 lightDir = -dir;
+
+	//ê´‘ì›ì˜ ì»¬ëŸ¬
+	float3 lightColor = float3(baseDirectionalLight._31, baseDirectionalLight._32, baseDirectionalLight._33) * baseDirectionalLight._34;
+
+	float NdotL = dot(lightDir, input.Normal);
+
+	float diff = NdotL;
+
+	//ê·¸ë¦¼ìê°€ ê·¸ë ¤ì ¸ì•¼ í•œë‹¤ë©´ diff ëŠ” ë¬´ì¡°ê±´ ìŒìˆ˜ê°€ ëœë‹¤ 
+	if (shadowDepth + bias < lightDepth && lightDepth < 1.0f)
+		diff = abs(diff) * -1.0f;
+
+	if (diff < 0.0)
+		diff = abs(diff) * 0.3f;
+
+	//ê¸°ë³¸ ê´‘ì› ì ìš©
+	finalDiffuse = lightColor * diff;
+
+	//ì¶”ê°€ë˜ëŠ” ê´‘ì›
+	float3 addDiffuse = float3(0, 0, 0);
+	//for (int i = 0; i < LightNum; i++)
+	//{
+	//	//i ì¸ë±ìŠ¤ì˜ ê´‘ì›ì´ ê³„ì‚°ë˜ì–´ addDiffuse, addSpecular ì— ëŒ€ì…ëœë‹¤.
+	//	ComputeLight(
+	//		addDiffuse,
+	//		addSpecular,
+	//		input.worldPos,
+	//		input.Normal,
+	//		viewDir,
+	//		i);
+
+	//	//ìµœì¢… ê´‘ì› ëŸ‰ì— ìŒ“ì¸ë‹¤.
+	//	finalDiffuse += addDiffuse;
+	//	finalSpecular += addSpecular;
+	//}
+
+	float3 diffuseColor = diffTex.rgb * finalDiffuse;
+
+	float3 finalColor = diffuseColor ;
+
+	//í–‰ë ¬ë³€í™˜ì„ ê±°ì¹œ ê°’ z ì— í–‰ë ¬ë³€í™˜ì—ì„œ ì–»ëŠ” ê°€ì¤‘ì¹˜ w ë¥¼ ë‚˜ëˆ„ë©´ 0 ~ 1 ì‚¬ì´ì˜ ê¹Šì´ ê°’ì´ ëœë‹¤.
+	float depth = input.FinalPos.z / input.FinalPos.w;
+
+	//ìœ„ì˜ depth ê°’ì„ ì¹´ë©”ë¼ì˜ near ì™€ far ë¥¼ ì´ìš©í•˜ì—¬ ì„ í˜•ìœ¼ë¡œ í´ì¤€ë‹¤....
+	//Perspective Projection Linear Depth
+	float z = depth;
+	float a = camFar / (camFar - camNear);
+	float b = -camNear / (camFar - camNear);
+	depth = b / (z - a);
+
+	Output.baseColor = float4(finalColor, 1);
+	Output.normalDepth = float4(input.Normal, depth);		//alpha ê°’ì— ëìŠ¤ë¥¼ ì¼ë‹¤.
+
+	return Output;
+}
 
 
 
@@ -398,11 +477,11 @@ PS_OUTPUT ps_Toon(PS_INPUT Input)
 
 	float3 worldNormal = normalize(Input.Normal);
 
-	//±¤¿øÀÇ ¹æÇâ
+	//ê´‘ì›ì˜ ë°©í–¥
 	float3 dir = float3(baseDirectionalLight._21, baseDirectionalLight._22, baseDirectionalLight._23);
 	float3 lightDir = -dir;
 
-	//±¤¿øÀÇ ÄÃ·¯
+	//ê´‘ì›ì˜ ì»¬ëŸ¬
 	float3 lightColor = float3(baseDirectionalLight._31, baseDirectionalLight._32, baseDirectionalLight._33) * baseDirectionalLight._34;
 
 
@@ -411,33 +490,33 @@ PS_OUTPUT ps_Toon(PS_INPUT Input)
 
 	float toon = 0.0f;
 
-	//±¤¿øÀÇ Àû¿ë·®À» ´Ü°è º°·Î ³ª´«´Ù.
-	float interval = 1.0 / 4.0f;		//5´Ü°è
-	toon = floor(diff / interval) * interval;		//floor °¡ ¼Ò¼ıÁ¡Àç³¤´Ù..
+	//ê´‘ì›ì˜ ì ìš©ëŸ‰ì„ ë‹¨ê³„ ë³„ë¡œ ë‚˜ëˆˆë‹¤.
+	float interval = 1.0 / 4.0f;		//5ë‹¨ê³„
+	toon = floor(diff / interval) * interval;		//floor ê°€ ì†Œìˆ«ì ì¬ë‚€ë‹¤..
 	toon = max(0.3f, toon);
 
 
 
-	//ÃÖÁ¾ »ö
+	//ìµœì¢… ìƒ‰
 	float3 finalDiffuse = lightColor * toon;
 
-		//Ãß°¡µÇ´Â ±¤¿ø
+		//ì¶”ê°€ë˜ëŠ” ê´‘ì›
 		float3 addDiffuse = float3(0, 0, 0);
 	for (int i = 0; i < LightNum; i++)
 	{
-		//i ÀÎµ¦½ºÀÇ ±¤¿øÀÌ °è»êµÇ¾î addDiffuse, addSpecular ¿¡ ´ëÀÔµÈ´Ù.
+		//i ì¸ë±ìŠ¤ì˜ ê´‘ì›ì´ ê³„ì‚°ë˜ì–´ addDiffuse, addSpecular ì— ëŒ€ì…ëœë‹¤.
 		ComputeLightToon(
 			addDiffuse,
 			Input.worldPos,
 			worldNormal,
 			i);
 
-		//ÃÖÁ¾ ±¤¿ø ·®¿¡ ½×ÀÎ´Ù.
+		//ìµœì¢… ê´‘ì› ëŸ‰ì— ìŒ“ì¸ë‹¤.
 		finalDiffuse += addDiffuse;
 	}
 
 
-	//RampTex ¸¦ °¡Á®¿Â´Ù.
+	//RampTex ë¥¼ ê°€ì ¸ì˜¨ë‹¤.
 	//float3 rampRgb = tex2D( Ramp, float2( diff, 0 ) ).rgb;
 	//float3 diffuseColor = tex2D( Diffuse, Input.Texcoord ).rgb * rampRgb;
 
@@ -445,10 +524,10 @@ PS_OUTPUT ps_Toon(PS_INPUT Input)
 
 
 
-		//Çà·Äº¯È¯À» °ÅÄ£ °ª z ¿¡ Çà·Äº¯È¯¿¡¼­ ¾ò´Â °¡ÁßÄ¡ w ¸¦ ³ª´©¸é 0 ~ 1 »çÀÌÀÇ ±íÀÌ °ªÀÌ µÈ´Ù.
+		//í–‰ë ¬ë³€í™˜ì„ ê±°ì¹œ ê°’ z ì— í–‰ë ¬ë³€í™˜ì—ì„œ ì–»ëŠ” ê°€ì¤‘ì¹˜ w ë¥¼ ë‚˜ëˆ„ë©´ 0 ~ 1 ì‚¬ì´ì˜ ê¹Šì´ ê°’ì´ ëœë‹¤.
 		float depth = Input.FinalPos.z / Input.FinalPos.w;
 
-	//À§ÀÇ depth °ªÀ» Ä«¸Ş¶óÀÇ near ¿Í far ¸¦ ÀÌ¿ëÇÏ¿© ¼±ÇüÀ¸·Î ÆìÁØ´Ù....
+	//ìœ„ì˜ depth ê°’ì„ ì¹´ë©”ë¼ì˜ near ì™€ far ë¥¼ ì´ìš©í•˜ì—¬ ì„ í˜•ìœ¼ë¡œ í´ì¤€ë‹¤....
 	//Perspective Projection Linear Depth
 	float z = depth;
 	float a = camFar / (camFar - camNear);
@@ -457,7 +536,7 @@ PS_OUTPUT ps_Toon(PS_INPUT Input)
 
 
 	Output.baseColor = float4(finalColor, 1);
-	Output.normalDepth = float4(worldNormal, depth);		//alpha °ª¿¡ µª½º¸¦ ½è´Ù.
+	Output.normalDepth = float4(worldNormal, depth);		//alpha ê°’ì— ëìŠ¤ë¥¼ ì¼ë‹¤.
 
 	return Output;
 }
@@ -467,7 +546,7 @@ PS_OUTPUT ps_Toon(PS_INPUT Input)
 // Render Distort
 //--------------------------------------------------------------//
 
-//ÀÌÀü±îÁö ±×·ÁÁø È­¸éÀÇ ³»¿ë
+//ì´ì „ê¹Œì§€ ê·¸ë ¤ì§„ í™”ë©´ì˜ ë‚´ìš©
 texture GrabTex;
 sampler2D GrabSampler = sampler_state
 {
@@ -485,24 +564,24 @@ PS_OUTPUT ps_Distort(PS_INPUT Input)
 
 	PS_OUTPUT Output = (PS_OUTPUT)0;
 
-	//Áö±İ ³»°¡ ±×·ÁÁö´Â À§Ä¡ÀÇ È­¸é ÁÂÇ¥¸¦ ÄÃ·¯·Î ±×·Áº¸ÀÚ...
+	//ì§€ê¸ˆ ë‚´ê°€ ê·¸ë ¤ì§€ëŠ” ìœ„ì¹˜ì˜ í™”ë©´ ì¢Œí‘œë¥¼ ì»¬ëŸ¬ë¡œ ê·¸ë ¤ë³´ì...
 	float2 screenUV = Input.FinalPos.xy / Input.FinalPos.w;
 
-	//-1 °ú 1 »çÀÌÀÇ °ªÀ» 0 ~ 1 »çÀÌÀÇ °ªÀ¸·Î..
+	//-1 ê³¼ 1 ì‚¬ì´ì˜ ê°’ì„ 0 ~ 1 ì‚¬ì´ì˜ ê°’ìœ¼ë¡œ..
 	screenUV = (screenUV + 1.0f) * 0.5f;
 
-	//Y °ª ¹İÀü
+	//Y ê°’ ë°˜ì „
 	screenUV.y = 1.0f - screenUV.y;
 	
 	float2 texUV = Input.Texcoord;
 	texUV.y += scrollU;
 
-	//³ë¸»°ª ¾ò´Â´Ù.
+	//ë…¸ë§ê°’ ì–»ëŠ”ë‹¤.
 	float2 norXY = tex2D(Normal, texUV).xy;
-	//³ë¸»°ªÀ» -1 ~ 1 »çÀÌ·Î..
+	//ë…¸ë§ê°’ì„ -1 ~ 1 ì‚¬ì´ë¡œ..
 	norXY = (norXY * 2.0f) - 1.0f;
 
-	//³ë¸» °ª¸¸Å­ UV ¿Ü°î
+	//ë…¸ë§ ê°’ë§Œí¼ UV ì™¸ê³¡
 	float2 uv = screenUV + norXY * distortAmout;
 	//uv = saturate(uv);
 
@@ -525,29 +604,29 @@ PS_OUTPUT ps_ReciveShadowToon(PS_INPUT_RECIVESHADOW Input)
 	float4 diffTex = tex2D(Diffuse, Input.Texcoord);
 		clip(diffTex.a - 0.1f);
 
-	//±¤¿ø ÀÔÀå¿¡¼­ ¹Ù¶óº» À§Ä¡ÀÇ µª½º °ª ( ¶óÀÌÆ® Çà·ÄÀ» Á÷±³ÀÌ±â¶§¹®¿¡ ¼±ÇüÀ¸·Î ¾ÈÇÉ´Ù )
+	//ê´‘ì› ì…ì¥ì—ì„œ ë°”ë¼ë³¸ ìœ„ì¹˜ì˜ ëìŠ¤ ê°’ ( ë¼ì´íŠ¸ í–‰ë ¬ì„ ì§êµì´ê¸°ë•Œë¬¸ì— ì„ í˜•ìœ¼ë¡œ ì•ˆí•€ë‹¤ )
 	float lightDepth = Input.LightClipPos.z / Input.LightClipPos.w;
 
-	//Shadow ¸ÊÀÇ UV ÃßÀû
+	//Shadow ë§µì˜ UV ì¶”ì 
 	//( -1 ~ 1 )
 	float2 shadowUV = Input.LightClipPos.xy / Input.LightClipPos.w;
-		shadowUV.y = -shadowUV.y;		//y¹İÀü...
-	//0 ~ 1 ÀÇ ¹üÀ§
+		shadowUV.y = -shadowUV.y;		//yë°˜ì „...
+	//0 ~ 1 ì˜ ë²”ìœ„
 	shadowUV = (shadowUV * 0.5f) + 0.5f;
 
-	//ÇöÁ¦ ±×·ÁÁö´Â ³ğÀÌ À§Ä¡¿¡ DirectionLight ÀÔÀå¿¡¼­ ½áÁø ±íÀÌ°ª...
+	//í˜„ì œ ê·¸ë ¤ì§€ëŠ” ë†ˆì´ ìœ„ì¹˜ì— DirectionLight ì…ì¥ì—ì„œ ì¨ì§„ ê¹Šì´ê°’...
 	float shadowDepth = tex2D(ShadowSampler, shadowUV).r;
 
-	//±×¸²ÀÚ°¡ ±×·ÁÁö´Â »óÈ²Àº shadowDepth + bias °ª º¸´Ù lightDepth °¡ Å«°æ¿ìÀÌ´Ù.
+	//ê·¸ë¦¼ìê°€ ê·¸ë ¤ì§€ëŠ” ìƒí™©ì€ shadowDepth + bias ê°’ ë³´ë‹¤ lightDepth ê°€ í°ê²½ìš°ì´ë‹¤.
 
 
 	float3 worldNormal = normalize(Input.Normal);
 
-		//±¤¿øÀÇ ¹æÇâ
+		//ê´‘ì›ì˜ ë°©í–¥
 		float3 dir = float3(baseDirectionalLight._21, baseDirectionalLight._22, baseDirectionalLight._23);
 		float3 lightDir = -dir;
 
-		//±¤¿øÀÇ ÄÃ·¯
+		//ê´‘ì›ì˜ ì»¬ëŸ¬
 		float3 lightColor = float3(baseDirectionalLight._31, baseDirectionalLight._32, baseDirectionalLight._33) * baseDirectionalLight._34;
 
 
@@ -555,39 +634,39 @@ PS_OUTPUT ps_ReciveShadowToon(PS_INPUT_RECIVESHADOW Input)
 	diff = (diff + 1.0f) * 0.5f;
 
 	float toon = 0.0f;
-	//±×¸²ÀÚ°¡ ±×·ÁÁ®¾ß ÇÑ´Ù¸é diff ´Â 0.3f °¡ µÈ´Ù 
+	//ê·¸ë¦¼ìê°€ ê·¸ë ¤ì ¸ì•¼ í•œë‹¤ë©´ diff ëŠ” 0.3f ê°€ ëœë‹¤ 
 	if (shadowDepth + bias < lightDepth && lightDepth < 1.0f)
 		toon = 0.3f;
 
 	else
 	{
-		//±¤¿øÀÇ Àû¿ë·®À» ´Ü°è º°·Î ³ª´«´Ù.
-		float interval = 1.0 / 4.0f;		//5´Ü°è
-		toon = floor(diff / interval) * interval;		//floor °¡ ¼Ò¼ıÁ¡Àç³¤´Ù..
+		//ê´‘ì›ì˜ ì ìš©ëŸ‰ì„ ë‹¨ê³„ ë³„ë¡œ ë‚˜ëˆˆë‹¤.
+		float interval = 1.0 / 4.0f;		//5ë‹¨ê³„
+		toon = floor(diff / interval) * interval;		//floor ê°€ ì†Œìˆ«ì ì¬ë‚€ë‹¤..
 		toon = max(0.3f, toon);
 
 	}
 
-	//ÃÖÁ¾ »ö
+	//ìµœì¢… ìƒ‰
 	float3 finalDiffuse = lightColor * toon;
 
-		//Ãß°¡µÇ´Â ±¤¿ø
+		//ì¶”ê°€ë˜ëŠ” ê´‘ì›
 		float3 addDiffuse = float3(0, 0, 0);
 	for (int i = 0; i < LightNum; i++)
 	{
-		//i ÀÎµ¦½ºÀÇ ±¤¿øÀÌ °è»êµÇ¾î addDiffuse, addSpecular ¿¡ ´ëÀÔµÈ´Ù.
+		//i ì¸ë±ìŠ¤ì˜ ê´‘ì›ì´ ê³„ì‚°ë˜ì–´ addDiffuse, addSpecular ì— ëŒ€ì…ëœë‹¤.
 		ComputeLightToon(
 			addDiffuse,
 			Input.worldPos,
 			worldNormal,
 			i);
 
-		//ÃÖÁ¾ ±¤¿ø ·®¿¡ ½×ÀÎ´Ù.
+		//ìµœì¢… ê´‘ì› ëŸ‰ì— ìŒ“ì¸ë‹¤.
 		finalDiffuse += addDiffuse;
 	}
 
 
-	//RampTex ¸¦ °¡Á®¿Â´Ù.
+	//RampTex ë¥¼ ê°€ì ¸ì˜¨ë‹¤.
 	//float3 rampRgb = tex2D( Ramp, float2( diff, 0 ) ).rgb;
 	//float3 diffuseColor = tex2D( Diffuse, Input.Texcoord ).rgb * rampRgb;
 
@@ -595,10 +674,10 @@ PS_OUTPUT ps_ReciveShadowToon(PS_INPUT_RECIVESHADOW Input)
 
 
 
-	//Çà·Äº¯È¯À» °ÅÄ£ °ª z ¿¡ Çà·Äº¯È¯¿¡¼­ ¾ò´Â °¡ÁßÄ¡ w ¸¦ ³ª´©¸é 0 ~ 1 »çÀÌÀÇ ±íÀÌ °ªÀÌ µÈ´Ù.
+	//í–‰ë ¬ë³€í™˜ì„ ê±°ì¹œ ê°’ z ì— í–‰ë ¬ë³€í™˜ì—ì„œ ì–»ëŠ” ê°€ì¤‘ì¹˜ w ë¥¼ ë‚˜ëˆ„ë©´ 0 ~ 1 ì‚¬ì´ì˜ ê¹Šì´ ê°’ì´ ëœë‹¤.
 	float depth = Input.FinalPos.z / Input.FinalPos.w;
 
-	//À§ÀÇ depth °ªÀ» Ä«¸Ş¶óÀÇ near ¿Í far ¸¦ ÀÌ¿ëÇÏ¿© ¼±ÇüÀ¸·Î ÆìÁØ´Ù....
+	//ìœ„ì˜ depth ê°’ì„ ì¹´ë©”ë¼ì˜ near ì™€ far ë¥¼ ì´ìš©í•˜ì—¬ ì„ í˜•ìœ¼ë¡œ í´ì¤€ë‹¤....
 	//Perspective Projection Linear Depth
 	float z = depth;
 	float a = camFar / (camFar - camNear);
@@ -606,7 +685,7 @@ PS_OUTPUT ps_ReciveShadowToon(PS_INPUT_RECIVESHADOW Input)
 	depth = b / (z - a);
 
 	Output.baseColor = float4(finalColor, 1);
-	Output.normalDepth = float4(worldNormal, depth);		//alpha °ª¿¡ µª½º¸¦ ½è´Ù.
+	Output.normalDepth = float4(worldNormal, depth);		//alpha ê°’ì— ëìŠ¤ë¥¼ ì¼ë‹¤.
 
 	return Output;
 }

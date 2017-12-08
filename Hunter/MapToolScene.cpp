@@ -294,7 +294,7 @@ bool MapToolScene::SceneUpdate(float deltaTime, const InputManager & input)
 
 	ReadyShadowMap(TERRAIN);
 
-	_ui->Update(deltaTime, input);
+	//_ui->Update(deltaTime, input);
 
 
 	return result;
