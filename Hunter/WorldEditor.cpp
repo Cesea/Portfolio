@@ -849,23 +849,15 @@ void Editor::InSystemEditMode()
 					bool32 isRunning = _pCurrentScene->_scriptSystem.GetRunning();
 					_pCurrentScene->_scriptSystem.SetRunning(!isRunning);
 
-					if (isRunning)
+					Player * pPlayer = (Player *)GAMEOBJECTFACTORY->GetPlayerObject();
+					if (isRunning &&
+						nullptr != pPlayer)
 					{
-						Player * pPlayer = (Player *)GAMEOBJECTFACTORY->GetPlayerObject();
-						if (!_pCurrentScene->_scriptSystem.GetRunning() ||
-							!_pCurrentScene->_actionSystem.GetRunning())
-						{
-							pPlayer->UnRegisterEvents();
-						}
+						pPlayer->UnRegisterEvents();
 					}
 					else
 					{
-						Player * pPlayer = (Player *)GAMEOBJECTFACTORY->GetPlayerObject();
-						if (!_pCurrentScene->_scriptSystem.GetRunning() ||
-							!_pCurrentScene->_actionSystem.GetRunning())
-						{
-							pPlayer->RegisterEvents();
-						}
+						pPlayer->RegisterEvents();
 					}
 				}
 			}

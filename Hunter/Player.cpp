@@ -312,6 +312,7 @@ void Player::MoveAndRotate(float deltaTime)
 	}
 	else
 	{
+
 		if (_camRotated)
 		{
 			_targetRotation = 0.0f;
