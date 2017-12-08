@@ -151,7 +151,7 @@ public:
 	void Destroy();
 
 	void SaveTerrain(const std::string &fileName);
-	void LoadTerrain(const std::string &fileName);
+	void LoadTerrain(const std::string &fileName, bool editMode);
 
 	bool IsIntersectRay(const Ray &ray, Vector3 *pOut);
 
@@ -190,6 +190,7 @@ public:
 
 	inline std::vector<int32> &GetActiveTerrainChunkIndices() { return _activeChunkIndices; }
 	inline std::vector<Terrain::TerrainTile *> &GetVisibleTerrainTiles() { return _visibleTiles; }
+	inline std::vector<Terrain::TerrainTile *> &GetShadowVisibleTerrainTiles() { return _shadowVisibleTiles; }
 
 	void RemoveEntityInTile(Entity entity, const TerrainTilePos &tilePos);
 

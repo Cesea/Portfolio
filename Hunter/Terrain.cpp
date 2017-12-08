@@ -181,9 +181,11 @@ void Terrain::SaveTerrain(const std::string & fileName)
 	VIDEO->SaveTexture(control2, _tileControl2Handle);
 }
 
-void Terrain::LoadTerrain(const std::string & fileName)
+void Terrain::LoadTerrain(const std::string & fileName, bool editMode)
 {
 	DataPackage toLoad;
+
+	_inEditMode = editMode;
 
 	TerrainConfig config;
 
@@ -941,6 +943,13 @@ void Terrain::RebuildTerrain(const Terrain::TerrainConfig &config)
 	SAFE_DELETE_ARRAY(_chunkIndex);
 	SAFE_DELETE(_pQuadTree);
 
+	 _activeChunkIndices.clear();
+	 _visibleChunks.clear();
+	 _visibleTiles.clear();
+
+	 _shadowVisibleChunks.clear();
+	 _shadowVisibleTiles.clear();
+
 	//Rebuild모드는 항상 에디터에서 불린다.
 	Create(config, true);
 }
@@ -1035,7 +1044,7 @@ bool Terrain::CreateTerrainChunk(int32 x, int32 z, const video::TerrainVertex * 
 
 	refChunk._centerX = (refChunk._startX + refChunk._endX) * 0.5f;
 	refChunk._centerZ = (refChunk._startZ + refChunk._endZ) * 0.5f;
-	refChunk._radius = (refChunk._centerX - refChunk._startX) * 1.2f;
+	refChunk._radius = (refChunk._centerX - refChunk._startX) * 1.35f;
 
 	float tileGap = (float)TERRAIN_CHUNK_DIM / (float)TERRAIN_TILE_RES;
 
@@ -1060,7 +1069,7 @@ bool Terrain::CreateTerrainChunk(int32 x, int32 z, const video::TerrainVertex * 
 			refTile._centerX = (refTile._endX + refTile._startX) * 0.5f;
 			refTile._centerZ = (refTile._endZ + refTile._startZ) * 0.5f;
 
-			refTile._radius = (refTile._centerX - refTile._startX) * 1.2f;
+			refTile._radius = (refTile._centerX - refTile._startX) * 1.35f;
 		}
 	}
 

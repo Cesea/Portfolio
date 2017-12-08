@@ -288,17 +288,11 @@
     <ClCompile Include="bloodFog.cpp">
       <Filter>Game\GameComponents\ParticleComponent</Filter>
     </ClCompile>
-    <ClCompile Include="normalBreath.cpp">
-      <Filter>Game\GameComponents\ParticleComponent</Filter>
+    <ClCompile Include="SoundManager.cpp">
+      <Filter>Manager\SoundManager</Filter>
     </ClCompile>
-    <ClCompile Include="normalFireBall.cpp">
-      <Filter>Game\GameComponents\ParticleComponent</Filter>
-    </ClCompile>
-    <ClCompile Include="Dragon.cpp">
-      <Filter>Game\GameObjects\Enemy</Filter>
-    </ClCompile>
-    <ClCompile Include="DragonAnimationString.cpp">
-      <Filter>Game\GameObjects\Enemy</Filter>
+    <ClCompile Include="BmpFont.cpp">
+      <Filter>UI</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -577,9 +571,6 @@
     <ClInclude Include="PointLight.h">
       <Filter>Game\Lights</Filter>
     </ClInclude>
-    <ClInclude Include="Memory.h">
-      <Filter>Core</Filter>
-    </ClInclude>
     <ClInclude Include="smoke.h">
       <Filter>Game\GameSystems</Filter>
     </ClInclude>
@@ -667,18 +658,6 @@
     </ClInclude>
     <ClInclude Include="bloodFog.h">
       <Filter>Game\GameComponents\ParticleComponent</Filter>
-    </ClInclude>
-    <ClInclude Include="normalBreath.h">
-      <Filter>Game\GameComponents\ParticleComponent</Filter>
-    </ClInclude>
-    <ClInclude Include="normalFireBall.h">
-      <Filter>Game\GameComponents\ParticleComponent</Filter>
-    </ClInclude>
-    <ClInclude Include="Dragon.h">
-      <Filter>Game\GameObjects\Enemy</Filter>
-    </ClInclude>
-    <ClInclude Include="DragonAnimationString.h">
-      <Filter>Game\GameObjects\Enemy</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -834,6 +813,9 @@
     </Filter>
     <Filter Include="Game\GameUtils\QaudTrees">
       <UniqueIdentifier>{3e32031f-0555-4a04-bf0a-4cedb72f5786}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Manager\SoundManager">
+      <UniqueIdentifier>{7ee46e62-db92-4811-aef8-1b4b29cc03c5}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

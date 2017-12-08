@@ -78,7 +78,16 @@ void Editor::InTerrainEditMode()
 			_terrainEditor._terrainConfig._xChunkCount = (int32)_terrainEditor._countX;
 			_terrainEditor._terrainConfig._zChunkCount = (int32)_terrainEditor._countZ;
 
+			_pCurrentScene->_world.SaveEntitiesInWorld("../resources/tmp01.ed");
+			_pCurrentScene->ReleaseAllGameObjects();
+			_pCurrentScene->_world.Clear();
+			_pCurrentScene->AddSystemToWorld();
+
 			TERRAIN->RebuildTerrain(_terrainEditor._terrainConfig);
+
+			_pCurrentScene->CreateLightsAndCameras();
+			_pCurrentScene->CreateObjectFromFile("../resources/tmp01.ed");
+			_pCurrentScene->_camera.SetTargetObject((Player *)GAMEOBJECTFACTORY->GetPlayerObject());
 		}
 		ImguiUnindent();
 	}
@@ -374,12 +383,21 @@ void Editor::InTerrainEditMode()
 		if (ImguiButton("Save Terrain"))
 		{
 			TERRAIN->SaveTerrain(_terrainEditor._fileName);
-			TERRAIN->_pCurrentScene->_world.SaveEntitiesInWorld("../resources/Test.ed");
+
+			std::string fileNameCopy = _terrainEditor._fileName;
+			std::string path;
+			std::string name;
+			std::string extension;
+
+			SplitFilePathToNamePathExtension(fileNameCopy, name, path, extension);
+
+			TERRAIN->_pCurrentScene->_world.SaveEntitiesInWorld(path + name + ".ed");
+
 		}
 
 		if (ImguiButton("Load Terrain"))
 		{
-			TERRAIN->LoadTerrain(_terrainEditor._fileName);
+			TERRAIN->LoadTerrain(_terrainEditor._fileName, true);
 		}
 
 		ImguiUnindent();
@@ -782,6 +800,33 @@ void Editor::InSystemEditMode()
 			ImguiUnindent();
 		}
 
+		//Edit Action System ///////////////////////////////////////////////////////////////////
+		if (false == _systemEditor._editActionSystem)
+		{
+			if (ImguiCollapse("Action System", nullptr, _systemEditor._editActionSystem))
+			{
+				_systemEditor.Reset();
+				_systemEditor._editActionSystem = true;
+			}
+		}
+		else
+		{
+			if (ImguiCollapse("Action System", nullptr, _systemEditor._editScrptSystem))
+			{
+				_systemEditor.Reset();
+			}
+			ImguiIndent();
+			{
+				if (ImguiCheck("Action Running", _pCurrentScene->_actionSystem.GetRunning()))
+				{
+					bool32 running = _pCurrentScene->_actionSystem.GetRunning();
+					_pCurrentScene->_actionSystem.SetRunning(!running);
+					_pCurrentScene->_actionSystem.ClearAllComponentsQueue();
+				}
+			}
+			ImguiUnindent();
+		}
+
 		//Edit Script System ///////////////////////////////////////////////////////////////////
 		if (false == _systemEditor._editScrptSystem)
 		{
@@ -793,22 +838,33 @@ void Editor::InSystemEditMode()
 		}
 		else
 		{
-			if (ImguiCollapse("ScriptSystem", nullptr, _systemEditor._editScrptSystem))
+			if (ImguiCollapse("Script System", nullptr, _systemEditor._editScrptSystem))
 			{
 				_systemEditor.Reset();
 			}
 			ImguiIndent();
 			{
-				if (ImguiCheck("Script Running", _systemEditor._scriptRunning))
+				if (ImguiCheck("Script Running", _pCurrentScene->_scriptSystem.GetRunning()))
 				{
-					_systemEditor._scriptRunning = !_systemEditor._scriptRunning;
+					bool32 isRunning = _pCurrentScene->_scriptSystem.GetRunning();
+					_pCurrentScene->_scriptSystem.SetRunning(!isRunning);
+
+					Player * pPlayer = (Player *)GAMEOBJECTFACTORY->GetPlayerObject();
+					if (isRunning &&
+						nullptr != pPlayer)
+					{
+						pPlayer->UnRegisterEvents();
+					}
+					else
+					{
+						pPlayer->RegisterEvents();
+					}
 				}
 			}
 			ImguiUnindent();
 		}
 	}
 	ImguiUnindent();
-
 }
 
 void Editor::ShowStatusWindow()

@@ -63,19 +63,30 @@ void Camera::MoveAndRotate(float deltaTime, const InputManager & input)
 	{
 		_cameraState = CAMERASTATE_CREATE;
 		_targetRadius = CAMERA_TARGET_DEFAULT_RADIUS;
-		//ShowCursor(true);
+
+		_horizontalAngle = 0.0f;
+
+		ShowCursor(true);
 	}
 	else if (input.keyboard.IsPressed('2'))
 	{
 		Assert(_pTargetObject);
 		_cameraState = CAMERASTATE_INGAME;
+
+		_horizontalAngle = -PI_DIV_2;
+		_verticalAngle = 0.0f;
+
 		Vector3 camPosition;
 		Vector3 targetPosition = refTargetTransform.GetWorldPosition();
 
-		camPosition.x = cosf(_horizontalAngle) * _targetRadius + targetPosition.x;
-		//camPosition.y = ;
-		camPosition.z = sinf(_horizontalAngle) * _targetRadius + targetPosition.z;
+		camPosition.x = cosf(_verticalAngle) * cosf(_horizontalAngle) * _targetRadius + targetPosition.x;
+		camPosition.y = targetPosition.y + 3.0f + sinf(_verticalAngle);
+		targetPosition.y += 1.6f;
+		camPosition.z = cosf(_verticalAngle) * sinf(_horizontalAngle) * _targetRadius + targetPosition.z;
 		refTransform.SetWorldPosition(camPosition);
+		refTransform.LookPosition(targetPosition);
+
+		ShowCursor(false);
 	}
 
 	//Mouse Move//////////////////////////////////////////////
@@ -90,17 +101,28 @@ void Camera::MoveAndRotate(float deltaTime, const InputManager & input)
 
 			if (deltaX != 0)
 			{
-				_horizontalAngle += 3.0f * deltaTime * (float)deltaX;
+				_horizontalAngle += 0.4f * deltaTime * (float)deltaX;
 			}
-
 			if (deltaY != 0)
 			{
-				_verticalAngle += 3.0f * deltaTime * (float)deltaY;
+				_verticalAngle += 0.4f * deltaTime * (float)deltaY;
 			}
 
-			ClampFloat(_verticalAngle, MIN_VERT_ANGLE, MAX_VERT_ANGLE);
+			if (_horizontalAngle < 0.0f)
+			{
+				_horizontalAngle += D3DX_PI * 2;
+			}
+			else if (_horizontalAngle > D3DX_PI * 2)
+			{
+				_horizontalAngle -= D3DX_PI * 2;
+			}
 
-			refTransform.SetRotateWorld(_verticalAngle * ONE_RAD, _horizontalAngle * ONE_RAD, 0.0f);
+			float xDiff = 0.4f * deltaTime * (float)deltaX;
+			float yDiff = 0.4f * deltaTime * (float)deltaY;
+
+			ClampFloat(_verticalAngle, -0.5f, PI_DIV_2 - 0.1f);
+
+			refTransform.SetRotateWorld(_verticalAngle, _horizontalAngle , 0.0f);
 		}
 	}break;
 
@@ -161,9 +183,11 @@ void Camera::MoveAndRotate(float deltaTime, const InputManager & input)
 				float angleDiff = GetAngleDiffXZ(camPlanerForward, targetForward);
 				_pTargetObject->_targetRotation = angleDiff;
 				_pTargetObject->_camRotated = true;
+				_pTargetObject->_rotating = true;
 				_pTargetObject->_startForward.ToZero();
 			}
 		}
+
 		//else if (_pTargetObject->_state == Player::PLAYERSTATE_MOVE)
 		//{
 		//}
@@ -173,7 +197,6 @@ void Camera::MoveAndRotate(float deltaTime, const InputManager & input)
 		SetCursorPos(CLIENTCENTERX, CLIENTCENTERY);
 	} break;
 	}
-
 
 	Vector3 diff = Vector3(0.0f, 0.0f, 0.0f);
 	////move forward

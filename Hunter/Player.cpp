@@ -20,17 +20,13 @@ Player::Player()
 
 Player::~Player()
 {
+	UnRegisterEvents();
+	SAFE_DELETE(_pDamageBox);
 }
 
 bool Player::CreateFromWorld(World & world, const Vector3 &pos)
 {
-   EventChannel channel;
-   channel.Add<InputManager::KeyDownEvent, Player>(*this);
-   channel.Add<InputManager::KeyReleasedEvent, Player>(*this);
-   channel.Add<InputManager::KeyPressedEvent, Player>(*this);
-   channel.Add<InputManager::MousePressedEvent, Player>(*this);
-
-   channel.Add<CollisionSystem::ActorTriggerEvent, Player>(*this);
+   RegisterEvents();
 
    _entity = world.CreateEntity();
 
@@ -104,9 +100,11 @@ bool Player::CreateFromWorld(World & world, const Vector3 &pos)
    //Plyer의 맴버 변수들을 셋팅해주자
    _combatToPeaceTimer.Reset(3.0f);
    _moveToStanceTimer.Reset(0.13f);
-   _attackToStanceTimer.Reset(0.9f);
+   _attackToStanceTimer.Reset(0.5f);
 
    _superArmorTimer.Reset(1.5f);
+
+   _state = PLAYERSTATE_STANCE;
 
    _keyConfig._up = 'W';
    _keyConfig._down = 'S';
@@ -134,7 +132,7 @@ void Player::Update(float deltaTime)
    {
    case Player::PLAYERSTATE_STANCE:
    {
-	   if (false == _inCombat)
+	   if (_inCombat)
 	   {
 		   bool combatToPeace = _combatToPeaceTimer.Tick(deltaTime);
 		   if (combatToPeace)
@@ -173,7 +171,8 @@ void Player::Update(float deltaTime)
 			   _attackToStanceTimer.Restart();
 			   _comboCount = 0;
 			   _canCombo = false;
-			   //this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWarCombatMode));
+			   _pActionComp->_actionQueue.ClearQueue();
+			   this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWarCombatMode));
 		   }
 	   }
    } break;
@@ -186,8 +185,8 @@ void Player::Update(float deltaTime)
 		   {
 			   _state = PLAYERSTATE_STANCE;
 			   _attackToStanceTimer.Restart();
-			   //_pActionComp->_actionQueue.ClearQueue();
-			   //this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWarCombatMode));
+			   _pActionComp->_actionQueue.ClearQueue();
+			   this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWarCombatMode));
 		   }
 	   }
    } break;
@@ -204,26 +203,28 @@ void Player::Update(float deltaTime)
 			   _state = PLAYERSTATE_STANCE;
 			   _attackToStanceTimer.Restart();
 			   _pActionComp->_actionQueue.ClearQueue();
+			   _pActionComp->MakePrevNull();
 
 			   if (_currentCommand._movement._vertical == VERTICAL_MOVEMENT_UP)
 			   {
 				   _state = PLAYERSTATE_MOVE;
-				   //this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWalk));
+				   _pActionComp->MakePrevNull();
+				   this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWalk));
 			   }
 			   else if (_currentCommand._movement._vertical == VERTICAL_MOVEMENT_DOWN)
 			   {
 				   _state = PLAYERSTATE_MOVE;
-				   //this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWarRetreat));
+				   this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWarRetreat));
 			   }
 			   else if (_currentCommand._movement._horizontal == HORIZONTAL_MOVEMENT_LEFT)
 			   {
 				   _state = PLAYERSTATE_MOVE;
-				   //this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWarMovingLeft));
+				   this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWarMovingLeft));
 			   }
 			   else if (_currentCommand._movement._horizontal == HORIZONTAL_MOVEMENT_RIGHT)
 			   {
 				   _state = PLAYERSTATE_MOVE;
-				   //this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWarMovingRight));
+				   this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWarMovingRight));
 			   }
 			   else if (IsMovementNone(_currentCommand._movement))
 			   {
@@ -233,9 +234,9 @@ void Player::Update(float deltaTime)
 	   }
    }break;
 
-   //case Player::PLAYERSTATE_HURT:
-   //{
-   //}break;
+   case Player::PLAYERSTATE_HURT:
+   {
+   }break;
 
    case Player::PLAYERSTATE_DEAD:
    {
@@ -259,11 +260,33 @@ void Player::Update(float deltaTime)
 	   PlayerImformationEvent(_pTransformComp->GetWorldPosition(), _state, _pTransformComp->GetForward(), _worldSwordPos));
 }
 
+void Player::RegisterEvents()
+{
+	EventChannel channel;
+	channel.Add<InputManager::KeyDownEvent, Player>(*this);
+	channel.Add<InputManager::KeyReleasedEvent, Player>(*this);
+	channel.Add<InputManager::KeyPressedEvent, Player>(*this);
+	channel.Add<InputManager::MousePressedEvent, Player>(*this);
+
+	channel.Add<CollisionSystem::ActorTriggerEvent, Player>(*this);
+}
+
+void Player::UnRegisterEvents()
+{
+	EventChannel channel;
+	channel.Remove<InputManager::KeyDownEvent, Player>(*this);
+	channel.Remove <InputManager::KeyReleasedEvent, Player>(*this);
+	channel.Remove <InputManager::KeyPressedEvent, Player>(*this);
+	channel.Remove <InputManager::MousePressedEvent, Player>(*this);
+
+	channel.Remove <CollisionSystem::ActorTriggerEvent, Player>(*this);
+}
+
 void Player::MoveAndRotate(float deltaTime)
 {
-	float absMinus = absFloat(_targetRotation) - absFloat(_currentRotation);
+	float absMinus = FAbs(_targetRotation) - FAbs(_currentRotation);
 
-	if (!FloatZero(absMinus * 0.1f))
+	if (FAbs(absMinus) > _rotationSpeed * deltaTime && _rotating)
 	{
 		if (_targetRotation < 0.0f)
 		{
@@ -296,10 +319,12 @@ void Player::MoveAndRotate(float deltaTime)
 			_targetRotation = 0.0f;
 			_currentRotation = 0.0f;
 			_camRotated = false;
+			_rotating = false;
 		}
 		else
 		{
 			_currentRotation = _targetRotation;
+			_rotating = false;
 		}
 	}
 
@@ -334,34 +359,18 @@ void Player::MoveAndRotate(float deltaTime)
 		toMove += right;
 	}
 	else if (_animationEnum == PlayerAnimationEnum::eWalk ||
-		_animationEnum == PlayerAnimationEnum::eWarCharging)
+		_animationEnum == PlayerAnimationEnum::eWarCharging ||
+		_animationEnum == PlayerAnimationEnum::eWarWalkSwingLeft ||
+		_animationEnum == PlayerAnimationEnum::eWarWalkSwingRight ||
+		_animationEnum == PlayerAnimationEnum::eWarWalkThrust)
 	{
+		Console::Log("tt\n");
 		toMove += forward;
 	}
 	else if (_animationEnum == PlayerAnimationEnum::eWalkingBack ||
 		_animationEnum == PlayerAnimationEnum::eWarRetreat)
 	{
 		toMove -= forward;
-	}
-	else if (_state == PLAYERSTATE_MOVEATTACK)
-	{
-		if (_currentCommand._movement._horizontal == HORIZONTAL_MOVEMENT_LEFT)
-		{
-			toMove -= right;
-		}
-		else if (_currentCommand._movement._horizontal == HORIZONTAL_MOVEMENT_RIGHT)
-		{
-			toMove += right;
-		}
-
-		if (_currentCommand._movement._vertical == VERTICAL_MOVEMENT_UP)
-		{
-			toMove += forward;
-		}
-		else if (_currentCommand._movement._vertical == VERTICAL_MOVEMENT_DOWN)
-		{
-			toMove -= forward;
-		}
 	}
 
    if (!toMove.IsZero())
@@ -509,13 +518,13 @@ void Player::Handle(const InputManager::KeyPressedEvent & event)
 		   else if (_animationEnum == PlayerAnimationEnum::eStrafeLeft ||
 			   _animationEnum == PlayerAnimationEnum::eWarMovingLeft)
 		   {
-			   _targetRotation = PI_DIV_4;
+			   RotatePlayer(PI_DIV_4);
 			   this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWalk));
 		   }
 		   else if (_animationEnum == PlayerAnimationEnum::eStrafeRight ||
 			   _animationEnum == PlayerAnimationEnum::eWarMovingRight)
 		   {
-			   _targetRotation = -PI_DIV_4;
+			   RotatePlayer(-PI_DIV_4);
 			   this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWalk));
 		   }
 	   }
@@ -529,14 +538,14 @@ void Player::Handle(const InputManager::KeyPressedEvent & event)
 		   else if (_animationEnum == PlayerAnimationEnum::eStrafeLeft ||
 			   _animationEnum == PlayerAnimationEnum::eWarMovingLeft)
 		   {
-			   _targetRotation = -PI_DIV_4;
+			   RotatePlayer(-PI_DIV_4);
 			   _inCombat ? this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWarRetreat)) :
 				   this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWalkingBack));
 		   }
 		   else if (_animationEnum == PlayerAnimationEnum::eStrafeRight ||
 			   _animationEnum == PlayerAnimationEnum::eWarMovingRight)
 		   {
-			   _targetRotation = PI_DIV_4;
+			   RotatePlayer(PI_DIV_4);
 			   _inCombat ? this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWarRetreat)) :
 				   this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWalkingBack));
 		   }
@@ -551,12 +560,12 @@ void Player::Handle(const InputManager::KeyPressedEvent & event)
 		   }
 		   else if (_animationEnum == PlayerAnimationEnum::eWalk)
 		   {
-			   _targetRotation = PI_DIV_4;
+			   RotatePlayer(PI_DIV_4);
 		   }
 		   else if (_animationEnum == PlayerAnimationEnum::eWalkingBack ||
 			   _animationEnum == PlayerAnimationEnum::eWarRetreat)
 		   {
-			   _targetRotation = -PI_DIV_4;
+			   RotatePlayer(-PI_DIV_4);
 		   }
 	   }
 	   else if (_keyConfig._right == inputCode)
@@ -569,12 +578,12 @@ void Player::Handle(const InputManager::KeyPressedEvent & event)
 		   }
 		   else if (_animationEnum == PlayerAnimationEnum::eWalk)
 		   {
-			   _targetRotation = -PI_DIV_4;
+			   RotatePlayer(-PI_DIV_4);
 		   }
 		   else if (_animationEnum == PlayerAnimationEnum::eWalkingBack ||
 			   _animationEnum == PlayerAnimationEnum::eWarRetreat)
 		   {
-			   _targetRotation = PI_DIV_4;
+			   RotatePlayer(PI_DIV_4);
 		   }
 	   }
 	   else if (VK_SHIFT == inputCode)
@@ -589,14 +598,14 @@ void Player::Handle(const InputManager::KeyPressedEvent & event)
 			   _animationEnum == PlayerAnimationEnum::eWalkingBack)
 		   {
 			   _camRotated = true;
-			   _targetRotation = D3DX_PI;
+			   RotatePlayer(D3DX_PI);
 			   this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWarCharging));
 		   }
 		   else if (_animationEnum == PlayerAnimationEnum::eStrafeLeft ||
 			   _animationEnum == PlayerAnimationEnum::eWarMovingLeft)
 		   {
 			   _camRotated = true;
-			   _targetRotation = PI_DIV_2;
+			   RotatePlayer(PI_DIV_2);
 			   this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWarCharging));
 
 		   }
@@ -604,7 +613,7 @@ void Player::Handle(const InputManager::KeyPressedEvent & event)
 			   _animationEnum == PlayerAnimationEnum::eWarMovingRight)
 		   {
 			   _camRotated = true;
-			   _targetRotation = -PI_DIV_2;
+			   RotatePlayer(-PI_DIV_2);
 			   this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWarCharging));
 
 		   }
@@ -618,17 +627,17 @@ void Player::Handle(const InputManager::KeyPressedEvent & event)
 		   if (_currentCommand._movement._horizontal == HORIZONTAL_MOVEMENT_LEFT)
 		   {
 			   _camRotated = true;
-			   _targetRotation -= PI_DIV_4;
+			   RotatePlayer(-PI_DIV_4);
 		   }
 		   else if (_currentCommand._movement._horizontal == HORIZONTAL_MOVEMENT_RIGHT)
 		   {
 			   _camRotated = true;
-			   _targetRotation += PI_DIV_4;
+			   RotatePlayer(PI_DIV_4);
 		   }
 		   else if (_currentCommand._movement._vertical == VERTICAL_MOVEMENT_DOWN)
 		   {
 			   _camRotated = true;
-			   _targetRotation += D3DX_PI;
+			   RotatePlayer(D3DX_PI);
 		   }
 	   }
 	   else if (_keyConfig._down == inputCode)
@@ -636,17 +645,17 @@ void Player::Handle(const InputManager::KeyPressedEvent & event)
 		   if (_currentCommand._movement._horizontal == HORIZONTAL_MOVEMENT_LEFT)
 		   {
 			   _camRotated = true;
-			   _targetRotation += PI_DIV_4;
+			   RotatePlayer(PI_DIV_4);
 		   }
 		   else if (_currentCommand._movement._horizontal == HORIZONTAL_MOVEMENT_RIGHT)
 		   {
 			   _camRotated = true;
-			   _targetRotation -= PI_DIV_4;
+			   RotatePlayer(-PI_DIV_4);
 		   }
 		   else if (_currentCommand._movement._vertical == VERTICAL_MOVEMENT_UP)
 		   {
 			   _camRotated = true;
-			   _targetRotation -= D3DX_PI;
+			   RotatePlayer(-D3DX_PI);
 		   }
 	   }
 	   else if (_keyConfig._left == inputCode)
@@ -654,17 +663,17 @@ void Player::Handle(const InputManager::KeyPressedEvent & event)
 		   if (_currentCommand._movement._vertical == VERTICAL_MOVEMENT_UP)
 		   {
 			   _camRotated = true;
-			   _targetRotation = PI_DIV_4;
+			   RotatePlayer(PI_DIV_4);
 		   }
 		   else if (_currentCommand._movement._vertical == VERTICAL_MOVEMENT_DOWN)
 		   {
 			   _camRotated = true;
-			   _targetRotation = -PI_DIV_4;
+			   RotatePlayer(-PI_DIV_4);
 		   }
 		   else if (_currentCommand._movement._horizontal == HORIZONTAL_MOVEMENT_RIGHT)
 		   {
 			   _camRotated = true;
-			   _targetRotation -= D3DX_PI;
+			   RotatePlayer(-D3DX_PI);
 		   }
 	   }
 	   else if (_keyConfig._right == inputCode)
@@ -672,17 +681,17 @@ void Player::Handle(const InputManager::KeyPressedEvent & event)
 		   if (_currentCommand._movement._vertical == VERTICAL_MOVEMENT_UP)
 		   {
 			   _camRotated = true;
-			   _targetRotation = -PI_DIV_4;
+			   RotatePlayer(-PI_DIV_4);
 		   }
 		   else if (_currentCommand._movement._vertical == VERTICAL_MOVEMENT_DOWN)
 		   {
 			   _camRotated = true;
-			   _targetRotation = +PI_DIV_4;
+			   RotatePlayer(PI_DIV_4);
 		   }
 		   else if (_currentCommand._movement._horizontal == HORIZONTAL_MOVEMENT_LEFT)
 		   {
 			   _camRotated = true;
-			   _targetRotation += D3DX_PI;
+			   RotatePlayer(D3DX_PI);
 		   }
 	   }
    } break;
@@ -696,11 +705,11 @@ void Player::Handle(const InputManager::KeyPressedEvent & event)
 	   {
 		   if (_keyConfig._left == inputCode)
 		   {
-			   _targetRotation += PI_DIV_4;
+			   RotatePlayer(PI_DIV_4);
 		   }
 		   else if (_keyConfig._right == inputCode)
 		   {
-			   _targetRotation -= PI_DIV_4;
+			   RotatePlayer(-PI_DIV_4);
 		   }
 	   }
    } break;
@@ -729,13 +738,13 @@ void Player::Handle(const InputManager::KeyReleasedEvent & event)
 	   {
 		   if (_currentCommand._movement._horizontal == HORIZONTAL_MOVEMENT_LEFT)
 		   {
-			   _targetRotation = 0.0f;
+			   RotatePlayer(0.0f);
 			   _inCombat ? this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWarMovingLeft)) :
 				   this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eStrafeLeft));
 		   }
 		   else if (_currentCommand._movement._horizontal == HORIZONTAL_MOVEMENT_RIGHT)
 		   {
-			   _targetRotation = 0.0f;
+			   RotatePlayer(0.0f);
 			   _inCombat ? this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWarMovingRight)) :
 				   this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eStrafeRight));
 		   }
@@ -744,13 +753,13 @@ void Player::Handle(const InputManager::KeyReleasedEvent & event)
 	   {
 		   if (_currentCommand._movement._horizontal == HORIZONTAL_MOVEMENT_LEFT)
 		   {
-			   _targetRotation = 0.0f;
+			   RotatePlayer(0.0f);
 			   _inCombat ? this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWarMovingLeft)) :
 				   this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eStrafeLeft));
 		   }
 		   else if (_currentCommand._movement._horizontal == HORIZONTAL_MOVEMENT_RIGHT)
 		   {
-			   _targetRotation = 0.0f;
+			   RotatePlayer(0.0f);
 			   _inCombat ? this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWarMovingRight)) :
 				   this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eStrafeRight));
 		   }
@@ -761,7 +770,7 @@ void Player::Handle(const InputManager::KeyReleasedEvent & event)
 			   _animationEnum == PlayerAnimationEnum::eWarRetreat || 
 			   _animationEnum == PlayerAnimationEnum::eWalkingBack)
 		   {
-			   _targetRotation = 0.0f;
+			   RotatePlayer(0.0f);
 		   }
 	   }
 	   else if (_keyConfig._right == inputCode)
@@ -770,7 +779,7 @@ void Player::Handle(const InputManager::KeyReleasedEvent & event)
 			   _animationEnum == PlayerAnimationEnum::eWarRetreat ||
 			   _animationEnum == PlayerAnimationEnum::eWalkingBack)
 		   {
-			   _targetRotation = 0.0f;
+			   RotatePlayer(0.0f);
 		   }
 	   }
    } break;
@@ -781,13 +790,13 @@ void Player::Handle(const InputManager::KeyReleasedEvent & event)
 		   if (_currentCommand._movement._horizontal == HORIZONTAL_MOVEMENT_LEFT)
 		   {
 			   _camRotated = true;
-			   _targetRotation += PI_DIV_4;
+			   RotatePlayer(PI_DIV_4);
 
 		   }
 		   else if (_currentCommand._movement._horizontal == HORIZONTAL_MOVEMENT_RIGHT)
 		   {
 			   _camRotated = true;
-			   _targetRotation -= PI_DIV_4;
+			   RotatePlayer(-PI_DIV_4);
 		   }
 	   }
 	   else if (_keyConfig._down == inputCode)
@@ -795,12 +804,12 @@ void Player::Handle(const InputManager::KeyReleasedEvent & event)
 		   if (_currentCommand._movement._horizontal == HORIZONTAL_MOVEMENT_LEFT)
 		   {
 			   _camRotated = true;
-			   _targetRotation -= PI_DIV_4;
+			   RotatePlayer(-PI_DIV_4);
 		   }
 		   else if (_currentCommand._movement._horizontal == HORIZONTAL_MOVEMENT_RIGHT)
 		   {
 			   _camRotated = true;
-			   _targetRotation += PI_DIV_4;
+			   RotatePlayer(PI_DIV_4);
 		   }
 	   }
 	   else if (_keyConfig._left == inputCode)
@@ -808,12 +817,13 @@ void Player::Handle(const InputManager::KeyReleasedEvent & event)
 		   if (_currentCommand._movement._vertical == VERTICAL_MOVEMENT_UP)
 		   {
 			   _camRotated = true;
-			   _targetRotation -= PI_DIV_4;
+			   RotatePlayer(-PI_DIV_4);
+
 		   }
 		   else if (_currentCommand._movement._vertical == VERTICAL_MOVEMENT_DOWN)
 		   {
 			   _camRotated = true;
-			   _targetRotation += PI_DIV_4;
+			   RotatePlayer(PI_DIV_4);
 		   }
 	   }
 	   else if (_keyConfig._right == inputCode)
@@ -821,12 +831,12 @@ void Player::Handle(const InputManager::KeyReleasedEvent & event)
 		   if (_currentCommand._movement._vertical == VERTICAL_MOVEMENT_UP)
 		   {
 			   _camRotated = true;
-			   _targetRotation += PI_DIV_4;
+			   RotatePlayer(PI_DIV_4);
 		   }
 		   else if (_currentCommand._movement._vertical == VERTICAL_MOVEMENT_DOWN)
 		   {
 			   _camRotated = true;
-			   _targetRotation -= PI_DIV_4;
+			   RotatePlayer(-PI_DIV_4);
 		   }
 	   }
 	   else if (VK_SHIFT == inputCode)
@@ -1095,6 +1105,20 @@ void Player::RepositionEntity(const TerrainTilePos & currentPos, const TerrainTi
 			refCurrentTile._entities.push_back(_entity);
 			
 		}
+	}
+}
+
+void Player::RotatePlayer(float angle)
+{
+	if (FloatZero(angle))
+	{
+		_targetRotation = 0.0f;
+	}
+
+	if (!_rotating)
+	{
+		_targetRotation = angle;
+		_rotating = true;
 	}
 }
 

@@ -59,6 +59,12 @@ public :
 
 	virtual const char *GetSceneName() = 0;
 
+	void CreateObjectFromFile(const std::string &fileName);
+
+	void ReleaseAllGameObjects();
+
+	virtual void CreateLightsAndCameras();
+	virtual void AddSystemToWorld();
 
 protected :
 	virtual bool SceneInit() = 0;

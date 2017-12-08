@@ -28,6 +28,8 @@ Engine::~Engine()
 	GIZMOMANAGER->ReleaseInstance();
 	SPRITEMANAGER->Release();
 	SPRITEMANAGER->ReleaseInstance();
+	SOUNDMANAGER->Release();
+	SOUNDMANAGER->ReleaseInstance();
 }
 
 void Engine::Run()
@@ -211,6 +213,7 @@ bool Engine::InitializeSystems()
 
 	GIZMOMANAGER->Init(gpDevice);
 	SPRITEMANAGER->Init(gpDevice);
+	SOUNDMANAGER->Init();
 
 	GAMEOBJECTFACTORY->Init();
 

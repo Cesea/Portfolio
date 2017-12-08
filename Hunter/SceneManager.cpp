@@ -106,6 +106,7 @@ bool SceneManager::Init()
 
 	//시작 씬을 설정한다
 	ChangeScene("MapToolScene");
+	//ChangeScene("TestScene");
 
 	return true;
 }

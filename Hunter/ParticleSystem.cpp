@@ -11,6 +11,11 @@ ParticleSystem::~ParticleSystem()
 }
 void ParticleSystem::update(float deltaTime)
 {
+	if (!_running)
+	{
+		return;
+	}
+
 	auto &entities = GetEntities();
 	for (int i = 0; i < entities.size(); i++)
 	{

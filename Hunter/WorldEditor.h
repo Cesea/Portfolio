@@ -198,7 +198,6 @@ struct StatusWindow
 	char _tileInfoStr[EDITOR_MAX_NAME];
 
 	char _cursorWorldPosStr[EDITOR_MAX_NAME];
-	//char _cursorChunkPosInfo[EDITOR_MAX_NAME];
 	char _cursorChunkInfoStr[EDITOR_MAX_NAME];
 	char _cursorTileInfoStr[EDITOR_MAX_NAME];
 };

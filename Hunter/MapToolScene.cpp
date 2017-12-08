@@ -164,6 +164,12 @@ bool MapToolScene::SceneInit()
 	_camera.SetMoveSpeed(6.0f);
 	_camera.SetRotationSpeed(1.0f);
 
+	_minimapCamera.CreateFromWorld(_world);
+	_minimapCamera._ortho = true;
+	_minimapCamera._aspect = 1;
+	_minimapCamera._orthoSize = 10 * 1.0f;	//투영크기는 그림자크기로...
+	_minimapCamera.ReadyRenderToTexture(512, 512);
+
 	_pMainLight->SetWorldPosition(Vector3(4.0f, 7.0f, 3.0f));
 	_pMainLight->SetTarget(Vector3(0.0f, 0.0f, 0.0f));
 
@@ -181,6 +187,16 @@ bool MapToolScene::SceneInit()
 	_editor = new Editor;
 	_editor->Init(this);
 	_editor->_pSelectedObject = GAMEOBJECTFACTORY->GetPlayerObject();
+
+	_scriptSystem.SetRunning(false);
+	_actionSystem.SetRunning(false);
+
+	Player * pPlayer = (Player *)GAMEOBJECTFACTORY->GetPlayerObject();
+	if (!_actionSystem.GetRunning() || 
+		!_scriptSystem.GetRunning())
+	{
+		pPlayer->UnRegisterEvents();
+	}
 
 	//Test
 	for (int32 i = 0; i < 100; ++i)
@@ -258,14 +274,14 @@ bool MapToolScene::SceneUpdate(float deltaTime, const InputManager & input)
 		}
 	}
 
-	if (input.keyboard.IsPressed('T'))
-	{
-		GAMEOBJECTFACTORY->GetPlayerObject()->GetEntity().Deactivate();
-	}
-	else if(input.keyboard.IsPressed('Y'))
-	{
-		GAMEOBJECTFACTORY->GetPlayerObject()->GetEntity().Activate();
-	}
+	//if (input.keyboard.IsPressed('T'))
+	//{
+	//	GAMEOBJECTFACTORY->GetPlayerObject()->GetEntity().Deactivate();
+	//}
+	//else if(input.keyboard.IsPressed('Y'))
+	//{
+	//	GAMEOBJECTFACTORY->GetPlayerObject()->GetEntity().Activate();
+	//}
 
 	_editor->Edit(RefVariant(), input);
 
@@ -276,7 +292,14 @@ bool MapToolScene::SceneUpdate(float deltaTime, const InputManager & input)
 	_actionSystem.Update(deltaTime);
 	_particleSystem.setCamera(&_camera, _camera.GetEntity().GetComponent<TransformComponent>().GetWorldPosition());
 	_particleSystem.update(deltaTime);
+
+
+	RenderMinimap();
+
 	ReadyShadowMap(TERRAIN);
+
+	//_ui->Update(deltaTime, input);
+
 
 	return result;
 }
@@ -324,14 +347,35 @@ bool MapToolScene::SceneRender0()
 
 bool MapToolScene::SceneRenderSprite()
 {
-	SPRITEMANAGER->BeginSpriteRender();
-	SPRITEMANAGER->EndSpriteRender();
+	//SPRITEMANAGER->BeginSpriteRender();
+	//SPRITEMANAGER->DrawTexture(_shadowCamera.GetRenderTexture(), nullptr, 600, 0, 1.0f, 1.0f, 0.0f);
+	
+	//SPRITEMANAGER->EndSpriteRender();
 	return true;
 }
 
 const char * MapToolScene::GetSceneName()
 {
 	return "MapToolScene";
+}
+
+void MapToolScene::RenderMinimap()
+{
+	//방향성광원에 붙은 카메라의 Frustum 업데이트
+	_minimapCamera.UpdateMatrix();
+	_minimapCamera.UpdateFrustum();
+
+	//_minimapCamera.RenderTextureBegin( 0xffffffff );
+
+	video::StaticXMesh::SetCamera( _minimapCamera );
+
+	video::SkinnedXMesh::SetCamera( _minimapCamera);
+
+	//TERRAIN->Render(_minimapCamera, );
+	//_renderSystem.Render(_minimapCamera);
+
+	//_shadowCamera.RenderTextureEnd();
+
 }
 
 void MapToolScene::Handle(const Editor::GetObjectFromSceneEvent & event)

@@ -65,35 +65,10 @@ IScene::IScene()
 
 bool IScene::Init()
 {
-	//시스템 생성
-	_world.AddSystem<RenderSystem>(_renderSystem);
-	_world.AddSystem<TransformSystem>(_transformSystem);
-	_world.AddSystem<ActionSystem>(_actionSystem);
-	_world.AddSystem<ScriptSystem>(_scriptSystem);
-	_world.AddSystem<CollisionSystem>(_collisionSystem);
-	_world.AddSystem<ParticleSystem>(_particleSystem);
-
-	//카메라 생성
-	_camera.CreateFromWorld(_world);
-	_camera.SetRotationSpeed(2.0f);
-	_camera.SetMoveSpeed(3.0f);
-	//_camera.GetEntity().GetComponent<TransformComponent>().MovePositionWorld(Vector3(0.0f, 4.0f, -6.0f));
-	//메인카메라 RenderToTexture 준비
-	_camera.ReadyRenderToTexture( WINSIZEX, WINSIZEY );
-
-
-	_shadowDistance = 50.0f;
-	_shadowCamera.CreateFromWorld(_world);
-	_shadowCamera._ortho = true;
-	_shadowCamera._camNear = 0.1f;
-	_shadowCamera._camFar = _shadowDistance * 2.0f;
-	_shadowCamera._aspect = 1;
-	_shadowCamera._orthoSize = _shadowDistance * 1.0f;	//투영크기는 그림자크기로...
-	_shadowCamera.ReadyShadowTexture(1024);
-
+	this->AddSystemToWorld();
 	//라이트 생성
 	_pMainLight = new DirectionalLight();
-	_pMainLight->CreateFromWorld(_world);
+	CreateLightsAndCameras();
 
 	_pEnvironmentSphere = new EnvironmentSphere;
 
@@ -163,7 +138,7 @@ void IScene::Release()
 bool IScene::Render()
 {
 	_camera.RenderTextureBegin( 0xff404040 );
-	
+
 	//환경 랜더
 	RenderEnvironmentSphere();
 
@@ -227,18 +202,6 @@ void IScene::ReadyShadowMap(Terrain *pTerrain)
 	_shadowCamera.UpdateMatrix();
 	_shadowCamera.UpdateFrustum();
 
-	////다이렉션라이팅 카메라에 들어오는 애들만 그린다...
-	//static std::vector<cBaseObject*>		shadowCullObject;
-	//shadowCullObject.clear();
-	//for( int i = 0 ; i < renderObjects->size() ; i++ )
-	//{
-	//	//프러스텀 안에 있니?
-	//	if( this->pDirectionLightCamera->Frustum.IsInFrustum( (*renderObjects)[i] ) )
-	//	{
-	//		shadowCullObject.push_back( (*renderObjects)[i] );
-	//	}
-	//}
-
 	//쉐도우 맵 그린다.
 	_shadowCamera.RenderTextureBegin( 0xffffffff );
 
@@ -247,12 +210,12 @@ void IScene::ReadyShadowMap(Terrain *pTerrain)
 	video::SkinnedXMesh::SetCamera( _shadowCamera);
 
 	_renderSystem.RenderShadow(_shadowCamera);
-
 	//만약 Terrain 도 쉐도우 맵을 그려야한다면...
-	//if(nullptr != pTerrain)
-	//{
-	//	pTerrain->RenderShadow( _shadowCamera ); 
-	//}
+	if(nullptr != pTerrain)
+	{
+		pTerrain->RenderShadow( _shadowCamera ); 
+	}
+
 	_shadowCamera.RenderTextureEnd();
 
 	//만약 Terrain 도 쉐도우 맵을 셋팅한다면...
@@ -276,6 +239,75 @@ void IScene::ReadyShadowMap(Terrain *pTerrain)
 LPDIRECT3DTEXTURE9 IScene::GetSceneTexture()
 {
 	return _camera.GetRenderTexture();
+}
+
+void IScene::CreateObjectFromFile(const std::string & fileName)
+{
+	DataPackage dataPackage;
+	uint32 fileSize{};
+	dataPackage.OpenFile(fileName.c_str(), &fileSize);
+	int32 numEntityToCreate;
+	dataPackage.ReadAs<int32>(&numEntityToCreate);
+
+	EntitySaveInfo entitySaveInfo;
+	ZeroMemory(&entitySaveInfo, sizeof(EntitySaveInfo));
+	for (int32 i = 0; i < numEntityToCreate; ++i)
+	{
+		dataPackage.ReadAs<EntitySaveInfo>(&entitySaveInfo);
+
+		_channel.Broadcast<GameObjectFactory::CreateObjectFromSaveInfoEvent>(
+			GameObjectFactory::CreateObjectFromSaveInfoEvent(entitySaveInfo._archeType, 
+				entitySaveInfo._resourceName, 
+				entitySaveInfo._position,
+				entitySaveInfo._scale,
+				entitySaveInfo._orientation));
+	}
+}
+
+void IScene::ReleaseAllGameObjects()
+{
+	for (uint32 i = 0; i < _gameObjects.size(); ++i)
+	{
+		SAFE_DELETE(_gameObjects[i]);
+	}
+	_gameObjects.clear();
+}
+
+void IScene::CreateLightsAndCameras()
+{
+	//카메라 생성
+	_camera.CreateFromWorld(_world);
+	_camera.SetRotationSpeed(2.0f);
+	_camera.SetMoveSpeed(3.0f);
+	//_camera.GetEntity().GetComponent<TransformComponent>().MovePositionWorld(Vector3(0.0f, 4.0f, -6.0f));
+	//메인카메라 RenderToTexture 준비
+	_camera.ReadyRenderToTexture( WINSIZEX, WINSIZEY );
+
+
+	_shadowDistance = 50.0f;
+	_shadowCamera.CreateFromWorld(_world);
+	_shadowCamera._ortho = true;
+	_shadowCamera._camNear = 0.1f;
+	_shadowCamera._camFar = _shadowDistance * 2.0f;
+	_shadowCamera._aspect = 1;
+	_shadowCamera._orthoSize = _shadowDistance * 1.0f;	//투영크기는 그림자크기로...
+	_shadowCamera.ReadyShadowTexture(1024);
+
+	_pMainLight->CreateFromWorld(_world);
+
+	_pMainLight->SetWorldPosition(Vector3(4.0f, 7.0f, 3.0f));
+	_pMainLight->SetTarget(Vector3(0.0f, 0.0f, 0.0f));
+}
+
+void IScene::AddSystemToWorld()
+{
+	//시스템 생성
+	_world.AddSystem<RenderSystem>(_renderSystem);
+	_world.AddSystem<TransformSystem>(_transformSystem);
+	_world.AddSystem<ActionSystem>(_actionSystem);
+	_world.AddSystem<ScriptSystem>(_scriptSystem);
+	_world.AddSystem<CollisionSystem>(_collisionSystem);
+	_world.AddSystem<ParticleSystem>(_particleSystem);
 }
 
 bool IScene::RenderEnvironmentSphere()

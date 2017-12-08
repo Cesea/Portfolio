@@ -139,6 +139,7 @@
     <ClCompile Include="batAnimationString.cpp" />
     <ClCompile Include="bloodFog.cpp" />
     <ClCompile Include="bloodParticle.cpp" />
+    <ClCompile Include="BmpFont.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="Cat.cpp" />
     <ClCompile Include="CatAnimationString.cpp" />
@@ -202,6 +203,7 @@
     <ClCompile Include="smoke.cpp" />
     <ClCompile Include="Snake.cpp" />
     <ClCompile Include="SnakeAnimationString.cpp" />
+    <ClCompile Include="SoundManager.cpp" />
     <ClCompile Include="SpriteManager.cpp" />
     <ClCompile Include="Terrain.cpp" />
     <ClCompile Include="TestScene.cpp" />
@@ -245,6 +247,7 @@
     <ClInclude Include="batAnimationString.h" />
     <ClInclude Include="bloodFog.h" />
     <ClInclude Include="bloodParticle.h" />
+    <ClInclude Include="BmpFont.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Cat.h" />
     <ClInclude Include="CatAnimationString.h" />
@@ -320,6 +323,7 @@
     <ClInclude Include="smoke.h" />
     <ClInclude Include="Snake.h" />
     <ClInclude Include="SnakeAnimationString.h" />
+    <ClInclude Include="SoundManager.h" />
     <ClInclude Include="SpriteManager.h" />
     <ClInclude Include="State.h" />
     <ClInclude Include="StateMachine.h" />
