@@ -20,16 +20,15 @@ private :
 	float _time;
 	float _maxTime;
 	float _scale;
-
-	bool fin;
 public:
 	Particle();
 	~Particle();
 
+	bool fin;
 
 	void createParticle(float maxTime, const Vector3 pos, const Vector3 accel, const Vector3 vel, float scale);
 	void updateParticle(float timeDelta);
 
-	void GetParticleVertex(	LPPARTICLE_VERTEX pOut,const VEC_COLOR& colors,	const VEC_SCALE& scales);
+	PARTICLE_VERTEX GetParticleVertex(const VEC_COLOR& colors,	const VEC_SCALE& scales);
 };
 

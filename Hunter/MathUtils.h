@@ -4,6 +4,8 @@
 #include "Vector2.h"
 #include "Vector3.h"
 
+constexpr float PI_DIV_2 = D3DX_PI * 0.5f;
+constexpr float PI_DIV_4 = D3DX_PI * 0.25f;
 
 //정점의 노말을 계산해주는 함수
 void ComputeNormal( Vector3 *pNormal, // 결과로 받을 노말

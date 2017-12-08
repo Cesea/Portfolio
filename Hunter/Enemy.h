@@ -51,11 +51,21 @@ protected:
 	//hurt
 	int _hurtTime;
 	int _hurtCount;
-	//플레이어 정보
+	//isHurt
+	bool _isHurt;
+	int _unBeatableTime;
+	int _unBeatableCount;
+	//Die
+	bool _isDie{ false };
+	int _dieCount{ 240 };
+
+	void RepositionEntity(const TerrainTilePos & currentPos, const TerrainTilePos & prevPos);
 public:
     Vector3 _playerPos;
 	Vector3 _playerForward;
+	Vector3 _playerSwordPos;
 	Player::PLAYERSTATE _playerState;
+
 	enum PATROLSET
 	{
 		PATROLSET_LINE,

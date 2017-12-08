@@ -93,20 +93,21 @@ sampler2D Terrain2 = sampler_state
    MIPFILTER = LINEAR;
    MAGFILTER = LINEAR;
 };
-texture Terrain3_Tex;
-sampler2D Terrain3 = sampler_state
+
+texture TerrainControl_Tex1;
+sampler2D TerrainControl1 = sampler_state
 {
-   Texture = (Terrain3_Tex);
-   MAGFILTER = LINEAR;
-   MINFILTER = LINEAR;
-   MIPFILTER = LINEAR;
-   MAXANISOTROPY = 0;
+   Texture = (TerrainControl_Tex1);
+   MAGFILTER = ANISOTROPIC;
+   MAXANISOTROPY = 16;
+   MINFILTER = ANISOTROPIC;
+   MIPFILTER = ANISOTROPIC;
 };
 
-texture TerrainControl_Tex;
-sampler2D TerrainControl = sampler_state
+texture TerrainControl_Tex2;
+sampler2D TerrainControl2 = sampler_state
 {
-   Texture = (TerrainControl_Tex);
+   Texture = (TerrainControl_Tex2);
    MAGFILTER = ANISOTROPIC;
    MAXANISOTROPY = 16;
    MINFILTER = ANISOTROPIC;
@@ -119,24 +120,27 @@ float4 ps_main( PS_INPUT Input ) : COLOR0
    float3 terrain0 = tex2D( Terrain0, Input.TileUV ).rgb;
    float3 terrain1 = tex2D( Terrain1, Input.TileUV ).rgb;
    float3 terrain2 = tex2D( Terrain2, Input.TileUV ).rgb;
-   float3 terrain3 = tex2D( Terrain3, Input.TileUV ).rgb;
   
    //Control Texture 의 컬러를 얻는다.
-   float3 controlColor = tex2D( TerrainControl, Input.ControlUV ).rgb;
-   
+   float4 controlColor1 = tex2D( TerrainControl1, Input.ControlUV );
+   float4 controlColor2 = tex2D( TerrainControl2, Input.ControlUV );
 
    //컨트롤 Texture 에서 색상비율을 얻는다.
-   float redFactor = controlColor.r;
-   float greenFactor = controlColor.g;
-   float blueFactor = controlColor.b;
-   float blackFactor = saturate( 1.0f - ( redFactor +  greenFactor + blueFactor ) );
+   //float redFactor = controlColor.r;
+   //float greenFactor = controlColor.g;
+   //float blueFactor = controlColor.b;
+   //float blackFactor = saturate( 1.0f - ( redFactor +  greenFactor + blueFactor ) );
+
+   float redFactor = 1.0f;
+   float greenFactor = 1.0f;
+   float blueFactor = 1.0f;
+   float blackFactor = 1.0f;
 
    float3 texColor1 = terrain0 * redFactor;
    float3 texColor2 = terrain1 * greenFactor;
    float3 texColor3 = terrain2 * blueFactor;
-   float3 texColor4 = terrain3 * blackFactor;
    
-   float3 finalColor = texColor1 + texColor2 + texColor3 + texColor4;
+   float3 finalColor = texColor1 + texColor2 + texColor3;
 
    float3 worldNormal = normalize(Input.Normal);
 
@@ -266,27 +270,17 @@ PS_OUTPUT ps_ReciveShadow( VS_OUTPUT_RECIVESHADOW Input )
 	//그림자가 그려지는 상황은 shadowDepth + bias 값 보다 lightDepth 가 큰경우이다.
 
    // Terrain Tile 컬러를 얻는다.
-   float3 terrain0 = tex2D( Terrain0, Input.TileUV ).rgb;
-   float3 terrain1 = tex2D( Terrain1, Input.TileUV ).rgb;
-   float3 terrain2 = tex2D( Terrain2, Input.TileUV ).rgb;
-   float3 terrain3 = tex2D( Terrain3, Input.TileUV ).rgb;
+   float3 terrainColor0 = tex2D( Terrain0, Input.TileUV ).rgb;
+   float3 terrainColor1 = tex2D( Terrain1, Input.TileUV ).rgb;
+   float3 terrainColor2 = tex2D( Terrain2, Input.TileUV ).rgb;
   
    //Control Texture 의 컬러를 얻는다.
-   float3 controlColor = tex2D( TerrainControl, Input.ControlUV ).rgb;
+   float4 controlColor1 = tex2D( TerrainControl1, Input.ControlUV );
+   float4 controlColor2 = tex2D( TerrainControl2, Input.ControlUV );
    
-
-   //컨트롤 Texture 에서 색상비율을 얻는다.
-   float redFactor = controlColor.r;
-   float greenFactor = controlColor.g;
-   float blueFactor = controlColor.b;
-   float blackFactor = saturate( 1.0f - ( redFactor +  greenFactor + blueFactor ) );
-
-   float3 texColor1 = terrain0 * redFactor;
-   float3 texColor2 = terrain1 * greenFactor;
-   float3 texColor3 = terrain2 * blueFactor;
-   float3 texColor4 = terrain3 * blackFactor;
+   float3 finalColor = lerp(terrainColor0, terrainColor1, controlColor1.w);
+   finalColor = lerp(finalColor, terrainColor2, controlColor2.w);
    
-   float3 finalColor = texColor1 + texColor2 + texColor3 + texColor4;
    float3 worldNormal = normalize(Input.Normal);
 
    float3 lightDir = float3(-baseDirectionalLight._21, 

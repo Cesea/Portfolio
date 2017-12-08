@@ -41,17 +41,11 @@ void ApplicationTimer::Tick()
 		{
 			break;
 		}
-		//timeToSleep = int32(_targetFramePerMS - _currentDeltaMS);
-		//Console::Log("%d\n", timeToSleep);
-		//prev = _currentDeltaSecond;
-		Sleep(1);
+		else
+		{
+			//Sleep(1);
+		}
 	}
-
-	////Console::Log("%d\n", timeToSleep);
-	//if (timeToSleep > 0 && timeToSleep < _targetFramePerMS)
-	//{
-	//	Sleep(timeToSleep);
-	//}
 	_prevCounter = _currentCounter;
 }
 

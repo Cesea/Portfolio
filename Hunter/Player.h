@@ -5,9 +5,16 @@
 #include "PlayerAnimationString.h"
 
 class Camera;
-
 class Player;
-class PlayerStateMachine;
+class DamageBox;
+
+struct KeyConfig
+{
+	uint32 _up;
+	uint32 _down;
+	uint32 _left;
+	uint32 _right;
+};
 
 struct PlayerCallbackData
 {
@@ -22,20 +29,24 @@ public :
 	HRESULT CALLBACK HandleCallback(THIS_ UINT Track, LPVOID pCallbackData);
 private :
 	Player *_pPlayer{};
+	EventChannel _channel;
 };
 
 class Player : public BaseGameObject
 {
-	friend class PlayerStateMachine;
 	friend class PlayerCallbackHandler;
+	friend class Camera;
 public :
 	friend class PlayerStanceState;
 public :
 	Player();
 	virtual ~Player();
 
-	virtual bool CreateFromWorld(World &world, const Vector3 &Pos);
+	virtual bool CreateFromWorld(World &world, const Vector3 &pos);
 	void Update(float deltaTime);
+
+	void RegisterEvents();
+	void UnRegisterEvents();
 
 	void Handle(const InputManager::KeyDownEvent &event);
 	void Handle(const InputManager::KeyReleasedEvent &event);
@@ -70,20 +81,23 @@ private :
 	void MoveAndRotate(float deltaTime);
 
 	PlayerCallbackData _callbackData;
-	PlayerStateMachine *_pStateMachine;
 	GameCommand _currentCommand;
-	void QueueAction(const Action &action);
+	GameCommand _prevCommand;
+	void QueueAction(Action &action, bool cancle = false);
+
+	void RepositionEntity(const TerrainTilePos &currentPos, const TerrainTilePos &prevPos);
 
 	ActionComponent *_pActionComp{};
 	TransformComponent *_pTransformComp{};
 	CollisionComponent *_pCollisionComp{};
-
 private :
 	EventChannel _channel;
-	float _walkSpeed{2.0f};
-	float _runSpeed{5.0f};
+	float _walkSpeed{1.6f};
+	float _runSpeed{5.5f};
 
-	int32 _hp{ 400 };
+	float _rotationSpeed{ 7.0f };
+
+	int32 _hp{ INT_MAX };
 
 	//int32 _stamina{ 100 };
 
@@ -95,24 +109,39 @@ private :
 	StopWatch _attackToStanceTimer;
 	int32 _comboCount{};
 
-
-	StopWatch _attackTriggerTimer;
-
 	bool32 _canCombo{false};
+
+	float _targetRotation{};
+	float _currentRotation{};
+
+	bool32 _camRotated{false};
+	bool32 _superArmor = true;
+	StopWatch _superArmorTimer;
+
+	Vector3 _startForward;
+	Vector3 _runStartForward;
+
+	KeyConfig _keyConfig;
+
+	DamageBox *_pDamageBox;
+	Bone *_pSwordFrame;
+	Vector3 _worldSwordPos;
 
 public :
 
 	struct PlayerImformationEvent
 	{
-		PlayerImformationEvent(const Vector3 &position,const PLAYERSTATE &state,const Vector3 &forward)
-			:_position(position),
-			_state(state),
-			_forward(forward)
+		PlayerImformationEvent(const Vector3 &position, 
+			const PLAYERSTATE &state,
+			const Vector3 &forward, 
+			const Vector3 &swordPos) 
+			: _position(position), _state(state), _forward(forward), _swordPos(swordPos)
 		{
 		}
 		Vector3 _position;
 		PLAYERSTATE _state;
 		Vector3 _forward;
+		Vector3 _swordPos;
 	};
 
 };

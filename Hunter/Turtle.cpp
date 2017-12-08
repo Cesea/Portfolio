@@ -1,6 +1,5 @@
 #include "stdafx.h"
 #include "Turtle.h"
-#include "TurtleStates.h"
 
 Turtle::Turtle()
 {
@@ -33,8 +32,9 @@ bool Turtle::CreateFromWorld(World & world, const Vector3 &Pos)
 	collision._boundingSphere._localCenter = pAnimation->_pSkinnedMesh->_boundInfo._center;
 	collision._boundingSphere._radius = pAnimation->_pSkinnedMesh->_boundInfo._radius;
 	collision._locked = false;
-	collision._isTrigger = false;;
+	collision._isTrigger = true;
 	collision._triggerType = CollisionComponent::TRIGGER_TYPE_ENEMY;
+	collision._type = CollisionComponent::COLLISION_TYPE_OBB;
 
 	ScriptComponent &scriptComponent = _entity.AddComponent<ScriptComponent>();
 	scriptComponent.SetScript(MAKE_SCRIPT_DELEGATE(Turtle, Update, *this));
@@ -50,22 +50,9 @@ bool Turtle::CreateFromWorld(World & world, const Vector3 &Pos)
 
 	_entity.Activate();
 
-	
-	_pStateMachine = new TurtleStateMachine;
-	_pStateMachine->Init(this);
-	_pStateMachine->RegisterState(META_TYPE(TurtleIdleState)->Name(), new TurtleIdleState());
-	_pStateMachine->RegisterState(META_TYPE(TurtleMoveState)->Name(), new TurtleMoveState());
-	_pStateMachine->RegisterState(META_TYPE(TurtleBite1State)->Name(), new TurtleBite1State());
-	_pStateMachine->RegisterState(META_TYPE(TurtleBite2State)->Name(), new TurtleBite2State());
-	_pStateMachine->RegisterState(META_TYPE(TurtleHurt1State)->Name(), new TurtleHurt1State());
-	_pStateMachine->RegisterState(META_TYPE(TurtleHurt2State)->Name(), new TurtleHurt2State());
-	_pStateMachine->RegisterState(META_TYPE(TurtleDeadState)->Name(), new TurtleDeadState());
-	_pStateMachine->RegisterState(META_TYPE(TurtleFindState)->Name(), new TurtleFindState());
-	_pStateMachine->ChangeState(META_TYPE(TurtleBite1State)->Name());
 	_state = TURTLESTATE_STAND;
 
 	_entity.Activate();
-
 
 	_speed = 1.0f;
 	_rotateSpeed = D3DX_PI / 256;
@@ -84,7 +71,7 @@ bool Turtle::CreateFromWorld(World & world, const Vector3 &Pos)
 
 	_playerPos = Vector3(-5.0f, 6.0f, 5.0f);
 
-	_atkRange = 0.5f;
+	_atkRange = 0.8f;
 	_atkTime = 90;
 	_atkCount = _atkTime;
 
@@ -96,8 +83,15 @@ bool Turtle::CreateFromWorld(World & world, const Vector3 &Pos)
 	_hurtTime = 60;
 	_hurtCount = _hurtTime;
 
+	_isHurt = false;
+	_unBeatableTime = 15;
+	_unBeatableCount = _unBeatableTime;
+
 	//이벤트 등록
 	EventChannel channel;
+	channel.Broadcast<GameObjectFactory::ObjectCreatedEvent>(
+		GameObjectFactory::ObjectCreatedEvent(ARCHE_TURTLE, _entity, transComp.GetWorldPosition()));
+
 	channel.Add<CollisionSystem::ActorTriggerEvent, Turtle>(*this);
 	setEvent();
 	return true;
@@ -105,8 +99,6 @@ bool Turtle::CreateFromWorld(World & world, const Vector3 &Pos)
 
 void Turtle::Update(float deltaTime)
 {
-	_pStateMachine->Update(deltaTime, _currentCommand);
-	_pStateMachine->Update(deltaTime, _currentCommand);
 	TransformComponent &transComp = _entity.GetComponent<TransformComponent>();
 
 	switch (_state)
@@ -117,14 +109,14 @@ void Turtle::Update(float deltaTime)
 		{
 			_delayCount = _delayTime;
 			_state = TURTLESTATE_WALK;
-			_pStateMachine->ChangeState(META_TYPE(TurtleMoveState)->Name());
+			this->QueueAction(TURTLE_ANIM(TURTLE_ANIMATION_ENUM::TURTLE_WALK));
 		}
 		break;
 	case TURTLESTATE_WALK:
 		if (_moveSegment.empty())
 		{
-			_pStateMachine->ChangeState(META_TYPE(TurtleIdleState)->Name());
 			_state = TURTLESTATE_STAND;
+			this->QueueAction(TURTLE_ANIM(TURTLE_ANIMATION_ENUM::TURTLE_STAND));
 		}
 		else
 		{
@@ -153,8 +145,7 @@ void Turtle::Update(float deltaTime)
 				_patrolIndex++;
 				if (_patrolIndex > _moveSegment.size() - 1) _patrolIndex = 0;
 				//IDLE 애니메이션 실행
-				_pStateMachine->ChangeState(META_TYPE(TurtleIdleState)->Name());
-				_state = TURTLESTATE_STAND;
+				this->QueueAction(TURTLE_ANIM(TURTLE_ANIMATION_ENUM::TURTLE_STAND));
 			}
 			//아니면 이동속도만큼 이동
 			else
@@ -171,7 +162,7 @@ void Turtle::Update(float deltaTime)
 		{
 			_roarCount = _roarTime;
 			_state = TURTLESTATE_TRACE;
-			_pStateMachine->ChangeState(META_TYPE(TurtleMoveState)->Name());
+			this->QueueAction(TURTLE_ANIM(TURTLE_ANIMATION_ENUM::TURTLE_WALK));
 		}
 		break;
 	case TURTLESTATE_TRACE:
@@ -187,7 +178,7 @@ void Turtle::Update(float deltaTime)
 		if (distance < _atkRange)
 		{
 			_state = TURTLESTATE_ATK1;
-			_pStateMachine->ChangeState(META_TYPE(TurtleBite1State)->Name());
+			this->QueueAction(TURTLE_ANIM(TURTLE_BITE1));
 		}
 		else
 		{
@@ -207,7 +198,7 @@ void Turtle::Update(float deltaTime)
 			if (distance < _atkRange)
 			{
 				_state = TURTLESTATE_ATK2;
-				_pStateMachine->ChangeState(META_TYPE(TurtleBite2State)->Name());
+				this->QueueAction(TURTLE_ANIM(TURTLE_BITE2));
 				_playerPos = Vector3(RandFloat(-5.0, 5.0), 5.0f, RandFloat(-5.0, 5.0));
 			}
 			//공격범위를 벗어났다?
@@ -216,7 +207,7 @@ void Turtle::Update(float deltaTime)
 				//배틀을 멈추고 기본자세 (다시추적시작)
 				_battle = false;
 				_state = TURTLESTATE_STAND;
-				_pStateMachine->ChangeState(META_TYPE(TurtleIdleState)->Name());
+				this->QueueAction(TURTLE_ANIM(TURTLE_STAND));
 			}
 		}
 		break;
@@ -232,7 +223,7 @@ void Turtle::Update(float deltaTime)
 			if (distance < _atkRange)
 			{
 				_state = TURTLESTATE_ATK1;
-				_pStateMachine->ChangeState(META_TYPE(TurtleBite1State)->Name());
+				this->QueueAction(TURTLE_ANIM(TURTLE_BITE1));
 			}
 			//공격범위를 벗어났다?
 			else
@@ -240,7 +231,7 @@ void Turtle::Update(float deltaTime)
 				//배틀을 멈추고 기본자세 (다시추적시작)
 				_battle = false;
 				_state = TURTLESTATE_STAND;
-				_pStateMachine->ChangeState(META_TYPE(TurtleIdleState)->Name());
+				this->QueueAction(TURTLE_ANIM(TURTLE_STAND));
 			}
 		}
 		break;
@@ -256,7 +247,7 @@ void Turtle::Update(float deltaTime)
 			if (distance < _atkRange)
 			{
 				_state = TURTLESTATE_ATK1;
-				_pStateMachine->ChangeState(META_TYPE(TurtleBite1State)->Name());
+				this->QueueAction(TURTLE_ANIM(TURTLE_BITE1));
 			}
 			else
 			{
@@ -264,7 +255,7 @@ void Turtle::Update(float deltaTime)
 				if (_battle)
 				{
 					_state = TURTLESTATE_TRACE;
-					_pStateMachine->ChangeState(META_TYPE(TurtleMoveState)->Name());
+					this->QueueAction(TURTLE_ANIM(TURTLE_WALK));
 				}
 				//비전투인데 맞았다?
 				else
@@ -272,7 +263,7 @@ void Turtle::Update(float deltaTime)
 					// 추격
 					_battle = true;
 					_state = TURTLESTATE_FIND;
-					_pStateMachine->ChangeState(META_TYPE(TurtleFindState)->Name());
+					this->QueueAction(TURTLE_ANIM(TURTLE_ROAR));
 					Vector3 distance = _playerPos - transComp.GetWorldPosition();
 					Vec3Normalize(&distance, &distance);
 					transComp.LookDirection(-distance, D3DX_PI * 2);
@@ -291,7 +282,7 @@ void Turtle::Update(float deltaTime)
 			//찾으면 FIND가 되며 battle상태가 
 			_battle = true;
 			_state = TURTLESTATE_FIND;
-			_pStateMachine->ChangeState(META_TYPE(TurtleFindState)->Name());
+			this->QueueAction(TURTLE_ANIM(TURTLE_ROAR));
 			Vector3 rotatePos = _playerPos;
 			rotatePos.y = transComp.GetWorldPosition().y;
 			Vector3 distance = rotatePos - transComp.GetWorldPosition();
@@ -300,35 +291,74 @@ void Turtle::Update(float deltaTime)
 		}
 	}
 
-	transComp.SetWorldPosition(transComp.GetWorldPosition().x, TERRAIN->GetHeight(transComp.GetWorldPosition().x, transComp.GetWorldPosition().z), transComp.GetWorldPosition().z);
+	transComp.SetWorldPosition(transComp.GetWorldPosition().x, 
+		TERRAIN->GetHeight(transComp.GetWorldPosition().x, transComp.GetWorldPosition().z), 
+		transComp.GetWorldPosition().z);
+
+	_prevTilePos = _tilePos;
+	TERRAIN->ConvertWorldPostoTilePos(transComp.GetWorldPosition(), &_tilePos);
+	RepositionEntity(_tilePos, _prevTilePos);
+
+	if (_isHurt)
+	{
+		_unBeatableCount--;
+		if (_unBeatableCount < 0)
+		{
+			_unBeatableCount = _unBeatableTime;
+			_isHurt = false;
+		}
+	}
+
+	if (_isDie)
+	{
+		_dieCount--;
+		if (_dieCount <= 0)
+		{
+			this->_valid = false;
+			EventChannel channel;
+			TERRAIN->RemoveEntityInTile(_entity, _tilePos);
+			channel.Broadcast<IScene::SceneDirty>(IScene::SceneDirty());
+		}
+	}
+
 }
 
 void Turtle::Handle(const CollisionSystem::ActorTriggerEvent & event)
 {
-	if (event._entity1 != _entity) return;
-	CollisionComponent & _collision = event._entity2.GetComponent<CollisionComponent>();
+	if (event._entity2 != _entity) return;
+	CollisionComponent & _collision = event._entity1.GetComponent<CollisionComponent>();
 	switch (_collision._triggerType)
 	{
 		//플레이어와 충돌했다(내가 가해자)
 	case CollisionComponent::TRIGGER_TYPE_PLAYER:
-		if (_state != TURTLESTATE_HURT&&_state != TURTLESTATE_DEATH)
-		{
-			resetAllCount();
-			_state = TURTLESTATE_HURT;
-			_pStateMachine->ChangeState(META_TYPE(TurtleHurt1State)->Name());
-			_battle = true;
-			_hp -= 50;
-			if (_hp <= 0)
-			{
-				_state = TURTLESTATE_DEATH;
-				_pStateMachine->ChangeState(META_TYPE(TurtleDeadState)->Name());
-			}
-		}
 		break;
 		//오브젝트와 충돌했다
 	case CollisionComponent::TRIGGER_TYPE_OBJECT:
 		break;
-	case CollisionComponent::TRIGGER_TYPE_DEFAULT:
+	case CollisionComponent::TRIGGER_TYPE_PLAYER_DMGBOX:
+		if (_isDie) break;
+		if (!_isHurt)
+		{
+			if (_state != TURTLESTATE_HURT&&_state != TURTLESTATE_DEATH)
+			{
+				resetAllCount();
+				_state = TURTLESTATE_HURT;
+				this->QueueAction(TURTLE_ANIM(TURTLE_ANIMATION_ENUM::TURTLE_HIT1));
+				_battle = true;
+				_hp -= 50;
+				if (_hp <= 0)
+				{
+					_state = TURTLESTATE_DEATH;
+					this->QueueAction(TURTLE_ANIM(TURTLE_ANIMATION_ENUM::TURTLE_DEATH));
+					_isDie = true;
+				}
+			}
+			_isHurt = true;
+			_collision._valid = false;
+			EventChannel channel;
+			channel.Broadcast<GameObjectFactory::CreateBlood>(
+				GameObjectFactory::CreateBlood(_playerPos));
+		}
 		break;
 	}
 }
@@ -353,9 +383,11 @@ void Turtle::SetupCallbackAndCompression()
 	AddCallbackKeysAndCompress(pController, anim0, 1, &warSwingLeftKeys, D3DXCOMPRESS_DEFAULT, 0.1f);
 }
 
-void Turtle::QueueAction(const Action & action)
+void Turtle::QueueAction(Action & action, bool cancle)
 {
-	_pActionComp->_actionQueue.PushAction(action);
+	action._cancle = cancle;
+   _pActionComp->_actionQueue.PushAction(action);
+   _animationEnum = action._enum;
 }
 
 bool Turtle::findPlayer(Vector3 forward, Vector3 playerPos, Vector3 myPos, float range1, float range2, float findRadian)

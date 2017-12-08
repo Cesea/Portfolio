@@ -138,7 +138,7 @@ bool Time_RayToOBB(const Vector3 &rayPos, Vector3 &rayDir,
 	Vector3 &OBBPos, Vector3 &xVec, Vector3 &yVec, Vector3 &zVec,
 	float xVecSize, float yVecSize, float zVecSize);
 
-bool IsBlocking(TransformComponent * pTransA, CollisionComponent::BoundingBox * pBoundA, TransformComponent * pTransB, CollisionComponent::BoundingBox * pBoundB, float moveFactor);
+bool IsBlocking(TransformComponent * pTransA, AABB * pBoundA, TransformComponent * pTransB, AABB * pBoundB, float moveFactor);
 
 AABB SetAABB(float xSize,float ySize,float zSize, Vector3 Pos);
 #endif

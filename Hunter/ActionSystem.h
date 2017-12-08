@@ -12,6 +12,8 @@ public:
 
 	void Update(float deltaTime);
 
+	void ClearAllComponentsQueue();
+
 	virtual void Initialize();
 
 	virtual void OnEntityAdded(Entity& entity);

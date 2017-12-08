@@ -59,7 +59,7 @@ void LoadEveryStaticResources()
 
 void LoadEverySkinnedResources()
 {
-//¸Þ½¬ ºÒ·¯¿À±â..
+//ë©”ì‰¬ ë¶ˆëŸ¬ì˜¤ê¸°..
 	Matrix correctionMat;
 	Matrix rotationCorrection;
 	MatrixRotationY(&rotationCorrection, D3DX_PI);
@@ -140,16 +140,16 @@ bool MapToolScene::SceneInit()
 
 	InitAnimations();
 
-	//ÅÍ·¹ÀÎ ·Îµå
+	//í„°ë ˆì¸ ë¡œë“œ
 	Terrain::TerrainConfig config;
-	config._xChunkCount = 2;
-	config._zChunkCount = 2;
+	config._xChunkCount = 4;
+	config._zChunkCount = 4;
 	strncpy(config._tile0FileName, "../resources/Terrain/TerrainTexture01.jpg", MAX_FILE_NAME);
 	strncpy(config._tile1FileName, "../resources/Terrain/TerrainTexture02.jpg", MAX_FILE_NAME);
 	strncpy(config._tile2FileName, "../resources/Terrain/TerrainTexture03.png", MAX_FILE_NAME);
-	strncpy(config._tile3FileName, "../resources/Terrain/TerrainTexture04.png", MAX_FILE_NAME);
 
-	config._textureMult = 200;
+	//TextureMultëŠ” í•˜ë‚˜ì˜ TerrainChunì— ëŒ€í•œ Multiplierê°’ì´ë‹¤.
+	config._textureMult = 25;
 
 	TERRAIN->SetScene(this);
 	TERRAIN->Create(config, true);
@@ -157,23 +157,90 @@ bool MapToolScene::SceneInit()
 	LoadEverySkinnedResources();
 	LoadEveryStaticResources();
 
+	_camera.SetMoveSpeed(6.0f);
+	_camera.SetRotationSpeed(1.0f);
+
+	_minimapCamera.CreateFromWorld(_world);
+	_minimapCamera._ortho = true;
+	_minimapCamera._aspect = 1;
+	_minimapCamera._orthoSize = 10 * 1.0f;	//íˆ¬ì˜í¬ê¸°ëŠ” ê·¸ë¦¼ìží¬ê¸°ë¡œ...
+	_minimapCamera.ReadyRenderToTexture(512, 512);
+
 	_pMainLight->SetWorldPosition(Vector3(4.0f, 7.0f, 3.0f));
 	_pMainLight->SetTarget(Vector3(0.0f, 0.0f, 0.0f));
 
 	_pEnvironmentSphere->Create("../resources/Textures/grassenvmap1024.dds");
 
 	_channel.Broadcast<GameObjectFactory::CreateObjectOnLocationEvent>(
-		GameObjectFactory::CreateObjectOnLocationEvent(ARCHE_HERO, ResourceHandle(), Vector3(0.0f, 2.0f, 0.0f)));
+		GameObjectFactory::CreateObjectOnLocationEvent(ARCHE_HERO, ResourceHandle(), 
+			Vector3(0.0f, 0.0f, 0.0f)));
 
-	//NOTE : GameObjectFactoryÀÇ GetPlayerObject´Â »ý¼º¿¡ ÀÇÁ¸¼ºÀ» °¡Áø´Ù
-	_camera.SetTargetObject(GAMEOBJECTFACTORY->GetPlayerObject());
+	//NOTE : GameObjectFactoryì˜ GetPlayerObjectëŠ” ìƒì„±ì— ì˜ì¡´ì„±ì„ ê°€ì§„ë‹¤
+	_camera.SetTargetObject((Player *)GAMEOBJECTFACTORY->GetPlayerObject());
 
-	//¿¡µðÅÍ »ý¼º
+	//ì—ë””í„° ìƒì„±
 	imguiRenderInit();
 	_editor = new Editor;
 	_editor->Init(this);
+	_editor->_pSelectedObject = GAMEOBJECTFACTORY->GetPlayerObject();
 
-	_ui = new UI;
+	_scriptSystem.SetRunning(false);
+	_actionSystem.SetRunning(false);
+
+	Player * pPlayer = (Player *)GAMEOBJECTFACTORY->GetPlayerObject();
+	if (!_actionSystem.GetRunning() || 
+		!_scriptSystem.GetRunning())
+	{
+		pPlayer->UnRegisterEvents();
+	}
+
+	//Test
+	for (int32 i = 0; i < 100; ++i)
+	{
+		float randX = RandFloat(-config._xChunkCount * TERRAIN_CHUNK_DIM * 0.5f,
+			config._xChunkCount * TERRAIN_CHUNK_DIM * 0.5f);
+		float randz = RandFloat(-config._zChunkCount * TERRAIN_CHUNK_DIM * 0.5f,  
+			config._zChunkCount * TERRAIN_CHUNK_DIM * 0.5f);
+		ARCHE_TYPE type = (ARCHE_TYPE)RandInt(2, 7);
+
+		ResourceHandle handle;
+		switch (type)
+		{
+		case ARCHE_ROCK:
+		{
+			handle = VIDEO->GetStaticXMesh("Rock01");
+		} break;
+		case ARCHE_GRASS:
+		{
+			handle = VIDEO->GetStaticXMesh("Grass01");
+		} break;
+		case ARCHE_TREE:
+		{
+			handle = VIDEO->GetStaticXMesh("Tree01");
+		} break;
+		case ARCHE_TREETRUNK:
+		{
+			handle = VIDEO->GetStaticXMesh("TreeTrunk01");
+		} break;
+		case ARCHE_MUSHROOM:
+		{
+			handle = VIDEO->GetStaticXMesh("Mushroom01");
+		} break;
+		}
+
+		//_channel.Broadcast<GameObjectFactory::CreateObjectOnLocationEvent>(
+		//	GameObjectFactory::CreateObjectOnLocationEvent(type, handle,
+		//		Vector3(randX, 0, randz)));
+	}
+	////ì‹¤í—˜
+	//trash = _world.CreateEntity();
+	//TransformComponent & trans = trash.AddComponent<TransformComponent>();
+	//trans.SetWorldPosition(Vector3(0, 5.0f, 0));
+	//ParticleComponent & par = trash.AddComponent<ParticleComponent>();
+	//par.init(ParticleComponent::PARTICLE_TYPE_SMOKE, 1000, 0.0025, Vector3(1.0f, 0, 0), Vector3(0.0f, 5.0f, 0.0f));
+	//par.min = Vector3(0, 0, 0);
+	//par.max = Vector3(0, 0, 0);
+	//trash.Activate();
 
 	return result;
 }
@@ -201,9 +268,16 @@ bool MapToolScene::SceneUpdate(float deltaTime, const InputManager & input)
 		{
 			y += 0.02f;
 		}
-
-		//_pMainLight->_entity.GetComponent<TransformComponent>().SetRotateWorld(Vector3(x, y, 0.0f));
 	}
+
+	//if (input.keyboard.IsPressed('T'))
+	//{
+	//	GAMEOBJECTFACTORY->GetPlayerObject()->GetEntity().Deactivate();
+	//}
+	//else if(input.keyboard.IsPressed('Y'))
+	//{
+	//	GAMEOBJECTFACTORY->GetPlayerObject()->GetEntity().Activate();
+	//}
 
 	_editor->Edit(RefVariant(), input);
 
@@ -212,10 +286,16 @@ bool MapToolScene::SceneUpdate(float deltaTime, const InputManager & input)
 	_transformSystem.PreUpdate(deltaTime);
 	_collisionSystem.Update(deltaTime, 4.0f);
 	_actionSystem.Update(deltaTime);
+	_particleSystem.setCamera(&_camera, _camera.GetEntity().GetComponent<TransformComponent>().GetWorldPosition());
+	_particleSystem.update(deltaTime);
+
+
+	RenderMinimap();
 
 	ReadyShadowMap(TERRAIN);
 
 	_ui->Update(deltaTime, input);
+
 
 	return result;
 }
@@ -231,6 +311,7 @@ bool MapToolScene::SceneRelease()
 	_gameObjects.clear();
 
 	_world.Clear();
+
 	//VIDEO->DestroyEveryVertexBuffers();
 	//VIDEO->DestroyEveryndexBuffers();
 	//VIDEO->DestroyEveryAnimationInstances();
@@ -253,6 +334,8 @@ bool MapToolScene::SceneRender0()
 
 	TERRAIN->Render(_camera, *_pMainLight, _camera);
 	_renderSystem.Render(_camera);
+	_particleSystem.render();
+	_collisionSystem.render();
 	_editor->Render();
 
 	return true;
@@ -260,15 +343,35 @@ bool MapToolScene::SceneRender0()
 
 bool MapToolScene::SceneRenderSprite()
 {
-	SPRITEMANAGER->BeginSpriteRender();
-	_ui->RenderUI();
-	SPRITEMANAGER->EndSpriteRender();
+	//SPRITEMANAGER->BeginSpriteRender();
+	//SPRITEMANAGER->DrawTexture(_shadowCamera.GetRenderTexture(), nullptr, 600, 0, 1.0f, 1.0f, 0.0f);
+	
+	//SPRITEMANAGER->EndSpriteRender();
 	return true;
 }
 
 const char * MapToolScene::GetSceneName()
 {
 	return "MapToolScene";
+}
+
+void MapToolScene::RenderMinimap()
+{
+	//ë°©í–¥ì„±ê´‘ì›ì— ë¶™ì€ ì¹´ë©”ë¼ì˜ Frustum ì—…ë°ì´íŠ¸
+	_minimapCamera.UpdateMatrix();
+	_minimapCamera.UpdateFrustum();
+
+	//_minimapCamera.RenderTextureBegin( 0xffffffff );
+
+	video::StaticXMesh::SetCamera( _minimapCamera );
+
+	video::SkinnedXMesh::SetCamera( _minimapCamera);
+
+	//TERRAIN->Render(_minimapCamera, );
+	//_renderSystem.Render(_minimapCamera);
+
+	//_shadowCamera.RenderTextureEnd();
+
 }
 
 void MapToolScene::Handle(const Editor::GetObjectFromSceneEvent & event)

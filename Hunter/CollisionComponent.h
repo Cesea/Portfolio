@@ -65,12 +65,18 @@ struct CollisionComponent : public Component
 		TRIGGER_TYPE_PLAYER,
 		TRIGGER_TYPE_ENEMY,
 		TRIGGER_TYPE_OBJECT,
-		TRIGGER_TYPE_DEFAULT
+		TRIGGER_TYPE_PLAYER_DMGBOX,
+		TRIGGER_TYPE_ENEMY_DMGBOX
 	};
 	bool _isTrigger{};
 	TRIGGER_TYPE _triggerType;
 	bool _locked{};
-
+	//DMG 박스들을 위한 변수들..
+	float _dmg;
+	float _velocity;
+	float _accel;
+	float _duration;
+	bool _valid;
 	//디버그용 함수들...
 	void GetWorldCenterRadius(const TransformComponent &transform, Vector3 *pOutCenter, float *pOutRadius);
 	void GetWorldBox(const TransformComponent& transform, Vector3* pOutBoxPos);

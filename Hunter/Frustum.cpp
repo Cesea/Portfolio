@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "Frustum.h"
 
-#define PLANE_EPSILON 5.0f
+#define PLANE_EPSILON 2.0f
 
 Frustum::Frustum()
 {

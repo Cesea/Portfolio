@@ -46,7 +46,7 @@
 
 #include <assert.h>
 
-#define WINSTARTX (100)
+#define WINSTARTX (300)
 #define WINSTARTY (100)
 
 #define WINSIZEX (1600)
@@ -60,6 +60,7 @@
 constexpr int CLIENTCENTERX = WINSTARTX +  WINSIZEX / 2;
 constexpr int CLIENTCENTERY = WINSTARTY + WINSIZEY / 2;
 
+#define MAX_FILE_NAME 256
 
 #include "Typedefs.h"
 #include "Memory.h"

@@ -114,40 +114,40 @@ void CollisionComponent::RenderBoxGizmo(const TransformComponent & transform)
 	GIZMOMANAGER->Line(worldPos[7], worldPos[3], 0xFF00FF00);
 	//AABB를 그리자
 
-	Vector3 min;
-	Vector3 max;
+	//Vector3 min;
+	//Vector3 max;
 
-	min = worldPos[0];
-	max = worldPos[0];
+	//min = worldPos[0];
+	//max = worldPos[0];
 
-	for (int i = 0; i < 8; i++)
-	{
-		if (min.x > worldPos[i].x)
-		{
-			min.x = worldPos[i].x;
-		}
-		else if (max.x < worldPos[i].x)
-		{
-			max.x = worldPos[i].x;
-		}
+	//for (int i = 0; i < 8; i++)
+	//{
+	//	if (min.x > worldPos[i].x)
+	//	{
+	//		min.x = worldPos[i].x;
+	//	}
+	//	else if (max.x < worldPos[i].x)
+	//	{
+	//		max.x = worldPos[i].x;
+	//	}
 
-		if (min.y > worldPos[i].y)
-		{
-			min.y = worldPos[i].y;
-		}
-		else if (max.y < worldPos[i].y)
-		{
-			max.y = worldPos[i].y;
-		}
+	//	if (min.y > worldPos[i].y)
+	//	{
+	//		min.y = worldPos[i].y;
+	//	}
+	//	else if (max.y < worldPos[i].y)
+	//	{
+	//		max.y = worldPos[i].y;
+	//	}
 
-		if (min.z > worldPos[i].z)
-		{
-			min.z = worldPos[i].z;
-		}
-		else if (max.z < worldPos[i].z)
-		{
-			max.z = worldPos[i].z;
-		}
-	}
-	GIZMOMANAGER->AABBBox(min, max, 0xFF008800);
+	//	if (min.z > worldPos[i].z)
+	//	{
+	//		min.z = worldPos[i].z;
+	//	}
+	//	else if (max.z < worldPos[i].z)
+	//	{
+	//		max.z = worldPos[i].z;
+	//	}
+	//}
+	GIZMOMANAGER->AABBBox(_boundingBox._localMinPos + transform.GetWorldPosition(), _boundingBox._localMaxPos + transform.GetWorldPosition(), 0xFF008800);
 }

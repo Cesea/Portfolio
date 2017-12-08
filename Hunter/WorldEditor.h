@@ -65,12 +65,9 @@ struct TerrainEditor
 	//float _brushOutterRadius{4.0f};
 	//float _brushIntensity{1.0f};
 
-	//채널은 r : 0, g : 1, b : 2, a : 3순으로 간다..
-	int32 _channel{ 0 };
-	bool32 _r{true};
-	bool32 _g{false};
-	bool32 _b{false};
-	bool32 _a{false};
+	int32 _layer{ 0 };
+	bool32 _layer1{ 0 };
+	bool32 _layer2{ 0 };
 
 	float _countX{};
 	float _countZ{};
@@ -79,7 +76,6 @@ struct TerrainEditor
 	char _textureName00[EDITOR_MAX_NAME]{0, };
 	char _textureName01[EDITOR_MAX_NAME]{0, };
 	char _textureName02[EDITOR_MAX_NAME]{0, };
-	char _textureName03[EDITOR_MAX_NAME]{0, };
 
 	char _fileName[EDITOR_MAX_NAME];
 };
@@ -105,6 +101,11 @@ struct ObjectLocator
 	bool32 _locateGrass{};
 	bool32 _locateMushroom{};
 	bool32 _locateMonster{};
+
+	float _scaleMin{0.1f};
+	float _scaleMax{1.9f};
+	float _rotationMin{-0.9f};
+	float _rotationMax{0.9f};
 
 	video::StaticXMeshHandle _currentStaticHandle;
 	video::SkinnedXMeshHandle _currentSkinnedHandle;
@@ -146,15 +147,22 @@ struct ObjectEditor
 	Quaternion _zRotation;
 };
 
-struct SceneEditor
+struct SystemEditor
 {
 	void Reset()
 	{
 		_editScrptSystem = false;
 		_editRenderSystem = false;
+		_editActionSystem = false;
+		_editCollisionSystem = false;
 	}
 	bool32 _editScrptSystem;
+	bool32 _editCollisionSystem;
 	bool32 _editRenderSystem;
+	bool32 _editActionSystem;
+
+	bool32 _scriptRunning{ true };
+	bool32 _renderShadow{true};
 };
 
 //일단은 StatusWindow는 Player만 사용할 수 있게끔 한다..
@@ -165,16 +173,34 @@ struct StatusWindow
 		_selectingType = ARCHE_NONE;
 		_selectingState = 0;
 
-		ZeroMemory(_worldPosition, sizeof(char) *EDITOR_MAX_NAME);
-		ZeroMemory(_terrainChunkPos, sizeof(char) *EDITOR_MAX_NAME);
-		ZeroMemory(_terrainTilePos, sizeof(char) *EDITOR_MAX_NAME);
+		ZeroMemory(_worldPosStr, sizeof(char) *EDITOR_MAX_NAME);
+		ZeroMemory(_chunkPosStr, sizeof(char) *EDITOR_MAX_NAME);
+		ZeroMemory(_tilePosStr, sizeof(char) *EDITOR_MAX_NAME);
+		ZeroMemory(_relPosStr, sizeof(char) *EDITOR_MAX_NAME);
+
+		ZeroMemory(_chunkInfoStr, sizeof(char) *EDITOR_MAX_NAME);
+		ZeroMemory(_tileInfoStr, sizeof(char) *EDITOR_MAX_NAME);
+
 	}
 
 	ARCHE_TYPE _selectingType{ARCHE_NONE};
 	int32 _selectingState{0};
-	char _worldPosition[EDITOR_MAX_NAME];
-	char _terrainChunkPos[EDITOR_MAX_NAME];
-	char _terrainTilePos[EDITOR_MAX_NAME];
+
+	char _worldTerrainInfoStr[EDITOR_MAX_NAME];
+	char _worldObjectInfoStr[EDITOR_MAX_NAME];
+
+	char _worldPosStr[EDITOR_MAX_NAME];
+	char _chunkPosStr[EDITOR_MAX_NAME];
+	char _tilePosStr[EDITOR_MAX_NAME];
+	char _relPosStr[EDITOR_MAX_NAME];
+
+	char _chunkInfoStr[EDITOR_MAX_NAME];
+	char _tileInfoStr[EDITOR_MAX_NAME];
+
+	char _cursorWorldPosStr[EDITOR_MAX_NAME];
+	//char _cursorChunkPosInfo[EDITOR_MAX_NAME];
+	char _cursorChunkInfoStr[EDITOR_MAX_NAME];
+	char _cursorTileInfoStr[EDITOR_MAX_NAME];
 };
 
 //Editor에서는 Scene의 포인터를 가지고 있어서 몬스터들의 스크립트나, 액션 시스템을 비 활성화 할 수 있다.
@@ -199,25 +225,32 @@ public :
 
 	void SetEdittingEntity(Entity &entity);
 
+	void SetShowStatusObject(BaseGameObject *pObject) { _pSelectedObject = pObject; }
+
 	void Render();
 public:
 	void RegisterEvents();
 public :
 
 	Entity *_selectedEntity{};
+	BaseGameObject *_pSelectedObject{};
 
 	enum EditMode
 	{
 		eNone,
 		eTerrainEdit,
 		eObjectLocate,
-		eObjectEdit
+		eObjectEdit,
+		eSystemEdit,
 	};
 	void ChangeEditState(EditMode mode);
 
 	void InTerrainEditMode();
 	void InObjectLocateMode();
 	void InObjectEditMode();
+	void InSystemEditMode();
+
+	void ShowStatusWindow();
 
 	EditMode _currentMode;
 	
@@ -242,6 +275,8 @@ public :
 	TerrainEditor _terrainEditor;
 	ObjectLocator _objectLocator;
 	ObjectEditor _objectEditor;
+
+	SystemEditor _systemEditor;
 
 	StatusWindow _statusWindow;
 

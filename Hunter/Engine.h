@@ -13,9 +13,9 @@
 
 #include "GizmoManager.h"
 #include "SpriteManager.h"
+#include "SoundManager.h"
 
-#include "GameObjectFactory.h"
-
+//#include "GameObjectFactory.h"
 
 #include <memory>
 

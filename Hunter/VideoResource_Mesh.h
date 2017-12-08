@@ -107,6 +107,7 @@ namespace video
 		void Render(ARCHE_TYPE type, const TransformComponent &transform);
 		void RenderShadow(const TransformComponent &transform);
 
+
 		bool32 _visible{ true };
 		ID3DXMesh *_pMesh{};
 		uint32 _numMaterial{};
@@ -149,6 +150,9 @@ namespace video
 
 		void CalculateTotalBoundInfo(Bone *pRoot);
 
+
+		BoneMesh *FindBoneMesh(Bone *pBone, LPCSTR name);
+
 		Matrix _matCorrection;
 
 		Bone *_pRootBone{};
@@ -158,6 +162,7 @@ namespace video
 
 		uint32 _numSubset{};
 		MeshBoundInfo _boundInfo{};
+	
 	};
 
 

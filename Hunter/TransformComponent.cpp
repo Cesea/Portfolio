@@ -1,4 +1,4 @@
-#include "stdafx.h"
+ï»¿#include "stdafx.h"
 #include "TransformComponent.h"
 
 
@@ -20,18 +20,19 @@ DEFINE_META(TransformComponent)
 
 TransformComponent::TransformComponent()
 {
-
-	this->_pParent = NULL;
-	this->_pFirstChild = NULL;
-	this->_pNextSibling = NULL;
+	this->_pParent = nullptr;
+	this->_pFirstChild = nullptr;
+	this->_pNextSibling = nullptr;
 
 	this->_transformDirty = false;
 
-	//Á¤º¸ ¸®¼Â
+	//ì •ë³´ ë¦¬ì…‹
 	this->Reset();
 
 	MatrixIdentity(&_matFinal);
 	MatrixIdentity(&_matLocal);
+
+	this->UpdateTransform();
 }
 
 
@@ -39,12 +40,12 @@ TransformComponent::~TransformComponent()
 {
 }
 
-//TransformComponent Á¤º¸¸¦ ÃÊ±âÈ­
+//TransformComponent ì •ë³´ë¥¼ ì´ˆê¸°í™”
 void TransformComponent::Reset(int resetFlag /*= -1*/)
 {
 	if (resetFlag & RESET_POSITION)
 	{
-		//À§Ä¡´Â 0, 0, 0
+		//ìœ„ì¹˜ëŠ” 0, 0, 0
 		this->_position.x = 0;
 		this->_position.y = 0;
 		this->_position.z = 0;
@@ -52,7 +53,7 @@ void TransformComponent::Reset(int resetFlag /*= -1*/)
 
 	if (resetFlag & RESET_ROTATION)
 	{
-		//È¸Àü¹æÇâÀº 
+		//íšŒì „ë°©í–¥ì€ 
 		//this->_axis[0] = Vector3( 1, 0, 0 );
 		//this->_axis[1] = Vector3( 0, 1, 0 );
 		//this->_axis[2] = Vector3( 0, 0, 1 );
@@ -65,67 +66,69 @@ void TransformComponent::Reset(int resetFlag /*= -1*/)
 
 	if (resetFlag & RESET_SCALE)
 	{
-		//½ºÄÉÀÏÀÇ ÃÊ±âÈ­ °ª
+		//ìŠ¤ì¼€ì¼ì˜ ì´ˆê¸°í™” ê°’
 		this->_scale = Vector3(1, 1, 1);
 	}
 
 	_transformDirty = true;
+	this->UpdateTransform();
 }
 
-//Æ¯Á¤ Child ¸¦ ³»ÀÚ½ÄÀ¸·Î ºÙÀÎ´Ù.
+
+//íŠ¹ì • Child ë¥¼ ë‚´ìì‹ìœ¼ë¡œ ë¶™ì¸ë‹¤.
 void TransformComponent::AddChild(TransformComponent* pNewChild)
 {
-	//ÀÌ¹Ì ³»»õ³¢¸é ÇÒÇÊ¿ä ¾ø´Ù
+	//ì´ë¯¸ ë‚´ìƒˆë¼ë©´ í• í•„ìš” ì—†ë‹¤
 	if (pNewChild->_pParent == this)
 		return;
 
-	//³ÊÀÌ»õ³¢ ³»¹ØÀ¸·Î µé¾î¿Ã·Á¸é ºÎ¸ğ¶û ¿¬À» ²÷¾î¶ó...
+	//ë„ˆì´ìƒˆë¼ ë‚´ë°‘ìœ¼ë¡œ ë“¤ì–´ì˜¬ë ¤ë©´ ë¶€ëª¨ë‘ ì—°ì„ ëŠì–´ë¼...
 	pNewChild->ReleaseParent();
 
-	//ºÎ¸ğÀÇ »ó´ëÀûÀÎ ÁÂÇ¥°ªÀ¸·Î °»½ÅÇÏ±âÀ§ÇØ 
-	//ºÎ¸ğÀÇ final ¿ªÇà·ÄÀ» ±¸ÇÑ´Ù.
+	//ë¶€ëª¨ì˜ ìƒëŒ€ì ì¸ ì¢Œí‘œê°’ìœ¼ë¡œ ê°±ì‹ í•˜ê¸°ìœ„í•´ 
+	//ë¶€ëª¨ì˜ final ì—­í–‰ë ¬ì„ êµ¬í•œë‹¤.
 	Matrix matInvFinal;
 	MatrixInverse(&matInvFinal, NULL, &this->_matFinal);
 
-	//ÀÚ½ÄÀÇ Position °ú Axis ¹× Scale °»½Å
+	//ìì‹ì˜ Position ê³¼ Axis ë° Scale ê°±ì‹ 
 	Vec3TransformCoord(&pNewChild->_position, &pNewChild->_position, &matInvFinal);
 
-	//Ãà3°³ º¯È¯ÇÏ°í 
+	//ì¶•3ê°œ ë³€í™˜í•˜ê³  
 	for (int32 i = 0; i < 3; i++) 
 	{
 		Vec3TransformNormal(pNewChild->_axis + i, pNewChild->_axis + i, &matInvFinal);
 	}
 
-	//3Ãà¿¡ ´ëÇÑ ±æÀÌ°ªÀ» ¾ò´Â´Ù.
+	//3ì¶•ì— ëŒ€í•œ ê¸¸ì´ê°’ì„ ì–»ëŠ”ë‹¤.
 	pNewChild->_scale.x = Vec3Length(&pNewChild->_right);
 	pNewChild->_scale.y = Vec3Length(&pNewChild->_up);
 	pNewChild->_scale.z = Vec3Length(&pNewChild->_forward);
 
-	//Á¤±ÔÈ­
+	//ì •ê·œí™”
 	Vec3Normalize(&pNewChild->_right, &pNewChild->_right);
 	Vec3Normalize(&pNewChild->_up, &pNewChild->_up);
 	Vec3Normalize(&pNewChild->_forward, &pNewChild->_forward);
 
-	//»õ·Î¿î ³ğÀÇ ºÎ¸ğ´Â ³»°¡ µÈ´Ù.
+	//ìƒˆë¡œìš´ ë†ˆì˜ ë¶€ëª¨ëŠ” ë‚´ê°€ ëœë‹¤.
 	pNewChild->_pParent = this;
 
-	//³ªÀÇ ÀÚ½Ä³ğ Æ÷ÀÎÅÍ
+	//ë‚˜ì˜ ìì‹ë†ˆ í¬ì¸í„°
 	TransformComponent* pChild = this->_pFirstChild;
 
-	//ÀÚ½ÄÀÌ ¾ø´Â ¾µ¾µÇÑ µ¶°Å³ëÀÎÀÌ¶ó¸é...
+	//ìì‹ì´ ì—†ëŠ” ì“¸ì“¸í•œ ë…ê±°ë…¸ì¸ì´ë¼ë©´...
 	if (nullptr == pChild ) 
 	{
-		//¾È½ÉÇÏ°í Ãß°¡
+		//ì•ˆì‹¬í•˜ê³  ì¶”ê°€
 		this->_pFirstChild = pNewChild;
 		pNewChild->_pParent = this;
 	}
 
-	//´ë°¡Á·¿¡ µé¾î°£´Ù.
+	//ëŒ€ê°€ì¡±ì— ë“¤ì–´ê°„ë‹¤.
 	else 
 	{
 		while (nullptr != pChild) 
 		{
-			//³»°¡ µé¾î°¥ ÀÚ¸®¸¦ Ã£¾Ò´Ù¸é...
+			//ë‚´ê°€ ë“¤ì–´ê°ˆ ìë¦¬ë¥¼ ì°¾ì•˜ë‹¤ë©´...
 			if (nullptr == pChild->_pNextSibling)
 			{
 				pChild->_pNextSibling = pNewChild;
@@ -137,35 +140,37 @@ void TransformComponent::AddChild(TransformComponent* pNewChild)
 		}
 	}
 
-	//¾÷µ¥ÀÌÆ®
+	//ì—…ë°ì´íŠ¸
+
+	this->UpdateTransform();
 	_transformDirty = true;
 }
 
-//Æ¯Á¤ TransformComponent ¿¡ ºÙ´Â´Ù.
+//íŠ¹ì • TransformComponent ì— ë¶™ëŠ”ë‹¤.
 void TransformComponent::AttachTo(TransformComponent* pNewParent)
 {
 	pNewParent->AddChild(this);
 }
 
-//ºÎ¸ğ¿Í ¾È³ç
+//ë¶€ëª¨ì™€ ì•ˆë…•
 void TransformComponent::ReleaseParent()
 {
-	//ºÎ¸ğ°¡ ¾ø´Ï?
+	//ë¶€ëª¨ê°€ ì—†ë‹ˆ?
 	if (nullptr == _pParent)
 	{
 		return;
 	}
 
-	//ºÎ¸ğ¶û ¿¬À» ²÷±â Àü¿¡ ºÎ¸ğºÎÅÍ ÀÚ½Ä¿¬À» ²÷¾î¶ó...
+	//ë¶€ëª¨ë‘ ì—°ì„ ëŠê¸° ì „ì— ë¶€ëª¨ë¶€í„° ìì‹ì—°ì„ ëŠì–´ë¼...
 	TransformComponent* pChild = _pParent->_pFirstChild;
 
-	//³»°¡ ºÎ¸ğÀÇ Ã¹Â°ÀÚ½ÄÀÌ´Ï?
+	//ë‚´ê°€ ë¶€ëª¨ì˜ ì²«ì§¸ìì‹ì´ë‹ˆ?
 	if (this == pChild ) 
 	{
-		//³»´ÙÀ½ ÀÚ½ÄÀÌ Ã¹¹øÂ° ÀÚ½ÄÀÌ µÈ´Ù.
+		//ë‚´ë‹¤ìŒ ìì‹ì´ ì²«ë²ˆì§¸ ìì‹ì´ ëœë‹¤.
 		this->_pParent->_pFirstChild = this->_pNextSibling;
 
-		//ÇüÀçµé°úÀÇ ¿¬µµ ²÷´Â´Ù.
+		//í˜•ì¬ë“¤ê³¼ì˜ ì—°ë„ ëŠëŠ”ë‹¤.
 		this->_pNextSibling = NULL;
 	}
 
@@ -173,44 +178,44 @@ void TransformComponent::ReleaseParent()
 	{
 		while (nullptr != pChild) 
 		{
-			//ÇöÀç ÀÚ½ÄÀÇ ´ÙÀ½ÀÌ ³ª´Ï?
+			//í˜„ì¬ ìì‹ì˜ ë‹¤ìŒì´ ë‚˜ë‹ˆ?
 			if (this == pChild->_pNextSibling) 
 			{
 				pChild->_pNextSibling = this->_pNextSibling;
 
-				//ÇüÀçµé°úÀÇ ¿¬µµ ²÷´Â´Ù.
+				//í˜•ì¬ë“¤ê³¼ì˜ ì—°ë„ ëŠëŠ”ë‹¤.
 				this->_pNextSibling = NULL;
 
 				break;
 			}
 
-			//´ÙÀ½ ÀÚ½Äº»´Ù.
+			//ë‹¤ìŒ ìì‹ë³¸ë‹¤.
 			pChild = pChild->_pNextSibling;
 		}
 	}
 
-	//ºÎ¸ğ¶û ¿¬À» ²÷¾î¶ó...
+	//ë¶€ëª¨ë‘ ì—°ì„ ëŠì–´ë¼...
 	this->_pParent = nullptr;
 
-	//ÀÚ½ÅÀÇ ÇöÀç ¿ùµå À§Ä¡¿¡ ´ëÇÑ °»½ÅÀÌ ÇÊ¿äÇÏ´Ù.
-	//ÁøÂ¥¿ùµå À§Ä¡´Â matFinal ÀÌ ´Ù °¡Áö°í ÀÖ´Ù.
+	//ìì‹ ì˜ í˜„ì¬ ì›”ë“œ ìœ„ì¹˜ì— ëŒ€í•œ ê°±ì‹ ì´ í•„ìš”í•˜ë‹¤.
+	//ì§„ì§œì›”ë“œ ìœ„ì¹˜ëŠ” matFinal ì´ ë‹¤ ê°€ì§€ê³  ìˆë‹¤.
 
-	//¿ùµå À§Ä¡ °»½Å
+	//ì›”ë“œ ìœ„ì¹˜ ê°±ì‹ 
 	this->_position.x = this->_matFinal._41;
 	this->_position.y = this->_matFinal._42;
 	this->_position.z = this->_matFinal._43;
 
-	//3Ãà ¾ò¾î¿Â´Ù.
+	//3ì¶• ì–»ì–´ì˜¨ë‹¤.
 	Vector3 forwardScaled(this->_matFinal._31, this->_matFinal._32, this->_matFinal._33);
 	Vector3 upScaled(this->_matFinal._21, this->_matFinal._22, this->_matFinal._23);
 	Vector3 rightScaled(this->_matFinal._11, this->_matFinal._12, this->_matFinal._13);
 
-	//3Ãà¿¡¼­ ½ºÄÉÀÏ »«´Ù
+	//3ì¶•ì—ì„œ ìŠ¤ì¼€ì¼ ëº€ë‹¤
 	float scaleX = Vec3Length(&rightScaled);
 	float scaleY = Vec3Length(&upScaled);
 	float scaleZ = Vec3Length(&forwardScaled);
 
-	//Á¤±ÔÈ­
+	//ì •ê·œí™”
 	Vector3 forwardUnit;
 	Vector3 upUnit;
 	Vector3 rightUnit;
@@ -218,36 +223,38 @@ void TransformComponent::ReleaseParent()
 	Vec3Normalize(&upUnit, &upScaled);
 	Vec3Normalize(&forwardUnit, &forwardScaled);
 
-	//Á¤±ÔÈ­µÈ 3Ãà ´ëÀÔ
+	//ì •ê·œí™”ëœ 3ì¶• ëŒ€ì…
 	this->_forward = forwardUnit;
 	this->_right = rightUnit;
 	this->_up = upUnit;
 
-	//½ºÄÉÀÏ ´ëÀÔ
+	//ìŠ¤ì¼€ì¼ ëŒ€ì…
 	this->_scale.x = scaleX;
 	this->_scale.y = scaleY;
 	this->_scale.z = scaleZ;
 
-	//³ª¸¸ÀÇ »õ»óÀÌ µÇ¾ú´Ù...
+	//ë‚˜ë§Œì˜ ìƒˆìƒì´ ë˜ì—ˆë‹¤...
 
-	//ºÎ¸ğ¶û »ç¶óÁø ±â³äÀ¸·Î Update ÇÑ¹ø Äİ
+
+	//ë¶€ëª¨ë‘ ì‚¬ë¼ì§„ ê¸°ë…ìœ¼ë¡œ Update í•œë²ˆ ì½œ
+	this->UpdateTransform();
 	_transformDirty = true;
 }
 
 
-//À§Ä¡¸¦ ¿ùµå ÁÂÇ¥°è·Î ¼ÂÆÃÇÑ´Ù. 
+//ìœ„ì¹˜ë¥¼ ì›”ë“œ ì¢Œí‘œê³„ë¡œ ì…‹íŒ…í•œë‹¤. 
 void TransformComponent::SetWorldPosition(float x, float y, float z)
 {
 	Vector3 pos(x, y, z);
 
-	//ºÎ¸ğ°¡ ÀÖ´Ù¸é ºÎ¸ğÀÇ »óÅÂÀûÀÎ À§Ä¡·Î ¹Ù²ã¶ó...
+	//ë¶€ëª¨ê°€ ìˆë‹¤ë©´ ë¶€ëª¨ì˜ ìƒíƒœì ì¸ ìœ„ì¹˜ë¡œ ë°”ê¿”ë¼...
 	if (nullptr != this->_pParent )
 	{
-		//ºÎ¸ğÀÇ ÃÖÁ¾ Çà·ÄÀÇ ¿ªÇà·Ä
+		//ë¶€ëª¨ì˜ ìµœì¢… í–‰ë ¬ì˜ ì—­í–‰ë ¬
 		Matrix matInvParentFinal;
 		MatrixInverse(&matInvParentFinal, NULL, &this->_pParent->_matFinal);
 
-		//±× ¿ªÇà¿¡ Pos Àû¿ë
+		//ê·¸ ì—­í–‰ì— Pos ì ìš©
 		Vec3TransformCoord(&pos, &pos, &matInvParentFinal);
 	}
 
@@ -255,19 +262,20 @@ void TransformComponent::SetWorldPosition(float x, float y, float z)
 	this->_position.y = pos.y;
 	this->_position.z = pos.z;
 
+	this->UpdateTransform();
 	_transformDirty = true;
 }
 
 void TransformComponent::SetWorldPosition(Vector3 pos)
 {
-	//ºÎ¸ğ°¡ ÀÖ´Ù¸é ºÎ¸ğÀÇ »óÅÂÀûÀÎ À§Ä¡·Î ¹Ù²ã¶ó...
+	//ë¶€ëª¨ê°€ ìˆë‹¤ë©´ ë¶€ëª¨ì˜ ìƒíƒœì ì¸ ìœ„ì¹˜ë¡œ ë°”ê¿”ë¼...
 	if (this->_pParent != NULL)
 	{
-		//ºÎ¸ğÀÇ ÃÖÁ¾ Çà·ÄÀÇ ¿ªÇà·Ä
+		//ë¶€ëª¨ì˜ ìµœì¢… í–‰ë ¬ì˜ ì—­í–‰ë ¬
 		Matrix matInvParentFinal;
 		MatrixInverse(&matInvParentFinal, NULL, &this->_pParent->_matFinal);
 
-		//±× ¿ªÇà¿¡ Pos Àû¿ë
+		//ê·¸ ì—­í–‰ì— Pos ì ìš©
 		Vec3TransformCoord(&pos, &pos, &matInvParentFinal);
 	}
 
@@ -275,16 +283,20 @@ void TransformComponent::SetWorldPosition(Vector3 pos)
 	this->_position.y = pos.y;
 	this->_position.z = pos.z;
 
+
+	this->UpdateTransform();
 	_transformDirty = true;
 }
 
-//À§Ä¡¸¦ ·ÎÄÃ ÁÂÇ¥°è·Î ¼ÂÆÃÇÑ´Ù.  ( ºÎ¸ğ°¡ ÀÖ´Â °æ¿ì ¹«¸ğÀÇ »óÅÂÀûÀÎ À§Ä¡ )
+//ìœ„ì¹˜ë¥¼ ë¡œì»¬ ì¢Œí‘œê³„ë¡œ ì…‹íŒ…í•œë‹¤.  ( ë¶€ëª¨ê°€ ìˆëŠ” ê²½ìš° ë¬´ëª¨ì˜ ìƒíƒœì ì¸ ìœ„ì¹˜ )
 void TransformComponent::SetLocalPosition(float x, float y, float z)
 {
 	this->_position.x = x;
 	this->_position.y = y;
 	this->_position.z = z;
 
+
+	this->UpdateTransform();
 	_transformDirty = true;
 }
 
@@ -294,78 +306,81 @@ void TransformComponent::SetLocalPosition(Vector3 pos)
 	this->_position.y = pos.y;
 	this->_position.z = pos.z;
 
+	this->UpdateTransform();
 	_transformDirty = true;
 }
 
-//ÀÚ½ÅÀÇ Ãà±âÁØÀ¸·Î ÀÌµ¿ ½ÃÅ²´Ù.
+//ìì‹ ì˜ ì¶•ê¸°ì¤€ìœ¼ë¡œ ì´ë™ ì‹œí‚¨ë‹¤.
 void TransformComponent::MovePositionSelf(float dx, float dy, float dz)
 {
-	//ÀÌµ¿ º¤ÅÍ
+	//ì´ë™ ë²¡í„°
 	Vector3 move(0, 0, 0);
 
-	//ÀÚ½ÅÀÇ ÀÌµ¿ Ãà ¾ò´Â´Ù.
+	//ìì‹ ì˜ ì´ë™ ì¶• ì–»ëŠ”ë‹¤.
 	Vector3 moveAxis[3];
 	this->GetUnitAxies(moveAxis);
 	move += moveAxis[0] * dx;
 	move += moveAxis[1] * dy;
 	move += moveAxis[2] * dz;
 
-	//¿ùµå ÀÌµ¿
+	//ì›”ë“œ ì´ë™
 	Vector3 nowWorldPos = this->GetWorldPosition();
 
-	//¾Æ·¡ÀÇ ÇÔ¼ö¿¡¼­ TransformUpdate °¡ ÀÏ¾î³²
+	//ì•„ë˜ì˜ í•¨ìˆ˜ì—ì„œ TransformUpdate ê°€ ì¼ì–´ë‚¨
 	this->SetWorldPosition(nowWorldPos + move);
 }
 
 void TransformComponent::MovePositionSelf(Vector3 delta)
 {
-	//ÀÌµ¿ º¤ÅÍ
+	//ì´ë™ ë²¡í„°
 	Vector3 move(0, 0, 0);
 
-	//ÀÚ½ÅÀÇ ÀÌµ¿ Ãà ¾ò´Â´Ù.
+	//ìì‹ ì˜ ì´ë™ ì¶• ì–»ëŠ”ë‹¤.
 	Vector3 moveAxis[3];
 	this->GetUnitAxies(moveAxis);
 	move += moveAxis[0] * delta.x;
 	move += moveAxis[1] * delta.y;
 	move += moveAxis[2] * delta.z;
 
-	//¿ùµå ÀÌµ¿
+	//ì›”ë“œ ì´ë™
 	Vector3 nowWorldPos = this->GetWorldPosition();
 
-	//¾Æ·¡ÀÇ ÇÔ¼ö¿¡¼­ TransformUpdate °¡ ÀÏ¾î³²
+	//ì•„ë˜ì˜ í•¨ìˆ˜ì—ì„œ TransformUpdate ê°€ ì¼ì–´ë‚¨
 	this->SetWorldPosition(nowWorldPos + move);
 }
 
-//¿ùµå ±âÁØÀ¸·Î ÀÌµ¿ ½ÃÅ²´Ù.
+//ì›”ë“œ ê¸°ì¤€ìœ¼ë¡œ ì´ë™ ì‹œí‚¨ë‹¤.
 void TransformComponent::MovePositionWorld(float dx, float dy, float dz)
 {
-	//ÀÌµ¿ º¤ÅÍ
+	//ì´ë™ ë²¡í„°
 	Vector3 move(dx, dy, dz);
 
-	//¿ùµå ÀÌµ¿
+	//ì›”ë“œ ì´ë™
 	Vector3 nowWorldPos = this->GetWorldPosition();
 
-	//¾Æ·¡ÀÇ ÇÔ¼ö¿¡¼­ TransformUpdate °¡ ÀÏ¾î³²
+	//ì•„ë˜ì˜ í•¨ìˆ˜ì—ì„œ TransformUpdate ê°€ ì¼ì–´ë‚¨
 	this->SetWorldPosition(nowWorldPos + move);
 }
 
 void TransformComponent::MovePositionWorld(Vector3 delta)
 {
-	//¿ùµå ÀÌµ¿
+	//ì›”ë“œ ì´ë™
 	Vector3 nowWorldPos = this->GetWorldPosition();
 
-	//¾Æ·¡ÀÇ ÇÔ¼ö¿¡¼­ TransformUpdate °¡ ÀÏ¾î³²
+	//ì•„ë˜ì˜ í•¨ìˆ˜ì—ì„œ TransformUpdate ê°€ ì¼ì–´ë‚¨
 	this->SetWorldPosition(nowWorldPos + delta);
 }
 
 
-//ºÎ¸ğ°¡ ÀÖ´Â °æ¿ì ·ÎÄÃ ±âÁØÀ¸·Î ÀÌµ¿ ½ÃÅ²´Ù.
+//ë¶€ëª¨ê°€ ìˆëŠ” ê²½ìš° ë¡œì»¬ ê¸°ì¤€ìœ¼ë¡œ ì´ë™ ì‹œí‚¨ë‹¤.
 void TransformComponent::MovePositionLocal(float dx, float dy, float dz)
 {
 	this->_position.x += dx;
 	this->_position.y += dy;
 	this->_position.z += dz;
 
+
+	this->UpdateTransform();
 	_transformDirty = true;
 }
 
@@ -373,11 +388,13 @@ void TransformComponent::MovePositionLocal(Vector3 delta)
 {
 	this->_position += delta;
 
+
+	this->UpdateTransform();
 	_transformDirty = true;
 }
 
 
-//½ºÄÉÀÏ ¼ÂÆÃ 
+//ìŠ¤ì¼€ì¼ ì…‹íŒ… 
 void TransformComponent::SetScale(float x, float y, float z)
 {
 	this->_scale.x = x;
@@ -385,6 +402,7 @@ void TransformComponent::SetScale(float x, float y, float z)
 	this->_scale.z = z;
 
 	_transformDirty = true;
+	this->UpdateTransform();
 }
 
 void TransformComponent::SetScale(Vector3 scale)
@@ -392,9 +410,10 @@ void TransformComponent::SetScale(Vector3 scale)
 	this->_scale = scale;
 
 	_transformDirty = true;
+	this->UpdateTransform();
 }
 
-//½ºÄÉÀÏ¸µ
+//ìŠ¤ì¼€ì¼ë§
 void TransformComponent::Scaling(float dx, float dy, float dz)
 {
 	this->_scale.x += dx;
@@ -410,19 +429,20 @@ void TransformComponent::Scaling(Vector3 deltaScale)
 	this->_scale += deltaScale;
 
 	_transformDirty = true;
+	this->UpdateTransform();
 }
 
-//¿ùµå ±âÁØÀ¸·Î È¸Àü 
+//ì›”ë“œ ê¸°ì¤€ìœ¼ë¡œ íšŒì „ 
 void TransformComponent::RotateWorld(float angleX, float angleY, float angleZ)
 {
-	//ºÎ¸ğ°¡ ÀÖ´Â °æ¿ì
+	//ë¶€ëª¨ê°€ ìˆëŠ” ê²½ìš°
 	if (this->_pParent)
 	{
-		//ÁøÂ¥·Î¿ùµå Ãà
+		//ì§„ì§œë¡œì›”ë“œ ì¶•
 		Vector3 worldAxis[3];
 		this->GetUnitAxies(worldAxis);
 
-		//°¢ Ãà¿¡ ´ëÇÑ È¸Àü Çà·Ä
+		//ê° ì¶•ì— ëŒ€í•œ íšŒì „ í–‰ë ¬
 		Matrix matRotateX;
 		MatrixRotationX(&matRotateX, angleX);
 
@@ -432,42 +452,40 @@ void TransformComponent::RotateWorld(float angleX, float angleY, float angleZ)
 		Matrix matRotateZ;
 		MatrixRotationZ(&matRotateZ, angleZ);
 
-		//ÃÖÁ¾ È¸Àü Çà·Ä
+		//ìµœì¢… íšŒì „ í–‰ë ¬
 		Matrix matRotate = matRotateY * matRotateX * matRotateZ;
 
-		//ºÎ¸ğÀÇ ¿ªÇà·Ä·Î ´Ù½Ã È¸Àü
+		//ë¶€ëª¨ì˜ ì—­í–‰ë ¬ë¡œ ë‹¤ì‹œ íšŒì „
 		Matrix matInvParentFinal;
 		MatrixInverse(&matInvParentFinal, NULL, &this->_pParent->_matFinal);
 
 		matRotate = matRotate * matInvParentFinal;
 
-		//ÃÖÁ¾ È¸Àü Çà·Ä ´ë·Î È¸Àü ½ÃÅ²´Ù.
+		//ìµœì¢… íšŒì „ í–‰ë ¬ ëŒ€ë¡œ íšŒì „ ì‹œí‚¨ë‹¤.
 		for (int i = 0; i < 3; i++)
+		{
 			Vec3TransformNormal(this->_axis + i, worldAxis + i, &matRotate);
+		}
 
-	_transformDirty = true;
+		this->UpdateTransform();
 	}
-
-
-	//ºÎ¸ğ°¡ ¾ø´Â °æ¿ì
+	//ë¶€ëª¨ê°€ ì—†ëŠ” ê²½ìš°
 	else
 	{
 		RotateLocal(angleX, angleY, angleZ);
 	}
-
-
 }
 
 void TransformComponent::RotateWorld(const Vector3 &angle)
 {
-	//ºÎ¸ğ°¡ ÀÖ´Â °æ¿ì
+	//ë¶€ëª¨ê°€ ìˆëŠ” ê²½ìš°
 	if (this->_pParent)
 	{
-		//ÁøÂ¥·Î¿ùµå Ãà
+		//ì§„ì§œë¡œì›”ë“œ ì¶•
 		Vector3 worldAxis[3];
 		this->GetUnitAxies(worldAxis);
 
-		//°¢ Ãà¿¡ ´ëÇÑ È¸Àü Çà·Ä
+		//ê° ì¶•ì— ëŒ€í•œ íšŒì „ í–‰ë ¬
 		Matrix matRotateX;
 		MatrixRotationX(&matRotateX, angle.x);
 
@@ -478,37 +496,35 @@ void TransformComponent::RotateWorld(const Vector3 &angle)
 		MatrixRotationZ(&matRotateZ, angle.z);
 
 
-		//ÃÖÁ¾ È¸Àü Çà·Ä¸¸µé¶§ ¹Ì¸® ¿ªÇà·Ä¼ººĞÀ» °öÇØ³õÀ¸¸é 1 ¹ø¸¸ È¸Àü½ÃÅ°¸é µÈ´Ù.
+		//ìµœì¢… íšŒì „ í–‰ë ¬ë§Œë“¤ë•Œ ë¯¸ë¦¬ ì—­í–‰ë ¬ì„±ë¶„ì„ ê³±í•´ë†“ìœ¼ë©´ 1 ë²ˆë§Œ íšŒì „ì‹œí‚¤ë©´ ëœë‹¤.
 
-		//ÃÖÁ¾ È¸Àü Çà·Ä
+		//ìµœì¢… íšŒì „ í–‰ë ¬
 		Matrix matRotate = matRotateY * matRotateX * matRotateZ;
 
-		//ºÎ¸ğÀÇ ¿ªÇà·Ä·Î ´Ù½Ã È¸Àü
+		//ë¶€ëª¨ì˜ ì—­í–‰ë ¬ë¡œ ë‹¤ì‹œ íšŒì „
 		Matrix matInvParentFinal;
 		MatrixInverse(&matInvParentFinal, NULL, &this->_pParent->_matFinal);
 
 		matRotate = matRotate * matInvParentFinal;
 
-		//ÃÖÁ¾ È¸Àü Çà·Ä ´ë·Î È¸Àü ½ÃÅ²´Ù.
+		//ìµœì¢… íšŒì „ í–‰ë ¬ ëŒ€ë¡œ íšŒì „ ì‹œí‚¨ë‹¤.
 		for (int i = 0; i < 3; i++)
 			Vec3TransformNormal(this->_axis + i, worldAxis + i, &matRotate);
 
-
-	
-	_transformDirty = true;
+		this->UpdateTransform();
 	}
 
-	//ºÎ¸ğ°¡ ¾ø´Â °æ¿ì
+	//ë¶€ëª¨ê°€ ì—†ëŠ” ê²½ìš°
 	else
 	{
 		RotateLocal(angle.x, angle.y, angle.z);
 	}
 }
 
-//ÀÚ½ÅÀÇ Ãà±âÁØÀ¸·Î È¸Àü
+//ìì‹ ì˜ ì¶•ê¸°ì¤€ìœ¼ë¡œ íšŒì „
 void TransformComponent::RotateSelf(float angleX, float angleY, float angleZ)
 {
-	//°¢ Ãà¿¡ ´ëÇÑ È¸Àü Çà·Ä
+	//ê° ì¶•ì— ëŒ€í•œ íšŒì „ í–‰ë ¬
 	Matrix matRotateX;
 	MatrixRotationAxis(&matRotateX, &this->GetRight(), angleX);
 
@@ -519,22 +535,20 @@ void TransformComponent::RotateSelf(float angleX, float angleY, float angleZ)
 	MatrixRotationAxis(&matRotateZ, &this->GetForward(), angleZ);
 
 
-	//ÃÖÁ¾ È¸Àü Çà·Ä
+	//ìµœì¢… íšŒì „ í–‰ë ¬
 	Matrix matRotate = matRotateY * matRotateX * matRotateZ;
 
 
-	//ÃÖÁ¾ È¸Àü Çà·Ä ´ë·Î È¸Àü ½ÃÅ²´Ù.
+	//ìµœì¢… íšŒì „ í–‰ë ¬ ëŒ€ë¡œ íšŒì „ ì‹œí‚¨ë‹¤.
 	for (int i = 0; i < 3; i++)
 		Vec3TransformNormal(&this->_axis[i], &this->_axis[i], &matRotate);
 
-
-	
-	_transformDirty = true;
+	this->UpdateTransform();
 }
 
 void TransformComponent::RotateSelf(const Vector3 &angle)
 {
-	//°¢ Ãà¿¡ ´ëÇÑ È¸Àü Çà·Ä
+	//ê° ì¶•ì— ëŒ€í•œ íšŒì „ í–‰ë ¬
 	Matrix matRotateX;
 	MatrixRotationAxis(&matRotateX, &this->GetRight(), angle.x);
 
@@ -545,23 +559,21 @@ void TransformComponent::RotateSelf(const Vector3 &angle)
 	MatrixRotationAxis(&matRotateZ, &this->GetForward(), angle.z);
 
 
-	//ÃÖÁ¾ È¸Àü Çà·Ä
+	//ìµœì¢… íšŒì „ í–‰ë ¬
 	Matrix matRotate = matRotateY * matRotateX * matRotateZ;
 
 
-	//ÃÖÁ¾ È¸Àü Çà·Ä ´ë·Î È¸Àü ½ÃÅ²´Ù.
+	//ìµœì¢… íšŒì „ í–‰ë ¬ ëŒ€ë¡œ íšŒì „ ì‹œí‚¨ë‹¤.
 	for (int i = 0; i < 3; i++)
 		Vec3TransformNormal(&this->_axis[i], &this->_axis[i], &matRotate);
 
-
-	
-	_transformDirty = true;
+	this->UpdateTransform();
 }
 
-//ºÎ¸ğ°¡ ÀÖ´Â °æ¿ì ºÎ¸ğ ·ÎÄÃÀÇ Ãà±âÁØÀ¸·Î È¸Àü
+//ë¶€ëª¨ê°€ ìˆëŠ” ê²½ìš° ë¶€ëª¨ ë¡œì»¬ì˜ ì¶•ê¸°ì¤€ìœ¼ë¡œ íšŒì „
 void TransformComponent::RotateLocal(float angleX, float angleY, float angleZ)
 {
-	//°¢ Ãà¿¡ ´ëÇÑ È¸Àü Çà·Ä
+	//ê° ì¶•ì— ëŒ€í•œ íšŒì „ í–‰ë ¬
 	Matrix matRotateX;
 	MatrixRotationX(&matRotateX, angleX);
 
@@ -571,22 +583,22 @@ void TransformComponent::RotateLocal(float angleX, float angleY, float angleZ)
 	Matrix matRotateZ;
 	MatrixRotationZ(&matRotateZ, angleZ);
 
-	//ÃÖÁ¾ È¸Àü Çà·Ä
+	//ìµœì¢… íšŒì „ í–‰ë ¬
 	Matrix matRotate = matRotateY * matRotateX * matRotateZ;
 
 
-	//ÃÖÁ¾ È¸Àü Çà·Ä ´ë·Î È¸Àü ½ÃÅ²´Ù.
+	//ìµœì¢… íšŒì „ í–‰ë ¬ ëŒ€ë¡œ íšŒì „ ì‹œí‚¨ë‹¤.
 	for (int i = 0; i < 3; i++)
+	{
 		Vec3TransformNormal(&this->_axis[i], &this->_axis[i], &matRotate);
-
-
+	}
 	
-	_transformDirty = true;
+	this->UpdateTransform();
 }
 
 void TransformComponent::RotateLocal(const Vector3 &angle)
 {
-	//°¢ Ãà¿¡ ´ëÇÑ È¸Àü Çà·Ä
+	//ê° ì¶•ì— ëŒ€í•œ íšŒì „ í–‰ë ¬
 	Matrix matRotateX;
 	MatrixRotationX(&matRotateX, angle.x);
 
@@ -596,38 +608,38 @@ void TransformComponent::RotateLocal(const Vector3 &angle)
 	Matrix matRotateZ;
 	MatrixRotationZ(&matRotateZ, angle.z);
 
-	//ÃÖÁ¾ È¸Àü Çà·Ä
+	//ìµœì¢… íšŒì „ í–‰ë ¬
 	Matrix matRotate = matRotateY * matRotateX * matRotateZ;
 
-	//ÃÖÁ¾ È¸Àü Çà·Ä ´ë·Î È¸Àü ½ÃÅ²´Ù.
+	//ìµœì¢… íšŒì „ í–‰ë ¬ ëŒ€ë¡œ íšŒì „ ì‹œí‚¨ë‹¤.
 	for (int i = 0; i < 3; i++)
+	{
 		Vec3TransformNormal(&this->_axis[i], &this->_axis[i], &matRotate);
-
-	
-	_transformDirty = true;
+	}
+	this->UpdateTransform();
 }
 
 
-//Æ¯Á¤ ¹æÇâÀ» ¹Ù¶óº¸°Ô È¸ÀüÇØ¶ó.
+//íŠ¹ì • ë°©í–¥ì„ ë°”ë¼ë³´ê²Œ íšŒì „í•´ë¼.
 void TransformComponent::LookDirection(const Vector3 &dir, const Vector3 &_up /*= Vector3(0, 1, 0)*/)
 {
-	//Á¤¸é º¤ÅÍ
+	//ì •ë©´ ë²¡í„°
 	Vector3 newForward = dir;
 
-	//¿À¸¥ÂÊº¤ÅÍ ( ¸Å°³º¯¼ö·Î µé¾î¿Â Up À» °¡Áö°í ¿ÜÀû )
+	//ì˜¤ë¥¸ìª½ë²¡í„° ( ë§¤ê°œë³€ìˆ˜ë¡œ ë“¤ì–´ì˜¨ Up ì„ ê°€ì§€ê³  ì™¸ì  )
 	Vector3 newRight;
 	Vec3Cross(&newRight, &_up, &newForward);
 	Vec3Normalize(&newRight, &newRight);
 
-	//¾÷ 
+	//ì—… 
 	Vector3 newUp;
 	Vec3Cross(&newUp, &newForward, &newRight);
 	Vec3Normalize(&newUp, &newUp);
 
-	//¸¸¾à ºÎ¸ğ°¡ ÀÖ´Ù¸é...
+	//ë§Œì•½ ë¶€ëª¨ê°€ ìˆë‹¤ë©´...
 	if (this->_pParent)
 	{
-		//»õ·Î¿î Ãà ¼ººĞ¿¡ ºÎ¸ğ ¿ªÇà·Ä °öÇØ....
+		//ìƒˆë¡œìš´ ì¶• ì„±ë¶„ì— ë¶€ëª¨ ì—­í–‰ë ¬ ê³±í•´....
 		Matrix matInvParentFinal;
 		MatrixInverse(&matInvParentFinal, NULL, &this->_pParent->_matFinal);
 
@@ -643,53 +655,53 @@ void TransformComponent::LookDirection(const Vector3 &dir, const Vector3 &_up /*
 		this->_up = newUp;
 	}
 
-	
-	_transformDirty = true;
+	this->UpdateTransform();
 }
 
-//Æ¯Á¤ ¹æÇâÀ» ¹Ù¶óº¸´Âµ¥ angle °¢¸¸Å­¸¸ È¸Àü ÇØ¶ó
+//íŠ¹ì • ë°©í–¥ì„ ë°”ë¼ë³´ëŠ”ë° angle ê°ë§Œí¼ë§Œ íšŒì „ í•´ë¼
 void TransformComponent::LookDirection(const Vector3 &dir, float angle)
 {
-	//ÁøÂ¥·Î¿ùµå Ãà
+	//ì§„ì§œë¡œì›”ë“œ ì¶•
 	Vector3 worldAxis[3];
 	this->GetUnitAxies(worldAxis);
-	//Á¤¸é º¤ÅÍ¿Í ¹Ù¶óº¼ ¹æÇâÀÇ °¢µµÂ÷¸¦ ¾òÀÚ...
+	//ì •ë©´ ë²¡í„°ì™€ ë°”ë¼ë³¼ ë°©í–¥ì˜ ê°ë„ì°¨ë¥¼ ì–»ì...
 	float distRadian = acos(
 		ClampMinusOnePlusOne(Vec3Dot(worldAxis + AXIS_Z, &dir)));
 
-	//°¢µµÂ÷°¡ °ÅÀÇ ¾ø´Ù¸é ÇÏÁö¸¶...
+	//ê°ë„ì°¨ê°€ ê±°ì˜ ì—†ë‹¤ë©´ í•˜ì§€ë§ˆ...
 	if (FloatZero(distRadian)) return;
 
-	//¿ÜÀû ( ³»Á¤¸é°ú Å¸°Ù±îÁöÀÇ ¹æÇâÀ» ¿ÜÀû )
+	//ì™¸ì  ( ë‚´ì •ë©´ê³¼ íƒ€ê²Ÿê¹Œì§€ì˜ ë°©í–¥ì„ ì™¸ì  )
 	Vector3 cross;
 	Vec3Cross(&cross, worldAxis + AXIS_Z, &dir);
 	Vec3Normalize(&cross, &cross);
 
-	//¿ÜÀûÃàÀ¸·Î °¢Â÷¸¸Å­ È¸Àü ½ÃÅ°´Â Çà·Ä
+	//ì™¸ì ì¶•ìœ¼ë¡œ ê°ì°¨ë§Œí¼ íšŒì „ ì‹œí‚¤ëŠ” í–‰ë ¬
 	Matrix matRotate;
 	MatrixRotationAxis(&matRotate, &cross, fmin(angle, distRadian));
 
-	//¸¸¾à ºÎ¸ğ°¡ ÀÖ´Ù¸é...
+	//ë§Œì•½ ë¶€ëª¨ê°€ ìˆë‹¤ë©´...
 	if (this->_pParent)
 	{
-		//È¸Àü ¼ººĞ¿¡ ºÎ¸ğ ¿ªÇà·Ä °öÇØ....
+		//íšŒì „ ì„±ë¶„ì— ë¶€ëª¨ ì—­í–‰ë ¬ ê³±í•´....
 		Matrix matInvParentFinal;
 		MatrixInverse(&matInvParentFinal, NULL, &this->_pParent->_matFinal);
 		matRotate = matRotate * matInvParentFinal;
 	}
 
-	//Àû¿ë
+	//ì ìš©
 	for (int i = 0; i < 3; i++)
+	{
 		Vec3TransformNormal(this->_axis + i, worldAxis + i, &matRotate);
+	}
 
-	
-	_transformDirty = true;
+	this->UpdateTransform();
 }
 
-//Æ¯Á¤À§Ä¡¸¦ ¹Ù¶óº¸°Ô È¸ÀüÇØ¶ó.
+//íŠ¹ì •ìœ„ì¹˜ë¥¼ ë°”ë¼ë³´ê²Œ íšŒì „í•´ë¼.
 void TransformComponent::LookPosition(const Vector3 &pos, const Vector3 &_up /*= Vector3(0, 1, 0)*/)
 {
-	//À§Ä¡¿¡ ´ëÇÑ ¹æÇâº¤ÅÍ¸¦ ¾ò´Â´Ù.
+	//ìœ„ì¹˜ì— ëŒ€í•œ ë°©í–¥ë²¡í„°ë¥¼ ì–»ëŠ”ë‹¤.
 	Vector3 worldPos = this->GetWorldPosition();
 	Vector3 dir = pos - worldPos;
 
@@ -697,10 +709,10 @@ void TransformComponent::LookPosition(const Vector3 &pos, const Vector3 &_up /*=
 	this->LookDirection(dir, _up);
 }
 
-//Æ¯Á¤À§Ä¡¸¦  ¹Ù¶óº¸´Âµ¥ angle °¢¸¸Å­¸¸ È¸Àü ÇØ¶ó
+//íŠ¹ì •ìœ„ì¹˜ë¥¼  ë°”ë¼ë³´ëŠ”ë° angle ê°ë§Œí¼ë§Œ íšŒì „ í•´ë¼
 void TransformComponent::LookPosition(const Vector3 &pos, float angle)
 {
-	//À§Ä¡¿¡ ´ëÇÑ ¹æÇâº¤ÅÍ¸¦ ¾ò´Â´Ù.
+	//ìœ„ì¹˜ì— ëŒ€í•œ ë°©í–¥ë²¡í„°ë¥¼ ì–»ëŠ”ë‹¤.
 	Vector3 worldPos = this->GetWorldPosition();
 	Vector3 dir = pos - worldPos;
 
@@ -708,156 +720,156 @@ void TransformComponent::LookPosition(const Vector3 &pos, float angle)
 	this->LookDirection(dir, angle);
 }
 
-//»ç¿ø¼ö¸¦ ÀÌ¿ëÇÑ Æ¯Á¤ È¸Àü°ªÀ¸·Î È¸Àü·®À» °¡Á®¶ó....
+//ì‚¬ì›ìˆ˜ë¥¼ ì´ìš©í•œ íŠ¹ì • íšŒì „ê°’ìœ¼ë¡œ íšŒì „ëŸ‰ì„ ê°€ì ¸ë¼....
 void TransformComponent::SetRotateWorld(float eAngleX, float eAngleY, float aAngleZ)
 {
-	//»ç¿ø¼ö ÁØºñ
+	//ì‚¬ì›ìˆ˜ ì¤€ë¹„
 	Quaternion quatRot;
 	QuaternionRotationYawPitchRoll(&quatRot, eAngleY, eAngleX, aAngleZ);
 
-	//»ç¿ø¼ö¿¡ ÀÇÇÑ Çà·ÄÁØºñ
+	//ì‚¬ì›ìˆ˜ì— ì˜í•œ í–‰ë ¬ì¤€ë¹„
 	Matrix matRotate;
-	MatrixRotationQuaternion(&matRotate, &quatRot);		//»ç¿ø¼ö¿¡ ÀÇÇÑ È¸Àü°ªÀ¸·Î È¸ÀüÇà·ÄÀÌ ¸¸µé¾îÁø´Ù.
+	MatrixRotationQuaternion(&matRotate, &quatRot);		//ì‚¬ì›ìˆ˜ì— ì˜í•œ íšŒì „ê°’ìœ¼ë¡œ íšŒì „í–‰ë ¬ì´ ë§Œë“¤ì–´ì§„ë‹¤.
 
-															//¸¸¾à ºÎ¸ğ°¡ ÀÖ´Ù¸é...
+															//ë§Œì•½ ë¶€ëª¨ê°€ ìˆë‹¤ë©´...
 	if (this->_pParent)
 	{
-		//È¸Àü ¼ººĞ¿¡ ºÎ¸ğ ¿ªÇà·Ä °öÇØ....
+		//íšŒì „ ì„±ë¶„ì— ë¶€ëª¨ ì—­í–‰ë ¬ ê³±í•´....
 		Matrix matInvParentFinal;
 		MatrixInverse(&matInvParentFinal, NULL, &this->_pParent->_matFinal);
 		matRotate = matRotate * matInvParentFinal;
 	}
 
-	//Ãà¸®¼Â
+	//ì¶•ë¦¬ì…‹
 	this->_right = Vector3(1, 0, 0);
 	this->_up = Vector3(0, 1, 0);
 	this->_forward = Vector3(0, 0, 1);
 
-	//ÃÖÁ¾ È¸Àü Çà·Ä ´ë·Î È¸Àü ½ÃÅ²´Ù.
+	//ìµœì¢… íšŒì „ í–‰ë ¬ ëŒ€ë¡œ íšŒì „ ì‹œí‚¨ë‹¤.
 	for (int i = 0; i < 3; i++)
 		Vec3TransformNormal(&this->_axis[i], &this->_axis[i], &matRotate);
 
-	_transformDirty = true;
+	this->UpdateTransform();
 }
 
 void TransformComponent::SetRotateLocal(float eAngleX, float eAngleY, float aAngleZ)
 {
-	//»ç¿ø¼ö ÁØºñ
+	//ì‚¬ì›ìˆ˜ ì¤€ë¹„
 	Quaternion quatRot;
 	QuaternionRotationYawPitchRoll(&quatRot, eAngleY, eAngleX, aAngleZ);
 
-	//»ç¿ø¼ö¿¡ ÀÇÇÑ Çà·ÄÁØºñ
+	//ì‚¬ì›ìˆ˜ì— ì˜í•œ í–‰ë ¬ì¤€ë¹„
 	Matrix matRotate;
-	MatrixRotationQuaternion(&matRotate, &quatRot);		//»ç¿ø¼ö¿¡ ÀÇÇÑ È¸Àü°ªÀ¸·Î È¸ÀüÇà·ÄÀÌ ¸¸µé¾îÁø´Ù.
+	MatrixRotationQuaternion(&matRotate, &quatRot);		//ì‚¬ì›ìˆ˜ì— ì˜í•œ íšŒì „ê°’ìœ¼ë¡œ íšŒì „í–‰ë ¬ì´ ë§Œë“¤ì–´ì§„ë‹¤.
 
-															//Ãà¸®¼Â
+															//ì¶•ë¦¬ì…‹
 	this->_right = Vector3(1, 0, 0);
 	this->_up = Vector3(0, 1, 0);
 	this->_forward = Vector3(0, 0, 1);
 
-	//ÃÖÁ¾ È¸Àü Çà·Ä ´ë·Î È¸Àü ½ÃÅ²´Ù.
+	//ìµœì¢… íšŒì „ í–‰ë ¬ ëŒ€ë¡œ íšŒì „ ì‹œí‚¨ë‹¤.
 	for (int i = 0; i < 3; i++)
 		Vec3TransformNormal(&this->_axis[i], &this->_axis[i], &matRotate);
 
-	_transformDirty = true;
+	this->UpdateTransform();
 }
 
-// È¸Àü Çà·ÄÀ» ³Ö¾îÁÖ¸é ±× È¸Àü Çà·Ä´ë·Î È¸ÀüÇÑ´Ù.
+// íšŒì „ í–‰ë ¬ì„ ë„£ì–´ì£¼ë©´ ê·¸ íšŒì „ í–‰ë ¬ëŒ€ë¡œ íšŒì „í•œë‹¤.
 void TransformComponent::SetRotateWorld(const Matrix& matWorldRotate)
 {
 	Matrix matRotate = matWorldRotate;
 
-	//¸¸¾à ºÎ¸ğ°¡ ÀÖ´Ù¸é...
+	//ë§Œì•½ ë¶€ëª¨ê°€ ìˆë‹¤ë©´...
 	if (this->_pParent)
 	{
-		//È¸Àü ¼ººĞ¿¡ ºÎ¸ğ ¿ªÇà·Ä °öÇØ....
+		//íšŒì „ ì„±ë¶„ì— ë¶€ëª¨ ì—­í–‰ë ¬ ê³±í•´....
 		Matrix matInvParentFinal;
 		MatrixInverse(&matInvParentFinal, NULL, &this->_pParent->_matFinal);
 		matRotate = matRotate * matInvParentFinal;
 	}
 
-	//Ãà¸®¼Â
+	//ì¶•ë¦¬ì…‹
 	this->_right = Vector3(1, 0, 0);
 	this->_up = Vector3(0, 1, 0);
 	this->_forward = Vector3(0, 0, 1);
 
-	//ÃÖÁ¾ È¸Àü Çà·Ä ´ë·Î È¸Àü ½ÃÅ²´Ù.
+	//ìµœì¢… íšŒì „ í–‰ë ¬ ëŒ€ë¡œ íšŒì „ ì‹œí‚¨ë‹¤.
 	for (int i = 0; i < 3; i++)
 		Vec3TransformNormal(&this->_axis[i], &this->_axis[i], &matRotate);
 
-	_transformDirty = true;
+	this->UpdateTransform();
 }
 
 void TransformComponent::SetRotateLocal(const Matrix& matWorldRotate)
 {
 	Matrix matRotate = matWorldRotate;
 
-	//Ãà¸®¼Â
+	//ì¶•ë¦¬ì…‹
 	this->_right = Vector3(1, 0, 0);
 	this->_up = Vector3(0, 1, 0);
 	this->_forward = Vector3(0, 0, 1);
 
-	//ÃÖÁ¾ È¸Àü Çà·Ä ´ë·Î È¸Àü ½ÃÅ²´Ù.
+	//ìµœì¢… íšŒì „ í–‰ë ¬ ëŒ€ë¡œ íšŒì „ ì‹œí‚¨ë‹¤.
 	for (int i = 0; i < 3; i++)
 		Vec3TransformNormal(&this->_axis[i], &this->_axis[i], &matRotate);
 
-	_transformDirty = true;
+	this->UpdateTransform();
 }
 
-// È¸Àü »ç¿ø¼ö¸¦ ³Ö¾îÁÖ¸é ±× È¸Àü°ª ´ë·Î È¸ÀüÇÑ´Ù.
+// íšŒì „ ì‚¬ì›ìˆ˜ë¥¼ ë„£ì–´ì£¼ë©´ ê·¸ íšŒì „ê°’ ëŒ€ë¡œ íšŒì „í•œë‹¤.
 void TransformComponent::SetRotateWorld(const Quaternion& matWorldRotate)
 {
-	//»ç¿ø¼ö ÁØºñ
+	//ì‚¬ì›ìˆ˜ ì¤€ë¹„
 	Quaternion quatRot = matWorldRotate;
 
-	//»ç¿ø¼ö¿¡ ÀÇÇÑ Çà·ÄÁØºñ
+	//ì‚¬ì›ìˆ˜ì— ì˜í•œ í–‰ë ¬ì¤€ë¹„
 	Matrix matRotate;
-	MatrixRotationQuaternion(&matRotate, &quatRot);		//»ç¿ø¼ö¿¡ ÀÇÇÑ È¸Àü°ªÀ¸·Î È¸ÀüÇà·ÄÀÌ ¸¸µé¾îÁø´Ù.
+	MatrixRotationQuaternion(&matRotate, &quatRot);		//ì‚¬ì›ìˆ˜ì— ì˜í•œ íšŒì „ê°’ìœ¼ë¡œ íšŒì „í–‰ë ¬ì´ ë§Œë“¤ì–´ì§„ë‹¤.
 
-															//¸¸¾à ºÎ¸ğ°¡ ÀÖ´Ù¸é...
+															//ë§Œì•½ ë¶€ëª¨ê°€ ìˆë‹¤ë©´...
 	if (this->_pParent)
 	{
-		//È¸Àü ¼ººĞ¿¡ ºÎ¸ğ ¿ªÇà·Ä °öÇØ....
+		//íšŒì „ ì„±ë¶„ì— ë¶€ëª¨ ì—­í–‰ë ¬ ê³±í•´....
 		Matrix matInvParentFinal;
 		MatrixInverse(&matInvParentFinal, NULL, &this->_pParent->_matFinal);
 		matRotate = matRotate * matInvParentFinal;
 	}
 
-	//Ãà¸®¼Â
+	//ì¶•ë¦¬ì…‹
 	this->_right = Vector3(1, 0, 0);
 	this->_up = Vector3(0, 1, 0);
 	this->_forward = Vector3(0, 0, 1);
 
-	//ÃÖÁ¾ È¸Àü Çà·Ä ´ë·Î È¸Àü ½ÃÅ²´Ù.
+	//ìµœì¢… íšŒì „ í–‰ë ¬ ëŒ€ë¡œ íšŒì „ ì‹œí‚¨ë‹¤.
 	for (int i = 0; i < 3; i++)
 		Vec3TransformNormal(&this->_axis[i], &this->_axis[i], &matRotate);
 
-	_transformDirty = true;
+	this->UpdateTransform();
 }
 
 void TransformComponent::SetRotateLocal(const Quaternion& matWorldRotate)
 {
-	//»ç¿ø¼ö ÁØºñ
+	//ì‚¬ì›ìˆ˜ ì¤€ë¹„
 	Quaternion quatRot = matWorldRotate;
 
-	//»ç¿ø¼ö¿¡ ÀÇÇÑ Çà·ÄÁØºñ
+	//ì‚¬ì›ìˆ˜ì— ì˜í•œ í–‰ë ¬ì¤€ë¹„
 	Matrix matRotate;
-	MatrixRotationQuaternion(&matRotate, &quatRot);		//»ç¿ø¼ö¿¡ ÀÇÇÑ È¸Àü°ªÀ¸·Î È¸ÀüÇà·ÄÀÌ ¸¸µé¾îÁø´Ù.
+	MatrixRotationQuaternion(&matRotate, &quatRot);		//ì‚¬ì›ìˆ˜ì— ì˜í•œ íšŒì „ê°’ìœ¼ë¡œ íšŒì „í–‰ë ¬ì´ ë§Œë“¤ì–´ì§„ë‹¤.
 
-															//Ãà¸®¼Â
+															//ì¶•ë¦¬ì…‹
 	this->_right = Vector3(1, 0, 0);
 	this->_up = Vector3(0, 1, 0);
 	this->_forward = Vector3(0, 0, 1);
 
-	//ÃÖÁ¾ È¸Àü Çà·Ä ´ë·Î È¸Àü ½ÃÅ²´Ù.
+	//ìµœì¢… íšŒì „ í–‰ë ¬ ëŒ€ë¡œ íšŒì „ ì‹œí‚¨ë‹¤.
 	for (int i = 0; i < 3; i++)
 		Vec3TransformNormal(&this->_axis[i], &this->_axis[i], &matRotate);
 
-	_transformDirty = true;
+	this->UpdateTransform();
 }
 
 
-// ÀÚ½ÅÀÇ È¸Àü °ªÀ» from °ú to »çÀÌÀÇ È¸Àü·®¸¸Å­ È¸Àüº¸°£(±¸¸éº¸°£) ÇÏ¿© Àû¿ë
+// ìì‹ ì˜ íšŒì „ ê°’ì„ from ê³¼ to ì‚¬ì´ì˜ íšŒì „ëŸ‰ë§Œí¼ íšŒì „ë³´ê°„(êµ¬ë©´ë³´ê°„) í•˜ì—¬ ì ìš©
 void TransformComponent::RotateSlerp(const TransformComponent& from, const TransformComponent& to, float t)
 {
 	t = Clamp01(t);
@@ -865,34 +877,34 @@ void TransformComponent::RotateSlerp(const TransformComponent& from, const Trans
 	Quaternion fromQuat = from.GetWorldRotateQuaternion();
 	Quaternion toQuat = to.GetWorldRotateQuaternion();
 
-	//t °¡ 0 °ú °°´Ù¸é...
+	//t ê°€ 0 ê³¼ ê°™ë‹¤ë©´...
 	if (FloatZero(t))
 	{
 		this->SetRotateWorld(fromQuat);
 	}
 
-	//t °¡ 1 °ú °°´Ù¸é...
+	//t ê°€ 1 ê³¼ ê°™ë‹¤ë©´...
 	else if (FloatEqual(t, 1.0f))
 	{
 		this->SetRotateWorld(toQuat);
 	}
 
 
-	//0 °ú 1 »çÀÌÀÇ °ªÀÏ¶§¸¸ º¸°£
+	//0 ê³¼ 1 ì‚¬ì´ì˜ ê°’ì¼ë•Œë§Œ ë³´ê°„
 	else
 	{
 		Quaternion result;
 
-		//from °ú to »ç¿ø¼ö°£ÀÇ t ¸¸Å­ÀÇ È¸Àüº¸°£À» ÇÏ¿©
-		//result »ç¿ø¼ö¿¡ ´ëÀÔ
+		//from ê³¼ to ì‚¬ì›ìˆ˜ê°„ì˜ t ë§Œí¼ì˜ íšŒì „ë³´ê°„ì„ í•˜ì—¬
+		//result ì‚¬ì›ìˆ˜ì— ëŒ€ì…
 		QuaternionSlerp(&result, &fromQuat, &toQuat, t);
 
-		//º¸°£µÈ »ç¿ø¼ö Á¤º¸·Î È¸Àü ¼ÂÆÃ
+		//ë³´ê°„ëœ ì‚¬ì›ìˆ˜ ì •ë³´ë¡œ íšŒì „ ì…‹íŒ…
 		this->SetRotateWorld(result);
 	}
 }
 
-// ÀÚ½ÅÀÇ À§Ä¡ °ªÀ» from °ú to »çÀÌÀÇ À§Ä¡¸¸Å­ ¼±Çüº¸°£ ÇÏ¿© Àû¿ë
+// ìì‹ ì˜ ìœ„ì¹˜ ê°’ì„ from ê³¼ to ì‚¬ì´ì˜ ìœ„ì¹˜ë§Œí¼ ì„ í˜•ë³´ê°„ í•˜ì—¬ ì ìš©
 void TransformComponent::PositionLerp(const TransformComponent& from, const TransformComponent& to, float t)
 {
 	t = Clamp01(t);
@@ -900,20 +912,20 @@ void TransformComponent::PositionLerp(const TransformComponent& from, const Tran
 	Vector3 fromWorldPos = from.GetWorldPosition();
 	Vector3 toWorldPos = to.GetWorldPosition();
 
-	//t °¡ 0 °ú °°´Ù¸é...
+	//t ê°€ 0 ê³¼ ê°™ë‹¤ë©´...
 	if (FloatZero(t))
 	{
 		this->SetWorldPosition(fromWorldPos);
 	}
 
-	//t °¡ 1 °ú °°´Ù¸é...
+	//t ê°€ 1 ê³¼ ê°™ë‹¤ë©´...
 	else if (FloatEqual(t, 1.0f))
 	{
 		this->SetWorldPosition(toWorldPos);
 	}
 
 
-	//0 °ú 1 »çÀÌÀÇ °ªÀÏ¶§¸¸ º¸°£
+	//0 ê³¼ 1 ì‚¬ì´ì˜ ê°’ì¼ë•Œë§Œ ë³´ê°„
 	else
 	{
 		Vector3 result;
@@ -922,7 +934,7 @@ void TransformComponent::PositionLerp(const TransformComponent& from, const Tran
 	}
 }
 
-// ÀÚ½ÅÀÇ ¸ğµç Á¤º¸¸¦ from °ú to »çÀÌÀÇ Á¤º¸¸¸Å­ º¸°£ ÇÏ¿© Àû¿ë
+// ìì‹ ì˜ ëª¨ë“  ì •ë³´ë¥¼ from ê³¼ to ì‚¬ì´ì˜ ì •ë³´ë§Œí¼ ë³´ê°„ í•˜ì—¬ ì ìš©
 void TransformComponent::Interpolate(const TransformComponent& from, const TransformComponent& to, float t)
 {
 	t = Clamp01(t);
@@ -931,7 +943,7 @@ void TransformComponent::Interpolate(const TransformComponent& from, const Trans
 	Vector3 resultPosition;
 	Quaternion resultRotate;
 
-	//t °¡ 0 °ú °°´Ù¸é...
+	//t ê°€ 0 ê³¼ ê°™ë‹¤ë©´...
 	if (FloatZero(t))
 	{
 		resultScale = from._scale;
@@ -939,7 +951,7 @@ void TransformComponent::Interpolate(const TransformComponent& from, const Trans
 		resultRotate = from.GetWorldRotateQuaternion();
 	}
 
-	//t °¡ 1 °ú °°´Ù¸é...
+	//t ê°€ 1 ê³¼ ê°™ë‹¤ë©´...
 	else if (FloatEqual(t, 1.0f))
 	{
 		resultScale = to._scale;
@@ -948,7 +960,7 @@ void TransformComponent::Interpolate(const TransformComponent& from, const Trans
 	}
 
 
-	//0 °ú 1 »çÀÌÀÇ °ªÀÏ¶§¸¸ º¸°£
+	//0 ê³¼ 1 ì‚¬ì´ì˜ ê°’ì¼ë•Œë§Œ ë³´ê°„
 	else
 	{
 		Vector3 fromScale = from._scale;
@@ -961,13 +973,13 @@ void TransformComponent::Interpolate(const TransformComponent& from, const Trans
 		Quaternion toQuat = to.GetWorldRotateQuaternion();
 
 
-		//½ºÄÉÀÏ º¸°£
+		//ìŠ¤ì¼€ì¼ ë³´ê°„
 		Vec3Lerp(&resultScale, &fromScale, &toScale, t);
 
-		//À§Ä¡ º¸°£
+		//ìœ„ì¹˜ ë³´ê°„
 		Vec3Lerp(&resultPosition, &fromPosition, &toPosition, t);
 
-		//È¸Àü º¸°£
+		//íšŒì „ ë³´ê°„
 		QuaternionSlerp(&resultRotate, &fromQuat, &toQuat, t);
 
 
@@ -975,27 +987,57 @@ void TransformComponent::Interpolate(const TransformComponent& from, const Trans
 
 	
 
-	//TODO : InterpolationÀ» ¾î¶»°Ô ÇØ¾ßÇÒ±î????
-	//³Ê°¡ ±âÁ¸¿¡ ¾î¶² °ªÀ» Áö´Ï°í ÀÖ¾ú´Ï?
-	//bool bPrevAutoUpdate = this->_autoUpdate;
+	//ë„ˆê°€ ê¸°ì¡´ì— ì–´ë–¤ ê°’ì„ ì§€ë‹ˆê³  ìˆì—ˆë‹ˆ?
+	//bool bPrevAutoUpdate = this->bAutoUpdate;
 
-	////ÀÏ´Ü ¿ÀÅä¾÷µ¥ÀÌÆ® ¸·´Â´Ù
-	//this->_autoUpdate = false;
+	//ì¼ë‹¨ ì˜¤í† ì—…ë°ì´íŠ¸ ë§‰ëŠ”ë‹¤
+	//this->bAutoUpdate = false;
 
-	//this->SetScale(resultScale);
-	//this->SetWorldPosition(resultPosition);
-	//this->SetRotateWorld(resultRotate);
+	this->SetScale(resultScale);
+	this->SetWorldPosition(resultPosition);
+	this->SetRotateWorld(resultRotate);
 
-	////µ¹·Á
-	//this->_autoUpdate = bPrevAutoUpdate;
+	//ëŒë ¤
+	//this->bAutoUpdate = bPrevAutoUpdate;
 
-	//if (this->_autoUpdate)
-	//	this->UpdateTransform();
+	//if (this->bAutoUpdate)
+		//this->UpdateTransform();
 }
 
-// Get µé..................
+void TransformComponent::UpdateTransform()
+{
+	MatrixIdentity(&this->_matLocal);
+
+	D3DXVECTOR3 scaledRight = this->_right * this->_scale.x;
+	D3DXVECTOR3 scaledUp = this->_up * this->_scale.y;
+	D3DXVECTOR3 scaledForward = this->_forward * this->_scale.z;
+
+	memcpy(&this->_matLocal._11, &scaledRight, sizeof(D3DXVECTOR3));
+	memcpy(&this->_matLocal._21, &scaledUp, sizeof(D3DXVECTOR3));
+	memcpy(&this->_matLocal._31, &scaledForward, sizeof(D3DXVECTOR3));
+	memcpy(&this->_matLocal._41, &this->_position, sizeof(D3DXVECTOR3));
+
+	if (this->_pParent == NULL)
+	{
+		this->_matFinal = _matLocal;
+	}
+	else 
+	{
+		this->_matFinal = _matLocal * this->_pParent->_matFinal;
+	}
+
+	TransformComponent* pChild = this->_pFirstChild;
+
+	while (pChild != NULL)
+	{
+		pChild->UpdateTransform();
+		pChild = pChild->_pNextSibling;
+	}
+}
+
+// Get ë“¤..................
 //
-//ÃÖÁ¾ Çà·ÄÀ» ¾ò´Â´Ù.
+//ìµœì¢… í–‰ë ¬ì„ ì–»ëŠ”ë‹¤.
 Matrix TransformComponent::GetFinalMatrix() const
 {
 	return this->_matFinal;
@@ -1003,15 +1045,15 @@ Matrix TransformComponent::GetFinalMatrix() const
 
 Matrix TransformComponent::GetWorldRotateMatrix() const
 {
-	//ÀÚ½ÅÀÇ ÃàÀ¸·Î È¸Àü Çà·ÄÀ» ¸¸µé¾î Àç³¤´Ù
+	//ìì‹ ì˜ ì¶•ìœ¼ë¡œ íšŒì „ í–‰ë ¬ì„ ë§Œë“¤ì–´ ì¬ë‚€ë‹¤
 	Matrix matRotate;
 	MatrixIdentity(&matRotate);
 
-	//3ÃàÀ» ¾ò´Â´Ù.
+	//3ì¶•ì„ ì–»ëŠ”ë‹¤.
 	Vector3 _axis[3];
 	this->GetUnitAxies(_axis);
 
-	//Çà·Ä¿¡ Àû¿ë
+	//í–‰ë ¬ì— ì ìš©
 	memcpy(&matRotate._11, _axis + 0, sizeof(Vector3));
 	memcpy(&matRotate._21, _axis + 1, sizeof(Vector3));
 	memcpy(&matRotate._31, _axis + 2, sizeof(Vector3));
@@ -1025,18 +1067,19 @@ Quaternion TransformComponent::GetWorldRotateQuaternion() const
 
 	Matrix matRotate = this->GetWorldRotateMatrix();
 
-	//È¸Àü Çà·Ä·Î »ç¿ø¼ö¸¦ ¸¸µç´Ù.
+	//íšŒì „ í–‰ë ¬ë¡œ ì‚¬ì›ìˆ˜ë¥¼ ë§Œë“ ë‹¤.
 	QuaternionRotationMatrix(&quat, &matRotate);
 
 	return quat;
 }
 
-//À§Ä¡ °ªÀ» ¾ò´Â´Ù.
+//ìœ„ì¹˜ ê°’ì„ ì–»ëŠ”ë‹¤.
 Vector3 TransformComponent::GetWorldPosition() const
 {
 	Vector3 pos = this->_position;
 
-	if (this->_pParent) {
+	if (this->_pParent) 
+	{
 		Vec3TransformCoord(&pos, &pos, &this->_pParent->_matFinal);
 	}
 
@@ -1048,14 +1091,14 @@ Vector3 TransformComponent::GetLocalPosition() const
 	return this->_position;
 }
 
-//ÃàÀ» ¾ò´Â´Ù. ( ¿ùµå ±âÁØ )
+//ì¶•ì„ ì–»ëŠ”ë‹¤. ( ì›”ë“œ ê¸°ì¤€ )
 void TransformComponent::GetScaledAxies(Vector3* pVecArr) const
 {
 	for (int i = 0; i < 3; i++) {
 		pVecArr[i] = this->_axis[i];
 	}
 
-	//ºÎ¸ğ°¡ ÀÖ´Ù¸é..
+	//ë¶€ëª¨ê°€ ìˆë‹¤ë©´..
 	if (this->_pParent) {
 		Matrix matParentFinal = this->_pParent->_matFinal;
 		for (int i = 0; i < 3; i++) {
@@ -1070,7 +1113,7 @@ void TransformComponent::GetUnitAxies(Vector3* pVecArr) const
 		Vec3Normalize(pVecArr + i, this->_axis + i);
 	}
 
-	//ºÎ¸ğ°¡ ÀÖ´Ù¸é..
+	//ë¶€ëª¨ê°€ ìˆë‹¤ë©´..
 	if (this->_pParent) {
 		Matrix matParentFinal = this->_pParent->_matFinal;
 		for (int i = 0; i < 3; i++) {
@@ -1083,7 +1126,7 @@ Vector3 TransformComponent::GetScaledAxis(int axisNum) const
 {
 	Vector3 result = this->_axis[axisNum];
 
-	//ºÎ¸ğ°¡ ÀÖ´Ù¸é..
+	//ë¶€ëª¨ê°€ ìˆë‹¤ë©´..
 	if (this->_pParent) {
 		Matrix matParentFinal = this->_pParent->_matFinal;
 		Vec3TransformNormal(&result, &result, &matParentFinal);
@@ -1097,7 +1140,7 @@ Vector3 TransformComponent::GetUnitAxis(int axisNum) const
 	Vector3 result;
 	Vec3Normalize(&result, this->_axis + axisNum);
 
-	//ºÎ¸ğ°¡ ÀÖ´Ù¸é..
+	//ë¶€ëª¨ê°€ ìˆë‹¤ë©´..
 	if (this->_pParent) {
 		Matrix matParentFinal = this->_pParent->_matFinal;
 		Vec3TransformNormal(&result, &result, &matParentFinal);
@@ -1131,7 +1174,7 @@ Vector3 TransformComponent::GetRight(bool bNormalize /*= true*/) const
 	return this->GetScaledAxis(AXIS_X);
 }
 
-//TransformComponent ¿¡ ´ëÇÑ ±âÁî¸ğ¸¦ ±×¸°´Ù.
+//TransformComponent ì— ëŒ€í•œ ê¸°ì¦ˆëª¨ë¥¼ ê·¸ë¦°ë‹¤.
 //void TransformComponent::RenderGizmo(bool applyScale /*= false*/)
 //{
 //	Vector3 worldPos = this->GetWorldPosition();
@@ -1148,7 +1191,7 @@ Vector3 TransformComponent::GetRight(bool bNormalize /*= true*/) const
 //
 //}
 
-///³»²¨
+///ë‚´êº¼
 void TransformComponent::SetForward(const Vector3 &forward)
 {
 	Vector3 WorldUp = Vector3(0, 1, 0);

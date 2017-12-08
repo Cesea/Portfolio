@@ -2,14 +2,17 @@
 #define I_SCENE_H
 
 #include "World.h"
-#include "Terrain.h"
 #include "Camera.h"
-#include "BaseGameObject.h"
-#include "GameSystems.h"
+
+#include "TransformSystem.h"
+#include "RenderSystem.h"
+#include "ActionSystem.h"
+#include "ScriptSystem.h"
+#include "CollisionSystem.h"
+#include "ParticleSystem.h"
 
 class EnvironmentSphere;
-
-class UI;
+class BaseGameObject;
 
 namespace video
 {
@@ -56,6 +59,13 @@ public :
 
 	virtual const char *GetSceneName() = 0;
 
+	void CreateObjectFromFile(const std::string &fileName);
+
+	void ReleaseAllGameObjects();
+
+	virtual void CreateLightsAndCameras();
+	virtual void AddSystemToWorld();
+
 protected :
 	virtual bool SceneInit() = 0;
 	virtual bool SceneUpdate(float deltaTime, const InputManager &input) = 0;
@@ -70,7 +80,11 @@ protected :
 	uint16 _screenIndices[6];
 
 	World _world;
+
 	std::vector<BaseGameObject *> _gameObjects;
+	std::vector<BaseGameObject *>::iterator _gameObjecetIter;
+	bool _gameObjectDirty{false};
+
 	Camera _camera;
 
 	DirectionalLight *_pMainLight;
@@ -90,10 +104,24 @@ protected :
 	ScriptSystem _scriptSystem;
 	ActionSystem _actionSystem;
 	CollisionSystem _collisionSystem;
+	ParticleSystem _particleSystem;
 
 	bool32 _editorInput{ false };
 
 public :
+
+	struct SceneDirty
+	{
+		SceneDirty()
+		{}
+	};
+
+	void Handle(const SceneDirty &event)
+	{
+		_gameObjectDirty = true;
+	}
 };
+
+
 
 #endif

@@ -743,6 +743,48 @@ namespace video
 		pEffect->EndEffect();
 	}
 
+	BoneMesh * SkinnedXMesh::FindBoneMesh(Bone *pBone, LPCSTR name)
+	{
+		if (nullptr == pBone)
+		{
+			pBone = _pRootBone;
+		}
+
+		if (pBone->pMeshContainer)
+		{
+			BoneMesh *pBoneMesh = (BoneMesh *)pBone->pMeshContainer;
+			if (strcmp(pBoneMesh->Name, name) == 0)
+			{
+				return pBoneMesh;
+			}
+
+			if (nullptr != pBoneMesh->pNextMeshContainer)
+			{
+				while (pBoneMesh)
+				{
+					pBoneMesh = (BoneMesh *)pBoneMesh->pNextMeshContainer;
+					if (strcmp(pBoneMesh->Name, name) == 0)
+					{
+						return pBoneMesh;
+					}
+				}
+			}
+
+		}
+
+		if (nullptr != pBone->pFrameSibling)
+		{
+			return FindBoneMesh((Bone *)pBone->pFrameSibling, name);
+		}
+
+		if (nullptr != pBone->pFrameFirstChild)
+		{
+			return FindBoneMesh((Bone *)pBone->pFrameFirstChild, name);
+		}
+
+		return nullptr;
+	}
+
 	void SkinnedXMesh::SetCamera(const Camera & camera)
 	{
 		video::Effect *pSkinned = VIDEO->GetEffect(_sEffectHandle);
@@ -948,76 +990,78 @@ namespace video
 		{
 			//본에 있는 메쉬 컨테이너는 BONE_MESH 이다
 			BoneMesh* pBoneMesh = (BoneMesh*)pBone->pMeshContainer;
-
-			//본 컴비네이션 정보가  
-			if (nullptr != pBoneMesh->BufBoneCombos)
+			if (pBoneMesh->_visible)
 			{
-				video::Effect *pEffect = VIDEO->GetEffect(_sEffectHandle);
-				pEffect->SetTechnique("RecieveShadowSkinned");
-
-				LPD3DXBONECOMBINATION pBoneComb =
-					(LPD3DXBONECOMBINATION)(pBoneMesh->BufBoneCombos->GetBufferPointer());
-
-				for (DWORD i = 0; i < pBoneMesh->NumAttributesGroup; i++)
+				//본 컴비네이션 정보가  
+				if (nullptr != pBoneMesh->BufBoneCombos)
 				{
-					for (DWORD palEntry = 0; palEntry < pBoneMesh->NumPaletteEntries; palEntry++)
-					{
-						DWORD dwMatrixIndex = pBoneComb[i].BoneId[palEntry];
+					video::Effect *pEffect = VIDEO->GetEffect(_sEffectHandle);
+					pEffect->SetTechnique("RecieveShadowSkinned");
 
-						if (dwMatrixIndex != UINT_MAX)
+					LPD3DXBONECOMBINATION pBoneComb =
+						(LPD3DXBONECOMBINATION)(pBoneMesh->BufBoneCombos->GetBufferPointer());
+
+					for (DWORD i = 0; i < pBoneMesh->NumAttributesGroup; i++)
+					{
+						for (DWORD palEntry = 0; palEntry < pBoneMesh->NumPaletteEntries; palEntry++)
 						{
-							D3DXMatrixMultiply(&_workingPalettes[palEntry],
-								&(pBoneMesh->pBoneOffsetMatices[dwMatrixIndex]),
-								pBoneMesh->ppBoneMatrixPtrs[dwMatrixIndex]);
+							DWORD dwMatrixIndex = pBoneComb[i].BoneId[palEntry];
+
+							if (dwMatrixIndex != UINT_MAX)
+							{
+								D3DXMatrixMultiply(&_workingPalettes[palEntry],
+									&(pBoneMesh->pBoneOffsetMatices[dwMatrixIndex]),
+									pBoneMesh->ppBoneMatrixPtrs[dwMatrixIndex]);
+							}
 						}
+						pEffect->SetMatrices("amPalette", _workingPalettes, pBoneMesh->NumPaletteEntries);
+
+						pEffect->SetInt("CurNumBones", pBoneMesh->MaxNumFaceInfls - 1);
+
+						DWORD materialIndex = pBoneComb[i].AttribId;
+
+						pEffect->SetTexture("DiffuseTexture", *VIDEO->GetTexture(pBoneMesh->_diffuseTextures[materialIndex]));
+						pEffect->SetTexture("SpecularTexture", *VIDEO->GetTexture(pBoneMesh->_specularTextures[materialIndex]));
+						pEffect->SetTexture("NormalTexture", *VIDEO->GetTexture(pBoneMesh->_normalTextures[materialIndex]));
+						pEffect->SetTexture("EmissionTexture", *VIDEO->GetTexture(pBoneMesh->_emissionTexture[materialIndex]));
+						pEffect->SetFloat("fSpecPower", pBoneMesh->_materials[materialIndex].Power);
+
+						pEffect->CommitChanges();
+
+						uint32 numPass = pEffect->BeginEffect();
+						for (uint32 p = 0; p < numPass; ++p)
+						{
+							pEffect->BeginPass(p);
+							pBoneMesh->WorkingMesh->DrawSubset(i);
+							pEffect->EndPass();
+						}
+						pEffect->EndEffect();
 					}
-					pEffect->SetMatrices( "amPalette", _workingPalettes, pBoneMesh->NumPaletteEntries);
-
-					pEffect->SetInt("CurNumBones", pBoneMesh->MaxNumFaceInfls - 1);
-
-					DWORD materialIndex = pBoneComb[i].AttribId;
-
-					pEffect->SetTexture("DiffuseTexture", *VIDEO->GetTexture(pBoneMesh->_diffuseTextures[materialIndex]));
-					pEffect->SetTexture("SpecularTexture", *VIDEO->GetTexture(pBoneMesh->_specularTextures[materialIndex]));
-					pEffect->SetTexture("NormalTexture", *VIDEO->GetTexture(pBoneMesh->_normalTextures[materialIndex]));
-					pEffect->SetTexture("EmissionTexture", *VIDEO->GetTexture(pBoneMesh->_emissionTexture[materialIndex]));
-					pEffect->SetFloat("fSpecPower", pBoneMesh->_materials[materialIndex].Power);
-
-					pEffect->CommitChanges();
-
-					uint32 numPass = pEffect->BeginEffect();
-					for (uint32 p = 0; p < numPass; ++p)
-					{
-						pEffect->BeginPass(p);
-						pBoneMesh->WorkingMesh->DrawSubset(i);
-						pEffect->EndPass();
-					}
-					pEffect->EndEffect();
 				}
-			}
-			else
-			{
-				video::Effect *pEffect = VIDEO->GetEffect(_sEffectHandle);
-				pEffect->SetTechnique("RecieveShadowStaitc");
-				pEffect->SetMatrix("matWorld", pBone->CombinedTransformationMatrix);
-				for (DWORD i = 0; i < pBoneMesh->NumAttributesGroup; i++)
+				else
 				{
-					pEffect->SetTexture("DiffuseTexture", *VIDEO->GetTexture(pBoneMesh->_diffuseTextures[i]));
-					pEffect->SetTexture("SpecularTexture", *VIDEO->GetTexture(pBoneMesh->_specularTextures[i]));
-					pEffect->SetTexture("NormalTexture", *VIDEO->GetTexture(pBoneMesh->_normalTextures[i]));
-					pEffect->SetTexture("EmissionTexture", *VIDEO->GetTexture(pBoneMesh->_emissionTexture[i]));
-					pEffect->SetFloat("fSpecPower", pBoneMesh->_materials[i].Power);
-
-					pEffect->CommitChanges();
-
-					uint32 numPass = pEffect->BeginEffect();
-					for (uint32 p = 0; p < numPass; ++p)
+					video::Effect *pEffect = VIDEO->GetEffect(_sEffectHandle);
+					pEffect->SetTechnique("RecieveShadowStaitc");
+					pEffect->SetMatrix("matWorld", pBone->CombinedTransformationMatrix);
+					for (DWORD i = 0; i < pBoneMesh->NumAttributesGroup; i++)
 					{
-						pEffect->BeginPass(p);
-						pBoneMesh->MeshData.pMesh->DrawSubset(i);
-						pEffect->EndPass();
+						pEffect->SetTexture("DiffuseTexture", *VIDEO->GetTexture(pBoneMesh->_diffuseTextures[i]));
+						pEffect->SetTexture("SpecularTexture", *VIDEO->GetTexture(pBoneMesh->_specularTextures[i]));
+						pEffect->SetTexture("NormalTexture", *VIDEO->GetTexture(pBoneMesh->_normalTextures[i]));
+						pEffect->SetTexture("EmissionTexture", *VIDEO->GetTexture(pBoneMesh->_emissionTexture[i]));
+						pEffect->SetFloat("fSpecPower", pBoneMesh->_materials[i].Power);
+
+						pEffect->CommitChanges();
+
+						uint32 numPass = pEffect->BeginEffect();
+						for (uint32 p = 0; p < numPass; ++p)
+						{
+							pEffect->BeginPass(p);
+							pBoneMesh->MeshData.pMesh->DrawSubset(i);
+							pEffect->EndPass();
+						}
+						pEffect->EndEffect();
 					}
-					pEffect->EndEffect();
 				}
 			}
 		}
@@ -1073,12 +1117,6 @@ namespace video
 					DWORD materialIndex = pBoneComb[i].AttribId;
 
 					pEffect->SetTexture("DiffuseTexture", *VIDEO->GetTexture(pBoneMesh->_diffuseTextures[materialIndex]));
-					//pEffect->SetTexture("SpecularTexture", *VIDEO->GetTexture(pBoneMesh->_specularTextures[materialIndex]));
-					//pEffect->SetTexture("NormalTexture", *VIDEO->GetTexture(pBoneMesh->_normalTextures[materialIndex]));
-					//pEffect->SetTexture("EmissionTexture", *VIDEO->GetTexture(pBoneMesh->_emissionTexture[materialIndex]));
-					//pEffect->SetFloat("fSpecPower", pBoneMesh->_materials[materialIndex].Power);
-
-					//pEffect->CommitChanges();
 
 					uint32 numPass = pEffect->BeginEffect();
 					for (uint32 p = 0; p < numPass; ++p)
@@ -1098,12 +1136,6 @@ namespace video
 				for (DWORD i = 0; i < pBoneMesh->NumAttributesGroup; i++)
 				{
 					pEffect->SetTexture("DiffuseTexture", *VIDEO->GetTexture(pBoneMesh->_diffuseTextures[i]));
-					//pEffect->SetTexture("SpecularTexture", *VIDEO->GetTexture(pBoneMesh->_specularTextures[i]));
-					//pEffect->SetTexture("NormalTexture", *VIDEO->GetTexture(pBoneMesh->_normalTextures[i]));
-					//pEffect->SetTexture("EmissionTexture", *VIDEO->GetTexture(pBoneMesh->_emissionTexture[i]));
-					//pEffect->SetFloat("fSpecPower", pBoneMesh->_materials[i].Power);
-					//pEffect->CommitChanges();
-
 					uint32 numPass = pEffect->BeginEffect();
 					for (uint32 p = 0; p < numPass; ++p)
 					{
@@ -1246,15 +1278,30 @@ STDMETHODIMP BoneHierachy::CreateMeshContainer(LPCSTR Name, CONST D3DXMESHDATA *
 	//ppNewMeshContainer 로 넘겨줄 새로운 BONEMESH 생성
 	BoneMesh* boneMesh = new BoneMesh;
 	ZeroMemory(boneMesh, sizeof(BoneMesh));
+	boneMesh->_visible = true;
+
+	if (nullptr != Name)
+	{
+		int len = strlen(Name);
+		boneMesh->Name = new char[len + 1];
+		strcpy_s(boneMesh->Name, len + 1, Name);
+	}
 
 	//매개변수로 받은 메쉬 데이터의 Device 를 얻는다.
 	LPDIRECT3DDEVICE9 d3dDevice = NULL;
 	pMeshData->pMesh->GetDevice(&d3dDevice);
 
-	if (strcmp(Name, "cuirass_metal") == 0)
+	if (strcmp(Name, "hair") == 0 ||
+		strcmp(Name, "_1H_sword") == 0 ||
+		strcmp(Name, "helmet_metal") == 0 )
 	{
-		int a = 0;
+		boneMesh->_visible = false;
 	}
+
+	//if ( strcmp(Name, "_1H_sword") == 0 )
+	//{
+	//	boneMesh->_visible = false;
+	//}
 
 	//메시데이터를 물린다.
 	boneMesh->MeshData.pMesh = pMeshData->pMesh;

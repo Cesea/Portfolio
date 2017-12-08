@@ -17,7 +17,7 @@ void Player::SetupCallbackAndCompression()
 	   pController->GetAnimationSetByName(PlayerAnimationString[PlayerAnimationEnum::eWarSwingLeft], (ID3DXAnimationSet **)&anim);
 
 	   D3DXKEY_CALLBACK key;
-	   key.Time =anim->GetPeriod() / 2.0f * anim->GetSourceTicksPerSecond();
+	   key.Time =anim->GetPeriod() / 3.0f * anim->GetSourceTicksPerSecond();
 	   key.pCallbackData = (void *)&_callbackData;
 
 	   AddCallbackKeysAndCompress(pController, anim, 1, &key, D3DXCOMPRESS_DEFAULT, 0.1f);
@@ -29,10 +29,10 @@ void Player::SetupCallbackAndCompression()
 	   pController->GetAnimationSetByName(PlayerAnimationString[PlayerAnimationEnum::eWarSwingRight], (ID3DXAnimationSet **)&anim);
 
 	   D3DXKEY_CALLBACK key;
-	   key.Time = anim->GetPeriod() / 2.0f * anim->GetSourceTicksPerSecond();
+	   key.Time = anim->GetPeriod() / 3.0f * anim->GetSourceTicksPerSecond();
 	   key.pCallbackData = (void *)&_callbackData;
 
-	   AddCallbackKeysAndCompress(pController, anim, 1, &key, D3DXCOMPRESS_DEFAULT, 0.1f);
+	   AddCallbackKeysAndCompress(pController, anim, 1, &key, D3DXCOMPRESS_DEFAULT, 0.3f);
    }
 
    //War Thrust Mid
@@ -41,10 +41,10 @@ void Player::SetupCallbackAndCompression()
 	   pController->GetAnimationSetByName(PlayerAnimationString[PlayerAnimationEnum::eWarThrustMid], (ID3DXAnimationSet **)&anim);
 
 	   D3DXKEY_CALLBACK key;
-	   key.Time = anim->GetPeriod() / 2.0f * anim->GetSourceTicksPerSecond();
+	   key.Time = anim->GetPeriod() / 3.0f * anim->GetSourceTicksPerSecond();
 	   key.pCallbackData = (void *)&_callbackData;
 
-	   AddCallbackKeysAndCompress(pController, anim, 1, &key, D3DXCOMPRESS_DEFAULT, 0.1f);
+	   AddCallbackKeysAndCompress(pController, anim, 1, &key, D3DXCOMPRESS_DEFAULT, 0.3f);
    }
 
    //War Walk Swing Left
@@ -53,10 +53,10 @@ void Player::SetupCallbackAndCompression()
 	   pController->GetAnimationSetByName(PlayerAnimationString[PlayerAnimationEnum::eWarWalkSwingLeft], (ID3DXAnimationSet **)&anim);
 
 	   D3DXKEY_CALLBACK key;
-	   key.Time =anim->GetPeriod() / 2.0f * anim->GetSourceTicksPerSecond();
+	   key.Time =anim->GetPeriod() / 3.0f * anim->GetSourceTicksPerSecond();
 	   key.pCallbackData = (void *)&_callbackData;
 
-	   AddCallbackKeysAndCompress(pController, anim, 1, &key, D3DXCOMPRESS_DEFAULT, 0.1f);
+	   AddCallbackKeysAndCompress(pController, anim, 1, &key, D3DXCOMPRESS_DEFAULT, 0.3f);
    }
 
    //War Walk Swing Left
@@ -65,10 +65,10 @@ void Player::SetupCallbackAndCompression()
 	   pController->GetAnimationSetByName(PlayerAnimationString[PlayerAnimationEnum::eWarWalkSwingRight], (ID3DXAnimationSet **)&anim);
 
 	   D3DXKEY_CALLBACK key;
-	   key.Time =anim->GetPeriod() / 2.0f * anim->GetSourceTicksPerSecond();
+	   key.Time =anim->GetPeriod() / 3.0f * anim->GetSourceTicksPerSecond();
 	   key.pCallbackData = (void *)&_callbackData;
 
-	   AddCallbackKeysAndCompress(pController, anim, 1, &key, D3DXCOMPRESS_DEFAULT, 0.1f);
+	   AddCallbackKeysAndCompress(pController, anim, 1, &key, D3DXCOMPRESS_DEFAULT, 0.3f);
    }
 
    //War Walk WalkThrust Mid
@@ -77,12 +77,11 @@ void Player::SetupCallbackAndCompression()
 	   pController->GetAnimationSetByName(PlayerAnimationString[PlayerAnimationEnum::eWarWalkThrust], (ID3DXAnimationSet **)&anim);
 
 	   D3DXKEY_CALLBACK key;
-	   key.Time =anim->GetPeriod() / 2.0f * anim->GetSourceTicksPerSecond();
+	   key.Time =anim->GetPeriod() / 3.0f * anim->GetSourceTicksPerSecond();
 	   key.pCallbackData = (void *)&_callbackData;
 
-	   AddCallbackKeysAndCompress(pController, anim, 1, &key, D3DXCOMPRESS_DEFAULT, 0.1f);
+	   AddCallbackKeysAndCompress(pController, anim, 1, &key, D3DXCOMPRESS_DEFAULT, 0.3f);
    }
-
 
    //War Block
    {
@@ -95,6 +94,20 @@ void Player::SetupCallbackAndCompression()
 
 	   AddCallbackKeysAndCompress(pController, anim, 1, &key, D3DXCOMPRESS_DEFAULT, 0.1f);
    }
+
+   //Talking hit
+   {
+	   ID3DXKeyframedAnimationSet *anim;
+	   pController->GetAnimationSetByName(PlayerAnimationString[PlayerAnimationEnum::eWarTakingHit],
+		   (ID3DXAnimationSet **)&anim);
+
+	   D3DXKEY_CALLBACK key;
+	   key.Time = anim->GetPeriod() / 1.2f * anim->GetSourceTicksPerSecond();
+	   key.pCallbackData = (void *)&_callbackData;
+
+	   AddCallbackKeysAndCompress(pController, anim, 1, &key, D3DXCOMPRESS_DEFAULT, 0.1f);
+   }
+
 }
 
 HRESULT PlayerCallbackHandler::HandleCallback(UINT Track, LPVOID pCallbackData)
@@ -104,45 +117,41 @@ HRESULT PlayerCallbackHandler::HandleCallback(UINT Track, LPVOID pCallbackData)
 	{
 		return S_OK;
 	}
+
+		Console::Log("tata\n");
+
 	switch (*pData->_animtionEnum)
 	{
 	case PlayerAnimationEnum::eWarSwingLeft:
-	{
-		_pPlayer->_canCombo = true;
-		_pPlayer->_pCollisionComp->_isTrigger = true;
-	}break;
 	case PlayerAnimationEnum::eWarSwingRight:
-	{
-		_pPlayer->_canCombo = true;
-		_pPlayer->_pCollisionComp->_isTrigger = true;
-	}break;
 	case PlayerAnimationEnum::eWarThrustMid :
-	{
-		_pPlayer->_canCombo = true;
-		_pPlayer->_pCollisionComp->_isTrigger = true;
-	}break;
 	case PlayerAnimationEnum::eWarWalkSwingLeft:
-	{
-		_pPlayer->_canCombo = true;
-		_pPlayer->_pCollisionComp->_isTrigger = true;
-	}break;
 	case PlayerAnimationEnum::eWarWalkSwingRight:
-	{
-		_pPlayer->_canCombo = true;
-		_pPlayer->_pCollisionComp->_isTrigger = true;
-	}break;
 	case PlayerAnimationEnum::eWarWalkThrust:
 	{
 		_pPlayer->_canCombo = true;
-		_pPlayer->_pCollisionComp->_isTrigger = true;
+		_pPlayer->_pDamageBox->GetEntity().GetComponent<CollisionComponent>()._valid = true;
+
+		//_pPlayer->_pCollisionComp->_isTrigger = true;
+		//_channel.Broadcast<GameObjectFactory::DamageBoxEvent>( GameObjectFactory::DamageBoxEvent(_pPlayer->_pTransformComp->GetWorldPosition() + 
+		//	_pPlayer->_pTransformComp->GetForward(), Vector3(1, 1, 1),
+		//	50.0f, CollisionComponent::TRIGGER_TYPE_PLAYER_DMGBOX, 0.0f, 0.0f, 0.4f));
 	}break;
 
-	//Shield
+	case PlayerAnimationEnum::eWarTakingHit :
+	{
+		_pPlayer->_superArmor = true;
+		_pPlayer->_state = Player::PLAYERSTATE_STANCE;
+		_pPlayer->QueueAction(PLAYER_ANIM(eWarCombatMode));
+		//_pPlayer->_state = Player::PLAYERSTATE_STANCE;
+		//_pPlayer->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWarTakingHit));
+
+	}break;
+
 	case PlayerAnimationEnum::eWarShieldBlock :
 	{
 		_pPlayer->_canCombo = true;
 	}
-
 	//case PlayerAnimationEnum::eWar:
 	//{
 	//	//_pPlayer->_canCombo = true;

@@ -1,6 +1,10 @@
 #include "stdafx.h"
 #include "Engine.h"
 
+#include "GameObjectFactory.h"
+
+#include <time.h>
+
 #define HUNTER_DEBUG 1
 
 Engine *gEngine;
@@ -24,6 +28,8 @@ Engine::~Engine()
 	GIZMOMANAGER->ReleaseInstance();
 	SPRITEMANAGER->Release();
 	SPRITEMANAGER->ReleaseInstance();
+	SOUNDMANAGER->Release();
+	SOUNDMANAGER->ReleaseInstance();
 }
 
 void Engine::Run()
@@ -95,9 +101,13 @@ void Engine::Run()
 
 //#if defined (DEBUG) || defined (_DEBUG)
 		static uint64 counter = 0;
+		static float aveMS = 0;
+		aveMS += APPTIMER->GetDeltaMS();
 		if ((counter % 60) == 0)
 		{
-			Console::Log("DeltaMS : %d\n", APPTIMER->GetDeltaMS());
+			aveMS /= 60.0f;
+			Console::Log("DeltaMS : %f\n", aveMS);
+			aveMS = 0.0f;
 		}
 		counter++;
 //#endif
@@ -181,6 +191,9 @@ bool Engine::InitializePlatform(HINSTANCE instanceHandle)
 	ShowWindow(_windowHandle, SW_SHOW);
 	UpdateWindow(_windowHandle);
 
+
+	srand(time(NULL));
+
 	return true;
 }
 
@@ -200,6 +213,7 @@ bool Engine::InitializeSystems()
 
 	GIZMOMANAGER->Init(gpDevice);
 	SPRITEMANAGER->Init(gpDevice);
+	SOUNDMANAGER->Init();
 
 	GAMEOBJECTFACTORY->Init();
 

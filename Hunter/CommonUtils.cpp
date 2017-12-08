@@ -66,7 +66,7 @@ int32 RandInt(int32 max)
 
 int32 RandInt(int32 min, int32 max)
 {
-	return rand() % (max - min); +min;
+	return min + rand() % (max - min);
 }
 
 IntRect::IntRect()

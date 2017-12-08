@@ -3,7 +3,16 @@
 
 #include "QuadTree.h"
 
-#include "BaseScene.h"
+Terrain::Terrain()
+{
+	EventChannel channel;
+	channel.Add<GameObjectFactory::ObjectCreatedEvent, Terrain>(*this);
+
+	_visibleChunks.reserve(16);
+	_shadowVisibleChunks.reserve(16);
+
+	_visibleTiles.reserve(256);
+}
 
 Terrain::~Terrain()
 {
@@ -47,7 +56,7 @@ bool Terrain::Create(const Terrain::TerrainConfig &config, bool32 inEditMode)
 	_sectionNumVertexX = _sectionNumCellX + 1;
 	_sectionNumVertexZ = _sectionNumCellZ + 1;
 
-	if (!(CreateTerrain(config._textureMult)))
+	if (!(CreateTerrain(config._textureMult * _xChunkCount)))
 	{
 		Destroy();
 		return false;
@@ -61,7 +70,7 @@ bool Terrain::Create(const Terrain::TerrainConfig &config, bool32 inEditMode)
 
 	//쿼드트리를 만든다.
 	_pQuadTree = new QuadTree;
-	_pQuadTree->Init(_terrainVertices, _numVertexX, _sectionResolution);
+	_pQuadTree->Init(_terrainVertices, _numVertexX, 1);
 
 	//터레인 Texture 로딩 ////////////////////////////////////
 	_effect = VIDEO->GetEffect("TerrainBase.fx");
@@ -71,7 +80,40 @@ bool Terrain::Create(const Terrain::TerrainConfig &config, bool32 inEditMode)
 
 void Terrain::RegisterEvents()
 {
+	EventChannel channel;
+	channel.Add<GameObjectFactory::ObjectCreatedEvent, Terrain>(*this);
+
 }
+
+void Terrain::UnRegisterEvents()
+{
+}
+
+void Terrain::Handle(const GameObjectFactory::ObjectCreatedEvent & event)
+{
+	TerrainTilePos tilePos;
+	ConvertWorldPostoTilePos(event._worldPosition, &tilePos);
+
+	TerrainChunk &refChunk = _pChunks[Index2D(tilePos._chunkX, tilePos._chunkZ, _xChunkCount)];
+	Entity entity = event._entity;
+	if (entity.IsValid())
+	{
+		int32 tileIndex = Index2D(tilePos._tileX, tilePos._tileZ, TERRAIN_TILE_RES);
+		refChunk._tiles[tileIndex]._entities.push_back(entity);
+		refChunk._numTotalEntity++;
+
+		int32 chunkIndex = Index2D(tilePos._chunkX, tilePos._chunkZ, _xChunkCount);
+		for (uint32 i = 0; i < _activeChunkIndices.size(); ++i)
+		{
+			if (_activeChunkIndices[i] == chunkIndex)
+			{
+				entity.Activate();
+				break;
+			}
+		}
+	}
+}
+
 
 void Terrain::Destroy()
 {
@@ -90,8 +132,8 @@ void Terrain::Destroy()
 	VIDEO->DestroyTexture(_tile0Handle);
 	VIDEO->DestroyTexture(_tile1Handle);
 	VIDEO->DestroyTexture(_tile2Handle);
-	VIDEO->DestroyTexture(_tile3Handle);
-	VIDEO->DestroyTexture(_tileSplatHandle);
+	VIDEO->DestroyTexture(_tileControl1Handle);
+	VIDEO->DestroyTexture(_tileControl2Handle);
 
 	//VIDEO->DestroyMaterial(_materialHandle);
 
@@ -103,36 +145,31 @@ void Terrain::Destroy()
 void Terrain::SaveTerrain(const std::string & fileName)
 {
 	//로딩 경로에서 파일명만 제거하고 경로만 받는다.
+	std::string fileNameCopy = fileName;
 	std::string path;
 	std::string name;
-	int lastPathIndex = 0;
+	std::string extension;
 
-	lastPathIndex = fileName.find_last_of('/');
-	if (lastPathIndex == -1)
-	{
-		lastPathIndex = fileName.find_last_of('\\');
-	}
-	//경로 구분이 있다면...
-	if (lastPathIndex != -1)
-	{
-		path = fileName.substr(0, lastPathIndex + 1);
-		name = fileName.substr(lastPathIndex + 1, fileName.length() - lastPathIndex);
-	}
+	SplitFilePathToNamePathExtension(fileNameCopy, name, path, extension);
 
 	DataPackage toSave;
 
-	char buffer[MAX_FILE_NAME];
-	ZeroMemory(buffer, sizeof(buffer));
+	char control1[MAX_FILE_NAME];
+	ZeroMemory(control1, sizeof(control1));
+	sprintf(control1, "%s", (path + name).c_str());
+	strncat(control1, "_Splat1.png", strlen("_Splat1.png"));
+	strncpy(_currentConfig._control1Name, control1, MAX_FILE_NAME);
 
-	sprintf(buffer, "%s", path.c_str());
-	strncat(buffer, "Splat.png", strlen("Splat.png"));
-
-	strncpy(_currentConfig._splatFileName, buffer, MAX_FILE_NAME);
-	//_currentConfig._splatFileName = 
+	char control2[MAX_FILE_NAME];
+	ZeroMemory(control2, sizeof(control2));
+	sprintf(control2, "%s", (path + name).c_str());
+	strncat(control2, "_Splat2.png", strlen("_Splat2.png"));
+	strncpy(_currentConfig._control2Name, control2, MAX_FILE_NAME);
 
 	toSave.Create(sizeof(Terrain::TerrainConfig) + (sizeof(video::TerrainVertex) * _numTotalVertex));
 
 	toSave.WriteAs<TerrainConfig>(_currentConfig);
+
 	for (int32 i = 0; i < _numTotalVertex; ++i)
 	{
 		video::TerrainVertex &vertex = _terrainVertices[i];
@@ -140,7 +177,8 @@ void Terrain::SaveTerrain(const std::string & fileName)
 	}
 	toSave.Save(fileName.c_str());
 	
-	VIDEO->SaveTexture(path + "TerrainSplat.png", _tileSplatHandle);
+	VIDEO->SaveTexture(control1, _tileControl1Handle);
+	VIDEO->SaveTexture(control2, _tileControl2Handle);
 }
 
 void Terrain::LoadTerrain(const std::string & fileName)
@@ -169,8 +207,8 @@ void Terrain::LoadTerrain(const std::string & fileName)
 	if (_tile0Handle.IsValid()) { VIDEO->DestroyTexture(_tile0Handle); }
 	if (_tile1Handle.IsValid()) { VIDEO->DestroyTexture(_tile1Handle); }
 	if (_tile2Handle.IsValid()) { VIDEO->DestroyTexture(_tile2Handle); }
-	if (_tile3Handle.IsValid()) { VIDEO->DestroyTexture(_tile3Handle); }
-	if (_tileSplatHandle.IsValid()) { VIDEO->DestroyTexture(_tileSplatHandle); }
+	if (_tileControl1Handle.IsValid()) { VIDEO->DestroyTexture(_tileControl1Handle); }
+	if (_tileControl2Handle.IsValid()) { VIDEO->DestroyTexture(_tileControl2Handle); }
 
 	SAFE_DELETE_ARRAY(_terrainVertices);
 	SAFE_DELETE(_pQuadTree);
@@ -222,7 +260,6 @@ void Terrain::LoadTerrain(const std::string & fileName)
 			CreateTerrainChunk(x, z, _terrainVertices);
 		}
 	}
-
 	//터레인 범위
 	_terrainStartX = _terrainVertices[0]._pos.x;
 	_terrainStartZ = _terrainVertices[0]._pos.z;
@@ -232,7 +269,6 @@ void Terrain::LoadTerrain(const std::string & fileName)
 	//쿼드트리를 만든다.
 	_pQuadTree = new QuadTree;
 	_pQuadTree->Init(_terrainVertices, _numVertexX, _sectionResolution);
-
 
 	LoadTextureFromConfig(_currentConfig);
 
@@ -414,10 +450,6 @@ void Terrain::Render(const Camera &camera, const DirectionalLight &mainLight, co
 {
 	//월드 행렬셋팅
 	video::Effect *pEffect = VIDEO->GetEffect(_effect);
-	//video::VertexBuffer *vBuffer = VIDEO->GetVertexBuffer(_vHandle);
-	//video::IndexBuffer *iBuffer = VIDEO->GetIndexBuffer(_iHandle);
-	//video::VertexDecl *decl = VIDEO->GetVertexDecl(vBuffer->_decl);
-
 	Matrix matInd;
 	MatrixIdentity(&matInd);
 	pEffect->SetMatrix("matWorld", matInd);
@@ -433,95 +465,115 @@ void Terrain::Render(const Camera &camera, const DirectionalLight &mainLight, co
 	pEffect->SetTexture("Terrain0_Tex", *VIDEO->GetTexture(_tile0Handle));
 	pEffect->SetTexture("Terrain1_Tex", *VIDEO->GetTexture(_tile1Handle));
 	pEffect->SetTexture("Terrain2_Tex", *VIDEO->GetTexture(_tile2Handle));
-	pEffect->SetTexture("Terrain3_Tex", *VIDEO->GetTexture(_tile3Handle));
-	pEffect->SetTexture("TerrainControl_Tex", *VIDEO->GetTexture(_tileSplatHandle));
+	pEffect->SetTexture("TerrainControl_Tex1", *VIDEO->GetTexture(_tileControl1Handle));
+	pEffect->SetTexture("TerrainControl_Tex2", *VIDEO->GetTexture(_tileControl2Handle));
+
+	//카메라에 보이는 청크, 타일들만 _visible에 넣는다
+	_visibleChunks.clear();
+	_visibleTiles.clear();
+	for (int32 i = 0; i < _xChunkCount * _zChunkCount; ++i)
+	{
+		TerrainChunk &refChunk = _pChunks[i];
+		if (camera.GetFrustum().IsSphereInFrustum(Vector3(refChunk._centerX, 0.0f, refChunk._centerZ),
+			refChunk._radius))
+		{
+			_visibleChunks.push_back(&refChunk);
+			//카메라에 보이는 청크가 현재 활성화 되어있는 청크라면.....
+			if (VectorHasItem(_activeChunkIndices, i))
+			{
+				for (int32 t = 0; t < TERRAIN_TILE_RES * TERRAIN_TILE_RES; ++t)
+				{
+					TerrainTile &refTile = refChunk._tiles[t];
+					if (camera.GetFrustum().IsSphereInFrustum(
+						Vector3(refTile._centerX, 0.0f, refTile._centerZ),
+						refTile._radius))
+					{
+						_visibleTiles.push_back(&refTile);
+					}
+				}
+			}
+		}
+
+	}
+	video::VertexBuffer *vBuffer = nullptr;
+	video::IndexBuffer *iBuffer = nullptr;
+	video::VertexDecl *decl = nullptr;
 
 	if (_inEditMode)
 	{
-		for (int32 z = 0; z < _zChunkCount; ++z)
+		for (uint32 i = 0; i < _visibleChunks.size(); ++i)
 		{
-			for (int32 x = 0; x < _xChunkCount; ++x)
+			TerrainChunk &refChunk = *_visibleChunks[i];
+			vBuffer = VIDEO->GetVertexBuffer(refChunk._vHandle);
+			iBuffer = VIDEO->GetIndexBuffer(refChunk._iHandle);
+			decl = VIDEO->GetVertexDecl(vBuffer->_decl);
+
+			//버텍스 버퍼에 정점 정보를 넣는다
+			video::TerrainVertex *pVertexData = nullptr;
+			video::TerrainVertex *pToCopy = _terrainVertices;
+			vBuffer->_ptr->Lock(0, 0, (void **)&pVertexData, D3DLOCK_DISCARD);
+			for (int32 j = 0; j < TERRAIN_CHUNK_DIM + 1; ++j)
 			{
-				TerrainChunk &refChunk = _pChunks[Index2D(x, z, _xChunkCount)];
-				if (camera.GetFrustum().IsSphereInFrustum( Vector3(refChunk._relCenterX, 0.0f, refChunk._relCenterZ), refChunk._radius))
-				{
-					video::VertexBuffer *vBuffer = VIDEO->GetVertexBuffer(refChunk._vHandle);
-					video::IndexBuffer *iBuffer = VIDEO->GetIndexBuffer(refChunk._iHandle);
-					video::VertexDecl *decl = VIDEO->GetVertexDecl(vBuffer->_decl);
+				int32 vertexXOffset = (refChunk._chunkX * TERRAIN_CHUNK_DIM);
+				int32 vertexZOffset = (refChunk._chunkZ * TERRAIN_CHUNK_DIM) + j;
 
-					//버텍스 버퍼에 정점 정보를 넣는다
-					video::TerrainVertex *pVertexData = nullptr;
-					video::TerrainVertex *pToCopy = _terrainVertices;
-					vBuffer->_ptr->Lock(0, 0, (void **)&pVertexData, D3DLOCK_DISCARD);
-					for (int32 i = 0; i < TERRAIN_CHUNK_DIM + 1; ++i)
-					{
-						int32 vertexXOffset = (x * TERRAIN_CHUNK_DIM);
-						int32 vertexZOffset = (z * TERRAIN_CHUNK_DIM) + i;
+				int32 offset = j * (TERRAIN_CHUNK_DIM + 1);
+				int32 toCopyOffset = Index2D(vertexXOffset, vertexZOffset, _numVertexX);
 
-						int32 offset = i * (TERRAIN_CHUNK_DIM + 1);
-						int32 toCopyOffset = Index2D(vertexXOffset, vertexZOffset, _numVertexX);
-
-						memcpy(pVertexData + offset, pToCopy + toCopyOffset, sizeof(video::TerrainVertex) * (TERRAIN_CHUNK_DIM + 1));
-					}
-
-					vBuffer->_ptr->Unlock();
-
-					//인덱스 버퍼에 정점 정보를 넣는다
-					void *pIndexData = nullptr;
-					iBuffer->_ptr->Lock(0, 0, (void **)&pIndexData, D3DLOCK_DISCARD);
-					memcpy(pIndexData, _chunkIndex, sizeof(TerrainFace) * TERRAIN_CHUNK_DIM * TERRAIN_CHUNK_DIM * 2);
-					iBuffer->_ptr->Unlock();
-
-					gpDevice->SetStreamSource(0, vBuffer->_ptr, 0, sizeof(video::TerrainVertex));
-					gpDevice->SetVertexDeclaration(decl->_ptr);
-					gpDevice->SetIndices(iBuffer->_ptr);
-
-					uint32 numPass = pEffect->BeginEffect();
-
-					for (uint32 i = 0; i < numPass; i++)
-					{
-						pEffect->BeginPass(i);
-
-						HRESULT re = gpDevice->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, 0,
-							_sectionNumVertexX * _sectionNumVertexZ, 0, _sectionNumCellX * _sectionNumCellX * 2);
-
-						pEffect->EndPass();
-					}
-					pEffect->EndEffect();
-				}
-
+				memcpy(pVertexData + offset, pToCopy + toCopyOffset, 
+					sizeof(video::TerrainVertex) * (TERRAIN_CHUNK_DIM + 1));
 			}
+
+			vBuffer->_ptr->Unlock();
+
+			//인덱스 버퍼에 정점 정보를 넣는다
+			void *pIndexData = nullptr;
+			iBuffer->_ptr->Lock(0, 0, (void **)&pIndexData, D3DLOCK_DISCARD);
+			memcpy(pIndexData, _chunkIndex, sizeof(TerrainFace) * TERRAIN_CHUNK_DIM * TERRAIN_CHUNK_DIM * 2);
+			iBuffer->_ptr->Unlock();
+
+			gpDevice->SetStreamSource(0, vBuffer->_ptr, 0, sizeof(video::TerrainVertex));
+			gpDevice->SetVertexDeclaration(decl->_ptr);
+			gpDevice->SetIndices(iBuffer->_ptr);
+
+			uint32 numPass = pEffect->BeginEffect();
+
+			for (uint32 p = 0; p < numPass; p++)
+			{
+				pEffect->BeginPass(p);
+
+				HRESULT re = gpDevice->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, 0,
+					_sectionNumVertexX * _sectionNumVertexZ, 0, _sectionNumCellX * _sectionNumCellX * 2);
+				pEffect->EndPass();
+			}
+			pEffect->EndEffect();
 		}
 	}
 	else
 	{
-		for (int32 i = 0; i < _xChunkCount * _zChunkCount; ++i)
+		for (uint32 i = 0; i < _visibleChunks.size(); ++i)
 		{
-			TerrainChunk &refChunk = _pChunks[i];
-			if (camera.GetFrustum().IsSphereInFrustum(
-				Vector3(refChunk._relCenterX, 0.0f, refChunk._relCenterZ), refChunk._radius))
+			TerrainChunk &refChunk = *_visibleChunks[i];
+			vBuffer = VIDEO->GetVertexBuffer(refChunk._vHandle);
+			iBuffer = VIDEO->GetIndexBuffer(refChunk._iHandle);
+			decl = VIDEO->GetVertexDecl(vBuffer->_decl);
+
+			gpDevice->SetStreamSource(0, vBuffer->_ptr, 0, sizeof(video::TerrainVertex));
+			gpDevice->SetVertexDeclaration(decl->_ptr);
+			gpDevice->SetIndices(iBuffer->_ptr);
+
+			uint32 numPass = pEffect->BeginEffect();
+
+			for (uint32 p = 0; p < numPass; p++)
 			{
-				video::VertexBuffer *vBuffer = VIDEO->GetVertexBuffer(refChunk._vHandle);
-				video::IndexBuffer *iBuffer = VIDEO->GetIndexBuffer(refChunk._iHandle);
-				video::VertexDecl *decl = VIDEO->GetVertexDecl(vBuffer->_decl);
+				pEffect->BeginPass(p);
 
-				gpDevice->SetStreamSource(0, vBuffer->_ptr, 0, sizeof(video::TerrainVertex));
-				gpDevice->SetVertexDeclaration(decl->_ptr);
-				gpDevice->SetIndices(iBuffer->_ptr);
+				gpDevice->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, 0,
+					_sectionNumVertexX * _sectionNumVertexZ, 0, _sectionNumCellX * _sectionNumCellX * 2);
 
-				uint32 numPass = pEffect->BeginEffect();
-
-				for (uint32 i = 0; i < numPass; i++)
-				{
-					pEffect->BeginPass(i);
-
-					gpDevice->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, 0,
-						_sectionNumVertexX * _sectionNumVertexZ, 0, _sectionNumCellX * _sectionNumCellX * 2);
-
-					pEffect->EndPass();
-				}
-				pEffect->EndEffect();
+				pEffect->EndPass();
 			}
+			pEffect->EndEffect();
 		}
 	}
 }
@@ -537,108 +589,189 @@ void Terrain::RenderShadow(const Camera & camera)
 	pEffect->SetMatrix( "matViewProjection", camera.GetViewProjectionMatrix() );
 
 	pEffect->SetTechnique("CreateShadow");
+
+	_shadowVisibleChunks.clear();
+	_shadowVisibleTiles.clear();
+	for (int32 i = 0; i < _xChunkCount * _zChunkCount; ++i)
+	{
+		TerrainChunk &refChunk = _pChunks[i];
+		if (camera.GetFrustum().IsSphereInFrustum(Vector3(refChunk._centerX, 0.0f, refChunk._centerZ),
+			refChunk._radius))
+		{
+			_shadowVisibleChunks.push_back(&refChunk);
+			//카메라에 보이는 청크가 현재 활성화 되어있는 청크라면.....
+			if (VectorHasItem(_activeChunkIndices, i))
+			{
+				for (int32 t = 0; t < TERRAIN_TILE_RES * TERRAIN_TILE_RES; ++t)
+				{
+					TerrainTile &refTile = refChunk._tiles[t];
+					if (camera.GetFrustum().IsSphereInFrustum(
+						Vector3(refTile._centerX, 0.0f, refTile._centerZ),
+						refTile._radius))
+					{
+						_shadowVisibleTiles.push_back(&refTile);
+					}
+				}
+			}
+		}
+
+	}
+
+	video::VertexBuffer *vBuffer = nullptr;
+	video::IndexBuffer *iBuffer = nullptr;
+	video::VertexDecl *decl = nullptr;
+
 	if (_inEditMode)
 	{
-		for (int32 z = 0; z < _zChunkCount; ++z)
+		for (uint32 i = 0; i < _shadowVisibleChunks.size(); ++i)
 		{
-			for (int32 x = 0; x < _xChunkCount; ++x)
+			TerrainChunk &refChunk = *_shadowVisibleChunks[i];
+			vBuffer = VIDEO->GetVertexBuffer(refChunk._vHandle);
+			iBuffer = VIDEO->GetIndexBuffer(refChunk._iHandle);
+			decl = VIDEO->GetVertexDecl(vBuffer->_decl);
+
+			//버텍스 버퍼에 정점 정보를 넣는다
+			video::TerrainVertex *pVertexData = nullptr;
+			video::TerrainVertex *pToCopy = _terrainVertices;
+			vBuffer->_ptr->Lock(0, 0, (void **)&pVertexData, D3DLOCK_DISCARD);
+			for (int32 j = 0; j < TERRAIN_CHUNK_DIM + 1; ++j)
 			{
-				TerrainChunk &refChunk = _pChunks[Index2D(x, z, _xChunkCount)];
-				if (camera.GetFrustum().IsSphereInFrustum( Vector3(refChunk._relCenterX, 0.0f, refChunk._relCenterZ), refChunk._radius))
-				{
-					video::VertexBuffer *vBuffer = VIDEO->GetVertexBuffer(refChunk._vHandle);
-					video::IndexBuffer *iBuffer = VIDEO->GetIndexBuffer(refChunk._iHandle);
-					video::VertexDecl *decl = VIDEO->GetVertexDecl(vBuffer->_decl);
+				int32 vertexXOffset = (refChunk._chunkX * TERRAIN_CHUNK_DIM);
+				int32 vertexZOffset = (refChunk._chunkZ * TERRAIN_CHUNK_DIM) + j;
 
-					//버텍스 버퍼에 정점 정보를 넣는다
-					video::TerrainVertex *pVertexData = nullptr;
-					video::TerrainVertex *pToCopy = _terrainVertices;
-					vBuffer->_ptr->Lock(0, 0, (void **)&pVertexData, D3DLOCK_DISCARD);
-					for (int32 i = 0; i < TERRAIN_CHUNK_DIM + 1; ++i)
-					{
-						int32 vertexXOffset = (x * TERRAIN_CHUNK_DIM);
-						int32 vertexZOffset = (z * TERRAIN_CHUNK_DIM) + i;
+				int32 offset = j * (TERRAIN_CHUNK_DIM + 1);
+				int32 toCopyOffset = Index2D(vertexXOffset, vertexZOffset, _numVertexX);
 
-						int32 offset = i * (TERRAIN_CHUNK_DIM + 1);
-						int32 toCopyOffset = Index2D(vertexXOffset, vertexZOffset, _numVertexX);
-
-						memcpy(pVertexData + offset, pToCopy + toCopyOffset, sizeof(video::TerrainVertex) * (TERRAIN_CHUNK_DIM + 1));
-					}
-
-					vBuffer->_ptr->Unlock();
-
-					//인덱스 버퍼에 정점 정보를 넣는다
-					void *pIndexData = nullptr;
-					iBuffer->_ptr->Lock(0, 0, (void **)&pIndexData, D3DLOCK_DISCARD);
-					memcpy(pIndexData, _chunkIndex, sizeof(TerrainFace) * TERRAIN_CHUNK_DIM * TERRAIN_CHUNK_DIM * 2);
-					iBuffer->_ptr->Unlock();
-
-					gpDevice->SetStreamSource(0, vBuffer->_ptr, 0, sizeof(video::TerrainVertex));
-					gpDevice->SetVertexDeclaration(decl->_ptr);
-					gpDevice->SetIndices(iBuffer->_ptr);
-
-					uint32 numPass = pEffect->BeginEffect();
-
-					for (uint32 i = 0; i < numPass; i++)
-					{
-						pEffect->BeginPass(i);
-
-						HRESULT re = gpDevice->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, 0,
-							_sectionNumVertexX * _sectionNumVertexZ, 0, _sectionNumCellX * _sectionNumCellX * 2);
-
-						pEffect->EndPass();
-					}
-					pEffect->EndEffect();
-				}
-
+				memcpy(pVertexData + offset, pToCopy + toCopyOffset, 
+					sizeof(video::TerrainVertex) * (TERRAIN_CHUNK_DIM + 1));
 			}
+
+			vBuffer->_ptr->Unlock();
+
+			//인덱스 버퍼에 정점 정보를 넣는다
+			void *pIndexData = nullptr;
+			iBuffer->_ptr->Lock(0, 0, (void **)&pIndexData, D3DLOCK_DISCARD);
+			memcpy(pIndexData, _chunkIndex, sizeof(TerrainFace) * TERRAIN_CHUNK_DIM * TERRAIN_CHUNK_DIM * 2);
+			iBuffer->_ptr->Unlock();
+
+			gpDevice->SetStreamSource(0, vBuffer->_ptr, 0, sizeof(video::TerrainVertex));
+			gpDevice->SetVertexDeclaration(decl->_ptr);
+			gpDevice->SetIndices(iBuffer->_ptr);
+
+			uint32 numPass = pEffect->BeginEffect();
+
+			for (uint32 p = 0; p < numPass; p++)
+			{
+				pEffect->BeginPass(p);
+
+				HRESULT re = gpDevice->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, 0,
+					_sectionNumVertexX * _sectionNumVertexZ, 0, _sectionNumCellX * _sectionNumCellX * 2);
+
+				pEffect->EndPass();
+			}
+			pEffect->EndEffect();
 		}
 	}
 	else
 	{
-		for (int32 i = 0; i < _xChunkCount * _zChunkCount; ++i)
+		for (uint32 i = 0; i < _shadowVisibleChunks.size(); ++i)
 		{
-			TerrainChunk &refChunk = _pChunks[i];
-			if (camera.GetFrustum().IsSphereInFrustum(
-				Vector3(refChunk._relCenterX, 0.0f, refChunk._relCenterZ), refChunk._radius))
+			TerrainChunk &refChunk = *_shadowVisibleChunks[i];
+			vBuffer = VIDEO->GetVertexBuffer(refChunk._vHandle);
+			iBuffer = VIDEO->GetIndexBuffer(refChunk._iHandle);
+			decl = VIDEO->GetVertexDecl(vBuffer->_decl);
+
+			gpDevice->SetStreamSource(0, vBuffer->_ptr, 0, sizeof(video::TerrainVertex));
+			gpDevice->SetVertexDeclaration(decl->_ptr);
+			gpDevice->SetIndices(iBuffer->_ptr);
+
+			uint32 numPass = pEffect->BeginEffect();
+
+			for (uint32 p = 0; p < numPass; p++)
 			{
-				video::VertexBuffer *vBuffer = VIDEO->GetVertexBuffer(refChunk._vHandle);
-				video::IndexBuffer *iBuffer = VIDEO->GetIndexBuffer(refChunk._iHandle);
-				video::VertexDecl *decl = VIDEO->GetVertexDecl(vBuffer->_decl);
+				pEffect->BeginPass(p);
 
-				gpDevice->SetStreamSource(0, vBuffer->_ptr, 0, sizeof(video::TerrainVertex));
-				gpDevice->SetVertexDeclaration(decl->_ptr);
-				gpDevice->SetIndices(iBuffer->_ptr);
+				gpDevice->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, 0,
+					_sectionNumVertexX * _sectionNumVertexZ, 0, _sectionNumCellX * _sectionNumCellX * 2);
 
-				uint32 numPass = pEffect->BeginEffect();
-
-				for (uint32 i = 0; i < numPass; i++)
-				{
-					pEffect->BeginPass(i);
-
-					gpDevice->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, 0,
-						_sectionNumVertexX * _sectionNumVertexZ, 0, _sectionNumCellX * _sectionNumCellX * 2);
-
-					pEffect->EndPass();
-				}
-				pEffect->EndEffect();
+				pEffect->EndPass();
 			}
+			pEffect->EndEffect();
 		}
 	}
 }
 
-void Terrain::AddEntityToSection(const Entity & entity, const Vector3 & position)
+
+void Terrain::RemoveEntityInTile(Entity entity, const TerrainTilePos & tilePos)
 {
-	
+	Terrain::TerrainChunk &refChunk = _pChunks[Index2D(tilePos._chunkX, tilePos._chunkZ, _xChunkCount)];
+	Terrain::TerrainTile &refTile = refChunk._tiles[Index2D(tilePos._tileX, tilePos._tileZ, TERRAIN_TILE_RES)];
+
+	for (auto iter = refTile._entities.begin(); iter != refTile._entities.end();)
+	{
+		if (iter->GetID() == entity.GetID())
+		{
+			refTile._entities.erase(iter);
+			break;
+		}
+		else
+		{
+			++iter;
+		}
+	}
 }
+
+void Terrain::ReTilelizeTilePosition(TerrainTilePos & tilePos)
+{
+	if (tilePos._tileX < 0)
+	{
+		tilePos._chunkX -= 1;
+		//Clamp(tilePos._chunkX, 0, _xChunkCount - 1);
+		tilePos._tileX += TERRAIN_TILE_RES;
+	}
+	else if (tilePos._tileX > TERRAIN_TILE_RES - 1)
+	{
+		tilePos._chunkX += 1;
+		//Clamp(tilePos._chunkX, 0, _xChunkCount - 1);
+		tilePos._tileX -= TERRAIN_TILE_RES;
+	}
+
+	if (tilePos._tileZ < 0)
+	{
+		tilePos._chunkZ -= 1;
+		//Clamp(tilePos._chunkZ, 0, _zChunkCount - 1);
+		tilePos._tileZ += TERRAIN_TILE_RES;
+	}
+	else if (tilePos._tileZ > TERRAIN_TILE_RES - 1)
+	{
+		tilePos._chunkZ += 1;
+		//Clamp(tilePos._chunkZ, 0, _zChunkCount - 1);
+		tilePos._tileZ -= TERRAIN_TILE_RES;
+	}
+}
+
+bool Terrain::IsTerrainTilePosValid(const TerrainTilePos & tilePos)
+{
+	if (tilePos._chunkX < 0 || tilePos._chunkZ < 0)
+	{
+		return false;
+	}
+	if (tilePos._chunkX > _xChunkCount - 1 || tilePos._chunkZ > _zChunkCount - 1)
+	{
+		return false;
+	}
+
+	return true;
+}
+
 
 bool Terrain::CreateTerrain(int32 tileNum)
 {
 	float tileIntervalX = static_cast<float>(tileNum) / _numCellX;
 	float tileIntervalY = static_cast<float>(tileNum) / _numCellZ;
 
-	float terrainStartX = -(_numCellX / 2);
-	float terrainStartZ = (_numCellZ / 2);
+	float terrainStartX = (float)-(_numCellX / 2);
+	float terrainStartZ = (float)(_numCellZ / 2);
 
 	_terrainVertices = new video::TerrainVertex[_numTotalVertex];
 
@@ -801,12 +934,19 @@ void Terrain::RebuildTerrain(const Terrain::TerrainConfig &config)
 	if (_tile0Handle.IsValid()) { VIDEO->DestroyTexture(_tile0Handle); }
 	if (_tile1Handle.IsValid()) { VIDEO->DestroyTexture(_tile1Handle); }
 	if (_tile2Handle.IsValid()) { VIDEO->DestroyTexture(_tile2Handle); }
-	if (_tile3Handle.IsValid()) { VIDEO->DestroyTexture(_tile3Handle); }
-	if (_tileSplatHandle.IsValid()) { VIDEO->DestroyTexture(_tileSplatHandle); }
+	if (_tileControl1Handle.IsValid()) { VIDEO->DestroyTexture(_tileControl1Handle); }
+	if (_tileControl2Handle.IsValid()) { VIDEO->DestroyTexture(_tileControl2Handle); }
 
 	SAFE_DELETE_ARRAY(_terrainVertices);
 	SAFE_DELETE_ARRAY(_chunkIndex);
 	SAFE_DELETE(_pQuadTree);
+
+	 _activeChunkIndices.clear();
+	 _visibleChunks.clear();
+	 _visibleTiles.clear();
+
+	 _shadowVisibleChunks.clear();
+	 _shadowVisibleTiles.clear();
 
 	//Rebuild모드는 항상 에디터에서 불린다.
 	Create(config, true);
@@ -824,23 +964,21 @@ bool Terrain::CreateTerrainChunk(int32 x, int32 z, const video::TerrainVertex * 
 {
 	int32 sectionIndex = Index2D(x, z, _xChunkCount);
 
-	TerrainChunk &refSection = _pChunks[sectionIndex];
-	refSection._pVertices = pTerrainVertices;
+	TerrainChunk &refChunk = _pChunks[sectionIndex];
 
-	refSection._chunkX = x;
-	refSection._chunkZ = z;
+	refChunk._pVertices = pTerrainVertices;
+
+	refChunk._chunkX = x;
+	refChunk._chunkZ = z;
 
 	int32 globalStartX = x * _sectionResolution;
 	int32 globalStartZ = z * _sectionResolution;
 
 	std::vector<video::TerrainVertex> vertices;
-	//std::vector<uint16> indices;
 
 	vertices.reserve(((_sectionNumVertexX ) * (_sectionNumVertexZ )) + 1);
-	//indices.reserve((_sectionNumCellX * (_sectionNumCellZ + 1)) * 3 * 2 + 1);
 	
 	vertices.clear();
-	//indices.clear();
 
 	//버텍스 정보 넣기...
 	for (int32 localZ = 0; localZ < _sectionNumVertexZ; localZ++)
@@ -856,11 +994,11 @@ bool Terrain::CreateTerrainChunk(int32 x, int32 z, const video::TerrainVertex * 
 		}
 	}
 
-	refSection._relStartX = vertices[0]._pos.x;
-	refSection._relStartZ = vertices[0]._pos.z;
+	refChunk._startX = vertices[0]._pos.x;
+	refChunk._startZ = vertices[0]._pos.z;
 
-	refSection._relEndX = vertices.back()._pos.x;
-	refSection._relEndZ = vertices.back()._pos.z;
+	refChunk._endX = vertices.back()._pos.x;
+	refChunk._endZ = vertices.back()._pos.z;
 
 	if (_inEditMode)
 	{
@@ -869,18 +1007,18 @@ bool Terrain::CreateTerrainChunk(int32 x, int32 z, const video::TerrainVertex * 
 		mem._data = nullptr;
 		mem._size = sizeof(video::TerrainVertex) * _sectionNumVertexX * _sectionNumVertexZ;
 
-		refSection._vHandle = VIDEO->CreateVertexBuffer(&mem, _declHandle);
-		Assert(refSection._vHandle.IsValid());
+		refChunk._vHandle = VIDEO->CreateVertexBuffer(&mem, _declHandle);
+		Assert(refChunk._vHandle.IsValid());
 
 		mem._data = nullptr;
 		mem._size = sizeof(uint32) * _sectionResolution * _sectionResolution * 2 * 3;
 
-		if (!refSection._iHandle.IsValid())
+		if (!refChunk._iHandle.IsValid())
 		{
-			refSection._iHandle = VIDEO->CreateIndexBuffer(&mem, sizeof(uint32));
+			refChunk._iHandle = VIDEO->CreateIndexBuffer(&mem, sizeof(uint32));
 		}
 
-		Assert(refSection._iHandle.IsValid());
+		Assert(refChunk._iHandle.IsValid());
 	}
 	else
 	{
@@ -889,22 +1027,49 @@ bool Terrain::CreateTerrainChunk(int32 x, int32 z, const video::TerrainVertex * 
 		mem._data = &vertices[0];
 		mem._size = sizeof(video::TerrainVertex) * _sectionNumVertexX * _sectionNumVertexZ;
 
-		refSection._vHandle = VIDEO->CreateVertexBuffer(&mem, _declHandle);
-		Assert(refSection._vHandle.IsValid());
+		refChunk._vHandle = VIDEO->CreateVertexBuffer(&mem, _declHandle);
+		Assert(refChunk._vHandle.IsValid());
 
 		mem._data = &_chunkIndex[0];
 		mem._size = sizeof(uint32) * _sectionResolution * _sectionResolution * 2 * 3;
 
-		if (!refSection._iHandle.IsValid())
+		if (!refChunk._iHandle.IsValid())
 		{
-			refSection._iHandle = VIDEO->CreateIndexBuffer(&mem, sizeof(uint32));
+			refChunk._iHandle = VIDEO->CreateIndexBuffer(&mem, sizeof(uint32));
 		}
-		Assert(refSection._iHandle.IsValid());
+		Assert(refChunk._iHandle.IsValid());
 	}
 
-	refSection._relCenterX = (refSection._relStartX + refSection._relEndX) * 0.5f;
-	refSection._relCenterZ = (refSection._relStartZ + refSection._relEndZ) * 0.5f;
-	refSection._radius = (refSection._relCenterX - refSection._relStartX) * 1.2f;
+	refChunk._centerX = (refChunk._startX + refChunk._endX) * 0.5f;
+	refChunk._centerZ = (refChunk._startZ + refChunk._endZ) * 0.5f;
+	refChunk._radius = (refChunk._centerX - refChunk._startX) * 1.2f;
+
+	float tileGap = (float)TERRAIN_CHUNK_DIM / (float)TERRAIN_TILE_RES;
+
+	for (int32 tz = 0; tz < TERRAIN_TILE_RES; ++tz)
+	{
+		for (int32 tx = 0; tx < TERRAIN_TILE_RES; ++tx)
+		{
+			Terrain::TerrainTile &refTile = refChunk._tiles[Index2D(tx, tz, TERRAIN_TILE_RES)];
+
+			refTile._chunkX = x;
+			refTile._chunkZ = z;
+
+			refTile._tileX = tx;
+			refTile._tileZ = tz;
+
+			refTile._startX = refChunk._startX + tileGap * (float)tx;
+			refTile._startZ = refChunk._startZ - (tileGap * (float)tz);
+
+			refTile._endX = refTile._startX + tileGap;
+			refTile._endZ = refTile._startZ - tileGap;
+
+			refTile._centerX = (refTile._endX + refTile._startX) * 0.5f;
+			refTile._centerZ = (refTile._endZ + refTile._startZ) * 0.5f;
+
+			refTile._radius = (refTile._centerX - refTile._startX) * 1.2f;
+		}
+	}
 
 	return true;
 }
@@ -919,10 +1084,11 @@ void Terrain::AddHeightOnCursorPos(const Vector2 &cursorPos, float innerRadius, 
 	Vector3 worldPos;
 	if (IsIntersectRay(ray, &worldPos))
 	{
-		TerrainTilePos tilePos =  ConvertWorldPostoTilePos(worldPos);
+		TerrainVertexPos vertexPos;
+		ConvertWorldPostoVertexPos(worldPos, &vertexPos);
 
-		int32 centerX = tilePos._chunkX * TERRAIN_CHUNK_DIM + tilePos._tileX;
-		int32 centerZ = tilePos._chunkZ * TERRAIN_CHUNK_DIM + tilePos._tileZ;
+		int32 centerX = vertexPos._chunkX * TERRAIN_CHUNK_DIM + vertexPos._tileX;
+		int32 centerZ = vertexPos._chunkZ * TERRAIN_CHUNK_DIM + vertexPos._tileZ;
 
 		int32 minX, minZ, maxX, maxZ;
 		minX = centerX - radius;
@@ -936,9 +1102,7 @@ void Terrain::AddHeightOnCursorPos(const Vector2 &cursorPos, float innerRadius, 
 		ClampInt(maxZ, 0, _numVertexZ - 1);
 
 		AddHeightGausian(minX, maxX, minZ, maxZ, intensity);
-
 		RebuildSection(minX, maxX, minZ, maxZ);
-
 	}
 }
 
@@ -953,16 +1117,17 @@ void Terrain::SmoothOnCursorPos(const Vector2 & cursorPos, float brushRadius)
 
 	if (IsIntersectRay(ray, &worldPos))
 	{
-		TerrainTilePos tilePos = ConvertWorldPostoTilePos(worldPos);
+		TerrainVertexPos vertexPos;
+		ConvertWorldPostoVertexPos(worldPos, &vertexPos);
 
-		int32 centerX = tilePos._chunkX * TERRAIN_CHUNK_DIM + tilePos._tileX;
-		int32 centerZ = tilePos._chunkZ * TERRAIN_CHUNK_DIM + tilePos._tileZ;
+		int32 centerX = vertexPos._chunkX * TERRAIN_CHUNK_DIM + vertexPos._tileX;
+		int32 centerZ = vertexPos._chunkZ * TERRAIN_CHUNK_DIM + vertexPos._tileZ;
 
 		int32 minX, maxX, minZ, maxZ;
-		minX = centerX - radius - 3;
-		maxX = centerX + radius + 3;
-		minZ = centerZ - radius - 3;
-		maxZ = centerZ + radius + 3;
+		minX = centerX - radius - 1;
+		maxX = centerX + radius + 1;
+		minZ = centerZ - radius - 1;
+		maxZ = centerZ + radius + 1;
 
 		ClampInt(minX, 0, _numVertexX);
 		ClampInt(maxX, 0, _numVertexX);
@@ -1070,25 +1235,119 @@ TerrainChunkPos Terrain::ConvertWorldPosToChunkPos(const Vector3 & worldPos)
 	return result;
 }
 
-TerrainTilePos Terrain::ConvertWorldPostoTilePos(const Vector3 & worldPos)
+void Terrain::ConvertWorldPostoTilePos(const Vector3 & worldPos, TerrainTilePos *pOutTilePos)
 {
-	TerrainTilePos result;
-	
 	float terrainPosX = worldPos.x + (float)_terrainHalfSizeX;
 	float terrainPosZ = -worldPos.z + (float)_terrainHalfSizeZ;
 
-	result._chunkX = (int32)(terrainPosX / TERRAIN_CHUNK_DIM);
-	result._chunkZ = (int32)(terrainPosZ / TERRAIN_CHUNK_DIM);
-	int32 chunkStartX = result._chunkX * TERRAIN_CHUNK_DIM;
-	int32 chunkStartZ = result._chunkZ * TERRAIN_CHUNK_DIM;
+	pOutTilePos->_chunkX = (int32)(terrainPosX / TERRAIN_CHUNK_DIM);
+	pOutTilePos->_chunkZ = (int32)(terrainPosZ / TERRAIN_CHUNK_DIM);
 
-	result._tileX = ((int32)terrainPosX - (int32)chunkStartX);
-	result._tileZ = ((int32)terrainPosZ - (int32)chunkStartZ);
+	int32 chunkStartX = pOutTilePos->_chunkX * TERRAIN_CHUNK_DIM;
+	int32 chunkStartZ = pOutTilePos->_chunkZ * TERRAIN_CHUNK_DIM;
 
-	result._relX = (float)(terrainPosX - (float)(chunkStartX + result._tileX));
-	result._relZ = (float)(terrainPosZ - (float)(chunkStartZ + result._tileZ));
+	pOutTilePos->_tileX = ((int32)terrainPosX - (int32)chunkStartX) / TERRAIN_TILE_DIM;
+	pOutTilePos->_tileZ = ((int32)terrainPosZ - (int32)chunkStartZ) / TERRAIN_TILE_DIM;
 
-	return result;
+	pOutTilePos->_relX = (float)(terrainPosX - (float)(chunkStartX + (pOutTilePos->_tileX * TERRAIN_TILE_DIM) ));
+	pOutTilePos->_relZ = (float)(terrainPosZ - (float)(chunkStartZ + (pOutTilePos->_tileZ * TERRAIN_TILE_DIM) ));
+}
+
+void Terrain::ConvertWorldPostoVertexPos(const Vector3 & worldPos, TerrainVertexPos * pOutVertexPos)
+{
+	float terrainPosX = worldPos.x + (float)_terrainHalfSizeX;
+	float terrainPosZ = -worldPos.z + (float)_terrainHalfSizeZ;
+
+	pOutVertexPos->_chunkX = (int32)(terrainPosX / TERRAIN_CHUNK_DIM);
+	pOutVertexPos->_chunkZ = (int32)(terrainPosZ / TERRAIN_CHUNK_DIM);
+
+	int32 chunkStartX = pOutVertexPos->_chunkX * TERRAIN_CHUNK_DIM;
+	int32 chunkStartZ = pOutVertexPos->_chunkZ * TERRAIN_CHUNK_DIM;
+
+	pOutVertexPos->_tileX = ((int32)terrainPosX - (int32)chunkStartX);
+	pOutVertexPos->_tileZ = ((int32)terrainPosZ - (int32)chunkStartZ);
+
+	pOutVertexPos->_relX = (float)(terrainPosX - (float)(chunkStartX + pOutVertexPos->_tileX));
+	pOutVertexPos->_relZ = (float)(terrainPosZ - (float)(chunkStartZ + pOutVertexPos->_tileZ));
+}
+
+void Terrain::ValidateTerrainChunks(const TerrainTilePos & currentPos, const TerrainTilePos & prevPos)
+{
+	int32 currentMinX = currentPos._chunkX - 1;
+	int32 currentMaxX = currentPos._chunkX + 1;
+	int32 currentMinZ = currentPos._chunkZ - 1;
+	int32 currentMaxZ = currentPos._chunkZ + 1;
+
+	ClampInt(currentMinX, 0, _xChunkCount - 1);
+	ClampInt(currentMaxX, 0, _xChunkCount - 1);
+	ClampInt(currentMinZ, 0, _zChunkCount - 1);
+	ClampInt(currentMaxZ, 0, _zChunkCount - 1);
+
+	int32 prevMinX = prevPos._chunkX - 1;
+	int32 prevMaxX = prevPos._chunkX + 1;
+	int32 prevMinZ = prevPos._chunkZ - 1;
+	int32 prevMaxZ = prevPos._chunkZ + 1;
+
+	ClampInt(prevMinX, 0, _zChunkCount - 1);
+	ClampInt(prevMaxX, 0, _zChunkCount - 1);
+	ClampInt(prevMinZ, 0, _zChunkCount - 1);
+	ClampInt(prevMaxZ, 0, _zChunkCount - 1);
+
+	std::vector<int32> toDeactivate{};
+	toDeactivate.reserve(9);
+
+	_activeChunkIndices.clear();
+	_activeChunkIndices.reserve(9);
+
+	for (int32 z = prevMinZ; z <= prevMaxZ; ++z)
+	{
+		for (int32 x = prevMinX; x <= prevMaxX; ++x)
+		{
+			toDeactivate.push_back(Index2D(x, z, _xChunkCount));
+		}
+	}
+
+	for (int32 z = currentMinZ; z <= currentMaxZ; ++z)
+	{
+		for (int32 x = currentMinX; x <= currentMaxX; ++x)
+		{
+			_activeChunkIndices.push_back(Index2D(x, z, _xChunkCount));
+		}
+	}
+
+	for (int32 i = 0; i < toDeactivate.size(); ++i)
+	{
+		bool32 hasValue = false;
+		for (int32 j = 0; j < _activeChunkIndices.size(); ++j)
+		{
+			if (toDeactivate[i] == _activeChunkIndices[j])
+			{
+				hasValue = true;
+			}
+		}
+		if (!hasValue)
+		{
+			_pChunks[toDeactivate[i]].DeactivateEntities();
+		}
+	}
+
+	for (int32 i = 0; i < _activeChunkIndices.size(); ++i)
+	{
+		bool32 hasValue = false;
+		for (int32 j = 0; j < toDeactivate.size(); ++j)
+		{
+			if (_activeChunkIndices[i] == toDeactivate[j])
+			{
+				hasValue = true;
+			}
+		}
+		if (!hasValue)
+		{
+			_pChunks[_activeChunkIndices[i]].ActivateEntities();
+		}
+	}
+	
+	_pCurrentScene->_world.Refresh();
 }
 
 void Terrain::EffectSetTexture(LPCSTR handle, LPDIRECT3DTEXTURE9 texture)
@@ -1112,30 +1371,27 @@ const Vector3 ConvertTilePosToWorldPos(const TerrainTilePos & tilePos)
 }
 
 //플레이어가 접근하면 터레인 청크에 있는 모든 엔티티들을 활성화 시킨다
-void Terrain::TerrainChunk::ValidateEntities()
+void Terrain::TerrainChunk::ActivateEntities()
 {
 	for (int32 i = 0; i < TERRAIN_CHUNKS_TILE_COUNT; ++i)
 	{
-
+		for (auto &entity : _tiles[i]._entities)
+		{
+			entity.Activate();
+		}
 	}
-	//for (int32 i = 0; i < _entities.size(); ++i)
-	//{
-	//	_entities[i].Deactivate();
-	//}
 }
 
-//플레이어가 접근하면 터레인 청크에 있는 모든 엔티티들을 비활성화 시킨다
-void Terrain::TerrainChunk::InvalidateEntities()
+//플레이어가 청크에서 멀어진다면.... 터레인 청크에 있는 모든 엔티티들을 비활성화 시킨다
+void Terrain::TerrainChunk::DeactivateEntities()
 {
-
 	for (int32 i = 0; i < TERRAIN_CHUNKS_TILE_COUNT; ++i)
 	{
-
+		for (auto &entity : _tiles[i]._entities)
+		{
+			entity.Deactivate();
+		}
 	}
-	//for (int32 i = 0; i < _entities.size(); ++i)
-	//{
-	//	_entities[i].Activate();
-	//}
 }
 
 //Rebuild Seciton은 인자로 들어온 min, max의 범위를 1씩 증가시켜서 내부 처리를 진행한다.
@@ -1305,14 +1561,15 @@ void Terrain::AddHeightGausian(int32 minX, int32 maxX, int32 minZ, int32 maxZ, f
 	int32 numVertX = maxX - minX + 1;
 	int32 numVertZ = maxZ - minZ + 1;
 
-	float* smooth = new float[numVertX * numVertZ];
-
-	//int32 kernel[3][3] = 
-	//{
-	//	{1, 2, 1},
-	//	{2, 4, 2},
-	//	{1, 2, 1}
-	//};
+	if (mult > 0)
+	{
+		mult *= 0.04f;
+	}
+	else
+	{
+		mult *= 0.2f;
+	}
+	float *smooth = new float[numVertX * numVertZ];
 
 	int32 counter = 0;
 	for (int32 z = minZ; z < maxZ; z++)
@@ -1376,7 +1633,7 @@ void Terrain::AddHeightGausian(int32 minX, int32 maxX, int32 minZ, int32 maxZ, f
 			totalSections += _terrainVertices[Index2D(x, z, _numVertexX)]._pos.y * 4.0f;
 			adjacentSections += 4;
 
-			smooth[counter++] = (totalSections / (float)adjacentSections) * mult;
+			smooth[counter++] = (totalSections / (float)adjacentSections) * (1.0f + mult);
 		}
 	}
 
@@ -1397,8 +1654,8 @@ void Terrain::AddHeightBlock(int32 minX, int32 maxX, int32 minZ, int32 maxZ, flo
 {
 }
 
-void Terrain::DrawAlphaTextureOnCursorPos(const Vector2 & cursorPos,
-	float innerRadius, float outterRadius, int32 channel)
+void Terrain::DrawAlphaTextureOnCursorPos(const Vector2 & cursorPos, float innerRadius, float outterRadius, 
+	int32 layer, bool32 subtract)
 {
 	Ray ray;
 	_pCurrentScene->_camera.ComputeRay(cursorPos, &ray);
@@ -1407,10 +1664,11 @@ void Terrain::DrawAlphaTextureOnCursorPos(const Vector2 & cursorPos,
 
 	if (IsIntersectRay(ray, &worldPos))
 	{
-		TerrainTilePos tilePos = ConvertWorldPostoTilePos(worldPos);
+		TerrainVertexPos vertexPos;
+		ConvertWorldPostoVertexPos(worldPos, &vertexPos);
 
-		int32 centerX = tilePos._chunkX * TERRAIN_CHUNK_DIM + tilePos._tileX;
-		int32 centerZ = tilePos._chunkZ * TERRAIN_CHUNK_DIM + tilePos._tileZ;
+		int32 centerX = vertexPos._chunkX * TERRAIN_CHUNK_DIM + vertexPos._tileX;
+		int32 centerZ = vertexPos._chunkZ * TERRAIN_CHUNK_DIM + vertexPos._tileZ;
 
 		//알파 텍스쳐의 1픽셀이 지형에 대해서 얼마의 크기인지를 구한다..
 		float pixelSize = (float)_terrainSizeX / (float)TERRAIN_ALPHA_TEXTURE_SIZE;
@@ -1434,7 +1692,17 @@ void Terrain::DrawAlphaTextureOnCursorPos(const Vector2 & cursorPos,
 		ClampInt(minPixelY, 0, TERRAIN_ALPHA_TEXTURE_SIZE - 1);
 
 		D3DLOCKED_RECT lockRect{};
-		video::Texture *pTexture = VIDEO->GetTexture(_tileSplatHandle);
+
+		//TODO : 이거 해야한다...
+		video::Texture *pTexture = nullptr;
+		if (layer == 0)
+		{
+			pTexture = VIDEO->GetTexture(_tileControl1Handle);
+		}
+		else if (layer == 1)
+		{
+			pTexture = VIDEO->GetTexture(_tileControl2Handle);
+		}
 		if (SUCCEEDED(pTexture->_ptr->LockRect(0, &lockRect, nullptr, 0)))
 		{
 			uint8 *pStart = (uint8 *)lockRect.pBits;
@@ -1447,7 +1715,7 @@ void Terrain::DrawAlphaTextureOnCursorPos(const Vector2 & cursorPos,
 				{
 					int32 in = (lockRect.Pitch * y) + (x * 4);
 
-					uint8 read = pStart[in + channel];
+					uint8 read = pStart[in + 3];
 
 					Vector3 diff = Vector3(x * pixelSize, 0.0f, y * pixelSize) -
 						Vector3(centerPixelX * pixelSize, 0.0f, centerPixelY * pixelSize);
@@ -1455,35 +1723,42 @@ void Terrain::DrawAlphaTextureOnCursorPos(const Vector2 & cursorPos,
 
 					if (length <= innerRadius)
 					{
-						write = 0xff;
+						if (subtract)
+						{
+							write = 0;
+						}
+						else
+						{
+							write = 0xff;
+						}
 					}
-					else if(length <= outterRadius)
+					else if(length <= outterRadius + EPSILON)
 					{
 						length -= innerRadius;
 						float range = (float)(outterRadius - innerRadius);
-						write =  (uint8)(((float)(range - length) / (float)(range)) * 0xff);
-
-						int a = 0;
+						if (subtract)
+						{
+							write = 255 - (uint8)(((float)(range - length) / (float)(range)) * 0xff);
+						}
+						else
+						{
+							write = (uint8)(((float)(range - length) / (float)(range)) * 0xff);
+						}
 					}
 					else
 					{
 						continue;
 					}
 
-					read = (read < write) ? write : read;
-					for (int32 i = 0; i < 4; ++i)
+					if (subtract)
 					{
-						if (i == channel)
-						{
-							pStart[in] = read;
-						}
-						else
-						{
-							pStart[in] = (uint8)((float)pStart[in] * 0.1f);
-							//pStart[in] = 0x00;
-						}
-						in++;
+						read = (read > write) ? write : read;
 					}
+					else
+					{
+						read = (read < write) ? write : read;
+					}
+					pStart[in + 3] = read;
 				}
 			}
 			pTexture->_ptr->UnlockRect(0);
@@ -1524,41 +1799,39 @@ void Terrain::LoadTextureFromConfig(const Terrain::TerrainConfig & config)
 		_tile2Handle = VIDEO->GetTexture("defaultDiffuse");
 	}
 
-	loadedHandle = VIDEO->CreateTexture(config._tile3FileName, config._tile3FileName);
-	if (loadedHandle.IsValid())
-	{
-		_tile3Handle = loadedHandle;
-	}
-	else
-	{
-		_tile3Handle = VIDEO->GetTexture("defaultDiffuse");
-	}
-
-	bool splatLoaded = false;
+	bool controlLoaded = false;
 	//만약 config에서 Splat 텍스쳐가 넘어왔다면
-	if (strlen(config._splatFileName) > 0)
+	if (strlen(config._control1Name) > 0)
 	{
-		_tileSplatHandle = VIDEO->CreateTexture(config._splatFileName);
-		if (!_tileSplatHandle.IsValid())
+		_tileControl1Handle = VIDEO->CreateTexture(config._control1Name);
+		_tileControl2Handle = VIDEO->CreateTexture(config._control2Name);
+		if (!_tileControl1Handle.IsValid())
 		{
-			_tileSplatHandle = VIDEO->GetTexture("diffuseDefault");
+			_tileControl1Handle = VIDEO->GetTexture("diffuseDefault");
+		}
+
+		if (!_tileControl2Handle.IsValid())
+		{
+			_tileControl2Handle = VIDEO->GetTexture("diffuseDefault");
 		}
 		else
 		{
-			splatLoaded = true;
+			controlLoaded = true;
 		}
 	}
-
-	//만약 config에서 Splat 텍스쳐가 넘어오지 않았다면, 새로운 텍스쳐를 생성하도록 한다...
+	//만약 config에서 Splat 텍스쳐가 넘어오지 않았다면, 새로운 텍스쳐를 두개 생성하도록 한다...
 	//그리고 모든 값을 0x00000000로 채운다.
-	if(!splatLoaded)
+	if(!controlLoaded)
 	{
-		_tileSplatHandle = VIDEO->CreateTexture(TERRAIN_ALPHA_TEXTURE_SIZE, TERRAIN_ALPHA_TEXTURE_SIZE,
+		_tileControl1Handle = VIDEO->CreateTexture(TERRAIN_ALPHA_TEXTURE_SIZE, TERRAIN_ALPHA_TEXTURE_SIZE,
 			D3DFMT_A8R8G8B8, D3DPOOL_MANAGED);
 
-		video::Texture *pTexture = VIDEO->GetTexture(_tileSplatHandle);
+		_tileControl2Handle = VIDEO->CreateTexture(TERRAIN_ALPHA_TEXTURE_SIZE, TERRAIN_ALPHA_TEXTURE_SIZE,
+			D3DFMT_A8R8G8B8, D3DPOOL_MANAGED);
+
+		video::Texture *pControl1= VIDEO->GetTexture(_tileControl1Handle);
 		D3DLOCKED_RECT lockRect{};
-		if (SUCCEEDED(pTexture->_ptr->LockRect(0, &lockRect, nullptr, 0)))
+		if (SUCCEEDED(pControl1->_ptr->LockRect(0, &lockRect, nullptr, 0)))
 		{
 			uint32 *pPixel = (uint32 *)lockRect.pBits;
 			for (int32 y = 0; y < TERRAIN_ALPHA_TEXTURE_SIZE; ++y)
@@ -1569,7 +1842,27 @@ void Terrain::LoadTextureFromConfig(const Terrain::TerrainConfig & config)
 					pPixel++;
 				}
 			}
-			pTexture->_ptr->UnlockRect(0);
+			pControl1->_ptr->UnlockRect(0);
+		}
+		//알파 텍스쳐의 Lock 을 실패하였다...
+		else
+		{
+			Console::Log("Alpha Texture Lock failed\n");
+		}
+
+		video::Texture *pControl2 = VIDEO->GetTexture(_tileControl2Handle);
+		if (SUCCEEDED(pControl2->_ptr->LockRect(0, &lockRect, nullptr, 0)))
+		{
+			uint32 *pPixel = (uint32 *)lockRect.pBits;
+			for (int32 y = 0; y < TERRAIN_ALPHA_TEXTURE_SIZE; ++y)
+			{
+				for (int32 x = 0; x < TERRAIN_ALPHA_TEXTURE_SIZE; ++x)
+				{
+					*pPixel = 0x00000000;
+					pPixel++;
+				}
+			}
+			pControl2->_ptr->UnlockRect(0);
 		}
 		//알파 텍스쳐의 Lock 을 실패하였다...
 		else
@@ -1577,7 +1870,6 @@ void Terrain::LoadTextureFromConfig(const Terrain::TerrainConfig & config)
 			Console::Log("Alpha Texture Lock failed\n");
 		}
 	}
-
 }
 
 Terrain::TerrainConfig::TerrainConfig(const TerrainConfig & other)
@@ -1589,8 +1881,8 @@ Terrain::TerrainConfig::TerrainConfig(const TerrainConfig & other)
 	strncpy(this->_tile0FileName, other._tile0FileName, MAX_FILE_NAME);
 	strncpy(this->_tile1FileName, other._tile1FileName, MAX_FILE_NAME);
 	strncpy(this->_tile2FileName, other._tile2FileName, MAX_FILE_NAME);
-	strncpy(this->_tile3FileName, other._tile3FileName, MAX_FILE_NAME);
-	strncpy(this->_splatFileName, other._splatFileName, MAX_FILE_NAME);
+	strncpy(this->_control1Name, other._control1Name, MAX_FILE_NAME);
+	strncpy(this->_control2Name, other._control2Name, MAX_FILE_NAME);
 }
 
 Terrain::TerrainConfig & Terrain::TerrainConfig::operator=(const TerrainConfig & other)
@@ -1602,7 +1894,32 @@ Terrain::TerrainConfig & Terrain::TerrainConfig::operator=(const TerrainConfig &
 	strncpy(this->_tile0FileName, other._tile0FileName, MAX_FILE_NAME);
 	strncpy(this->_tile1FileName, other._tile1FileName, MAX_FILE_NAME);
 	strncpy(this->_tile2FileName, other._tile2FileName, MAX_FILE_NAME);
-	strncpy(this->_tile3FileName, other._tile3FileName, MAX_FILE_NAME);
-	strncpy(this->_splatFileName, other._splatFileName, MAX_FILE_NAME);
+	strncpy(this->_control1Name, other._control1Name, MAX_FILE_NAME);
+	strncpy(this->_control2Name, other._control2Name, MAX_FILE_NAME);
+	return *this;
+}
+
+TerrainTilePos::TerrainTilePos()
+	:_chunkX(), _chunkZ(), 
+	_tileX(), _tileZ(), 
+	_relX(), _relZ()
+{
+}
+
+TerrainTilePos::TerrainTilePos(const TerrainTilePos & other)
+	:_chunkX(other._chunkX), _chunkZ(other._chunkZ), 
+	_tileX(other._tileX), _tileZ(other._tileZ), 
+	_relX(other._relX), _relZ(other._relZ)
+{
+}
+
+TerrainTilePos & TerrainTilePos::operator=(const TerrainTilePos & other)
+{
+	_chunkX = other._chunkX;
+	_chunkZ = other._chunkZ;
+	_tileX = other._tileX;
+	_tileZ = other._tileZ;
+	_relX = other._relX;
+	_relZ = other._relZ;
 	return *this;
 }

@@ -1,6 +1,5 @@
 #include "stdafx.h"
 #include "Bat.h"
-#include "BatStates.h"
 
 Bat::Bat()
 {
@@ -52,8 +51,9 @@ bool Bat::CreateFromWorld(World & world, const Vector3 &Pos)
 	collision._boundingSphere._localCenter = pAnimation->_pSkinnedMesh->_boundInfo._center;
 	collision._boundingSphere._radius = pAnimation->_pSkinnedMesh->_boundInfo._radius;
 	collision._locked = false;
-	collision._isTrigger = false;;
+	collision._isTrigger = true;
 	collision._triggerType = CollisionComponent::TRIGGER_TYPE_ENEMY;
+	collision._type = CollisionComponent::COLLISION_TYPE_OBB;
 
 	ScriptComponent &scriptComponent = _entity.AddComponent<ScriptComponent>();
 	scriptComponent.SetScript(MAKE_SCRIPT_DELEGATE(Bat, Update, *this));
@@ -69,20 +69,7 @@ bool Bat::CreateFromWorld(World & world, const Vector3 &Pos)
 
 	_entity.Activate();
 
-	_pStateMachine = new BatStateMachine;
-	_pStateMachine->Init(this);
-	_pStateMachine->RegisterState(META_TYPE(BatIdleState)->Name(), new BatIdleState());
-	_pStateMachine->RegisterState(META_TYPE(BatMoveState)->Name(), new BatMoveState());
-	_pStateMachine->RegisterState(META_TYPE(BatAttackState)->Name(), new BatAttackState());
-	_pStateMachine->RegisterState(META_TYPE(BatAttack2State)->Name(), new BatAttack2State());
-	_pStateMachine->RegisterState(META_TYPE(BatAttack3State)->Name(), new BatAttack3State());
-	_pStateMachine->RegisterState(META_TYPE(BatFindState)->Name(), new BatFindState());
-	_pStateMachine->RegisterState(META_TYPE(BatHurt1State)->Name(), new BatHurt1State());
-	_pStateMachine->RegisterState(META_TYPE(BatHurt2State)->Name(), new BatHurt2State());
-	_pStateMachine->RegisterState(META_TYPE(BatDeadState)->Name(), new BatDeadState());
-	_pStateMachine->ChangeState(META_TYPE(BatIdleState)->Name());
-
-	_state = BATSTATE_IDLE;;
+	_state = BATSTATE_IDLE;
 
 	_speed = 4.0f;
 	_rotateSpeed = D3DX_PI / 64;
@@ -90,13 +77,12 @@ bool Bat::CreateFromWorld(World & world, const Vector3 &Pos)
 
 	this->PatrolSet(rand() % 3, transComp.GetWorldPosition(), 5.0f);
 
-	for (int i = 0; i < _moveSegment.size(); i++)
+	for (uint32 i = 0; i < _moveSegment.size(); i++)
 	{
 		_moveSegment[i].y++;
 	}
 
-
-	_delayTime = 180.0f;
+	_delayTime = 180;
 	_delayCount = _delayTime;
 
 	_findDistance = 3.0f;
@@ -112,15 +98,16 @@ bool Bat::CreateFromWorld(World & world, const Vector3 &Pos)
 	switch (_skinType)
 	{
 	case BATSKINSTATE_RED:
-		_atkRange = 1.5f;
+		_atkRange = 1.0f;
 		break;
 	case BATSKINSTATE_BLACK:
-		_atkRange = 2.0f;
+		_atkRange = 1.3f;
 		break;
 	case BATSKINSTATE_GOLD:
-		_atkRange = 2.5f;
+		_atkRange = 1.3f;
 		break;
 	}
+
 	_atkTime = 80;
 	_atkTime2 = 172;
 	_atkTime3 = 100;
@@ -134,8 +121,14 @@ bool Bat::CreateFromWorld(World & world, const Vector3 &Pos)
 
 	_hp = 500;
 
+	_isHurt = false;
+	_unBeatableTime = 15;
+	_unBeatableCount = _unBeatableTime;
+
 	//이벤트 등록
 	EventChannel channel;
+	channel.Broadcast<GameObjectFactory::ObjectCreatedEvent>(
+		GameObjectFactory::ObjectCreatedEvent(ARCHE_BAT, _entity, transComp.GetWorldPosition()));
 	channel.Add<CollisionSystem::ActorTriggerEvent, Bat>(*this);
 	setEvent();
 	return true;
@@ -143,7 +136,6 @@ bool Bat::CreateFromWorld(World & world, const Vector3 &Pos)
 
 void Bat::Update(float deltaTime)
 {
-	_pStateMachine->Update(deltaTime, _currentCommand);
 	_playerPos.y += 1.0f;
 	TransformComponent &transComp = _entity.GetComponent<TransformComponent>();
 	switch (_state)
@@ -154,13 +146,13 @@ void Bat::Update(float deltaTime)
 		{
 			_delayCount = _delayTime;
 			_state = BATSTATE_PATROL;
-			_pStateMachine->ChangeState(META_TYPE(BatMoveState)->Name());
+			this->QueueAction(BAT_ANIM(BAT_FORWARD));
 		}
 		break;
 	case BATSTATE_PATROL:
 		if (_moveSegment.empty())
 		{
-			_pStateMachine->ChangeState(META_TYPE(BatIdleState)->Name());
+			this->QueueAction(BAT_ANIM(BAT_IDLE));
 			_state = BATSTATE_IDLE;
 		}
 		else
@@ -176,6 +168,8 @@ void Bat::Update(float deltaTime)
 			Vec3Normalize(&rotateDir, &rotateDir);
 			float distRadian = acos(
 				ClampMinusOnePlusOne(Vec3Dot(&-rotateDir, &transComp.GetForward())));
+
+			//NOTE hyun : 여기서 이걸 해 주는 이유가 뭘까??
 			if (distRadian > D3DX_PI) D3DX_PI * 2 - distRadian;
 			if (distRadian > _rotateSpeed)
 			{
@@ -190,7 +184,7 @@ void Bat::Update(float deltaTime)
 				_patrolIndex++;
 				if (_patrolIndex > _moveSegment.size() - 1) _patrolIndex = 0;
 				//IDLE 애니메이션 실행
-				_pStateMachine->ChangeState(META_TYPE(BatIdleState)->Name());
+				this->QueueAction(BAT_ANIM(BAT_IDLE));
 				_state = BATSTATE_IDLE;
 			}
 			//아니면 이동속도만큼 이동
@@ -208,7 +202,7 @@ void Bat::Update(float deltaTime)
 		{
 			_roarCount = _roarTime;
 			_state = BATSTATE_RUN;
-			_pStateMachine->ChangeState(META_TYPE(BatMoveState)->Name());
+			this->QueueAction(BAT_ANIM(BAT_FORWARD));
 		}
 		break;
 	case BATSTATE_RUN:
@@ -228,15 +222,15 @@ void Bat::Update(float deltaTime)
 			{
 			case BATSKINSTATE_RED:
 				_state = BATSTATE_ATK1;
-				_pStateMachine->ChangeState(META_TYPE(BatAttackState)->Name());
+				this->QueueAction(BAT_ANIM(BAT_ATTACK1));
 				break;
 			case BATSKINSTATE_BLACK:
 				_state = BATSTATE_ATK2;
-				_pStateMachine->ChangeState(META_TYPE(BatAttack2State)->Name());
+				this->QueueAction(BAT_ANIM(BAT_ATTACK2));
 				break;
 			case BATSKINSTATE_GOLD:
 				_state = BATSTATE_ATK3;
-				_pStateMachine->ChangeState(META_TYPE(BatAttack3State)->Name());
+				this->QueueAction(BAT_ANIM(BAT_ATTACK3));
 				break;
 			}
 		}
@@ -248,6 +242,13 @@ void Bat::Update(float deltaTime)
 	break;
 	case BATSTATE_ATK1:
 		_atkCount--;
+		if (_atkCount == 50)
+		{
+			Vector3 targetPos = transComp.GetWorldPosition() - transComp.GetForward();
+			EventChannel _channel;
+			_channel.Broadcast<GameObjectFactory::DamageBoxEvent>(GameObjectFactory::DamageBoxEvent(targetPos,
+				Vector3(_atkRange * 0.5f, _atkRange * 0.5f, _atkRange * 0.5f), 10.0f, CollisionComponent::TRIGGER_TYPE_ENEMY_DMGBOX, 0.0f, 0.0f, 1.0f));
+		}
 		if (_atkCount < 0)
 		{
 			_atkCount = _atkTime2;
@@ -261,12 +262,19 @@ void Bat::Update(float deltaTime)
 				//배틀을 멈추고 기본자세 (다시추적시작)
 				_battle = false;
 				_state = BATSTATE_IDLE;
-				_pStateMachine->ChangeState(META_TYPE(BatIdleState)->Name());
+				this->QueueAction(BAT_ANIM(BAT_IDLE));
 			}
 		}
 		break;
 	case BATSTATE_ATK2:
 		_atkCount--;
+		if (_atkCount == 50)
+		{
+			Vector3 targetPos = transComp.GetWorldPosition() - transComp.GetForward();
+			EventChannel _channel;
+			_channel.Broadcast<GameObjectFactory::DamageBoxEvent>(GameObjectFactory::DamageBoxEvent(targetPos,
+				Vector3(_atkRange * 0.5f, _atkRange * 0.5f, _atkRange * 0.5f), 10.0f, CollisionComponent::TRIGGER_TYPE_ENEMY_DMGBOX, 0.0f, 0.0f, 1.0f));
+		}
 		if (_atkCount < 0)
 		{
 			_atkCount = _atkTime3;
@@ -280,12 +288,19 @@ void Bat::Update(float deltaTime)
 				//배틀을 멈추고 기본자세 (다시추적시작)
 				_battle = false;
 				_state = BATSTATE_IDLE;
-				_pStateMachine->ChangeState(META_TYPE(BatIdleState)->Name());
+				this->QueueAction(BAT_ANIM(BAT_IDLE));
 			}
 		}
 		break;
 	case BATSTATE_ATK3:
 		_atkCount--;
+		if (_atkCount == 40)
+		{
+			Vector3 targetPos = transComp.GetWorldPosition() - transComp.GetForward();
+			EventChannel _channel;
+			_channel.Broadcast<GameObjectFactory::DamageBoxEvent>(GameObjectFactory::DamageBoxEvent(targetPos,
+				Vector3(_atkRange * 0.5f, _atkRange * 0.5f, _atkRange * 0.5f), 10.0f, CollisionComponent::TRIGGER_TYPE_ENEMY_DMGBOX, 0.0f, 0.0f, 1.0f));
+		}
 		if (_atkCount < 0)
 		{
 			_atkCount = _atkTime;
@@ -299,7 +314,7 @@ void Bat::Update(float deltaTime)
 				//배틀을 멈추고 기본자세 (다시추적시작)
 				_battle = false;
 				_state = BATSTATE_IDLE;
-				_pStateMachine->ChangeState(META_TYPE(BatIdleState)->Name());
+				this->QueueAction(BAT_ANIM(BAT_IDLE));
 			}
 		}
 		break;
@@ -315,7 +330,7 @@ void Bat::Update(float deltaTime)
 			if (distance < _atkRange)
 			{
 				_state = BATSTATE_ATK1;
-				_pStateMachine->ChangeState(META_TYPE(BatAttackState)->Name());
+				this->QueueAction(BAT_ANIM(BAT_ATTACK1));
 			}
 			else
 			{
@@ -323,7 +338,7 @@ void Bat::Update(float deltaTime)
 				if (_battle)
 				{
 					_state = BATSTATE_RUN;
-					_pStateMachine->ChangeState(META_TYPE(BatMoveState)->Name());
+					this->QueueAction(BAT_ANIM(BAT_FORWARD));
 				}
 				//비전투인데 맞았다?
 				else
@@ -331,7 +346,7 @@ void Bat::Update(float deltaTime)
 					// 추격
 					_battle = true;
 					_state = BATSTATE_FIND;
-					_pStateMachine->ChangeState(META_TYPE(BatIdleState)->Name());
+					this->QueueAction(BAT_ANIM(BAT_IDLE));
 					Vector3 distance = _playerPos - transComp.GetWorldPosition();
 					Vec3Normalize(&distance, &distance);
 					transComp.LookDirection(-distance, D3DX_PI * 2);
@@ -350,7 +365,7 @@ void Bat::Update(float deltaTime)
 			//찾으면 FIND가 되며 battle상태가 
 			_battle = true;
 			_state = BATSTATE_FIND;
-			_pStateMachine->ChangeState(META_TYPE(BatFindState)->Name());
+			this->QueueAction(BAT_ANIM(BAT_ROAR));
 			Vector3 rotatePos = _playerPos;
 			rotatePos.y = transComp.GetWorldPosition().y;
 			Vector3 distance = rotatePos - transComp.GetWorldPosition();
@@ -359,37 +374,77 @@ void Bat::Update(float deltaTime)
 		}
 	}
 	transComp.SetWorldPosition(transComp.GetWorldPosition().x, TERRAIN->GetHeight(transComp.GetWorldPosition().x, transComp.GetWorldPosition().z)+1.0f, transComp.GetWorldPosition().z);
+
+	_prevTilePos = _tilePos;
+	TERRAIN->ConvertWorldPostoTilePos(transComp.GetWorldPosition(), &_tilePos);
+	RepositionEntity(_tilePos, _prevTilePos);
+
+	if (_isHurt)
+	{
+		_unBeatableCount--;
+		if (_unBeatableCount < 0)
+		{
+			_unBeatableCount = _unBeatableTime;
+			_isHurt = false;
+		}
+	}
+
+	if (_isDie)
+	{
+		_dieCount--;
+		if (_dieCount <= 0)
+		{
+			this->_valid = false;
+			EventChannel channel;
+			TERRAIN->RemoveEntityInTile(_entity, _tilePos);
+			channel.Broadcast<IScene::SceneDirty>(IScene::SceneDirty());
+		}
+	}
 }
 
 void Bat::Handle(const CollisionSystem::ActorTriggerEvent & event)
 {
-	if (event._entity1 != _entity)
+	if (event._entity2 != _entity)
 	{
 		return;
 	}
-	CollisionComponent & _collision = event._entity2.GetComponent<CollisionComponent>();
+	CollisionComponent & _collision = event._entity1.GetComponent<CollisionComponent>();
 	switch (_collision._triggerType)
 	{
-		//플레이어와 충돌했다(내가 가해자)
+		//플레이어와 충돌했다(내가 피해자)
 	case CollisionComponent::TRIGGER_TYPE_PLAYER:
-		if (_state != BATSTATE_HURT&&_state != BATSTATE_DEATH)
-		{
-			resetAllCount();
-			_state = BATSTATE_HURT;
-			_pStateMachine->ChangeState(META_TYPE(BatHurt1State)->Name());
-			_battle = true;
-			_hp -= 50;
-			if (_hp <= 0)
-			{
-				_state = BATSTATE_DEATH;
-				_pStateMachine->ChangeState(META_TYPE(BatDeadState)->Name());
-			}
-		}
 		break;
 		//오브젝트와 충돌했다
 	case CollisionComponent::TRIGGER_TYPE_OBJECT:
 		break;
-	case CollisionComponent::TRIGGER_TYPE_DEFAULT:
+		//플레이어의 공격과 충돌했다
+	case CollisionComponent::TRIGGER_TYPE_PLAYER_DMGBOX:
+		if (_isDie) break;
+
+		if (!_isHurt)
+		{
+			if (_state != BATSTATE_HURT&&_state != BATSTATE_DEATH)
+			{
+				Console::Log("tatata\n");
+				resetAllCount();
+				_state = BATSTATE_HURT;
+				this->QueueAction(BAT_ANIM(BAT_HIT1));
+				_collision._valid = false;
+				_battle = true;
+				_hp -= _collision._dmg;
+				if (_hp <= 0)
+				{
+					_state = BATSTATE_DEATH;
+					this->QueueAction(BAT_ANIM(BAT_DEATH));
+					_isDie = true;
+				}
+			}
+			_isHurt = true;
+			_collision._valid = false;
+			EventChannel channel;
+			channel.Broadcast<GameObjectFactory::CreateBlood>(
+				GameObjectFactory::CreateBlood(_playerSwordPos));
+		}
 		break;
 	}
 }
@@ -399,24 +454,26 @@ void Bat::SetupCallbackAndCompression()
 	ActionComponent &refActionComp = _entity.GetComponent<ActionComponent>();
 	TransformComponent &refTransform = _entity.GetComponent<TransformComponent>();
 
-	ID3DXAnimationController *pController = refActionComp._pAnimationController;
-	uint32 numAnimationSet = pController->GetNumAnimationSets();
-	ID3DXKeyframedAnimationSet *anim0;
+	//ID3DXAnimationController *pController = refActionComp._pAnimationController;
+	//uint32 numAnimationSet = pController->GetNumAnimationSets();
+	//ID3DXKeyframedAnimationSet *anim0;
 
-	pController->GetAnimationSetByName(BatAnimationString[BAT_ANIMATION_ENUM::BAT_IDLE], (ID3DXAnimationSet **)&anim0);
+	//pController->GetAnimationSetByName(BatAnimationString[BAT_ANIMATION_ENUM::BAT_IDLE], (ID3DXAnimationSet **)&anim0);
 
-	_callbackData._animtionEnum = (BAT_ANIMATION_ENUM *)&_animationEnum;
+	//_callbackData._animtionEnum = (BAT_ANIMATION_ENUM *)&_animationEnum;
 
-	D3DXKEY_CALLBACK warSwingLeftKeys;
-	warSwingLeftKeys.Time = anim0->GetPeriod() / 1.0f * anim0->GetSourceTicksPerSecond();
-	warSwingLeftKeys.pCallbackData = (void *)&_callbackData;
+	//D3DXKEY_CALLBACK warSwingLeftKeys;
+	//warSwingLeftKeys.Time = (float)anim0->GetPeriod() / 1.0f * (float)anim0->GetSourceTicksPerSecond();
+	//warSwingLeftKeys.pCallbackData = (void *)&_callbackData;
 
-	AddCallbackKeysAndCompress(pController, anim0, 1, &warSwingLeftKeys, D3DXCOMPRESS_DEFAULT, 0.1f);
+	//AddCallbackKeysAndCompress(pController, anim0, 1, &warSwingLeftKeys, D3DXCOMPRESS_DEFAULT, 0.1f);
 }
 
-void Bat::QueueAction(const Action & action)
+void Bat::QueueAction(Action & action, bool cancle )
 {
+	action._cancle = cancle;
 	_pActionComp->_actionQueue.PushAction(action);
+	_animationEnum = action._enum;
 }
 
 bool Bat::findPlayer(Vector3 forward, Vector3 playerPos, Vector3 myPos, float range1, float range2, float findRadian)

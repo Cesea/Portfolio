@@ -9,6 +9,8 @@ void GameObjectFactory::Init()
 	_channel.Add<GameObjectFactory::CreateObjectOnClickEvent, GameObjectFactory>(*this);
 	_channel.Add<GameObjectFactory::CreateObjectOnLocationEvent, GameObjectFactory>(*this);
 	_channel.Add<GameObjectFactory::CreateObjectFromSaveInfoEvent, GameObjectFactory>(*this);
+	_channel.Add<GameObjectFactory::DamageBoxEvent, GameObjectFactory>(*this);
+	_channel.Add<GameObjectFactory::CreateBlood, GameObjectFactory>(*this);
 }
 
 void GameObjectFactory::Release()
@@ -16,12 +18,17 @@ void GameObjectFactory::Release()
 	_channel.Remove<GameObjectFactory::CreateObjectOnClickEvent, GameObjectFactory>(*this);
 	_channel.Remove<GameObjectFactory::CreateObjectOnLocationEvent, GameObjectFactory>(*this);
 	_channel.Remove<GameObjectFactory::CreateObjectFromSaveInfoEvent, GameObjectFactory>(*this);
+	_channel.Remove<GameObjectFactory::DamageBoxEvent, GameObjectFactory>(*this);
+	_channel.Remove<GameObjectFactory::CreateBlood, GameObjectFactory>(*this);
 	_pCurrentScene = nullptr;
 	_pPlayer = nullptr;
 }
 
-//NOTE : ¿ÀºêÁ§Æ®¸¦ »ý¼ºÇÏ¸é ObjectCreated Event¸¦ ¹ß»ý½ÃÅ²´Ù
-void GameObjectFactory::CreateObject(ARCHE_TYPE type, ResourceHandle handle, const Vector3 & position)
+void GameObjectFactory::CreateObject(ARCHE_TYPE type, 
+	ResourceHandle handle, 
+	const Vector3 & position, 
+	const Vector3 & scale, 
+	const Vector3 & orientation)
 {
 	switch (type)
 	{
@@ -31,11 +38,12 @@ void GameObjectFactory::CreateObject(ARCHE_TYPE type, ResourceHandle handle, con
 
 		TransformComponent &transform = entity.AddComponent<TransformComponent>();
 		transform._position = position;
+		transform.SetScale(scale);
+		transform.SetRotateWorld(Quaternion(orientation.x, orientation.y, orientation.z, 1.0f));
+
 		RenderComponent &render = entity.AddComponent<RenderComponent>();
 		render._type = RenderComponent::Type::eStatic;
 		render._arche = ARCHE_ROCK;
-
-		TERRAIN->AddEntityToSection(entity, position);
 
 		video::StaticXMeshHandle meshHandle;
 		meshHandle.count = handle.count;
@@ -52,7 +60,7 @@ void GameObjectFactory::CreateObject(ARCHE_TYPE type, ResourceHandle handle, con
 		collision._locked = true;
 		collision._triggerType = CollisionComponent::TRIGGER_TYPE_OBJECT;
 
-		entity.Activate();
+		//entity.Activate();
 		_channel.Broadcast<GameObjectFactory::ObjectCreatedEvent>(
 			ObjectCreatedEvent(ARCHE_ROCK, entity, transform.GetWorldPosition()));
 
@@ -63,8 +71,8 @@ void GameObjectFactory::CreateObject(ARCHE_TYPE type, ResourceHandle handle, con
 
 		TransformComponent &transform = entity.AddComponent<TransformComponent>();
 		transform._position = position;
-
-		TERRAIN->AddEntityToSection(entity, position);
+		transform.SetScale(scale);
+		transform.SetRotateWorld(Quaternion(orientation.x, orientation.y, orientation.z, 1.0f));
 
 		RenderComponent &render = entity.AddComponent<RenderComponent>();
 		render._type = RenderComponent::Type::eStatic;
@@ -84,10 +92,10 @@ void GameObjectFactory::CreateObject(ARCHE_TYPE type, ResourceHandle handle, con
 		collision._boundingSphere._radius = pMesh->_meshBoundInfo._radius;
 		collision._locked = true;
 
-		entity.Activate();
+		//entity.Activate();
 
 		_channel.Broadcast<GameObjectFactory::ObjectCreatedEvent>(
-			ObjectCreatedEvent(ARCHE_ROCK, entity, transform.GetWorldPosition()));
+			ObjectCreatedEvent(ARCHE_TREE, entity, transform.GetWorldPosition()));
 	}break;
 
 	case ARCHE_TREETRUNK :
@@ -96,8 +104,8 @@ void GameObjectFactory::CreateObject(ARCHE_TYPE type, ResourceHandle handle, con
 
 		TransformComponent &transform = entity.AddComponent<TransformComponent>();
 		transform._position = position;
-
-		TERRAIN->AddEntityToSection(entity, position);
+		transform.SetScale(scale);
+		transform.SetRotateWorld(Quaternion(orientation.x, orientation.y, orientation.z, 1.0f));
 
 		RenderComponent &render = entity.AddComponent<RenderComponent>();
 		render._type = RenderComponent::Type::eStatic;
@@ -117,8 +125,8 @@ void GameObjectFactory::CreateObject(ARCHE_TYPE type, ResourceHandle handle, con
 		collision._boundingSphere._radius = pMesh->_meshBoundInfo._radius;
 		collision._locked = true;
 
-		entity.Activate();
-
+		_channel.Broadcast<GameObjectFactory::ObjectCreatedEvent>(
+			ObjectCreatedEvent(ARCHE_TREETRUNK, entity, transform.GetWorldPosition()));
 	}break;
 
 	case ARCHE_GRASS:
@@ -127,8 +135,8 @@ void GameObjectFactory::CreateObject(ARCHE_TYPE type, ResourceHandle handle, con
 
 		TransformComponent &transform = entity.AddComponent<TransformComponent>();
 		transform._position = position;
-
-		TERRAIN->AddEntityToSection(entity, position);
+		transform.SetScale(scale);
+		transform.SetRotateWorld(Quaternion(orientation.x, orientation.y, orientation.z, 1.0f));
 
 		RenderComponent &render = entity.AddComponent<RenderComponent>();
 		render._type = RenderComponent::Type::eStatic;
@@ -142,13 +150,15 @@ void GameObjectFactory::CreateObject(ARCHE_TYPE type, ResourceHandle handle, con
 
 		video::StaticXMesh *pMesh = VIDEO->GetStaticXMesh(render._static);
 
-		CollisionComponent &collision = entity.AddComponent<CollisionComponent>();
-		collision._boundingBox.Init(pMesh->_meshBoundInfo._min, pMesh->_meshBoundInfo._max);
-		collision._boundingSphere._localCenter = pMesh->_meshBoundInfo._center;
-		collision._boundingSphere._radius = pMesh->_meshBoundInfo._radius;
-		collision._locked = true;
+		//CollisionComponent &collision = entity.AddComponent<CollisionComponent>();
+		//collision._boundingBox.Init(pMesh->_meshBoundInfo._min, pMesh->_meshBoundInfo._max);
+		//collision._boundingSphere._localCenter = pMesh->_meshBoundInfo._center;
+		//collision._boundingSphere._radius = pMesh->_meshBoundInfo._radius;
+		//collision._type = CollisionComponent::COLLISION_TYPE_BOX;
+		//collision._locked = true;
 
-		entity.Activate();
+		_channel.Broadcast<GameObjectFactory::ObjectCreatedEvent>(
+			ObjectCreatedEvent(ARCHE_GRASS, entity, transform.GetWorldPosition()));
 	}break;
 
 	case ARCHE_MUSHROOM :
@@ -157,8 +167,8 @@ void GameObjectFactory::CreateObject(ARCHE_TYPE type, ResourceHandle handle, con
 
 		TransformComponent &transform = entity.AddComponent<TransformComponent>();
 		transform._position = position;
-
-		TERRAIN->AddEntityToSection(entity, position);
+		transform.SetScale(scale);
+		transform.SetRotateWorld(Quaternion(orientation.x, orientation.y, orientation.z, 1.0f));
 
 		RenderComponent &render = entity.AddComponent<RenderComponent>();
 		render._type = RenderComponent::Type::eStatic;
@@ -176,63 +186,88 @@ void GameObjectFactory::CreateObject(ARCHE_TYPE type, ResourceHandle handle, con
 		collision._boundingBox.Init(pMesh->_meshBoundInfo._min, pMesh->_meshBoundInfo._max);
 		collision._boundingSphere._localCenter = pMesh->_meshBoundInfo._center;
 		collision._boundingSphere._radius = pMesh->_meshBoundInfo._radius;
+		collision._type = CollisionComponent::COLLISION_TYPE_BOX;
 		collision._locked = true;
 
-		entity.Activate();
+		//entity.Activate();
+
+		_channel.Broadcast<GameObjectFactory::ObjectCreatedEvent>(
+			ObjectCreatedEvent(ARCHE_MUSHROOM, entity, transform.GetWorldPosition()));
 	}break;
 
 	case ARCHE_HERO :
 	{
-		//NOTE : SetLinkCamera¸¦ ÀÌ·¸°Ô ÇÒ¶§ MultiThreadedLoadingÀ» ÇÒ¶§ ÅÍÁú ¼ö ÀÖ´Ù
+		//NOTE : SetLinkCameraë¥¼ ì´ë ‡ê²Œ í• ë•Œ MultiThreadedLoadingì„ í• ë•Œ í„°ì§ˆ ìˆ˜ ìžˆë‹¤
 		Player* _player = new Player();
 		_player->SetLinkCamera(&_pCurrentScene->_camera);
 		_pCurrentScene->_gameObjects.push_back(_player);
 		BaseGameObject *pBack = _pCurrentScene->_gameObjects.back();
-		pBack->CreateFromWorld(_pCurrentScene->_world,Vector3(0,0,0));
-		//NOTE : ¿©±â¼­ ÇÃ·¹ÀÌ¾îÀÇ Æ÷ÀÎÅÍ¸¦ ÀúÀåÇÏ°í´Â ÀÖÁö¸¸, ³ªÁß¿¡´Â Å°°ªÀ¸·Î Ã£À» ¼ö ÀÖ°Ô²û ¹Ù²ã¾ß ÇÑ´Ù...
+		pBack->CreateFromWorld(_pCurrentScene->_world, position);
+		//NOTE : ì—¬ê¸°ì„œ í”Œë ˆì´ì–´ì˜ í¬ì¸í„°ë¥¼ ì €ìž¥í•˜ê³ ëŠ” ìžˆì§€ë§Œ, ë‚˜ì¤‘ì—ëŠ” í‚¤ê°’ìœ¼ë¡œ ì°¾ì„ ìˆ˜ ìžˆê²Œë” ë°”ê¿”ì•¼ í•œë‹¤...
 		_pPlayer = pBack;
-	}break;
 
+		TerrainTilePos tilePos;
+		TERRAIN->ConvertWorldPostoTilePos(position, &tilePos);
+		std::vector<int32> &activeChunks = TERRAIN->GetActiveTerrainChunkIndices();
+		int32 minX = tilePos._chunkX - 1;
+		int32 maxX = tilePos._chunkX + 1;
+		int32 minZ = tilePos._chunkZ - 1;
+		int32 maxZ = tilePos._chunkZ + 1;
+
+		ClampInt(minX, 0, TERRAIN->GetXChunkCount() - 1);
+		ClampInt(maxX, 0, TERRAIN->GetXChunkCount() - 1);
+		ClampInt(minZ, 0, TERRAIN->GetZChunkCount() - 1);
+		ClampInt(maxZ, 0, TERRAIN->GetZChunkCount() - 1);
+
+		for (int32 z = minZ; z <= maxZ; ++z)
+		{
+			for (int32 x = minX; x <= maxX; ++x)
+			{
+				activeChunks.push_back(Index2D(x, z, TERRAIN->GetXChunkCount()));
+			}
+		}
+	}break;
 	case ARCHE_BAT :
 	{
 		_pCurrentScene->_gameObjects.push_back(new Bat());
 		BaseGameObject *pBack = _pCurrentScene->_gameObjects.back();
 		pBack->CreateFromWorld(_pCurrentScene->_world, position);
-	}break;
 
+	}break;
 	case ARCHE_CAT :
 	{
 		_pCurrentScene->_gameObjects.push_back(new Cat());
 		BaseGameObject *pBack = _pCurrentScene->_gameObjects.back();
 		pBack->CreateFromWorld(_pCurrentScene->_world, position);
-	}break;
 
+	}break;
 	case ARCHE_LIZARD:
 	{
 		_pCurrentScene->_gameObjects.push_back(new Lizard());
 		BaseGameObject *pBack = _pCurrentScene->_gameObjects.back();
 		pBack->CreateFromWorld(_pCurrentScene->_world, position);
-	}break;
 
+	}break;
 	case ARCHE_SNAKE:
 	{
 		_pCurrentScene->_gameObjects.push_back(new Snake());
 		BaseGameObject *pBack = _pCurrentScene->_gameObjects.back();
 		pBack->CreateFromWorld(_pCurrentScene->_world, position);
-	}break;
 
+	}break;
 	case ARCHE_TURTLE :
 	{
 		_pCurrentScene->_gameObjects.push_back(new Turtle());
 		BaseGameObject *pBack = _pCurrentScene->_gameObjects.back();
 		pBack->CreateFromWorld(_pCurrentScene->_world, position);
-	}break;
 
+	}break;
 	case ARCHE_HYDRA :
 	{
 		_pCurrentScene->_gameObjects.push_back(new Hydra());
 		BaseGameObject *pBack = _pCurrentScene->_gameObjects.back();
 		pBack->CreateFromWorld(_pCurrentScene->_world, position);
+
 	}break;
 	}
 }
@@ -248,16 +283,22 @@ void GameObjectFactory::Handle(const CreateObjectOnClickEvent & event)
 	Ray ray;
 	_pCurrentScene->_camera.ComputeRay(event._cursorPos, &ray);
 
+	Vector3 randomScale(event._scale, event._scale, event._scale);
+	Vector3 randomYOrientation(0.0f, event._yRotation, 0.0f);
+
 	if (TERRAIN->IsIntersectRay(ray, &terrainHitPos))
 	{
-		CreateObject(event._type, event._handle, terrainHitPos);
+		CreateObject(event._type, event._handle, terrainHitPos, 
+			randomScale, randomYOrientation);
 	}
 
 }
 
 void GameObjectFactory::Handle(const CreateObjectOnLocationEvent & event)
 {
-	CreateObject(event._type, event._handle, event._position);
+	Vector3 position = event._position;
+	position.y = TERRAIN->GetHeight(position.x, position.z);
+	CreateObject(event._type, event._handle, position);
 }
 
 void GameObjectFactory::Handle(const CreateObjectFromSaveInfoEvent & event)
@@ -313,6 +354,57 @@ void GameObjectFactory::Handle(const CreateObjectFromSaveInfoEvent & event)
 		CreateObject(ARCHE_HYDRA, ResourceHandle(), event._position);
 	}break;
 	}
+}
+
+void GameObjectFactory::Handle(const DamageBoxEvent & event)
+{
+	_pCurrentScene->_gameObjects.push_back(new DamageBox());
+	BaseGameObject *pBack = _pCurrentScene->_gameObjects.back();
+
+	pBack->CreateFromWorld(_pCurrentScene->_world, event._position);
+
+	//ì´ë²¤íŠ¸ì„¤ì •
+	Entity _entity = pBack->GetEntity();
+	CollisionComponent & collision = _entity.GetComponent<CollisionComponent>();
+	collision._boundingBox.Init(-event._size, event._size);
+	collision._accel = event._accel;
+	collision._dmg = event._dmg;
+	collision._velocity = event._velocity;
+	collision._triggerType = event._type;
+	collision._duration = event._duration;
+}
+
+void GameObjectFactory::Handle(const CreateBlood & event)
+{
+	Entity &entity = _pCurrentScene->_world.CreateEntity();
+
+	TransformComponent &transform = entity.AddComponent<TransformComponent>();
+	transform._position = event._pos;
+
+	ParticleComponent &particle = entity.AddComponent<ParticleComponent>();
+	particle.min = Vector3(-0.1f, -0.1f, -0.1f);
+	particle.max = Vector3(0.1f, 0.1f, 0.1f);
+	particle.isEmission = true;
+	particle.duration = 0.5f;
+	particle.delay = 0.0f;
+	particle.init(ParticleComponent::PARTICLE_TYPE_BLOOD_FOG, 1500, 0.005f, Vector3(1, 0, 0), event._pos+ Vector3(0, 1.0f, 1.0f));
+
+	Entity &entity2 = _pCurrentScene->_world.CreateEntity();
+
+	TransformComponent &transform2 = entity2.AddComponent<TransformComponent>();
+	transform2._position = event._pos;
+
+
+	ParticleComponent &particle2 = entity2.AddComponent<ParticleComponent>();
+	particle2.min = Vector3(-0.1f, -0.1f, -0.1f);
+	particle2.max = Vector3(0.1f, 0.1f, 0.1f);
+	particle.isEmission = true;
+	particle2.duration = 0.5f;
+	particle2.delay = 0.0f;
+	particle2.init(ParticleComponent::PARTICLE_TYPE_BLOOD_PARTICLE, 50, 0.005f, Vector3(1, 0, 0), event._pos+ Vector3(0, 1.0f, 1.0f));
+
+	entity.Activate();
+	entity2.Activate();
 }
 
 const char * ArcheToString(ARCHE_TYPE type)

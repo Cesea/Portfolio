@@ -4,9 +4,7 @@
 #include "WorldEditor.h"
 
 //실질적으로 사용되는 씬들
-#include "BaseScene.h"
 #include "MapToolScene.h"
-#include "GameScene.h"
 #include "TestScene.h"
 
 //로딩 씬들
@@ -87,10 +85,6 @@ bool SceneManager::Init()
 	//기본 베이스 씬 세팅
 	IScene *pScene = new MapToolScene;
 	AddScene(pScene->GetSceneName(), pScene);
-	pScene = new BaseScene;
-	AddScene(pScene->GetSceneName(), pScene);
-	pScene = new GameScene;
-	AddScene(pScene->GetSceneName(), pScene);
 	pScene = new TestScene;
 	AddScene(pScene->GetSceneName(), pScene);
 
@@ -112,6 +106,7 @@ bool SceneManager::Init()
 
 	//시작 씬을 설정한다
 	ChangeScene("MapToolScene");
+	//ChangeScene("TestScene");
 
 	return true;
 }
