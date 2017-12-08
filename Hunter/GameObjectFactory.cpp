@@ -403,7 +403,7 @@ void GameObjectFactory::Handle(const CreateBlood & event)
 	particle.isEmission = true;
 	particle.duration = 0.5f;
 	particle.delay = 0.0f;
-	particle.init(ParticleComponent::PARTICLE_TYPE_BLOOD_FOG, 1500, 0.005f, Vector3(1, 0, 0), event._pos);
+	particle.init(ParticleComponent::PARTICLE_TYPE_BLOOD_FOG, 500, 0.025f, Vector3(1, 0, 0), event._pos);
 
 	Entity &entity2 = _pCurrentScene->_world.CreateEntity();
 
@@ -434,7 +434,7 @@ void GameObjectFactory::Handle(const CreateBreath & event)
 	particle.isEmission = true;
 	particle.duration = 1.0f;
 	particle.delay = 0.0f;
-	particle.init(ParticleComponent::PARTICLE_TYPE_NORMALBREATH, 4500, 0.0025f, event._direction/3, event._pos);
+	particle.init(ParticleComponent::PARTICLE_TYPE_NORMALBREATH, 450, 0.025f, event._direction/3, event._pos);
 
 	entity.Activate();
 }

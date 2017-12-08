@@ -14,7 +14,7 @@ class bloodFog :
 
 		out.lifeTime = RandFloat(1.0f, 2.0f);
 
-		out.initialSize = RandFloat(6.0f, 8.0f);
+		out.initialSize = RandFloat(10.0f, 12.0f);
 
 		Vector3 rndVec = Vector3(RandFloat(-1.0f, 1.0f), RandFloat(-1.0f, 1.0f), RandFloat(-1.0f, 1.0f));
 		D3DXVec3Normalize(&rndVec, &rndVec);
