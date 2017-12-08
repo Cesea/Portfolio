@@ -295,7 +295,7 @@ void video::VideoDevice::LoadDefaultEffects()
 {
 	VIDEO->CreateEffect("../resources/Shaders/StaticMesh.fx", "StaticMesh.fx");
 	VIDEO->CreateEffect("../resources/Shaders/SkinnedMesh.fx", "SkinnedMesh.fx");
-	VIDEO->CreateEffect("../resources/Shaders/terrainBase.fx", "TerrainBase.fx");
+	VIDEO->CreateEffect("../resources/Shaders/TerrainBase.fx", "TerrainBase.fx");
 
 	VIDEO->CreateEffect("../resources/Shaders/EnvironmentSphere.fx", "EnvironmentSphere.fx");
 	VIDEO->CreateEffect("../resources/Shaders/PostEffect.fx", "PostEffect.fx");

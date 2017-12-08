@@ -151,7 +151,7 @@ public:
 	void Destroy();
 
 	void SaveTerrain(const std::string &fileName);
-	void LoadTerrain(const std::string &fileName);
+	void LoadTerrain(const std::string &fileName, bool editMode);
 
 	bool IsIntersectRay(const Ray &ray, Vector3 *pOut);
 

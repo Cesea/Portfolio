@@ -181,9 +181,11 @@ void Terrain::SaveTerrain(const std::string & fileName)
 	VIDEO->SaveTexture(control2, _tileControl2Handle);
 }
 
-void Terrain::LoadTerrain(const std::string & fileName)
+void Terrain::LoadTerrain(const std::string & fileName, bool editMode)
 {
 	DataPackage toLoad;
+
+	_inEditMode = editMode;
 
 	TerrainConfig config;
 

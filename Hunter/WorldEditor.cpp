@@ -397,7 +397,7 @@ void Editor::InTerrainEditMode()
 
 		if (ImguiButton("Load Terrain"))
 		{
-			TERRAIN->LoadTerrain(_terrainEditor._fileName);
+			TERRAIN->LoadTerrain(_terrainEditor._fileName, true);
 		}
 
 		ImguiUnindent();

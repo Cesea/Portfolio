@@ -7,50 +7,72 @@
 UI::UI()
 {
 	_uiOn = true;
-	video::TextureHandle pHpBgHandle = VIDEO->CreateTexture("../resources/Textures/UITexture/LifeOrbBg.png", "../resources/Textures/UITexture/LifeOrbBg.png");
-	_pHpBg = VIDEO->GetTexture(pHpBgHandle);
-	video::TextureHandle pHpHandle = VIDEO->CreateTexture("../resources/Textures/UITexture/LifeOrb.png", "../resources/Textures/UITexture/LifeOrb.png");
-	_pHp = VIDEO->GetTexture(pHpHandle);
 
-	video::TextureHandle pFuryBgHandle = VIDEO->CreateTexture("../resources/Textures/UITexture/FuryBg.png", "../resources/Textures/UITexture/FuryBg.png");
-	_pFuryBg = VIDEO->GetTexture(pFuryBgHandle);
-	video::TextureHandle pFuryHandle = VIDEO->CreateTexture("../resources/Textures/UITexture/Fury.png", "../resources/Textures/UITexture/Fury.png");
-	_pFury = VIDEO->GetTexture(pFuryHandle);
+	_hpBgHandle = VIDEO->CreateTexture("../resources/Textures/UITexture/LifeOrbBg.png",
+		"../resources/Textures/UITexture/LifeOrbBg.png");
+	_pHpBg = VIDEO->GetTexture(_hpBgHandle);
 
-	video::TextureHandle pMiniMenuHandle = VIDEO->CreateTexture("../resources/Textures/UITexture/miniMenuBg.png", "../resources/Textures/UITexture/miniMenuBg.png");
-	_pMiniMenu = VIDEO->GetTexture(pMiniMenuHandle);
+	_hpHandle = VIDEO->CreateTexture("../resources/Textures/UITexture/LifeOrb.png",
+		"../resources/Textures/UITexture/LifeOrb.png");
+	_pHp = VIDEO->GetTexture(_hpHandle);
 
-	video::TextureHandle pSlotHandle = VIDEO->CreateTexture("../resources/Textures/UITexture/slot.png", "../resources/Textures/UITexture/slot.png");
-	_pSlot = VIDEO->GetTexture(pSlotHandle);
+	_furyBgHandle = VIDEO->CreateTexture("../resources/Textures/UITexture/FuryBg.png", 
+		"../resources/Textures/UITexture/FuryBg.png");
+	_pFuryBg = VIDEO->GetTexture(_furyBgHandle);
 
-	video::TextureHandle pBt1AHandle = VIDEO->CreateTexture("../resources/Textures/UITexture/Bt1_A.png", "../resources/Textures/UITexture/Bt1_A.png");
-	_bt1_A = VIDEO->GetTexture(pBt1AHandle);
-	video::TextureHandle pBt1BHandle = VIDEO->CreateTexture("../resources/Textures/UITexture/Bt1_B.png", "../resources/Textures/UITexture/Bt1_B.png");
-	_bt1_B = VIDEO->GetTexture(pBt1BHandle);
+	_furyHandle = VIDEO->CreateTexture("../resources/Textures/UITexture/Fury.png", 
+		"../resources/Textures/UITexture/Fury.png");
+	_pFury = VIDEO->GetTexture(_furyHandle);
 
-	video::TextureHandle pBt2AHandle = VIDEO->CreateTexture("../resources/Textures/UITexture/Bt2_A.png", "../resources/Textures/UITexture/Bt2_A.png");
-	_bt2_A = VIDEO->GetTexture(pBt2AHandle);
-	video::TextureHandle pBt2BHandle = VIDEO->CreateTexture("../resources/Textures/UITexture/Bt2_B.png", "../resources/Textures/UITexture/Bt2_B.png");
-	_bt2_B = VIDEO->GetTexture(pBt2BHandle);
+	_miniMenuHandle = VIDEO->CreateTexture("../resources/Textures/UITexture/miniMenuBg.png",
+		"../resources/Textures/UITexture/miniMenuBg.png");
+	_pMiniMenu = VIDEO->GetTexture(_miniMenuHandle);
 
-	video::TextureHandle pBt3AHandle = VIDEO->CreateTexture("../resources/Textures/UITexture/Bt3_A.png", "../resources/Textures/UITexture/Bt3_A.png");
-	_bt3_A = VIDEO->GetTexture(pBt3AHandle);
-	video::TextureHandle pBt3BHandle = VIDEO->CreateTexture("../resources/Textures/UITexture/Bt3_B.png", "../resources/Textures/UITexture/Bt3_B.png");
-	_bt3_B = VIDEO->GetTexture(pBt3BHandle);
+	_slotHandle = VIDEO->CreateTexture("../resources/Textures/UITexture/slot.png", 
+		"../resources/Textures/UITexture/slot.png");
+	_pSlot = VIDEO->GetTexture(_slotHandle);
 
-	video::TextureHandle pMush1Handle = VIDEO->CreateTexture("../resources/Textures/UITexture/mush1.png", "../resources/Textures/UITexture/mush1.png");
-	_mush1 = VIDEO->GetTexture(pMush1Handle);
-	video::TextureHandle pMush2Handle = VIDEO->CreateTexture("../resources/Textures/UITexture/mush2.png", "../resources/Textures/UITexture/mush2.png");
-	_mush2 = VIDEO->GetTexture(pMush2Handle);
-	video::TextureHandle pMush3Handle = VIDEO->CreateTexture("../resources/Textures/UITexture/mush3.png", "../resources/Textures/UITexture/mush3.png");
-	_mush3 = VIDEO->GetTexture(pMush3Handle);
+	_bt1AHandle = VIDEO->CreateTexture("../resources/Textures/UITexture/Bt1_A.png", 
+		"../resources/Textures/UITexture/Bt1_A.png");
+	_bt1_A = VIDEO->GetTexture(_bt1AHandle);
 
-	video::TextureHandle pPotion1Handle = VIDEO->CreateTexture("../resources/Textures/UITexture/potion1.png", "../resources/Textures/UITexture/potion1.png");
-	_potion1 = VIDEO->GetTexture(pPotion1Handle);
-	video::TextureHandle pPotion2Handle = VIDEO->CreateTexture("../resources/Textures/UITexture/potion2.png", "../resources/Textures/UITexture/potion2.png");
-	_potion2 = VIDEO->GetTexture(pPotion2Handle);
-	video::TextureHandle pPotion3Handle = VIDEO->CreateTexture("../resources/Textures/UITexture/potion3.png", "../resources/Textures/UITexture/potion3.png");
-	_potion3 = VIDEO->GetTexture(pPotion3Handle);
+	_bt1BHandle = VIDEO->CreateTexture("../resources/Textures/UITexture/Bt1_B.png", 
+		"../resources/Textures/UITexture/Bt1_B.png");
+	_bt1_B = VIDEO->GetTexture(_bt1BHandle);
+
+	_bt2AHandle = VIDEO->CreateTexture("../resources/Textures/UITexture/Bt2_A.png", 
+		"../resources/Textures/UITexture/Bt2_A.png");
+	_bt2_A = VIDEO->GetTexture(_bt2AHandle);
+	_bt2BHandle = VIDEO->CreateTexture("../resources/Textures/UITexture/Bt2_B.png", 
+		"../resources/Textures/UITexture/Bt2_B.png");
+	_bt2_B = VIDEO->GetTexture(_bt2BHandle);
+
+	_bt3AHandle = VIDEO->CreateTexture("../resources/Textures/UITexture/Bt3_A.png",
+		"../resources/Textures/UITexture/Bt3_A.png");
+	_bt3_A = VIDEO->GetTexture(_bt3AHandle);
+	_bt3BHandle = VIDEO->CreateTexture("../resources/Textures/UITexture/Bt3_B.png",
+		"../resources/Textures/UITexture/Bt3_B.png");
+	_bt3_B = VIDEO->GetTexture(_bt3BHandle);
+
+	_mush1Handle = VIDEO->CreateTexture("../resources/Textures/UITexture/mush1.png", 
+		"../resources/Textures/UITexture/mush1.png");
+	_mush1 = VIDEO->GetTexture(_mush1Handle);
+	_mush2Handle = VIDEO->CreateTexture("../resources/Textures/UITexture/mush2.png", 
+		"../resources/Textures/UITexture/mush2.png");
+	_mush2 = VIDEO->GetTexture(_mush2Handle);
+	_mush3Handle = VIDEO->CreateTexture("../resources/Textures/UITexture/mush3.png", 
+		"../resources/Textures/UITexture/mush3.png");
+	_mush3 = VIDEO->GetTexture(_mush3Handle);
+
+	_potion1Handle = VIDEO->CreateTexture("../resources/Textures/UITexture/potion1.png", 
+		"../resources/Textures/UITexture/potion1.png");
+	_potion1 = VIDEO->GetTexture(_potion1Handle);
+	_potion2Handle = VIDEO->CreateTexture("../resources/Textures/UITexture/potion2.png", 
+		"../resources/Textures/UITexture/potion2.png");
+	_potion2 = VIDEO->GetTexture(_potion2Handle);
+	_potion3Handle = VIDEO->CreateTexture("../resources/Textures/UITexture/potion3.png", 
+		"../resources/Textures/UITexture/potion3.png");
+	_potion3 = VIDEO->GetTexture(_potion3Handle);
 
 	_inventory = new Inventory;
 
@@ -75,23 +97,29 @@ UI::UI()
 
 UI::~UI()
 {
+
+	VIDEO->DestroyTexture(_hpBgHandle);
+	VIDEO->DestroyTexture(_furyBgHandle);
+	VIDEO->DestroyTexture(_miniMenuHandle);
+	VIDEO->DestroyTexture(_hpHandle);
+	VIDEO->DestroyTexture(_furyHandle);
+	VIDEO->DestroyTexture(_slotHandle);
+	VIDEO->DestroyTexture(_bt1AHandle);
+	VIDEO->DestroyTexture(_bt1BHandle);
+	VIDEO->DestroyTexture(_bt2AHandle);
+	VIDEO->DestroyTexture(_bt2BHandle);
+	VIDEO->DestroyTexture(_bt3AHandle);
+	VIDEO->DestroyTexture(_bt3BHandle);
+	VIDEO->DestroyTexture(_mush1Handle);
+	VIDEO->DestroyTexture(_mush2Handle);
+	VIDEO->DestroyTexture(_mush3Handle);
+	VIDEO->DestroyTexture(_potion1Handle);
+	VIDEO->DestroyTexture(_potion2Handle);
+	VIDEO->DestroyTexture(_potion3Handle);
 }
 
 void UI::Update(float deltaTime, const InputManager & input)
 {
-	//input.keyboard.IsDown();
-	//input.keyboard.IsPressed();
-	//input.keyboard.IsReleased();
-
-	//input.mouse.GetCurrentPoint();
-
-	//MOUSE_BUTTON_LEFT;
-	//MOUSE_BUTTON_RIGHT;
-	//MOUSE_BUTTON_MIDDLE;
-	//input.mouse.IsDown();
-	//input.mouse.IsReleased();
-	//input.mouse.IsPressed();
-
 	if (_uiOn == true)
 	{
 		POINT _pt;

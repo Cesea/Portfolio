@@ -132,8 +132,6 @@ void LoadEverySkinnedResources2()
 bool TestScene::SceneInit()
 {
 	bool result = true;
-	_channel.Add<Editor::GetObjectFromSceneEvent, TestScene>(*this);
-
 	GAMEOBJECTFACTORY->SetCurrentScene(this);
 
 	video::StaticXMesh::_sEffectHandle = VIDEO->GetEffect("StaticMesh.fx");
@@ -144,24 +142,9 @@ bool TestScene::SceneInit()
 	//터레인 로드
 	Terrain::TerrainConfig config;
 
-	//DataPackage terrainData;
-	//uint32 terrainFileSize = 0;
-	//terrainData.OpenFile("../resources/TestScene/Terrain01.tr", &terrainFileSize);
-	//Assert(terrainFileSize > 0);
-	//terrainData.ReadAs<Terrain::TerrainConfig>(&config);
-
-	//config._xChunkCount = 2;
-	//config._zChunkCount = 2;
-	//strncpy(config._tile0FileName, "../resources/Terrain/TerrainTexture01.jpg", MAX_FILE_NAME);
-	//strncpy(config._tile1FileName, "../resources/Terrain/TerrainTexture02.jpg", MAX_FILE_NAME);
-	//strncpy(config._tile2FileName, "../resources/Terrain/TerrainTexture03.png", MAX_FILE_NAME);
-	//strncpy(config._tile3FileName, "../resources/Terrain/TerrainTexture04.png", MAX_FILE_NAME);
-	//config._textureMult = 200;
-
-
 	TERRAIN->SetScene(this);
 	TERRAIN->Create(config, false);
-	TERRAIN->LoadTerrain("../resources/TestScene/Terrain01.tr");
+	TERRAIN->LoadTerrain("../resources/TestScene/Terrain01.tr", false);
 
 	LoadEveryStaticResources2();
 	LoadEverySkinnedResources2();
@@ -179,6 +162,8 @@ bool TestScene::SceneInit()
 	_camera.GetEntity().GetComponent<TransformComponent>().MovePositionWorld(Vector3(0.0f, 4.0f, -6.0f));
 	_camera.SetTargetObject((Player *)GAMEOBJECTFACTORY->GetPlayerObject());
 
+	_pInGameUI = new UI;
+
 	return result; 
 }
 
@@ -194,6 +179,8 @@ bool TestScene::SceneUpdate(float deltaTime, const InputManager & input)
 	_particleSystem.setCamera(&_camera, _camera.GetEntity().GetComponent<TransformComponent>().GetWorldPosition());
 	_particleSystem.update(deltaTime);
 
+	_pInGameUI->Update(deltaTime, input);
+
 	ReadyShadowMap(TERRAIN);
 
 	return result;
@@ -201,12 +188,8 @@ bool TestScene::SceneUpdate(float deltaTime, const InputManager & input)
 
 bool TestScene::SceneRelease()
 {
-	for (auto object : _gameObjects)
-	{
-		SAFE_DELETE(object);
-	}
-	_gameObjects.clear();
-
+	SAFE_DELETE(_pInGameUI);
+	ReleaseAllGameObjects();
 	_world.Clear();
 
 	return true;
@@ -227,7 +210,16 @@ bool TestScene::SceneRender0()
 	_particleSystem.render();
 	_collisionSystem.render();
 
-	//_editor->Render();
+	return true;
+}
+
+bool TestScene::SceneRenderSprite()
+{
+	SPRITEMANAGER->BeginSpriteRender();
+	_pInGameUI->RenderUI();
+
+
+	SPRITEMANAGER->EndSpriteRender();
 
 	return true;
 }
@@ -235,30 +227,4 @@ bool TestScene::SceneRender0()
 const char * TestScene::GetSceneName()
 {
 	return "TestScene";
-}
-
-void TestScene::Handle(const Editor::GetObjectFromSceneEvent & event)
-{
-	Vector3 position;
-	Vector3 terrainHitPos;
-	Ray ray;
-	_camera.ComputeRay(event._cursorPos, &ray);
-	std::vector<Entity> collidingEntity{};
-	std::vector<float> collidingDistance;
-
-	_collisionSystem.QueryRayEntityHit(ray, &collidingEntity, &collidingDistance);
-	if (collidingEntity.size() > 0)
-	{
-		float minDistance = 9999.0f;
-		int32 minIndex = 0;
-		for (int32 i = 0; i < collidingDistance.size(); ++i)
-		{
-			if (collidingDistance[i] < minDistance)
-			{
-				minDistance = collidingDistance[i];
-				minIndex = i;
-			}
-		}
-		_editor->SetEdittingEntity(collidingEntity[minIndex]);
-	}
 }
