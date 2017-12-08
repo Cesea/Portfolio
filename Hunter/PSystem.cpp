@@ -80,6 +80,7 @@ void PSystem::setCamera(Camera* camera,Vector3 pos)
 
 void PSystem::update(float timeDelta)
 {
+
 	mTime += timeDelta;
 
 	mDeadParticles.resize(0);

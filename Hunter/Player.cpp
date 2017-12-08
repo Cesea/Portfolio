@@ -24,13 +24,7 @@ Player::~Player()
 
 bool Player::CreateFromWorld(World & world, const Vector3 &pos)
 {
-   EventChannel channel;
-   channel.Add<InputManager::KeyDownEvent, Player>(*this);
-   channel.Add<InputManager::KeyReleasedEvent, Player>(*this);
-   channel.Add<InputManager::KeyPressedEvent, Player>(*this);
-   channel.Add<InputManager::MousePressedEvent, Player>(*this);
-
-   channel.Add<CollisionSystem::ActorTriggerEvent, Player>(*this);
+   RegisterEvents();
 
    _entity = world.CreateEntity();
 
@@ -208,22 +202,23 @@ void Player::Update(float deltaTime)
 			   if (_currentCommand._movement._vertical == VERTICAL_MOVEMENT_UP)
 			   {
 				   _state = PLAYERSTATE_MOVE;
-				   //this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWalk));
+				   _pActionComp->MakePrevNull();
+				   this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWalk));
 			   }
 			   else if (_currentCommand._movement._vertical == VERTICAL_MOVEMENT_DOWN)
 			   {
 				   _state = PLAYERSTATE_MOVE;
-				   //this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWarRetreat));
+				   this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWarRetreat));
 			   }
 			   else if (_currentCommand._movement._horizontal == HORIZONTAL_MOVEMENT_LEFT)
 			   {
 				   _state = PLAYERSTATE_MOVE;
-				   //this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWarMovingLeft));
+				   this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWarMovingLeft));
 			   }
 			   else if (_currentCommand._movement._horizontal == HORIZONTAL_MOVEMENT_RIGHT)
 			   {
 				   _state = PLAYERSTATE_MOVE;
-				   //this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWarMovingRight));
+				   this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWarMovingRight));
 			   }
 			   else if (IsMovementNone(_currentCommand._movement))
 			   {
@@ -259,11 +254,33 @@ void Player::Update(float deltaTime)
 	   PlayerImformationEvent(_pTransformComp->GetWorldPosition(), _state, _pTransformComp->GetForward(), _worldSwordPos));
 }
 
+void Player::RegisterEvents()
+{
+	EventChannel channel;
+	channel.Add<InputManager::KeyDownEvent, Player>(*this);
+	channel.Add<InputManager::KeyReleasedEvent, Player>(*this);
+	channel.Add<InputManager::KeyPressedEvent, Player>(*this);
+	channel.Add<InputManager::MousePressedEvent, Player>(*this);
+
+	channel.Add<CollisionSystem::ActorTriggerEvent, Player>(*this);
+}
+
+void Player::UnRegisterEvents()
+{
+	EventChannel channel;
+	channel.Remove<InputManager::KeyDownEvent, Player>(*this);
+	channel.Remove <InputManager::KeyReleasedEvent, Player>(*this);
+	channel.Remove <InputManager::KeyPressedEvent, Player>(*this);
+	channel.Remove <InputManager::MousePressedEvent, Player>(*this);
+
+	channel.Remove <CollisionSystem::ActorTriggerEvent, Player>(*this);
+}
+
 void Player::MoveAndRotate(float deltaTime)
 {
 	float absMinus = absFloat(_targetRotation) - absFloat(_currentRotation);
 
-	if (!FloatZero(absMinus * 0.1f))
+	if (!FloatZero(absMinus * 0.05f))
 	{
 		if (_targetRotation < 0.0f)
 		{

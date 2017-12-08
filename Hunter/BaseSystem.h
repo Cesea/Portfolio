@@ -22,6 +22,9 @@ public:
 
 	const std::vector<Entity>& GetEntities() const;
 
+	void SetRunning(bool32 running) { _running = running; }
+	bool32 GetRunning() { return _running; }
+
 protected :
 
 	virtual void Initialize() {}
@@ -41,6 +44,8 @@ protected :
 
 	std::vector<Entity> _entities;
 	friend World;
+
+	bool32 _running{ true };
 };
 
 #endif

@@ -178,6 +178,16 @@ bool MapToolScene::SceneInit()
 	_editor->Init(this);
 	_editor->_pSelectedObject = GAMEOBJECTFACTORY->GetPlayerObject();
 
+	_scriptSystem.SetRunning(false);
+	_actionSystem.SetRunning(false);
+
+	Player * pPlayer = (Player *)GAMEOBJECTFACTORY->GetPlayerObject();
+	if (!_actionSystem.GetRunning() || 
+		!_scriptSystem.GetRunning())
+	{
+		pPlayer->UnRegisterEvents();
+	}
+
 	//Test
 	for (int32 i = 0; i < 100; ++i)
 	{
@@ -254,14 +264,14 @@ bool MapToolScene::SceneUpdate(float deltaTime, const InputManager & input)
 		}
 	}
 
-	if (input.keyboard.IsPressed('T'))
-	{
-		GAMEOBJECTFACTORY->GetPlayerObject()->GetEntity().Deactivate();
-	}
-	else if(input.keyboard.IsPressed('Y'))
-	{
-		GAMEOBJECTFACTORY->GetPlayerObject()->GetEntity().Activate();
-	}
+	//if (input.keyboard.IsPressed('T'))
+	//{
+	//	GAMEOBJECTFACTORY->GetPlayerObject()->GetEntity().Deactivate();
+	//}
+	//else if(input.keyboard.IsPressed('Y'))
+	//{
+	//	GAMEOBJECTFACTORY->GetPlayerObject()->GetEntity().Activate();
+	//}
 
 	_editor->Edit(RefVariant(), input);
 
@@ -311,7 +321,7 @@ bool MapToolScene::SceneRender0()
 
 	TERRAIN->Render(_camera, *_pMainLight, _camera);
 	_renderSystem.Render(_camera);
-	//_particleSystem.render();
+	_particleSystem.render();
 	_collisionSystem.render();
 	_editor->Render();
 

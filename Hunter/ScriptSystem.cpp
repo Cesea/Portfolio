@@ -11,6 +11,11 @@ ScriptSystem::~ScriptSystem()
 
 void ScriptSystem::Update(float deltaTime)
 {
+	if (!_running)
+	{
+		return;
+	}
+
 	auto &entities = GetEntities();
 	for (uint32 i = 0; i < entities.size(); ++i)
 	{

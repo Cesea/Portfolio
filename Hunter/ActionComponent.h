@@ -73,13 +73,8 @@ public :
 	void UpdateAnimation(float deltaTime);
 	//인덱스로 찾기
 	bool PlayActionImmediate(const Action &action);
-	//void PlayOneShot(const Action &action);
-	//void PlayOneShotAfterHold(const Action &action);
 
-	////문자열로 찾기
-	//void Play(const std::string &animName, float crossFadeTime = 0.0);
-	//void PlayOneShot(const std::string &animName, float inCrossFadeTime = 0.0, float outCrossFadeTime = 0.0f);
-	//void PlayOneShotAfterHold(const std::string &animName, float crossFadeTime = 0.0);
+	void MakePrevNull() { _pPrevPlayingAnimationSet = nullptr; }
 
 
 	void Play( const std::string &animName, float crossFadeTime = 0.0, bool32 blocking = false);

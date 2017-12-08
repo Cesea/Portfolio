@@ -45,6 +45,9 @@ public :
 	virtual bool CreateFromWorld(World &world, const Vector3 &pos);
 	void Update(float deltaTime);
 
+	void RegisterEvents();
+	void UnRegisterEvents();
+
 	void Handle(const InputManager::KeyDownEvent &event);
 	void Handle(const InputManager::KeyReleasedEvent &event);
 	void Handle(const InputManager::KeyPressedEvent &event);

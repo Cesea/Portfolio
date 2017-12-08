@@ -37,6 +37,11 @@ CollisionSystem::~CollisionSystem()
 
 void CollisionSystem::Update(float deltaTime, float checkRange)	
 {
+	if (!_running)
+	{
+		return;
+	}
+
 	auto &entities = GetEntities();
 
 	AABB aabb0;

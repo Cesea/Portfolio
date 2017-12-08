@@ -29,6 +29,11 @@ void RenderSystem::UpdateAnimations(float deltaTime)
 
 void RenderSystem::Render(const Camera &camera)
 {
+	if (!_running)
+	{
+		return;
+	}
+
 	static int32 count = 0;
 	static int32 renderCount = 0;
 
