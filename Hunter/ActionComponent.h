@@ -118,6 +118,8 @@ public :
 
 	AnimationSetVector _animations;
 	AnimationSetTable _animationTable;
+
+	int32 _animationEnum{};
 };
 
 

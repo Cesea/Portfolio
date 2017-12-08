@@ -95,7 +95,7 @@ private :
 	float _walkSpeed{1.6f};
 	float _runSpeed{5.5f};
 
-	float _rotationSpeed{ 7.0f };
+	float _rotationSpeed{ 6.0f };
 
 	int32 _hp{ INT_MAX };
 
@@ -113,6 +113,8 @@ private :
 
 	float _targetRotation{};
 	float _currentRotation{};
+	bool32 _rotating{ false };
+	void RotatePlayer(float angle);
 
 	bool32 _camRotated{false};
 	bool32 _superArmor = true;

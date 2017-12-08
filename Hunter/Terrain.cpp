@@ -1044,7 +1044,7 @@ bool Terrain::CreateTerrainChunk(int32 x, int32 z, const video::TerrainVertex * 
 
 	refChunk._centerX = (refChunk._startX + refChunk._endX) * 0.5f;
 	refChunk._centerZ = (refChunk._startZ + refChunk._endZ) * 0.5f;
-	refChunk._radius = (refChunk._centerX - refChunk._startX) * 1.2f;
+	refChunk._radius = (refChunk._centerX - refChunk._startX) * 1.35f;
 
 	float tileGap = (float)TERRAIN_CHUNK_DIM / (float)TERRAIN_TILE_RES;
 
@@ -1069,7 +1069,7 @@ bool Terrain::CreateTerrainChunk(int32 x, int32 z, const video::TerrainVertex * 
 			refTile._centerX = (refTile._endX + refTile._startX) * 0.5f;
 			refTile._centerZ = (refTile._endZ + refTile._startZ) * 0.5f;
 
-			refTile._radius = (refTile._centerX - refTile._startX) * 1.2f;
+			refTile._radius = (refTile._centerX - refTile._startX) * 1.35f;
 		}
 	}
 

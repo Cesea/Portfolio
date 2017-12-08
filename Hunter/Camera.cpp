@@ -183,6 +183,7 @@ void Camera::MoveAndRotate(float deltaTime, const InputManager & input)
 				float angleDiff = GetAngleDiffXZ(camPlanerForward, targetForward);
 				_pTargetObject->_targetRotation = angleDiff;
 				_pTargetObject->_camRotated = true;
+				_pTargetObject->_rotating = true;
 				_pTargetObject->_startForward.ToZero();
 			}
 		}

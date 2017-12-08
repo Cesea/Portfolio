@@ -99,20 +99,20 @@ void ActionComponent::UpdateAnimation(float deltaTime)
 		_animDelta = 0.0f;
 	}
 
-	if ( _leftCrossFadeTime > 0.0f )
+	if (_leftCrossFadeTime > 0.0f)
 	{
 		_leftCrossFadeTime -= deltaTime;
-		if ( _leftCrossFadeTime <= 0.0f )
+		if (_leftCrossFadeTime <= 0.0f)
 		{
-			_pAnimationController->SetTrackWeight( 0, 1 );
-			_pAnimationController->SetTrackEnable( 1, false );
+			_pAnimationController->SetTrackWeight(0, 1);
+			_pAnimationController->SetTrackEnable(1, false);
 		}
 		else
 		{
-			float w1 = ( _leftCrossFadeTime / _crossFadeTime );	
+			float w1 = (_leftCrossFadeTime / _crossFadeTime);
 			float w0 = 1.0f - w1;
-			_pAnimationController->SetTrackWeight( 0, w0 );
-			_pAnimationController->SetTrackWeight( 1, w1 );
+			_pAnimationController->SetTrackWeight(0, w0);
+			_pAnimationController->SetTrackWeight(1, w1);
 		}
 	}
 }
@@ -122,16 +122,19 @@ bool ActionComponent::PlayActionImmediate(const Action & action)
 	if (action._stop && action._playOnce)
 	{
 		PlayOneShotAfterHold(action._name, action._crossFadeTime, action._blocking);
+		_animationEnum = action._enum;
 	}
 	else
 	{
 		if (action._playOnce)
 		{
 			PlayOneShot(action._name, action._crossFadeTime, action._outCrossFadeTime, action._blocking);
+			_animationEnum = action._enum;
 		}
 		else
 		{
 			Play(action._name, action._crossFadeTime, action._blocking);
+			_animationEnum = action._enum;
 		}
 	}
 	return true;
