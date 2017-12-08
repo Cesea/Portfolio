@@ -185,7 +185,7 @@ void Cat::Update(float deltaTime)
 	break;
 	case CATSTATE_ATK1:
 		_atkCount--;
-		if (_atkCount == 40)
+		if (_atkCount == 30)
 		{
 			Vector3 targetPos = transComp.GetWorldPosition() - transComp.GetForward();
 			EventChannel _channel;
@@ -216,7 +216,7 @@ void Cat::Update(float deltaTime)
 		break;
 	case CATSTATE_ATK2:
 		_atkCount--;
-		if (_atkCount == 40)
+		if (_atkCount == 30)
 		{
 			Vector3 targetPos = transComp.GetWorldPosition() - transComp.GetForward();
 			EventChannel _channel;
@@ -247,7 +247,7 @@ void Cat::Update(float deltaTime)
 		break;
 	case CATSTATE_ATK3:
 		_atkCount--;
-		if (_atkCount == 40)
+		if (_atkCount == 30)
 		{
 			Vector3 targetPos = transComp.GetWorldPosition() - transComp.GetForward();
 			EventChannel _channel;
@@ -280,7 +280,7 @@ void Cat::Update(float deltaTime)
 		break;
 	case CATSTATE_ATK5:
 		_atkCount--;
-		if (_atkCount == 40)
+		if (_atkCount == 30)
 		{
 			Vector3 targetPos = transComp.GetWorldPosition() - transComp.GetForward();
 			EventChannel _channel;
@@ -440,7 +440,7 @@ void Cat::Handle(const CollisionSystem::ActorTriggerEvent & event)
 			_collision._valid = false;
 			EventChannel channel;
 			channel.Broadcast<GameObjectFactory::CreateBlood>(
-				GameObjectFactory::CreateBlood(_playerPos));
+				GameObjectFactory::CreateBlood(_playerSwordPos));
 		}
 		break;
 	}

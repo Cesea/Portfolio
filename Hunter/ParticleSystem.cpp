@@ -35,6 +35,14 @@ void ParticleSystem::update(float deltaTime)
 		{
 			particle._particle->makeParticle = false;
 		}
+
+		//움직이는 파티클이면 이동한다
+		if (particle.canMove)
+		{
+			transComp.SetWorldPosition(transComp.GetWorldPosition() + particle.velocity/20);
+			particle._particle->setPos(transComp.GetWorldPosition());
+		}
+
 		//생성중지된후에 시간이 흐르면 엔티티 삭제
 		if (particle.duration <= -4)
 		{

@@ -10,6 +10,7 @@
 #include "Lizard.h"
 #include "Snake.h"
 #include "Turtle.h"
+#include "Dragon.h"
 #include "DamageBox.h"
 
 void InitAnimations();

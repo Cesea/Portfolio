@@ -659,15 +659,6 @@
     <ClInclude Include="bloodFog.h">
       <Filter>Game\GameComponents\ParticleComponent</Filter>
     </ClInclude>
-    <ClInclude Include="SoundManager.h">
-      <Filter>Manager\SoundManager</Filter>
-    </ClInclude>
-    <ClInclude Include="Memory.h">
-      <Filter>Core\Memory</Filter>
-    </ClInclude>
-    <ClInclude Include="BmpFont.h">
-      <Filter>UI</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Core">

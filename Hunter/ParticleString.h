@@ -5,3 +5,5 @@
 #include "smoke.h"
 #include "bloodParticle.h"
 #include "bloodFog.h"
+#include "normalBreath.h"
+#include "normalFireBall.h"

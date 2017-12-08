@@ -20,6 +20,7 @@ enum ARCHE_TYPE
 	ARCHE_SNAKE,
 	ARCHE_TURTLE,
 	ARCHE_HYDRA,
+	ARCHE_DRAGON,
 	ARCHE_COUNT,
 };
 
@@ -153,6 +154,39 @@ public :
 	};
 	//Receive Blood Particle Event
 	void Handle(const CreateBlood & event);
+
+	//Create NormalBreath Event
+	struct CreateBreath
+	{
+		CreateBreath(Vector3 pos,Vector3 direction): _pos(pos),_direction(direction) {}
+		Vector3 _pos;
+		Vector3 _direction;
+	};
+	//Receive NormalFireBall Event
+	void Handle(const CreateBreath & event);
+
+	//Create NormalFireBall Event
+	struct CreateNFireBall
+	{
+		CreateNFireBall(Vector3 pos,Vector3 velocity,float dmg):_pos(pos),_velocity(velocity),_dmg(dmg) { }
+		Vector3 _pos;
+		Vector3 _velocity;
+		float _dmg;
+	};
+	//Receive NormalFireBall Event
+	void Handle(const CreateNFireBall & event);
+
+	//CreateNormalFireBall2 Event
+	struct CreateNFireBall2
+	{
+		CreateNFireBall2(Vector3 pos, Vector3 velocity, float dmg) :_pos(pos), _velocity(velocity), _dmg(dmg) { }
+		Vector3 _pos;
+		Vector3 _velocity;
+		float _dmg;
+	};
+	//Receive NormalFireBall2 Event
+	void Handle(const CreateNFireBall2 & event);
+
 
 	/////////////////////////////////////////////
 

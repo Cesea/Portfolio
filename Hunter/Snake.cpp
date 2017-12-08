@@ -21,7 +21,8 @@ bool Snake::CreateFromWorld(World & world, const Vector3 &Pos)
 
 	RenderComponent &renderComp = _entity.AddComponent<RenderComponent>();
 	renderComp._type = RenderComponent::Type::eSkinned;
-	switch (rand() % 3)
+	int a = 0;
+	switch (a)
 	{
 	case 0:
 		_skinType = SNAKESKINSTATE_RED;
@@ -104,7 +105,7 @@ bool Snake::CreateFromWorld(World & world, const Vector3 &Pos)
 	_atkRange = 1.0f;
 	if (_skinType == SNAKESKINSTATE_RED)
 	{
-		_atkRange = 1.5f;
+		_atkRange = 6.0f;
 	}
 	_atkTime = 60;
 	_atkCount = _atkTime;
@@ -268,6 +269,14 @@ void Snake::Update(float deltaTime)
 		break;
 	case SNAKESTATE_ATK2:
 		_atkCount--;
+		if (_atkCount == 30)
+		{
+			EventChannel _channel;
+			Vector3 startPos = transComp.GetWorldPosition() - transComp.GetForward() * 3 / 2 + Vector3(0, 1, 0);
+			Vector3 direction = startPos - (_playerPos + Vector3(0, 1, 0));
+			Vec3Normalize(&direction, &direction);
+			_channel.Broadcast<GameObjectFactory::CreateNFireBall2>(GameObjectFactory::CreateNFireBall2(startPos, -direction, 5.0f));
+		}
 		if (_atkCount < 0)
 		{
 			_atkCount = _atkTime;
@@ -341,8 +350,16 @@ void Snake::Update(float deltaTime)
 			Vec3Normalize(&direction, &direction);
 			if (distance < _atkRange)
 			{
-				_state = SNAKESTATE_ATK1;
-				this->QueueAction(SNAKE_ANIM(SNAKE_ATTACK1));
+				if (_skinType == SNAKESKINSTATE_RED)
+				{
+					_state = SNAKESTATE_ATK2;
+					this->QueueAction(SNAKE_ANIM(SNAKE_ATTACK2));
+				}
+				else
+				{
+					_state = SNAKESTATE_ATK1;
+					this->QueueAction(SNAKE_ANIM(SNAKE_ATTACK1));
+				}
 			}
 			else
 			{
@@ -453,7 +470,7 @@ void Snake::Handle(const CollisionSystem::ActorTriggerEvent & event)
 			_collision._valid = false;
 			EventChannel channel;
 			channel.Broadcast<GameObjectFactory::CreateBlood>(
-				GameObjectFactory::CreateBlood(_playerPos));
+				GameObjectFactory::CreateBlood(_playerSwordPos));
 		}
 		break;
 	}

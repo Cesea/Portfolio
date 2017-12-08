@@ -9,4 +9,5 @@ void InitAnimations()
 	InitCatAnimation();
 	InitHydraAnimation();
 	InitLizardAnimation();
+	InitDragonAnimation();
 }
