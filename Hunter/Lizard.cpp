@@ -334,8 +334,16 @@ void Lizard::Update(float deltaTime)
 			Vec3Normalize(&direction, &direction);
 			if (distance < _atkRange)
 			{
-				_state = LIZARDSTATE_ATK1;
-				this->QueueAction(LIZARD_ANIM(LIZARD_ATTACK));
+				if (_skinType == LIZARDSKINSTATE_BLACK)
+				{
+					_state = LIZARDSTATE_ATK3;
+					this->QueueAction(LIZARD_ANIM(LIZARD_SPIT));
+				}
+				else
+				{
+					_state = LIZARDSTATE_ATK1;
+					this->QueueAction(LIZARD_ANIM(LIZARD_ATTACK));
+				}
 			}
 			else
 			{
