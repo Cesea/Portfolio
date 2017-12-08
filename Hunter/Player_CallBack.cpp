@@ -3,7 +3,7 @@
 
 void Player::SetupCallbackAndCompression()
 {
-   _callbackData._animtionEnum = (PlayerAnimationEnum *)&_animationEnum;
+   _callbackData._animtionEnum = (int32 *)&_pActionComp->_animationEnum;
 
    ActionComponent &refActionComp = _entity.GetComponent<ActionComponent>();
    TransformComponent &refTransform = _entity.GetComponent<TransformComponent>();
@@ -102,7 +102,7 @@ void Player::SetupCallbackAndCompression()
 		   (ID3DXAnimationSet **)&anim);
 
 	   D3DXKEY_CALLBACK key;
-	   key.Time = anim->GetPeriod() / 1.2f * anim->GetSourceTicksPerSecond();
+	   key.Time = anim->GetPeriod() / 1.1f * anim->GetSourceTicksPerSecond();
 	   key.pCallbackData = (void *)&_callbackData;
 
 	   AddCallbackKeysAndCompress(pController, anim, 1, &key, D3DXCOMPRESS_DEFAULT, 0.1f);
@@ -117,8 +117,6 @@ HRESULT PlayerCallbackHandler::HandleCallback(UINT Track, LPVOID pCallbackData)
 	{
 		return S_OK;
 	}
-
-		Console::Log("tata\n");
 
 	switch (*pData->_animtionEnum)
 	{
@@ -140,11 +138,8 @@ HRESULT PlayerCallbackHandler::HandleCallback(UINT Track, LPVOID pCallbackData)
 
 	case PlayerAnimationEnum::eWarTakingHit :
 	{
-		_pPlayer->_superArmor = true;
 		_pPlayer->_state = Player::PLAYERSTATE_STANCE;
 		_pPlayer->QueueAction(PLAYER_ANIM(eWarCombatMode));
-		//_pPlayer->_state = Player::PLAYERSTATE_STANCE;
-		//_pPlayer->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWarTakingHit));
 
 	}break;
 

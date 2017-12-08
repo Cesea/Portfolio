@@ -58,8 +58,8 @@ void ActionComponent::UpdateAnimation(float deltaTime)
 		if (_actionQueue.HasAction() && 
 			_actionQueue.Front()._cancle)
 		{
-			//PlayActionImmediate(_actionQueue.Front());
-			//_actionQueue.PopAction();
+			PlayActionImmediate(_actionQueue.Front());
+			_actionQueue.PopAction();
 		}
 		else if (_animationPlayFactor >= 0.95f)
 		{

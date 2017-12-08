@@ -18,7 +18,7 @@ struct KeyConfig
 
 struct PlayerCallbackData
 {
-	PlayerAnimationEnum *_animtionEnum;
+	int32 *_animtionEnum{};
 };
 
 class PlayerCallbackHandler : public GameObjectAnimationCallbackHandler

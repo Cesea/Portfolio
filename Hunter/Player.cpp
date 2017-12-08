@@ -102,7 +102,7 @@ bool Player::CreateFromWorld(World & world, const Vector3 &pos)
    _moveToStanceTimer.Reset(0.13f);
    _attackToStanceTimer.Reset(0.5f);
 
-   _superArmorTimer.Reset(1.5f);
+   _superArmorTimer.Reset(2.2f);
 
    _state = PLAYERSTATE_STANCE;
 
@@ -348,26 +348,26 @@ void Player::MoveAndRotate(float deltaTime)
 	bool rightAdded{ false };
 	bool forwardAdded{ false };
 
-	if (_animationEnum == PlayerAnimationEnum::eStrafeLeft ||
-		_animationEnum == PlayerAnimationEnum::eWarMovingLeft)
+	if (_pActionComp->_animationEnum == PlayerAnimationEnum::eStrafeLeft ||
+		_pActionComp->_animationEnum == PlayerAnimationEnum::eWarMovingLeft)
 	{
 		toMove -= right;
 	}
-	else if (_animationEnum == PlayerAnimationEnum::eStrafeRight ||
-		_animationEnum == PlayerAnimationEnum::eWarMovingRight)
+	else if (_pActionComp->_animationEnum == PlayerAnimationEnum::eStrafeRight ||
+		_pActionComp->_animationEnum == PlayerAnimationEnum::eWarMovingRight)
 	{
 		toMove += right;
 	}
-	else if (_animationEnum == PlayerAnimationEnum::eWalk ||
-		_animationEnum == PlayerAnimationEnum::eWarCharging ||
-		_animationEnum == PlayerAnimationEnum::eWarWalkSwingLeft ||
-		_animationEnum == PlayerAnimationEnum::eWarWalkSwingRight ||
-		_animationEnum == PlayerAnimationEnum::eWarWalkThrust)
+	else if (_pActionComp->_animationEnum == PlayerAnimationEnum::eWalk ||
+		_pActionComp->_animationEnum == PlayerAnimationEnum::eWarCharging ||
+		_pActionComp->_animationEnum == PlayerAnimationEnum::eWarWalkSwingLeft ||
+		_pActionComp->_animationEnum == PlayerAnimationEnum::eWarWalkSwingRight ||
+		_pActionComp->_animationEnum == PlayerAnimationEnum::eWarWalkThrust)
 	{
 		toMove += forward;
 	}
-	else if (_animationEnum == PlayerAnimationEnum::eWalkingBack ||
-		_animationEnum == PlayerAnimationEnum::eWarRetreat)
+	else if (_pActionComp->_animationEnum == PlayerAnimationEnum::eWalkingBack ||
+		_pActionComp->_animationEnum == PlayerAnimationEnum::eWarRetreat)
 	{
 		toMove -= forward;
 	}
@@ -509,19 +509,19 @@ void Player::Handle(const InputManager::KeyPressedEvent & event)
    {
 	   if (_keyConfig._up == inputCode)
 	   {
-		   if (_animationEnum == PlayerAnimationEnum::eWalkingBack ||
-			   _animationEnum == PlayerAnimationEnum::eWarRetreat)
+		   if (_pActionComp->_animationEnum == PlayerAnimationEnum::eWalkingBack ||
+			   _pActionComp->_animationEnum == PlayerAnimationEnum::eWarRetreat)
 		   {
 			   this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWalk));
 		   }
-		   else if (_animationEnum == PlayerAnimationEnum::eStrafeLeft ||
-			   _animationEnum == PlayerAnimationEnum::eWarMovingLeft)
+		   else if (_pActionComp->_animationEnum == PlayerAnimationEnum::eStrafeLeft ||
+			   _pActionComp->_animationEnum == PlayerAnimationEnum::eWarMovingLeft)
 		   {
 			   RotatePlayer(PI_DIV_4);
 			   this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWalk));
 		   }
-		   else if (_animationEnum == PlayerAnimationEnum::eStrafeRight ||
-			   _animationEnum == PlayerAnimationEnum::eWarMovingRight)
+		   else if (_pActionComp->_animationEnum == PlayerAnimationEnum::eStrafeRight ||
+			   _pActionComp->_animationEnum == PlayerAnimationEnum::eWarMovingRight)
 		   {
 			   RotatePlayer(-PI_DIV_4);
 			   this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWalk));
@@ -529,20 +529,20 @@ void Player::Handle(const InputManager::KeyPressedEvent & event)
 	   }
 	   else if (_keyConfig._down == inputCode)
 	   {
-		   if (_animationEnum == PlayerAnimationEnum::eWalk) 
+		   if (_pActionComp->_animationEnum == PlayerAnimationEnum::eWalk) 
 		   {
 			   _inCombat ? this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWarRetreat)) :
 				   this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWalkingBack));
 		   }
-		   else if (_animationEnum == PlayerAnimationEnum::eStrafeLeft ||
-			   _animationEnum == PlayerAnimationEnum::eWarMovingLeft)
+		   else if (_pActionComp->_animationEnum == PlayerAnimationEnum::eStrafeLeft ||
+			   _pActionComp->_animationEnum == PlayerAnimationEnum::eWarMovingLeft)
 		   {
 			   RotatePlayer(-PI_DIV_4);
 			   _inCombat ? this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWarRetreat)) :
 				   this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWalkingBack));
 		   }
-		   else if (_animationEnum == PlayerAnimationEnum::eStrafeRight ||
-			   _animationEnum == PlayerAnimationEnum::eWarMovingRight)
+		   else if (_pActionComp->_animationEnum == PlayerAnimationEnum::eStrafeRight ||
+			   _pActionComp->_animationEnum == PlayerAnimationEnum::eWarMovingRight)
 		   {
 			   RotatePlayer(PI_DIV_4);
 			   _inCombat ? this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWarRetreat)) :
@@ -551,36 +551,36 @@ void Player::Handle(const InputManager::KeyPressedEvent & event)
 	   }
 	   else if (_keyConfig._left == inputCode)
 	   {
-		   if (_animationEnum == PlayerAnimationEnum::eStrafeRight || 
-			  _animationEnum == PlayerAnimationEnum::eWarMovingRight)
+		   if (_pActionComp->_animationEnum == PlayerAnimationEnum::eStrafeRight || 
+			  _pActionComp->_animationEnum == PlayerAnimationEnum::eWarMovingRight)
 		   {
 			   _inCombat ? this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWarMovingLeft)) :
 				   this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eStrafeLeft));
 		   }
-		   else if (_animationEnum == PlayerAnimationEnum::eWalk)
+		   else if (_pActionComp->_animationEnum == PlayerAnimationEnum::eWalk)
 		   {
 			   RotatePlayer(PI_DIV_4);
 		   }
-		   else if (_animationEnum == PlayerAnimationEnum::eWalkingBack ||
-			   _animationEnum == PlayerAnimationEnum::eWarRetreat)
+		   else if (_pActionComp->_animationEnum == PlayerAnimationEnum::eWalkingBack ||
+			   _pActionComp->_animationEnum == PlayerAnimationEnum::eWarRetreat)
 		   {
 			   RotatePlayer(-PI_DIV_4);
 		   }
 	   }
 	   else if (_keyConfig._right == inputCode)
 	   {
-		   if (_animationEnum == PlayerAnimationEnum::eStrafeLeft ||
-			   _animationEnum == PlayerAnimationEnum::eWarMovingLeft)
+		   if (_pActionComp->_animationEnum == PlayerAnimationEnum::eStrafeLeft ||
+			   _pActionComp->_animationEnum == PlayerAnimationEnum::eWarMovingLeft)
 		   {
 			   _inCombat ? this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWarMovingRight)) :
 				   this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eStrafeRight));
 		   }
-		   else if (_animationEnum == PlayerAnimationEnum::eWalk)
+		   else if (_pActionComp->_animationEnum == PlayerAnimationEnum::eWalk)
 		   {
 			   RotatePlayer(-PI_DIV_4);
 		   }
-		   else if (_animationEnum == PlayerAnimationEnum::eWalkingBack ||
-			   _animationEnum == PlayerAnimationEnum::eWarRetreat)
+		   else if (_pActionComp->_animationEnum == PlayerAnimationEnum::eWalkingBack ||
+			   _pActionComp->_animationEnum == PlayerAnimationEnum::eWarRetreat)
 		   {
 			   RotatePlayer(PI_DIV_4);
 		   }
@@ -589,27 +589,27 @@ void Player::Handle(const InputManager::KeyPressedEvent & event)
 	   {
 		   _state = PLAYERSTATE_RUN;
 
-		   if (_animationEnum == PlayerAnimationEnum::eWalk)
+		   if (_pActionComp->_animationEnum == PlayerAnimationEnum::eWalk)
 		   {
 			   this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWarCharging));
 		   }
-		   else if (_animationEnum == PlayerAnimationEnum::eWarRetreat ||
-			   _animationEnum == PlayerAnimationEnum::eWalkingBack)
+		   else if (_pActionComp->_animationEnum == PlayerAnimationEnum::eWarRetreat ||
+			   _pActionComp->_animationEnum == PlayerAnimationEnum::eWalkingBack)
 		   {
 			   _camRotated = true;
 			   RotatePlayer(D3DX_PI);
 			   this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWarCharging));
 		   }
-		   else if (_animationEnum == PlayerAnimationEnum::eStrafeLeft ||
-			   _animationEnum == PlayerAnimationEnum::eWarMovingLeft)
+		   else if (_pActionComp->_animationEnum == PlayerAnimationEnum::eStrafeLeft ||
+			   _pActionComp->_animationEnum == PlayerAnimationEnum::eWarMovingLeft)
 		   {
 			   _camRotated = true;
 			   RotatePlayer(PI_DIV_2);
 			   this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWarCharging));
 
 		   }
-		   else if (_animationEnum == PlayerAnimationEnum::eStrafeRight ||
-			   _animationEnum == PlayerAnimationEnum::eWarMovingRight)
+		   else if (_pActionComp->_animationEnum == PlayerAnimationEnum::eStrafeRight ||
+			   _pActionComp->_animationEnum == PlayerAnimationEnum::eWarMovingRight)
 		   {
 			   _camRotated = true;
 			   RotatePlayer(-PI_DIV_2);
@@ -765,18 +765,18 @@ void Player::Handle(const InputManager::KeyReleasedEvent & event)
 	   }
 	   else if (_keyConfig._left == inputCode)
 	   {
-		   if (_animationEnum == PlayerAnimationEnum::eWalk ||
-			   _animationEnum == PlayerAnimationEnum::eWarRetreat || 
-			   _animationEnum == PlayerAnimationEnum::eWalkingBack)
+		   if (_pActionComp->_animationEnum == PlayerAnimationEnum::eWalk ||
+			   _pActionComp->_animationEnum == PlayerAnimationEnum::eWarRetreat || 
+			   _pActionComp->_animationEnum == PlayerAnimationEnum::eWalkingBack)
 		   {
 			   RotatePlayer(0.0f);
 		   }
 	   }
 	   else if (_keyConfig._right == inputCode)
 	   {
-		   if (_animationEnum == PlayerAnimationEnum::eWalk ||
-			   _animationEnum == PlayerAnimationEnum::eWarRetreat ||
-			   _animationEnum == PlayerAnimationEnum::eWalkingBack)
+		   if (_pActionComp->_animationEnum == PlayerAnimationEnum::eWalk ||
+			   _pActionComp->_animationEnum == PlayerAnimationEnum::eWarRetreat ||
+			   _pActionComp->_animationEnum == PlayerAnimationEnum::eWalkingBack)
 		   {
 			   RotatePlayer(0.0f);
 		   }
@@ -1008,18 +1008,8 @@ void Player::Handle(const InputManager::MousePressedEvent & event)
    } break;
    case Player::PLAYERSTATE_HURT:
    {
+	   int a = 0;
    } break;
-   }
-
-   if (inputCode == MOUSE_BUTTON_LEFT)
-   {
-	   _currentCommand._type = GAMECOMMAND_ACTION;
-	   _currentCommand._behavior._type = BEHAVIOR_ATTACK;
-   }
-   else if (inputCode == MOUSE_BUTTON_RIGHT)
-   {
-	   _currentCommand._type = GAMECOMMAND_ACTION;
-	   _currentCommand._behavior._type = BEHAVIOR_BLOCK;
    }
 }
 
@@ -1036,14 +1026,19 @@ void Player::Handle(const CollisionSystem::ActorTriggerEvent & event)
 	{
 	case CollisionComponent::TRIGGER_TYPE_ENEMY_DMGBOX :
 	{
+		_collision._valid = false;
 		if (_state != PLAYERSTATE_HURT && _state != PLAYERSTATE_DEAD && !_superArmor)
 		{
-			_collision._valid = false;
-			_collision._duration = -1.0f;
+			_pDamageBox->GetEntity().GetComponent<CollisionComponent>()._valid = false;
+			_attackToStanceTimer.Restart();
+			_comboCount = 0;
+			_canCombo = false;
+
 			MovementStop(_currentMovement);
 			_state = PLAYERSTATE_HURT;
 			_hp -= 50;
 			_inCombat = true;
+			_superArmor = true;
 			if (_hp > 0)
 			{
 				this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWarTakingHit), true);
@@ -1067,7 +1062,7 @@ void Player::QueueAction(Action & action, bool cancle)
 {
 	action._cancle = cancle;
    _pActionComp->_actionQueue.PushAction(action);
-   _animationEnum = action._enum;
+   //_animationEnum = action._enum;
 }
 
 void Player::RepositionEntity(const TerrainTilePos & currentPos, const TerrainTilePos & prevPos)
