@@ -198,6 +198,10 @@ bool MapToolScene::SceneInit()
 		pPlayer->UnRegisterEvents();
 	}
 
+	_channel.Broadcast<GameObjectFactory::CreateObjectOnLocationEvent>(
+		GameObjectFactory::CreateObjectOnLocationEvent(ARCHE_DRAGON, ResourceHandle(),
+			Vector3(0.0f, 0.0f, 0.0f)));
+
 	//Test
 	for (int32 i = 0; i < 100; ++i)
 	{
@@ -244,7 +248,13 @@ bool MapToolScene::SceneInit()
 	//par.init(ParticleComponent::PARTICLE_TYPE_SMOKE, 1000, 0.0025, Vector3(1.0f, 0, 0), Vector3(0.0f, 5.0f, 0.0f));
 	//par.min = Vector3(0, 0, 0);
 	//par.max = Vector3(0, 0, 0);
+
 	//trash.Activate();
+	//_gameObjects.push_back(new Dragon());
+	//BaseGameObject *pBack = _gameObjects.back();
+	//pBack->CreateFromWorld(_world, Vector3(0, 3, 0));
+
+
 
 	return result;
 }
