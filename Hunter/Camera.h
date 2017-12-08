@@ -99,6 +99,9 @@ protected:
 
 	float _offsetForwardMult{};
 	float _offsetUpMult{};
+
+	Quaternion _camRot;
+
 };
 
 #endif

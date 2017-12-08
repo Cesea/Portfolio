@@ -29,8 +29,17 @@ public:
 	virtual bool SceneRenderSprite();
 
 	virtual const char *GetSceneName();
+
+	Camera &GetMinimapCamera() { return _minimapCamera; }
+
 protected :
 	Editor *_editor{};
+
+private :
+
+	void RenderMinimap();
+
+	Camera _minimapCamera;
 
 public:
 	virtual void Handle(const Editor::GetObjectFromSceneEvent &event);

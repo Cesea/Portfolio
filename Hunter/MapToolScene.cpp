@@ -160,6 +160,12 @@ bool MapToolScene::SceneInit()
 	_camera.SetMoveSpeed(6.0f);
 	_camera.SetRotationSpeed(1.0f);
 
+	_minimapCamera.CreateFromWorld(_world);
+	_minimapCamera._ortho = true;
+	_minimapCamera._aspect = 1;
+	_minimapCamera._orthoSize = 10 * 1.0f;	//투영크기는 그림자크기로...
+	_minimapCamera.ReadyRenderToTexture(512, 512);
+
 	_pMainLight->SetWorldPosition(Vector3(4.0f, 7.0f, 3.0f));
 	_pMainLight->SetTarget(Vector3(0.0f, 0.0f, 0.0f));
 
@@ -282,7 +288,12 @@ bool MapToolScene::SceneUpdate(float deltaTime, const InputManager & input)
 	_actionSystem.Update(deltaTime);
 	_particleSystem.setCamera(&_camera, _camera.GetEntity().GetComponent<TransformComponent>().GetWorldPosition());
 	_particleSystem.update(deltaTime);
+
+
+	RenderMinimap();
+
 	ReadyShadowMap(TERRAIN);
+
 
 	return result;
 }
@@ -340,6 +351,25 @@ bool MapToolScene::SceneRenderSprite()
 const char * MapToolScene::GetSceneName()
 {
 	return "MapToolScene";
+}
+
+void MapToolScene::RenderMinimap()
+{
+	//방향성광원에 붙은 카메라의 Frustum 업데이트
+	_minimapCamera.UpdateMatrix();
+	_minimapCamera.UpdateFrustum();
+
+	//_minimapCamera.RenderTextureBegin( 0xffffffff );
+
+	video::StaticXMesh::SetCamera( _minimapCamera );
+
+	video::SkinnedXMesh::SetCamera( _minimapCamera);
+
+	//TERRAIN->Render(_minimapCamera, );
+	//_renderSystem.Render(_minimapCamera);
+
+	//_shadowCamera.RenderTextureEnd();
+
 }
 
 void MapToolScene::Handle(const Editor::GetObjectFromSceneEvent & event)

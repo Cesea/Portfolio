@@ -288,6 +288,9 @@
     <ClCompile Include="bloodFog.cpp">
       <Filter>Game\GameComponents\ParticleComponent</Filter>
     </ClCompile>
+    <ClCompile Include="SoundManager.cpp">
+      <Filter>Manager\SoundManager</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ClassTypeID.h" />
@@ -565,9 +568,6 @@
     <ClInclude Include="PointLight.h">
       <Filter>Game\Lights</Filter>
     </ClInclude>
-    <ClInclude Include="Memory.h">
-      <Filter>Core</Filter>
-    </ClInclude>
     <ClInclude Include="smoke.h">
       <Filter>Game\GameSystems</Filter>
     </ClInclude>
@@ -655,6 +655,12 @@
     </ClInclude>
     <ClInclude Include="bloodFog.h">
       <Filter>Game\GameComponents\ParticleComponent</Filter>
+    </ClInclude>
+    <ClInclude Include="SoundManager.h">
+      <Filter>Manager\SoundManager</Filter>
+    </ClInclude>
+    <ClInclude Include="Memory.h">
+      <Filter>Core\Memory</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -810,6 +816,9 @@
     </Filter>
     <Filter Include="Game\GameUtils\QaudTrees">
       <UniqueIdentifier>{3e32031f-0555-4a04-bf0a-4cedb72f5786}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Manager\SoundManager">
+      <UniqueIdentifier>{7ee46e62-db92-4811-aef8-1b4b29cc03c5}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

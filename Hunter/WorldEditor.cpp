@@ -865,7 +865,6 @@ void Editor::InSystemEditMode()
 		}
 	}
 	ImguiUnindent();
-
 }
 
 void Editor::ShowStatusWindow()

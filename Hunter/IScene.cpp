@@ -202,18 +202,6 @@ void IScene::ReadyShadowMap(Terrain *pTerrain)
 	_shadowCamera.UpdateMatrix();
 	_shadowCamera.UpdateFrustum();
 
-	////다이렉션라이팅 카메라에 들어오는 애들만 그린다...
-	//static std::vector<cBaseObject*>		shadowCullObject;
-	//shadowCullObject.clear();
-	//for( int i = 0 ; i < renderObjects->size() ; i++ )
-	//{
-	//	//프러스텀 안에 있니?
-	//	if( this->pDirectionLightCamera->Frustum.IsInFrustum( (*renderObjects)[i] ) )
-	//	{
-	//		shadowCullObject.push_back( (*renderObjects)[i] );
-	//	}
-	//}
-
 	//쉐도우 맵 그린다.
 	_shadowCamera.RenderTextureBegin( 0xffffffff );
 

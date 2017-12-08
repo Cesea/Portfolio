@@ -58,12 +58,34 @@ void Camera::MoveAndRotate(float deltaTime, const InputManager & input)
 	Vector3 right = refTransform.GetRight();
 	Vector3 up = refTransform.GetUp();
 
+
+	Console::Log("%f, %f\n", _horizontalAngle, _verticalAngle);
+
 	//State 변경
 	if (input.keyboard.IsPressed('1'))
 	{
 		_cameraState = CAMERASTATE_CREATE;
 		_targetRadius = CAMERA_TARGET_DEFAULT_RADIUS;
-		//ShowCursor(true);
+
+		Vector3 camForward = refTransform.GetForward();
+		Vector3 xUnit(1.0f, 0.0f, 0.0f);
+
+		float angleDiff = GetAngleDiffXZ(camForward, xUnit);
+
+		Console::Log("%f\n", angleDiff);
+
+		//_horizontalAngle -= angleDiff;
+		//Quaternion quat = refTransform.GetWorldRotateQuaternion();
+
+		//Vector3 axis;
+		//float angle;
+		//QuaternionToAxisAngle(&quat, &axis, &angle);
+
+		//refTransform.SetRotateWorld(quat);
+		//QuaternionSlerp()
+		//QuaternionRotationMatrix()
+
+		ShowCursor(true);
 	}
 	else if (input.keyboard.IsPressed('2'))
 	{
@@ -72,10 +94,14 @@ void Camera::MoveAndRotate(float deltaTime, const InputManager & input)
 		Vector3 camPosition;
 		Vector3 targetPosition = refTargetTransform.GetWorldPosition();
 
+		_horizontalAngle = -PI_DIV_2;
+		_verticalAngle = 0.0f;
+
 		camPosition.x = cosf(_horizontalAngle) * _targetRadius + targetPosition.x;
 		//camPosition.y = ;
 		camPosition.z = sinf(_horizontalAngle) * _targetRadius + targetPosition.z;
 		refTransform.SetWorldPosition(camPosition);
+		ShowCursor(false);
 	}
 
 	//Mouse Move//////////////////////////////////////////////
@@ -90,17 +116,28 @@ void Camera::MoveAndRotate(float deltaTime, const InputManager & input)
 
 			if (deltaX != 0)
 			{
-				_horizontalAngle += 3.0f * deltaTime * (float)deltaX;
+				_horizontalAngle += 0.4f * deltaTime * (float)deltaX;
 			}
-
 			if (deltaY != 0)
 			{
-				_verticalAngle += 3.0f * deltaTime * (float)deltaY;
+				_verticalAngle += 0.4f * deltaTime * (float)deltaY;
 			}
 
-			ClampFloat(_verticalAngle, MIN_VERT_ANGLE, MAX_VERT_ANGLE);
+			if (_horizontalAngle < 0.0f)
+			{
+				_horizontalAngle += D3DX_PI * 2;
+			}
+			else if (_horizontalAngle > D3DX_PI * 2)
+			{
+				_horizontalAngle -= D3DX_PI * 2;
+			}
 
-			refTransform.SetRotateWorld(_verticalAngle * ONE_RAD, _horizontalAngle * ONE_RAD, 0.0f);
+			float xDiff = 0.4f * deltaTime * (float)deltaX;
+			float yDiff = 0.4f * deltaTime * (float)deltaY;
+
+			ClampFloat(_verticalAngle, -0.5f, PI_DIV_2 - 0.1f);
+
+			refTransform.SetRotateWorld(_verticalAngle, _horizontalAngle , 0.0f);
 		}
 	}break;
 
@@ -164,6 +201,7 @@ void Camera::MoveAndRotate(float deltaTime, const InputManager & input)
 				_pTargetObject->_startForward.ToZero();
 			}
 		}
+
 		//else if (_pTargetObject->_state == Player::PLAYERSTATE_MOVE)
 		//{
 		//}
@@ -173,7 +211,6 @@ void Camera::MoveAndRotate(float deltaTime, const InputManager & input)
 		SetCursorPos(CLIENTCENTERX, CLIENTCENTERY);
 	} break;
 	}
-
 
 	Vector3 diff = Vector3(0.0f, 0.0f, 0.0f);
 	////move forward
