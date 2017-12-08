@@ -72,18 +72,22 @@ void BmpFont::RenderText(char* WORD, int X, int Y, float sizeX, float sizeY, D3D
 	{
 
 		char ch = WORD[i];
-		Word* wd = Search(ch);
+		Word* wd = nullptr;
+		wd = Search(ch);
 
 		if (i == 0)
 		{
 			totalX = X;
 		}
-		RECT rt = { wd->x ,wd->y,wd->x + wd->width,wd->y + wd->height };
-		LPRECT trp = &rt;
+		if (nullptr != wd)
+		{
+			RECT rt = { wd->x ,wd->y,wd->x + wd->width,wd->y + wd->height };
+			LPRECT trp = &rt;
 
-		
-		SPRITEMANAGER->DrawTexture(FontIMG->_ptr, trp, totalX, Y - (wd->height * sizeY), sizeX, sizeY, 0, color, NULL);
-		totalX += wd->width * sizeX;
+
+			SPRITEMANAGER->DrawTexture(FontIMG->_ptr, trp, totalX, Y - (wd->height * sizeY), sizeX, sizeY, 0, color, NULL);
+			totalX += wd->width * sizeX;
+		}
 	}
 
 }

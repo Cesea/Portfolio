@@ -20,7 +20,7 @@ public:
 
 	World& GetWorld() const;
 
-	const std::vector<Entity>& GetEntities() const;
+	std::vector<Entity>& GetEntities();
 
 	void SetRunning(bool32 running) { _running = running; }
 	bool32 GetRunning() { return _running; }

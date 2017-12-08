@@ -364,7 +364,6 @@ void Player::MoveAndRotate(float deltaTime)
 		_animationEnum == PlayerAnimationEnum::eWarWalkSwingRight ||
 		_animationEnum == PlayerAnimationEnum::eWarWalkThrust)
 	{
-		Console::Log("tt\n");
 		toMove += forward;
 	}
 	else if (_animationEnum == PlayerAnimationEnum::eWalkingBack ||

@@ -50,7 +50,7 @@ void Entity::Activate()
 	GetWorld().ActivateEntity(*this);
 }
 
-void Entity::Deactivate()
+void Entity::Deactivate() 
 {
 	GetWorld().DeactivateEntity(*this);
 }

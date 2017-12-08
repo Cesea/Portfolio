@@ -79,7 +79,7 @@ public:
 
 	void Deactivate();
 
-	void Kill();
+	void Kill(); 
 
 	template <typename T, typename... Args>
 	T& AddComponent(Args&&... args);

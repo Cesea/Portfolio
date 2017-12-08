@@ -17,7 +17,7 @@ World & BaseSystem::GetWorld() const
 	return *_world;
 }
 
-const std::vector<Entity>& BaseSystem::GetEntities() const
+std::vector<Entity>& BaseSystem::GetEntities() 
 {
 	return _entities;
 }

@@ -9,7 +9,8 @@ ParticleSystem::ParticleSystem()
 ParticleSystem::~ParticleSystem()
 {
 }
-void ParticleSystem::update(float deltaTime)
+
+void ParticleSystem::update(float deltaTime) 
 {
 	if (!_running)
 	{
@@ -46,11 +47,10 @@ void ParticleSystem::update(float deltaTime)
 		//생성중지된후에 시간이 흐르면 엔티티 삭제
 		if (particle.duration <= -4)
 		{
-
+			entities[i].Kill();
 		}
 		else
 		{
-
 			particle._particle->setCamera(_cam, _camPos);
 			particle._particle->update(deltaTime);
 		}

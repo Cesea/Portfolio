@@ -194,7 +194,6 @@ void PSystem::draw()
 
 		particle_Effect->EndPass();
 		particle_Effect->End();
-		gpDevice->SetRenderState(D3DRS_LIGHTING, true);
 	}
 }
 

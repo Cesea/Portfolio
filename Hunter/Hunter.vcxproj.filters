@@ -294,6 +294,18 @@
     <ClCompile Include="BmpFont.cpp">
       <Filter>UI</Filter>
     </ClCompile>
+    <ClCompile Include="normalBreath.cpp">
+      <Filter>Game\GameComponents\ParticleComponent</Filter>
+    </ClCompile>
+    <ClCompile Include="normalFireBall.cpp">
+      <Filter>Game\GameComponents\ParticleComponent</Filter>
+    </ClCompile>
+    <ClCompile Include="DragonAnimationString.cpp">
+      <Filter>Game\GameObjects\Enemy\Dragon</Filter>
+    </ClCompile>
+    <ClCompile Include="Dragon.cpp">
+      <Filter>Game\GameObjects\Enemy\Dragon</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ClassTypeID.h" />
@@ -659,6 +671,27 @@
     <ClInclude Include="bloodFog.h">
       <Filter>Game\GameComponents\ParticleComponent</Filter>
     </ClInclude>
+    <ClInclude Include="normalBreath.h">
+      <Filter>Game\GameComponents\ParticleComponent</Filter>
+    </ClInclude>
+    <ClInclude Include="normalFireBall.h">
+      <Filter>Game\GameComponents\ParticleComponent</Filter>
+    </ClInclude>
+    <ClInclude Include="DragonAnimationString.h">
+      <Filter>Game\GameObjects\Enemy\Dragon</Filter>
+    </ClInclude>
+    <ClInclude Include="Dragon.h">
+      <Filter>Game\GameObjects\Enemy\Dragon</Filter>
+    </ClInclude>
+    <ClInclude Include="BmpFont.h">
+      <Filter>UI</Filter>
+    </ClInclude>
+    <ClInclude Include="SoundManager.h">
+      <Filter>Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="Memory.h">
+      <Filter>Core\Memory</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Core">
@@ -816,6 +849,9 @@
     </Filter>
     <Filter Include="Manager\SoundManager">
       <UniqueIdentifier>{7ee46e62-db92-4811-aef8-1b4b29cc03c5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\GameObjects\Enemy\Dragon">
+      <UniqueIdentifier>{5ded30f0-b5e7-4e35-ada7-203ed1a27d8f}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>
