@@ -139,7 +139,7 @@ void RenderSystem::Render(const Camera &camera)
 
 void RenderSystem::RenderShadow(const Camera & camera)
 {
-	std::vector<Terrain::TerrainTile *> &visibleTiles = TERRAIN->GetVisibleTerrainTiles();
+	std::vector<Terrain::TerrainTile *> &visibleTiles = TERRAIN->GetShadowVisibleTerrainTiles();
 	for (auto &tile : visibleTiles)
 	{
 		for (uint32 i = 0; i < tile->_entities.size(); ++i)

@@ -20,6 +20,8 @@ Player::Player()
 
 Player::~Player()
 {
+	UnRegisterEvents();
+	SAFE_DELETE(_pDamageBox);
 }
 
 bool Player::CreateFromWorld(World & world, const Vector3 &pos)
@@ -101,6 +103,8 @@ bool Player::CreateFromWorld(World & world, const Vector3 &pos)
    _attackToStanceTimer.Reset(0.9f);
 
    _superArmorTimer.Reset(1.5f);
+
+   _state = PLAYERSTATE_STANCE;
 
    _keyConfig._up = 'W';
    _keyConfig._down = 'S';

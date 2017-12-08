@@ -171,27 +171,7 @@ bool TestScene::SceneInit()
 	_pMainLight->SetTarget(Vector3(0.0f, 0.0f, 0.0f));
 
 	_pEnvironmentSphere->Create("../resources/Textures/grassenvmap1024.dds");
-
-	DataPackage dataPackage;
-	uint32 fileSize{};
-	dataPackage.OpenFile("../resources/TestScene/Terrain01.ed", &fileSize);
-	int32 numEntityToCreate;
-	dataPackage.ReadAs<int32>(&numEntityToCreate);
-
-	EntitySaveInfo entitySaveInfo;
-	ZeroMemory(&entitySaveInfo, sizeof(EntitySaveInfo));
-	for (int32 i = 0; i < numEntityToCreate; ++i)
-	{
-		dataPackage.ReadAs<EntitySaveInfo>(&entitySaveInfo);
-
-		_channel.Broadcast<GameObjectFactory::CreateObjectFromSaveInfoEvent>(
-			GameObjectFactory::CreateObjectFromSaveInfoEvent(entitySaveInfo._archeType, 
-				entitySaveInfo._resourceName, 
-				entitySaveInfo._position,
-				entitySaveInfo._scale,
-				entitySaveInfo._orientation));
-	}
-
+	this->CreateObjectFromFile("../resources/TestScene/Terrain01.ed");
 
 	//朝五虞 持失
 	_camera.SetMoveSpeed(6.0f);

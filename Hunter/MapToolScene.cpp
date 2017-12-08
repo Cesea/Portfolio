@@ -331,6 +331,8 @@ bool MapToolScene::SceneRender0()
 bool MapToolScene::SceneRenderSprite()
 {
 	SPRITEMANAGER->BeginSpriteRender();
+	SPRITEMANAGER->DrawTexture(_shadowCamera.GetRenderTexture(), nullptr, 600, 0, 1.0f, 1.0f, 0.0f);
+	
 	SPRITEMANAGER->EndSpriteRender();
 	return true;
 }

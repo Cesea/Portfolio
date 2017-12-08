@@ -941,6 +941,13 @@ void Terrain::RebuildTerrain(const Terrain::TerrainConfig &config)
 	SAFE_DELETE_ARRAY(_chunkIndex);
 	SAFE_DELETE(_pQuadTree);
 
+	 _activeChunkIndices.clear();
+	 _visibleChunks.clear();
+	 _visibleTiles.clear();
+
+	 _shadowVisibleChunks.clear();
+	 _shadowVisibleTiles.clear();
+
 	//Rebuild모드는 항상 에디터에서 불린다.
 	Create(config, true);
 }

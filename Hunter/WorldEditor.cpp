@@ -78,7 +78,16 @@ void Editor::InTerrainEditMode()
 			_terrainEditor._terrainConfig._xChunkCount = (int32)_terrainEditor._countX;
 			_terrainEditor._terrainConfig._zChunkCount = (int32)_terrainEditor._countZ;
 
+			_pCurrentScene->_world.SaveEntitiesInWorld("../resources/tmp01.ed");
+			_pCurrentScene->ReleaseAllGameObjects();
+			_pCurrentScene->_world.Clear();
+			_pCurrentScene->AddSystemToWorld();
+
 			TERRAIN->RebuildTerrain(_terrainEditor._terrainConfig);
+
+			_pCurrentScene->CreateLightsAndCameras();
+			_pCurrentScene->CreateObjectFromFile("../resources/tmp01.ed");
+			_pCurrentScene->_camera.SetTargetObject((Player *)GAMEOBJECTFACTORY->GetPlayerObject());
 		}
 		ImguiUnindent();
 	}
