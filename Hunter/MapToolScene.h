@@ -40,7 +40,6 @@ private :
 	void RenderMinimap();
 
 	Camera _minimapCamera;
-	Dragon * _Dragon;
 
 public:
 	virtual void Handle(const Editor::GetObjectFromSceneEvent &event);
