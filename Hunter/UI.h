@@ -1,6 +1,7 @@
 #pragma once
 
 class Player;
+class BmpFont;
 
 #include "Inventory.h"
 
@@ -33,11 +34,21 @@ private:
 	video::Texture* _bt3_B;
 	bool _bt3On;
 
+	video::Texture* _mush1;
+	video::Texture* _mush2;
+	video::Texture* _mush3;
+
+	video::Texture* _potion1;
+	video::Texture* _potion2;
+	video::Texture* _potion3;
+
 	float MaxHp;
 	float CurHp;
 
 	float MaxFury;
 	float CurFury;
+
+	Inventory* _inventory;
 
 public:
 
