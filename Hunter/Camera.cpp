@@ -58,32 +58,13 @@ void Camera::MoveAndRotate(float deltaTime, const InputManager & input)
 	Vector3 right = refTransform.GetRight();
 	Vector3 up = refTransform.GetUp();
 
-
-	Console::Log("%f, %f\n", _horizontalAngle, _verticalAngle);
-
 	//State 변경
 	if (input.keyboard.IsPressed('1'))
 	{
 		_cameraState = CAMERASTATE_CREATE;
 		_targetRadius = CAMERA_TARGET_DEFAULT_RADIUS;
 
-		Vector3 camForward = refTransform.GetForward();
-		Vector3 xUnit(1.0f, 0.0f, 0.0f);
-
-		float angleDiff = GetAngleDiffXZ(camForward, xUnit);
-
-		Console::Log("%f\n", angleDiff);
-
-		//_horizontalAngle -= angleDiff;
-		//Quaternion quat = refTransform.GetWorldRotateQuaternion();
-
-		//Vector3 axis;
-		//float angle;
-		//QuaternionToAxisAngle(&quat, &axis, &angle);
-
-		//refTransform.SetRotateWorld(quat);
-		//QuaternionSlerp()
-		//QuaternionRotationMatrix()
+		_horizontalAngle = 0.0f;
 
 		ShowCursor(true);
 	}
@@ -91,16 +72,20 @@ void Camera::MoveAndRotate(float deltaTime, const InputManager & input)
 	{
 		Assert(_pTargetObject);
 		_cameraState = CAMERASTATE_INGAME;
-		Vector3 camPosition;
-		Vector3 targetPosition = refTargetTransform.GetWorldPosition();
 
 		_horizontalAngle = -PI_DIV_2;
 		_verticalAngle = 0.0f;
 
-		camPosition.x = cosf(_horizontalAngle) * _targetRadius + targetPosition.x;
-		//camPosition.y = ;
-		camPosition.z = sinf(_horizontalAngle) * _targetRadius + targetPosition.z;
+		Vector3 camPosition;
+		Vector3 targetPosition = refTargetTransform.GetWorldPosition();
+
+		camPosition.x = cosf(_verticalAngle) * cosf(_horizontalAngle) * _targetRadius + targetPosition.x;
+		camPosition.y = targetPosition.y + 3.0f + sinf(_verticalAngle);
+		targetPosition.y += 1.6f;
+		camPosition.z = cosf(_verticalAngle) * sinf(_horizontalAngle) * _targetRadius + targetPosition.z;
 		refTransform.SetWorldPosition(camPosition);
+		refTransform.LookPosition(targetPosition);
+
 		ShowCursor(false);
 	}
 
