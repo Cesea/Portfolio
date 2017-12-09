@@ -171,11 +171,14 @@ void Hydra::SetupCallbackAndCompression()
 		ID3DXKeyframedAnimationSet *anim;
 		pController->GetAnimationSetByName(HydraAnimationString[HYDRA_ANIMATION_ENUM::HYDRA_DEATH], (ID3DXAnimationSet **)&anim);
 
-		D3DXKEY_CALLBACK keys;
-		keys.Time = (anim->GetPeriod() * 0.10) * anim->GetSourceTicksPerSecond();
-		keys.pCallbackData = (void *)&_callbackData[DESC_LEFT];
+		D3DXKEY_CALLBACK keys[2];
+		keys[0].Time = (anim->GetPeriod() * 0.10) * anim->GetSourceTicksPerSecond();
+		keys[0].pCallbackData = (void *)&_callbackData[DESC_LEFT];
 
-		AddCallbackKeysAndCompress(pController, anim, 1, &keys, D3DXCOMPRESS_DEFAULT, 0.0);
+		keys[1].Time = (anim->GetPeriod() * 0.40) * anim->GetSourceTicksPerSecond();
+		keys[1].pCallbackData = (void *)&_callbackData[DESC_RIGHT];
+
+		AddCallbackKeysAndCompress(pController, anim, 2, keys, D3DXCOMPRESS_DEFAULT, 0.0);
 	}
 #pragma endregion
 
@@ -249,6 +252,10 @@ HRESULT HydraCallbackHandler::HandleCallback(UINT Track, LPVOID pCallbackData)
 		if (pData->_description == DESC_LEFT)
 		{
 			SOUNDMANAGER->Play3D("hydra_death_01", *pData->_pPosition);
+		}
+		else if (pData->_description == DESC_RIGHT)
+		{
+			SOUNDMANAGER->Play3D("lizard_fall_01", *pData->_pPosition);
 		}
 	}break;
 	case HYDRA_HIT1 :

@@ -132,46 +132,46 @@ HRESULT TurtleCallbackHandler::HandleCallback(UINT Track, LPVOID pCallbackData)
 	{
 		if (pData->_description == DESC_ATTACK1)
 		{
-			SOUNDMANAGER->Play3D("", *pData->_pPosition);
+			SOUNDMANAGER->Play3D("turtle_attack_01", *pData->_pPosition);
 		}
 	}break;
 	case TURTLE_BITE2:
 	{
 		if (pData->_description == DESC_ATTACK2)
 		{
-			SOUNDMANAGER->Play3D("", *pData->_pPosition);
+			SOUNDMANAGER->Play3D("turtle_attack_01", *pData->_pPosition);
 		}
 	}break;
 	case TURTLE_DEATH:
 	{
 		if (pData->_description == DESC_LEFT)
 		{
-			SOUNDMANAGER->Play3D("", *pData->_pPosition);
+			SOUNDMANAGER->Play3D("turtle_dead_01", *pData->_pPosition);
 		}
 	}break;
 	case TURTLE_HIT1:
 	{
 		if (pData->_description == DESC_LEFT)
 		{
-			SOUNDMANAGER->Play3D("", *pData->_pPosition);
+			SOUNDMANAGER->Play3D("turtle_hit_01", *pData->_pPosition);
 		}
 	}break;
 	case TURTLE_ROAR:
 	{
 		if (pData->_description == DESC_LEFT)
 		{
-			SOUNDMANAGER->Play3D("", *pData->_pPosition);
+			SOUNDMANAGER->Play3D("turtle_roar_01", *pData->_pPosition);
 		}
 	}break;
 	case TURTLE_WALK:
 	{
 		if (pData->_description == DESC_LEFT)
 		{
-			SOUNDMANAGER->Play3D("", *pData->_pPosition);
+			SOUNDMANAGER->Play3D("turtle_walk_left", *pData->_pPosition);
 		}
 		else if (pData->_description == DESC_RIGHT)
 		{
-			SOUNDMANAGER->Play3D("", *pData->_pPosition);
+			SOUNDMANAGER->Play3D("turtle_walk_right", *pData->_pPosition);
 		}
 	}break;
 	}

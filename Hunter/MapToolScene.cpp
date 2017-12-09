@@ -95,6 +95,63 @@ void LoadEverySoundResources()
 
 #pragma endregion
 
+#pragma region Lizard
+	SOUNDMANAGER->AddSound3D("lizard_attack_01", 
+		"../resources/sfx/Lizard/lizard_attack_01.wav", false, false, 4.0f, 13.0f);
+	SOUNDMANAGER->AddSound3D("lizard_attack_02", 
+		"../resources/sfx/Lizard/lizard_attack_02.wav", false, false, 4.0f, 13.0f);
+	SOUNDMANAGER->AddSound3D("lizard_bite_01", 
+		"../resources/sfx/Lizard/lizard_bite_01.wav", false, false, 4.0f, 13.0f);
+	SOUNDMANAGER->AddSound3D("lizard_dead_01", 
+		"../resources/sfx/Lizard/lizard_dead_01.wav", false, false, 4.0f, 13.0f);
+	SOUNDMANAGER->AddSound3D("lizard_hit_01", 
+		"../resources/sfx/Lizard/lizard_hit_01.wav", false, false, 4.0f, 13.0f);
+	SOUNDMANAGER->AddSound3D("lizard_idle_01", 
+		"../resources/sfx/Lizard/lizard_idle_01.wav", false, false, 4.0f, 13.0f);
+	SOUNDMANAGER->AddSound3D("lizard_spit_01", 
+		"../resources/sfx/Lizard/lizard_spit_01.wav", false, false, 4.0f, 13.0f);
+	SOUNDMANAGER->AddSound3D("lizard_walk_left", 
+		"../resources/sfx/Lizard/lizard_walk_left.wav", false, false, 4.0f, 13.0f);
+	SOUNDMANAGER->AddSound3D("lizard_walk_right", 
+		"../resources/sfx/Lizard/lizard_walk_right.wav", false, false, 4.0f, 13.0f);
+	SOUNDMANAGER->AddSound3D("lizard_fall_01", 
+		"../resources/sfx/Lizard/lizard_fall_01.wav", false, false, 4.0f, 13.0f);
+#pragma endregion
+
+#pragma region Snake
+	SOUNDMANAGER->AddSound3D("snake_attack_01", 
+		"../resources/sfx/Snake/snake_attack_01.wav", false, false, 4.0f, 13.0f);
+	SOUNDMANAGER->AddSound3D("snake_spit_01", 
+		"../resources/sfx/Snake/snake_spit_01.wav", false, false, 4.0f, 13.0f);
+	SOUNDMANAGER->AddSound3D("snake_attack_03", 
+		"../resources/sfx/Snake/snake_attack_03.wav", false, false, 4.0f, 13.0f);
+	SOUNDMANAGER->AddSound3D("snake_roar_01", 
+		"../resources/sfx/Snake/snake_roar_01.wav", false, false, 4.0f, 13.0f);
+	SOUNDMANAGER->AddSound3D("snake_dead_01", 
+		"../resources/sfx/Snake/snake_dead_01.wav", false, false, 4.0f, 13.0f);
+#pragma endregion
+
+#pragma region Turtle
+	SOUNDMANAGER->AddSound3D("turtle_attack_01", 
+		"../resources/sfx/Turtle/turtle_attack_01.wav", false, false, 4.0f, 13.0f);
+	SOUNDMANAGER->AddSound3D("turtle_attack_02", 
+		"../resources/sfx/Turtle/turtle_attack_02.wav", false, false, 4.0f, 13.0f);
+
+	SOUNDMANAGER->AddSound3D("turtle_dead_01", 
+		"../resources/sfx/Turtle/turtle_dead_01.wav", false, false, 4.0f, 13.0f);
+	SOUNDMANAGER->AddSound3D("turtle_hit_01", 
+		"../resources/sfx/Turtle/turtle_hit_01.wav", false, false, 4.0f, 13.0f);
+
+	SOUNDMANAGER->AddSound3D("turtle_roar_01", 
+		"../resources/sfx/Turtle/turtle_roar_01.wav", false, false, 4.0f, 13.0f);
+
+	SOUNDMANAGER->AddSound3D("turtle_walk_left", 
+		"../resources/sfx/Turtle/turtle_walk_left.wav", false, false, 4.0f, 13.0f);
+
+	SOUNDMANAGER->AddSound3D("turtle_walk_right", 
+		"../resources/sfx/Turtle/turtle_walk_right.wav", false, false, 4.0f, 13.0f);
+#pragma endregion
+
 }
 
 void LoadEveryStaticResources()

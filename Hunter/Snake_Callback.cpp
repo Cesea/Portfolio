@@ -102,7 +102,7 @@ void Snake::SetupCallbackAndCompression()
 		pController->GetAnimationSetByName(SnakeAnimationString[SNAKE_ANIMATION_ENUM::SNAKE_DEATH], (ID3DXAnimationSet **)&anim);
 
 		D3DXKEY_CALLBACK keys;
-		keys.Time = (anim->GetPeriod() * 0.5) * anim->GetSourceTicksPerSecond();
+		keys.Time = (anim->GetPeriod() * 0.05) * anim->GetSourceTicksPerSecond();
 		keys.pCallbackData = (void *)&_callbackData[DESC_LEFT];
 
 		AddCallbackKeysAndCompress(pController, anim, 1, &keys, D3DXCOMPRESS_DEFAULT, 0.0);
@@ -140,28 +140,28 @@ HRESULT SnakeCallbackHandler::HandleCallback(UINT Track, LPVOID pCallbackData)
 	{
 		if (pData->_description == DESC_ATTACK1)
 		{
-			SOUNDMANAGER->Play3D("", *pData->_pPosition);
+			SOUNDMANAGER->Play3D("snake_attack_01", *pData->_pPosition);
 		}
 	}break;
 	case SNAKE_ATTACK2 :
 	{
 		if (pData->_description == DESC_ATTACK2)
 		{
-			SOUNDMANAGER->Play3D("", *pData->_pPosition);
+			SOUNDMANAGER->Play3D("snake_spit_01", *pData->_pPosition);
 		}
 	}break;
 	case SNAKE_ATTACK3 :
 	{
 		if (pData->_description == DESC_ATTACK3)
 		{
-			SOUNDMANAGER->Play3D("", *pData->_pPosition);
+			SOUNDMANAGER->Play3D("snake_attack_03", *pData->_pPosition);
 		}
 	}break;
 	case SNAKE_DEATH :
 	{
 		if (pData->_description == DESC_LEFT)
 		{
-			SOUNDMANAGER->Play3D("", *pData->_pPosition);
+			SOUNDMANAGER->Play3D("snake_dead_01", *pData->_pPosition);
 		}
 	}break;
 	case SNAKE_HIT1:
@@ -185,7 +185,7 @@ HRESULT SnakeCallbackHandler::HandleCallback(UINT Track, LPVOID pCallbackData)
 	{
 		if (pData->_description == DESC_LEFT)
 		{
-			SOUNDMANAGER->Play3D("", *pData->_pPosition);
+			SOUNDMANAGER->Play3D("snake_roar_01", *pData->_pPosition);
 		}
 	}break;
 	//case SNAKE_STAND :

@@ -41,26 +41,35 @@ void Lizard::SetupCallbackAndCompression()
 		ID3DXKeyframedAnimationSet *anim;
 		pController->GetAnimationSetByName(LizardAnimationString[LIZARD_ANIMATION_ENUM::LIZARD_WALK], (ID3DXAnimationSet **)&anim);
 
-		D3DXKEY_CALLBACK keys[2];
+		D3DXKEY_CALLBACK keys[4];
 		keys[0].Time = (anim->GetPeriod() * 0.06) * anim->GetSourceTicksPerSecond();
-		keys[0].pCallbackData = (void *)&_callbackData[DESC_RIGHT];
+		keys[0].pCallbackData = (void *)&_callbackData[DESC_LEFT];
 
-		keys[1].Time = (anim->GetPeriod() * 0.40) * anim->GetSourceTicksPerSecond();
+		keys[1].Time = (anim->GetPeriod() * 0.25) * anim->GetSourceTicksPerSecond();
 		keys[1].pCallbackData = (void *)&_callbackData[DESC_LEFT];
 
-		AddCallbackKeysAndCompress(pController, anim, 2, keys, D3DXCOMPRESS_DEFAULT, 0.0);
+		keys[2].Time = (anim->GetPeriod() * 0.35) * anim->GetSourceTicksPerSecond();
+		keys[2].pCallbackData = (void *)&_callbackData[DESC_RIGHT];
+
+		keys[3].Time = (anim->GetPeriod() * 0.75) * anim->GetSourceTicksPerSecond();
+		keys[3].pCallbackData = (void *)&_callbackData[DESC_RIGHT];
+
+		AddCallbackKeysAndCompress(pController, anim, 4, keys, D3DXCOMPRESS_DEFAULT, 0.0);
 	}
 	//Run
 	{
 		ID3DXKeyframedAnimationSet *anim;
 		pController->GetAnimationSetByName(LizardAnimationString[LIZARD_ANIMATION_ENUM::LIZARD_RUN], (ID3DXAnimationSet **)&anim);
 
-		D3DXKEY_CALLBACK keys[2];
+		D3DXKEY_CALLBACK keys[3];
 		keys[0].Time = (anim->GetPeriod() * 0.05) * anim->GetSourceTicksPerSecond();
-		keys[0].pCallbackData = (void *)&_callbackData[DESC_LEFT];
+		keys[0].pCallbackData = (void *)&_callbackData[DESC_RIGHT];
 
 		keys[1].Time = (anim->GetPeriod() * 0.47) * anim->GetSourceTicksPerSecond();
 		keys[1].pCallbackData = (void *)&_callbackData[DESC_RIGHT];
+
+		keys[2].Time = (anim->GetPeriod() * 0.83) * anim->GetSourceTicksPerSecond();
+		keys[2].pCallbackData = (void *)&_callbackData[DESC_LEFT];
 
 		AddCallbackKeysAndCompress(pController, anim, 2, keys, D3DXCOMPRESS_DEFAULT, 0.0);
 	}
@@ -83,11 +92,14 @@ void Lizard::SetupCallbackAndCompression()
 		ID3DXKeyframedAnimationSet *anim;
 		pController->GetAnimationSetByName(LizardAnimationString[LIZARD_ANIMATION_ENUM::LIZARD_BITE], (ID3DXAnimationSet **)&anim);
 
-		D3DXKEY_CALLBACK keys;
-		keys.Time = (anim->GetPeriod() * 0.44) * anim->GetSourceTicksPerSecond();
-		keys.pCallbackData = (void *)&_callbackData[DESC_ATTACK1];
+		D3DXKEY_CALLBACK keys[2];
+		keys[0].Time = (anim->GetPeriod() * 0.07) * anim->GetSourceTicksPerSecond();
+		keys[0].pCallbackData = (void *)&_callbackData[DESC_ATTACK1];
 
-		AddCallbackKeysAndCompress(pController, anim, 1, &keys, D3DXCOMPRESS_DEFAULT, 0.0);
+		keys[1].Time = (anim->GetPeriod() * 0.52) * anim->GetSourceTicksPerSecond();
+		keys[1].pCallbackData = (void *)&_callbackData[DESC_ATTACK2];
+
+		AddCallbackKeysAndCompress(pController, anim, 2, keys, D3DXCOMPRESS_DEFAULT, 0.0);
 	}
 	//Spit
 	{
@@ -95,7 +107,7 @@ void Lizard::SetupCallbackAndCompression()
 		pController->GetAnimationSetByName(LizardAnimationString[LIZARD_ANIMATION_ENUM::LIZARD_SPIT], (ID3DXAnimationSet **)&anim);
 
 		D3DXKEY_CALLBACK keys;
-		keys.Time = (anim->GetPeriod() * 0.05) * anim->GetSourceTicksPerSecond();
+		keys.Time = (anim->GetPeriod() * 0.49) * anim->GetSourceTicksPerSecond();
 		keys.pCallbackData = (void *)&_callbackData[DESC_ATTACK1];
 
 		AddCallbackKeysAndCompress(pController, anim, 1, &keys, D3DXCOMPRESS_DEFAULT, 0.0);
@@ -109,7 +121,7 @@ void Lizard::SetupCallbackAndCompression()
 		pController->GetAnimationSetByName(LizardAnimationString[LIZARD_ANIMATION_ENUM::LIZARD_HIT1], (ID3DXAnimationSet **)&anim);
 
 		D3DXKEY_CALLBACK keys;
-		keys.Time = (anim->GetPeriod() * 0.07) * anim->GetSourceTicksPerSecond();
+		keys.Time = (anim->GetPeriod() * 0.1) * anim->GetSourceTicksPerSecond();
 		keys.pCallbackData = (void *)&_callbackData[DESC_LEFT];
 
 		AddCallbackKeysAndCompress(pController, anim, 1, &keys, D3DXCOMPRESS_DEFAULT, 0.0);
@@ -119,11 +131,14 @@ void Lizard::SetupCallbackAndCompression()
 		ID3DXKeyframedAnimationSet *anim;
 		pController->GetAnimationSetByName(LizardAnimationString[LIZARD_ANIMATION_ENUM::LIZARD_DEATH], (ID3DXAnimationSet **)&anim);
 
-		D3DXKEY_CALLBACK keys;
-		keys.Time = (anim->GetPeriod() * 0.15) * anim->GetSourceTicksPerSecond();
-		keys.pCallbackData = (void *)&_callbackData[DESC_LEFT];
+		D3DXKEY_CALLBACK keys[2];
+		keys[0].Time = (anim->GetPeriod() * 0.06) * anim->GetSourceTicksPerSecond();
+		keys[0].pCallbackData = (void *)&_callbackData[DESC_LEFT];
 
-		AddCallbackKeysAndCompress(pController, anim, 1, &keys, D3DXCOMPRESS_DEFAULT, 0.0);
+		keys[1].Time = (anim->GetPeriod() * 0.40) * anim->GetSourceTicksPerSecond();
+		keys[1].pCallbackData = (void *)&_callbackData[DESC_RIGHT];
+
+		AddCallbackKeysAndCompress(pController, anim, 2, keys, D3DXCOMPRESS_DEFAULT, 0.0);
 	}
 #pragma endregion
 
@@ -158,59 +173,65 @@ HRESULT LizardCallbackHandler::HandleCallback(UINT Track, LPVOID pCallbackData)
 	{
 		if (pData->_description == DESC_ATTACK1)
 		{
-			SOUNDMANAGER->Play3D("", *pData->_pPosition);
+			SOUNDMANAGER->Play3D("lizard_attack1", *pData->_pPosition);
 		}
 	}break;
 	case LIZARD_BITE:
 	{
 		if (pData->_description == DESC_ATTACK1)
 		{
-			SOUNDMANAGER->Play3D("", *pData->_pPosition);
+			SOUNDMANAGER->Play3D("lizard_attack2", *pData->_pPosition);
+		}
+		else if (pData->_description == DESC_ATTACK2)
+		{
+			SOUNDMANAGER->Play3D("lizard_bite_01", *pData->_pPosition);
 		}
 	}break;
 	case LIZARD_DEATH:
 	{
 		if (pData->_description == DESC_LEFT)
 		{
-			SOUNDMANAGER->Play3D("", *pData->_pPosition);
+			SOUNDMANAGER->Play3D("lizard_dead_01", *pData->_pPosition);
 		}
+		else if (pData->_description == DESC_RIGHT)
+		{
+			SOUNDMANAGER->Play3D("lizard_fall_01", *pData->_pPosition);
+		}
+
 	}break;
 	case LIZARD_HIT1:
 	{
 		if (pData->_description == DESC_LEFT)
 		{
-			SOUNDMANAGER->Play3D("", *pData->_pPosition);
+			SOUNDMANAGER->Play3D("lizard_hit_01", *pData->_pPosition);
 		}
 	}break;
 	case LIZARD_HIT2:
-	{
-	}break;
-	case LIZARD_IDLE:
 	{
 	}break;
 	case LIZARD_ROAR:
 	{
 		if (pData->_description == DESC_LEFT)
 		{
-			SOUNDMANAGER->Play3D("", *pData->_pPosition);
+			SOUNDMANAGER->Play3D("lizard_idle_01", *pData->_pPosition);
 		}
 	}break;
 	case LIZARD_RUN:
 	{
-		if (pData->_description == DESC_LEFT)
+	if (pData->_description == DESC_LEFT)
 		{
-			SOUNDMANAGER->Play3D("", *pData->_pPosition);
+			SOUNDMANAGER->Play3D("lizard_walk_left", *pData->_pPosition);
 		}
 		else if (pData->_description == DESC_RIGHT)
 		{
-			SOUNDMANAGER->Play3D("", *pData->_pPosition);
+			SOUNDMANAGER->Play3D("lizard_walk_right", *pData->_pPosition);
 		}
 	}break;
 	case LIZARD_SPIT:
 	{
 		if (pData->_description == DESC_ATTACK1)
 		{
-			SOUNDMANAGER->Play3D("", *pData->_pPosition);
+			SOUNDMANAGER->Play3D("lizard_spit_01", *pData->_pPosition);
 		}
 	}break;
 	case LIZARD_STAND:
@@ -220,11 +241,11 @@ HRESULT LizardCallbackHandler::HandleCallback(UINT Track, LPVOID pCallbackData)
 	{
 		if (pData->_description == DESC_LEFT)
 		{
-			SOUNDMANAGER->Play3D("", *pData->_pPosition);
+			SOUNDMANAGER->Play3D("lizard_walk_left", *pData->_pPosition);
 		}
 		else if (pData->_description == DESC_RIGHT)
 		{
-			SOUNDMANAGER->Play3D("", *pData->_pPosition);
+			SOUNDMANAGER->Play3D("lizard_walk_right", *pData->_pPosition);
 		}
 	}break;
 	}
