@@ -1,6 +1,27 @@
 #include "stdafx.h"
 #include "MapToolScene.h"
 
+void LoadEverySoundResources()
+{
+	SOUNDMANAGER->AddSound3D("player_walk_left", 
+		"../resources/sfx/Player/Walk/player_dirt_walk_armorlight_01.wav", false, false, 4.0f, 13.0f);
+	SOUNDMANAGER->AddSound3D("player_walk_right", 
+		"../resources/sfx/Player/Walk/player_dirt_walk_armorlight_04.wav", false, false, 4.0f, 13.0f);
+
+	SOUNDMANAGER->AddSound3D("player_run_left", 
+		"../resources/sfx/Player/Run/player_dirt_run_armorlight_01.wav", false, false, 4.0f, 13.0f);
+	SOUNDMANAGER->AddSound3D("player_run_right", 
+		"../resources/sfx/Player/Run/player_dirt_run_armorlight_04.wav", false, false, 4.0f, 13.0f);
+
+
+	SOUNDMANAGER->AddSound3D("player_swing_01", 
+		"../resources/sfx/Player/Attack/player_swing_blade_medium_01.wav", false, false, 4.0f, 13.0f);
+	SOUNDMANAGER->AddSound3D("player_swing_02", 
+		"../resources/sfx/Player/Attack/player_swing_blade_medium_02.wav", false, false, 4.0f, 13.0f);
+	SOUNDMANAGER->AddSound3D("player_swing_03", 
+		"../resources/sfx/Player/Attack/player_swing_blade_medium_03.wav", false, false, 4.0f, 13.0f);
+}
+
 void LoadEveryStaticResources()
 {
 	Matrix correctionMat;
@@ -68,64 +89,64 @@ void LoadEverySkinnedResources()
 	video::SkinnedXMeshHandle knight  = VIDEO->CreateSkinnedXMesh(
 		"../resources/Models/Knight/Knight.X", &correctionMat, "Knight");
 
-	MatrixScaling(&correctionMat, 1.4f, 1.4f, 1.4f);
-	video::SkinnedXMeshHandle snakeMesh = VIDEO->CreateSkinnedXMesh(
-		"../resources/Models/Snake/Snake_Red.X", &correctionMat, "Snake1");
+	//MatrixScaling(&correctionMat, 1.4f, 1.4f, 1.4f);
+	//video::SkinnedXMeshHandle snakeMesh = VIDEO->CreateSkinnedXMesh(
+	//	"../resources/Models/Snake/Snake_Red.X", &correctionMat, "Snake1");
 
-	MatrixScaling(&correctionMat, 1.4f, 1.4f, 1.4f);
-	video::SkinnedXMeshHandle snakeMesh2 = VIDEO->CreateSkinnedXMesh(
-		"../resources/Models/Snake/Snake_Black.X", &correctionMat, "Snake2");
+	//MatrixScaling(&correctionMat, 1.4f, 1.4f, 1.4f);
+	//video::SkinnedXMeshHandle snakeMesh2 = VIDEO->CreateSkinnedXMesh(
+	//	"../resources/Models/Snake/Snake_Black.X", &correctionMat, "Snake2");
 
-	MatrixScaling(&correctionMat, 1.4f, 1.4f, 1.4f);
-	video::SkinnedXMeshHandle snakeMesh3 = VIDEO->CreateSkinnedXMesh(
-		"../resources/Models/Snake/Snake_Cyan.X", &correctionMat, "Snake3");
+	//MatrixScaling(&correctionMat, 1.4f, 1.4f, 1.4f);
+	//video::SkinnedXMeshHandle snakeMesh3 = VIDEO->CreateSkinnedXMesh(
+	//	"../resources/Models/Snake/Snake_Cyan.X", &correctionMat, "Snake3");
 
-	MatrixScaling(&correctionMat, 1.4f, 1.4f, 1.4f);
-	video::SkinnedXMeshHandle turtleMesh = VIDEO->CreateSkinnedXMesh(
-		"../resources/Models/DragonTurtle/DragonTurtle_Black.X", &correctionMat, "Turtle");
+	//MatrixScaling(&correctionMat, 1.4f, 1.4f, 1.4f);
+	//video::SkinnedXMeshHandle turtleMesh = VIDEO->CreateSkinnedXMesh(
+	//	"../resources/Models/DragonTurtle/DragonTurtle_Black.X", &correctionMat, "Turtle");
 
-	MatrixScaling(&correctionMat, 1.0f, 1.0f, 1.0f);
-	video::SkinnedXMeshHandle batMesh1 = VIDEO->CreateSkinnedXMesh(
-		"../resources/Models/DragonBat/DragonBat_Red.X", &correctionMat, "Bat1");
-
-
-	MatrixScaling(&correctionMat, 1.0f, 1.0f, 1.0f);
-	video::SkinnedXMeshHandle batMesh2 = VIDEO->CreateSkinnedXMesh(
-		"../resources/Models/DragonBat/DragonBat_Black.X", &correctionMat, "Bat2");
+	//MatrixScaling(&correctionMat, 1.0f, 1.0f, 1.0f);
+	//video::SkinnedXMeshHandle batMesh1 = VIDEO->CreateSkinnedXMesh(
+	//	"../resources/Models/DragonBat/DragonBat_Red.X", &correctionMat, "Bat1");
 
 
-	MatrixScaling(&correctionMat, 1.0f, 1.0f, 1.0f);
-	video::SkinnedXMeshHandle batMesh3 = VIDEO->CreateSkinnedXMesh(
-		"../resources/Models/DragonBat/DragonBat_Gold.X", &correctionMat, "Bat3");
+	//MatrixScaling(&correctionMat, 1.0f, 1.0f, 1.0f);
+	//video::SkinnedXMeshHandle batMesh2 = VIDEO->CreateSkinnedXMesh(
+	//	"../resources/Models/DragonBat/DragonBat_Black.X", &correctionMat, "Bat2");
 
 
-	MatrixScaling(&correctionMat, 1.4f, 1.4f, 1.4f);
-	video::SkinnedXMeshHandle catMesh = VIDEO->CreateSkinnedXMesh(
-		"../resources/Models/DevilCat/DevilCat.X", &correctionMat, "Cat");
+	//MatrixScaling(&correctionMat, 1.0f, 1.0f, 1.0f);
+	//video::SkinnedXMeshHandle batMesh3 = VIDEO->CreateSkinnedXMesh(
+	//	"../resources/Models/DragonBat/DragonBat_Gold.X", &correctionMat, "Bat3");
 
-	MatrixScaling(&correctionMat, 2.0f, 2.0f, 2.0f);
-	video::SkinnedXMeshHandle HydraMesh1 = VIDEO->CreateSkinnedXMesh(
-		"../resources/Models/Hydra/Hydra_Green.X", &correctionMat, "Hydra1");
 
-	MatrixScaling(&correctionMat, 2.0f, 2.0f, 2.0f);
-	video::SkinnedXMeshHandle HydraMesh2 = VIDEO->CreateSkinnedXMesh(
-		"../resources/Models/Hydra/Hydra_Red.X", &correctionMat, "Hydra2");
+	//MatrixScaling(&correctionMat, 1.4f, 1.4f, 1.4f);
+	//video::SkinnedXMeshHandle catMesh = VIDEO->CreateSkinnedXMesh(
+	//	"../resources/Models/DevilCat/DevilCat.X", &correctionMat, "Cat");
 
-	MatrixScaling(&correctionMat, 2.0f, 2.0f, 2.0f);
-	video::SkinnedXMeshHandle HydraMesh3 = VIDEO->CreateSkinnedXMesh(
-		"../resources/Models/Hydra/Hydra_Black.X", &correctionMat, "Hydra3");
+	//MatrixScaling(&correctionMat, 2.0f, 2.0f, 2.0f);
+	//video::SkinnedXMeshHandle HydraMesh1 = VIDEO->CreateSkinnedXMesh(
+	//	"../resources/Models/Hydra/Hydra_Green.X", &correctionMat, "Hydra1");
 
-	MatrixScaling(&correctionMat, 2.0f, 2.0f, 2.0f);
-	video::SkinnedXMeshHandle HydraMesh4 = VIDEO->CreateSkinnedXMesh(
-		"../resources/Models/Hydra/Hydra_Gold.X", &correctionMat, "Hydra4");
+	//MatrixScaling(&correctionMat, 2.0f, 2.0f, 2.0f);
+	//video::SkinnedXMeshHandle HydraMesh2 = VIDEO->CreateSkinnedXMesh(
+	//	"../resources/Models/Hydra/Hydra_Red.X", &correctionMat, "Hydra2");
 
-	MatrixScaling(&correctionMat, 1.0f, 1.0f, 1.0f);
-	video::SkinnedXMeshHandle LizardMesh1 = VIDEO->CreateSkinnedXMesh(
-		"../resources/Models/Lizard/Lizard.X", &correctionMat, "Lizard1");
+	//MatrixScaling(&correctionMat, 2.0f, 2.0f, 2.0f);
+	//video::SkinnedXMeshHandle HydraMesh3 = VIDEO->CreateSkinnedXMesh(
+	//	"../resources/Models/Hydra/Hydra_Black.X", &correctionMat, "Hydra3");
 
-	MatrixScaling(&correctionMat, 1.0f, 1.0f, 1.0f);
-	video::SkinnedXMeshHandle LizardMesh2 = VIDEO->CreateSkinnedXMesh(
-		"../resources/Models/Lizard/Lizard_Black.X", &correctionMat, "Lizard2");
+	//MatrixScaling(&correctionMat, 2.0f, 2.0f, 2.0f);
+	//video::SkinnedXMeshHandle HydraMesh4 = VIDEO->CreateSkinnedXMesh(
+	//	"../resources/Models/Hydra/Hydra_Gold.X", &correctionMat, "Hydra4");
+
+	//MatrixScaling(&correctionMat, 1.0f, 1.0f, 1.0f);
+	//video::SkinnedXMeshHandle LizardMesh1 = VIDEO->CreateSkinnedXMesh(
+	//	"../resources/Models/Lizard/Lizard.X", &correctionMat, "Lizard1");
+
+	//MatrixScaling(&correctionMat, 1.0f, 1.0f, 1.0f);
+	//video::SkinnedXMeshHandle LizardMesh2 = VIDEO->CreateSkinnedXMesh(
+	//	"../resources/Models/Lizard/Lizard_Black.X", &correctionMat, "Lizard2");
 
 	MatrixScaling(&correctionMat, 1.0f, 1.0f, 1.0f);
 	video::SkinnedXMeshHandle Dragon = VIDEO->CreateSkinnedXMesh(
@@ -160,6 +181,7 @@ bool MapToolScene::SceneInit()
 	
 	LoadEverySkinnedResources();
 	LoadEveryStaticResources();
+	LoadEverySoundResources();
 
 	_camera.SetMoveSpeed(6.0f);
 	_camera.SetRotationSpeed(1.0f);
@@ -203,43 +225,43 @@ bool MapToolScene::SceneInit()
 			Vector3(0.0f, 0.0f, 0.0f)));
 
 	//Test
-	for (int32 i = 0; i < 100; ++i)
-	{
-		float randX = RandFloat(-config._xChunkCount * TERRAIN_CHUNK_DIM * 0.5f,
-			config._xChunkCount * TERRAIN_CHUNK_DIM * 0.5f);
-		float randz = RandFloat(-config._zChunkCount * TERRAIN_CHUNK_DIM * 0.5f,  
-			config._zChunkCount * TERRAIN_CHUNK_DIM * 0.5f);
-		ARCHE_TYPE type = (ARCHE_TYPE)RandInt(2, 7);
+	//for (int32 i = 0; i < 100; ++i)
+	//{
+	//	float randX = RandFloat(-config._xChunkCount * TERRAIN_CHUNK_DIM * 0.5f,
+	//		config._xChunkCount * TERRAIN_CHUNK_DIM * 0.5f);
+	//	float randz = RandFloat(-config._zChunkCount * TERRAIN_CHUNK_DIM * 0.5f,  
+	//		config._zChunkCount * TERRAIN_CHUNK_DIM * 0.5f);
+	//	ARCHE_TYPE type = (ARCHE_TYPE)RandInt(2, 7);
 
-		ResourceHandle handle;
-		switch (type)
-		{
-		case ARCHE_ROCK:
-		{
-			handle = VIDEO->GetStaticXMesh("Rock01");
-		} break;
-		case ARCHE_GRASS:
-		{
-			handle = VIDEO->GetStaticXMesh("Grass01");
-		} break;
-		case ARCHE_TREE:
-		{
-			handle = VIDEO->GetStaticXMesh("Tree01");
-		} break;
-		case ARCHE_TREETRUNK:
-		{
-			handle = VIDEO->GetStaticXMesh("TreeTrunk01");
-		} break;
-		case ARCHE_MUSHROOM:
-		{
-			handle = VIDEO->GetStaticXMesh("Mushroom01");
-		} break;
-		}
+	//	ResourceHandle handle;
+	//	switch (type)
+	//	{
+	//	case ARCHE_ROCK:
+	//	{
+	//		handle = VIDEO->GetStaticXMesh("Rock01");
+	//	} break;
+	//	case ARCHE_GRASS:
+	//	{
+	//		handle = VIDEO->GetStaticXMesh("Grass01");
+	//	} break;
+	//	case ARCHE_TREE:
+	//	{
+	//		handle = VIDEO->GetStaticXMesh("Tree01");
+	//	} break;
+	//	case ARCHE_TREETRUNK:
+	//	{
+	//		handle = VIDEO->GetStaticXMesh("TreeTrunk01");
+	//	} break;
+	//	case ARCHE_MUSHROOM:
+	//	{
+	//		handle = VIDEO->GetStaticXMesh("Mushroom01");
+	//	} break;
+	//	}
 
 		//_channel.Broadcast<GameObjectFactory::CreateObjectOnLocationEvent>(
 		//	GameObjectFactory::CreateObjectOnLocationEvent(type, handle,
 		//		Vector3(randX, 0, randz)));
-	}
+
 	////실험
 	//trash = _world.CreateEntity();
 	//TransformComponent & trans = trash.AddComponent<TransformComponent>();
@@ -255,6 +277,9 @@ bool MapToolScene::SceneInit()
 	//pBack->CreateFromWorld(_world, Vector3(0, 3, 0));
 
 
+	//SOUNDMANAGER->Play("walk_left");
+
+	bool  inTerrain = TERRAIN->IsWorldPositionInTerrain(Vector3(-200, -200, -200));
 
 	return result;
 }

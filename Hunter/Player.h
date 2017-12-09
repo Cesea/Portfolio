@@ -19,6 +19,9 @@ struct KeyConfig
 struct PlayerCallbackData
 {
 	int32 *_animtionEnum{};
+	Vector3 *_pPosition{};
+	//0이면 left 1이면 right
+	int32 _description;
 };
 
 class PlayerCallbackHandler : public GameObjectAnimationCallbackHandler
@@ -80,7 +83,7 @@ private :
 
 	void MoveAndRotate(float deltaTime);
 
-	PlayerCallbackData _callbackData;
+	PlayerCallbackData _callbackData[6];
 	GameCommand _currentCommand;
 	GameCommand _prevCommand;
 	void QueueAction(Action &action, bool cancle = false);

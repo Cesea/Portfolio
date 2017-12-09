@@ -28,6 +28,9 @@ private:
 	typedef std::unordered_map<std::string, FMOD::Channel**> ArrChannels;
 	typedef std::unordered_map<std::string, FMOD::Channel**>::iterator ArrChannelsIter;
 
+	//typedef std::unordered_map<std::string, FMOD::Sound **> ThreeDSounds;
+	//typedef std::unordered_map<std::string, FMOD::Sound **>::iterator ThreeDSoundsIter;
+
 private:
 	FMOD::System* _system;
 	FMOD::Sound** _sound;
@@ -35,13 +38,25 @@ private:
 
 	ArrSounds _mTotalSounds;
 
+	FMOD_VECTOR _pos;
+	FMOD_VECTOR _vel;
+	FMOD_VECTOR _forward;
+	FMOD_VECTOR _up;
+
 public:
 	bool Init(void);
 	void Release(void);
 
 	void AddSound(const std::string &keyName, const std::string & soundName, bool background, bool loop);
+	void AddSound3D(const std::string &keyName, const std::string &fileName, bool background, bool loop, 
+		float minDist, float maxDist);
+
 	void Play(const std::string & keyName);
 	void Play(const std::string & keyName, float volume);
+
+	void Play3D(const std::string &keyName, const Vector3 &pos);
+	void Play3D(const std::string &keyName, const Vector3 &pos, float volume);
+
 	void Stop(const std::string & keyName);
 	void Pause(const std::string & keyName);
 	void Resume(const std::string & keyName);
@@ -61,6 +76,9 @@ public:
 
 	SoundManager(void);
 	virtual ~SoundManager(void);
+
+	void SetListenerInfo(const Vector3 &pos, const Vector3 &vel, const Vector3 &forward);
+
 };
 
 #define SOUNDMANAGER SoundManager::GetInstance()

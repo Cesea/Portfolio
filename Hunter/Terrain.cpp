@@ -704,6 +704,19 @@ void Terrain::RenderShadow(const Camera & camera)
 }
 
 
+bool Terrain::IsWorldPositionInTerrain(const Vector3 & worldPosition)
+{
+	if (worldPosition.x < -_terrainHalfSizeX || worldPosition.x > _terrainHalfSizeX ||
+		worldPosition.z < -_terrainHalfSizeZ || worldPosition.z > _terrainHalfSizeZ)
+	{
+		return false;
+	}
+	else
+	{
+		return true;
+	}
+}
+
 void Terrain::RemoveEntityInTile(Entity entity, const TerrainTilePos & tilePos)
 {
 	Terrain::TerrainChunk &refChunk = _pChunks[Index2D(tilePos._chunkX, tilePos._chunkZ, _xChunkCount)];

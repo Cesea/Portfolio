@@ -88,6 +88,7 @@ void Engine::Run()
 		_pInput->Update();
 		float deltaTime = APPTIMER->GetTargetTime();
 		_pScene->Update(deltaTime, *_pInput.get());
+		SOUNDMANAGER->Update();
 
 		gpDevice->Clear(0, nullptr, D3DCLEAR_TARGET | D3DCLEAR_STENCIL | D3DCLEAR_ZBUFFER, 0xff303040, 1.0f, 0);
 		gpDevice->BeginScene();

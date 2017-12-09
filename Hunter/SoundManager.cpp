@@ -8,6 +8,7 @@ bool SoundManager::Init(void)
 
 	//채널수 설정
 	_system->init(TOTALSOUNDBUFFER, FMOD_INIT_NORMAL, 0);
+	_system->set3DSettings(1.0f, 1.0f, 1.0f);
 
 	//사운드 채널 생성
 	_sound = new Sound*[TOTALSOUNDBUFFER];
@@ -16,6 +17,11 @@ bool SoundManager::Init(void)
 	//초기화
 	ZeroMemory(_sound, sizeof(Sound*) * TOTALSOUNDBUFFER);
 	ZeroMemory(_channel, sizeof(Channel*) * TOTALSOUNDBUFFER);
+
+
+	_up.x = 0.0f;
+	_up.y = 1.0f;
+	_up.z = 0.0f;
 
 	return true;
 }
@@ -64,8 +70,7 @@ void SoundManager::AddSound(const std::string & keyName, const std::string & sou
 		}
 		else
 		{
-			_system->createSound(soundName.c_str(),
-				FMOD_LOOP_NORMAL, 0, &_sound[_mTotalSounds.size()]);
+			_system->createSound(soundName.c_str(), FMOD_LOOP_NORMAL, 0, &_sound[_mTotalSounds.size()]);
 		}
 	}
 	else
@@ -79,6 +84,50 @@ void SoundManager::AddSound(const std::string & keyName, const std::string & sou
 	_mTotalSounds.insert(make_pair(keyName, &_sound[_mTotalSounds.size()]));
 }
 
+void SoundManager::AddSound3D(const std::string & keyName, const std::string & fileName, 
+	bool background, bool loop, float minDist, float maxDist)
+{
+	//배경음임?
+	if (loop)
+	{
+		if (background)
+		{
+			_system->createStream(fileName.c_str(),
+				FMOD_3D, 0, &_sound[_mTotalSounds.size()]);
+
+			ArrSoundsIter iter = _mTotalSounds.find(keyName);
+			if (iter != _mTotalSounds.end())
+			{
+				auto aa = iter->second;
+				//(*aa)->setMode();
+			}
+
+		}
+		else
+		{
+			_system->createSound(fileName.c_str(),
+				FMOD_3D, 0, &_sound[_mTotalSounds.size()]);
+			_sound[_mTotalSounds.size()]->setMode(FMOD_LOOP_NORMAL);
+		}
+	}
+	else
+	{
+		//한번만 사운드 재생
+		_system->createSound(fileName.c_str(),
+			FMOD_3D, 0, &_sound[_mTotalSounds.size()]);
+	}
+
+	//맵에 사운드를 키값과 함께 넣어준다
+	_mTotalSounds.insert(make_pair(keyName, &_sound[_mTotalSounds.size()]));
+
+	ArrSoundsIter iter = _mTotalSounds.find(keyName);
+	if (iter != _mTotalSounds.end())
+	{
+		auto aa = iter->second;
+		(*aa)->set3DMinMaxDistance(minDist, maxDist);
+	}
+}
+
 void SoundManager::Play(const std::string & keyName)
 {
 	ArrSoundsIter iter = _mTotalSounds.begin();
@@ -90,6 +139,7 @@ void SoundManager::Play(const std::string & keyName)
 		if (keyName == iter->first)
 		{
 			//사운드 플레이~~~
+			_channel[count]->set3DAttributes(&_pos, &_vel);
 			_system->playSound(FMOD_CHANNEL_FREE, 
 				*iter->second, false, &_channel[count]);
 		}
@@ -107,6 +157,51 @@ void SoundManager::Play(const std::string & keyName, float volume)
 		if (keyName == iter->first)
 		{
 			//사운드 플레이~~~
+			_system->playSound(FMOD_CHANNEL_FREE, 
+				*iter->second, false, &_channel[count]);
+			_channel[count]->setVolume(volume);
+		}
+	}
+}
+
+void SoundManager::Play3D(const std::string & keyName, const Vector3 & pos)
+{
+	FMOD_VECTOR p;
+	p.x = pos.x;
+	p.y = pos.y;
+	p.z = pos.z;
+	ArrSoundsIter iter = _mTotalSounds.begin();
+
+	int count = 0;
+
+	for (iter; iter != _mTotalSounds.end(); ++iter, count++)
+	{
+		if (keyName == iter->first)
+		{
+			//사운드 플레이~~~
+			_channel[count]->set3DAttributes(&p, &_vel);
+			_system->playSound(FMOD_CHANNEL_FREE, 
+				*iter->second, false, &_channel[count]);
+		}
+	}
+}
+
+void SoundManager::Play3D(const std::string & keyName, const Vector3 & pos, float volume)
+{
+	FMOD_VECTOR p;
+	p.x = pos.x;
+	p.y = pos.y;
+	p.z = pos.z;
+	ArrSoundsIter iter = _mTotalSounds.begin();
+
+	int count = 0;
+
+	for (iter; iter != _mTotalSounds.end(); ++iter, count++)
+	{
+		if (keyName == iter->first)
+		{
+			//사운드 플레이~~~
+			_channel[count]->set3DAttributes(&p, &_vel);
 			_system->playSound(FMOD_CHANNEL_FREE, 
 				*iter->second, false, &_channel[count]);
 			_channel[count]->setVolume(volume);
@@ -252,6 +347,7 @@ unsigned int SoundManager::GetPosition(const std::string & keyName)
 
 void SoundManager::Update(void)
 {
+	_system->set3DListenerAttributes(0, &_pos, &_vel, &_forward, &_up);
 	_system->update();
 }
 
@@ -262,3 +358,19 @@ SoundManager::SoundManager(void)
 SoundManager::~SoundManager(void)
 {
 }
+
+void SoundManager::SetListenerInfo(const Vector3 & pos, const Vector3 & vel, const Vector3 & forward)
+{
+	_pos.x = pos.x;
+	_pos.y = pos.y;
+	_pos.z = pos.z;
+
+	_vel.x = vel.x;
+	_vel.y = vel.y;
+	_vel.z = vel.z;
+
+	_forward.x = forward.x;
+	_forward.y = forward.y;
+	_forward.z = forward.z;
+}
+

@@ -256,8 +256,11 @@ void Player::Update(float deltaTime)
 
    refDamageTrans.SetWorldPosition(_worldSwordPos);
 
+
    _channel.Broadcast<PlayerImformationEvent>(
 	   PlayerImformationEvent(_pTransformComp->GetWorldPosition(), _state, _pTransformComp->GetForward(), _worldSwordPos));
+
+
 }
 
 void Player::RegisterEvents()
@@ -409,6 +412,9 @@ void Player::MoveAndRotate(float deltaTime)
 	  RepositionEntity(_tilePos, _prevTilePos);
 
    }
+
+   SOUNDMANAGER->SetListenerInfo(refTransform.GetWorldPosition(), Vector3(), refTransform.GetForward());
+
 }
 
 void Player::Handle(const InputManager::KeyDownEvent & event)

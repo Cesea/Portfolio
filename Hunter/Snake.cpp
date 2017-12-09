@@ -68,18 +68,6 @@ bool Snake::CreateFromWorld(World & world, const Vector3 &Pos)
 
 	_entity.Activate();
 
-	//_pStateMachine = new SnakeStateMachine;
-	//_pStateMachine->Init(this);
-	//_pStateMachine->RegisterState(META_TYPE(SnakeIdleState)->Name(), new SnakeIdleState());
-	//_pStateMachine->RegisterState(META_TYPE(SnakeMoveState)->Name(), new SnakeMoveState());
-	//_pStateMachine->RegisterState(META_TYPE(SnakeFindState)->Name(), new SnakeFindState());
-	//_pStateMachine->RegisterState(META_TYPE(SnakeAttackState)->Name(), new SnakeAttackState());
-	//_pStateMachine->RegisterState(META_TYPE(SnakeAttack2State)->Name(), new SnakeAttack2State());
-	//_pStateMachine->RegisterState(META_TYPE(SnakeAttack3State)->Name(), new SnakeAttack3State());
-	//_pStateMachine->RegisterState(META_TYPE(SnakeStandState)->Name(), new SnakeStandState());
-	//_pStateMachine->RegisterState(META_TYPE(SnakeDeadState)->Name(), new SnakeDeadState());
-	//_pStateMachine->RegisterState(META_TYPE(SnakeHurtState)->Name(), new SnakeHurtState());
-	//this->QueueAction(SNAKE_ANIM(SNAKE_MOVE))
 	_state = SNAKESTATE_PATROL;
 	
 	_hp = 500;

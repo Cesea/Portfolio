@@ -74,6 +74,8 @@ artifacts/
 *.zip
 *.jpg
 *.dds
+*.wav
+*.mp3
 
 # Chutzpah Test files
 _Chutzpah*

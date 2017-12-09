@@ -185,6 +185,8 @@ public:
 		return _pChunks[index]; 
 	}
 
+	bool IsWorldPositionInTerrain(const Vector3 &worldPosition);
+
 	inline int32 GetXChunkCount() { return _xChunkCount; }
 	inline int32 GetZChunkCount() { return _zChunkCount; }
 
