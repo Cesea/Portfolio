@@ -680,6 +680,7 @@ void Hydra::Handle(const CollisionSystem::ActorTriggerEvent & event)
 
 		if (!_isHurt)
 		{
+			PlayPlayerAttackSound(collision._dmg, _playerSwordPos);
 			if (_state == HYDRASTATE_IDLE || _state == HYDRASTATE_STAND)
 			{
 				resetAllCount();
@@ -687,14 +688,13 @@ void Hydra::Handle(const CollisionSystem::ActorTriggerEvent & event)
 				this->QueueAction(HYDRA_ANIM(HYDRA_HIT1));
 				_battle = true;
 			}
-			_hp -= 50;
 			if (_hp <= 0)
 			{
 				resetAllCount();
 				_state = HYDRASTATE_HURT;
 				this->QueueAction(HYDRA_ANIM(HYDRA_HIT1));
 				_battle = true;
-				_hp -= 50;
+				_hp -= collision._dmg;
 				if (_hp <= 0)
 				{
 					_state = HYDRASTATE_DEATH;

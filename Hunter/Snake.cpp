@@ -443,10 +443,11 @@ void Snake::Handle(const CollisionSystem::ActorTriggerEvent & event)
 			if (_state != SNAKESTATE_HURT&&_state != SNAKESTATE_DIE)
 			{
 				resetAllCount();
+				PlayPlayerAttackSound(_collision._dmg, _playerSwordPos);
 				_state = SNAKESTATE_HURT;
 				this->QueueAction(SNAKE_ANIM(SNAKE_HIT1));
 				_battle = true;
-				_hp -= 50;
+				_hp -= _collision._dmg;
 				if (_hp <= 0)
 				{
 					_state = SNAKESTATE_DIE;

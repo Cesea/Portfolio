@@ -4,9 +4,15 @@
 #include "BaseGameObject.h"
 #include "PlayerAnimationString.h"
 
+#define PLAYER_ATTACK_ONE_DAMAGE (40)
+#define PLAYER_ATTACK_TWO_DAMAGE (50)
+#define PLAYER_ATTACK_THREE_DAMAGE (70)
+
 class Camera;
 class Player;
 class DamageBox;
+
+void PlayPlayerAttackSound(int32 damage, const Vector3 &position);
 
 struct KeyConfig
 {
@@ -93,6 +99,7 @@ private :
 	ActionComponent *_pActionComp{};
 	TransformComponent *_pTransformComp{};
 	CollisionComponent *_pCollisionComp{};
+
 private :
 	EventChannel _channel;
 	float _walkSpeed{1.6f};
@@ -100,7 +107,7 @@ private :
 
 	float _rotationSpeed{ 6.0f };
 
-	int32 _hp{ INT_MAX };
+	int32 _hp{ 999998 };
 
 	//int32 _stamina{ 100 };
 
@@ -131,6 +138,8 @@ private :
 	DamageBox *_pDamageBox;
 	Bone *_pSwordFrame;
 	Vector3 _worldSwordPos;
+
+	StopWatch _deadTimer;
 
 public :
 

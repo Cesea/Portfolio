@@ -7,6 +7,7 @@
 
 #define MAX_COMBO_COUNT 3
 
+
 //#include "stdafx.h"
 //#include "Player.h"
 //
@@ -55,6 +56,7 @@ bool Player::CreateFromWorld(World & world, const Vector3 &pos)
    collision._boundingSphere._radius = pAnimation->_pSkinnedMesh->_boundInfo._radius;
    collision._triggerType = CollisionComponent::TRIGGER_TYPE_PLAYER;
    collision._type = CollisionComponent::COLLISION_TYPE_BOX;
+   collision._valid = true;
    _pCollisionComp = &collision;
 
    ScriptComponent &scriptComponent = _entity.AddComponent<ScriptComponent>();
@@ -94,7 +96,7 @@ bool Player::CreateFromWorld(World & world, const Vector3 &pos)
 	   float range = 0.8f;
 
 	   damageCollision._boundingBox.Init(Vector3(-range, -range, -range), Vector3(range, range, range));
-	   damageCollision._dmg = 100;
+	   damageCollision._dmg = PLAYER_ATTACK_ONE_DAMAGE;
    }
 
    //Plyer의 맴버 변수들을 셋팅해주자
@@ -1035,6 +1037,13 @@ void Player::Handle(const CollisionSystem::ActorTriggerEvent & event)
 	case CollisionComponent::TRIGGER_TYPE_ENEMY_DMGBOX :
 	{
 		_collision._valid = false;
+
+		if (_state == PLAYERSTATE_BLOCK)
+		{
+			SOUNDMANAGER->Play3D("player_shield_block", _pTransformComp->_position);
+			return;
+		}
+
 		if (_state != PLAYERSTATE_HURT && _state != PLAYERSTATE_DEAD && !_superArmor)
 		{
 			_pDamageBox->GetEntity().GetComponent<CollisionComponent>()._valid = false;
@@ -1044,7 +1053,7 @@ void Player::Handle(const CollisionSystem::ActorTriggerEvent & event)
 
 			MovementStop(_currentMovement);
 			_state = PLAYERSTATE_HURT;
-			_hp -= 50;
+			_hp -= _collision._dmg;
 			_inCombat = true;
 			_superArmor = true;
 			if (_hp > 0)
@@ -1070,7 +1079,22 @@ void Player::QueueAction(Action & action, bool cancle)
 {
 	action._cancle = cancle;
    _pActionComp->_actionQueue.PushAction(action);
-   //_animationEnum = action._enum;
+
+   if (action._enum == PlayerAnimationEnum::eWarSwingLeft ||
+	   action._enum == PlayerAnimationEnum::eWarWalkSwingLeft)
+   {
+	   _pDamageBox->GetEntity().GetComponent<CollisionComponent>()._dmg = PLAYER_ATTACK_ONE_DAMAGE;
+   }
+   else if (action._enum == PlayerAnimationEnum::eWarSwingRight ||
+	   action._enum == PlayerAnimationEnum::eWarWalkSwingRight)
+   {
+	   _pDamageBox->GetEntity().GetComponent<CollisionComponent>()._dmg = PLAYER_ATTACK_TWO_DAMAGE;
+   }
+   else if (action._enum == PlayerAnimationEnum::eWarThrustMid ||
+	   action._enum == PlayerAnimationEnum::eWarWalkThrust)
+   {
+	   _pDamageBox->GetEntity().GetComponent<CollisionComponent>()._dmg = PLAYER_ATTACK_THREE_DAMAGE;
+   }
 }
 
 void Player::RepositionEntity(const TerrainTilePos & currentPos, const TerrainTilePos & prevPos)
@@ -1124,4 +1148,18 @@ void Player::RotatePlayer(float angle)
 	}
 }
 
-
+void PlayPlayerAttackSound(int32 damage, const Vector3 &position)
+{
+	if (damage == PLAYER_ATTACK_ONE_DAMAGE)
+	{
+		SOUNDMANAGER->Play3D("player_impact_01", position);
+	}
+	else if (damage == PLAYER_ATTACK_TWO_DAMAGE)
+	{
+		SOUNDMANAGER->Play3D("player_impact_02", position);
+	}
+	else if (damage == PLAYER_ATTACK_THREE_DAMAGE)
+	{
+		SOUNDMANAGER->Play3D("player_impact_03", position);
+	}
+}

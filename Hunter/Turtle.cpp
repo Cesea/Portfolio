@@ -341,11 +341,12 @@ void Turtle::Handle(const CollisionSystem::ActorTriggerEvent & event)
 		{
 			if (_state != TURTLESTATE_HURT&&_state != TURTLESTATE_DEATH)
 			{
+				PlayPlayerAttackSound(_collision._dmg, _playerSwordPos);
 				resetAllCount();
 				_state = TURTLESTATE_HURT;
 				this->QueueAction(TURTLE_ANIM(TURTLE_ANIMATION_ENUM::TURTLE_HIT1));
 				_battle = true;
-				_hp -= 50;
+				_hp -= _collision._dmg;
 				if (_hp <= 0)
 				{
 					_state = TURTLESTATE_DEATH;

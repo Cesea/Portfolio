@@ -76,7 +76,7 @@ struct CollisionComponent : public Component
 	float _velocity;
 	float _accel;
 	float _duration;
-	bool _valid;
+	bool _valid{true};
 	//디버그용 함수들...
 	void GetWorldCenterRadius(const TransformComponent &transform, Vector3 *pOutCenter, float *pOutRadius);
 	void GetWorldBox(const TransformComponent& transform, Vector3* pOutBoxPos);

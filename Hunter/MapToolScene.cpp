@@ -30,6 +30,14 @@ void LoadEverySoundResources()
 		"../resources/sfx/Player/ToCombat/player_1hand_draw.wav", false, false, 4.0f, 13.0f);
 	SOUNDMANAGER->AddSound3D("player_to_stance", 
 		"../resources/sfx/Player/ToStance/player_1hand_sheathe.wav", false, false, 4.0f, 13.0f);
+
+	SOUNDMANAGER->AddSound3D("player_impact_01",
+		"../resources/sfx/Player/Attack/player_impact_01.wav", false, false, 2.0, 5.0f);
+	SOUNDMANAGER->AddSound3D("player_impact_02",
+		"../resources/sfx/Player/Attack/player_impact_02.wav", false, false, 2.0, 5.0f);
+	SOUNDMANAGER->AddSound3D("player_impact_03",
+		"../resources/sfx/Player/Attack/player_impact_03.wav", false, false, 2.0, 5.0f);
+
 #pragma endregion
 
 #pragma region Cat

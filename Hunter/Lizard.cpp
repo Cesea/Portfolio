@@ -436,6 +436,7 @@ void Lizard::Handle(const CollisionSystem::ActorTriggerEvent & event)
 		if (_isDie) break;
 		if (!_isHurt)
 		{
+			PlayPlayerAttackSound(_collision._dmg, _playerSwordPos);
 			//일반공격중엔 무적으로
 			if (_state != LIZARDSTATE_HURT&&_state != LIZARDSTATE_DEATH&&_state != LIZARDSTATE_ATK1&&_state != LIZARDSTATE_ATK2)
 			{
@@ -444,7 +445,7 @@ void Lizard::Handle(const CollisionSystem::ActorTriggerEvent & event)
 				this->QueueAction(LIZARD_ANIM(LIZARD_HIT1));
 				_battle = true;
 			}
-			_hp -= 50;
+			_hp -= _collision._dmg;
 			if (_hp <= 0)
 			{
 				_state = LIZARDSTATE_DEATH;

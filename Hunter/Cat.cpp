@@ -423,11 +423,12 @@ void Cat::Handle(const CollisionSystem::ActorTriggerEvent & event)
 		{
 			if (_state != CATSTATE_HURT&&_state != CATSTATE_DEATH)
 			{
+				PlayPlayerAttackSound(_collision._dmg, _playerSwordPos);
 				resetAllCount();
 				_state = CATSTATE_HURT;
 				this->QueueAction(CAT_ANIM(CAT_HIT1));
 				_battle = true;
-				_hp -= 50;
+				_hp -= _collision._dmg;
 				if (_hp <= 0)
 				{
 					_state = CATSTATE_DEATH;

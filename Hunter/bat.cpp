@@ -425,7 +425,7 @@ void Bat::Handle(const CollisionSystem::ActorTriggerEvent & event)
 		{
 			if (_state != BATSTATE_HURT&&_state != BATSTATE_DEATH)
 			{
-				Console::Log("tatata\n");
+				PlayPlayerAttackSound(_collision._dmg, _playerSwordPos);
 				resetAllCount();
 				_state = BATSTATE_HURT;
 				this->QueueAction(BAT_ANIM(BAT_HIT1));

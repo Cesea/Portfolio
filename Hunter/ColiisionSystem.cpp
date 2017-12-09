@@ -10,31 +10,6 @@ CollisionSystem::~CollisionSystem()
 
 }
 
-//for (uint32 i = 0; i < entities.size(); ++i)
-//{
-//	TransformComponent &transform = entities[i].GetComponent<TransformComponent>();
-//	CollisionComponent &collision = entities[i].GetComponent<CollisionComponent>();
-//
-//	TerrainGridPosition gridPosition = ConvertWorldPositionToGridPosition( transform._position);
-//
-//	TerrainGrid &terrainGrid = TERRAIN->GetGrid(gridPosition);
-//	for (int32 j = 0; j < terrainGrid._baseObject.size(); ++j)
-//	{
-//		TransformComponent &otherTransform = terrainGrid._objects[j]._entities;
-//		CollisionComponent &otherCollision = terrainGrid._objects[j]._entities;
-
-//		Vector3 diff = transform.GetWorldPosition() - otherTransform.GetWorldPosition();
-//		float distance = Vec3Length(&diff);
-//		if (distance < checkRange)
-//		{
-
-//		}
-//	}
-//	terrainGrid.
-//}
-
-#define COLLISION_OPTIMIZE_TEST
-
 void CollisionSystem::Update(float deltaTime, float checkRange)	
 {
 	if (!_running)
@@ -254,24 +229,27 @@ void CollisionSystem::Update(float deltaTime, float checkRange)
 										Vector3 zVec = Vector3(a._13, a._23, a._33);
 										if (Collision_AABBToOBB(aabb1._min, aabb1._max, aabb0._center, -xVec, yVec, -zVec, aabb0._xSize, aabb0._ySize, aabb0._zSize))
 										{
-											if (collision._isTrigger)
+											if (collision._isTrigger && collision._valid && collision2._valid)
 											{
-												switch (collision._triggerType &&
-													collision._valid && collision2._valid)
+												switch (collision._triggerType)
 												{
 												case CollisionComponent::TRIGGER_TYPE_ENEMY:
 												case CollisionComponent::TRIGGER_TYPE_PLAYER:
+												{
 													_channel.Broadcast<ActorTriggerEvent>(ActorTriggerEvent(entities[i], refTileEntitiies[j]));
-													break;
+												} break;
 												case CollisionComponent::TRIGGER_TYPE_OBJECT:
+												{
 													_channel.Broadcast<ObjectTriggerEvent>(ObjectTriggerEvent(entities[i], refTileEntitiies[j]));
-													break;
+												} break;
 												case CollisionComponent::TRIGGER_TYPE_PLAYER_DMGBOX:
+												{
 													_channel.Broadcast<ActorTriggerEvent>(ActorTriggerEvent(entities[i], refTileEntitiies[j]));
-													break;
+												} break;
 												case CollisionComponent::TRIGGER_TYPE_ENEMY_DMGBOX:
+												{
 													_channel.Broadcast<ActorTriggerEvent>(ActorTriggerEvent(entities[i], refTileEntitiies[j]));
-													break;
+												} break;
 												}
 
 											}
@@ -282,17 +260,21 @@ void CollisionSystem::Update(float deltaTime, float checkRange)
 												{
 												case CollisionComponent::TRIGGER_TYPE_ENEMY:
 												case CollisionComponent::TRIGGER_TYPE_PLAYER:
+												{
 													_channel.Broadcast<ActorTriggerEvent>(ActorTriggerEvent(refTileEntitiies[j], entities[i]));
-													break;
+												} break;
 												case CollisionComponent::TRIGGER_TYPE_OBJECT:
+												{
 													_channel.Broadcast<ObjectTriggerEvent>(ObjectTriggerEvent(refTileEntitiies[j], entities[i]));
-													break;
+												} break;
 												case CollisionComponent::TRIGGER_TYPE_PLAYER_DMGBOX:
+												{
 													_channel.Broadcast<ActorTriggerEvent>(ActorTriggerEvent(refTileEntitiies[j], entities[i]));
-													break;
+												} break;
 												case CollisionComponent::TRIGGER_TYPE_ENEMY_DMGBOX:
+												{
 													_channel.Broadcast<ActorTriggerEvent>(ActorTriggerEvent(refTileEntitiies[j], entities[i]));
-													break;
+												} break;
 												}
 											}
 											//오브젝트와 충돌했다면 민다

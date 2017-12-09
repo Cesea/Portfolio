@@ -405,10 +405,8 @@ HRESULT PlayerCallbackHandler::HandleCallback(UINT Track, LPVOID pCallbackData)
 
 	case PlayerAnimationEnum::eWarTakingHit :
 	{
-
 		_pPlayer->_state = Player::PLAYERSTATE_STANCE;
 		_pPlayer->QueueAction(PLAYER_ANIM(eWarCombatMode));
-
 	}break;
 
 	case PlayerAnimationEnum::eWarShieldBlock :
