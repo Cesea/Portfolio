@@ -185,7 +185,7 @@ void Hydra::SetupCallbackAndCompression()
 		pController->GetAnimationSetByName(HydraAnimationString[HYDRA_ANIMATION_ENUM::HYDRA_IDLE], (ID3DXAnimationSet **)&anim);
 
 		D3DXKEY_CALLBACK keys;
-		keys.Time = (anim->GetPeriod() * 0.15) * anim->GetSourceTicksPerSecond();
+		keys.Time = (anim->GetPeriod() * 0.44) * anim->GetSourceTicksPerSecond();
 		keys.pCallbackData = (void *)&_callbackData[DESC_LEFT];
 
 		AddCallbackKeysAndCompress(pController, anim, 1, &keys, D3DXCOMPRESS_DEFAULT, 0.0);
@@ -206,63 +206,63 @@ HRESULT HydraCallbackHandler::HandleCallback(UINT Track, LPVOID pCallbackData)
 	{
 		if (pData->_description == DESC_ATTACK1)
 		{
-			SOUNDMANAGER->Play3D("", *pData->_pPosition);
+			SOUNDMANAGER->Play3D("hydra_attack_01", *pData->_pPosition);
 		}
 	}break;
 	case HYDRA_BITE2:
 	{
 		if (pData->_description == DESC_ATTACK2)
 		{
-			SOUNDMANAGER->Play3D("", *pData->_pPosition);
+			SOUNDMANAGER->Play3D("hydra_attack_02", *pData->_pPosition);
 		}
 	}break;
 	case HYDRA_BITE3:
 	{
 		if (pData->_description == DESC_ATTACK3)
 		{
-			SOUNDMANAGER->Play3D("", *pData->_pPosition);
+			SOUNDMANAGER->Play3D("hydra_attack_03", *pData->_pPosition);
 		}
 	}break;
 	case HYDRA_BREATH_FIRE1:
 	{
 		if (pData->_description == DESC_ATTACK1)
 		{
-			SOUNDMANAGER->Play3D("", *pData->_pPosition);
+			SOUNDMANAGER->Play3D("hydra_breath_01", *pData->_pPosition);
 		}
 	}break;
 	case HYDRA_BREATH_FIRE2:
 	{
 		if (pData->_description == DESC_ATTACK2)
 		{
-			SOUNDMANAGER->Play3D("", *pData->_pPosition);
+			SOUNDMANAGER->Play3D("hydra_breath_01", *pData->_pPosition);
 		}
 	}break;
 	case HYDRA_BREATH_FIRE3:
 	{
 		if (pData->_description == DESC_ATTACK3)
 		{
-			SOUNDMANAGER->Play3D("", *pData->_pPosition);
+			SOUNDMANAGER->Play3D("hydra_breath_01", *pData->_pPosition);
 		}
 	}break;
 	case HYDRA_DEATH:
 	{
 		if (pData->_description == DESC_LEFT)
 		{
-			SOUNDMANAGER->Play3D("", *pData->_pPosition);
+			SOUNDMANAGER->Play3D("hydra_death_01", *pData->_pPosition);
 		}
 	}break;
 	case HYDRA_HIT1 :
 	{
 		if (pData->_description == DESC_LEFT)
 		{
-			SOUNDMANAGER->Play3D("", *pData->_pPosition);
+			SOUNDMANAGER->Play3D("hydra_hit_01", *pData->_pPosition);
 		}
 	}break;
 	case HYDRA_IDLE:
 	{
 		if (pData->_description == DESC_LEFT)
 		{
-			SOUNDMANAGER->Play3D("", *pData->_pPosition);
+			SOUNDMANAGER->Play3D("hydra_idle_01", *pData->_pPosition);
 		}
 	}break;
 	//case HYDRA_STAND:
@@ -272,25 +272,25 @@ HRESULT HydraCallbackHandler::HandleCallback(UINT Track, LPVOID pCallbackData)
 	{
 		if (pData->_description == DESC_RIGHT)
 		{
-			SOUNDMANAGER->Play3D("", *pData->_pPosition);
+			SOUNDMANAGER->Play3D("hydra_walk_right", *pData->_pPosition);
 		}
 		else if (pData->_description == DESC_LEFT)
 		{
-			SOUNDMANAGER->Play3D("", *pData->_pPosition);
+			SOUNDMANAGER->Play3D("hydra_walk_left", *pData->_pPosition);
 		}
 	}break;
 	case HYDRA_WHIP_HEAD:
 	{
 		if (pData->_description == DESC_ATTACK1)
 		{
-			SOUNDMANAGER->Play3D("", *pData->_pPosition);
+			SOUNDMANAGER->Play3D("hydra_whip_01", *pData->_pPosition);
 		}
 	}break;
 	case HYDRA_WHIP_TAIL:
 	{
 		if (pData->_description == DESC_ATTACK1)
 		{
-			SOUNDMANAGER->Play3D("", *pData->_pPosition);
+			SOUNDMANAGER->Play3D("hydra_whip_01", *pData->_pPosition);
 		}
 	}break;
 	}

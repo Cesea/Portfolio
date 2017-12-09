@@ -19,7 +19,7 @@ bool Hydra::CreateFromWorld(World & world, const Vector3 &Pos)
 	static int32 animCount = 0;
 	RenderComponent &renderComp = _entity.AddComponent<RenderComponent>();
 	renderComp._type = RenderComponent::Type::eSkinned;
-	int a = 1;
+	int a = 2;
 	switch (a)
 	{
 	case 0:

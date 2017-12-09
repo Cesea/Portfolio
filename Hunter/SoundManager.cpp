@@ -65,19 +65,22 @@ void SoundManager::AddSound(const std::string & keyName, const std::string & sou
 		//배경음임?
 		if (background)
 		{
-			_system->createStream(soundName.c_str(),
+			FMOD_RESULT result = _system->createStream(soundName.c_str(),
 				FMOD_LOOP_NORMAL, 0, &_sound[_mTotalSounds.size()]);
+			Assert(result == FMOD_OK);
 		}
 		else
 		{
-			_system->createSound(soundName.c_str(), FMOD_LOOP_NORMAL, 0, &_sound[_mTotalSounds.size()]);
+			FMOD_RESULT result = _system->createSound(soundName.c_str(), FMOD_LOOP_NORMAL, 0, &_sound[_mTotalSounds.size()]);
+			Assert(result == FMOD_OK);
 		}
 	}
 	else
 	{
 		//한번만 사운드 재생
-		_system->createSound(soundName.c_str(),
+		FMOD_RESULT result = _system->createSound(soundName.c_str(),
 			FMOD_DEFAULT, 0, &_sound[_mTotalSounds.size()]);
+		Assert(result == FMOD_OK);
 	}
 
 	//맵에 사운드를 키값과 함께 넣어준다
@@ -92,29 +95,24 @@ void SoundManager::AddSound3D(const std::string & keyName, const std::string & f
 	{
 		if (background)
 		{
-			_system->createStream(fileName.c_str(),
+			FMOD_RESULT result = _system->createStream(fileName.c_str(),
 				FMOD_3D, 0, &_sound[_mTotalSounds.size()]);
-
-			ArrSoundsIter iter = _mTotalSounds.find(keyName);
-			if (iter != _mTotalSounds.end())
-			{
-				auto aa = iter->second;
-				//(*aa)->setMode();
-			}
-
+			Assert(result == FMOD_OK);
 		}
 		else
 		{
-			_system->createSound(fileName.c_str(),
+			FMOD_RESULT result = _system->createSound(fileName.c_str(),
 				FMOD_3D, 0, &_sound[_mTotalSounds.size()]);
 			_sound[_mTotalSounds.size()]->setMode(FMOD_LOOP_NORMAL);
+			Assert(result == FMOD_OK);
 		}
 	}
 	else
 	{
 		//한번만 사운드 재생
-		_system->createSound(fileName.c_str(),
+		FMOD_RESULT result = _system->createSound(fileName.c_str(),
 			FMOD_3D, 0, &_sound[_mTotalSounds.size()]);
+			Assert(result == FMOD_OK);
 	}
 
 	//맵에 사운드를 키값과 함께 넣어준다

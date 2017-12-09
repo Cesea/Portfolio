@@ -40,16 +40,16 @@ void Cat::SetupCallbackAndCompression()
 
 #pragma region Roar
 	//Roar
-	//{
-	//	ID3DXKeyframedAnimationSet *anim;
-	//	pController->GetAnimationSetByName(CatAnimationString[CAT_ANIMATION_ENUM::CAR_ROAR], (ID3DXAnimationSet **)&anim);
+	{
+		ID3DXKeyframedAnimationSet *anim;
+		pController->GetAnimationSetByName(CatAnimationString[CAT_ANIMATION_ENUM::CAT_IDLE], (ID3DXAnimationSet **)&anim);
 
-	//	D3DXKEY_CALLBACK keys;
-	//	keys.Time = (anim->GetPeriod() * 0.05) * anim->GetSourceTicksPerSecond();
-	//	keys.pCallbackData = (void *)&_callbackData[DESC_ATTACK1];
+		D3DXKEY_CALLBACK keys;
+		keys.Time = (anim->GetPeriod() * 0.30) * anim->GetSourceTicksPerSecond();
+		keys.pCallbackData = (void *)&_callbackData[DESC_LEFT];
 
-	//	AddCallbackKeysAndCompress(pController, anim, 1, &keys, D3DXCOMPRESS_DEFAULT, 0.0);
-	//}
+		AddCallbackKeysAndCompress(pController, anim, 1, &keys, D3DXCOMPRESS_DEFAULT, 0.0);
+	}
 
 #pragma endregion
 
@@ -193,6 +193,10 @@ HRESULT CatCallbackHandler::HandleCallback(UINT Track, LPVOID pCallbackData)
 
 	case CAT_IDLE:
 	{
+		if (pData->_description == DESC_LEFT)
+		{
+			SOUNDMANAGER->Play3D("cat_roar_01", *pData->_pPosition);
+		}
 	}break;
 
 	case CAT_RUN:
@@ -203,14 +207,12 @@ HRESULT CatCallbackHandler::HandleCallback(UINT Track, LPVOID pCallbackData)
 		}
 
 	}break;
-	case CAT_STAND:
-	{
-	}break;
-	case CAT_WALK:
-	{
-	}break;
+	//case CAT_STAND:
+	//{
+	//}break;
+	//case CAT_WALK:
+	//{
+	//}break;
 	}
-
-
 	return S_OK;
 }

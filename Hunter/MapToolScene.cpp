@@ -14,7 +14,6 @@ void LoadEverySoundResources()
 	SOUNDMANAGER->AddSound3D("player_run_right", 
 		"../resources/sfx/Player/Run/player_dirt_run_armorlight_04.wav", false, false, 4.0f, 13.0f);
 
-
 	SOUNDMANAGER->AddSound3D("player_swing_01", 
 		"../resources/sfx/Player/Attack/player_swing_blade_medium_01.wav", false, false, 4.0f, 13.0f);
 	SOUNDMANAGER->AddSound3D("player_swing_02", 
@@ -35,23 +34,64 @@ void LoadEverySoundResources()
 
 #pragma region Cat
 	SOUNDMANAGER->AddSound3D("cat_attack_01", 
-		"../resources/sfx/Cat/Attack/cat_attack_01.wav", false, false, 4.0f, 13.0f);
+		"../resources/sfx/Cat/cat_attack_01.wav", false, false, 4.0f, 13.0f);
 	SOUNDMANAGER->AddSound3D("cat_attack_02", 
-		"../resources/sfx/Cat/Attack/cat_attack_02.wav", false, false, 4.0f, 13.0f);
+		"../resources/sfx/Cat/cat_attack_02.wav", false, false, 4.0f, 13.0f);
 	SOUNDMANAGER->AddSound3D("cat_attack_04", 
-		"../resources/sfx/Cat/Attack/cat_attack_04.wav", false, false, 4.0f, 13.0f);
-
+		"../resources/sfx/Cat/cat_attack_04.wav", false, false, 4.0f, 13.0f);
 	SOUNDMANAGER->AddSound3D("cat_roar_01", 
-		"../resources/sfx/Cat/Roar/cat_roar_01.wav", false, false, 4.0f, 13.0f);
-
+		"../resources/sfx/Cat/cat_roar_01.wav", false, false, 4.0f, 13.0f);
 	SOUNDMANAGER->AddSound3D("cat_run_01", 
-		"../resources/sfx/Cat/Run/cat_run_01.wav", false, false, 4.0f, 13.0f);
-
+		"../resources/sfx/Cat/cat_run_01.wav", false, false, 4.0f, 13.0f);
 	SOUNDMANAGER->AddSound3D("cat_hit_01", 
-		"../resources/sfx/Cat/Hit/cat_hit_01.wav", false, false, 4.0f, 13.0f);
-
+		"../resources/sfx/Cat/cat_hit_01.wav", false, false, 4.0f, 13.0f);
 	SOUNDMANAGER->AddSound3D("cat_dead_01", 
-		"../resources/sfx/Cat/Dead/cat_dead_01.wav", false, false, 4.0f, 13.0f);
+		"../resources/sfx/Cat/cat_dead_01.wav", false, false, 4.0f, 13.0f);
+#pragma endregion
+
+#pragma region Bat
+	SOUNDMANAGER->AddSound3D("bat_forward_01", 
+		"../resources/sfx/Bat/bat_forward_01.wav", false, false, 4.0f, 13.0f);
+	SOUNDMANAGER->AddSound3D("bat_roar_01", 
+		"../resources/sfx/Bat/bat_roar_01.wav", false, false, 4.0f, 13.0f);
+	SOUNDMANAGER->AddSound3D("bat_attack_01", 
+		"../resources/sfx/Bat/bat_attack_01.wav", false, false, 4.0f, 13.0f);
+	SOUNDMANAGER->AddSound3D("bat_attack_02", 
+		"../resources/sfx/Bat/bat_attack_02.wav", false, false, 4.0f, 13.0f);
+	SOUNDMANAGER->AddSound3D("bat_spit_01", 
+		"../resources/sfx/Bat/bat_spit_01.wav", false, false, 4.0f, 13.0f);
+	SOUNDMANAGER->AddSound3D("bat_dead_01", 
+		"../resources/sfx/Bat/bat_dead_01.wav", false, false, 4.0f, 13.0f);
+	SOUNDMANAGER->AddSound3D("bat_hit_01", 
+		"../resources/sfx/Bat/bat_hit_01.wav", false, false, 4.0f, 13.0f);
+#pragma endregion
+
+#pragma region Hydra
+	SOUNDMANAGER->AddSound3D("hydra_walk_left", 
+		"../resources/sfx/Hydra/hydra_walk_left.wav", false, false, 4.0f, 13.0f);
+	SOUNDMANAGER->AddSound3D("hydra_walk_right", 
+		"../resources/sfx/Hydra/hydra_walk_right.wav", false, false, 4.0f, 13.0f);
+
+	SOUNDMANAGER->AddSound3D("hydra_attack_01", 
+		"../resources/sfx/Hydra/hydra_attack_01.wav", false, false, 4.0f, 13.0f);
+	SOUNDMANAGER->AddSound3D("hydra_attack_02", 
+		"../resources/sfx/Hydra/hydra_attack_02.wav", false, false, 4.0f, 13.0f);
+	SOUNDMANAGER->AddSound3D("hydra_attack_03", 
+		"../resources/sfx/Hydra/hydra_attack_03.wav", false, false, 4.0f, 13.0f);
+
+	SOUNDMANAGER->AddSound3D("hydra_breath_01", 
+		"../resources/sfx/Hydra/hydra_breath_01.wav", false, false, 4.0f, 13.0f);
+
+	SOUNDMANAGER->AddSound3D("hydra_death_01", 
+		"../resources/sfx/Hydra/hydra_death_01.wav", false, false, 4.0f, 13.0f);
+	SOUNDMANAGER->AddSound3D("hydra_hit_01", 
+		"../resources/sfx/Hydra/hydra_hit_01.wav", false, false, 4.0f, 13.0f);
+
+	SOUNDMANAGER->AddSound3D("hydra_idle_01", 
+		"../resources/sfx/Hydra/hydra_idle_01.wav", false, false, 4.0f, 13.0f);
+
+	SOUNDMANAGER->AddSound3D("hydra_whip_01", 
+		"../resources/sfx/Hydra/hydra_whip_01.wav", false, false, 4.0f, 13.0f);
 
 #pragma endregion
 
