@@ -9,17 +9,16 @@ class SnakeStateMachine;
 
 struct SnakeCallbackData
 {
-	SNAKE_ANIMATION_ENUM *_animtionEnum;
+	int32 *_animtionEnum;
+	Vector3 *_pPosition{};
+	int32 _description;
 };
 
 class SnakeCallbackHandler : public GameObjectAnimationCallbackHandler
 {
 public :
 	virtual bool Init(BaseGameObject *pSnake) { _pSnake = (Snake *)pSnake; return true; }
-    HRESULT CALLBACK HandleCallback( THIS_ UINT Track, LPVOID pCallbackData )
-    {
-        return S_OK;
-    }
+	HRESULT CALLBACK HandleCallback(THIS_ UINT Track, LPVOID pCallbackData);
 
 private :
 	Snake *_pSnake{};
@@ -65,7 +64,7 @@ public:
 protected:
 	void SetupCallbackAndCompression();
 
-	SnakeCallbackData _callbackData;
+	SnakeCallbackData _callbackData[5];
 
 	GameCommand _currentCommand;
 

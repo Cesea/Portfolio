@@ -19,7 +19,8 @@
 	SnakeAnimationAction<Name>::_action._crossFadeTime = CrossFadeTime; \
 	SnakeAnimationAction<Name>::_action._outCrossFadeTime = OutCrossFadeTime; \
 	strncpy(SnakeAnimationAction<Name>::_action._name, SnakeAnimationString[SNAKE_ANIMATION_ENUM::Name], strlen(SnakeAnimationString[SNAKE_ANIMATION_ENUM::Name])); \
-	SnakeAnimationAction<Name>::_action._name; 
+	SnakeAnimationAction<Name>::_action._name;  \
+	SnakeAnimationAction<Name>::_action._enum = Name; 
 
 #define SNAKE_ANIM( Name ) SnakeAnimationAction<Name>::_action
 

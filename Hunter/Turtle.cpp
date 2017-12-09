@@ -71,7 +71,7 @@ bool Turtle::CreateFromWorld(World & world, const Vector3 &Pos)
 
 	_playerPos = Vector3(-5.0f, 6.0f, 5.0f);
 
-	_atkRange = 0.8f;
+	_atkRange = 0.5f;
 	_atkTime = 90;
 	_atkCount = _atkTime;
 
@@ -363,25 +363,6 @@ void Turtle::Handle(const CollisionSystem::ActorTriggerEvent & event)
 	}
 }
 
-void Turtle::SetupCallbackAndCompression()
-{
-	ActionComponent &refActionComp = _entity.GetComponent<ActionComponent>();
-	TransformComponent &refTransform = _entity.GetComponent<TransformComponent>();
-
-	ID3DXAnimationController *pController = refActionComp._pAnimationController;
-	uint32 numAnimationSet = pController->GetNumAnimationSets();
-	ID3DXKeyframedAnimationSet *anim0;
-
-	pController->GetAnimationSetByName(TurtleAnimationString[TURTLE_ANIMATION_ENUM::TURTLE_STAND], (ID3DXAnimationSet **)&anim0);
-
-	_callbackData._animtionEnum = (TURTLE_ANIMATION_ENUM *)&_animationEnum;
-
-	D3DXKEY_CALLBACK warSwingLeftKeys;
-	warSwingLeftKeys.Time = anim0->GetPeriod() / 1.0f * anim0->GetSourceTicksPerSecond();
-	warSwingLeftKeys.pCallbackData = (void *)&_callbackData;
-
-	AddCallbackKeysAndCompress(pController, anim0, 1, &warSwingLeftKeys, D3DXCOMPRESS_DEFAULT, 0.1f);
-}
 
 void Turtle::QueueAction(Action & action, bool cancle)
 {
@@ -418,3 +399,4 @@ bool Turtle::findPlayer(Vector3 forward, Vector3 playerPos, Vector3 myPos, float
 
 	return false;
 }
+

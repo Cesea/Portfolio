@@ -73,12 +73,12 @@ void InitPlayerAnimation()
    PLAYER_ANIM_DEFINE(eRun, false, false, false, 1.0f, 0.2f, 0.2f);
    PLAYER_ANIM_DEFINE(eSayNo, true, true, false, 1.0f, 0.2f, 0.2f);
    PLAYER_ANIM_DEFINE(eSneaking, true, false, true, 1.0f, 0.2f, 0.2f);
-   PLAYER_ANIM_DEFINE(eStandingFree, false, false, false, 1.0f, 0.2f, 0.2f);
+   PLAYER_ANIM_DEFINE(eStandingFree, false, false, false, 1.0f, 0.3f, 0.2f);
    PLAYER_ANIM_DEFINE(eSwimming, false, false, false, 1.0f, 0.2f, 0.2f);
    PLAYER_ANIM_DEFINE(eTalking, true, true, false, 1.0f, 0.2f, 0.2f);
    PLAYER_ANIM_DEFINE(eWarThrowingAxe, true, true, false, 1.0f, 0.2f, 0.2f);
    PLAYER_ANIM_DEFINE(eWarThrowingSpear, true, true, false, 1.0f, 0.2f, 0.2f);
-   PLAYER_ANIM_DEFINE(eWarCombatMode, false, false, false, 1.0f, 0.2f, 0.2f);
+   PLAYER_ANIM_DEFINE(eWarCombatMode, false, false, false, 1.0f, 0.4f, 0.5f);
    PLAYER_ANIM_DEFINE(eWarDying, false, false, true, 1.0f, 0.2f, 0.2f);
    PLAYER_ANIM_DEFINE(eWarBackwards, false, true, false, 1.0f, 0.2f, 0.2f);
    PLAYER_ANIM_DEFINE(eWarBelowHighSwing, true, true, false, 1.0f, 0.2f, 0.2f);

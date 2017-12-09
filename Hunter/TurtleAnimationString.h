@@ -19,7 +19,8 @@
 	TurtleAnimationAction<Name>::_action._crossFadeTime = CrossFadeTime; \
 	TurtleAnimationAction<Name>::_action._outCrossFadeTime = OutCrossFadeTime; \
 	strncpy(TurtleAnimationAction<Name>::_action._name, TurtleAnimationString[TURTLE_ANIMATION_ENUM::Name], strlen(TurtleAnimationString[TURTLE_ANIMATION_ENUM::Name])); \
-	TurtleAnimationAction<Name>::_action._name; 
+	TurtleAnimationAction<Name>::_action._name;  \
+	TurtleAnimationAction<Name>::_action._enum = Name; 
 
 #define TURTLE_ANIM( Name ) TurtleAnimationAction<Name>::_action
 

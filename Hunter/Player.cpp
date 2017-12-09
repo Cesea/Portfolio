@@ -140,6 +140,7 @@ void Player::Update(float deltaTime)
 			   _inCombat = false;
 			   _combatToPeaceTimer.Restart();
 			   this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eStandingFree));
+			   SOUNDMANAGER->Play3D("player_to_stance", *_callbackData[0]._pPosition);
 		   }
 	   }
    } break;
@@ -907,6 +908,7 @@ void Player::Handle(const InputManager::MousePressedEvent & event)
 	   {
 		   if (false == _inCombat)
 		   {
+			   SOUNDMANAGER->Play3D("player_to_combat", *_callbackData[0]._pPosition);
 			   this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWarCombatMode));
 			   _inCombat = true;
 		   }

@@ -66,7 +66,6 @@ bool Cat::CreateFromWorld(World & world, const Vector3 &Pos)
 
 	_battle = false;
 
-
 	_atkRange = 1.0f;
 	_atkTime = 70;
 	_atkCount = _atkTime;
@@ -446,31 +445,10 @@ void Cat::Handle(const CollisionSystem::ActorTriggerEvent & event)
 	}
 }
 
-void Cat::SetupCallbackAndCompression()
-{
-	ActionComponent &refActionComp = _entity.GetComponent<ActionComponent>();
-	TransformComponent &refTransform = _entity.GetComponent<TransformComponent>();
-
-	ID3DXAnimationController *pController = refActionComp._pAnimationController;
-	uint32 numAnimationSet = pController->GetNumAnimationSets();
-	ID3DXKeyframedAnimationSet *anim0;
-
-	pController->GetAnimationSetByName(CatAnimationString[CAT_ANIMATION_ENUM::CAT_IDLE], (ID3DXAnimationSet **)&anim0);
-
-	_callbackData._animtionEnum = (CAT_ANIMATION_ENUM *)&_animationEnum;
-
-	D3DXKEY_CALLBACK warSwingLeftKeys;
-	warSwingLeftKeys.Time = anim0->GetPeriod() / 1.0f * anim0->GetSourceTicksPerSecond();
-	warSwingLeftKeys.pCallbackData = (void *)&_callbackData;
-
-	AddCallbackKeysAndCompress(pController, anim0, 1, &warSwingLeftKeys, D3DXCOMPRESS_DEFAULT, 0.1f);
-}
-
 void Cat::QueueAction(Action & action, bool cancle)
 {
 	action._cancle = cancle;
 	_pActionComp->_actionQueue.PushAction(action);
-	_animationEnum = action._enum;
 }
 
 bool Cat::findPlayer(Vector3 forward, Vector3 playerPos, Vector3 myPos, float range1, float range2, float findRadian)
@@ -501,3 +479,4 @@ bool Cat::findPlayer(Vector3 forward, Vector3 playerPos, Vector3 myPos, float ra
 
 	return false;
 }
+

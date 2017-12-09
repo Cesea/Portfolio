@@ -449,25 +449,6 @@ void Bat::Handle(const CollisionSystem::ActorTriggerEvent & event)
 	}
 }
 
-void Bat::SetupCallbackAndCompression()
-{
-	ActionComponent &refActionComp = _entity.GetComponent<ActionComponent>();
-	TransformComponent &refTransform = _entity.GetComponent<TransformComponent>();
-
-	//ID3DXAnimationController *pController = refActionComp._pAnimationController;
-	//uint32 numAnimationSet = pController->GetNumAnimationSets();
-	//ID3DXKeyframedAnimationSet *anim0;
-
-	//pController->GetAnimationSetByName(BatAnimationString[BAT_ANIMATION_ENUM::BAT_IDLE], (ID3DXAnimationSet **)&anim0);
-
-	//_callbackData._animtionEnum = (BAT_ANIMATION_ENUM *)&_animationEnum;
-
-	//D3DXKEY_CALLBACK warSwingLeftKeys;
-	//warSwingLeftKeys.Time = (float)anim0->GetPeriod() / 1.0f * (float)anim0->GetSourceTicksPerSecond();
-	//warSwingLeftKeys.pCallbackData = (void *)&_callbackData;
-
-	//AddCallbackKeysAndCompress(pController, anim0, 1, &warSwingLeftKeys, D3DXCOMPRESS_DEFAULT, 0.1f);
-}
 
 void Bat::QueueAction(Action & action, bool cancle )
 {
@@ -504,3 +485,4 @@ bool Bat::findPlayer(Vector3 forward, Vector3 playerPos, Vector3 myPos, float ra
 
 	return false;
 }
+

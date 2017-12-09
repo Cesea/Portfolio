@@ -9,17 +9,17 @@ class BatStateMachine;
 
 struct BatCallbackData
 {
-	BAT_ANIMATION_ENUM *_animtionEnum;
+	int32 *_animtionEnum;
+	Vector3 *_pPosition{};
+	//0이면 left 1이면 right
+	int32 _description;
 };
 
 class BatCallbackHandler : public GameObjectAnimationCallbackHandler
 {
 public:
 	virtual bool Init(BaseGameObject *pBat) { _pBat = (Bat *)pBat; return true; }
-	HRESULT CALLBACK HandleCallback(THIS_ UINT Track, LPVOID pCallbackData)
-	{
-		return S_OK;
-	}
+	HRESULT CALLBACK HandleCallback(THIS_ UINT Track, LPVOID pCallbackData);
 
 private:
 	Bat *_pBat{};
@@ -61,7 +61,7 @@ public:
 protected:
 	void SetupCallbackAndCompression();
 
-	BatCallbackData _callbackData;
+	BatCallbackData _callbackData[5];
 
 	GameCommand _currentCommand;
 

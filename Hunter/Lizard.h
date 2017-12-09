@@ -9,27 +9,16 @@ class LizardStateMachine;
 
 struct LizardCallbackData
 {
-	LIZARD_ANIMATION_ENUM *_animtionEnum;
+	int32 *_animtionEnum;
+	Vector3 *_pPosition{};
+	int32 _description;
 };
 
 class LizardCallbackHandler : public GameObjectAnimationCallbackHandler
 {
 public:
 	bool Init(BaseGameObject *pLizard) { _pLizard = (Lizard *)pLizard; return true; }
-	HRESULT CALLBACK HandleCallback(THIS_ UINT Track, LPVOID pCallbackData)
-	{
-		//      SnakeCallbackData* pData = ( SnakeCallbackData* )pCallbackData;
-		//if (nullptr == pData)
-		//{
-		//          return S_OK;
-		//}
-
-		//switch (*pData->_animtionEnum)
-		//{
-
-		//}
-		return S_OK;
-	}
+	HRESULT CALLBACK HandleCallback(THIS_ UINT Track, LPVOID pCallbackData);
 
 private:
 	Lizard *_pLizard{};
@@ -71,7 +60,7 @@ public:
 protected:
 	void SetupCallbackAndCompression();
 
-	LizardCallbackData _callbackData;
+	LizardCallbackData _callbackData[5];
 
 	LizardStateMachine *_pStateMachine;
 

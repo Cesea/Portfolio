@@ -19,7 +19,8 @@
 	HydraAnimationAction<Name>::_action._crossFadeTime = CrossFadeTime; \
 	HydraAnimationAction<Name>::_action._outCrossFadeTime = OutCrossFadeTime; \
 	strncpy(HydraAnimationAction<Name>::_action._name, HydraAnimationString[HYDRA_ANIMATION_ENUM::Name], strlen(HydraAnimationString[HYDRA_ANIMATION_ENUM::Name])); \
-	HydraAnimationAction<Name>::_action._name; 
+	HydraAnimationAction<Name>::_action._name;  \
+	HydraAnimationAction<Name>::_action._enum = Name; 
 
 #define HYDRA_ANIM( Name ) HydraAnimationAction<Name>::_action
 

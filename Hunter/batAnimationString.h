@@ -19,7 +19,8 @@
 	BatAnimationAction<Name>::_action._crossFadeTime = CrossFadeTime; \
 	BatAnimationAction<Name>::_action._outCrossFadeTime = OutCrossFadeTime; \
 	strncpy(BatAnimationAction<Name>::_action._name, BatAnimationString[BAT_ANIMATION_ENUM::Name], strlen(BatAnimationString[BAT_ANIMATION_ENUM::Name])); \
-	BatAnimationAction<Name>::_action._name; 
+	BatAnimationAction<Name>::_action._name; \
+	BatAnimationAction<Name>::_action._enum = Name; 
 
 #define BAT_ANIM( Name ) BatAnimationAction<Name>::_action
 

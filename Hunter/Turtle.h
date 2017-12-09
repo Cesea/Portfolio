@@ -6,27 +6,16 @@ class Turtle;
 
 struct TurtleCallbackData
 {
-	TURTLE_ANIMATION_ENUM *_animtionEnum;
+	int32 *_animtionEnum;
+	Vector3 *_pPosition{};
+	int32 _description;
 };
 
 class TurtleCallbackHandler : public GameObjectAnimationCallbackHandler
 {
 public:
 	bool Init(BaseGameObject *pTurtle) { _pTurtle = (Turtle *)pTurtle; return true; }
-	HRESULT CALLBACK HandleCallback(THIS_ UINT Track, LPVOID pCallbackData)
-	{
-		//      SnakeCallbackData* pData = ( SnakeCallbackData* )pCallbackData;
-		//if (nullptr == pData)
-		//{
-		//          return S_OK;
-		//}
-
-		//switch (*pData->_animtionEnum)
-		//{
-
-		//}
-		return S_OK;
-	}
+	HRESULT CALLBACK HandleCallback(THIS_ UINT Track, LPVOID pCallbackData);
 
 private:
 	Turtle *_pTurtle{};
@@ -65,7 +54,7 @@ public:
 protected:
 	void SetupCallbackAndCompression();
 
-	TurtleCallbackData _callbackData;
+	TurtleCallbackData _callbackData[5];
 
 	GameCommand _currentCommand;
 

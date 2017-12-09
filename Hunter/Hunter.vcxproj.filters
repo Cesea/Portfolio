@@ -306,6 +306,12 @@
     <ClCompile Include="Dragon.cpp">
       <Filter>Game\GameObjects\Enemy\Dragon</Filter>
     </ClCompile>
+    <ClCompile Include="Cat_Callback.cpp">
+      <Filter>Game\GameObjects\Enemy\Cat</Filter>
+    </ClCompile>
+    <ClCompile Include="Bat_Callback.cpp">
+      <Filter>Game\GameObjects\Enemy\Bat</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ClassTypeID.h" />

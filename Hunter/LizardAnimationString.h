@@ -19,7 +19,8 @@
 	LizardAnimationAction<Name>::_action._crossFadeTime = CrossFadeTime; \
 	LizardAnimationAction<Name>::_action._outCrossFadeTime = OutCrossFadeTime; \
 	strncpy(LizardAnimationAction<Name>::_action._name, LizardAnimationString[LIZARD_ANIMATION_ENUM::Name], strlen(LizardAnimationString[LIZARD_ANIMATION_ENUM::Name])); \
-	LizardAnimationAction<Name>::_action._name; 
+	LizardAnimationAction<Name>::_action._name; \
+	LizardAnimationAction<Name>::_action._enum = Name;; 
 
 #define LIZARD_ANIM( Name ) LizardAnimationAction<Name>::_action
 

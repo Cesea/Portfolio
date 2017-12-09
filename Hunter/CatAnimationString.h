@@ -19,7 +19,9 @@
 	CatAnimationAction<Name>::_action._crossFadeTime = CrossFadeTime; \
 	CatAnimationAction<Name>::_action._outCrossFadeTime = OutCrossFadeTime; \
 	strncpy(CatAnimationAction<Name>::_action._name, CatAnimationString[CAT_ANIMATION_ENUM::Name], strlen(CatAnimationString[CAT_ANIMATION_ENUM::Name])); \
-	CatAnimationAction<Name>::_action._name; 
+	CatAnimationAction<Name>::_action._name;  \
+	CatAnimationAction<Name>::_action._enum = Name;
+	
 
 #define CAT_ANIM( Name ) CatAnimationAction<Name>::_action
 

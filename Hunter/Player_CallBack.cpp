@@ -41,8 +41,9 @@ void Player::SetupCallbackAndCompression()
    ID3DXAnimationController *pController = refActionComp._pAnimationController;
    uint32 numAnimationSet = pController->GetNumAnimationSets();
 
-#pragma region Walk
 
+
+#pragma region Walk
    //Walk
    {
 	   ID3DXKeyframedAnimationSet *anim;
@@ -277,11 +278,14 @@ void Player::SetupCallbackAndCompression()
 	   ID3DXKeyframedAnimationSet *anim;
 	   pController->GetAnimationSetByName(PlayerAnimationString[PlayerAnimationEnum::eWarShieldBlock], (ID3DXAnimationSet **)&anim);
 
-	   D3DXKEY_CALLBACK key;
-	   key.Time = (anim->GetPeriod() / 1.5f) * anim->GetSourceTicksPerSecond();
-	   key.pCallbackData = (void *)&_callbackData;
+	   D3DXKEY_CALLBACK keys[2];
+	   keys[0].Time = (anim->GetPeriod() * 0.05f) * anim->GetSourceTicksPerSecond();
+	   keys[0].pCallbackData = (void *)&_callbackData[DESC_ATTACK1];
 
-	   AddCallbackKeysAndCompress(pController, anim, 1, &key, D3DXCOMPRESS_DEFAULT, 0.1f);
+	   keys[1].Time = (anim->GetPeriod() * 0.4f) * anim->GetSourceTicksPerSecond();
+	   keys[1].pCallbackData = (void *)&_callbackData[DESC_RIGHT];
+
+	   AddCallbackKeysAndCompress(pController, anim, 2, keys, D3DXCOMPRESS_DEFAULT, 0.0f);
    }
 
    //Talking hit
@@ -401,6 +405,7 @@ HRESULT PlayerCallbackHandler::HandleCallback(UINT Track, LPVOID pCallbackData)
 
 	case PlayerAnimationEnum::eWarTakingHit :
 	{
+
 		_pPlayer->_state = Player::PLAYERSTATE_STANCE;
 		_pPlayer->QueueAction(PLAYER_ANIM(eWarCombatMode));
 
@@ -408,7 +413,15 @@ HRESULT PlayerCallbackHandler::HandleCallback(UINT Track, LPVOID pCallbackData)
 
 	case PlayerAnimationEnum::eWarShieldBlock :
 	{
-		_pPlayer->_canCombo = true;
+		if (pData->_description == DESC_ATTACK1)
+		{
+			_pPlayer->_canCombo = true;
+			SOUNDMANAGER->Play3D("player_shield_draw", *pData->_pPosition);
+		}
+		else if (pData->_description == DESC_RIGHT)
+		{
+			SOUNDMANAGER->Play3D("player_walk_right", *pData->_pPosition);
+		}
 	}
 	//case PlayerAnimationEnum::eWar:
 	//{

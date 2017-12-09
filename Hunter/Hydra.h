@@ -9,17 +9,16 @@ class HydraStateMachine;
 
 struct HydraCallbackData
 {
-	HYDRA_ANIMATION_ENUM *_animtionEnum;
+	int32 *_animtionEnum;
+	Vector3 *_pPosition{};
+	int32 _description;
 };
 
 class HydraCallbackHandler : public GameObjectAnimationCallbackHandler
 {
 public:
 	virtual bool Init(BaseGameObject *pHydra) { _pHydra = (Hydra *)pHydra; return true; }
-	HRESULT CALLBACK HandleCallback(THIS_ UINT Track, LPVOID pCallbackData)
-	{
-		return S_OK;
-	}
+	HRESULT CALLBACK HandleCallback(THIS_ UINT Track, LPVOID pCallbackData);
 
 private:
 	Hydra *_pHydra{};
@@ -68,7 +67,7 @@ public:
 protected:
 	void SetupCallbackAndCompression();
 
-	HydraCallbackData _callbackData;
+	HydraCallbackData _callbackData[6];
 
 	GameCommand _currentCommand;
 

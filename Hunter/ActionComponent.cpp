@@ -25,6 +25,7 @@ void ActionComponent::MakeAnimationList()
 void ActionComponent::SetFirstAction(const Action &action)
 {
 	auto found = _animationTable.find(action._name);
+	_animationEnum = action._enum;
 	if (found != _animationTable.end())
 	{
 		_playing = true;

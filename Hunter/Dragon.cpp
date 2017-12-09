@@ -49,6 +49,7 @@ bool Dragon::CreateFromWorld(World & world, const Vector3 & Pos)
 	_pActionComp->MakeAnimationList();
 	_pActionComp->SetFirstAction(DRAGON_ANIM(DRAGON_ANIMATION_ENUM::DRAGON_IDLE));
 
+
 	_entity.Activate();
 
 	EventChannel channel;

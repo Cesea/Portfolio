@@ -137,12 +137,14 @@
     <ClCompile Include="BaseSystem.cpp" />
     <ClCompile Include="bat.cpp" />
     <ClCompile Include="batAnimationString.cpp" />
+    <ClCompile Include="Bat_Callback.cpp" />
     <ClCompile Include="bloodFog.cpp" />
     <ClCompile Include="bloodParticle.cpp" />
     <ClCompile Include="BmpFont.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="Cat.cpp" />
     <ClCompile Include="CatAnimationString.cpp" />
+    <ClCompile Include="Cat_Callback.cpp" />
     <ClCompile Include="charge.cpp" />
     <ClCompile Include="CollisionComponent.cpp" />
     <ClCompile Include="CollisionUtils.cpp" />

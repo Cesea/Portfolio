@@ -8,17 +8,16 @@ class Cat;
 
 struct CatCallbackData
 {
-	CAT_ANIMATION_ENUM *_animtionEnum;
+	int32 *_animtionEnum;
+	Vector3 *_pPosition{};
+	int32 _description;
 };
 
 class CatCallbackHandler : public GameObjectAnimationCallbackHandler
 {
 public:
 	virtual bool Init(BaseGameObject *pCat) { _pCat = (Cat *)pCat; return true; }
-	HRESULT CALLBACK HandleCallback(THIS_ UINT Track, LPVOID pCallbackData)
-	{
-		return S_OK;
-	}
+	HRESULT CALLBACK HandleCallback(THIS_ UINT Track, LPVOID pCallbackData);
 
 private:
 	Cat *_pCat{};
@@ -55,7 +54,7 @@ public:
 protected:
 	void SetupCallbackAndCompression();
 
-	CatCallbackData _callbackData;
+	CatCallbackData _callbackData[6];
 
 	GameCommand _currentCommand;
 

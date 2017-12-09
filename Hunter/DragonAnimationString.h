@@ -19,7 +19,8 @@
 	DragonAnimationAction<Name>::_action._crossFadeTime = CrossFadeTime; \
 	DragonAnimationAction<Name>::_action._outCrossFadeTime = OutCrossFadeTime; \
 	strncpy(DragonAnimationAction<Name>::_action._name, DragonAnimationString[DRAGON_ANIMATION_ENUM::Name], strlen(DragonAnimationString[DRAGON_ANIMATION_ENUM::Name])); \
-	DragonAnimationAction<Name>::_action._name; 
+	DragonAnimationAction<Name>::_action._name;  \
+	DragonAnimationAction<Name>::_action._enum = Name; 
 
 #define DRAGON_ANIM( Name ) DragonAnimationAction<Name>::_action
 
