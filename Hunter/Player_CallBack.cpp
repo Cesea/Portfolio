@@ -347,8 +347,6 @@ HRESULT PlayerCallbackHandler::HandleCallback(UINT Track, LPVOID pCallbackData)
 	case PlayerAnimationEnum::eWarSwingLeft:
 	case PlayerAnimationEnum::eWarWalkSwingLeft:
 	{
-		_pPlayer->_canCombo = true;
-		_pPlayer->_pDamageBox->GetEntity().GetComponent<CollisionComponent>()._valid = true;
 
 		if (pData->_description == 0)
 		{
@@ -360,6 +358,8 @@ HRESULT PlayerCallbackHandler::HandleCallback(UINT Track, LPVOID pCallbackData)
 		}
 		else if (pData->_description == 2)
 		{
+			_pPlayer->_canCombo = true;
+			_pPlayer->_pDamageBox->GetEntity().GetComponent<CollisionComponent>()._valid = true;
 			SOUNDMANAGER->Play3D("player_swing_01", *pData->_pPosition);
 		}
 
@@ -367,8 +367,6 @@ HRESULT PlayerCallbackHandler::HandleCallback(UINT Track, LPVOID pCallbackData)
 	case PlayerAnimationEnum::eWarSwingRight:
 	case PlayerAnimationEnum::eWarWalkSwingRight:
 	{
-		_pPlayer->_canCombo = true;
-		_pPlayer->_pDamageBox->GetEntity().GetComponent<CollisionComponent>()._valid = true;
 
 		if (pData->_description == 0)
 		{
@@ -380,14 +378,14 @@ HRESULT PlayerCallbackHandler::HandleCallback(UINT Track, LPVOID pCallbackData)
 		}
 		if (pData->_description == 3)
 		{
+			_pPlayer->_canCombo = true;
+			_pPlayer->_pDamageBox->GetEntity().GetComponent<CollisionComponent>()._valid = true;
 			SOUNDMANAGER->Play3D("player_swing_02", *pData->_pPosition);
 		}
 	}break;
 	case PlayerAnimationEnum::eWarThrustMid :
 	case PlayerAnimationEnum::eWarWalkThrust:
 	{
-		_pPlayer->_canCombo = true;
-		_pPlayer->_pDamageBox->GetEntity().GetComponent<CollisionComponent>()._valid = true;
 
 		if (pData->_description == 0)
 		{
@@ -399,6 +397,8 @@ HRESULT PlayerCallbackHandler::HandleCallback(UINT Track, LPVOID pCallbackData)
 		}
 		else if (pData->_description == 4)
 		{
+			_pPlayer->_canCombo = true;
+			_pPlayer->_pDamageBox->GetEntity().GetComponent<CollisionComponent>()._valid = true;
 			SOUNDMANAGER->Play3D("player_swing_03", *pData->_pPosition);
 		}
 	}break;

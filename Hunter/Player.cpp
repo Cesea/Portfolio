@@ -204,7 +204,6 @@ void Player::Update(float deltaTime)
 			   _state = PLAYERSTATE_STANCE;
 			   _attackToStanceTimer.Restart();
 			   _pActionComp->_actionQueue.ClearQueue();
-			   _pActionComp->MakePrevNull();
 
 			   if (_currentCommand._movement._vertical == VERTICAL_MOVEMENT_UP)
 			   {
@@ -443,11 +442,6 @@ void Player::Handle(const InputManager::KeyDownEvent & event)
       _currentCommand._type = GAMECOMMAND_MOVE;
       _currentCommand._movement._vertical = VERTICAL_MOVEMENT_DOWN;
    }
-
-   if (VK_SHIFT == inputCode)
-   {
-	   _currentCommand._dash = true;
-   }
 }
 
 void Player::Handle(const InputManager::KeyPressedEvent & event)
@@ -592,7 +586,14 @@ void Player::Handle(const InputManager::KeyPressedEvent & event)
 			   RotatePlayer(PI_DIV_4);
 		   }
 	   }
-	   else if (VK_SHIFT == inputCode)
+	   else if (VK_SHIFT == inputCode &&
+		   (_pActionComp->_animationEnum == PlayerAnimationEnum::eWalk ||
+			   _pActionComp->_animationEnum == PlayerAnimationEnum::eStrafeLeft ||
+			   _pActionComp->_animationEnum == PlayerAnimationEnum::eStrafeRight ||
+			   _pActionComp->_animationEnum == PlayerAnimationEnum::eWarMovingLeft ||
+			   _pActionComp->_animationEnum == PlayerAnimationEnum::eWarMovingRight ||
+			   _pActionComp->_animationEnum == PlayerAnimationEnum::eWalkingBack ||
+			   _pActionComp->_animationEnum == PlayerAnimationEnum::eWarRetreat))
 	   {
 		   _state = PLAYERSTATE_RUN;
 
@@ -621,7 +622,6 @@ void Player::Handle(const InputManager::KeyPressedEvent & event)
 			   _camRotated = true;
 			   RotatePlayer(-PI_DIV_2);
 			   this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWarCharging));
-
 		   }
 
 	   }
