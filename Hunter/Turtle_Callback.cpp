@@ -137,18 +137,42 @@ HRESULT TurtleCallbackHandler::HandleCallback(UINT Track, LPVOID pCallbackData)
 	}break;
 	case TURTLE_BITE2:
 	{
+		if (pData->_description == DESC_ATTACK2)
+		{
+			SOUNDMANAGER->Play3D("", *pData->_pPosition);
+		}
 	}break;
 	case TURTLE_DEATH:
 	{
+		if (pData->_description == DESC_LEFT)
+		{
+			SOUNDMANAGER->Play3D("", *pData->_pPosition);
+		}
 	}break;
 	case TURTLE_HIT1:
 	{
+		if (pData->_description == DESC_LEFT)
+		{
+			SOUNDMANAGER->Play3D("", *pData->_pPosition);
+		}
 	}break;
 	case TURTLE_ROAR:
 	{
+		if (pData->_description == DESC_LEFT)
+		{
+			SOUNDMANAGER->Play3D("", *pData->_pPosition);
+		}
 	}break;
 	case TURTLE_WALK:
 	{
+		if (pData->_description == DESC_LEFT)
+		{
+			SOUNDMANAGER->Play3D("", *pData->_pPosition);
+		}
+		else if (pData->_description == DESC_RIGHT)
+		{
+			SOUNDMANAGER->Play3D("", *pData->_pPosition);
+		}
 	}break;
 	}
 

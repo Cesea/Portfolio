@@ -255,64 +255,6 @@ bool MapToolScene::SceneInit()
 		pPlayer->UnRegisterEvents();
 	}
 
-	_channel.Broadcast<GameObjectFactory::CreateObjectOnLocationEvent>(
-		GameObjectFactory::CreateObjectOnLocationEvent(ARCHE_DRAGON, ResourceHandle(),
-			Vector3(0.0f, 0.0f, 0.0f)));
-
-	//Test
-	//for (int32 i = 0; i < 100; ++i)
-	//{
-	//	float randX = RandFloat(-config._xChunkCount * TERRAIN_CHUNK_DIM * 0.5f,
-	//		config._xChunkCount * TERRAIN_CHUNK_DIM * 0.5f);
-	//	float randz = RandFloat(-config._zChunkCount * TERRAIN_CHUNK_DIM * 0.5f,  
-	//		config._zChunkCount * TERRAIN_CHUNK_DIM * 0.5f);
-	//	ARCHE_TYPE type = (ARCHE_TYPE)RandInt(2, 7);
-
-	//	ResourceHandle handle;
-	//	switch (type)
-	//	{
-	//	case ARCHE_ROCK:
-	//	{
-	//		handle = VIDEO->GetStaticXMesh("Rock01");
-	//	} break;
-	//	case ARCHE_GRASS:
-	//	{
-	//		handle = VIDEO->GetStaticXMesh("Grass01");
-	//	} break;
-	//	case ARCHE_TREE:
-	//	{
-	//		handle = VIDEO->GetStaticXMesh("Tree01");
-	//	} break;
-	//	case ARCHE_TREETRUNK:
-	//	{
-	//		handle = VIDEO->GetStaticXMesh("TreeTrunk01");
-	//	} break;
-	//	case ARCHE_MUSHROOM:
-	//	{
-	//		handle = VIDEO->GetStaticXMesh("Mushroom01");
-	//	} break;
-	//	}
-
-		//_channel.Broadcast<GameObjectFactory::CreateObjectOnLocationEvent>(
-		//	GameObjectFactory::CreateObjectOnLocationEvent(type, handle,
-		//		Vector3(randX, 0, randz)));
-
-	////실험
-	//trash = _world.CreateEntity();
-	//TransformComponent & trans = trash.AddComponent<TransformComponent>();
-	//trans.SetWorldPosition(Vector3(0, 5.0f, 0));
-	//ParticleComponent & par = trash.AddComponent<ParticleComponent>();
-	//par.init(ParticleComponent::PARTICLE_TYPE_SMOKE, 1000, 0.0025, Vector3(1.0f, 0, 0), Vector3(0.0f, 5.0f, 0.0f));
-	//par.min = Vector3(0, 0, 0);
-	//par.max = Vector3(0, 0, 0);
-
-	//trash.Activate();
-	//_gameObjects.push_back(new Dragon());
-	//BaseGameObject *pBack = _gameObjects.back();
-	//pBack->CreateFromWorld(_world, Vector3(0, 3, 0));
-
-
-	//SOUNDMANAGER->Play("walk_left");
 
 	bool  inTerrain = TERRAIN->IsWorldPositionInTerrain(Vector3(-200, -200, -200));
 
@@ -344,13 +286,9 @@ bool MapToolScene::SceneUpdate(float deltaTime, const InputManager & input)
 		}
 	}
 
-	//if (input.keyboard.IsPressed('T'))
+	//if (TERRAIN->IsObjectExistInRange(Vector3(2.0f, 0.0f, 1.0f), Vector3(-20.0f, 0.0f, -20.0f), en))
 	//{
-	//	GAMEOBJECTFACTORY->GetPlayerObject()->GetEntity().Deactivate();
-	//}
-	//else if(input.keyboard.IsPressed('Y'))
-	//{
-	//	GAMEOBJECTFACTORY->GetPlayerObject()->GetEntity().Activate();
+	//	Console::Log("tatata\n");
 	//}
 
 	_editor->Edit(RefVariant(), input);

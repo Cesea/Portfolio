@@ -171,12 +171,14 @@
     <ClCompile Include="GizmoManager.cpp" />
     <ClCompile Include="Hydra.cpp" />
     <ClCompile Include="HydraAnimationString.cpp" />
+    <ClCompile Include="Hydra_Callback.cpp" />
     <ClCompile Include="imgui.cpp" />
     <ClCompile Include="imguiRenderer.cpp" />
     <ClCompile Include="Inventory.cpp" />
     <ClCompile Include="IScene.cpp" />
     <ClCompile Include="Lizard.cpp" />
     <ClCompile Include="LizardAnimationString.cpp" />
+    <ClCompile Include="Lizard_Callback.cpp" />
     <ClCompile Include="LoadingScene00.cpp" />
     <ClCompile Include="MapToolScene.cpp" />
     <ClCompile Include="MathUtils.cpp" />
@@ -205,6 +207,7 @@
     <ClCompile Include="smoke.cpp" />
     <ClCompile Include="Snake.cpp" />
     <ClCompile Include="SnakeAnimationString.cpp" />
+    <ClCompile Include="Snake_Callback.cpp" />
     <ClCompile Include="SoundManager.cpp" />
     <ClCompile Include="SpriteManager.cpp" />
     <ClCompile Include="Terrain.cpp" />
@@ -225,6 +228,7 @@
     <ClCompile Include="TransformSystem.cpp" />
     <ClCompile Include="Turtle.cpp" />
     <ClCompile Include="TurtleAnimationString.cpp" />
+    <ClCompile Include="Turtle_Callback.cpp" />
     <ClCompile Include="UI.cpp" />
     <ClCompile Include="Variant.cpp" />
     <ClCompile Include="VariantBase.cpp" />

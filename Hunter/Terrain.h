@@ -32,6 +32,8 @@ struct TerrainTilePos
 	TerrainTilePos(const TerrainTilePos &other);
 	TerrainTilePos & operator=(const TerrainTilePos &other);
 
+	bool operator==(const TerrainTilePos &other);
+
 	int32 _chunkX;
 	int32 _chunkZ;
 
@@ -41,6 +43,8 @@ struct TerrainTilePos
 	float _relX;
 	float _relZ;
 };
+
+
 
 struct TerrainVertexPos
 {
@@ -186,6 +190,11 @@ public:
 	}
 
 	bool IsWorldPositionInTerrain(const Vector3 &worldPosition);
+	bool IsTileHasCollisionObject(const Vector3 worldPosition);
+	bool IsTileHasCollisionObject(const TerrainTilePos &tilePosition);
+	bool IsTileHasCollisionObject(const TerrainTilePos &tilePosition, Entity &testObject);
+	bool IsObjectExistInRange(const Vector3 &start, const Vector3 &end, Entity &testObject);
+
 
 	inline int32 GetXChunkCount() { return _xChunkCount; }
 	inline int32 GetZChunkCount() { return _zChunkCount; }

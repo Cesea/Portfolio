@@ -312,6 +312,18 @@
     <ClCompile Include="Bat_Callback.cpp">
       <Filter>Game\GameObjects\Enemy\Bat</Filter>
     </ClCompile>
+    <ClCompile Include="Hydra_Callback.cpp">
+      <Filter>Game\GameObjects\Enemy\Hydra</Filter>
+    </ClCompile>
+    <ClCompile Include="Lizard_Callback.cpp">
+      <Filter>Game\GameObjects\Enemy\Lizard</Filter>
+    </ClCompile>
+    <ClCompile Include="Snake_Callback.cpp">
+      <Filter>Game\GameObjects\Enemy\Snake</Filter>
+    </ClCompile>
+    <ClCompile Include="Turtle_Callback.cpp">
+      <Filter>Game\GameObjects\Enemy\Turtle</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ClassTypeID.h" />

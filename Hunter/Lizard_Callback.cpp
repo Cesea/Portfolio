@@ -84,7 +84,6 @@ void Lizard::SetupCallbackAndCompression()
 		pController->GetAnimationSetByName(LizardAnimationString[LIZARD_ANIMATION_ENUM::LIZARD_BITE], (ID3DXAnimationSet **)&anim);
 
 		D3DXKEY_CALLBACK keys;
-		D3DXKEY_CALLBACK keys;
 		keys.Time = (anim->GetPeriod() * 0.44) * anim->GetSourceTicksPerSecond();
 		keys.pCallbackData = (void *)&_callbackData[DESC_ATTACK1];
 

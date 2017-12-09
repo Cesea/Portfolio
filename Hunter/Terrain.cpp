@@ -717,6 +717,124 @@ bool Terrain::IsWorldPositionInTerrain(const Vector3 & worldPosition)
 	}
 }
 
+bool Terrain::IsTileHasCollisionObject(const Vector3 worldPosition)
+{
+	TerrainTilePos pos;
+	this->ConvertWorldPostoTilePos(worldPosition, &pos);
+
+	return IsTileHasCollisionObject(pos);
+
+}
+
+bool Terrain::IsTileHasCollisionObject(const TerrainTilePos & tilePosition)
+{
+	std::vector<Entity> &refEntities = GetTileAt(tilePosition)->_entities;
+	for (auto entity : refEntities)
+	{
+		if (entity.HasComponent<CollisionComponent>())
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+bool Terrain::IsTileHasCollisionObject(const TerrainTilePos & tilePosition, Entity & testObject)
+{
+	std::vector<Entity> &refEntities = GetTileAt(tilePosition)->_entities;
+	for (auto entity : refEntities)
+	{
+		if (entity.HasComponent<CollisionComponent>() && 
+			entity != testObject)
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+bool Terrain::IsObjectExistInRange(const Vector3 &start, const Vector3 &end, Entity &testObject)
+{
+	Vector3 realStart;
+	Vector3 realEnd;
+
+	if (start.x < end.x)
+	{
+		realStart.x = start.x;
+		realEnd.x = end.x;
+	}
+	else
+	{
+		realStart.x = end.x;
+		realEnd.x = start.x;
+	}
+
+	if (start.z > end.z)
+	{
+		realStart.z = start.z;
+		realEnd.z = end.z;
+	}
+	else
+	{
+		realStart.z = end.z;
+		realEnd.z = start.z;
+	}
+
+	TerrainTilePos startPos;
+	TerrainTilePos endPos;
+
+	this->ConvertWorldPostoTilePos(realStart, &startPos);
+	this->ConvertWorldPostoTilePos(realEnd, &endPos);
+
+	if (startPos == endPos)
+	{
+		return IsTileHasCollisionObject(startPos);
+	}
+	else
+	{
+		int32 xChunkDiff = endPos._chunkX - startPos._chunkX;
+		int32 xTileDiff{};
+		if (xChunkDiff > 0)
+		{
+			xTileDiff = endPos._tileX - startPos._tileX + (TERRAIN_TILE_RES * xChunkDiff);
+		}
+		else
+		{
+			xTileDiff = endPos._tileX - startPos._tileX;
+		}
+
+		int32 zChunkDiff = endPos._chunkZ - startPos._chunkZ;
+		int32 zTileDiff{};
+		if (zChunkDiff > 0)
+		{
+			zTileDiff = endPos._tileZ - startPos._tileZ + (TERRAIN_TILE_RES * zChunkDiff);
+		}
+		else
+		{
+			zTileDiff = endPos._tileZ - startPos._tileZ;
+		}
+
+		for (int32 z = 0; z < zTileDiff; ++z)
+		{
+			for (int32 x = 0; x < xTileDiff; ++x)
+			{
+				TerrainTilePos testPos = startPos;
+				testPos._tileX += x;
+				testPos._tileZ += z;
+
+				this->ReTilelizeTilePosition(testPos);
+
+				if (IsTileHasCollisionObject(testPos, testObject))
+				{
+					return true;
+				}
+
+			}
+		}
+	}
+	return false;
+}
+
 void Terrain::RemoveEntityInTile(Entity entity, const TerrainTilePos & tilePos)
 {
 	Terrain::TerrainChunk &refChunk = _pChunks[Index2D(tilePos._chunkX, tilePos._chunkZ, _xChunkCount)];
@@ -1937,4 +2055,12 @@ TerrainTilePos & TerrainTilePos::operator=(const TerrainTilePos & other)
 	_relX = other._relX;
 	_relZ = other._relZ;
 	return *this;
+}
+
+bool TerrainTilePos::operator==(const TerrainTilePos & other)
+{
+	return (_chunkX == other._chunkX) &&
+		(_chunkZ == other._chunkZ) &&
+		(_tileX == other._tileX) &&
+		(_tileZ == other._tileZ);
 }
