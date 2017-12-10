@@ -130,15 +130,15 @@ public :
 	struct DamageBoxEvent
 	{
 		DamageBoxEvent(const Vector3 &position, const Vector3 &size, float dmg, 
-			CollisionComponent::TRIGGER_TYPE type, float accel, float vel, float duration)
+			CollisionComponent::TRIGGER_TYPE type, Vector3 accel, Vector3 vel, float duration)
 			:  _position(position), _size(size), _dmg(dmg), _type(type),_velocity(vel),_accel(accel),_duration(duration) 
 		{
 		}
 		Vector3 _size;
 		Vector3 _position;
 		float _dmg;
-		float _velocity;
-		float _accel;
+		Vector3 _velocity;
+		Vector3 _accel;
 		float _duration;
 		CollisionComponent::TRIGGER_TYPE _type;
 	};
@@ -186,6 +186,28 @@ public :
 	};
 	//Receive NormalFireBall2 Event
 	void Handle(const CreateNFireBall2 & event);
+
+	//CreateDragonCharge Event
+	struct CreateCharge
+	{
+		CreateCharge(Vector3 pos,float dmg,Vector3 direction):_pos(pos),_dmg(dmg),_direction(direction) {}
+		Vector3 _pos;
+		float _dmg;
+		Vector3 _direction;
+	};
+	//Receive DragonCharge Event
+	void Handle(const CreateCharge & event);
+
+	//CreateDragonBreath Event
+	struct CreateDragonBreath
+	{
+		CreateDragonBreath(Vector3 pos, float dmg, Vector3 direction) :_pos(pos), _dmg(dmg), _direction(direction) {}
+		Vector3 _pos;
+		float _dmg;
+		Vector3 _direction;
+	};
+	//Receive DragonBreath Event
+	void Handle(const CreateDragonBreath & event);
 
 
 	/////////////////////////////////////////////

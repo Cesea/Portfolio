@@ -46,8 +46,8 @@ bool Bat::CreateFromWorld(World & world, const Vector3 &Pos)
 	video::AnimationInstance *pAnimation = VIDEO->GetAnimationInstance(renderComp._skinned);
 
 	CollisionComponent &collision = _entity.AddComponent<CollisionComponent>();
-	collision._boundingBox.Init(pAnimation->_pSkinnedMesh->_boundInfo._min,
-		pAnimation->_pSkinnedMesh->_boundInfo._max);
+	collision._boundingBox.Init(pAnimation->_pSkinnedMesh->_boundInfo._min-Vector3(-0.7,-0.3,0)+Vector3(0,-0.3,0),
+		pAnimation->_pSkinnedMesh->_boundInfo._max+ Vector3(-0.7, -0.3, 0) + Vector3(0, -0.3, 0));
 	collision._boundingSphere._localCenter = pAnimation->_pSkinnedMesh->_boundInfo._center;
 	collision._boundingSphere._radius = pAnimation->_pSkinnedMesh->_boundInfo._radius;
 	collision._locked = false;
@@ -223,14 +223,17 @@ void Bat::Update(float deltaTime)
 			case BATSKINSTATE_RED:
 				_state = BATSTATE_ATK1;
 				this->QueueAction(BAT_ANIM(BAT_ATTACK1));
+				_atkCount = _atkTime;
 				break;
 			case BATSKINSTATE_BLACK:
 				_state = BATSTATE_ATK2;
 				this->QueueAction(BAT_ANIM(BAT_ATTACK2));
+				_atkCount = _atkTime2;
 				break;
 			case BATSKINSTATE_GOLD:
 				_state = BATSTATE_ATK3;
 				this->QueueAction(BAT_ANIM(BAT_ATTACK3));
+				_atkCount = _atkTime3;
 				break;
 			}
 		}
@@ -242,16 +245,16 @@ void Bat::Update(float deltaTime)
 	break;
 	case BATSTATE_ATK1:
 		_atkCount--;
-		if (_atkCount == 30)
+		if (_atkCount == 40)
 		{
 			Vector3 targetPos = transComp.GetWorldPosition() - transComp.GetForward();
 			EventChannel _channel;
 			_channel.Broadcast<GameObjectFactory::DamageBoxEvent>(GameObjectFactory::DamageBoxEvent(targetPos,
-				Vector3(_atkRange * 0.5f, _atkRange * 0.5f, _atkRange * 0.5f), 10.0f, CollisionComponent::TRIGGER_TYPE_ENEMY_DMGBOX, 0.0f, 0.0f, 1.0f));
+				Vector3(_atkRange * 0.5f, _atkRange * 0.5f, _atkRange * 0.5f), 10.0f, CollisionComponent::TRIGGER_TYPE_ENEMY_DMGBOX, Vector3(0,0,0),Vector3(0,0,0), 1.0f));
 		}
 		if (_atkCount < 0)
 		{
-			_atkCount = _atkTime2;
+			_atkCount = _atkTime;
 			//공격을 마쳤으면 다시한번검사
 			Vector3 direction = _playerPos - transComp.GetWorldPosition();
 			float distance = Vec3Length(&direction);
@@ -268,16 +271,16 @@ void Bat::Update(float deltaTime)
 		break;
 	case BATSTATE_ATK2:
 		_atkCount--;
-		if (_atkCount == 122)
+		if (_atkCount == 140)
 		{
 			Vector3 targetPos = transComp.GetWorldPosition() - transComp.GetForward();
 			EventChannel _channel;
 			_channel.Broadcast<GameObjectFactory::DamageBoxEvent>(GameObjectFactory::DamageBoxEvent(targetPos,
-				Vector3(_atkRange * 0.5f, _atkRange * 0.5f, _atkRange * 0.5f), 10.0f, CollisionComponent::TRIGGER_TYPE_ENEMY_DMGBOX, 0.0f, 0.0f, 1.0f));
+				Vector3(_atkRange * 0.5f, _atkRange * 0.5f, _atkRange * 0.5f), 10.0f, CollisionComponent::TRIGGER_TYPE_ENEMY_DMGBOX, Vector3(0, 0, 0), Vector3(0, 0, 0), 1.0f));
 		}
 		if (_atkCount < 0)
 		{
-			_atkCount = _atkTime3;
+			_atkCount = _atkTime2;
 			//공격을 마쳤으면 다시한번검사
 			Vector3 direction = _playerPos - transComp.GetWorldPosition();
 			float distance = Vec3Length(&direction);
@@ -299,11 +302,11 @@ void Bat::Update(float deltaTime)
 			Vector3 targetPos = transComp.GetWorldPosition() - transComp.GetForward();
 			EventChannel _channel;
 			_channel.Broadcast<GameObjectFactory::DamageBoxEvent>(GameObjectFactory::DamageBoxEvent(targetPos,
-				Vector3(_atkRange * 0.5f, _atkRange * 0.5f, _atkRange * 0.5f), 10.0f, CollisionComponent::TRIGGER_TYPE_ENEMY_DMGBOX, 0.0f, 0.0f, 1.0f));
+				Vector3(_atkRange * 0.5f, _atkRange * 0.5f, _atkRange * 0.5f), 10.0f, CollisionComponent::TRIGGER_TYPE_ENEMY_DMGBOX, Vector3(0, 0, 0), Vector3(0, 0, 0), 1.0f));
 		}
 		if (_atkCount < 0)
 		{
-			_atkCount = _atkTime;
+			_atkCount = _atkTime3;
 			//공격을 마쳤으면 다시한번검사
 			Vector3 direction = _playerPos - transComp.GetWorldPosition();
 			float distance = Vec3Length(&direction);
@@ -373,7 +376,7 @@ void Bat::Update(float deltaTime)
 			transComp.LookDirection(-distance, D3DX_PI * 2);
 		}
 	}
-	transComp.SetWorldPosition(transComp.GetWorldPosition().x, TERRAIN->GetHeight(transComp.GetWorldPosition().x, transComp.GetWorldPosition().z)+1.0f, transComp.GetWorldPosition().z);
+	transComp.SetWorldPosition(transComp.GetWorldPosition().x, 0.3f+TERRAIN->GetHeight(transComp.GetWorldPosition().x, transComp.GetWorldPosition().z)+1.0f, transComp.GetWorldPosition().z);
 
 	_prevTilePos = _tilePos;
 	TERRAIN->ConvertWorldPostoTilePos(transComp.GetWorldPosition(), &_tilePos);

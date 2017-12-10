@@ -13,7 +13,7 @@ class normalBreath :
 		out.lifeTime = RandFloat(2.0f, 3.0f);
 
 		// Initial size in pixels.
-		out.initialSize = RandFloat(4.0f, 6.0f);
+		out.initialSize = RandFloat(8.0f, 12.0f);
 
 		// Give a very small initial velocity to give the flares
 		// some randomness.
