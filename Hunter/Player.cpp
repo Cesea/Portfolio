@@ -8,13 +8,6 @@
 #define MAX_COMBO_COUNT 3
 
 
-//#include "stdafx.h"
-//#include "Player.h"
-//
-//#include "PlayerStates.h"
-//
-//#define MAX_COMBO_COUNT 3
-
 Player::Player()
 {
 }
@@ -112,6 +105,9 @@ bool Player::CreateFromWorld(World & world, const Vector3 &pos)
    _keyConfig._down = 'S';
    _keyConfig._left = 'A';
    _keyConfig._right = 'D';
+
+   _currentHP = 1800;
+   _currentFury = 50;
 
    return true;
 }
@@ -1053,10 +1049,10 @@ void Player::Handle(const CollisionSystem::ActorTriggerEvent & event)
 
 			MovementStop(_currentMovement);
 			_state = PLAYERSTATE_HURT;
-			_hp -= _collision._dmg;
+			_currentHP -= _collision._dmg;
 			_inCombat = true;
 			_superArmor = true;
-			if (_hp > 0)
+			if (_currentHP > 0)
 			{
 				this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWarTakingHit), true);
 			}

@@ -90,13 +90,6 @@ bool UI::Init(IScene * currentScene)
 
 	_inventory = new Inventory;
 
-	MaxHp = 158;
-	CurHp = 102;
-	
-	MaxFury = 111;
-	CurFury = 88;
-
-	//Player* _player = GAMEOBJECTFACTORY->GetPlayerObject();
 
 	_bt1On = false;
 	_bt2On = false;
@@ -182,7 +175,6 @@ void UI::Update(float deltaTime, const InputManager & input)
 			if (input.mouse.IsReleased(MOUSE_BUTTON_LEFT))
 			{
 				_bt2On = false;
-				
 			}
 		}
 		else
@@ -252,7 +244,6 @@ void UI::Update(float deltaTime, const InputManager & input)
 	//{
 	//	_inventory->Additem(potion3, 1);
 	//}
-
 }
 
 void UI::RenderUI(void)
@@ -261,19 +252,16 @@ void UI::RenderUI(void)
 	if (_uiOn == true)
 	{
 		RECT hpRect = { 0,1,255,256 };
-		RECT hpBarRect = { 0,1,255,(CurHp / MaxHp) * 256 };
+		RECT hpBarRect = { 0,1,255,((float)_pPlayer->_currentHP / (float)_pPlayer->_maxHP) * 256 };
 
 		RECT furyRect = { 1,1,255,256 };
-		RECT furyBarRect = { 1,1,255,(CurFury / MaxFury) * 256 };
+		RECT furyBarRect = { 1,1,255,((float)_pPlayer->_currentFury / (float)_pPlayer->_maxFury) * 256 };
 
 		RECT slotRect = { 0,0,126,126 };
 
 		RECT btRect = { 0,0,64,64 };
 
-		//
-
 		RECT miniMenuRect = { 0,0,290,82 };
-
 
 		if (_bt1On == false)
 		{

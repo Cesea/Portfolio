@@ -45,6 +45,8 @@ class Player : public BaseGameObject
 {
 	friend class PlayerCallbackHandler;
 	friend class Camera;
+	friend class UI;
+
 public :
 	friend class PlayerStanceState;
 public :
@@ -107,7 +109,11 @@ private :
 
 	float _rotationSpeed{ 6.0f };
 
-	int32 _hp{ 999998 };
+	int32 _maxHP{ 2000 };
+	int32 _currentHP{ 2000 };
+
+	int32 _maxFury{ 100 };
+	int32 _currentFury{ 100 };
 
 	//int32 _stamina{ 100 };
 

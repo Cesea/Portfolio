@@ -66,12 +66,6 @@ private:
 	video::TextureHandle _potion2Handle;
 	video::TextureHandle _potion3Handle;
 
-	float MaxHp;
-	float CurHp;
-
-	float MaxFury;
-	float CurFury;
-
 	Inventory* _inventory;
 
 	IScene *_pCurrentScene;
