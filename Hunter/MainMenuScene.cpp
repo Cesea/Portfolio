@@ -158,16 +158,10 @@ void MainMenuScene::LoadStaticModelResources()
 	_loading.LoadModelResources("../resources/Models/Environment/Grass/Grass10.X", "Grass10", true, 0.01f, 0.0f);
 
 	//Load Tree
-	_loading.LoadModelResources("../resources/Models/Environment/Tree/Tree1.X", "Tree01", true, 0.01f, 0.0f);
-	_loading.LoadModelResources("../resources/Models/Environment/Tree/Tree2.X", "Tree02", true, 0.01f, 0.0f);
-	_loading.LoadModelResources("../resources/Models/Environment/Tree/Tree3.X", "Tree03", true, 0.01f, 0.0f);
-	_loading.LoadModelResources("../resources/Models/Environment/Tree/Tree4.X", "Tree04", true, 0.01f, 0.0f);
-	_loading.LoadModelResources("../resources/Models/Environment/Tree/Tree5.X", "Tree05", true, 0.01f, 0.0f);
-	_loading.LoadModelResources("../resources/Models/Environment/Tree/Tree6.X", "Tree06", true, 0.01f, 0.0f);
-	_loading.LoadModelResources("../resources/Models/Environment/Tree/Tree7.X", "Tree07", true, 0.01f, 0.0f);
-	_loading.LoadModelResources("../resources/Models/Environment/Tree/Tree8.X", "Tree08", true, 0.01f, 0.0f);
-	_loading.LoadModelResources("../resources/Models/Environment/Tree/Tree9.X", "Tree09", true, 0.01f, 0.0f);
-	_loading.LoadModelResources("../resources/Models/Environment/Tree/Tree10.X", "Tree10", true, 0.01f, 0.0f);
+	_loading.LoadModelResources("../resources/Models/Environment/Tree/Tree5.X", "Tree01", true, 0.01f, 0.0f);
+	_loading.LoadModelResources("../resources/Models/Environment/Tree/Tree6.X", "Tree02", true, 0.01f, 0.0f);
+	_loading.LoadModelResources("../resources/Models/Environment/Tree/Tree7.X", "Tree03", true, 0.01f, 0.0f);
+	_loading.LoadModelResources("../resources/Models/Environment/Tree/Tree8.X", "Tree04", true, 0.01f, 0.0f);
 
 	//Load TreeTrunk
 	_loading.LoadModelResources("../resources/Models/Environment/TreeTrunk/TreeTrunk1.X",

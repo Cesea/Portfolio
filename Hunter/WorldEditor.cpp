@@ -512,12 +512,6 @@ void Editor::InObjectLocateMode()
 		if (ImguiButton("Tree02")) { _objectLocator._currentStaticHandle = VIDEO->GetStaticXMesh("Tree02"); }
 		if (ImguiButton("Tree03")) { _objectLocator._currentStaticHandle = VIDEO->GetStaticXMesh("Tree03"); }
 		if (ImguiButton("Tree04")) { _objectLocator._currentStaticHandle = VIDEO->GetStaticXMesh("Tree04"); }
-		if (ImguiButton("Tree05")) { _objectLocator._currentStaticHandle = VIDEO->GetStaticXMesh("Tree05"); }
-		if (ImguiButton("Tree06")) { _objectLocator._currentStaticHandle = VIDEO->GetStaticXMesh("Tree06"); }
-		if (ImguiButton("Tree07")) { _objectLocator._currentStaticHandle = VIDEO->GetStaticXMesh("Tree07"); }
-		if (ImguiButton("Tree08")) { _objectLocator._currentStaticHandle = VIDEO->GetStaticXMesh("Tree08"); }
-		if (ImguiButton("Tree09")) { _objectLocator._currentStaticHandle = VIDEO->GetStaticXMesh("Tree09"); }
-		if (ImguiButton("Tree10")) { _objectLocator._currentStaticHandle = VIDEO->GetStaticXMesh("Tree10"); }
 		_objectLocator._typeToLocate = (_objectLocator._currentStaticHandle.IsValid()) ? ARCHE_TREE : ARCHE_NONE;
 		ImguiUnindent();
 	}
@@ -637,10 +631,10 @@ void Editor::InObjectLocateMode()
 		{
 			_objectLocator._typeToLocate = ARCHE_TURTLE;
 		}
-		//if (ImguiButton("Dragon"))
-		//{
-		//	_objectLocator._currentSkinnedHandle = VIDEO->GetSkinnedXMesh("Dragon");
-		//}
+		if (ImguiButton("Dragon"))
+		{
+			_objectLocator._typeToLocate = ARCHE_DRAGON;
+		}
 		ImguiUnindent();
 	}
 
@@ -710,35 +704,35 @@ void Editor::InObjectEditMode()
 			ImguiLabel("Position");
 			{
 				ImguiIndent();
-				ImguiSlider("X", &_objectEditor._pTransform->_position.x, -100.0f, 100.0f, 0.1f);
-				ImguiSlider("Y", &_objectEditor._pTransform->_position.y, -100.0f, 100.0f, 0.1f);
-				ImguiSlider("Z", &_objectEditor._pTransform->_position.z, -100.0f, 100.0f, 0.1f);
+				if (ImguiDownButton("X Position Up")) { _objectEditor._pTransform->_position.x += 0.02f; }
+				if (ImguiDownButton("X Position Down")) { _objectEditor._pTransform->_position.x -= 0.02f; }
+				ImguiSeparator();
+				if (ImguiDownButton("Y Position Up")) { _objectEditor._pTransform->_position.y += 0.02f; }
+				if (ImguiDownButton("Y Position Down")) { _objectEditor._pTransform->_position.y -= 0.02f; }
+				ImguiSeparator();
+				if (ImguiDownButton("Z Position Up")) { _objectEditor._pTransform->_position.z += 0.02f; }
+				if (ImguiDownButton("Z Position Down")) { _objectEditor._pTransform->_position.z -= 0.02f; }
 				ImguiUnindent();
 			}
 
 			ImguiLabel("Scale");
 			{
 				ImguiIndent();
-				ImguiSlider("X", &_objectEditor._pTransform->_scale.x, 0.0f, 100.0f, 0.1f);
-				ImguiSlider("Y", &_objectEditor._pTransform->_scale.y, 0.0f, 100.0f, 0.1f);
-				ImguiSlider("Z", &_objectEditor._pTransform->_scale.z, 0.0f, 100.0f, 0.1f);
+
+				if (ImguiDownButton("X Scale Up")) { _objectEditor._pTransform->_scale.x += 0.02f; }
+				if (ImguiDownButton("X Scale Down")) { _objectEditor._pTransform->_scale.x -= 0.02f; }
+				ImguiSeparator();
+				if (ImguiDownButton("Y Scale Up")) { _objectEditor._pTransform->_scale.y += 0.02f; }
+				if (ImguiDownButton("Y Scale Down")) { _objectEditor._pTransform->_scale.y -= 0.02f; }
+				ImguiSeparator();
+				if (ImguiDownButton("Z Scale Up")) { _objectEditor._pTransform->_scale.z += 0.02f; }
+				if (ImguiDownButton("Z Scale Down")) { _objectEditor._pTransform->_scale.z -= 0.02f; }
+
 				ImguiUnindent();
 			}
 
 			ImguiLabel("Orientation");
 			{
-				//float yaw, pitch, roll;
-				//Matrix rotation = _objectEditor._pTransform->GetFinalMatrix();
-				//rotation._41 = 0;
-				//rotation._42 = 0;
-				//rotation._43 = 0;
-				////Vec3R
-				//Quaternion quat;
-				//QuaternionRotationMatrix(&quat, &rotation);
-
-				//Matrix test;
-				//MatrixRotationQuaternion(&test, &quat);
-
 				float x{ 0.0f };
 				float y{ 0.0f };
 				float z{ 0.0f };
@@ -753,11 +747,6 @@ void Editor::InObjectEditMode()
 				ImguiSeparator();
 				if (ImguiDownButton("Z Axis Up")) { z += 0.02f; }
 				if (ImguiDownButton("Z Axis Down")) { z -= 0.02f; }
-				//ImguiSlider("X", &quat.x, -1.9f, 1.9f, 0.01f);
-				//ImguiSlider("W", &quat.w, -1.9f, 1.9f, 0.01f);
-				//ImguiSlider("Z", &quat.z, -1.9f, 1.9f, 0.01f);
-
-				//_objectEditor._pTransform->RotateWorld();
 
 				_objectEditor._pTransform->RotateLocal(x, y, z);
 
