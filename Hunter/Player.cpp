@@ -106,8 +106,8 @@ bool Player::CreateFromWorld(World & world, const Vector3 &pos)
    _keyConfig._left = 'A';
    _keyConfig._right = 'D';
 
-   _currentHP = 1800;
-   _currentFury = 50;
+   _currentHP = 1000;
+   _currentFury = 100;
 
    return true;
 }
@@ -1049,7 +1049,7 @@ void Player::Handle(const CollisionSystem::ActorTriggerEvent & event)
 
 			MovementStop(_currentMovement);
 			_state = PLAYERSTATE_HURT;
-			_currentHP -= _collision._dmg;
+			_currentHP -= 100.0f;
 			_inCombat = true;
 			_superArmor = true;
 			if (_currentHP > 0)

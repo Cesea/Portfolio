@@ -19,7 +19,7 @@ bool Hydra::CreateFromWorld(World & world, const Vector3 &Pos)
 	static int32 animCount = 0;
 	RenderComponent &renderComp = _entity.AddComponent<RenderComponent>();
 	renderComp._type = RenderComponent::Type::eSkinned;
-	int a = 2;
+	int a = RandInt(4);
 	switch (a)
 	{
 	case 0:
@@ -719,8 +719,7 @@ void Hydra::Handle(const CollisionSystem::ActorTriggerEvent & event)
 				this->QueueAction(HYDRA_ANIM(HYDRA_HIT1));
 				_battle = true;
 			}
-			if (_hp <= 0)
-			{
+		
 				resetAllCount();
 				_state = HYDRASTATE_HURT;
 				this->QueueAction(HYDRA_ANIM(HYDRA_HIT1));
@@ -732,7 +731,7 @@ void Hydra::Handle(const CollisionSystem::ActorTriggerEvent & event)
 					this->QueueAction(HYDRA_ANIM(HYDRA_DEATH));
 					_isDie = true;
 				}
-			}
+			
 			_isHurt = true;
 			collision._valid = false;
 			EventChannel channel;

@@ -38,10 +38,12 @@ public:
 	bool _loaded{ false };
 
 private :
-	void StartShowTitle() { _titleGoing = true; }
+	void StartShowTitle();
 	float _titlePercent{0.0f};
 	bool _titleGoing{ false };
 	bool _titleShown{ false };
+
+	bool _titlePlaying{ false };
 
 
 };

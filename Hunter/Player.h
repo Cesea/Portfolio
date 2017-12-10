@@ -110,8 +110,8 @@ private :
 
 	float _rotationSpeed{ 6.0f };
 
-	int32 _maxHP{ 2000 };
-	int32 _currentHP{ 2000 };
+	int32 _maxHP{ 1000 };
+	int32 _currentHP{ 1000 };
 
 	int32 _maxFury{ 100 };
 	int32 _currentFury{ 100 };

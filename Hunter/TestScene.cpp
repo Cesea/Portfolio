@@ -1,139 +1,6 @@
 #include "stdafx.h"
 #include "TestScene.h"
 
-void LoadEverySoundResource2()
-{
-	SOUNDMANAGER->AddSound("inven_open_01",
-		"../resources/sfx/inven_open_01.wav", false, false);
-	SOUNDMANAGER->AddSound("inven_close_01",
-		"../resources/sfx/inven_close_01.wav", false, false);
-	SOUNDMANAGER->AddSound("inven_select_01",
-		"../resources/sfx/inven_select_01.wav", false, false);
-}
-
-void LoadEveryStaticResources2()
-{
-	Matrix correctionMat;
-	Matrix rotationCorrection;
-//Load Rocks
-	MatrixScaling(&correctionMat, 1.0f, 1.0f, 1.0f);
-	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Rock/Rock1_A.X", &correctionMat, "Rock01");
-	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Rock/Rock2_A.X", &correctionMat, "Rock02");
-	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Rock/Rock3_A.X", &correctionMat, "Rock03");
-	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Rock/Rock4_A.X", &correctionMat, "Rock04");
-	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Rock/Rock5_A.X", &correctionMat, "Rock05");
-	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Rock/Rock6_A.X", &correctionMat, "Rock06");
-	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Rock/Rock7_A.X", &correctionMat, "Rock07");
-	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Rock/Rock8_A.X", &correctionMat, "Rock08");
-	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Rock/Rock9_A.X", &correctionMat, "Rock09");
-	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Rock/Rock10_A.X", &correctionMat, "Rock10");
-
-	//Load Grass
-	MatrixScaling(&correctionMat, 0.01f, 0.01f, 0.01f);
-	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Grass/Grass1.X", &correctionMat, "Grass01");
-	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Grass/Grass2.X", &correctionMat, "Grass02");
-	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Grass/Grass3.X", &correctionMat, "Grass03");
-	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Grass/Grass4.X", &correctionMat, "Grass04");
-	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Grass/Grass5.X", &correctionMat, "Grass05");
-	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Grass/Grass6.X", &correctionMat, "Grass06");
-	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Grass/Grass7.X", &correctionMat, "Grass07");
-	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Grass/Grass8.X", &correctionMat, "Grass08");
-	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Grass/Grass9.X", &correctionMat, "Grass09");
-	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Grass/Grass10.X", &correctionMat, "Grass10");
-
-	//Load Tree
-	MatrixScaling(&correctionMat, 0.01f, 0.01f, 0.01f);
-	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Tree/Tree1.X", &correctionMat, "Tree01");
-	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Tree/Tree2.X", &correctionMat, "Tree02");
-	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Tree/Tree3.X", &correctionMat, "Tree03");
-	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Tree/Tree4.X", &correctionMat, "Tree04");
-	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Tree/Tree5.X", &correctionMat, "Tree05");
-	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Tree/Tree6.X", &correctionMat, "Tree06");
-	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Tree/Tree7.X", &correctionMat, "Tree07");
-	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Tree/Tree8.X", &correctionMat, "Tree08");
-	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Tree/Tree9.X", &correctionMat, "Tree09");
-	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Tree/Tree10.X", &correctionMat, "Tree10");
-
-	//Load TreeTrunk
-	MatrixScaling(&correctionMat, 0.01f, 0.01f, 0.01f);
-	VIDEO->CreateStaticXMesh("../resources/Models/Environment/TreeTrunk/TreeTrunk1.X", &correctionMat, "TreeTrunk01");
-	VIDEO->CreateStaticXMesh("../resources/Models/Environment/TreeTrunk/TreeTrunk2.X", &correctionMat, "TreeTrunk02");
-	VIDEO->CreateStaticXMesh("../resources/Models/Environment/TreeTrunk/TreeTrunk3.X", &correctionMat, "TreeTrunk03");
-
-	//Load Mushroom
-	MatrixScaling(&correctionMat, 0.01f, 0.01f, 0.01f);
-	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Mushroom/Mushroom1.X", &correctionMat, "Mushroom01");
-	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Mushroom/Mushroom2.X", &correctionMat, "Mushroom02");
-	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Mushroom/Mushroom3.X", &correctionMat, "Mushroom03");
-}
-
-void LoadEverySkinnedResources2()
-{
-//메쉬 불러오기..
-	Matrix correctionMat;
-	Matrix rotationCorrection;
-	MatrixRotationY(&rotationCorrection, D3DX_PI);
-	MatrixScaling(&correctionMat, 0.01f, 0.01f, 0.01f);
-	MatrixMultiply(&correctionMat, &correctionMat, &rotationCorrection);
-	video::SkinnedXMeshHandle knight  = VIDEO->CreateSkinnedXMesh(
-		"../resources/Models/Knight/Knight.X", &correctionMat, "Knight");
-
-	MatrixScaling(&correctionMat, 1.4f, 1.4f, 1.4f);
-	video::SkinnedXMeshHandle snakeMesh = VIDEO->CreateSkinnedXMesh(
-		"../resources/Models/Snake/Snake_Red.X", &correctionMat, "Snake1");
-
-	MatrixScaling(&correctionMat, 1.4f, 1.4f, 1.4f);
-	video::SkinnedXMeshHandle snakeMesh2 = VIDEO->CreateSkinnedXMesh(
-		"../resources/Models/Snake/Snake_Black.X", &correctionMat, "Snake2");
-
-	MatrixScaling(&correctionMat, 1.4f, 1.4f, 1.4f);
-	video::SkinnedXMeshHandle snakeMesh3 = VIDEO->CreateSkinnedXMesh(
-		"../resources/Models/Snake/Snake_Cyan.X", &correctionMat, "Snake3");
-
-	MatrixScaling(&correctionMat, 1.4f, 1.4f, 1.4f);
-	video::SkinnedXMeshHandle turtleMesh = VIDEO->CreateSkinnedXMesh(
-		"../resources/Models/DragonTurtle/DragonTurtle_Black.X", &correctionMat, "Turtle");
-
-	MatrixScaling(&correctionMat, 1.0f, 1.0f, 1.0f);
-	video::SkinnedXMeshHandle batMesh1 = VIDEO->CreateSkinnedXMesh(
-		"../resources/Models/DragonBat/DragonBat_Red.X", &correctionMat, "Bat1");
-
-	MatrixScaling(&correctionMat, 1.0f, 1.0f, 1.0f);
-	video::SkinnedXMeshHandle batMesh2 = VIDEO->CreateSkinnedXMesh(
-		"../resources/Models/DragonBat/DragonBat_Black.X", &correctionMat, "Bat2");
-
-	MatrixScaling(&correctionMat, 1.0f, 1.0f, 1.0f);
-	video::SkinnedXMeshHandle batMesh3 = VIDEO->CreateSkinnedXMesh(
-		"../resources/Models/DragonBat/DragonBat_Gold.X", &correctionMat, "Bat3");
-
-	MatrixScaling(&correctionMat, 1.4f, 1.4f, 1.4f);
-	video::SkinnedXMeshHandle catMesh = VIDEO->CreateSkinnedXMesh(
-		"../resources/Models/DevilCat/DevilCat.X", &correctionMat, "Cat");
-
-	MatrixScaling(&correctionMat, 2.0f, 2.0f, 2.0f);
-	video::SkinnedXMeshHandle HydraMesh1 = VIDEO->CreateSkinnedXMesh(
-		"../resources/Models/Hydra/Hydra_Green.X", &correctionMat, "Hydra1");
-
-	MatrixScaling(&correctionMat, 2.0f, 2.0f, 2.0f);
-	video::SkinnedXMeshHandle HydraMesh2 = VIDEO->CreateSkinnedXMesh(
-		"../resources/Models/Hydra/Hydra_Red.X", &correctionMat, "Hydra2");
-
-	MatrixScaling(&correctionMat, 2.0f, 2.0f, 2.0f);
-	video::SkinnedXMeshHandle HydraMesh3 = VIDEO->CreateSkinnedXMesh(
-		"../resources/Models/Hydra/Hydra_Black.X", &correctionMat, "Hydra3");
-
-	MatrixScaling(&correctionMat, 2.0f, 2.0f, 2.0f);
-	video::SkinnedXMeshHandle HydraMesh4 = VIDEO->CreateSkinnedXMesh(
-		"../resources/Models/Hydra/Hydra_Gold.X", &correctionMat, "Hydra4");
-
-	MatrixScaling(&correctionMat, 1.0f, 1.0f, 1.0f);
-	video::SkinnedXMeshHandle LizardMesh1 = VIDEO->CreateSkinnedXMesh(
-		"../resources/Models/Lizard/Lizard.X", &correctionMat, "Lizard1");
-
-	MatrixScaling(&correctionMat, 1.0f, 1.0f, 1.0f);
-	video::SkinnedXMeshHandle LizardMesh2 = VIDEO->CreateSkinnedXMesh(
-		"../resources/Models/Lizard/Lizard_Black.X", &correctionMat, "Lizard2");
-}
 
 bool TestScene::SceneInit()
 {
@@ -167,6 +34,8 @@ bool TestScene::SceneInit()
 	_pInGameUI->Init(this);
 
 	_camera.SetCameraState(CAMERASTATE_INCOMBAT);
+
+	SOUNDMANAGER->Play("in_game_bgm_01");
 
 	return result; 
 }

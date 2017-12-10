@@ -108,6 +108,14 @@ bool MapToolScene::SceneUpdate(float deltaTime, const InputManager & input)
 		_camera.SetCameraState(CAMERASTATE_UI);
 	}
 
+	if (input.keyboard.IsReleased(VK_ESCAPE))
+	{
+		ReleaseAllGameObjects();
+		_world.Clear();
+
+		gEngine->GetScene()->ChangeScene("MainMenuScene");
+		return true;
+	}
 
 	_editor->Edit(RefVariant(), input);
 

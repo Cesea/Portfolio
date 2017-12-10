@@ -333,6 +333,9 @@
     <ClCompile Include="Draon_Callback.cpp">
       <Filter>Game\GameObjects\Enemy\Dragon</Filter>
     </ClCompile>
+    <ClCompile Include="BossScene.cpp">
+      <Filter>Game\GameScenes\BossScene</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ClassTypeID.h" />
@@ -725,6 +728,9 @@
     <ClInclude Include="LoadItem.h">
       <Filter>Game\GameScenes\MainMenuScene\LoadItem</Filter>
     </ClInclude>
+    <ClInclude Include="BossScene.h">
+      <Filter>Game\GameScenes\BossScene</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Core">
@@ -891,6 +897,9 @@
     </Filter>
     <Filter Include="Game\GameScenes\MainMenuScene\LoadItem">
       <UniqueIdentifier>{eaebac0f-84ef-4264-9bce-e8e342001cb8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\GameScenes\BossScene">
+      <UniqueIdentifier>{a9e45e3f-b417-4235-bfc7-e5f974a8aac5}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

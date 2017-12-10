@@ -10,6 +10,7 @@ bool MainMenuScene::SceneInit()
 
 	GAMEOBJECTFACTORY->SetCurrentScene(this);
 
+	SOUNDMANAGER->AddSound("title_bgm", "../resources/sfx/title_bgm_01.mp3", true, true);
 
 	LoadStaticModelResources();
 	LoadSkinnedModelResources();
@@ -51,18 +52,18 @@ bool MainMenuScene::SceneUpdate(float deltaTime, const InputManager & input)
 		{
 			gEngine->GetScene()->ChangeScene("TestScene");
 			//channel.Broadcast<SceneManager::SceneChangeEvent>(SceneManager::SceneChangeEvent("TestScene"));
-			Console::Log("tata1\n");
+			SOUNDMANAGER->Stop("title_bgm");
 		}
 		else if (PtInRect(&mapToolRect, mousePoint))
 		{
 			gEngine->GetScene()->ChangeScene("MapToolScene");
 			//channel.Broadcast<SceneManager::SceneChangeEvent>(SceneManager::SceneChangeEvent("MapToolScene"));
-			Console::Log("tata2\n");
+			SOUNDMANAGER->Stop("title_bgm");
 			return true;;
 		}
 		else if (PtInRect(&gameEndRect, mousePoint))
 		{
-			Console::Log("tata3\n");
+			SOUNDMANAGER->Stop("title_bgm");
 		}
 	}
 
@@ -71,6 +72,11 @@ bool MainMenuScene::SceneUpdate(float deltaTime, const InputManager & input)
 	{
 		_loaded = true;
 		StartShowTitle();
+		if (!_titlePlaying)
+		{
+			_titlePlaying = true;
+			SOUNDMANAGER->Play("title_bgm");
+		}
 	}
 
 	if (_titleGoing)
@@ -225,8 +231,18 @@ void MainMenuScene::LoadSkinnedModelResources()
 
 void MainMenuScene::LoadSoundResources()
 {
-#pragma region Player 
+	_loading.LoadSoundResources("in_game_bgm_01",
+		"../resources/sfx/in_game_bgm_01.mp3", true, true);
 
+	_loading.LoadSoundResources("inven_open_01",
+		"../resources/sfx/inven_open_01.wav", false, false);
+	_loading.LoadSoundResources("inven_close_01",
+		"../resources/sfx/inven_close_01.wav", false, false);
+	_loading.LoadSoundResources("inven_select_01",
+		"../resources/sfx/inven_select_01.wav", false, false);
+
+
+#pragma region Player 
 	_loading.LoadSoundResources("player_walk_left", 
 		"../resources/sfx/Player/Walk/player_dirt_walk_armorlight_01.wav", false, false, 4.0f, 13.0f);
 	_loading.LoadSoundResources("player_walk_right", 
@@ -393,6 +409,11 @@ void MainMenuScene::LoadSoundResources()
 		"../resources/sfx/Turtle/turtle_walk_right.wav", false, false, 4.0f, 13.0f);
 #pragma endregion
 
+}
+
+void MainMenuScene::StartShowTitle()
+{
+	_titleGoing = true;
 }
 
 

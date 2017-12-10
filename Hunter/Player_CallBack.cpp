@@ -353,7 +353,6 @@ HRESULT PlayerCallbackHandler::HandleCallback(UINT Track, LPVOID pCallbackData)
 	case PlayerAnimationEnum::eWarSwingLeft:
 	case PlayerAnimationEnum::eWarWalkSwingLeft:
 	{
-
 		if (pData->_description == 0)
 		{
 			SOUNDMANAGER->Play3D("player_walk_left", *pData->_pPosition);

@@ -141,6 +141,7 @@
     <ClCompile Include="bloodFog.cpp" />
     <ClCompile Include="bloodParticle.cpp" />
     <ClCompile Include="BmpFont.cpp" />
+    <ClCompile Include="BossScene.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="Cat.cpp" />
     <ClCompile Include="CatAnimationString.cpp" />
@@ -257,6 +258,7 @@
     <ClInclude Include="bloodFog.h" />
     <ClInclude Include="bloodParticle.h" />
     <ClInclude Include="BmpFont.h" />
+    <ClInclude Include="BossScene.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Cat.h" />
     <ClInclude Include="CatAnimationString.h" />

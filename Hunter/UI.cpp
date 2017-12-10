@@ -244,6 +244,7 @@ void UI::Update(float deltaTime, const InputManager & input)
 	//{
 	//	_inventory->Additem(potion3, 1);
 	//}
+
 }
 
 void UI::RenderUI(void)
@@ -251,11 +252,11 @@ void UI::RenderUI(void)
 	SPRITEMANAGER->BeginSpriteRender();
 	if (_uiOn == true)
 	{
-		RECT hpRect = { 0,1,255,256 };
-		RECT hpBarRect = { 0,1,255,((float)_pPlayer->_currentHP / (float)_pPlayer->_maxHP) * 256 };
+		float hpRatio = (float)_pPlayer->_currentHP / (float)_pPlayer->_maxHP;
+		RECT hpBarRect = { 0, 130 + ((1.0f - hpRatio) * 126.0f), 256, 256 };
 
-		RECT furyRect = { 1,1,255,256 };
-		RECT furyBarRect = { 1,1,255,((float)_pPlayer->_currentFury / (float)_pPlayer->_maxFury) * 256 };
+		float furyRatio = (float)_pPlayer->_currentFury / (float)_pPlayer->_currentFury;
+		RECT furyBarRect = { 0, 130 + ((1.0f - hpRatio) * 126.0f), 256, 256 };
 
 		RECT slotRect = { 0,0,126,126 };
 
@@ -425,11 +426,13 @@ void UI::RenderUI(void)
 
 		SPRITEMANAGER->DrawTexture(_pSlot->_ptr, &slotRect, 495, WINSIZEY - (slotRect.bottom * 0.50), 0.50, 0.50, 0, 0xFFFFFFFF);
 
-		SPRITEMANAGER->DrawTexture(_pHpBg->_ptr, &hpBarRect, 0, 708, 0.75f, 0.75f, 0, 0xFFFFFFFF);
-		SPRITEMANAGER->DrawTexture(_pHp->_ptr, &hpRect, 0, 708, 0.75f, 0.75f, 0, 0xFFFFFFFF);
+		SPRITEMANAGER->DrawTexture(_pHp->_ptr, &hpBarRect, 0, WINSIZEY - 256 + hpBarRect.top , 1.0f, 1.0f, 0, 0xFFFFFFFF);
+		SPRITEMANAGER->DrawTexture(_pHpBg->_ptr, nullptr, 0, WINSIZEY - 256, 1.0f, 1.0f, 0, 0xFFFFFFFF);
 
-		SPRITEMANAGER->DrawTexture(_pFuryBg->_ptr, &furyBarRect, WINSIZEX - (furyRect.right * 0.75), 708, 0.75f, 0.75f, 0, 0xFFFFFFFF);
-		SPRITEMANAGER->DrawTexture(_pFury->_ptr, &furyRect, WINSIZEX - (furyRect.right * 0.75), 708, 0.75f, 0.75f, 0, 0xFFFFFFFF);
+		SPRITEMANAGER->DrawTexture(_pFury->_ptr, &furyBarRect, WINSIZEX - 256, 
+			WINSIZEY - 256 + furyBarRect.top, 1.0f, 1.0f, 0, 0xFFFFFFFF);
+		SPRITEMANAGER->DrawTexture(_pFuryBg->_ptr, nullptr, WINSIZEX - 256, 
+			WINSIZEY - 256, 1.0f, 1.0f, 0, 0xFFFFFFFF);
 
 		SPRITEMANAGER->DrawTexture(_pMiniMenu->_ptr, NULL, WINSIZEX - 510, WINSIZEY - 64, 0.5f, 0.5f, 0, 0xFFFFFFFF);
 	}
