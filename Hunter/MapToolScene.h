@@ -4,10 +4,12 @@
 #include "IScene.h"
 
 #include "WorldEditor.h"
-#include "Player.h"
-#include "Snake.h"
-#include "Dragon.h"
-#include "UI.h"
+//#include "Player.h"
+//#include "Snake.h"
+//#include "Dragon.h"
+//#include "UI.h"
+
+#include "LoadItem.h"
 
 class MapToolScene : public IScene
 {
@@ -30,16 +32,15 @@ public:
 
 	virtual const char *GetSceneName();
 
-	Camera &GetMinimapCamera() { return _minimapCamera; }
-
 protected :
 	Editor *_editor{};
 
+	Loading _loading;
 private :
 
-	void RenderMinimap();
-
-	Camera _minimapCamera;
+	void LoadStaticModelResources();
+	void LoadSkinnedModelResources();
+	void LoadSoundResources();
 
 public:
 	virtual void Handle(const Editor::GetObjectFromSceneEvent &event);

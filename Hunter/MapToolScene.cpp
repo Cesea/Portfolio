@@ -1,311 +1,10 @@
 #include "stdafx.h"
 #include "MapToolScene.h"
 
-void LoadEverySoundResources()
-{
-#pragma region Player 
-	SOUNDMANAGER->AddSound3D("player_walk_left", 
-		"../resources/sfx/Player/Walk/player_dirt_walk_armorlight_01.wav", false, false, 4.0f, 13.0f);
-	SOUNDMANAGER->AddSound3D("player_walk_right", 
-		"../resources/sfx/Player/Walk/player_dirt_walk_armorlight_04.wav", false, false, 4.0f, 13.0f);
-
-	SOUNDMANAGER->AddSound3D("player_run_left", 
-		"../resources/sfx/Player/Run/player_dirt_run_armorlight_01.wav", false, false, 4.0f, 13.0f);
-	SOUNDMANAGER->AddSound3D("player_run_right", 
-		"../resources/sfx/Player/Run/player_dirt_run_armorlight_04.wav", false, false, 4.0f, 13.0f);
-
-	SOUNDMANAGER->AddSound3D("player_swing_01", 
-		"../resources/sfx/Player/Attack/player_swing_blade_medium_01.wav", false, false, 4.0f, 13.0f);
-	SOUNDMANAGER->AddSound3D("player_swing_02", 
-		"../resources/sfx/Player/Attack/player_swing_blade_medium_02.wav", false, false, 4.0f, 13.0f);
-	SOUNDMANAGER->AddSound3D("player_swing_03", 
-		"../resources/sfx/Player/Attack/player_swing_blade_medium_03.wav", false, false, 4.0f, 13.0f);
-
-	SOUNDMANAGER->AddSound3D("player_shield_block", 
-		"../resources/sfx/Player/Block/player_shield_block.wav", false, false, 4.0f, 13.0f);
-	SOUNDMANAGER->AddSound3D("player_shield_draw", 
-		"../resources/sfx/Player/Block/player_shield_draw.wav", false, false, 4.0f, 13.0f);
-
-	SOUNDMANAGER->AddSound3D("player_to_combat", 
-		"../resources/sfx/Player/ToCombat/player_1hand_draw.wav", false, false, 4.0f, 13.0f);
-	SOUNDMANAGER->AddSound3D("player_to_stance", 
-		"../resources/sfx/Player/ToStance/player_1hand_sheathe.wav", false, false, 4.0f, 13.0f);
-
-	SOUNDMANAGER->AddSound3D("player_impact_01",
-		"../resources/sfx/Player/Attack/player_impact_01.wav", false, false, 2.0, 5.0f);
-	SOUNDMANAGER->AddSound3D("player_impact_02",
-		"../resources/sfx/Player/Attack/player_impact_02.wav", false, false, 2.0, 5.0f);
-	SOUNDMANAGER->AddSound3D("player_impact_03",
-		"../resources/sfx/Player/Attack/player_impact_03.wav", false, false, 2.0, 5.0f);
-
-	SOUNDMANAGER->AddSound3D("player_hit_01",
-		"../resources/sfx/Player/player_hit_01.wav", false, false, 2.0f, 5.0f);
-	SOUNDMANAGER->AddSound3D("player_hit_02",
-		"../resources/sfx/Player/player_hit_02.wav", false, false, 2.0f, 5.0f);
-	SOUNDMANAGER->AddSound3D("player_hit_03",
-		"../resources/sfx/Player/player_hit_03.wav", false, false, 2.0f, 5.0f);
-
-	SOUNDMANAGER->AddSound3D("player_hit_talk_01",
-		"../resources/sfx/Player/player_hit_talk_01.wav", false, false, 2.0f, 5.0f);
-
-#pragma endregion
-
-#pragma region Cat
-	SOUNDMANAGER->AddSound3D("cat_attack_01", 
-		"../resources/sfx/Cat/cat_attack_01.wav", false, false, 4.0f, 13.0f);
-	SOUNDMANAGER->AddSound3D("cat_attack_02", 
-		"../resources/sfx/Cat/cat_attack_02.wav", false, false, 4.0f, 13.0f);
-	SOUNDMANAGER->AddSound3D("cat_attack_04", 
-		"../resources/sfx/Cat/cat_attack_04.wav", false, false, 4.0f, 13.0f);
-	SOUNDMANAGER->AddSound3D("cat_roar_01", 
-		"../resources/sfx/Cat/cat_roar_01.wav", false, false, 4.0f, 13.0f);
-	SOUNDMANAGER->AddSound3D("cat_run_01", 
-		"../resources/sfx/Cat/cat_run_01.wav", false, false, 4.0f, 13.0f);
-	SOUNDMANAGER->AddSound3D("cat_hit_01", 
-		"../resources/sfx/Cat/cat_hit_01.wav", false, false, 4.0f, 13.0f);
-	SOUNDMANAGER->AddSound3D("cat_dead_01", 
-		"../resources/sfx/Cat/cat_dead_01.wav", false, false, 4.0f, 13.0f);
-#pragma endregion
-
-#pragma region Bat
-	SOUNDMANAGER->AddSound3D("bat_forward_01", 
-		"../resources/sfx/Bat/bat_forward_01.wav", false, false, 4.0f, 13.0f);
-	SOUNDMANAGER->AddSound3D("bat_roar_01", 
-		"../resources/sfx/Bat/bat_roar_01.wav", false, false, 4.0f, 13.0f);
-	SOUNDMANAGER->AddSound3D("bat_attack_01", 
-		"../resources/sfx/Bat/bat_attack_01.wav", false, false, 4.0f, 13.0f);
-	SOUNDMANAGER->AddSound3D("bat_attack_02", 
-		"../resources/sfx/Bat/bat_attack_02.wav", false, false, 4.0f, 13.0f);
-	SOUNDMANAGER->AddSound3D("bat_spit_01", 
-		"../resources/sfx/Bat/bat_spit_01.wav", false, false, 4.0f, 13.0f);
-	SOUNDMANAGER->AddSound3D("bat_dead_01", 
-		"../resources/sfx/Bat/bat_dead_01.wav", false, false, 4.0f, 13.0f);
-	SOUNDMANAGER->AddSound3D("bat_hit_01", 
-		"../resources/sfx/Bat/bat_hit_01.wav", false, false, 4.0f, 13.0f);
-#pragma endregion
-
-#pragma region Hydra
-	SOUNDMANAGER->AddSound3D("hydra_walk_left", 
-		"../resources/sfx/Hydra/hydra_walk_left.wav", false, false, 4.0f, 13.0f);
-	SOUNDMANAGER->AddSound3D("hydra_walk_right", 
-		"../resources/sfx/Hydra/hydra_walk_right.wav", false, false, 4.0f, 13.0f);
-
-	SOUNDMANAGER->AddSound3D("hydra_attack_01", 
-		"../resources/sfx/Hydra/hydra_attack_01.wav", false, false, 4.0f, 13.0f);
-	SOUNDMANAGER->AddSound3D("hydra_attack_02", 
-		"../resources/sfx/Hydra/hydra_attack_02.wav", false, false, 4.0f, 13.0f);
-	SOUNDMANAGER->AddSound3D("hydra_attack_03", 
-		"../resources/sfx/Hydra/hydra_attack_03.wav", false, false, 4.0f, 13.0f);
-
-	SOUNDMANAGER->AddSound3D("hydra_breath_01", 
-		"../resources/sfx/Hydra/hydra_breath_01.wav", false, false, 4.0f, 13.0f);
-
-	SOUNDMANAGER->AddSound3D("hydra_death_01", 
-		"../resources/sfx/Hydra/hydra_death_01.wav", false, false, 4.0f, 13.0f);
-	SOUNDMANAGER->AddSound3D("hydra_hit_01", 
-		"../resources/sfx/Hydra/hydra_hit_01.wav", false, false, 4.0f, 13.0f);
-
-	SOUNDMANAGER->AddSound3D("hydra_idle_01", 
-		"../resources/sfx/Hydra/hydra_idle_01.wav", false, false, 4.0f, 13.0f);
-
-	SOUNDMANAGER->AddSound3D("hydra_whip_01", 
-		"../resources/sfx/Hydra/hydra_whip_01.wav", false, false, 4.0f, 13.0f);
-
-#pragma endregion
-
-#pragma region Lizard
-	SOUNDMANAGER->AddSound3D("lizard_attack_01", 
-		"../resources/sfx/Lizard/lizard_attack_01.wav", false, false, 4.0f, 13.0f);
-	SOUNDMANAGER->AddSound3D("lizard_attack_02", 
-		"../resources/sfx/Lizard/lizard_attack_02.wav", false, false, 4.0f, 13.0f);
-	SOUNDMANAGER->AddSound3D("lizard_bite_01", 
-		"../resources/sfx/Lizard/lizard_bite_01.wav", false, false, 4.0f, 13.0f);
-	SOUNDMANAGER->AddSound3D("lizard_dead_01", 
-		"../resources/sfx/Lizard/lizard_dead_01.wav", false, false, 4.0f, 13.0f);
-	SOUNDMANAGER->AddSound3D("lizard_hit_01", 
-		"../resources/sfx/Lizard/lizard_hit_01.wav", false, false, 4.0f, 13.0f);
-	SOUNDMANAGER->AddSound3D("lizard_idle_01", 
-		"../resources/sfx/Lizard/lizard_idle_01.wav", false, false, 4.0f, 13.0f);
-	SOUNDMANAGER->AddSound3D("lizard_spit_01", 
-		"../resources/sfx/Lizard/lizard_spit_01.wav", false, false, 4.0f, 13.0f);
-	SOUNDMANAGER->AddSound3D("lizard_walk_left", 
-		"../resources/sfx/Lizard/lizard_walk_left.wav", false, false, 4.0f, 13.0f);
-	SOUNDMANAGER->AddSound3D("lizard_walk_right", 
-		"../resources/sfx/Lizard/lizard_walk_right.wav", false, false, 4.0f, 13.0f);
-	SOUNDMANAGER->AddSound3D("lizard_fall_01", 
-		"../resources/sfx/Lizard/lizard_fall_01.wav", false, false, 4.0f, 13.0f);
-#pragma endregion
-
-#pragma region Snake
-	SOUNDMANAGER->AddSound3D("snake_attack_01", 
-		"../resources/sfx/Snake/snake_attack_01.wav", false, false, 4.0f, 13.0f);
-	SOUNDMANAGER->AddSound3D("snake_spit_01", 
-		"../resources/sfx/Snake/snake_spit_01.wav", false, false, 4.0f, 13.0f);
-	SOUNDMANAGER->AddSound3D("snake_attack_03", 
-		"../resources/sfx/Snake/snake_attack_03.wav", false, false, 4.0f, 13.0f);
-	SOUNDMANAGER->AddSound3D("snake_roar_01", 
-		"../resources/sfx/Snake/snake_roar_01.wav", false, false, 4.0f, 13.0f);
-	SOUNDMANAGER->AddSound3D("snake_dead_01", 
-		"../resources/sfx/Snake/snake_dead_01.wav", false, false, 4.0f, 13.0f);
-#pragma endregion
-
-#pragma region Turtle
-	SOUNDMANAGER->AddSound3D("turtle_attack_01", 
-		"../resources/sfx/Turtle/turtle_attack_01.wav", false, false, 4.0f, 13.0f);
-	SOUNDMANAGER->AddSound3D("turtle_attack_02", 
-		"../resources/sfx/Turtle/turtle_attack_02.wav", false, false, 4.0f, 13.0f);
-
-	SOUNDMANAGER->AddSound3D("turtle_dead_01", 
-		"../resources/sfx/Turtle/turtle_dead_01.wav", false, false, 4.0f, 13.0f);
-	SOUNDMANAGER->AddSound3D("turtle_hit_01", 
-		"../resources/sfx/Turtle/turtle_hit_01.wav", false, false, 4.0f, 13.0f);
-
-	SOUNDMANAGER->AddSound3D("turtle_roar_01", 
-		"../resources/sfx/Turtle/turtle_roar_01.wav", false, false, 4.0f, 13.0f);
-
-	SOUNDMANAGER->AddSound3D("turtle_walk_left", 
-		"../resources/sfx/Turtle/turtle_walk_left.wav", false, false, 4.0f, 13.0f);
-
-	SOUNDMANAGER->AddSound3D("turtle_walk_right", 
-		"../resources/sfx/Turtle/turtle_walk_right.wav", false, false, 4.0f, 13.0f);
-#pragma endregion
-
-}
-
-void LoadEveryStaticResources()
-{
-	Matrix correctionMat;
-	Matrix rotationCorrection;
-#pragma region Rock
-	MatrixScaling(&correctionMat, 1.0f, 1.0f, 1.0f);
-	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Rock/Rock1_A.X", &correctionMat, "Rock01");
-	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Rock/Rock4_A.X", &correctionMat, "Rock02");
-	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Rock/Rock6_A.X", &correctionMat, "Rock03");
-	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Rock/Rock8_A.X", &correctionMat, "Rock04");
-	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Rock/Rock9_A.X", &correctionMat, "Rock05");
-
-	MatrixScaling(&correctionMat, 0.018f, 0.018f, 0.018f);
-	VIDEO->CreateStaticXMesh("../resources/Models/Environment/DruidRock/LargeStone1.X", 
-		&correctionMat, "LargeStone1");
-	VIDEO->CreateStaticXMesh("../resources/Models/Environment/DruidRock/LargeStone2.X", 
-		&correctionMat, "LargeStone2");
-	VIDEO->CreateStaticXMesh("../resources/Models/Environment/DruidRock/MediumStone1.X", 
-		&correctionMat, "MediumStone1");
-
-#pragma endregion
-
-	//Load Grass
-	MatrixScaling(&correctionMat, 0.01f, 0.01f, 0.01f);
-	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Grass/Grass1.X", &correctionMat, "Grass01");
-	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Grass/Grass2.X", &correctionMat, "Grass02");
-	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Grass/Grass3.X", &correctionMat, "Grass03");
-	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Grass/Grass4.X", &correctionMat, "Grass04");
-	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Grass/Grass5.X", &correctionMat, "Grass05");
-	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Grass/Grass6.X", &correctionMat, "Grass06");
-	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Grass/Grass7.X", &correctionMat, "Grass07");
-	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Grass/Grass8.X", &correctionMat, "Grass08");
-	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Grass/Grass9.X", &correctionMat, "Grass09");
-	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Grass/Grass10.X", &correctionMat, "Grass10");
-
-	//Load Tree
-	MatrixScaling(&correctionMat, 0.01f, 0.01f, 0.01f);
-	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Tree/Tree1.X", &correctionMat, "Tree01");
-	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Tree/Tree2.X", &correctionMat, "Tree02");
-	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Tree/Tree3.X", &correctionMat, "Tree03");
-	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Tree/Tree4.X", &correctionMat, "Tree04");
-	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Tree/Tree5.X", &correctionMat, "Tree05");
-	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Tree/Tree6.X", &correctionMat, "Tree06");
-	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Tree/Tree7.X", &correctionMat, "Tree07");
-	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Tree/Tree8.X", &correctionMat, "Tree08");
-	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Tree/Tree9.X", &correctionMat, "Tree09");
-	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Tree/Tree10.X", &correctionMat, "Tree10");
-
-	//Load TreeTrunk
-	MatrixScaling(&correctionMat, 0.01f, 0.01f, 0.01f);
-	VIDEO->CreateStaticXMesh("../resources/Models/Environment/TreeTrunk/TreeTrunk1.X", &correctionMat, "TreeTrunk01");
-	VIDEO->CreateStaticXMesh("../resources/Models/Environment/TreeTrunk/TreeTrunk2.X", &correctionMat, "TreeTrunk02");
-	VIDEO->CreateStaticXMesh("../resources/Models/Environment/TreeTrunk/TreeTrunk3.X", &correctionMat, "TreeTrunk03");
-
-	//Load Mushroom
-	MatrixScaling(&correctionMat, 0.01f, 0.01f, 0.01f);
-	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Mushroom/Mushroom1.X", &correctionMat, "Mushroom01");
-	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Mushroom/Mushroom2.X", &correctionMat, "Mushroom02");
-	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Mushroom/Mushroom3.X", &correctionMat, "Mushroom03");
-}
 
 void LoadEverySkinnedResources()
 {
-//메쉬 불러오기..
-	Matrix correctionMat;
-	Matrix rotationCorrection;
-	MatrixRotationY(&rotationCorrection, D3DX_PI);
-	MatrixScaling(&correctionMat, 0.01f, 0.01f, 0.01f);
-	MatrixMultiply(&correctionMat, &correctionMat, &rotationCorrection);
-	video::SkinnedXMeshHandle knight  = VIDEO->CreateSkinnedXMesh(
-		"../resources/Models/Knight/Knight.X", &correctionMat, "Knight");
 
-	MatrixScaling(&correctionMat, 1.4f, 1.4f, 1.4f);
-	video::SkinnedXMeshHandle snakeMesh = VIDEO->CreateSkinnedXMesh(
-		"../resources/Models/Snake/Snake_Red.X", &correctionMat, "Snake1");
-
-	MatrixScaling(&correctionMat, 1.4f, 1.4f, 1.4f);
-	video::SkinnedXMeshHandle snakeMesh2 = VIDEO->CreateSkinnedXMesh(
-		"../resources/Models/Snake/Snake_Black.X", &correctionMat, "Snake2");
-
-	MatrixScaling(&correctionMat, 1.4f, 1.4f, 1.4f);
-	video::SkinnedXMeshHandle snakeMesh3 = VIDEO->CreateSkinnedXMesh(
-		"../resources/Models/Snake/Snake_Cyan.X", &correctionMat, "Snake3");
-
-	MatrixScaling(&correctionMat, 1.4f, 1.4f, 1.4f);
-	video::SkinnedXMeshHandle turtleMesh = VIDEO->CreateSkinnedXMesh(
-		"../resources/Models/DragonTurtle/DragonTurtle_Black.X", &correctionMat, "Turtle");
-
-	MatrixScaling(&correctionMat, 1.0f, 1.0f, 1.0f);
-	video::SkinnedXMeshHandle batMesh1 = VIDEO->CreateSkinnedXMesh(
-		"../resources/Models/DragonBat/DragonBat_Red.X", &correctionMat, "Bat1");
-
-
-	MatrixScaling(&correctionMat, 1.0f, 1.0f, 1.0f);
-	video::SkinnedXMeshHandle batMesh2 = VIDEO->CreateSkinnedXMesh(
-		"../resources/Models/DragonBat/DragonBat_Black.X", &correctionMat, "Bat2");
-
-
-	MatrixScaling(&correctionMat, 1.0f, 1.0f, 1.0f);
-	video::SkinnedXMeshHandle batMesh3 = VIDEO->CreateSkinnedXMesh(
-		"../resources/Models/DragonBat/DragonBat_Gold.X", &correctionMat, "Bat3");
-
-
-	MatrixScaling(&correctionMat, 1.4f, 1.4f, 1.4f);
-	video::SkinnedXMeshHandle catMesh = VIDEO->CreateSkinnedXMesh(
-		"../resources/Models/DevilCat/DevilCat.X", &correctionMat, "Cat");
-
-	MatrixScaling(&correctionMat, 2.0f, 2.0f, 2.0f);
-	video::SkinnedXMeshHandle HydraMesh1 = VIDEO->CreateSkinnedXMesh(
-		"../resources/Models/Hydra/Hydra_Green.X", &correctionMat, "Hydra1");
-
-	MatrixScaling(&correctionMat, 2.0f, 2.0f, 2.0f);
-	video::SkinnedXMeshHandle HydraMesh2 = VIDEO->CreateSkinnedXMesh(
-		"../resources/Models/Hydra/Hydra_Red.X", &correctionMat, "Hydra2");
-
-	MatrixScaling(&correctionMat, 2.0f, 2.0f, 2.0f);
-	video::SkinnedXMeshHandle HydraMesh3 = VIDEO->CreateSkinnedXMesh(
-		"../resources/Models/Hydra/Hydra_Black.X", &correctionMat, "Hydra3");
-
-	MatrixScaling(&correctionMat, 2.0f, 2.0f, 2.0f);
-	video::SkinnedXMeshHandle HydraMesh4 = VIDEO->CreateSkinnedXMesh(
-		"../resources/Models/Hydra/Hydra_Gold.X", &correctionMat, "Hydra4");
-
-	MatrixScaling(&correctionMat, 1.0f, 1.0f, 1.0f);
-	video::SkinnedXMeshHandle LizardMesh1 = VIDEO->CreateSkinnedXMesh(
-		"../resources/Models/Lizard/Lizard.X", &correctionMat, "Lizard1");
-
-	MatrixScaling(&correctionMat, 1.0f, 1.0f, 1.0f);
-	video::SkinnedXMeshHandle LizardMesh2 = VIDEO->CreateSkinnedXMesh(
-		"../resources/Models/Lizard/Lizard_Black.X", &correctionMat, "Lizard2");
-
-	MatrixScaling(&correctionMat, 1.0f, 1.0f, 1.0f);
-	video::SkinnedXMeshHandle Dragon = VIDEO->CreateSkinnedXMesh(
-		"../resources/Models/DragonBoss/DragonBoss.X", &correctionMat, "Dragon");
 }
 
 bool MapToolScene::SceneInit()
@@ -334,18 +33,21 @@ bool MapToolScene::SceneInit()
 	TERRAIN->SetScene(this);
 	TERRAIN->Create(config, true);
 	
-	LoadEverySkinnedResources();
-	LoadEveryStaticResources();
-	LoadEverySoundResources();
+	//LoadEverySkinnedResources();
+	//LoadEveryStaticResources();
+	//LoadEverySoundResources();
+	LoadStaticModelResources();
+	LoadSkinnedModelResources();
+	LoadSoundResources();
+
+	float loaded{};
+	while (loaded < 1.0f)
+	{
+		loaded = _loading.LoadNext();
+	}
 
 	_camera.SetMoveSpeed(6.0f);
 	_camera.SetRotationSpeed(1.0f);
-
-	_minimapCamera.CreateFromWorld(_world);
-	_minimapCamera._ortho = true;
-	_minimapCamera._aspect = 1;
-	_minimapCamera._orthoSize = 10 * 1.0f;	//투영크기는 그림자크기로...
-	_minimapCamera.ReadyRenderToTexture(512, 512);
 
 	_pMainLight->SetWorldPosition(Vector3(4.0f, 7.0f, 3.0f));
 	_pMainLight->SetTarget(Vector3(0.0f, 0.0f, 0.0f));
@@ -430,9 +132,6 @@ bool MapToolScene::SceneUpdate(float deltaTime, const InputManager & input)
 	_particleSystem.setCamera(&_camera, _camera.GetEntity().GetComponent<TransformComponent>().GetWorldPosition());
 	_particleSystem.update(deltaTime);
 
-
-	RenderMinimap();
-
 	ReadyShadowMap(TERRAIN);
 
 	//_ui->Update(deltaTime, input);
@@ -496,22 +195,278 @@ const char * MapToolScene::GetSceneName()
 	return "MapToolScene";
 }
 
-void MapToolScene::RenderMinimap()
+void MapToolScene::LoadStaticModelResources()
 {
-	//방향성광원에 붙은 카메라의 Frustum 업데이트
-	_minimapCamera.UpdateMatrix();
-	_minimapCamera.UpdateFrustum();
+	Matrix correctionMat;
+	Matrix rotationCorrection;
+#pragma region Rock
+	MatrixScaling(&correctionMat, 1.0f, 1.0f, 1.0f);
+	_loading.LoadModelResources("../resources/Models/Environment/Rock/Rock1_A.X", "Rock01", true, 1.0f, 0.0f);
+	_loading.LoadModelResources("../resources/Models/Environment/Rock/Rock4_A.X", "Rock02", true, 1.0f, 0.0f);
+	_loading.LoadModelResources("../resources/Models/Environment/Rock/Rock6_A.X", "Rock03", true, 1.0f, 0.0f);
+	_loading.LoadModelResources("../resources/Models/Environment/Rock/Rock8_A.X", "Rock04", true, 1.0f, 0.0f);
+	_loading.LoadModelResources("../resources/Models/Environment/Rock/Rock9_A.X", "Rock05", true, 1.0f, 0.0f);
 
-	//_minimapCamera.RenderTextureBegin( 0xffffffff );
+	_loading.LoadModelResources("../resources/Models/Environment/DruidRock/LargeStone1.X",
+		"LargeStone1", true, 0.018f, 0.0f);
+	_loading.LoadModelResources("../resources/Models/Environment/DruidRock/LargeStone2.X",
+		"LargeStone2", true, 0.018f, 0.0f);
+	_loading.LoadModelResources("../resources/Models/Environment/DruidRock/MediumStone1.X",
+		"MediumStone1", true, 0.018f, 0.0f);
+#pragma endregion
 
-	video::StaticXMesh::SetCamera( _minimapCamera );
+	_loading.LoadModelResources("../resources/Models/Environment/Grass/Grass1.X", "Grass01", true, 0.01f, 0.0f);
+	_loading.LoadModelResources("../resources/Models/Environment/Grass/Grass2.X", "Grass02", true, 0.01f, 0.0f);
+	_loading.LoadModelResources("../resources/Models/Environment/Grass/Grass3.X", "Grass03", true, 0.01f, 0.0f);
+	_loading.LoadModelResources("../resources/Models/Environment/Grass/Grass4.X", "Grass04", true, 0.01f, 0.0f);
+	_loading.LoadModelResources("../resources/Models/Environment/Grass/Grass5.X", "Grass05", true, 0.01f, 0.0f);
+	_loading.LoadModelResources("../resources/Models/Environment/Grass/Grass6.X", "Grass06", true, 0.01f, 0.0f);
+	_loading.LoadModelResources("../resources/Models/Environment/Grass/Grass7.X", "Grass07", true, 0.01f, 0.0f);
+	_loading.LoadModelResources("../resources/Models/Environment/Grass/Grass8.X", "Grass08", true, 0.01f, 0.0f);
+	_loading.LoadModelResources("../resources/Models/Environment/Grass/Grass9.X", "Grass09", true, 0.01f, 0.0f);
+	_loading.LoadModelResources("../resources/Models/Environment/Grass/Grass10.X", "Grass10", true, 0.01f, 0.0f);
 
-	video::SkinnedXMesh::SetCamera( _minimapCamera);
+	//Load Tree
+	_loading.LoadModelResources("../resources/Models/Environment/Tree/Tree1.X", "Tree01", true, 0.01f, 0.0f);
+	_loading.LoadModelResources("../resources/Models/Environment/Tree/Tree2.X", "Tree02", true, 0.01f, 0.0f);
+	_loading.LoadModelResources("../resources/Models/Environment/Tree/Tree3.X", "Tree03", true, 0.01f, 0.0f);
+	_loading.LoadModelResources("../resources/Models/Environment/Tree/Tree4.X", "Tree04", true, 0.01f, 0.0f);
+	_loading.LoadModelResources("../resources/Models/Environment/Tree/Tree5.X", "Tree05", true, 0.01f, 0.0f);
+	_loading.LoadModelResources("../resources/Models/Environment/Tree/Tree6.X", "Tree06", true, 0.01f, 0.0f);
+	_loading.LoadModelResources("../resources/Models/Environment/Tree/Tree7.X", "Tree07", true, 0.01f, 0.0f);
+	_loading.LoadModelResources("../resources/Models/Environment/Tree/Tree8.X", "Tree08", true, 0.01f, 0.0f);
+	_loading.LoadModelResources("../resources/Models/Environment/Tree/Tree9.X", "Tree09", true, 0.01f, 0.0f);
+	_loading.LoadModelResources("../resources/Models/Environment/Tree/Tree10.X", "Tree10", true, 0.01f, 0.0f);
 
-	//TERRAIN->Render(_minimapCamera, );
-	//_renderSystem.Render(_minimapCamera);
+	//Load TreeTrunk
+	_loading.LoadModelResources("../resources/Models/Environment/TreeTrunk/TreeTrunk1.X",
+		"TreeTrunk01", true, 0.01f, 0.0f);
+	_loading.LoadModelResources("../resources/Models/Environment/TreeTrunk/TreeTrunk2.X",
+		"TreeTrunk02", true, 0.01f, 0.0f);
+	_loading.LoadModelResources("../resources/Models/Environment/TreeTrunk/TreeTrunk3.X",
+		"TreeTrunk03", true, 0.01f, 0.0f);
 
-	//_shadowCamera.RenderTextureEnd();
+	_loading.LoadModelResources("../resources/Models/Environment/Mushroom/Mushroom1.X",
+		"Mushroom01", true, 0.01f, 0.0f);
+	_loading.LoadModelResources("../resources/Models/Environment/Mushroom/Mushroom2.X",
+		"Mushroom02", true, 0.01f, 0.0f);
+	_loading.LoadModelResources("../resources/Models/Environment/Mushroom/Mushroom3.X",
+		"Mushroom03", true, 0.01f, 0.0f);
+}
+
+void MapToolScene::LoadSkinnedModelResources()
+{
+	_loading.LoadModelResources("../resources/Models/Knight/Knight.X",
+		"Knight", false, 0.01f, D3DX_PI);
+
+	_loading.LoadModelResources("../resources/Models/Snake/Snake_Red.X",
+		"Snake1", false, 1.4f, 0.0f);
+	_loading.LoadModelResources("../resources/Models/Snake/Snake_Black.X",
+		"Snake2", false, 1.4f, 0.0f);
+	_loading.LoadModelResources("../resources/Models/Snake/Snake_Cyan.X",
+		"Snake3", false, 1.4f, 0.0f);
+
+
+	_loading.LoadModelResources("../resources/Models/DragonTurtle/DragonTurtle_Black.X",
+		"Turtle", false, 1.4f, 0.0f);
+
+	_loading.LoadModelResources("../resources/Models/DragonBat/DragonBat_Red.X",
+		"Bat1", false, 1.0f, 0.0f);
+	_loading.LoadModelResources("../resources/Models/DragonBat/DragonBat_Black.X",
+		"Bat2", false, 1.0f, 0.0f);
+	_loading.LoadModelResources("../resources/Models/DragonBat/DragonBat_Gold.X",
+		"Bat3", false, 1.0f, 0.0f);
+
+	_loading.LoadModelResources("../resources/Models/DevilCat/DevilCat.X",
+		"Cat", false, 1.4f, 0.0f);
+
+	_loading.LoadModelResources("../resources/Models/Hydra/Hydra_Green.X",
+		"Hydra1", false, 2.0f, 0.0f);
+	_loading.LoadModelResources("../resources/Models/Hydra/Hydra_Red.X",
+		"Hydra2", false, 2.0f, 0.0f);
+	_loading.LoadModelResources("../resources/Models/Hydra/Hydra_Black.X",
+		"Hydra3", false, 2.0f, 0.0f);
+	_loading.LoadModelResources("../resources/Models/Hydra/Hydra_Gold.X",
+		"Hydra4", false, 2.0f, 0.0f);
+
+	_loading.LoadModelResources("../resources/Models/Lizard/Lizard.X",
+		"Lizard1", false, 1.0f, 0.0f);
+	_loading.LoadModelResources("../resources/Models/Lizard/Lizard_Black.X",
+		"Lizard2", false, 1.0f, 0.0f);
+
+	_loading.LoadModelResources("../resources/Models/DragonBoss/DragonBoss.X",
+		"Dragon", false, 1.0f, 0.0f);
+}
+
+void MapToolScene::LoadSoundResources()
+{
+#pragma region Player 
+
+	_loading.LoadSoundResources("player_walk_left", 
+		"../resources/sfx/Player/Walk/player_dirt_walk_armorlight_01.wav", false, false, 4.0f, 13.0f);
+	_loading.LoadSoundResources("player_walk_right", 
+		"../resources/sfx/Player/Walk/player_dirt_walk_armorlight_04.wav", false, false, 4.0f, 13.0f);
+
+	_loading.LoadSoundResources("player_run_left", 
+		"../resources/sfx/Player/Run/player_dirt_run_armorlight_01.wav", false, false, 4.0f, 13.0f);
+	_loading.LoadSoundResources("player_run_right", 
+		"../resources/sfx/Player/Run/player_dirt_run_armorlight_04.wav", false, false, 4.0f, 13.0f);
+
+	_loading.LoadSoundResources("player_swing_01", 
+		"../resources/sfx/Player/Attack/player_swing_blade_medium_01.wav", false, false, 4.0f, 13.0f);
+	_loading.LoadSoundResources("player_swing_02", 
+		"../resources/sfx/Player/Attack/player_swing_blade_medium_02.wav", false, false, 4.0f, 13.0f);
+	_loading.LoadSoundResources("player_swing_03", 
+		"../resources/sfx/Player/Attack/player_swing_blade_medium_03.wav", false, false, 4.0f, 13.0f);
+
+	_loading.LoadSoundResources("player_shield_block", 
+		"../resources/sfx/Player/Block/player_shield_block.wav", false, false, 4.0f, 13.0f);
+	_loading.LoadSoundResources("player_shield_draw", 
+		"../resources/sfx/Player/Block/player_shield_draw.wav", false, false, 4.0f, 13.0f);
+
+	_loading.LoadSoundResources("player_to_combat", 
+		"../resources/sfx/Player/ToCombat/player_1hand_draw.wav", false, false, 4.0f, 13.0f);
+	_loading.LoadSoundResources("player_to_stance", 
+		"../resources/sfx/Player/ToStance/player_1hand_sheathe.wav", false, false, 4.0f, 13.0f);
+
+	_loading.LoadSoundResources("player_impact_01",
+		"../resources/sfx/Player/Attack/player_impact_01.wav", false, false, 2.0, 5.0f);
+	_loading.LoadSoundResources("player_impact_02",
+		"../resources/sfx/Player/Attack/player_impact_02.wav", false, false, 2.0, 5.0f);
+	_loading.LoadSoundResources("player_impact_03",
+		"../resources/sfx/Player/Attack/player_impact_03.wav", false, false, 2.0, 5.0f);
+
+	_loading.LoadSoundResources("player_hit_01",
+		"../resources/sfx/Player/player_hit_01.wav", false, false, 2.0f, 5.0f);
+	_loading.LoadSoundResources("player_hit_02",
+		"../resources/sfx/Player/player_hit_02.wav", false, false, 2.0f, 5.0f);
+	_loading.LoadSoundResources("player_hit_03",
+		"../resources/sfx/Player/player_hit_03.wav", false, false, 2.0f, 5.0f);
+
+	_loading.LoadSoundResources("player_hit_talk_01",
+		"../resources/sfx/Player/player_hit_talk_01.wav", false, false, 2.0f, 5.0f);
+
+#pragma endregion
+
+#pragma region Cat
+	_loading.LoadSoundResources("cat_attack_01", 
+		"../resources/sfx/Cat/cat_attack_01.wav", false, false, 4.0f, 13.0f);
+	_loading.LoadSoundResources("cat_attack_02", 
+		"../resources/sfx/Cat/cat_attack_02.wav", false, false, 4.0f, 13.0f);
+	_loading.LoadSoundResources("cat_attack_04", 
+		"../resources/sfx/Cat/cat_attack_04.wav", false, false, 4.0f, 13.0f);
+	_loading.LoadSoundResources("cat_roar_01", 
+		"../resources/sfx/Cat/cat_roar_01.wav", false, false, 4.0f, 13.0f);
+	_loading.LoadSoundResources("cat_run_01", 
+		"../resources/sfx/Cat/cat_run_01.wav", false, false, 4.0f, 13.0f);
+	_loading.LoadSoundResources("cat_hit_01", 
+		"../resources/sfx/Cat/cat_hit_01.wav", false, false, 4.0f, 13.0f);
+	_loading.LoadSoundResources("cat_dead_01", 
+		"../resources/sfx/Cat/cat_dead_01.wav", false, false, 4.0f, 13.0f);
+#pragma endregion
+
+#pragma region Bat
+	_loading.LoadSoundResources("bat_forward_01", 
+		"../resources/sfx/Bat/bat_forward_01.wav", false, false, 4.0f, 13.0f);
+	_loading.LoadSoundResources("bat_roar_01", 
+		"../resources/sfx/Bat/bat_roar_01.wav", false, false, 4.0f, 13.0f);
+	_loading.LoadSoundResources("bat_attack_01", 
+		"../resources/sfx/Bat/bat_attack_01.wav", false, false, 4.0f, 13.0f);
+	_loading.LoadSoundResources("bat_attack_02", 
+		"../resources/sfx/Bat/bat_attack_02.wav", false, false, 4.0f, 13.0f);
+	_loading.LoadSoundResources("bat_spit_01", 
+		"../resources/sfx/Bat/bat_spit_01.wav", false, false, 4.0f, 13.0f);
+	_loading.LoadSoundResources("bat_dead_01", 
+		"../resources/sfx/Bat/bat_dead_01.wav", false, false, 4.0f, 13.0f);
+	_loading.LoadSoundResources("bat_hit_01", 
+		"../resources/sfx/Bat/bat_hit_01.wav", false, false, 4.0f, 13.0f);
+#pragma endregion
+
+#pragma region Hydra
+	_loading.LoadSoundResources("hydra_walk_left", 
+		"../resources/sfx/Hydra/hydra_walk_left.wav", false, false, 4.0f, 13.0f);
+	_loading.LoadSoundResources("hydra_walk_right", 
+		"../resources/sfx/Hydra/hydra_walk_right.wav", false, false, 4.0f, 13.0f);
+
+	_loading.LoadSoundResources("hydra_attack_01", 
+		"../resources/sfx/Hydra/hydra_attack_01.wav", false, false, 4.0f, 13.0f);
+	_loading.LoadSoundResources("hydra_attack_02", 
+		"../resources/sfx/Hydra/hydra_attack_02.wav", false, false, 4.0f, 13.0f);
+	_loading.LoadSoundResources("hydra_attack_03", 
+		"../resources/sfx/Hydra/hydra_attack_03.wav", false, false, 4.0f, 13.0f);
+
+	_loading.LoadSoundResources("hydra_breath_01", 
+		"../resources/sfx/Hydra/hydra_breath_01.wav", false, false, 4.0f, 13.0f);
+
+	_loading.LoadSoundResources("hydra_death_01", 
+		"../resources/sfx/Hydra/hydra_death_01.wav", false, false, 4.0f, 13.0f);
+	_loading.LoadSoundResources("hydra_hit_01", 
+		"../resources/sfx/Hydra/hydra_hit_01.wav", false, false, 4.0f, 13.0f);
+
+	_loading.LoadSoundResources("hydra_idle_01", 
+		"../resources/sfx/Hydra/hydra_idle_01.wav", false, false, 4.0f, 13.0f);
+
+	_loading.LoadSoundResources("hydra_whip_01", 
+		"../resources/sfx/Hydra/hydra_whip_01.wav", false, false, 4.0f, 13.0f);
+
+#pragma endregion
+
+#pragma region Lizard
+	_loading.LoadSoundResources("lizard_attack_01", 
+		"../resources/sfx/Lizard/lizard_attack_01.wav", false, false, 4.0f, 13.0f);
+	_loading.LoadSoundResources("lizard_attack_02", 
+		"../resources/sfx/Lizard/lizard_attack_02.wav", false, false, 4.0f, 13.0f);
+	_loading.LoadSoundResources("lizard_bite_01", 
+		"../resources/sfx/Lizard/lizard_bite_01.wav", false, false, 4.0f, 13.0f);
+	_loading.LoadSoundResources("lizard_dead_01", 
+		"../resources/sfx/Lizard/lizard_dead_01.wav", false, false, 4.0f, 13.0f);
+	_loading.LoadSoundResources("lizard_hit_01", 
+		"../resources/sfx/Lizard/lizard_hit_01.wav", false, false, 4.0f, 13.0f);
+	_loading.LoadSoundResources("lizard_idle_01", 
+		"../resources/sfx/Lizard/lizard_idle_01.wav", false, false, 4.0f, 13.0f);
+	_loading.LoadSoundResources("lizard_spit_01", 
+		"../resources/sfx/Lizard/lizard_spit_01.wav", false, false, 4.0f, 13.0f);
+	_loading.LoadSoundResources("lizard_walk_left", 
+		"../resources/sfx/Lizard/lizard_walk_left.wav", false, false, 4.0f, 13.0f);
+	_loading.LoadSoundResources("lizard_walk_right", 
+		"../resources/sfx/Lizard/lizard_walk_right.wav", false, false, 4.0f, 13.0f);
+	_loading.LoadSoundResources("lizard_fall_01", 
+		"../resources/sfx/Lizard/lizard_fall_01.wav", false, false, 4.0f, 13.0f);
+#pragma endregion
+
+#pragma region Snake
+	_loading.LoadSoundResources("snake_attack_01", 
+		"../resources/sfx/Snake/snake_attack_01.wav", false, false, 4.0f, 13.0f);
+	_loading.LoadSoundResources("snake_spit_01", 
+		"../resources/sfx/Snake/snake_spit_01.wav", false, false, 4.0f, 13.0f);
+	_loading.LoadSoundResources("snake_attack_03", 
+		"../resources/sfx/Snake/snake_attack_03.wav", false, false, 4.0f, 13.0f);
+	_loading.LoadSoundResources("snake_roar_01", 
+		"../resources/sfx/Snake/snake_roar_01.wav", false, false, 4.0f, 13.0f);
+	_loading.LoadSoundResources("snake_dead_01", 
+		"../resources/sfx/Snake/snake_dead_01.wav", false, false, 4.0f, 13.0f);
+#pragma endregion
+
+#pragma region Turtle
+	_loading.LoadSoundResources("turtle_attack_01", 
+		"../resources/sfx/Turtle/turtle_attack_01.wav", false, false, 4.0f, 13.0f);
+	_loading.LoadSoundResources("turtle_attack_02", 
+		"../resources/sfx/Turtle/turtle_attack_02.wav", false, false, 4.0f, 13.0f);
+
+	_loading.LoadSoundResources("turtle_dead_01", 
+		"../resources/sfx/Turtle/turtle_dead_01.wav", false, false, 4.0f, 13.0f);
+	_loading.LoadSoundResources("turtle_hit_01", 
+		"../resources/sfx/Turtle/turtle_hit_01.wav", false, false, 4.0f, 13.0f);
+
+	_loading.LoadSoundResources("turtle_roar_01", 
+		"../resources/sfx/Turtle/turtle_roar_01.wav", false, false, 4.0f, 13.0f);
+
+	_loading.LoadSoundResources("turtle_walk_left", 
+		"../resources/sfx/Turtle/turtle_walk_left.wav", false, false, 4.0f, 13.0f);
+
+	_loading.LoadSoundResources("turtle_walk_right", 
+		"../resources/sfx/Turtle/turtle_walk_right.wav", false, false, 4.0f, 13.0f);
+#pragma endregion
 
 }
 

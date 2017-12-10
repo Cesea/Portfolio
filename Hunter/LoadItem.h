@@ -70,7 +70,7 @@ public :
 	Loading() {}
 	virtual ~Loading() { }
 
-	void LoadSoundResources(const std::string &fileName, const std::string &keyName, 
+	void LoadSoundResources(const std::string &keyName, const std::string &fileName, 
 		bool bgm, bool loop, float min = 0.0f, float max = 0.0f);
 	void LoadModelResources(const std::string &fileName, const std::string &keyName, 
 		bool isStatic, float scale, float rotationY);

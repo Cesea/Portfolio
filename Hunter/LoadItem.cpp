@@ -49,7 +49,7 @@ bool SoundLoadItem::Init(const std::string & fileName, const std::string & keyNa
 	return true;
 }
 
-void Loading::LoadSoundResources(const std::string & fileName, const std::string & keyName, 
+void Loading::LoadSoundResources(const std::string & keyName, const std::string & fileName, 
 	bool bgm, bool loop, float min, float max)
 {
 	SoundLoadItem *newItem = new SoundLoadItem;
