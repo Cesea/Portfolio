@@ -711,6 +711,8 @@ bool Inventory::CheckBag(void)
 
 void Inventory::closeInventory(void)
 {
+	Player *pPlayer = (Player *)GAMEOBJECTFACTORY->GetPlayerObject();
+	pPlayer->RegisterEvents();
 	if (_bag[8]._type != Null)
 	{
 		bool is = false;

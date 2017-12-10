@@ -9,7 +9,8 @@ class Player;
 enum CAMERA_STATE
 {
 	CAMERASTATE_CREATE,
-	CAMERASTATE_INGAME,
+	CAMERASTATE_INCOMBAT,
+	CAMERASTATE_UI,
 };
 
 constexpr float CAMERA_TARGET_DEFAULT_RADIUS = 5.0f;
@@ -18,7 +19,6 @@ constexpr float CAMERA_TARGET_DEFAULT_RADIUS = 5.0f;
 class Camera
 {
 public:
-	CAMERA_STATE _cameraState{};
 
 	float _fov;
 	float _camNear;
@@ -45,6 +45,8 @@ public:
 	void SetMoveSpeed(float speed) { _moveSpeed = speed; }
 	void SetRotationSpeed(float speed) { _rotationSpeed = speed; }
 
+	void SetCameraState(CAMERA_STATE state);
+
 	const Matrix &GetViewMatrix() const { return _matView; }
 	const Matrix &GetProjectionMatrix() const { return _matProjection; }
 	const Matrix &GetViewProjectionMatrix() const { return _matViewProjection; }
@@ -66,11 +68,6 @@ public:
 	LPDIRECT3DTEXTURE9 GetRenderTexture();
 
 private:
-	void NormalCameraUpdate(void);
-
-	//bool move(POINT pt);
-
-	//POINT tempPt;
 
 	LPDIRECT3DTEXTURE9 _pRenderTexture{};
 	LPDIRECT3DSURFACE9 _pRenderSurface{};
@@ -101,7 +98,7 @@ protected:
 	float _offsetUpMult{};
 
 	Quaternion _camRot;
-
+	CAMERA_STATE _cameraState{};
 };
 
 #endif

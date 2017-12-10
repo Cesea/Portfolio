@@ -173,6 +173,9 @@ bool TestScene::SceneInit()
 	_camera.SetTargetObject((Player *)GAMEOBJECTFACTORY->GetPlayerObject());
 
 	_pInGameUI = new UI;
+	_pInGameUI->Init(this);
+
+	_camera.SetCameraState(CAMERASTATE_INCOMBAT);
 
 	return result; 
 }
@@ -180,6 +183,7 @@ bool TestScene::SceneInit()
 bool TestScene::SceneUpdate(float deltaTime, const InputManager & input)
 {
 	bool result = true;
+
 	_world.Refresh();
 	_scriptSystem.Update(deltaTime);
 	_transformSystem.PreUpdate(deltaTime);
@@ -198,6 +202,7 @@ bool TestScene::SceneUpdate(float deltaTime, const InputManager & input)
 
 bool TestScene::SceneRelease()
 {
+	_pInGameUI->Release();
 	SAFE_DELETE(_pInGameUI);
 	ReleaseAllGameObjects();
 	_world.Clear();

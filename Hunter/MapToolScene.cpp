@@ -401,10 +401,19 @@ bool MapToolScene::SceneUpdate(float deltaTime, const InputManager & input)
 		}
 	}
 
-	//if (TERRAIN->IsObjectExistInRange(Vector3(2.0f, 0.0f, 1.0f), Vector3(-20.0f, 0.0f, -20.0f), en))
-	//{
-	//	Console::Log("tatata\n");
-	//}
+	if (input.keyboard.IsPressed('1'))
+	{
+		_camera.SetCameraState(CAMERASTATE_CREATE);
+	}
+	else if(input.keyboard.IsPressed('2'))
+	{
+		_camera.SetCameraState(CAMERASTATE_INCOMBAT);
+	}
+	else if(input.keyboard.IsPressed('3'))
+	{
+		_camera.SetCameraState(CAMERASTATE_UI);
+	}
+
 
 	_editor->Edit(RefVariant(), input);
 

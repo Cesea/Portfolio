@@ -2,6 +2,7 @@
 
 class Player;
 class BmpFont;
+class IScene;
 
 #include "Inventory.h"
 
@@ -9,7 +10,7 @@ class UI
 {
 private:
 
-	Player* _player;
+	Player* _pPlayer;
 
 	bool _uiOn;
 
@@ -73,15 +74,18 @@ private:
 
 	Inventory* _inventory;
 
+	IScene *_pCurrentScene;
+
 public:
 
 	void Update(float deltaTime, const InputManager &input);
 
 	void RenderUI(void);
 
+	bool Init(IScene *currentScene);
+	void Release();
+
 	UI();
 	~UI();
-
-	
 };
 

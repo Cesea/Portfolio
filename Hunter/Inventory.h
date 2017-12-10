@@ -76,7 +76,15 @@ public :
 	Inventory();
 	~Inventory();
 
-	void SetInvenOn(bool on) { _invenOn = on; }
+	void SetInvenOn(bool on) 
+	{
+		if (on == true)
+		{
+			Player *pPlayer = (Player *)GAMEOBJECTFACTORY->GetPlayerObject();
+			pPlayer->UnRegisterEvents();
+		}
+		_invenOn = on; 
+	}
 	bool GetInvenOn(void) { return _invenOn; }
 
 	bool Additem(itemType type, int val);	//반환값이 펄스면 아이템창이 꽉찬거임

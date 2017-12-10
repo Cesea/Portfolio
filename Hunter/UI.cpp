@@ -6,6 +6,20 @@
 
 UI::UI()
 {
+	
+
+}
+
+
+UI::~UI()
+{
+
+	
+}
+
+bool UI::Init(IScene * currentScene)
+{
+	_pCurrentScene = currentScene;
 	_uiOn = true;
 
 	_hpBgHandle = VIDEO->CreateTexture("../resources/Textures/UITexture/LifeOrbBg.png",
@@ -88,16 +102,13 @@ UI::UI()
 	_bt2On = false;
 	_bt3On = false;
 
-	_player = (Player*)GAMEOBJECTFACTORY->GetPlayerObject();
+	_pPlayer = (Player*)GAMEOBJECTFACTORY->GetPlayerObject();
 
-	//_player->
-
+	return true;
 }
 
-
-UI::~UI()
+void UI::Release()
 {
-
 	VIDEO->DestroyTexture(_hpBgHandle);
 	VIDEO->DestroyTexture(_furyBgHandle);
 	VIDEO->DestroyTexture(_miniMenuHandle);
@@ -116,6 +127,10 @@ UI::~UI()
 	VIDEO->DestroyTexture(_potion1Handle);
 	VIDEO->DestroyTexture(_potion2Handle);
 	VIDEO->DestroyTexture(_potion3Handle);
+
+	SAFE_DELETE(_inventory);
+	_pCurrentScene = nullptr;
+
 }
 
 void UI::Update(float deltaTime, const InputManager & input)
@@ -198,6 +213,7 @@ void UI::Update(float deltaTime, const InputManager & input)
 			{
 				SOUNDMANAGER->Play("inven_open_01");
 				_inventory->SetInvenOn(true);
+				_pCurrentScene->_camera.SetCameraState(CAMERASTATE_UI);
 
 			}
 			else if (_inventory->GetInvenOn() == true)
@@ -205,36 +221,37 @@ void UI::Update(float deltaTime, const InputManager & input)
 				SOUNDMANAGER->Play("inven_close_01");
 				_inventory->SetInvenOn(false);
 				_inventory->closeInventory();
+				_pCurrentScene->_camera.SetCameraState(CAMERASTATE_INCOMBAT);
 			}
 		}
 	}
 
 	_inventory->Update(deltaTime, input);
 
-	if (input.keyboard.IsReleased('1'))
-	{
-		_inventory->Additem(mush1, 1);
-	}
-	else if (input.keyboard.IsReleased('2'))
-	{
-		_inventory->Additem(mush2, 1);
-	}
-	else if (input.keyboard.IsReleased('3'))
-	{
-		_inventory->Additem(mush3, 1);
-	}
-	else if (input.keyboard.IsReleased('4'))
-	{
-		_inventory->Additem(potion1, 1);
-	}
-	else if (input.keyboard.IsReleased('5'))
-	{
-		_inventory->Additem(potion2, 1);
-	}
-	else if (input.keyboard.IsReleased('6'))
-	{
-		_inventory->Additem(potion3, 1);
-	}
+	//if (input.keyboard.IsReleased('1'))
+	//{
+	//	_inventory->Additem(mush1, 1);
+	//}
+	//else if (input.keyboard.IsReleased('2'))
+	//{
+	//	_inventory->Additem(mush2, 1);
+	//}
+	//else if (input.keyboard.IsReleased('3'))
+	//{
+	//	_inventory->Additem(mush3, 1);
+	//}
+	//else if (input.keyboard.IsReleased('4'))
+	//{
+	//	_inventory->Additem(potion1, 1);
+	//}
+	//else if (input.keyboard.IsReleased('5'))
+	//{
+	//	_inventory->Additem(potion2, 1);
+	//}
+	//else if (input.keyboard.IsReleased('6'))
+	//{
+	//	_inventory->Additem(potion3, 1);
+	//}
 
 }
 

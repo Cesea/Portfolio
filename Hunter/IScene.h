@@ -13,6 +13,7 @@
 
 class EnvironmentSphere;
 class BaseGameObject;
+class UI;
 
 namespace video
 {
@@ -40,6 +41,7 @@ public :
 	friend class GameObjectFactory;
 	friend class Editor;
 	friend class Terrain;
+	friend class UI;
 
 	IScene();
 	virtual ~IScene() {}
