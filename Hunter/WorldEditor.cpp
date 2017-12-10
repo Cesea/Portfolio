@@ -436,7 +436,8 @@ void Editor::InObjectLocateMode()
 		_objectLocator._rotationMax = _objectLocator._rotationMin + 0.1f;
 	}
 
-	if (!_objectLocator._currentStaticHandle.IsValid())
+	if (!_objectLocator._currentStaticHandle.IsValid() || 
+		_objectLocator._typeToLocate == ARCHE_NONE)
 	{
 		ImguiLabel("No Item Selected");
 	}
@@ -607,6 +608,10 @@ void Editor::InObjectLocateMode()
 			_objectLocator.Reset();
 		}
 		ImguiIndent();
+		if (ImguiButton("Hero"))
+		{
+			_objectLocator._typeToLocate = ARCHE_HERO;
+		}
 		if (ImguiButton("Bat"))
 		{
 			_objectLocator._typeToLocate = ARCHE_BAT;

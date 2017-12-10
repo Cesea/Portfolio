@@ -183,6 +183,23 @@ void Camera::MoveAndRotate(float deltaTime, const InputManager & input)
 			Vec3Normalize(&diff, &diff);
 		}
 		refTransform.MovePositionWorld(diff);
+
+		if (refTransform._position.y < 10.0f)
+		{
+			SetMoveSpeed(8.0f);
+			SetRotationSpeed(0.7f);
+		}
+		else if (refTransform._position.y < 30.0f)
+		{
+			SetMoveSpeed(12.0f);
+			SetRotationSpeed(1.0f);
+		}
+		else if (refTransform._position.y < 50.0f)
+		{
+			SetMoveSpeed(18.0f);
+			SetRotationSpeed(1.4f);
+		}
+
 	} break;
 
 	//case CAMERASTATE_INCOMBAT:
@@ -262,10 +279,30 @@ void Camera::SetCameraState(CAMERA_STATE state)
 
 			_horizontalAngle = 0.0f;
 
+			TransformComponent &refTransform = _entity.GetComponent<TransformComponent>();
+			if (refTransform._position.y < 10.0f)
+			{
+				SetMoveSpeed(3.0f);
+				SetRotationSpeed(0.7f);
+			}
+			else if(refTransform._position.y < 30.0f)
+			{
+				SetMoveSpeed(5.0f);
+				SetRotationSpeed(1.0f);
+			}
+			else if (refTransform._position.y < 50.0f)
+			{
+				SetMoveSpeed(7.0f);
+				SetRotationSpeed(1.4f);
+			}
+
 			ShowCursor(true);
 		}
 		else if (state == CAMERASTATE_INCOMBAT)
 		{
+			SetMoveSpeed(6.0f);
+			SetRotationSpeed(1.0f);
+
 			Assert(_pTargetObject);
 			_cameraState = CAMERASTATE_INCOMBAT;
 
@@ -473,24 +510,39 @@ LPDIRECT3DTEXTURE9 Camera::GetRenderTexture()
 	return _pRenderTexture;
 }
 
-//SetCursorPos(WINSTARTX + (WINSIZEX * 0.5), WINSTARTY + (WINSIZEY * 0.5));
-//if (_curDist < PLAYER_TO_CAMERA_DIST)
-//{
-//	cameraTransform->_position.z += 0.1f;
-//}
-//else if (_curDist > PLAYER_TO_CAMERA_DIST)
-//{
-//	//cameraTransform->_position.z -= 0.1f;
-//	cameraTransform->_position.z = PLAYER_TO_CAMERA_DIST;
-//}
-//}
-//bool Camera::move(POINT pt)
-//{
-//	if (pt.x != tempPt.x || pt.y != tempPt.y)
-//	{
-//		tempPt.x = pt.x;
-//		tempPt.y = pt.y;
-//		return true;
-//	}
-//	return false;
-//}
+void Camera::RepositionEntity(const TerrainTilePos & currentPos, const TerrainTilePos & prevPos)
+{
+	bool32 _chunkMoved = false;
+	//청크가 다를때..... 터레인의 엔티티를 활성화, 비활성화한다
+	if (currentPos._chunkX != prevPos._chunkX || currentPos._chunkZ != prevPos._chunkZ)
+	{
+		TERRAIN->ValidateTerrainChunks(currentPos, prevPos);
+		_chunkMoved = true;
+	}
+
+	//타일이 다를....... tile의 entity벡터를 처리해주자
+	if (currentPos._tileX != prevPos._tileX || currentPos._tileZ != prevPos._tileZ)
+	{
+		Terrain::TerrainChunk &refPrevChunk =  TERRAIN->GetChunkAt(prevPos._chunkX, prevPos._chunkZ);
+		Terrain::TerrainTile &refPrevTile = refPrevChunk._tiles[Index2D(prevPos._tileX, prevPos._tileZ, TERRAIN_TILE_RES)];
+
+		bool removed = false;
+		for (uint32 i = 0; i < refPrevTile._entities.size(); ++i)
+		{
+			if (refPrevTile._entities[i] == _entity)
+			{
+				refPrevTile._entities.erase(refPrevTile._entities.begin() + i);
+				removed = true;
+				break;
+			}
+		}
+
+		if (removed)
+		{
+			Terrain::TerrainChunk &refCurrentChunk = TERRAIN->GetChunkAt(currentPos._chunkX, currentPos._chunkZ);
+			Terrain::TerrainTile &refCurrentTile = refCurrentChunk._tiles[Index2D(currentPos._tileX, currentPos._tileZ, TERRAIN_TILE_RES)];
+			refCurrentTile._entities.push_back(_entity);
+			
+		}
+	}
+}
