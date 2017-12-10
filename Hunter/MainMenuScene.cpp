@@ -325,30 +325,30 @@ void MainMenuScene::LoadSoundResources()
 
 #pragma region Hydra
 	_loading.LoadSoundResources("hydra_walk_left", 
-		"../resources/sfx/Hydra/hydra_walk_left.wav", false, false, 4.0f, 13.0f);
+		"../resources/sfx/Hydra/hydra_walk_left.wav", false, false, 1.0f, 13.0f);
 	_loading.LoadSoundResources("hydra_walk_right", 
-		"../resources/sfx/Hydra/hydra_walk_right.wav", false, false, 4.0f, 13.0f);
+		"../resources/sfx/Hydra/hydra_walk_right.wav", false, false, 1.0f, 13.0f);
 
 	_loading.LoadSoundResources("hydra_attack_01", 
-		"../resources/sfx/Hydra/hydra_attack_01.wav", false, false, 4.0f, 13.0f);
+		"../resources/sfx/Hydra/hydra_attack_01.wav", false, false, 1.0f, 13.0f);
 	_loading.LoadSoundResources("hydra_attack_02", 
-		"../resources/sfx/Hydra/hydra_attack_02.wav", false, false, 4.0f, 13.0f);
+		"../resources/sfx/Hydra/hydra_attack_02.wav", false, false, 1.0f, 13.0f);
 	_loading.LoadSoundResources("hydra_attack_03", 
-		"../resources/sfx/Hydra/hydra_attack_03.wav", false, false, 4.0f, 13.0f);
+		"../resources/sfx/Hydra/hydra_attack_03.wav", false, false, 1.0f, 13.0f);
 
 	_loading.LoadSoundResources("hydra_breath_01", 
-		"../resources/sfx/Hydra/hydra_breath_01.wav", false, false, 4.0f, 13.0f);
+		"../resources/sfx/Hydra/hydra_breath_01.wav", false, false, 1.0f, 13.0f);
 
 	_loading.LoadSoundResources("hydra_death_01", 
-		"../resources/sfx/Hydra/hydra_death_01.wav", false, false, 4.0f, 13.0f);
+		"../resources/sfx/Hydra/hydra_death_01.wav", false, false, 1.0f, 13.0f);
 	_loading.LoadSoundResources("hydra_hit_01", 
-		"../resources/sfx/Hydra/hydra_hit_01.wav", false, false, 4.0f, 13.0f);
+		"../resources/sfx/Hydra/hydra_hit_01.wav", false, false, 1.0f, 13.0f);
 
 	_loading.LoadSoundResources("hydra_idle_01", 
-		"../resources/sfx/Hydra/hydra_idle_01.wav", false, false, 4.0f, 13.0f);
+		"../resources/sfx/Hydra/hydra_idle_01.wav", false, false, 1.0f, 13.0f);
 
 	_loading.LoadSoundResources("hydra_whip_01", 
-		"../resources/sfx/Hydra/hydra_whip_01.wav", false, false, 4.0f, 13.0f);
+		"../resources/sfx/Hydra/hydra_whip_01.wav", false, false, 1.0f, 13.0f);
 
 #pragma endregion
 

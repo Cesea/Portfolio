@@ -158,7 +158,9 @@ void Bat::Update(float deltaTime)
 		else
 		{
 			//다음 인덱스로 방향을 얻고
-			Vector3 direction = _moveSegment[_patrolIndex] - transComp.GetWorldPosition();
+			Vector3 getNext = _moveSegment[_patrolIndex];
+			getNext.y = transComp.GetWorldPosition().y;
+			Vector3 direction = getNext - transComp.GetWorldPosition();
 			float distance = Vec3Length(&direction);
 			Vec3Normalize(&direction, &direction);
 			//몸이 덜 돌아갔는가?
@@ -177,7 +179,7 @@ void Bat::Update(float deltaTime)
 				break;
 			}
 			//이동속도보다 가까움?
-			if (distance < _speed*deltaTime)
+			if (distance <= _speed*deltaTime*3)
 			{
 				//거리만큼 움직이고 patrolIndex변경
 				transComp.SetWorldPosition(transComp.GetWorldPosition() + direction*distance);
@@ -426,21 +428,21 @@ void Bat::Handle(const CollisionSystem::ActorTriggerEvent & event)
 
 		if (!_isHurt)
 		{
+			PlayPlayerAttackSound(_collision._dmg, _playerSwordPos);
 			if (_state != BATSTATE_HURT&&_state != BATSTATE_DEATH)
 			{
-				PlayPlayerAttackSound(_collision._dmg, _playerSwordPos);
 				resetAllCount();
 				_state = BATSTATE_HURT;
 				this->QueueAction(BAT_ANIM(BAT_HIT1));
 				_collision._valid = false;
 				_battle = true;
-				_hp -= _collision._dmg;
-				if (_hp <= 0)
-				{
-					_state = BATSTATE_DEATH;
-					this->QueueAction(BAT_ANIM(BAT_DEATH));
-					_isDie = true;
-				}
+			}
+			_hp -= _collision._dmg;
+			if (_hp <= 0)
+			{
+				_state = BATSTATE_DEATH;
+				this->QueueAction(BAT_ANIM(BAT_DEATH));
+				_isDie = true;
 			}
 			_isHurt = true;
 			_collision._valid = false;
