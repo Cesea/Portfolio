@@ -4,6 +4,7 @@
 #include "WorldEditor.h"
 
 //실질적으로 사용되는 씬들
+#include "MainMenuScene.h"
 #include "MapToolScene.h"
 #include "TestScene.h"
 
@@ -83,7 +84,10 @@ bool SceneManager::Init()
 
 	GetChannel().Add<SceneChangeEvent, SceneManager>(*this);
 	//기본 베이스 씬 세팅
-	IScene *pScene = new MapToolScene;
+
+	IScene *pScene = new MainMenuScene;
+	AddScene(pScene->GetSceneName(), pScene);
+	pScene = new MapToolScene;
 	AddScene(pScene->GetSceneName(), pScene);
 	pScene = new TestScene;
 	AddScene(pScene->GetSceneName(), pScene);
@@ -105,7 +109,8 @@ bool SceneManager::Init()
 	_changeEffects.push_back(pEffect2 );
 
 	//시작 씬을 설정한다
-	ChangeScene("MapToolScene");
+	ChangeScene("MainMenuScene");
+	//ChangeScene("MapToolScene");
 	//ChangeScene("TestScene");
 
 	return true;

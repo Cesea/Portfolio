@@ -473,11 +473,19 @@ void Editor::InObjectLocateMode()
 		if (ImguiButton("Rock03")) { _objectLocator._currentStaticHandle = VIDEO->GetStaticXMesh("Rock03"); }
 		if (ImguiButton("Rock04")) { _objectLocator._currentStaticHandle = VIDEO->GetStaticXMesh("Rock04"); }
 		if (ImguiButton("Rock05")) { _objectLocator._currentStaticHandle = VIDEO->GetStaticXMesh("Rock05"); }
-		if (ImguiButton("Rock06")) { _objectLocator._currentStaticHandle = VIDEO->GetStaticXMesh("Rock06"); }
-		if (ImguiButton("Rock07")) { _objectLocator._currentStaticHandle = VIDEO->GetStaticXMesh("Rock07"); }
-		if (ImguiButton("Rock08")) { _objectLocator._currentStaticHandle = VIDEO->GetStaticXMesh("Rock08"); }
-		if (ImguiButton("Rock09")) { _objectLocator._currentStaticHandle = VIDEO->GetStaticXMesh("Rock09"); }
-		if (ImguiButton("Rock10")) { _objectLocator._currentStaticHandle = VIDEO->GetStaticXMesh("Rock10"); }
+		ImguiSeparator();
+		if (ImguiButton("MediumStone01")) 
+		{
+			_objectLocator._currentStaticHandle = VIDEO->GetStaticXMesh("MediumStone1");
+		}
+		if (ImguiButton("LargeStone01")) 
+		{
+			_objectLocator._currentStaticHandle = VIDEO->GetStaticXMesh("LargeStone1");
+		}
+		if (ImguiButton("LargeStone02")) 
+		{
+			_objectLocator._currentStaticHandle = VIDEO->GetStaticXMesh("LargeStone2");
+		}
 
 		_objectLocator._typeToLocate = (_objectLocator._currentStaticHandle.IsValid()) ? ARCHE_ROCK : ARCHE_NONE;
 

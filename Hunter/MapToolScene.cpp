@@ -176,18 +176,23 @@ void LoadEveryStaticResources()
 {
 	Matrix correctionMat;
 	Matrix rotationCorrection;
-//Load Rocks
+#pragma region Rock
 	MatrixScaling(&correctionMat, 1.0f, 1.0f, 1.0f);
 	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Rock/Rock1_A.X", &correctionMat, "Rock01");
-	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Rock/Rock2_A.X", &correctionMat, "Rock02");
-	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Rock/Rock3_A.X", &correctionMat, "Rock03");
-	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Rock/Rock4_A.X", &correctionMat, "Rock04");
-	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Rock/Rock5_A.X", &correctionMat, "Rock05");
-	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Rock/Rock6_A.X", &correctionMat, "Rock06");
-	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Rock/Rock7_A.X", &correctionMat, "Rock07");
-	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Rock/Rock8_A.X", &correctionMat, "Rock08");
-	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Rock/Rock9_A.X", &correctionMat, "Rock09");
-	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Rock/Rock10_A.X", &correctionMat, "Rock10");
+	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Rock/Rock4_A.X", &correctionMat, "Rock02");
+	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Rock/Rock6_A.X", &correctionMat, "Rock03");
+	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Rock/Rock8_A.X", &correctionMat, "Rock04");
+	VIDEO->CreateStaticXMesh("../resources/Models/Environment/Rock/Rock9_A.X", &correctionMat, "Rock05");
+
+	MatrixScaling(&correctionMat, 0.018f, 0.018f, 0.018f);
+	VIDEO->CreateStaticXMesh("../resources/Models/Environment/DruidRock/LargeStone1.X", 
+		&correctionMat, "LargeStone1");
+	VIDEO->CreateStaticXMesh("../resources/Models/Environment/DruidRock/LargeStone2.X", 
+		&correctionMat, "LargeStone2");
+	VIDEO->CreateStaticXMesh("../resources/Models/Environment/DruidRock/MediumStone1.X", 
+		&correctionMat, "MediumStone1");
+
+#pragma endregion
 
 	//Load Grass
 	MatrixScaling(&correctionMat, 0.01f, 0.01f, 0.01f);

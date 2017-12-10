@@ -51,8 +51,6 @@ void Camera::CreateFromWorld(World & world)
 void Camera::MoveAndRotate(float deltaTime, const InputManager & input)
 {
 	TransformComponent &refTransform = _entity.GetComponent<TransformComponent>();
-	TransformComponent &refTargetTransform =
-		_pTargetObject->GetEntity().GetComponent<TransformComponent>();
 
 	Vector3 forward = refTransform.GetForward();
 	Vector3 right = refTransform.GetRight();
@@ -129,6 +127,9 @@ void Camera::MoveAndRotate(float deltaTime, const InputManager & input)
 		}
 
 		ClampFloat(_verticalAngle, 0.1f, PI_DIV_2 - 0.1f);
+
+		TransformComponent &refTargetTransform =
+			_pTargetObject->GetEntity().GetComponent<TransformComponent>();
 
 		Vector3 camPosition;
 		Vector3 targetPosition = refTargetTransform.GetWorldPosition();
@@ -251,8 +252,6 @@ void Camera::SetTargetObject(Player * pTargetObject)
 void Camera::SetCameraState(CAMERA_STATE state)
 {
 	TransformComponent &refTransform = _entity.GetComponent<TransformComponent>();
-	TransformComponent &refTargetTransform =
-		_pTargetObject->GetEntity().GetComponent<TransformComponent>();
 	//State 변경
 	if (_cameraState != state)
 	{
@@ -274,6 +273,9 @@ void Camera::SetCameraState(CAMERA_STATE state)
 			_verticalAngle = 0.0f;
 
 			Vector3 camPosition;
+
+			TransformComponent &refTargetTransform =
+				_pTargetObject->GetEntity().GetComponent<TransformComponent>();
 			Vector3 targetPosition = refTargetTransform.GetWorldPosition();
 
 			camPosition.x = cosf(_verticalAngle) * cosf(_horizontalAngle) * _targetRadius + targetPosition.x;

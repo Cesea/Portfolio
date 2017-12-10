@@ -654,7 +654,7 @@ bool IsRayHitBoundBox(const Ray & ray,
 
 	//상면
 	Plane planeTop;
-	planeBottom.Create(verticies[1], verticies[5], verticies[2]);
+	planeTop.Create(verticies[1], verticies[5], verticies[2]);
 	if (IntersectRayToPlane( &hit, newRay, planeTop, false ) )
 	{
 		//히트지점이 이 안에 있니?
@@ -702,7 +702,7 @@ bool IsRayHitBoundBox(const Ray & ray,
 
 	//우면
 	Plane planeRight;
-	planeLeft.Create(verticies[2], verticies[6], verticies[3]);
+	planeRight.Create(verticies[2], verticies[6], verticies[3]);
 	//우면이 레이랑 충돌했니?
 	if ( IntersectRayToPlane( &hit, newRay, planeRight, false ) )
 	{
@@ -723,12 +723,8 @@ bool IsRayHitBoundBox(const Ray & ray,
 			return true;
 		}
 	}
-
 	//여기까지온다면 충돌실패
-
 	return false;
-
-
 }
 
 bool IntersectRayToPlane(Vector3 * pOutHitPos, const Ray & ray, const Plane & plane, bool bCheck2Side)

@@ -29,6 +29,8 @@ protected :
 	UI *_pInGameUI;
 
 	Editor *_editor{};
+
+
 public:
 };
 

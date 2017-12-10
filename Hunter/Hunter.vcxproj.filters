@@ -327,6 +327,9 @@
     <ClCompile Include="MainMenuScene.cpp">
       <Filter>Game\GameScenes\MainMenuScene</Filter>
     </ClCompile>
+    <ClCompile Include="LoadItem.cpp">
+      <Filter>Game\GameScenes\MainMenuScene\LoadItem</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ClassTypeID.h" />
@@ -716,6 +719,9 @@
     <ClInclude Include="MainMenuScene.h">
       <Filter>Game\GameScenes\MainMenuScene</Filter>
     </ClInclude>
+    <ClInclude Include="LoadItem.h">
+      <Filter>Game\GameScenes\MainMenuScene\LoadItem</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Core">
@@ -879,6 +885,9 @@
     </Filter>
     <Filter Include="Game\GameScenes\MainMenuScene">
       <UniqueIdentifier>{f600d8e7-5864-4b6a-81b2-dc51f3d3124a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\GameScenes\MainMenuScene\LoadItem">
+      <UniqueIdentifier>{eaebac0f-84ef-4264-9bce-e8e342001cb8}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

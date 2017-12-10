@@ -523,7 +523,7 @@ namespace video
 				{
 					_normalTextures.push_back(normalHandle);
 				}
-
+		
 				texFilePath = path + "Mushroom_S.png";
 				video::TextureHandle specularHandle = VIDEO->GetTexture(texFilePath);
 				if (!specularHandle.IsValid())
@@ -546,7 +546,58 @@ namespace video
 				_emissionTexture.push_back(VIDEO->GetTexture("emissionDefault.png"));
 			}
 #pragma endregion
+			else if (strncmp(pMaterials[i].pTextureFilename, "Druid", strlen("Druid")) == 0)
+			{
+				video::TextureHandle diffuseHandle = VIDEO->GetTexture(texFilePath);
+				if (!diffuseHandle.IsValid())
+				{
+					_diffuseTextures.push_back(VIDEO->CreateTexture(texFilePath, texFilePath));
+				}
+				else
+				{
+					_diffuseTextures.push_back(diffuseHandle);
+				}
 
+				texFilePath = path + "DruidRock_N.png";
+				video::TextureHandle normalHandle = VIDEO->GetTexture(texFilePath);
+				if (!normalHandle.IsValid())
+				{
+					video::TextureHandle loadedHandle = VIDEO->CreateTexture(texFilePath, texFilePath);
+					if (!loadedHandle.IsValid())
+					{
+						_normalTextures.push_back(VIDEO->GetTexture("normalDefault.png"));
+					}
+					else
+					{
+						_normalTextures.push_back(loadedHandle);
+					}
+				}
+				else
+				{
+					_normalTextures.push_back(normalHandle);
+				}
+		
+				texFilePath = path + "DruidRock_S.png";
+				video::TextureHandle specularHandle = VIDEO->GetTexture(texFilePath);
+				if (!specularHandle.IsValid())
+				{
+					video::TextureHandle loadedHandle = VIDEO->CreateTexture(texFilePath, texFilePath);
+					if (!loadedHandle.IsValid())
+					{
+						_specularTextures.push_back(VIDEO->GetTexture("specularDefault.png"));
+					}
+					else
+					{
+						_specularTextures.push_back(loadedHandle);
+					}
+				}
+				else
+				{
+					_specularTextures.push_back(specularHandle);
+				}
+
+				_emissionTexture.push_back(VIDEO->GetTexture("emissionDefault.png"));
+			}
 			else
 			{
 				//Texture 로딩하고 푸쉬

@@ -67,11 +67,14 @@ void CollisionSystem::Update(float deltaTime, float checkRange)
 						aabb1 = SetAABB(collision2._boundingBox._xSize, collision2._boundingBox._ySize, collision2._boundingBox._zSize, transform2.GetWorldPosition());
 
 						Vector3 distanceVec = transform.GetWorldPosition() - transform2.GetWorldPosition();
-						float distanceSquare = Vec3LengthSq(&distanceVec);
-						if (distance < checkRange)
+						//float distanceSquare = Vec3LengthSq(&distanceVec);
+						//if (distance < checkRange)
 						{
 							bool checkCollision = false;
-							if (collision2._locked && collision._locked) continue;
+							if (collision2._locked && collision._locked)
+							{
+								continue;
+							}
 							//둘중 하나가 고정되어있음
 							//if ((collision._locked && !collision2._locked) || (!collision._locked && collision2._locked))
 							else
