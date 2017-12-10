@@ -73,8 +73,8 @@ struct CollisionComponent : public Component
 	bool _locked{};
 	//DMG 박스들을 위한 변수들..
 	float _dmg;
-	float _velocity;
-	float _accel;
+	Vector3 _velocity;
+	Vector3 _accel;
 	float _duration;
 	bool _valid;
 	//디버그용 함수들...

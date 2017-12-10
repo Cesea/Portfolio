@@ -14,6 +14,8 @@ void GameObjectFactory::Init()
 	_channel.Add<GameObjectFactory::CreateBreath, GameObjectFactory>(*this);
 	_channel.Add<GameObjectFactory::CreateNFireBall, GameObjectFactory>(*this);
 	_channel.Add<GameObjectFactory::CreateNFireBall2, GameObjectFactory>(*this);
+	_channel.Add<GameObjectFactory::CreateCharge, GameObjectFactory>(*this);
+	_channel.Add<GameObjectFactory::CreateDragonBreath, GameObjectFactory>(*this);
 }
 
 void GameObjectFactory::Release()
@@ -26,6 +28,8 @@ void GameObjectFactory::Release()
 	_channel.Remove<GameObjectFactory::CreateBreath, GameObjectFactory>(*this);
 	_channel.Remove<GameObjectFactory::CreateNFireBall, GameObjectFactory>(*this);
 	_channel.Remove<GameObjectFactory::CreateNFireBall2, GameObjectFactory>(*this);
+	_channel.Remove<GameObjectFactory::CreateCharge, GameObjectFactory>(*this);
+	_channel.Remove<GameObjectFactory::CreateDragonBreath, GameObjectFactory>(*this);
 	_pCurrentScene = nullptr;
 	_pPlayer = nullptr;
 }
@@ -487,6 +491,64 @@ void GameObjectFactory::Handle(const CreateNFireBall2 & event)
 	collision._locked = false;
 
 	entity.Activate();
+}
+
+void GameObjectFactory::Handle(const CreateCharge & event)
+{
+	Entity &entity = _pCurrentScene->_world.CreateEntity();
+	TransformComponent &transform = entity.AddComponent<TransformComponent>();
+	transform._position = event._pos;
+	ParticleComponent &particle = entity.AddComponent<ParticleComponent>();
+	particle.min = Vector3(-0.1f, -0.1f, -0.1f);
+	particle.max = Vector3(0.1f, 0.1f, 0.1f);
+	particle.isEmission = true;
+	particle.duration = 3.0f;
+	particle.delay = 0.0f;
+	particle.init(ParticleComponent::PARTICLE_TYPE_CHARGE, 1500, 0.01f, Vector3(0, 0, 0), event._pos);
+
+	entity.Activate();
+
+	Entity &entity2 = _pCurrentScene->_world.CreateEntity();
+	TransformComponent &transform2 = entity2.AddComponent<TransformComponent>();
+	transform2._position = event._pos;
+	ParticleComponent &particle2 = entity2.AddComponent<ParticleComponent>();
+	particle2.min = Vector3(-0.1f, -0.1f, -0.1f);
+	particle2.max = Vector3(0.1f, 0.1f, 0.1f);
+	particle2.isEmission = true;
+	particle2.duration = 3.0f;
+	particle2.delay = 0.0f;
+	particle2.init(ParticleComponent::PARTICLE_TYPE_FIREBALL, 1500, 0.01f, Vector3(0, 0, 0), event._pos);
+
+	entity2.Activate();
+}
+
+void GameObjectFactory::Handle(const CreateDragonBreath & event)
+{
+	Entity &entity = _pCurrentScene->_world.CreateEntity();
+	TransformComponent &transform = entity.AddComponent<TransformComponent>();
+	transform._position = event._pos;
+	ParticleComponent &particle = entity.AddComponent<ParticleComponent>();
+	particle.min = Vector3(-0.1f, -0.1f, -0.1f);
+	particle.max = Vector3(0.1f, 0.1f, 0.1f);
+	particle.isEmission = true;
+	particle.duration = 1.5f;
+	particle.delay = 0.0f;
+	particle.init(ParticleComponent::PARTICLE_TYPE_FIREBREATH, 1500, 0.0025f, event._direction, event._pos);
+
+	entity.Activate();
+
+	Entity &entity2 = _pCurrentScene->_world.CreateEntity();
+	TransformComponent &transform2 = entity2.AddComponent<TransformComponent>();
+	transform2._position = event._pos;
+	ParticleComponent &particle2 = entity2.AddComponent<ParticleComponent>();
+	particle2.min = Vector3(-0.1f, -0.1f, -0.1f);
+	particle2.max = Vector3(0.1f, 0.1f, 0.1f);
+	particle2.isEmission = true;
+	particle2.duration = 1.5f;
+	particle2.delay = 0.0f;
+	particle2.init(ParticleComponent::PARTICLE_TYPE_SMOKE, 500, 0.025f,Vector3(0,1,0), event._pos);
+
+	entity2.Activate();
 }
 
 const char * ArcheToString(ARCHE_TYPE type)

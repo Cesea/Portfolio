@@ -28,8 +28,9 @@ bool Dragon::CreateFromWorld(World & world, const Vector3 & Pos)
 	video::AnimationInstance *pAnimation = VIDEO->GetAnimationInstance(renderComp._skinned);
 
 	CollisionComponent &collision = _entity.AddComponent<CollisionComponent>();
-	collision._boundingBox.Init(pAnimation->_pSkinnedMesh->_boundInfo._min,
-		pAnimation->_pSkinnedMesh->_boundInfo._max);
+	//collision._boundingBox.Init(pAnimation->_pSkinnedMesh->_boundInfo._min,
+	//	pAnimation->_pSkinnedMesh->_boundInfo._max);
+	collision._boundingBox.Init(transComp.GetWorldPosition() - Vector3(1.2, 0.5, 3)+Vector3(0,-0.5,-0.5), transComp.GetWorldPosition() + Vector3(1.2, 0.5, 3) + Vector3(0, -0.5, -0.5));
 	collision._boundingSphere._localCenter = pAnimation->_pSkinnedMesh->_boundInfo._center;
 	collision._boundingSphere._radius = pAnimation->_pSkinnedMesh->_boundInfo._radius;
 	collision._locked = false;
@@ -67,7 +68,15 @@ bool Dragon::CreateFromWorld(World & world, const Vector3 & Pos)
 	//Dragon Fly_Atk Count
 	_flyAtkTime = 120;
 	_flyAtkCount = _flyAtkTime;
-
+	//Dragon Breath_Ready Count
+	_breathReadyTime = 600;
+	_breathReadyCount = _breathReadyTime;
+	//Dragon Breath Count
+	_breathTime = 120;
+	_breathCount = _breathTime;
+	//Dragon Breath Delay Count 
+	_breathDelayTime = 60;
+	_breathDelayCount = _breathDelayTime;
 
 	_normalSpeed = 2.0f;
 	_speed = _normalSpeed;
@@ -90,12 +99,25 @@ bool Dragon::CreateFromWorld(World & world, const Vector3 & Pos)
 	_flyAtkNum = 2;
 	_flyAtkNumCount = _flyAtkNum;
 
+	_breathNum = 3;
+	_breathNumCount = _breathNum;
+
 	_anim = DRAGONANIMSTATE_DEFAULT;
 	_pattern = DRAGONPATTERNSTATE_GROUND;
+	_state = DRAGONSTATE_START;
+
+	_hp = 1500;
+
+	_isHurt = false;
+	_unBeatableTime = 15;
+	_unBeatableCount = _unBeatableTime;
+
+
 	//이벤트 세팅
 	EventChannel channel;
 	channel.Broadcast<GameObjectFactory::ObjectCreatedEvent>(
-		GameObjectFactory::ObjectCreatedEvent(ARCHE_HYDRA, _entity, transComp.GetWorldPosition()));
+		GameObjectFactory::ObjectCreatedEvent(ARCHE_DRAGON, _entity, transComp.GetWorldPosition()));
+	channel.Add<CollisionSystem::ActorTriggerEvent, Dragon>(*this);
 	setEvent();
 
 	return true;
@@ -133,7 +155,7 @@ void Dragon::Update(float deltaTime)
 			_speed = _normalSpeed;
 		}
 	}
-		break;
+	break;
 	case DRAGONSTATE_MOVE_IN:
 	{
 		//다음 인덱스로 방향을 얻고
@@ -162,11 +184,11 @@ void Dragon::Update(float deltaTime)
 		if (distance < _speed*deltaTime)
 		{
 			_moveSegmentIndex++;
-			if (_moveSegmentIndex > _moveSegment.size() - 1) _state= DRAGONSTATE_TRACE;
+			if (_moveSegmentIndex > _moveSegment.size() - 1) _state = DRAGONSTATE_TRACE;
 		}
 		transComp.SetWorldPosition(transComp.GetWorldPosition() - transComp.GetForward()*_speed*deltaTime);
 	}
-		break;
+	break;
 	case DRAGONSTATE_TRACE:
 	{
 		Vector3 direction = _playerPos - transComp.GetWorldPosition();
@@ -189,7 +211,7 @@ void Dragon::Update(float deltaTime)
 		}
 
 	}
-		break;
+	break;
 	case DRAGONSTATE_MOVE_OUT:
 	{
 		Vector3 direction = _escapePoint - transComp.GetWorldPosition();
@@ -238,7 +260,7 @@ void Dragon::Update(float deltaTime)
 		rotatePos.y = transComp.GetWorldPosition().y;
 		Vector3 rotateDir = rotatePos - transComp.GetWorldPosition();
 		Vec3Normalize(&rotateDir, &rotateDir);
-		transComp.LookDirection(-rotateDir, _rotateSpeed/8);
+		transComp.LookDirection(-rotateDir, _rotateSpeed / 8);
 	}
 	break;
 	case DRAGONSTATE_FLY_ROUND:
@@ -277,7 +299,7 @@ void Dragon::Update(float deltaTime)
 		}
 		transComp.SetWorldPosition(transComp.GetWorldPosition() - transComp.GetForward()*_speed*deltaTime);
 	}
-		break;
+	break;
 	case DRAGONSTATE_FLY_TRACE:
 	{
 		Vector3 targetPos = _playerPos;
@@ -315,11 +337,93 @@ void Dragon::Update(float deltaTime)
 		if (distance < _speed*deltaTime)
 		{
 			_pattern = DRAGONPATTERNSTATE_GROUND;
-			_state = DRAGONSTATE_START;
+			_state = DRAGONSTATE_START_BREATH;
 			this->QueueAction(DRAGON_ANIM(DRAGON_IDLE));
 		}
 
 		transComp.SetWorldPosition(transComp.GetWorldPosition() + direction * _speed * deltaTime);
+	}
+	break;
+	case DRAGONSTATE_START_BREATH:
+	{
+		_breathReadyCount--;
+
+		if (_breathReadyCount > 220)
+		{
+			Vector3 rotatePos = _playerPos;
+			rotatePos.y = transComp.GetWorldPosition().y;
+			Vector3 rotateDir = rotatePos - transComp.GetWorldPosition();
+			Vec3Normalize(&rotateDir, &rotateDir);
+			transComp.LookDirection(-rotateDir, _rotateSpeed);
+		}
+		if (_breathReadyCount == 220)
+		{
+			EventChannel channel;
+			channel.Broadcast<GameObjectFactory::CreateCharge>(
+				GameObjectFactory::CreateCharge(transComp.GetWorldPosition() - transComp.GetForward()*4.0f + Vector3(0, 1, 0), 10.0f, Vector3(0, 0, 0)));
+		}
+		if (_breathReadyCount <= 0)
+		{
+			_breathReadyCount = _breathReadyTime;
+			_state = DRAGONSTATE_BREATH;
+			this->QueueAction(DRAGON_ANIM(DRAGON_BREATH));
+		}
+	}
+		break;
+	case DRAGONSTATE_BREATH:
+	{
+		_breathCount--;
+		if (_breathCount == 100)
+		{
+			Vector3 direction = -transComp.GetForward();
+			direction = rotateVector(direction, D3DX_PI / 30);
+			//브레스를 쏜다
+			EventChannel channel;
+			channel.Broadcast<GameObjectFactory::CreateDragonBreath>(
+				GameObjectFactory::CreateDragonBreath(transComp.GetWorldPosition() - transComp.GetForward()*6.0f + Vector3(0, 1, 0), 10.0f, transComp.GetForward()));
+			channel.Broadcast<GameObjectFactory::DamageBoxEvent>(GameObjectFactory::DamageBoxEvent(transComp.GetWorldPosition(),
+				Vector3(2.5f, 2.0f, 2.5f), 10.0f, CollisionComponent::TRIGGER_TYPE_ENEMY_DMGBOX, direction *30, Vector3(0, 0, 0), 3.0f));
+		}
+		if (_breathCount < 0)
+		{
+			_breathCount = _breathTime;
+
+			_breathNumCount--;
+			if (_breathNumCount == 0)
+			{
+				_breathNumCount = _breathNum;
+				_state = DRAGONSTATE_START;
+				this->QueueAction(DRAGON_ANIM(DRAGON_IDLE));
+			}
+			else
+			{
+				_state = DRAGONSTATE_STAND_BREATH;
+				this->QueueAction(DRAGON_ANIM(DRAGON_STAND));
+			}
+			Vector3 direction = -transComp.GetForward();
+			direction = rotateVector(direction, D3DX_PI / 30);
+			EventChannel channel;
+			channel.Broadcast<GameObjectFactory::DamageBoxEvent>(GameObjectFactory::DamageBoxEvent(transComp.GetWorldPosition(),
+				Vector3(2.0f, 2.0f, 2.0f), 10.0f, CollisionComponent::TRIGGER_TYPE_ENEMY_DMGBOX, direction * 30, Vector3(0, 0, 0), 3.0f));
+		}
+
+
+	}
+	break;
+	case DRAGONSTATE_STAND_BREATH:
+	{
+		_breathDelayCount--;
+		if (_breathDelayCount < 0)
+		{
+			_breathDelayCount = _breathDelayTime;
+			_state = DRAGONSTATE_BREATH;
+			this->QueueAction(DRAGON_ANIM(DRAGON_BREATH));
+		}
+		Vector3 rotatePos = _playerPos;
+		rotatePos.y = transComp.GetWorldPosition().y;
+		Vector3 rotateDir = rotatePos - transComp.GetWorldPosition();
+		Vec3Normalize(&rotateDir, &rotateDir);
+		transComp.LookDirection(-rotateDir, D3DX_PI);
 	}
 		break;
 	case DRAGONSTATE_DEFAULT:
@@ -337,7 +441,7 @@ void Dragon::Update(float deltaTime)
 			Vector3 targetPos = transComp.GetWorldPosition() - transComp.GetForward()*_atkRange;
 			EventChannel _channel;
 			_channel.Broadcast<GameObjectFactory::DamageBoxEvent>(GameObjectFactory::DamageBoxEvent(targetPos,
-				Vector3(2.0f, 2.0f, 2.0f), 10.0f, CollisionComponent::TRIGGER_TYPE_ENEMY_DMGBOX, 0.0f, 0.0f, 1.0f));
+				Vector3(2.0f, 2.0f, 2.0f), 10.0f, CollisionComponent::TRIGGER_TYPE_ENEMY_DMGBOX, Vector3(0, 0, 0), Vector3(0, 0, 0), 1.0f));
 		}
 		if (_biteCount < 0)
 		{
@@ -362,7 +466,7 @@ void Dragon::Update(float deltaTime)
 			}
 		}
 	}
-		break;
+	break;
 	case DRAGONANIMSTATE_WHIP_TAIL:
 	{
 		_whipCount--;
@@ -371,7 +475,7 @@ void Dragon::Update(float deltaTime)
 			Vector3 targetPos = transComp.GetWorldPosition() + transComp.GetForward();
 			EventChannel _channel;
 			_channel.Broadcast<GameObjectFactory::DamageBoxEvent>(GameObjectFactory::DamageBoxEvent(targetPos,
-				Vector3(4.0f, 2.0f, 4.0f), 10.0f, CollisionComponent::TRIGGER_TYPE_ENEMY_DMGBOX, 0.0f, 0.0f, 1.0f));
+				Vector3(4.0f, 2.0f, 4.0f), 10.0f, CollisionComponent::TRIGGER_TYPE_ENEMY_DMGBOX, Vector3(0,0,0),Vector3(0,0,0), 1.0f));
 		}
 		if (_whipCount < 0)
 		{
@@ -387,15 +491,16 @@ void Dragon::Update(float deltaTime)
 			Vector3 direction = _playerPos - _escapePoint;
 			Vec3Normalize(&direction, &direction);
 			_escapePoint = transComp.GetWorldPosition() - direction * 50.0f;
+			_speed = _normalSpeed;
 
 		}
 		Vector3 rotatePos = _escapePoint;
 		rotatePos.y = transComp.GetWorldPosition().y;
 		Vector3 rotateDir = rotatePos - transComp.GetWorldPosition();
 		Vec3Normalize(&rotateDir, &rotateDir);
-		transComp.LookDirection(-rotateDir, _rotateSpeed*2);
+		transComp.LookDirection(-rotateDir, _rotateSpeed * 2);
 	}
-		break;
+	break;
 	case DRAGONANIMSTATE_STAND:
 		//주어진 대기시간만큼 STAND후 Next Animation 실행
 		_stopCount--;
@@ -416,11 +521,11 @@ void Dragon::Update(float deltaTime)
 		//공격박스생성
 		if (_flyAtkCount == 70)
 		{
-			Vector3 targetPos = transComp.GetWorldPosition() - transComp.GetForward()*2;
+			Vector3 targetPos = transComp.GetWorldPosition() - transComp.GetForward() * 2;
 			targetPos.y = TERRAIN->GetHeight(targetPos.x, targetPos.z);
 			EventChannel _channel;
 			_channel.Broadcast<GameObjectFactory::DamageBoxEvent>(GameObjectFactory::DamageBoxEvent(targetPos,
-				Vector3(2.0f, 2.0f, 2.0f), 10.0f, CollisionComponent::TRIGGER_TYPE_ENEMY_DMGBOX, 0.0f, 0.0f, 1.0f));
+				Vector3(2.0f, 2.0f, 2.0f), 10.0f, CollisionComponent::TRIGGER_TYPE_ENEMY_DMGBOX, Vector3(0,0,0),Vector3(0,0,0), 1.0f));
 		}
 
 		//Forward로 전진하면서 공격한다
@@ -431,17 +536,17 @@ void Dragon::Update(float deltaTime)
 		}
 		else
 		{
-			transComp.SetWorldPosition(transComp.GetWorldPosition()-
+			transComp.SetWorldPosition(transComp.GetWorldPosition() -
 				transComp.GetForward()*10.0f*deltaTime);
-			
+
 
 			transComp.SetWorldPosition(transComp.GetWorldPosition() + Vector3(0, 0.2f, 0));
 			//일정고도이상 올라가면 그만
-			if (transComp.GetWorldPosition().y > _flyHeight) 
-            transComp.SetWorldPosition(transComp.GetWorldPosition().x, _flyHeight,transComp.GetWorldPosition().z);
-			
+			if (transComp.GetWorldPosition().y > _flyHeight)
+				transComp.SetWorldPosition(transComp.GetWorldPosition().x, _flyHeight, transComp.GetWorldPosition().z);
+
 		}
-		
+
 		if (_flyAtkCount < 0)
 		{
 			_flyAtkCount = _flyAtkTime;
@@ -479,18 +584,71 @@ void Dragon::Update(float deltaTime)
 
 
 
-	if(_pattern != DRAGONPATTERNSTATE_FLY)
-	transComp.SetWorldPosition(transComp.GetWorldPosition().x,
-		TERRAIN->GetHeight(transComp.GetWorldPosition().x, transComp.GetWorldPosition().z),
-		transComp.GetWorldPosition().z);
+	if (_pattern != DRAGONPATTERNSTATE_FLY)
+		transComp.SetWorldPosition(transComp.GetWorldPosition().x,
+			TERRAIN->GetHeight(transComp.GetWorldPosition().x, transComp.GetWorldPosition().z),
+			transComp.GetWorldPosition().z);
 
 	_prevTilePos = _tilePos;
 	TERRAIN->ConvertWorldPostoTilePos(transComp.GetWorldPosition(), &_tilePos);
 	RepositionEntity(_tilePos, _prevTilePos);
+
+	if (_isHurt)
+	{
+		_unBeatableCount--;
+		if (_unBeatableCount < 0)
+		{
+			_unBeatableCount = _unBeatableTime;
+			_isHurt = false;
+		}
+	}
+
+	if (_isDie)
+	{
+		_dieCount--;
+		if (_dieCount <= 0)
+		{
+			this->_valid = false;
+			EventChannel channel;
+			TERRAIN->RemoveEntityInTile(_entity, _tilePos);
+			channel.Broadcast<IScene::SceneDirty>(IScene::SceneDirty());
+		}
+	}
 }
 
 void Dragon::Handle(const CollisionSystem::ActorTriggerEvent & event)
 {
+
+	if (event._entity2 != _entity) return;
+	CollisionComponent & collision = event._entity1.GetComponent<CollisionComponent>();
+
+	switch (collision._triggerType)
+	{
+		//플레이어와 충돌했다(내가 가해자)
+	case CollisionComponent::TRIGGER_TYPE_PLAYER:
+		break;
+		//오브젝트와 충돌했다
+	case CollisionComponent::TRIGGER_TYPE_OBJECT:
+		break;
+	case CollisionComponent::TRIGGER_TYPE_PLAYER_DMGBOX:
+
+		if (_isDie) break;
+
+		if (!_isHurt)
+		{
+			_hp -= 50;
+			if (_hp <= 0)
+			{
+				_isDie = true;
+			}
+			_isHurt = true;
+			collision._valid = false;
+			EventChannel channel;
+			channel.Broadcast<GameObjectFactory::CreateBlood>(
+				GameObjectFactory::CreateBlood(_playerSwordPos));
+		}
+		break;
+	}
 }
 
 void Dragon::SetupCallbackAndCompression()

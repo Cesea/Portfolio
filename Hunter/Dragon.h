@@ -71,7 +71,9 @@ private:
 		DRAGONSTATE_FLY_ROUND,
 		DRAGONSTATE_FLY_TRACE,
 		DRAGONSTATE_FLY_DOWN,
+		DRAGONSTATE_START_BREATH,
 		DRAGONSTATE_BREATH,
+		DRAGONSTATE_STAND_BREATH,
 		DRAGONSTATE_DEFAULT
 	};
 	DRAGONSTATE _state;
@@ -110,6 +112,17 @@ private:
 	int _flyNumCount;
 	int _flyAtkNum;
 	int _flyAtkNumCount;
+	//브레스 준비 프레임
+	int _breathReadyTime;
+	int _breathReadyCount;
+	//브레스 프레임
+	int _breathTime;
+	int _breathCount;
+	int _breathNum;
+	int _breathNumCount;
+	//브레스 쿨타임
+	int _breathDelayTime;
+	int _breathDelayCount;
 
 	DRAGONANIMSTATE _nextAnim;
 };

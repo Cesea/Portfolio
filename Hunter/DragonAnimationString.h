@@ -35,6 +35,7 @@ enum DRAGON_ANIMATION_ENUM
 {
 	DRAGON_ATTACK1,
 	DRAGON_ATTACK2,
+	DRAGON_BREATH,
 	DRAGON_DEATH,
 	DRAGON_EAT,
 	DRAGON_FLY,
@@ -56,6 +57,7 @@ static const char *DragonAnimationString[] =
 {
 	{ "attack1" },
 	{ "attack2" },
+	{"breath_fire"},
 	{ "death" },
 	{"eat"},
 	{"fly"},
@@ -75,6 +77,7 @@ static const char *DragonAnimationString[] =
 
 DRAGON_ANIM_DECLARE(DRAGON_ATTACK1);
 DRAGON_ANIM_DECLARE(DRAGON_ATTACK2);
+DRAGON_ANIM_DECLARE(DRAGON_BREATH);
 DRAGON_ANIM_DECLARE(DRAGON_DEATH);
 DRAGON_ANIM_DECLARE(DRAGON_EAT);
 DRAGON_ANIM_DECLARE(DRAGON_FLY);

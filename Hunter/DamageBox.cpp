@@ -86,4 +86,10 @@ void DamageBox::Update(float deltaTime)
 		TERRAIN->RemoveEntityInTile(_entity, _tilePos);
 		channel.Broadcast<IScene::SceneDirty>(IScene::SceneDirty());
 	}
+
+
+	Vector3 prevPos = refTrans.GetWorldPosition();	
+	prevPos = prevPos + collision._accel*deltaTime;
+	refTrans.SetWorldPosition(prevPos);
+	
 }
