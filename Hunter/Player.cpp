@@ -1034,7 +1034,7 @@ void Player::Handle(const CollisionSystem::ActorTriggerEvent & event)
 	{
 		_collision._valid = false;
 
-		if (_state == PLAYERSTATE_BLOCK)
+		if (_pActionComp->_animationEnum == PlayerAnimationEnum::eWarShieldBlock)
 		{
 			SOUNDMANAGER->Play3D("player_shield_block", _pTransformComp->_position);
 			return;

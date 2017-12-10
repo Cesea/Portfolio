@@ -62,9 +62,10 @@ bool MapToolScene::SceneInit()
 	{
 		pPlayer->UnRegisterEvents();
 	}
+	_channel.Broadcast<GameObjectFactory::CreateObjectOnLocationEvent>(
+		GameObjectFactory::CreateObjectOnLocationEvent(ARCHE_DRAGON, ResourceHandle(), 
+			Vector3(0.0f, 0.0f, 0.0f)));
 
-
-	bool  inTerrain = TERRAIN->IsWorldPositionInTerrain(Vector3(-200, -200, -200));
 
 	return result;
 }

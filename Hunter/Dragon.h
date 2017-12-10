@@ -12,10 +12,7 @@ class DragonCallbackHandler : public GameObjectAnimationCallbackHandler
 {
 public:
 	virtual bool Init(BaseGameObject *pDragon) { _pDragon = (Dragon *)pDragon; return true; }
-	HRESULT CALLBACK HandleCallback(THIS_ UINT Track, LPVOID pCallbackData)
-	{
-		return S_OK;
-	}
+	HRESULT CALLBACK HandleCallback(THIS_ UINT Track, LPVOID pCallbackData);
 
 private:
 	Dragon *_pDragon{};

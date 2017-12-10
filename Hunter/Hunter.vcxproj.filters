@@ -330,6 +330,9 @@
     <ClCompile Include="LoadItem.cpp">
       <Filter>Game\GameScenes\MainMenuScene\LoadItem</Filter>
     </ClCompile>
+    <ClCompile Include="Draon_Callback.cpp">
+      <Filter>Game\GameObjects\Enemy\Dragon</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ClassTypeID.h" />
