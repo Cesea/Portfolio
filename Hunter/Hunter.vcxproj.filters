@@ -324,6 +324,9 @@
     <ClCompile Include="Turtle_Callback.cpp">
       <Filter>Game\GameObjects\Enemy\Turtle</Filter>
     </ClCompile>
+    <ClCompile Include="MainMenuScene.cpp">
+      <Filter>Game\GameScenes\MainMenuScene</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ClassTypeID.h" />
@@ -710,6 +713,9 @@
     <ClInclude Include="SoundManager.h">
       <Filter>Manager\SoundManager</Filter>
     </ClInclude>
+    <ClInclude Include="MainMenuScene.h">
+      <Filter>Game\GameScenes\MainMenuScene</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Core">
@@ -870,6 +876,9 @@
     </Filter>
     <Filter Include="Game\GameObjects\Enemy\Dragon">
       <UniqueIdentifier>{5ded30f0-b5e7-4e35-ada7-203ed1a27d8f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\GameScenes\MainMenuScene">
+      <UniqueIdentifier>{f600d8e7-5864-4b6a-81b2-dc51f3d3124a}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

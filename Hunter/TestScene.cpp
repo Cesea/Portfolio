@@ -98,16 +98,13 @@ void LoadEverySkinnedResources2()
 	video::SkinnedXMeshHandle batMesh1 = VIDEO->CreateSkinnedXMesh(
 		"../resources/Models/DragonBat/DragonBat_Red.X", &correctionMat, "Bat1");
 
-
 	MatrixScaling(&correctionMat, 1.0f, 1.0f, 1.0f);
 	video::SkinnedXMeshHandle batMesh2 = VIDEO->CreateSkinnedXMesh(
 		"../resources/Models/DragonBat/DragonBat_Black.X", &correctionMat, "Bat2");
 
-
 	MatrixScaling(&correctionMat, 1.0f, 1.0f, 1.0f);
 	video::SkinnedXMeshHandle batMesh3 = VIDEO->CreateSkinnedXMesh(
 		"../resources/Models/DragonBat/DragonBat_Gold.X", &correctionMat, "Bat3");
-
 
 	MatrixScaling(&correctionMat, 1.4f, 1.4f, 1.4f);
 	video::SkinnedXMeshHandle catMesh = VIDEO->CreateSkinnedXMesh(

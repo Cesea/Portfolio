@@ -428,7 +428,7 @@ bool IsBlocking(TransformComponent * pTransA,AABB * pBoundA, TransformComponent 
 }
 
 
-bool IsRayHitBound(const Ray & ray, const CollisionComponent::BoundingSphere & boundingSphere,
+bool IsRayHitBoundSphere(const Ray & ray, const CollisionComponent &collisionComponent,
 	const TransformComponent & transform, Vector3 * pOutHitPos, Vector3 * pOutHitNormal)
 {
 	Matrix matWorld = transform.GetFinalMatrix();
@@ -440,12 +440,13 @@ bool IsRayHitBound(const Ray & ray, const CollisionComponent::BoundingSphere & b
 	Vector3 halfSize;
 
 	//변환된 위치
-	Vec3TransformCoord(&center, &boundingSphere._localCenter, &matWorld);
+	const CollisionComponent::BoundingSphere &refBoundingSphere = collisionComponent._boundingSphere;
+	Vec3TransformCoord(&center, &refBoundingSphere._localCenter, &matWorld);
 
 	//반지름...
-	halfSize.x = boundingSphere._radius  * scale.x;
-	halfSize.y = boundingSphere._radius * scale.y;
-	halfSize.z = boundingSphere._radius * scale.z;
+	halfSize.x = refBoundingSphere._radius  * scale.x;
+	halfSize.y = refBoundingSphere._radius * scale.y;
+	halfSize.z = refBoundingSphere._radius * scale.z;
 	radius = Vec3Length(&halfSize);
 
 	//레이의 오리진에서 부터 구의 센터까지의 방향벡터
@@ -508,6 +509,265 @@ bool IsRayHitBound(const Ray & ray, const CollisionComponent::BoundingSphere & b
 			Vec3Normalize(pOutHitNormal, pOutHitNormal);
 		}
 	}
+
+	return true;
+}
+
+bool IsRayHitBoundBox(const Ray & ray, 
+	const CollisionComponent &collision, 
+	const TransformComponent & transform, 
+	Vector3 * pOutHitPos, Vector3 * pOutHitNormal)
+{
+	//에시당초 구랑 충돌안하면 사각형과 죽었다깨어나도 안된다...
+	if ( IsRayHitBoundSphere(
+		ray,
+		collision,
+		transform,
+		nullptr, nullptr ) == false ) 
+	{
+		return false;
+	}
+
+	//여기까온다면 사각형과 충돌검사를 해야함.....
+	//레이를 로컬로 끌어땡긴다
+
+	//bound 의 역행렬
+	Matrix matWorld = transform.GetFinalMatrix();
+	Matrix matInvMatrix;
+	MatrixInverse( &matInvMatrix, nullptr, &matWorld );
+
+	//NewRayInfo
+	Vector3 origin;
+	Vec3TransformCoord( &origin, &ray.origin, &matInvMatrix );
+	Vector3 direction;
+	Vec3TransformNormal( &direction, &ray.direction, &matInvMatrix );
+
+	Ray newRay;
+	newRay.origin = origin;
+	newRay.direction = direction;
+
+
+	const CollisionComponent::BoundingBox &refBoundingBox = collision._boundingBox;
+	//정점 8 개 뺀다...
+
+	//   5-------6
+	//  /|      /|
+	// 1-------2 |
+	// | 4-----|-7
+	// |/      |/
+	// 0-------3 
+
+	//로컬 8 개의 정점을 구한다
+	Vector3 verticies[8];
+	verticies[0] = Vector3( refBoundingBox._localMinPos.x, 
+		refBoundingBox._localMinPos.y, refBoundingBox._localMinPos.z );
+	verticies[1] = Vector3( refBoundingBox._localMinPos.x, 
+		refBoundingBox._localMaxPos.y, refBoundingBox._localMinPos.z );
+	verticies[2] = Vector3( refBoundingBox._localMaxPos.x, 
+		refBoundingBox._localMaxPos.y, refBoundingBox._localMinPos.z );
+	verticies[3] = Vector3( refBoundingBox._localMaxPos.x, 
+		refBoundingBox._localMinPos.y, refBoundingBox._localMinPos.z );
+	verticies[4] = Vector3( refBoundingBox._localMinPos.x, 
+		refBoundingBox._localMinPos.y, refBoundingBox._localMaxPos.z );
+	verticies[5] = Vector3( refBoundingBox._localMinPos.x, 
+		refBoundingBox._localMaxPos.y, refBoundingBox._localMaxPos.z );
+	verticies[6] = Vector3( refBoundingBox._localMaxPos.x, 
+		refBoundingBox._localMaxPos.y, refBoundingBox._localMaxPos.z );
+	verticies[7] = Vector3( refBoundingBox._localMaxPos.x, 
+		refBoundingBox._localMinPos.y, refBoundingBox._localMaxPos.z );
+
+	Vector3 hit;
+	Vector3 min = refBoundingBox._localMinPos;
+	Vector3 max = refBoundingBox._localMaxPos;
+
+	//뒷면
+	Plane planeBack;
+	planeBack.Create(verticies[0], verticies[1], verticies[2]);
+	//뒷면이 레이랑 충돌했니?
+	if ( IntersectRayToPlane( &hit, newRay, planeBack, false ) )
+	{
+		//히트지점이 이 안에 있니?
+		if ( min.x <= hit.x && hit.x <= max.x &&
+			min.y <= hit.y && hit.y <= max.y ) {
+
+			//hit 지점월드로 땡겨서 리턴
+			if (nullptr != pOutHitPos) 
+			{
+				Vec3TransformCoord( pOutHitPos, &hit, &matWorld );
+			}
+
+			if ( nullptr != pOutHitNormal) 
+			{
+				*pOutHitNormal = -transform.GetForward();
+			}
+			return true;
+		}
+	}
+
+	//앞면
+	Plane planeFront;
+	planeFront.Create(verticies[6], verticies[5], verticies[4]);
+	//앞면이 레이랑 충돌했니?
+	if (IntersectRayToPlane( &hit, newRay, planeFront, false ) )
+	{
+		//히트지점이 이 안에 있니?
+		if ( min.x <= hit.x && hit.x <= max.x &&
+			min.y <= hit.y && hit.y <= max.y ) {
+
+			//hit 지점월드로 땡겨서 리턴
+			if ( nullptr != pOutHitPos )
+			{
+				Vec3TransformCoord( pOutHitPos, &hit, &matWorld );
+			}
+
+			if ( nullptr != pOutHitNormal ) 
+			{
+				*pOutHitNormal = transform.GetForward();
+			}
+			return true;
+		}
+	}
+
+	//하면
+	Plane planeBottom;
+	planeBottom.Create(verticies[3], verticies[4], verticies[0]);
+	//하면이 레이랑 충돌했니?
+	if ( IntersectRayToPlane( &hit, newRay, planeBottom, false ) )
+	{
+		//히트지점이 이 안에 있니?
+		if ( min.x <= hit.x && hit.x <= max.x &&
+			min.z <= hit.z && hit.z <= max.z ) 
+		{
+			//hit 지점월드로 땡겨서 리턴
+			if (nullptr !=  pOutHitPos ) 
+			{
+				Vec3TransformCoord( pOutHitPos, &hit, &matWorld );
+			}
+
+			if (nullptr !=  pOutHitNormal ) 
+			{
+				*pOutHitNormal = -transform.GetUp();
+			}
+			return true;
+		}
+	}
+
+	//상면
+	Plane planeTop;
+	planeBottom.Create(verticies[1], verticies[5], verticies[2]);
+	if (IntersectRayToPlane( &hit, newRay, planeTop, false ) )
+	{
+		//히트지점이 이 안에 있니?
+		if ( min.x <= hit.x && hit.x <= max.x &&
+			min.z <= hit.z && hit.z <= max.z ) 
+		{
+			//hit 지점월드로 땡겨서 리턴
+			if ( nullptr != pOutHitPos ) 
+			{
+				Vec3TransformCoord( pOutHitPos, &hit, &matWorld );
+			}
+
+			if ( nullptr != pOutHitNormal ) 
+			{
+				*pOutHitNormal = transform.GetUp();
+			}
+			return true;
+		}
+	}
+
+
+	//좌면
+	Plane planeLeft;
+	planeLeft.Create(verticies[0], verticies[5], verticies[1]);
+	if ( IntersectRayToPlane( &hit, newRay, planeLeft, false ) )
+	{
+		//히트지점이 이 안에 있니?
+		if ( min.y <= hit.y && hit.y <= max.y &&
+			min.z <= hit.z && hit.z <= max.z ) 
+		{
+			//hit 지점월드로 땡겨서 리턴
+			if (nullptr !=  pOutHitPos) 
+			{
+				Vec3TransformCoord( pOutHitPos, &hit, &matWorld );
+			}
+
+			if ( nullptr != pOutHitNormal ) 
+			{
+				*pOutHitNormal = -transform.GetRight();
+			}
+
+			return true;
+		}
+	}
+
+	//우면
+	Plane planeRight;
+	planeLeft.Create(verticies[2], verticies[6], verticies[3]);
+	//우면이 레이랑 충돌했니?
+	if ( IntersectRayToPlane( &hit, newRay, planeRight, false ) )
+	{
+		//히트지점이 이 안에 있니?
+		if ( min.y <= hit.y && hit.y <= max.y &&
+			min.z <= hit.z && hit.z <= max.z ) 
+		{
+			//hit 지점월드로 땡겨서 리턴
+			if ( nullptr != pOutHitPos ) 
+			{
+				Vec3TransformCoord( pOutHitPos, &hit, &matWorld );
+			}
+
+			if ( nullptr != pOutHitNormal ) 
+			{
+				*pOutHitNormal = transform.GetRight();
+			}
+			return true;
+		}
+	}
+
+	//여기까지온다면 충돌실패
+
+	return false;
+
+
+}
+
+bool IntersectRayToPlane(Vector3 * pOutHitPos, const Ray & ray, const Plane & plane, bool bCheck2Side)
+{
+	//노말 벡터
+	Vector3 normal( plane.a, plane.b, plane.c );
+
+	float dot2 = Vec3Dot( &normal, &ray.direction );		//광선의 방향과 평면의 법선 방향의 각차의 cos 값
+																//dot2 가 0 이란예기는 반직선의 방향과 평면의 방향이 직교한다는 예기인데...
+																//이는 즉 평면과 반직선은 평행하다는 예기가 된다.
+	if ( FLOATEQUAL( dot2, 0.0f ) )
+	{
+		return false;
+	}
+
+	//반직선의 시작점에서 평면까지으 최단거리
+	float dist = Vec3Dot( &normal, &ray.origin ) + plane.d;
+
+	//양면 체크를 안한다면...
+	if ( bCheck2Side == false )
+	{
+		//반직선의 시작 위치가 뒤에 있어도 실패
+		if (dist < 0.0f)
+		{
+			return false;
+		}
+	}
+
+	//반직선방향으로 충돌지점까지의 거리
+	float t = dist / -dot2;
+
+	//레이 방향이 반대로 되어있는 경우
+	if (t < 0.0f)
+	{
+		return false;
+	}
+
+	//충돌 위치
+	*pOutHitPos = ray.origin + ( ray.direction * t );
 
 	return true;
 }
@@ -923,7 +1183,8 @@ bool Collision_RayToAABB(const Vector3 & rayPos, const Vector3 & rayDir, const V
 	//만약 마지막 min이 음수라면(현재 마지막 max는 양수) 광선이 AABB안에서 발사되었다 -> 무조건 충돌
 	if (finalMin< 0.0f) return true;
 
-	return true;}
+	return true;
+}
 
 float Time_RayToAABB(const Vector3 & rayPos, const Vector3 & rayDir, const Vector3 & minPos, const Vector3 & maxPos)
 {

@@ -14,7 +14,7 @@ public :
 
 	void Update(float deltaTime, float checkRange);
 
-	void QueryRayEntityHit(const Ray &ray, std::vector<Entity> *pOutCollidingEntity, 
+	void QueryRayEntityHit(const Ray &ray, std::vector<Entity> *pOutCollidingEntities, 
 		std::vector<float> *pOutDistance);
 
 	virtual void Initialize();

@@ -39,19 +39,24 @@ struct Sphere
 
 #define EPSILON 0.001f
 
-bool IsRayHitBound(
+bool IsRayHitBoundSphere(
 	const Ray &ray,
-	const CollisionComponent::BoundingSphere &boundingSphere,
+	const CollisionComponent &collisionComponent,
 	const TransformComponent &transform,	
 	Vector3* pOutHitPos, 
 	Vector3* pOutHitNormal);
 
-bool IsRayHitBound(
+bool IsRayHitBoundBox(
 		const Ray &ray,
-		const CollisionComponent::BoundingBox &boundingBox,
+		const CollisionComponent &collisionComponent,
 		const TransformComponent &transform,
 		Vector3 *pOutHitPos, 
 		Vector3 *pOutHitNormal);
+
+//반직선과 평면의 충돌 위치
+bool IntersectRayToPlane(Vector3* pOutHitPos, const Ray &ray, const Plane &plane,
+	bool bCheck2Side = false);
+
 
 
 

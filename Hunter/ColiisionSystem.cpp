@@ -64,11 +64,10 @@ void CollisionSystem::Update(float deltaTime, float checkRange)
 						TransformComponent& transform2 = refTileEntitiies[j].GetComponent<TransformComponent>();
 						CollisionComponent & collision2 = refTileEntitiies[j].GetComponent<CollisionComponent>();
 
-
 						aabb1 = SetAABB(collision2._boundingBox._xSize, collision2._boundingBox._ySize, collision2._boundingBox._zSize, transform2.GetWorldPosition());
 
 						Vector3 distanceVec = transform.GetWorldPosition() - transform2.GetWorldPosition();
-						float distance = Vec3Length(&distanceVec);
+						float distanceSquare = Vec3LengthSq(&distanceVec);
 						if (distance < checkRange)
 						{
 							bool checkCollision = false;
@@ -370,12 +369,54 @@ void CollisionSystem::Update(float deltaTime, float checkRange)
 	}
 }
 
-void CollisionSystem::QueryRayEntityHit(const Ray &ray, std::vector<Entity>* pOutCollidingEntity, 
+#define QUERY_OPTIMIZE_TEST
+
+void CollisionSystem::QueryRayEntityHit(const Ray &ray, std::vector<Entity>* pOutCollidingEntities, 
 	std::vector<float> *pOutDistance)
 {
 	auto &entities = GetEntities();
 
 	Vector3 hitPos;
+#if defined QUERY_OPTIMIZE_TEST
+	if (TERRAIN->IsIntersectRay(ray, &hitPos))
+	{
+		TerrainTilePos tilePos;
+		TERRAIN->ConvertWorldPostoTilePos(hitPos, &tilePos);
+
+		for (int32 z = -1; z <= 1; ++z)
+		{
+			for (int32 x = -1; x <= 1; ++x)
+			{
+				TerrainTilePos testTilePos = tilePos;
+				testTilePos._tileX += x;
+				testTilePos._tileZ += z;
+				TERRAIN->ReTilelizeTilePosition(testTilePos);
+
+				if (TERRAIN->IsTerrainTilePosValid(testTilePos))
+				{
+					Terrain::TerrainTile *pTile = TERRAIN->GetTileAt(testTilePos);
+
+					for (auto &entity : pTile->_entities)
+					{
+						if (entity.HasComponent<CollisionComponent>())
+						{
+							if (IsRayHitBoundBox(ray, 
+								entity.GetComponent<CollisionComponent>(), 
+								entity.GetComponent<TransformComponent>(), 
+								&hitPos, nullptr))
+							{
+								pOutCollidingEntities->push_back(entity);
+								float distance = Vec3LengthSq(&(hitPos - ray.origin));
+								pOutDistance->push_back(distance);
+
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+#else 
 	for (uint32 i = 0; i < entities.size(); ++i)
 	{
 		CollisionComponent &refCollision = entities[i].GetComponent<CollisionComponent>();
@@ -383,12 +424,14 @@ void CollisionSystem::QueryRayEntityHit(const Ray &ray, std::vector<Entity>* pOu
 
 		if (IsRayHitBound(ray, refCollision._boundingSphere, transform, &hitPos, nullptr))
 		{
-			pOutCollidingEntity->push_back(entities[i]);
+			pOutCollidingEntities->push_back(entities[i]);
 
 			float distance = Vec3LengthSq(&(hitPos - ray.origin));
 			pOutDistance->push_back(distance);
 		}
 	}
+#endif
+
 }
 
 void CollisionSystem::Initialize()

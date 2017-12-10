@@ -491,11 +491,6 @@ bool ImguiButton(const char * text, bool enabled)
 	bool over = enabled && InRect(x, y, w, h);
 	bool res = ButtonLogic(id, over);
 
-	if (over)
-	{
-		int a = 0;
-	}
-
 	AddCommandRect((float)x, (float)y, (float)w, (float)h, ImguiRGBA(255, 200, 200, IsActive(id) ? 230 : 150));
 	if (enabled)
 	{
@@ -510,6 +505,35 @@ bool ImguiButton(const char * text, bool enabled)
 
 
 	return res;
+}
+
+bool ImguiDownButton(const char * text, bool enabled)
+{
+	gState._widgetID++;
+	unsigned int id = (gState._areaID << 16) | gState._widgetID;
+
+	int x = gState._widgetX;
+	int y = gState._widgetY;
+	int w = 120;
+	int h = BUTTON_HEIGHT;
+	gState._widgetY += BUTTON_HEIGHT + DEFAULT_SPACING;
+
+	bool over = enabled && InRect(x, y, w, h);
+	bool res = ButtonLogic(id, over);
+
+	AddCommandRect((float)x, (float)y, (float)w, (float)h, ImguiRGBA(255, 200, 200, IsActive(id) ? 230 : 150));
+	if (enabled)
+	{
+		AddCommandText(x + BUTTON_HEIGHT / 2, y + BUTTON_HEIGHT / 2 - TEXT_HEIGHT / 2, 
+			ImguiTextAlign::eImguiAlignLeft, text, IsHot(id) ? ImguiRGBA(255, 196, 0, 255) : ImguiRGBA(255, 255, 255, 200));
+	}
+	else
+	{
+		AddCommandText(x + BUTTON_HEIGHT / 2, y + BUTTON_HEIGHT / 2 - TEXT_HEIGHT / 2, 
+			ImguiTextAlign::eImguiAlignLeft, text, ImguiRGBA(128, 128, 128, 200));
+	}
+
+	return IsActive(id);
 }
 
 bool ImguiItem(const char * text, bool enabled)

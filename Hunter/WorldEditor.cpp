@@ -719,25 +719,39 @@ void Editor::InObjectEditMode()
 
 			ImguiLabel("Orientation");
 			{
-				Quaternion quat;
-				Matrix rotation = _objectEditor._pTransform->_matFinal;
-				rotation._41 = 0;
-				rotation._42 = 0;
-				rotation._43 = 0;
+				//float yaw, pitch, roll;
+				//Matrix rotation = _objectEditor._pTransform->GetFinalMatrix();
+				//rotation._41 = 0;
+				//rotation._42 = 0;
+				//rotation._43 = 0;
+				////Vec3R
+				//Quaternion quat;
+				//QuaternionRotationMatrix(&quat, &rotation);
 
-				QuaternionRotationMatrix(&quat, &rotation);
+				//Matrix test;
+				//MatrixRotationQuaternion(&test, &quat);
+
+				float x{ 0.0f };
+				float y{ 0.0f };
+				float z{ 0.0f };
 
 				ImguiIndent();
 
-				ImguiSlider("X", &quat.x, -1.9f, 1.9f, 0.01f);
-				ImguiSlider("W", &quat.w, -1.9f, 1.9f, 0.01f);
-				ImguiSlider("Z", &quat.z, -1.9f, 1.9f, 0.01f);
+				if (ImguiDownButton("X Axis Up")) { x += 0.02f; }
+				if (ImguiDownButton("X Axis Down")) { x -= 0.02f; }
+				ImguiSeparator();
+				if (ImguiDownButton("Y Axis Up")) { y += 0.02f; }
+				if (ImguiDownButton("Y Axis Down")) { y -= 0.02f; }
+				ImguiSeparator();
+				if (ImguiDownButton("Z Axis Up")) { z += 0.02f; }
+				if (ImguiDownButton("Z Axis Down")) { z -= 0.02f; }
+				//ImguiSlider("X", &quat.x, -1.9f, 1.9f, 0.01f);
+				//ImguiSlider("W", &quat.w, -1.9f, 1.9f, 0.01f);
+				//ImguiSlider("Z", &quat.z, -1.9f, 1.9f, 0.01f);
 
+				//_objectEditor._pTransform->RotateWorld();
 
-				//Quaternion
-				QuaternionNormalize(&quat, &quat);
-
-				_objectEditor._pTransform->SetRotateWorld(quat);
+				_objectEditor._pTransform->RotateLocal(x, y, z);
 
 				ImguiUnindent();
 			}

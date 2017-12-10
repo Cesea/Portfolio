@@ -35,12 +35,14 @@ void ImguiSeparator();
 void ImguiSeparatorLine();
 
 bool ImguiButton(const char* text, bool enabled = true);
+bool ImguiDownButton(const char *text, bool enabled = true);
 bool ImguiItem(const char* text, bool enabled = true);
 bool ImguiCheck(const char* text, bool checked, bool enabled = true);
 bool ImguiCollapse(const char* text, const char* subtext, bool checked, bool enabled = true);
 void ImguiLabel(const char* text);
 void ImguiValue(const char* text);
 bool ImguiSlider(const char* text, float* val, float vmin, float vmax, float vinc, bool enabled = true);
+
 
 bool ImguiFreeCollapse(const char* text, const char* subtext, bool checked, int32 x_, int32 y_, bool enabled = true);
 
