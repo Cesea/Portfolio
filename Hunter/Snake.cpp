@@ -47,6 +47,7 @@ bool Snake::CreateFromWorld(World & world, const Vector3 &Pos)
 	CollisionComponent &collision = _entity.AddComponent<CollisionComponent>();
 	collision._boundingBox.Init(pAnimation->_pSkinnedMesh->_boundInfo._min,
 		pAnimation->_pSkinnedMesh->_boundInfo._max);
+	collision._boundingBox.Init(Vector3(-0.5, 0, -0.7), Vector3(0.5, 1.0, 0.7));
 	collision._boundingSphere._localCenter = pAnimation->_pSkinnedMesh->_boundInfo._center;
 	collision._boundingSphere._radius = pAnimation->_pSkinnedMesh->_boundInfo._radius;
 	collision._locked = false;
@@ -93,7 +94,7 @@ bool Snake::CreateFromWorld(World & world, const Vector3 &Pos)
 	_atkRange = 1.0f;
 	if (_skinType == SNAKESKINSTATE_RED)
 	{
-		_atkRange = 6.0f;
+		_atkRange = 10.0f;
 	}
 	_atkTime = 60;
 	_atkCount = _atkTime;
@@ -107,6 +108,9 @@ bool Snake::CreateFromWorld(World & world, const Vector3 &Pos)
 	_isHurt = false;
 	_unBeatableTime = 15;
 	_unBeatableCount = _unBeatableTime;
+
+	_delayTime2 = 60;
+	_delayCount2 = _delayTime2;
 
 	//이벤트 등록
 	EventChannel channel;
@@ -232,7 +236,7 @@ void Snake::Update(float deltaTime)
 			Vector3 targetPos = transComp.GetWorldPosition() - transComp.GetForward();
 			EventChannel _channel;
 			_channel.Broadcast<GameObjectFactory::DamageBoxEvent>(GameObjectFactory::DamageBoxEvent(targetPos,
-				Vector3(_atkRange * 0.5f, _atkRange * 0.5f, _atkRange * 0.5f), 10.0f, CollisionComponent::TRIGGER_TYPE_ENEMY_DMGBOX, 0.0f, 0.0f, 1.0f));
+				Vector3(_atkRange * 0.5f, _atkRange * 0.5f, _atkRange * 0.5f), 10.0f, CollisionComponent::TRIGGER_TYPE_ENEMY_DMGBOX, Vector3(0, 0, 0), Vector3(0, 0, 0), 1.0f));
 		}
 		if (_atkCount < 0)
 		{
@@ -284,17 +288,30 @@ void Snake::Update(float deltaTime)
 			Vector3 rotateDir = rotatePos - transComp.GetWorldPosition();
 			Vec3Normalize(&rotateDir, &rotateDir);
 			transComp.LookDirection(-rotateDir, D3DX_PI);
+
+			this->QueueAction(SNAKE_ANIM(SNAKE_STAND));
+			_state = SNAKESTATE_DELAY;
 		}
+		break;
+	case SNAKESTATE_DELAY:
+	{
+		_delayCount2--;
+		if (_delayCount2 < 0)
+		{
+			_delayCount2 = _delayTime2;
+			_state = SNAKESTATE_ATK2;
+			this->QueueAction(SNAKE_ANIM(SNAKE_ATTACK2));
+		}
+	}
 		break;
 	case SNAKESTATE_ATK3:
 		_atkCount--;
-
 		if (_atkCount == 30)
 		{
 			Vector3 targetPos = transComp.GetWorldPosition() - transComp.GetForward();
 			EventChannel _channel;
 			_channel.Broadcast<GameObjectFactory::DamageBoxEvent>(GameObjectFactory::DamageBoxEvent(targetPos,
-				Vector3(_atkRange * 0.5f, _atkRange * 0.5f, _atkRange * 0.5f), 10.0f, CollisionComponent::TRIGGER_TYPE_ENEMY_DMGBOX, 0.0f, 0.0f, 1.0f));
+				Vector3(_atkRange * 0.5f, _atkRange * 0.5f, _atkRange * 0.5f), 10.0f, CollisionComponent::TRIGGER_TYPE_ENEMY_DMGBOX, Vector3(0, 0, 0), Vector3(0, 0, 0), 1.0f));
 		}
 
 		if (_atkCount < 0)

@@ -10,7 +10,7 @@ ParticleSystem::~ParticleSystem()
 {
 }
 
-void ParticleSystem::update(float deltaTime) 
+void ParticleSystem::update(float deltaTime)	
 {
 	if (!_running)
 	{
@@ -25,7 +25,7 @@ void ParticleSystem::update(float deltaTime)
 
 		//µô·¹ÀÌ ½Ã°£À» ±ð´Â´Ù
 		if (particle.delay > 0.0f)
-		{
+		{	
 			particle.delay -= deltaTime;
 			continue;
 		}
