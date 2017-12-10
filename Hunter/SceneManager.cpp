@@ -82,7 +82,7 @@ SceneManager::~SceneManager()
 bool SceneManager::Init()
 {
 
-	GetChannel().Add<SceneChangeEvent, SceneManager>(*this);
+	GetChannel().Add<SceneManager::SceneChangeEvent, SceneManager>(*this);
 	//기본 베이스 씬 세팅
 
 	IScene *pScene = new MainMenuScene;
@@ -109,8 +109,8 @@ bool SceneManager::Init()
 	_changeEffects.push_back(pEffect2 );
 
 	//시작 씬을 설정한다
-	//ChangeScene("MainMenuScene");
-	ChangeScene("MapToolScene");
+	ChangeScene("MainMenuScene");
+	//ChangeScene("MapToolScene");
 	//ChangeScene("TestScene");
 
 	return true;

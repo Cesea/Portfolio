@@ -29,9 +29,21 @@ public:
 	LPDIRECT3DTEXTURE9 _pCharacters{};
 	LPDIRECT3DTEXTURE9 _pLetters{};
 
-	void LoadResources();
+	Loading _loading;
+	void LoadStaticModelResources();
+	void LoadSkinnedModelResources();
+	void LoadSoundResources();
 
-	bool _loadEnded{false};
+	float _loadPercent{ 0.0f };
+	bool _loaded{ false };
+
+private :
+	void StartShowTitle() { _titleGoing = true; }
+	float _titlePercent{0.0f};
+	bool _titleGoing{ false };
+	bool _titleShown{ false };
+
+
 };
 
 

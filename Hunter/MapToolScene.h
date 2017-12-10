@@ -35,12 +35,8 @@ public:
 protected :
 	Editor *_editor{};
 
-	Loading _loading;
 private :
 
-	void LoadStaticModelResources();
-	void LoadSkinnedModelResources();
-	void LoadSoundResources();
 
 public:
 	virtual void Handle(const Editor::GetObjectFromSceneEvent &event);

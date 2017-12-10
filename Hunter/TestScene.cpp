@@ -143,18 +143,12 @@ bool TestScene::SceneInit()
 	video::StaticXMesh::_sEffectHandle = VIDEO->GetEffect("StaticMesh.fx");
 	video::SkinnedXMesh::_sEffectHandle = VIDEO->GetEffect("SkinnedMesh.fx");
 
-	InitAnimations();
-
 	//터레인 로드
 	Terrain::TerrainConfig config;
 
 	TERRAIN->SetScene(this);
 	TERRAIN->Create(config, false);
 	TERRAIN->LoadTerrain("../resources/TestScene/Terrain01.tr", false);
-
-	LoadEveryStaticResources2();
-	LoadEverySkinnedResources2();
-	LoadEverySoundResource2();
 
 	//라이트 생성
 	_pMainLight->SetWorldPosition(Vector3(0.0f, 5.0f, 5.0f));
