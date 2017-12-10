@@ -188,6 +188,12 @@ void Turtle::Update(float deltaTime)
 	break;
 	case TURTLESTATE_ATK1:
 		_atkCount--;
+		if (_atkCount == 40)
+		{
+			EventChannel _channel;
+			_channel.Broadcast<GameObjectFactory::DamageBoxEvent>(GameObjectFactory::DamageBoxEvent(transComp.GetWorldPosition() -transComp.GetForward(),
+				Vector3(1,1,1), 10.0f, CollisionComponent::TRIGGER_TYPE_ENEMY_DMGBOX, Vector3(0, 0, 0), Vector3(0, 0, 0), 1.0f));
+		}
 		if (_atkCount < 0)
 		{
 			_atkCount = _atkTime;
@@ -213,6 +219,12 @@ void Turtle::Update(float deltaTime)
 		break;
 	case TURTLESTATE_ATK2:
 		_atkCount--;
+		if (_atkCount == 40)
+		{
+			EventChannel _channel;
+			_channel.Broadcast<GameObjectFactory::DamageBoxEvent>(GameObjectFactory::DamageBoxEvent(transComp.GetWorldPosition()-transComp.GetForward(),
+				Vector3(1, 1, 1), 10.0f, CollisionComponent::TRIGGER_TYPE_ENEMY_DMGBOX, Vector3(0, 0, 0), Vector3(0, 0, 0), 1.0f));
+		}
 		if (_atkCount < 0)
 		{
 			_atkCount = _atkTime;
