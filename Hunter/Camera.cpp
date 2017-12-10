@@ -56,7 +56,6 @@ void Camera::MoveAndRotate(float deltaTime, const InputManager & input)
 	Vector3 right = refTransform.GetRight();
 	Vector3 up = refTransform.GetUp();
 
-
 	//Mouse Move//////////////////////////////////////////////
 	switch (_cameraState)
 	{
@@ -300,30 +299,33 @@ void Camera::SetCameraState(CAMERA_STATE state)
 		}
 		else if (state == CAMERASTATE_INCOMBAT)
 		{
-			SetMoveSpeed(6.0f);
-			SetRotationSpeed(1.0f);
+			if (nullptr != _pTargetObject)
+			{
+				SetMoveSpeed(6.0f);
+				SetRotationSpeed(1.0f);
 
-			Assert(_pTargetObject);
-			_cameraState = CAMERASTATE_INCOMBAT;
+				Assert(_pTargetObject);
+				_cameraState = CAMERASTATE_INCOMBAT;
 
-			//_horizontalAngle = -PI_DIV_2;
-			_verticalAngle = 0.0f;
+				//_horizontalAngle = -PI_DIV_2;
+				_verticalAngle = 0.0f;
 
-			Vector3 camPosition;
+				Vector3 camPosition;
 
-			TransformComponent &refTargetTransform =
-				_pTargetObject->GetEntity().GetComponent<TransformComponent>();
-			Vector3 targetPosition = refTargetTransform.GetWorldPosition();
+				TransformComponent &refTargetTransform =
+					_pTargetObject->GetEntity().GetComponent<TransformComponent>();
+				Vector3 targetPosition = refTargetTransform.GetWorldPosition();
 
-			camPosition.x = cosf(_verticalAngle) * cosf(_horizontalAngle) * _targetRadius + targetPosition.x;
-			camPosition.y = targetPosition.y + 3.0f + sinf(_verticalAngle);
-			targetPosition.y += 1.6f;
-			camPosition.z = cosf(_verticalAngle) * sinf(_horizontalAngle) * _targetRadius + targetPosition.z;
-			refTransform.SetWorldPosition(camPosition);
-			refTransform.LookPosition(targetPosition);
+				camPosition.x = cosf(_verticalAngle) * cosf(_horizontalAngle) * _targetRadius + targetPosition.x;
+				camPosition.y = targetPosition.y + 3.0f + sinf(_verticalAngle);
+				targetPosition.y += 1.6f;
+				camPosition.z = cosf(_verticalAngle) * sinf(_horizontalAngle) * _targetRadius + targetPosition.z;
+				refTransform.SetWorldPosition(camPosition);
+				refTransform.LookPosition(targetPosition);
 
-			ShowCursor(false);
-			SetCursorPos(CLIENTCENTERX, CLIENTCENTERY);
+				ShowCursor(false);
+				SetCursorPos(CLIENTCENTERX, CLIENTCENTERY);
+			}
 		}
 		else if (state == CAMERASTATE_UI)
 		{

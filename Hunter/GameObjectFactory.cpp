@@ -238,7 +238,9 @@ void GameObjectFactory::CreateObject(ARCHE_TYPE type,
 				activeChunks.push_back(Index2D(x, z, TERRAIN->GetXChunkCount()));
 			}
 		}
+		_pCurrentScene->_camera.SetTargetObject((Player *)_pPlayer);
 	}break;
+
 	case ARCHE_BAT :
 	{
 		_pCurrentScene->_gameObjects.push_back(new Bat());
