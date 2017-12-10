@@ -46,7 +46,7 @@ private:
 		HYDRASTATE_HURT,
 		HYDRASTATE_DEATH,
 		HYDRASTATE_SP_ATK1,
-		HYDRASTATE_SP_ATK2,
+		HYDRASTATE_SP_ATK2
 	};
 	enum HYDRASKINSTATE
 	{
@@ -57,6 +57,9 @@ private:
 	};
 	HYDRASTATE _state;
 	HYDRASKINSTATE _skinType;
+
+	int _delayTime;
+	int _delayCount;
 public:
 	Hydra();
 	virtual ~Hydra();

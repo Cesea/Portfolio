@@ -47,6 +47,7 @@ bool Snake::CreateFromWorld(World & world, const Vector3 &Pos)
 	CollisionComponent &collision = _entity.AddComponent<CollisionComponent>();
 	collision._boundingBox.Init(pAnimation->_pSkinnedMesh->_boundInfo._min,
 		pAnimation->_pSkinnedMesh->_boundInfo._max);
+	collision._boundingBox.Init(Vector3(-0.5, 0, -0.7), Vector3(0.5, 1.0, 0.7));
 	collision._boundingSphere._localCenter = pAnimation->_pSkinnedMesh->_boundInfo._center;
 	collision._boundingSphere._radius = pAnimation->_pSkinnedMesh->_boundInfo._radius;
 	collision._locked = false;

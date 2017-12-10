@@ -106,7 +106,7 @@ bool Dragon::CreateFromWorld(World & world, const Vector3 & Pos)
 	_pattern = DRAGONPATTERNSTATE_GROUND;
 	_state = DRAGONSTATE_START;
 
-	_hp = 1500;
+	_hp = 150;
 
 	_isHurt = false;
 	_unBeatableTime = 15;
@@ -511,6 +511,8 @@ void Dragon::Update(float deltaTime)
 			case DRAGONANIMSTATE_WHIP_TAIL:
 				_anim = _nextAnim;
 				this->QueueAction(DRAGON_ANIM(DRAGON_WHIP_TAIL));
+				_escapePoint = -_playerPos;
+				_escapePoint.y = TERRAIN->GetHeight(_escapePoint.x, _escapePoint.z);
 				break;
 			}
 		}
@@ -563,7 +565,7 @@ void Dragon::Update(float deltaTime)
 				_escapePoint.y = TERRAIN->GetHeight(_escapePoint.x, _escapePoint.z);
 				Vector3 direction = _playerPos - _escapePoint;
 				Vec3Normalize(&direction, &direction);
-				_escapePoint = transComp.GetWorldPosition() + direction * 50.0f;
+				_escapePoint = transComp.GetWorldPosition() - direction * 50.0f;
 				_escapePoint.y = TERRAIN->GetHeight(_escapePoint.x, _escapePoint.z);
 			}
 			else
@@ -640,6 +642,9 @@ void Dragon::Handle(const CollisionSystem::ActorTriggerEvent & event)
 			if (_hp <= 0)
 			{
 				_isDie = true;
+				this->QueueAction(DRAGON_ANIM(DRAGON_DEATH));
+				_state = DRAGONSTATE_DEFAULT;
+				_anim = DRAGONANIMSTATE_DEFAULT;
 			}
 			_isHurt = true;
 			collision._valid = false;
