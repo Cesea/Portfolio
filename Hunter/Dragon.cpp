@@ -87,6 +87,9 @@ bool Dragon::CreateFromWorld(World & world, const Vector3 & Pos)
 	_flyNum = 2;
 	_flyNumCount = _flyNum;
 
+	_flyAtkNum = 2;
+	_flyAtkNumCount = _flyAtkNum;
+
 	_anim = DRAGONANIMSTATE_DEFAULT;
 	_pattern = DRAGONPATTERNSTATE_GROUND;
 	//이벤트 세팅
@@ -110,11 +113,23 @@ void Dragon::Update(float deltaTime)
 		if (_delayCount <= 0)
 		{
 			_delayCount = _delayTime;
-			_state = DRAGONSTATE_MOVE_IN;
-			this->QueueAction(DRAGON_ANIM(DRAGON_RUN));
-			_moveSegment.empty();
-			_moveSegment = GetMoveSegment(transComp.GetWorldPosition());
-			_moveSegmentIndex = 0;
+
+			Vector3 direction = _playerPos - transComp.GetWorldPosition();
+			float distance = Vec3Length(&direction);
+
+			if (distance < 5.0f)
+			{
+				_state = DRAGONSTATE_TRACE;
+				this->QueueAction(DRAGON_ANIM(DRAGON_RUN));
+			}
+			else
+			{
+				_state = DRAGONSTATE_MOVE_IN;
+				this->QueueAction(DRAGON_ANIM(DRAGON_RUN));
+				_moveSegment.empty();
+				_moveSegment = GetMoveSegment(transComp.GetWorldPosition());
+				_moveSegmentIndex = 0;
+			}
 			_speed = _normalSpeed;
 		}
 	}
@@ -162,7 +177,7 @@ void Dragon::Update(float deltaTime)
 		Vector3 rotateDir = rotatePos - transComp.GetWorldPosition();
 		Vec3Normalize(&rotateDir, &rotateDir);
 		transComp.LookDirection(-rotateDir, D3DX_PI);
-
+		this->speedUp();
 		transComp.SetWorldPosition(transComp.GetWorldPosition() + direction * _speed * deltaTime);
 		if (distance < _atkRange)
 		{
@@ -250,14 +265,14 @@ void Dragon::Update(float deltaTime)
 			if (_flySegmentIndex > _flySegment.size() - 1)
 			{
 				_flySegmentIndex = 0;
-				
-				_flyNumCount--;
-				if (_flyNumCount == 0)
-				{
-					_flyNumCount = _flyNum;
-					this->QueueAction(DRAGON_ANIM(DRAGON_FLY_FAST));
-					_state = DRAGONSTATE_FLY_TRACE;
-				}
+			}
+
+			_flyNumCount--;
+			if (_flyNumCount == 0)
+			{
+				_flyNumCount = _flyNum;
+				this->QueueAction(DRAGON_ANIM(DRAGON_FLY_FAST));
+				_state = DRAGONSTATE_FLY_TRACE;
 			}
 		}
 		transComp.SetWorldPosition(transComp.GetWorldPosition() - transComp.GetForward()*_speed*deltaTime);
@@ -275,8 +290,7 @@ void Dragon::Update(float deltaTime)
 		rotatePos.y = transComp.GetWorldPosition().y;
 		Vector3 rotateDir = rotatePos - transComp.GetWorldPosition();
 		Vec3Normalize(&rotateDir, &rotateDir);
-		transComp.LookDirection(-rotateDir, D3DX_PI);
-
+		transComp.LookDirection(-rotateDir, _rotateSpeed);
 		transComp.SetWorldPosition(transComp.GetWorldPosition() + direction * _speed * deltaTime);
 		if (distance < 10.0f)
 		{
@@ -288,7 +302,24 @@ void Dragon::Update(float deltaTime)
 	break;
 	case DRAGONSTATE_FLY_DOWN:
 	{
+		Vector3 direction = _escapePoint - transComp.GetWorldPosition();
+		float distance = Vec3Length(&direction);
+		Vec3Normalize(&direction, &direction);
 
+		Vector3 rotatePos = _escapePoint;
+		rotatePos.y = transComp.GetWorldPosition().y;
+		Vector3 rotateDir = rotatePos - transComp.GetWorldPosition();
+		Vec3Normalize(&rotateDir, &rotateDir);
+		transComp.LookDirection(-rotateDir, _rotateSpeed);
+
+		if (distance < _speed*deltaTime)
+		{
+			_pattern = DRAGONPATTERNSTATE_GROUND;
+			_state = DRAGONSTATE_START;
+			this->QueueAction(DRAGON_ANIM(DRAGON_IDLE));
+		}
+
+		transComp.SetWorldPosition(transComp.GetWorldPosition() + direction * _speed * deltaTime);
 	}
 		break;
 	case DRAGONSTATE_DEFAULT:
@@ -299,6 +330,7 @@ void Dragon::Update(float deltaTime)
 	switch (_anim)
 	{
 	case DRAGONANIMSTATE_BITE:
+	{
 		_biteCount--;
 		if (_biteCount == 30)
 		{
@@ -329,6 +361,7 @@ void Dragon::Update(float deltaTime)
 				_escapePoint = -_playerPos;
 			}
 		}
+	}
 		break;
 	case DRAGONANIMSTATE_WHIP_TAIL:
 	{
@@ -383,7 +416,7 @@ void Dragon::Update(float deltaTime)
 		//공격박스생성
 		if (_flyAtkCount == 70)
 		{
-			Vector3 targetPos = transComp.GetWorldPosition() + transComp.GetForward();
+			Vector3 targetPos = transComp.GetWorldPosition() - transComp.GetForward()*2;
 			targetPos.y = TERRAIN->GetHeight(targetPos.x, targetPos.z);
 			EventChannel _channel;
 			_channel.Broadcast<GameObjectFactory::DamageBoxEvent>(GameObjectFactory::DamageBoxEvent(targetPos,
@@ -411,14 +444,22 @@ void Dragon::Update(float deltaTime)
 		
 		if (_flyAtkCount < 0)
 		{
+			_flyAtkCount = _flyAtkTime;
 			_flyAtkNumCount--;
 			if (_flyAtkNumCount == 0)
 			{
-				_flyAtkNumCount = _flyAtkCount;
-
+				_flyAtkNumCount = _flyAtkNum;
 				_anim = DRAGONANIMSTATE_DEFAULT;
 				_state = DRAGONSTATE_FLY_DOWN;
 				this->QueueAction(DRAGON_ANIM(DRAGON_FLY));
+
+				//도망위치설정
+				_escapePoint = -_playerPos;
+				_escapePoint.y = TERRAIN->GetHeight(_escapePoint.x, _escapePoint.z);
+				Vector3 direction = _playerPos - _escapePoint;
+				Vec3Normalize(&direction, &direction);
+				_escapePoint = transComp.GetWorldPosition() + direction * 50.0f;
+				_escapePoint.y = TERRAIN->GetHeight(_escapePoint.x, _escapePoint.z);
 			}
 			else
 			{
