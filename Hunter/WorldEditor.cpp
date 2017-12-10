@@ -927,7 +927,7 @@ void Editor::ShowStatusWindow()
 				const Terrain::TerrainChunk &refChunk = TERRAIN->GetChunkAt(tilePos._chunkX, tilePos._chunkZ);
 
 				sprintf(_statusWindow._chunkInfoStr, "Total Num Entities : %d", refChunk._numTotalEntity);
-				sprintf(_statusWindow._tileInfoStr, "Tile Num Entity : %d", 
+				sprintf(_statusWindow._tileInfoStr, "Tile Num Entity : %d",
 					refChunk._tiles[Index2D(tilePos._tileX, tilePos._tileZ, TERRAIN_TILE_DIM)]._entities.size());
 
 				ImguiLabel(_statusWindow._chunkInfoStr);
@@ -935,49 +935,52 @@ void Editor::ShowStatusWindow()
 
 				ImguiUnindent();
 			}
+		}
+		ImguiSeparatorLine();
 
-			ImguiSeparatorLine();
+		ImguiLabel("Cursor Pos");
+		{
+			ImguiIndent();
+			Ray ray;
+			_pCurrentScene->_camera.ComputeRay(Vector2((float)_mx, (float)_my), &ray);
+			Vector3 rayHitPos;
+			if (TERRAIN->IsIntersectRay(ray, &rayHitPos))
+			{
+				TerrainTilePos cursorTilePos;
+				TERRAIN->ConvertWorldPostoTilePos(rayHitPos, &cursorTilePos);
 
+				const Terrain::TerrainChunk &refCursorChunk =
+					TERRAIN->GetChunkAt(cursorTilePos._chunkX, cursorTilePos._chunkZ);
+
+				sprintf(_statusWindow._cursorWorldPosStr, "Cursor World X : %f, Y : %f, Z : %f",
+					rayHitPos.x, rayHitPos.y, rayHitPos.z);
+				sprintf(_statusWindow._cursorChunkInfoStr, "Chunk Total Num Entities : %d",
+					refCursorChunk._numTotalEntity);
+				sprintf(_statusWindow._cursorTileInfoStr, "Tile Num Entity : %d",
+					refCursorChunk.
+					_tiles[Index2D(cursorTilePos._tileX, cursorTilePos._tileZ, TERRAIN_TILE_DIM)].
+					_entities.size());
+
+				ImguiLabel(_statusWindow._cursorWorldPosStr);
+				ImguiLabel(_statusWindow._cursorChunkInfoStr);
+				ImguiLabel(_statusWindow._cursorTileInfoStr);
+			}
+			ImguiUnindent();
+		}
+
+		BaseGameObject *pPlayer = GAMEOBJECTFACTORY->GetPlayerObject();
+		if (nullptr != pPlayer)
+		{
 			ImguiLabel("Player Pos");
 			{
 				ImguiIndent();
-				sprintf(_statusWindow._chunkPosStr, "ChunkX : %d, ChunkZ : %d", tilePos._chunkX, tilePos._chunkZ);
-				sprintf(_statusWindow._tilePosStr, "TileX : %d, TileZ : %d", tilePos._tileX, tilePos._tileZ);
-				sprintf(_statusWindow._relPosStr, "RelX : %f, RelZ : %f", tilePos._relX, tilePos._relZ);
+				sprintf(_statusWindow._chunkPosStr, "ChunkX : %d, ChunkZ : %d", pPlayer->GetTilePos()._chunkX, pPlayer->GetTilePos()._chunkZ);
+				sprintf(_statusWindow._tilePosStr, "TileX : %d, TileZ : %d", pPlayer->GetTilePos()._tileX, pPlayer->GetTilePos()._tileZ);
+				sprintf(_statusWindow._relPosStr, "RelX : %f, RelZ : %f", pPlayer->GetTilePos()._relX, pPlayer->GetTilePos()._relZ);
 
 				ImguiLabel(_statusWindow._chunkPosStr);
 				ImguiLabel(_statusWindow._tilePosStr);
 				ImguiLabel(_statusWindow._relPosStr);
-				ImguiUnindent();
-			}
-
-			ImguiLabel("Cursor Pos");
-			{
-				ImguiIndent();
-				Ray ray;
-				_pCurrentScene->_camera.ComputeRay(Vector2((float)_mx, (float)_my), &ray);
-				Vector3 rayHitPos;
-				if (TERRAIN->IsIntersectRay(ray, &rayHitPos))
-				{
-					TerrainTilePos cursorTilePos;
-					TERRAIN->ConvertWorldPostoTilePos(rayHitPos, &cursorTilePos);
-
-					const Terrain::TerrainChunk &refCursorChunk = 
-						TERRAIN->GetChunkAt(cursorTilePos._chunkX, cursorTilePos._chunkZ);
-
-					sprintf(_statusWindow._cursorWorldPosStr, "Cursor World X : %f, Y : %f, Z : %f",
-						rayHitPos.x, rayHitPos.y, rayHitPos.z);
-					sprintf(_statusWindow._cursorChunkInfoStr, "Chunk Total Num Entities : %d",
-						refCursorChunk._numTotalEntity);
-					sprintf(_statusWindow._cursorTileInfoStr, "Tile Num Entity : %d",
-						refCursorChunk.
-						_tiles[Index2D(cursorTilePos._tileX, cursorTilePos._tileZ, TERRAIN_TILE_DIM)].
-						_entities.size());
-
-					ImguiLabel(_statusWindow._cursorWorldPosStr);
-					ImguiLabel(_statusWindow._cursorChunkInfoStr);
-					ImguiLabel(_statusWindow._cursorTileInfoStr);
-				}
 				ImguiUnindent();
 			}
 		}

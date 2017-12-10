@@ -4,8 +4,9 @@
 #include "TransformComponent.h"
 #include "Frustum.h"
 
+#include "Terrain.h"
+
 class Player;
-class TerrainTilePos;
 
 enum CAMERA_STATE
 {
@@ -100,6 +101,10 @@ protected:
 
 	Quaternion _camRot;
 	CAMERA_STATE _cameraState{};
+
+	TerrainTilePos _currentTilePos;
+	TerrainTilePos _prevTilePos;
+
 
 	void RepositionEntity(const TerrainTilePos &currentPos, const TerrainTilePos &prevPos);
 };

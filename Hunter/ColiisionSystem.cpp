@@ -22,13 +22,6 @@ void CollisionSystem::Update(float deltaTime, float checkRange)
 	AABB aabb0;
 	AABB aabb1;
 
-	//static int32 counter = 0;
-	//if (counter % 60 == 0)
-	//{
-	//	Console::Log("LoopCount : %d\n", entities.size());
-	//}
-	//counter++;
-
 	TerrainTilePos tilePos1;
 
 	for (uint32 i = 0; i < entities.size(); ++i)

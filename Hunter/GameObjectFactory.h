@@ -4,6 +4,10 @@
 #include "SingletonBase.h"
 
 class IScene;
+class BaseGameObject;
+
+#include "CollisionComponent.h"
+
 
 enum ARCHE_TYPE
 {

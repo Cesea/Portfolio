@@ -254,10 +254,8 @@ void Player::Update(float deltaTime)
 
    refDamageTrans.SetWorldPosition(_worldSwordPos);
 
-
    _channel.Broadcast<PlayerImformationEvent>(
 	   PlayerImformationEvent(_pTransformComp->GetWorldPosition(), _state, _pTransformComp->GetForward(), _worldSwordPos));
-
 
 }
 

@@ -15,9 +15,9 @@ Camera::Camera()
 
 	//기본 Far
 #if defined (DEBUG) || defined (_DEBUG)
-	_camFar = 500.0f;
-#else 
 	_camFar = 600.0f;
+#else 
+	_camFar = 800.0f;
 #endif
 
 	_moveSpeed = 1.0f;
@@ -199,6 +199,9 @@ void Camera::MoveAndRotate(float deltaTime, const InputManager & input)
 			SetRotationSpeed(1.4f);
 		}
 
+		_prevTilePos = _currentTilePos;
+		TERRAIN->ConvertWorldPostoTilePos(refTransform.GetWorldPosition(), &_currentTilePos);
+		RepositionEntity(_currentTilePos, _prevTilePos);
 	} break;
 
 	//case CAMERASTATE_INCOMBAT:
@@ -520,31 +523,5 @@ void Camera::RepositionEntity(const TerrainTilePos & currentPos, const TerrainTi
 	{
 		TERRAIN->ValidateTerrainChunks(currentPos, prevPos);
 		_chunkMoved = true;
-	}
-
-	//타일이 다를....... tile의 entity벡터를 처리해주자
-	if (currentPos._tileX != prevPos._tileX || currentPos._tileZ != prevPos._tileZ)
-	{
-		Terrain::TerrainChunk &refPrevChunk =  TERRAIN->GetChunkAt(prevPos._chunkX, prevPos._chunkZ);
-		Terrain::TerrainTile &refPrevTile = refPrevChunk._tiles[Index2D(prevPos._tileX, prevPos._tileZ, TERRAIN_TILE_RES)];
-
-		bool removed = false;
-		for (uint32 i = 0; i < refPrevTile._entities.size(); ++i)
-		{
-			if (refPrevTile._entities[i] == _entity)
-			{
-				refPrevTile._entities.erase(refPrevTile._entities.begin() + i);
-				removed = true;
-				break;
-			}
-		}
-
-		if (removed)
-		{
-			Terrain::TerrainChunk &refCurrentChunk = TERRAIN->GetChunkAt(currentPos._chunkX, currentPos._chunkZ);
-			Terrain::TerrainTile &refCurrentTile = refCurrentChunk._tiles[Index2D(currentPos._tileX, currentPos._tileZ, TERRAIN_TILE_RES)];
-			refCurrentTile._entities.push_back(_entity);
-			
-		}
 	}
 }

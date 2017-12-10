@@ -2,6 +2,7 @@
 #define TERRAIN_H
 
 #include "SingletonBase.h"
+#include "GameObjectFactory.h"
 
 class IScene;
 class QuadTree;
