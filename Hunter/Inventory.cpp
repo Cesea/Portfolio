@@ -164,6 +164,7 @@ void Inventory::Update(float deltaTime, const InputManager &input)
 			{
 				if (PtInRect(&_bag[i]._slotRect, _pt))
 				{
+					SOUNDMANAGER->Play("inven_select_01");
 					if (_bag[i]._type == Null)
 					{
 						_bag[i]._type = _tempType;
@@ -417,39 +418,35 @@ void Inventory::Update(float deltaTime, const InputManager &input)
 			{
 				if (_bag[i]._value > 0)
 				{
-					
-						if (input.mouse.IsPressed(MOUSE_BUTTON_RIGHT))
+					if (input.mouse.IsPressed(MOUSE_BUTTON_RIGHT))
+					{
+						SOUNDMANAGER->Play("inven_select_01");
+						if (_tempType == Null)
 						{
-							if (_tempType == Null)
+							_tempType = _bag[i]._type;
+							_tempValue += 1;
+							_bag[i]._value -= 1;
+							if (_bag[i]._value <= 0)
 							{
-								_tempType = _bag[i]._type;
-								_tempValue += 1;
-								_bag[i]._value -= 1;
-								if (_bag[i]._value <= 0)
-								{
-									_bag[i]._type = Null;
-								}
-								break;
+								_bag[i]._type = Null;
 							}
-							else if (_tempType == _bag[i]._type)
-							{
-								_tempValue += 1;
-								_bag[i]._value -= 1;
-								if (_bag[i]._value <= 0)
-								{
-									_bag[i]._type = Null;
-								}
-								break;
-							}
+							break;
 						}
-					
+						else if (_tempType == _bag[i]._type)
+						{
+							_tempValue += 1;
+							_bag[i]._value -= 1;
+							if (_bag[i]._value <= 0)
+							{
+								_bag[i]._type = Null;
+							}
+							break;
+						}
+					}
 				}
-				
 			}
-			
 		}
 	}
-	
 }
 
 void Inventory::Render()

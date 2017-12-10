@@ -1,6 +1,15 @@
 #include "stdafx.h"
 #include "TestScene.h"
 
+void LoadEverySoundResource2()
+{
+	SOUNDMANAGER->AddSound("inven_open_01",
+		"../resources/sfx/inven_open_01.wav", false, false);
+	SOUNDMANAGER->AddSound("inven_close_01",
+		"../resources/sfx/inven_close_01.wav", false, false);
+	SOUNDMANAGER->AddSound("inven_select_01",
+		"../resources/sfx/inven_select_01.wav", false, false);
+}
 
 void LoadEveryStaticResources2()
 {
@@ -148,6 +157,7 @@ bool TestScene::SceneInit()
 
 	LoadEveryStaticResources2();
 	LoadEverySkinnedResources2();
+	LoadEverySoundResource2();
 
 	//라이트 생성
 	_pMainLight->SetWorldPosition(Vector3(0.0f, 5.0f, 5.0f));

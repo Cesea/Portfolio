@@ -141,11 +141,13 @@ void UI::Update(float deltaTime, const InputManager & input)
 				_bt1On = false;
 				if (_inventory->GetInvenOn() == false)
 				{
+					SOUNDMANAGER->Play("inven_open_01");
 					_inventory->SetInvenOn(true);
 
 				}
 				else if (_inventory->GetInvenOn() == true)
 				{
+					SOUNDMANAGER->Play("inven_close_01");
 					_inventory->closeInventory();
 					_inventory->SetInvenOn(false);
 				}
@@ -194,11 +196,13 @@ void UI::Update(float deltaTime, const InputManager & input)
 		{
 			if (_inventory->GetInvenOn() == false)
 			{
+				SOUNDMANAGER->Play("inven_open_01");
 				_inventory->SetInvenOn(true);
 
 			}
 			else if (_inventory->GetInvenOn() == true)
 			{
+				SOUNDMANAGER->Play("inven_close_01");
 				_inventory->SetInvenOn(false);
 				_inventory->closeInventory();
 			}
@@ -239,8 +243,6 @@ void UI::RenderUI(void)
 	SPRITEMANAGER->BeginSpriteRender();
 	if (_uiOn == true)
 	{
-		
-
 		RECT hpRect = { 0,1,255,256 };
 		RECT hpBarRect = { 0,1,255,(CurHp / MaxHp) * 256 };
 

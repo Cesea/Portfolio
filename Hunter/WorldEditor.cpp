@@ -729,10 +729,12 @@ void Editor::InObjectEditMode()
 
 				ImguiIndent();
 
-				ImguiSlider("X", &quat.x, 0.0f, 1.0f, 0.01f);
-				ImguiSlider("Y", &quat.y, -0.9f, 0.9f, 0.01f);
-				ImguiSlider("Z", &quat.z, 0.0f, 1.0f, 0.01f);
+				ImguiSlider("X", &quat.x, -1.9f, 1.9f, 0.01f);
+				ImguiSlider("W", &quat.w, -1.9f, 1.9f, 0.01f);
+				ImguiSlider("Z", &quat.z, -1.9f, 1.9f, 0.01f);
 
+
+				//Quaternion
 				QuaternionNormalize(&quat, &quat);
 
 				_objectEditor._pTransform->SetRotateWorld(quat);

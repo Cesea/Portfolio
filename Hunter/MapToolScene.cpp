@@ -38,6 +38,16 @@ void LoadEverySoundResources()
 	SOUNDMANAGER->AddSound3D("player_impact_03",
 		"../resources/sfx/Player/Attack/player_impact_03.wav", false, false, 2.0, 5.0f);
 
+	SOUNDMANAGER->AddSound3D("player_hit_01",
+		"../resources/sfx/Player/player_hit_01.wav", false, false, 2.0f, 5.0f);
+	SOUNDMANAGER->AddSound3D("player_hit_02",
+		"../resources/sfx/Player/player_hit_02.wav", false, false, 2.0f, 5.0f);
+	SOUNDMANAGER->AddSound3D("player_hit_03",
+		"../resources/sfx/Player/player_hit_03.wav", false, false, 2.0f, 5.0f);
+
+	SOUNDMANAGER->AddSound3D("player_hit_talk_01",
+		"../resources/sfx/Player/player_hit_talk_01.wav", false, false, 2.0f, 5.0f);
+
 #pragma endregion
 
 #pragma region Cat

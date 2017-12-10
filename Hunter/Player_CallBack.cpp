@@ -294,11 +294,17 @@ void Player::SetupCallbackAndCompression()
 	   pController->GetAnimationSetByName(PlayerAnimationString[PlayerAnimationEnum::eWarTakingHit],
 		   (ID3DXAnimationSet **)&anim);
 
-	   D3DXKEY_CALLBACK key;
-	   key.Time = (anim->GetPeriod() / 1.1f) * anim->GetSourceTicksPerSecond();
-	   key.pCallbackData = (void *)&_callbackData;
+	   D3DXKEY_CALLBACK keys[3];
+	   keys[0].Time = (anim->GetPeriod() * 0.05f) * anim->GetSourceTicksPerSecond();
+	   keys[0].pCallbackData = (void *)&_callbackData[DESC_LEFT];
 
-	   AddCallbackKeysAndCompress(pController, anim, 1, &key, D3DXCOMPRESS_DEFAULT, 0.1f);
+	   keys[1].Time = (anim->GetPeriod() * 0.15f) * anim->GetSourceTicksPerSecond();
+	   keys[1].pCallbackData = (void *)&_callbackData[DESC_RIGHT];
+
+	   keys[2].Time = (anim->GetPeriod() * 0.9f) * anim->GetSourceTicksPerSecond();
+	   keys[2].pCallbackData = (void *)&_callbackData[DESC_ATTACK1];
+
+	   AddCallbackKeysAndCompress(pController, anim, 3, keys, D3DXCOMPRESS_DEFAULT, 0.1f);
    }
 
 }
@@ -405,8 +411,19 @@ HRESULT PlayerCallbackHandler::HandleCallback(UINT Track, LPVOID pCallbackData)
 
 	case PlayerAnimationEnum::eWarTakingHit :
 	{
-		_pPlayer->_state = Player::PLAYERSTATE_STANCE;
-		_pPlayer->QueueAction(PLAYER_ANIM(eWarCombatMode));
+		if (pData->_description == DESC_LEFT)
+		{
+			SOUNDMANAGER->Play3D("player_hit_01", *pData->_pPosition);
+		}
+		else if (pData->_description == DESC_RIGHT)
+		{
+			SOUNDMANAGER->Play3D("player_hit_talk_01", *pData->_pPosition);
+		}
+		else if (pData->_description == DESC_ATTACK1)
+		{
+			_pPlayer->_state = Player::PLAYERSTATE_STANCE;
+			_pPlayer->QueueAction(PLAYER_ANIM(eWarCombatMode));
+		}
 	}break;
 
 	case PlayerAnimationEnum::eWarShieldBlock :

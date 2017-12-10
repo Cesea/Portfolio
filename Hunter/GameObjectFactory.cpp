@@ -36,6 +36,8 @@ void GameObjectFactory::CreateObject(ARCHE_TYPE type,
 	const Vector3 & scale, 
 	const Vector3 & orientation)
 {
+	Quaternion quat(orientation.x, orientation.y, orientation.z, 1.0f);
+	QuaternionNormalize(&quat, &quat);
 	switch (type)
 	{
 	case ARCHE_ROCK:
@@ -45,7 +47,7 @@ void GameObjectFactory::CreateObject(ARCHE_TYPE type,
 		TransformComponent &transform = entity.AddComponent<TransformComponent>();
 		transform._position = position;
 		transform.SetScale(scale);
-		transform.SetRotateWorld(Quaternion(orientation.x, orientation.y, orientation.z, 1.0f));
+		transform.SetRotateWorld(quat);
 
 		RenderComponent &render = entity.AddComponent<RenderComponent>();
 		render._type = RenderComponent::Type::eStatic;
@@ -78,7 +80,7 @@ void GameObjectFactory::CreateObject(ARCHE_TYPE type,
 		TransformComponent &transform = entity.AddComponent<TransformComponent>();
 		transform._position = position;
 		transform.SetScale(scale);
-		transform.SetRotateWorld(Quaternion(orientation.x, orientation.y, orientation.z, 1.0f));
+		transform.SetRotateWorld(quat);
 
 		RenderComponent &render = entity.AddComponent<RenderComponent>();
 		render._type = RenderComponent::Type::eStatic;
@@ -111,7 +113,7 @@ void GameObjectFactory::CreateObject(ARCHE_TYPE type,
 		TransformComponent &transform = entity.AddComponent<TransformComponent>();
 		transform._position = position;
 		transform.SetScale(scale);
-		transform.SetRotateWorld(Quaternion(orientation.x, orientation.y, orientation.z, 1.0f));
+		transform.SetRotateWorld(quat);
 
 		RenderComponent &render = entity.AddComponent<RenderComponent>();
 		render._type = RenderComponent::Type::eStatic;
@@ -142,7 +144,7 @@ void GameObjectFactory::CreateObject(ARCHE_TYPE type,
 		TransformComponent &transform = entity.AddComponent<TransformComponent>();
 		transform._position = position;
 		transform.SetScale(scale);
-		transform.SetRotateWorld(Quaternion(orientation.x, orientation.y, orientation.z, 1.0f));
+		transform.SetRotateWorld(quat);
 
 		RenderComponent &render = entity.AddComponent<RenderComponent>();
 		render._type = RenderComponent::Type::eStatic;
@@ -174,7 +176,7 @@ void GameObjectFactory::CreateObject(ARCHE_TYPE type,
 		TransformComponent &transform = entity.AddComponent<TransformComponent>();
 		transform._position = position;
 		transform.SetScale(scale);
-		transform.SetRotateWorld(Quaternion(orientation.x, orientation.y, orientation.z, 1.0f));
+		transform.SetRotateWorld(quat);
 
 		RenderComponent &render = entity.AddComponent<RenderComponent>();
 		render._type = RenderComponent::Type::eStatic;
