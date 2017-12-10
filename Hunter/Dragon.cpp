@@ -106,7 +106,7 @@ bool Dragon::CreateFromWorld(World & world, const Vector3 & Pos)
 	_pattern = DRAGONPATTERNSTATE_GROUND;
 	_state = DRAGONSTATE_START;
 
-	_hp = 150;
+	_hp = 1500;
 
 	_isHurt = false;
 	_unBeatableTime = 15;
@@ -376,13 +376,13 @@ void Dragon::Update(float deltaTime)
 		if (_breathCount == 100)
 		{
 			Vector3 direction = -transComp.GetForward();
-			direction = rotateVector(direction, D3DX_PI / 30);
+			direction = rotateVector(direction, -D3DX_PI / 60);
 			//브레스를 쏜다
 			EventChannel channel;
 			channel.Broadcast<GameObjectFactory::CreateDragonBreath>(
 				GameObjectFactory::CreateDragonBreath(transComp.GetWorldPosition() - transComp.GetForward()*6.0f + Vector3(0, 1, 0), 10.0f, transComp.GetForward()));
 			channel.Broadcast<GameObjectFactory::DamageBoxEvent>(GameObjectFactory::DamageBoxEvent(transComp.GetWorldPosition(),
-				Vector3(2.5f, 2.0f, 2.5f), 10.0f, CollisionComponent::TRIGGER_TYPE_ENEMY_DMGBOX, direction *30, Vector3(0, 0, 0), 3.0f));
+				Vector3(3.0f, 2.0f, 3.0f), 10.0f, CollisionComponent::TRIGGER_TYPE_ENEMY_DMGBOX, direction *30, Vector3(0, 0, 0), 3.0f));
 		}
 		if (_breathCount < 0)
 		{
@@ -401,10 +401,10 @@ void Dragon::Update(float deltaTime)
 				this->QueueAction(DRAGON_ANIM(DRAGON_STAND));
 			}
 			Vector3 direction = -transComp.GetForward();
-			direction = rotateVector(direction, D3DX_PI / 30);
+			direction = rotateVector(direction, -D3DX_PI / 60);
 			EventChannel channel;
 			channel.Broadcast<GameObjectFactory::DamageBoxEvent>(GameObjectFactory::DamageBoxEvent(transComp.GetWorldPosition(),
-				Vector3(2.0f, 2.0f, 2.0f), 10.0f, CollisionComponent::TRIGGER_TYPE_ENEMY_DMGBOX, direction * 30, Vector3(0, 0, 0), 3.0f));
+				Vector3(3.0f, 2.0f, 3.0f), 10.0f, CollisionComponent::TRIGGER_TYPE_ENEMY_DMGBOX, direction * 30, Vector3(0, 0, 0), 3.0f));
 		}
 
 
@@ -506,6 +506,7 @@ void Dragon::Update(float deltaTime)
 		_stopCount--;
 		if (_stopCount < 0)
 		{
+			_stopCount = _stopTime;
 			switch (_nextAnim)
 			{
 			case DRAGONANIMSTATE_WHIP_TAIL:
@@ -513,6 +514,9 @@ void Dragon::Update(float deltaTime)
 				this->QueueAction(DRAGON_ANIM(DRAGON_WHIP_TAIL));
 				_escapePoint = -_playerPos;
 				_escapePoint.y = TERRAIN->GetHeight(_escapePoint.x, _escapePoint.z);
+				Vector3 direction = _playerPos - _escapePoint;
+				Vec3Normalize(&direction, &direction);
+				_escapePoint = transComp.GetWorldPosition() - direction * 50.0f;
 				break;
 			}
 		}
@@ -582,10 +586,6 @@ void Dragon::Update(float deltaTime)
 	case DRAGONANIMSTATE_DEFAULT:
 		break;
 	}
-
-
-
-
 	if (_pattern != DRAGONPATTERNSTATE_FLY)
 		transComp.SetWorldPosition(transComp.GetWorldPosition().x,
 			TERRAIN->GetHeight(transComp.GetWorldPosition().x, transComp.GetWorldPosition().z),

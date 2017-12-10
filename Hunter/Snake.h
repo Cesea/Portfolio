@@ -39,6 +39,7 @@ private:
 		SNAKESTATE_RUN,
 		SNAKESTATE_ATK1,
 		SNAKESTATE_ATK2,
+		SNAKESTATE_DELAY,
 		SNAKESTATE_ATK3,
 		SNAKESTATE_STAND,
 		SNAKESTATE_HURT,
@@ -52,6 +53,9 @@ private:
 	};
 	SNAKESTATE _state;
 	SNAKESKINSTATE _skinType;
+
+	int _delayTime2;
+	int _delayCount2;
 public:
 	Snake();
 	virtual ~Snake();

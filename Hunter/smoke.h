@@ -20,9 +20,9 @@ class Smoke :
 
 		out.initialColor = WHITENESS;
 
-		out.initialPos.x = RandFloat(AABBMin.x, AABBMax.x);
-		out.initialPos.y = RandFloat(AABBMin.y, AABBMax.y);
-		out.initialPos.z = RandFloat(AABBMin.z, AABBMax.z);
+		out.initialPos.x = Pos.x+RandFloat(AABBMin.x, AABBMax.x);
+		out.initialPos.y = Pos.y+RandFloat(AABBMin.y, AABBMax.y);
+		out.initialPos.z = Pos.z+RandFloat(AABBMin.z, AABBMax.z);
 	}
 public:
 	Smoke(const std::string& fxName,

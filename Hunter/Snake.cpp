@@ -106,7 +106,7 @@ bool Snake::CreateFromWorld(World & world, const Vector3 &Pos)
 	_atkRange = 1.0f;
 	if (_skinType == SNAKESKINSTATE_RED)
 	{
-		_atkRange = 6.0f;
+		_atkRange = 10.0f;
 	}
 	_atkTime = 60;
 	_atkCount = _atkTime;
@@ -120,6 +120,9 @@ bool Snake::CreateFromWorld(World & world, const Vector3 &Pos)
 	_isHurt = false;
 	_unBeatableTime = 15;
 	_unBeatableCount = _unBeatableTime;
+
+	_delayTime2 = 60;
+	_delayCount2 = _delayTime2;
 
 	//이벤트 등록
 	EventChannel channel;
@@ -297,11 +300,24 @@ void Snake::Update(float deltaTime)
 			Vector3 rotateDir = rotatePos - transComp.GetWorldPosition();
 			Vec3Normalize(&rotateDir, &rotateDir);
 			transComp.LookDirection(-rotateDir, D3DX_PI);
+
+			this->QueueAction(SNAKE_ANIM(SNAKE_STAND));
+			_state = SNAKESTATE_DELAY;
 		}
+		break;
+	case SNAKESTATE_DELAY:
+	{
+		_delayCount2--;
+		if (_delayCount2 < 0)
+		{
+			_delayCount2 = _delayTime2;
+			_state = SNAKESTATE_ATK2;
+			this->QueueAction(SNAKE_ANIM(SNAKE_ATTACK2));
+		}
+	}
 		break;
 	case SNAKESTATE_ATK3:
 		_atkCount--;
-
 		if (_atkCount == 30)
 		{
 			Vector3 targetPos = transComp.GetWorldPosition() - transComp.GetForward();
