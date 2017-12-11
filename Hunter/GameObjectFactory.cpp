@@ -162,12 +162,11 @@ void GameObjectFactory::CreateObject(ARCHE_TYPE type,
 
 		video::StaticXMesh *pMesh = VIDEO->GetStaticXMesh(render._static);
 
-		//CollisionComponent &collision = entity.AddComponent<CollisionComponent>();
-		//collision._boundingBox.Init(pMesh->_meshBoundInfo._min, pMesh->_meshBoundInfo._max);
-		//collision._boundingSphere._localCenter = pMesh->_meshBoundInfo._center;
-		//collision._boundingSphere._radius = pMesh->_meshBoundInfo._radius;
-		//collision._type = CollisionComponent::COLLISION_TYPE_BOX;
-		//collision._locked = true;
+		CollisionComponent &collision = entity.AddComponent<CollisionComponent>();
+		collision._boundingBox.Init(pMesh->_meshBoundInfo._min, pMesh->_meshBoundInfo._max);
+		collision._boundingSphere._localCenter = pMesh->_meshBoundInfo._center;
+		collision._boundingSphere._radius = pMesh->_meshBoundInfo._radius;
+		collision._locked = true;;
 
 		_channel.Broadcast<GameObjectFactory::ObjectCreatedEvent>(
 			ObjectCreatedEvent(ARCHE_GRASS, entity, transform.GetWorldPosition()));

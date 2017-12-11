@@ -27,7 +27,7 @@ bool MapToolScene::SceneInit()
 	strncpy(config._tile2FileName, "../resources/Terrain/TerrainTexture03.png", MAX_FILE_NAME);
 
 	//TextureMult는 하나의 TerrainChun에 대한 Multiplier값이다.
-	config._textureMult = 25;
+	config._textureMult = 20;
 
 	TERRAIN->SetScene(this);
 	TERRAIN->Create(config, true);

@@ -209,12 +209,13 @@ void IScene::ReadyShadowMap(Terrain *pTerrain)
 
 	video::SkinnedXMesh::SetCamera( _shadowCamera);
 
-	_renderSystem.RenderShadow(_shadowCamera);
+
 	//만약 Terrain 도 쉐도우 맵을 그려야한다면...
 	if(nullptr != pTerrain)
 	{
 		pTerrain->RenderShadow( _shadowCamera ); 
 	}
+	_renderSystem.RenderShadow(_shadowCamera);
 
 	_shadowCamera.RenderTextureEnd();
 
@@ -291,7 +292,7 @@ void IScene::CreateLightsAndCameras()
 	_shadowCamera._camFar = _shadowDistance * 2.0f;
 	_shadowCamera._aspect = 1;
 	_shadowCamera._orthoSize = _shadowDistance * 1.0f;	//투영크기는 그림자크기로...
-	_shadowCamera.ReadyShadowTexture(1024);
+	_shadowCamera.ReadyShadowTexture(2048);
 
 	_pMainLight->CreateFromWorld(_world);
 

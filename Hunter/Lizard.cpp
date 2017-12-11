@@ -20,7 +20,7 @@ bool Lizard::CreateFromWorld(World & world, const Vector3 &Pos)
 	RenderComponent &renderComp = _entity.AddComponent<RenderComponent>();
 	renderComp._type = RenderComponent::Type::eSkinned;
 
-	int a = 1;
+	int a = RandInt(2);
 	switch (a)
 	{
 	case 0:

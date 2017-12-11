@@ -397,7 +397,23 @@ void Editor::InTerrainEditMode()
 
 		if (ImguiButton("Load Terrain"))
 		{
+
+			_pCurrentScene->ReleaseAllGameObjects();
+			_pCurrentScene->_world.Clear();
+			_pCurrentScene->AddSystemToWorld();
+
 			TERRAIN->LoadTerrain(_terrainEditor._fileName, true);
+
+			_pCurrentScene->CreateLightsAndCameras();
+
+			std::string fileNameCopy = _terrainEditor._fileName;
+			std::string path;
+			std::string name;
+			std::string extension;
+
+			SplitFilePathToNamePathExtension(fileNameCopy, name, path, extension);
+			_pCurrentScene->CreateObjectFromFile(path + name + ".ed");
+			_pCurrentScene->_camera.SetTargetObject((Player *)GAMEOBJECTFACTORY->GetPlayerObject());
 		}
 
 		ImguiUnindent();
