@@ -240,7 +240,8 @@ void MainMenuScene::LoadSoundResources()
 		"../resources/sfx/inven_close_01.wav", false, false);
 	_loading.LoadSoundResources("inven_select_01",
 		"../resources/sfx/inven_select_01.wav", false, false);
-
+	_loading.LoadSoundResources("findSound",
+		"../resources/sfx/findSound.mp3", false, false);
 
 #pragma region Player 
 	_loading.LoadSoundResources("player_walk_left", 
