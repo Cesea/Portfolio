@@ -308,7 +308,10 @@ void GameObjectFactory::Handle(const CreateObjectOnClickEvent & event)
 
 	if (TERRAIN->IsIntersectRay(ray, &terrainHitPos))
 	{
-		CreateObject(event._type, event._handle, terrainHitPos, 
+		position = terrainHitPos;
+		position.y = TERRAIN->GetHeight(position.x, position.z) - 0.1f;
+
+		CreateObject(event._type, event._handle, position, 
 			randomScale, randomYOrientation);
 	}
 

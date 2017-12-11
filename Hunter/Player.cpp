@@ -248,7 +248,7 @@ void Player::Update(float deltaTime)
    //Console::Log("%d\n", (int32)_pDamageBox->GetEntity().GetComponent<CollisionComponent>()._valid);
    _worldSwordPos = refDamageTrans.GetWorldPosition();
    Matrix forwardTrans;
-   MatrixTranslation(&forwardTrans, -60.0f, 0.0f, 0.0f);
+   MatrixTranslation(&forwardTrans, -30.0f, 10.0f, 0.0f);
    MatrixMultiply(&forwardTrans,  &forwardTrans,  &_pSwordFrame->CombinedTransformationMatrix);
    Vec3TransformCoord(&_worldSwordPos, &_worldSwordPos, &forwardTrans);
 

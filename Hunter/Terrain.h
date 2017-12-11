@@ -45,8 +45,6 @@ struct TerrainTilePos
 	float _relZ;
 };
 
-
-
 struct TerrainVertexPos
 {
 	int32 _chunkX{};
@@ -284,9 +282,6 @@ private:
 	float   _terrainStartZ{};
 	float	_terrainEndX{};
 	float	_terrainEndZ{};
-
-	////LOD∫Ò¿≤
-	//float _lodRatio{};
 
 	video::TextureHandle _tile0Handle{};
 	video::TextureHandle _tile1Handle{};

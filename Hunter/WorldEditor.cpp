@@ -953,7 +953,9 @@ void Editor::ShowStatusWindow()
 					TERRAIN->GetChunkAt(cursorTilePos._chunkX, cursorTilePos._chunkZ);
 
 				sprintf(_statusWindow._cursorWorldPosStr, "Cursor World X : %f, Y : %f, Z : %f",
-					rayHitPos.x, rayHitPos.y, rayHitPos.z);
+					rayHitPos.x,
+					TERRAIN->GetHeight(rayHitPos.x, rayHitPos.z), 
+					rayHitPos.z);
 				sprintf(_statusWindow._cursorChunkInfoStr, "Chunk Total Num Entities : %d",
 					refCursorChunk._numTotalEntity);
 				sprintf(_statusWindow._cursorTileInfoStr, "Tile Num Entity : %d",

@@ -7,6 +7,11 @@
 class GizmoManager : public SingletonBase<GizmoManager>
 {
 private:
+	LPDIRECT3DDEVICE9 _pDevice;
+	Vector3		  _pCirclePos[CIRCLEGIZMO_SEGMENTS + 1];
+
+public:
+
 	struct GizmoVertex
 	{
 		Vector3 pos;
@@ -14,11 +19,6 @@ private:
 		enum { FVF = D3DFVF_XYZ | D3DFVF_DIFFUSE };
 	};
 
-private:
-	LPDIRECT3DDEVICE9 _pDevice;
-	Vector3		  _pCirclePos[CIRCLEGIZMO_SEGMENTS + 1];
-
-public:
 	bool Init(LPDIRECT3DDEVICE9 pDevice);
 	void Release();
 
@@ -36,6 +36,9 @@ public:
 
 	void AABBBox(const Vector3 &minPos, const Vector3 &maxPos,
 		uint32 color = 0xFF808080)const;
+
+	void RectX(const Vector3 &min, const Vector3 &max, uint32 color = 0xFFFFFFFF);
+	void RectZ(const Vector3 &min, const Vector3 &max, uint32 color = 0xFFFFFFFF);
 
 	void RenderWorldGizmo(const Vector3 &pos);
 };

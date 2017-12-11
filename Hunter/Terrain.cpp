@@ -75,6 +75,7 @@ bool Terrain::Create(const Terrain::TerrainConfig &config, bool32 inEditMode)
 	//터레인 Texture 로딩 ////////////////////////////////////
 	_effect = VIDEO->GetEffect("TerrainBase.fx");
 
+
 	LoadTextureFromConfig(_currentConfig);
 }
 
@@ -549,6 +550,13 @@ void Terrain::Render(const Camera &camera, const DirectionalLight &mainLight, co
 				pEffect->EndPass();
 			}
 			pEffect->EndEffect();
+
+			Vector3 leftTop(refChunk._startX, 0.0f, refChunk._startZ);
+			Vector3 rightTop(refChunk._endX, 4.0f, refChunk._startZ);
+			Vector3 rightBottom(refChunk._endX, 0.0f, refChunk._endZ);
+
+			GIZMOMANAGER->RectX(leftTop, rightTop, 0x80008000);
+			GIZMOMANAGER->RectZ(rightTop, rightBottom, 0x80008000);
 		}
 	}
 	else

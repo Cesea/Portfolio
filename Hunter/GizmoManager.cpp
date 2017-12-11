@@ -221,6 +221,98 @@ void GizmoManager::AABBBox(const Vector3 & minPos, const Vector3 & maxPos, uint3
 	this->Line(Vector3(maxPos.x, minPos.y, minPos.z), Vector3(maxPos.x, minPos.y, maxPos.z), color);
 }
 
+void GizmoManager::RectX(const Vector3 & min, const Vector3 & max, uint32 color)
+{
+	//이전 월드 행렬을 기억하자
+	Matrix matPrevWorld;
+	_pDevice->GetTransform(D3DTS_WORLD, &matPrevWorld);
+
+	//사용할 월드
+	Matrix matIdentity;
+	MatrixIdentity(&matIdentity);
+	_pDevice->SetTransform(D3DTS_WORLD, &matIdentity);
+
+	//이전 라이트 기억
+	DWORD prevLight = 0;
+	_pDevice->GetRenderState(D3DRS_LIGHTING, &prevLight);
+
+	//라이트 끄자
+	_pDevice->SetRenderState(D3DRS_LIGHTING, FALSE);
+
+	GizmoVertex vertices[6];
+	vertices[0].pos = Vector3(min.x, min.y, min.z);
+	vertices[0].color = color;
+
+	vertices[1].pos = Vector3(min.x, max.y, min.z);
+	vertices[1].color = color;
+
+	vertices[2].pos = Vector3(max.x, max.y, min.z);
+	vertices[2].color = color;
+
+	vertices[3].pos = Vector3(min.x, min.y, max.z);
+	vertices[3].color = color;
+
+	vertices[4].pos = Vector3(max.x, max.y, max.z);
+	vertices[4].color = color;
+
+	vertices[5].pos = Vector3(max.x, min.y, max.z);
+	vertices[5].color = color;
+
+	_pDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
+	_pDevice->SetFVF(GizmoVertex::FVF);
+	_pDevice->DrawPrimitiveUP(D3DPT_TRIANGLELIST, 2, vertices, sizeof(GizmoVertex));
+
+	_pDevice->SetTransform(D3DTS_WORLD, &matPrevWorld);
+	_pDevice->SetRenderState(D3DRS_LIGHTING, prevLight);
+	_pDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);
+}
+
+void GizmoManager::RectZ(const Vector3 & min, const Vector3 & max, uint32 color)
+{
+	//이전 월드 행렬을 기억하자
+	Matrix matPrevWorld;
+	_pDevice->GetTransform(D3DTS_WORLD, &matPrevWorld);
+
+	//사용할 월드
+	Matrix matIdentity;
+	MatrixIdentity(&matIdentity);
+	_pDevice->SetTransform(D3DTS_WORLD, &matIdentity);
+
+	//이전 라이트 기억
+	DWORD prevLight = 0;
+	_pDevice->GetRenderState(D3DRS_LIGHTING, &prevLight);
+
+	//라이트 끄자
+	_pDevice->SetRenderState(D3DRS_LIGHTING, FALSE);
+
+	GizmoVertex vertices[6];
+	vertices[0].pos = Vector3(min.x, min.y, max.z);
+	vertices[0].color = color;
+
+	vertices[1].pos = Vector3(min.x, max.y, max.z);
+	vertices[1].color = color;
+
+	vertices[2].pos = Vector3(min.x, max.y, min.z);
+	vertices[2].color = color;
+
+	vertices[3].pos = Vector3(max.x, min.y, max.z);
+	vertices[3].color = color;
+
+	vertices[4].pos = Vector3(max.x, max.y, min.z);
+	vertices[4].color = color;
+
+	vertices[5].pos = Vector3(max.x, min.y, min.z);
+	vertices[5].color = color;
+
+	_pDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
+	_pDevice->SetFVF(GizmoVertex::FVF);
+	_pDevice->DrawPrimitiveUP(D3DPT_TRIANGLELIST, 2, vertices, sizeof(GizmoVertex));
+
+	_pDevice->SetTransform(D3DTS_WORLD, &matPrevWorld);
+	_pDevice->SetRenderState(D3DRS_LIGHTING, prevLight);
+	_pDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);
+}
+
 void GizmoManager::RenderWorldGizmo(const Vector3 & pos)
 {
 	this->Line(pos, Vector3(pos.x + 1, pos.y, pos.z), 0xFFFF0000);
