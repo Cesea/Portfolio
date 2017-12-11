@@ -199,6 +199,8 @@ void GameObjectFactory::CreateObject(ARCHE_TYPE type,
 		collision._boundingSphere._radius = pMesh->_meshBoundInfo._radius;
 		collision._type = CollisionComponent::COLLISION_TYPE_BOX;
 		collision._locked = true;
+		collision._triggerType = CollisionComponent::TRIGGER_TYPE_OBJECT;
+		collision._isTrigger = true;
 
 		//entity.Activate();
 

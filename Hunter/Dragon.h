@@ -120,6 +120,12 @@ private:
 	//브레스 쿨타임
 	int _breathDelayTime;
 	int _breathDelayCount;
+	//달리기 프레임
+	int _runTime;
+	int _runCount;
+	//날기 프레임
+	int _flyTime;
+	int _flyCount;
 
 	DRAGONANIMSTATE _nextAnim;
 };
