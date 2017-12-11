@@ -78,6 +78,12 @@ bool Dragon::CreateFromWorld(World & world, const Vector3 & Pos)
 	//Dragon Breath Delay Count 
 	_breathDelayTime = 60;
 	_breathDelayCount = _breathDelayTime;
+	//Dragon Run Count
+	_runTime = 20;
+	_runCount = _runTime;
+	//Dragon Fly Count
+	_flyTime = 90;
+	_flyCount = 20;
 
 	_normalSpeed = 2.0f;
 	_speed = _normalSpeed;
@@ -114,6 +120,7 @@ bool Dragon::CreateFromWorld(World & world, const Vector3 & Pos)
 	_unBeatableCount = _unBeatableTime;
 
 
+
 	//이벤트 세팅
 	EventChannel channel;
 	channel.Broadcast<GameObjectFactory::ObjectCreatedEvent>(
@@ -133,6 +140,10 @@ void Dragon::Update(float deltaTime)
 	case DRAGONSTATE_START:
 	{
 		_delayCount--;
+		if (_delayCount == 230)
+		{
+			SOUNDMANAGER->Play3D("dragon_roar", transComp.GetWorldPosition());
+		}
 		if (_delayCount <= 0)
 		{
 			_delayCount = _delayTime;
@@ -188,6 +199,14 @@ void Dragon::Update(float deltaTime)
 			if (_moveSegmentIndex > _moveSegment.size() - 1) _state = DRAGONSTATE_TRACE;
 		}
 		transComp.SetWorldPosition(transComp.GetWorldPosition() - transComp.GetForward()*_speed*deltaTime);
+
+		_runCount--;
+		if (_runCount < 0)
+		{
+			_runCount = _runTime;
+			SOUNDMANAGER->Play3D("dragon_step", transComp.GetWorldPosition());
+
+		}
 	}
 	break;
 	case DRAGONSTATE_TRACE:
@@ -209,8 +228,15 @@ void Dragon::Update(float deltaTime)
 			//공격한다
 			_anim = DRAGONANIMSTATE_BITE;
 			this->QueueAction(DRAGON_ANIM(DRAGON_ATTACK1));
+			SOUNDMANAGER->Play3D("dragon_bite", transComp.GetWorldPosition());
 		}
+		_runCount--;
+		if (_runCount < 0)
+		{
+			_runCount = _runTime;
+			SOUNDMANAGER->Play3D("dragon_step", transComp.GetWorldPosition());
 
+		}
 	}
 	break;
 	case DRAGONSTATE_MOVE_OUT:
@@ -246,6 +272,14 @@ void Dragon::Update(float deltaTime)
 			_pattern = DRAGONPATTERNSTATE_FLY;
 		}
 		transComp.SetWorldPosition(transComp.GetWorldPosition() - transComp.GetForward()*_speed*deltaTime);
+
+		_runCount--;
+		if (_runCount < 0)
+		{
+			_runCount = _runTime;
+			SOUNDMANAGER->Play3D("dragon_step", transComp.GetWorldPosition());
+
+		}
 	}
 	break;
 	case DRAGONSTATE_STARTFLY:
@@ -262,6 +296,12 @@ void Dragon::Update(float deltaTime)
 		Vector3 rotateDir = rotatePos - transComp.GetWorldPosition();
 		Vec3Normalize(&rotateDir, &rotateDir);
 		transComp.LookDirection(-rotateDir, _rotateSpeed / 8);
+		_flyCount--;
+		if (_flyCount < 0)
+		{
+			_flyCount = _flyTime;
+			SOUNDMANAGER->Play3D("dragon_wing", transComp.GetWorldPosition());
+		}
 	}
 	break;
 	case DRAGONSTATE_FLY_ROUND:
@@ -299,6 +339,12 @@ void Dragon::Update(float deltaTime)
 			}
 		}
 		transComp.SetWorldPosition(transComp.GetWorldPosition() - transComp.GetForward()*_speed*deltaTime);
+		_flyCount--;
+		if (_flyCount < 0)
+		{
+			_flyCount = _flyTime;
+			SOUNDMANAGER->Play3D("dragon_wing", transComp.GetWorldPosition());
+		}
 	}
 	break;
 	case DRAGONSTATE_FLY_TRACE:
@@ -320,6 +366,13 @@ void Dragon::Update(float deltaTime)
 			_state = DRAGONSTATE_DEFAULT;
 			_anim = DRAGONANIMSTATE_FLY_ATK;
 			this->QueueAction(DRAGON_ANIM(DRAGON_FLY_ATTACK));
+			SOUNDMANAGER->Play3D("dragon_atk", transComp.GetWorldPosition());
+		}
+		_flyCount-=2;
+		if (_flyCount < 0)
+		{
+			_flyCount = _flyTime;
+			SOUNDMANAGER->Play3D("dragon_wing", transComp.GetWorldPosition());
 		}
 	}
 	break;
@@ -340,9 +393,17 @@ void Dragon::Update(float deltaTime)
 			_pattern = DRAGONPATTERNSTATE_GROUND;
 			_state = DRAGONSTATE_START_BREATH;
 			this->QueueAction(DRAGON_ANIM(DRAGON_IDLE));
+			_flyCount = 20;
 		}
 
 		transComp.SetWorldPosition(transComp.GetWorldPosition() + direction * _speed * deltaTime);
+
+		_flyCount--;
+		if (_flyCount < 0)
+		{
+			_flyCount = _flyTime;
+			SOUNDMANAGER->Play3D("dragon_wing", transComp.GetWorldPosition());
+		}
 	}
 	break;
 	case DRAGONSTATE_START_BREATH:
@@ -362,6 +423,7 @@ void Dragon::Update(float deltaTime)
 			EventChannel channel;
 			channel.Broadcast<GameObjectFactory::CreateCharge>(
 				GameObjectFactory::CreateCharge(transComp.GetWorldPosition() - transComp.GetForward()*4.0f + Vector3(0, 1, 0), 10.0f, Vector3(0, 0, 0)));
+			SOUNDMANAGER->Play3D("dragon_charge", transComp.GetWorldPosition());
 		}
 		if (_breathReadyCount <= 0)
 		{
@@ -384,6 +446,7 @@ void Dragon::Update(float deltaTime)
 				GameObjectFactory::CreateDragonBreath(transComp.GetWorldPosition() - transComp.GetForward()*6.0f + Vector3(0, 1, 0), 10.0f, transComp.GetForward()));
 			channel.Broadcast<GameObjectFactory::DamageBoxEvent>(GameObjectFactory::DamageBoxEvent(transComp.GetWorldPosition(),
 				Vector3(3.0f, 2.0f, 3.0f), 10.0f, CollisionComponent::TRIGGER_TYPE_ENEMY_DMGBOX, direction *30, Vector3(0, 0, 0), 3.0f));
+			SOUNDMANAGER->Play3D("dragon_BreathFire", transComp.GetWorldPosition());
 		}
 		if (_breathCount < 0)
 		{
@@ -465,6 +528,10 @@ void Dragon::Update(float deltaTime)
 				//회전을 위한 좌표
 				_escapePoint = -_playerPos;
 			}
+			else
+			{
+				SOUNDMANAGER->Play3D("dragon_bite", transComp.GetWorldPosition());
+			}
 		}
 	}
 	break;
@@ -518,6 +585,7 @@ void Dragon::Update(float deltaTime)
 				Vector3 direction = _playerPos - _escapePoint;
 				Vec3Normalize(&direction, &direction);
 				_escapePoint = transComp.GetWorldPosition() - direction * 50.0f;
+				SOUNDMANAGER->Play3D("dragon_atk", transComp.GetWorldPosition());
 				break;
 			}
 		}
@@ -556,6 +624,7 @@ void Dragon::Update(float deltaTime)
 
 		if (_flyAtkCount < 0)
 		{
+			_flyCount = 20;
 			_flyAtkCount = _flyAtkTime;
 			_flyAtkNumCount--;
 			if (_flyAtkNumCount == 0)
@@ -639,7 +708,8 @@ void Dragon::Handle(const CollisionSystem::ActorTriggerEvent & event)
 
 		if (!_isHurt)
 		{
-			_hp -= 50;
+			PlayPlayerAttackSound(collision._dmg, _playerSwordPos);
+			_hp -= collision._dmg;
 			if (_hp <= 0)
 			{
 				_isDie = true;

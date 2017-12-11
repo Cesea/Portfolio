@@ -407,6 +407,23 @@ void MainMenuScene::LoadSoundResources()
 
 	_loading.LoadSoundResources("turtle_walk_right", 
 		"../resources/sfx/Turtle/turtle_walk_right.wav", false, false, 4.0f, 13.0f);
+#pragma region Dragon
+	_loading.LoadSoundResources("dragon_atk",
+		"../resources/sfx/Dragon/dragon_atk.mp3", false, false, 4.0f, 13.0f);
+	_loading.LoadSoundResources("dragon_bite",
+		"../resources/sfx/Dragon/dragon_bite.mp3", false, false, 4.0f, 13.0f);
+
+	_loading.LoadSoundResources("dragon_BreathFire",
+		"../resources/sfx/Dragon/dragon_BreathFire.mp3", false, false, 4.0f, 13.0f);
+	_loading.LoadSoundResources("dragon_charge",
+		"../resources/sfx/Dragon/dragon_charge.mp3", false, false, 4.0f, 13.0f);
+
+	_loading.LoadSoundResources("dragon_roar",
+		"../resources/sfx/Dragon/dragon_roar.mp3", false, false, 4.0f, 13.0f);
+	_loading.LoadSoundResources("dragon_step",
+		"../resources/sfx/Dragon/dragon_step.mp3", false, false, 4.0f, 13.0f);
+	_loading.LoadSoundResources("dragon_wing",
+		"../resources/sfx/Dragon/dragon_wing.mp3", false, false, 4.0f, 13.0f);
 #pragma endregion
 
 }
