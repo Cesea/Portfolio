@@ -101,6 +101,26 @@ public :
 
 	void Synthesis(void);
 
+	struct ItemCollectEvent
+	{
+		ItemCollectEvent(itemType type, int32 val)
+			:_type(type), _val(val)
+		{ }
+		itemType _type;
+		int32 _val;
+	};
+	void Handle(const ItemCollectEvent &event);
+
+	struct UseItemEvent
+	{
+		UseItemEvent(itemType type, int32 val)
+			:_type(type), _val(val)
+		{
+		}
+		itemType _type;
+		int32 _val;
+	};
+	void Handle(const UseItemEvent &event);
 protected :
 
 };

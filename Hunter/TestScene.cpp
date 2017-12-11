@@ -15,14 +15,16 @@ bool TestScene::SceneInit()
 
 	TERRAIN->SetScene(this);
 	TERRAIN->Create(config, false);
-	TERRAIN->LoadTerrain("../resources/TestScene/Terrain05.tr", false);
+	//TERRAIN->LoadTerrain("../resources/TestScene/Terrain05.tr", false);
+	TERRAIN->LoadTerrain("../resources/TestScene/Mush.tr", false);
 
 	//라이트 생성
 	_pMainLight->SetWorldPosition(Vector3(0.0f, 5.0f, 5.0f));
 	_pMainLight->SetTarget(Vector3(0.0f, 0.0f, 0.0f));
 
 	_pEnvironmentSphere->Create("../resources/Textures/grassenvmap1024.dds");
-	this->CreateObjectFromFile("../resources/TestScene/Terrain05.ed");
+	//this->CreateObjectFromFile("../resources/TestScene/Terrain05.ed");
+	this->CreateObjectFromFile("../resources/TestScene/Mush.ed");
 
 	//카메라 생성
 	_camera.SetMoveSpeed(6.0f);
@@ -81,7 +83,7 @@ bool TestScene::SceneRender0()
 	TERRAIN->Render(_camera, *_pMainLight, _camera);
 	_renderSystem.Render(_camera);
 	_particleSystem.render();
-	//_collisionSystem.render();
+	_collisionSystem.render();
 
 	return true;
 }

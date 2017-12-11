@@ -146,6 +146,7 @@ void Turtle::Update(float deltaTime)
 				if (_patrolIndex > _moveSegment.size() - 1) _patrolIndex = 0;
 				//IDLE 애니메이션 실행
 				this->QueueAction(TURTLE_ANIM(TURTLE_ANIMATION_ENUM::TURTLE_STAND));
+				_state = TURTLESTATE_STAND;
 			}
 			//아니면 이동속도만큼 이동
 			else

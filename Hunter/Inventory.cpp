@@ -3,6 +3,8 @@
 
 Inventory::Inventory()
 {
+	EventChannel channel;
+	channel.Add<Inventory::ItemCollectEvent, Inventory>(*this);
 	_invenOn = false;
 
 	video::TextureHandle invenHandle = VIDEO->CreateTexture("../resources/Textures/UITexture/inven.png", "../resources/Textures/UITexture/inven.png");
@@ -993,4 +995,14 @@ void Inventory::Synthesis(void)
 			}
 		}
 	}
+}
+
+void Inventory::Handle(const ItemCollectEvent & event)
+{
+	Additem(event._type, event._val);
+}
+
+void Inventory::Handle(const UseItemEvent & event)
+{
+	DropItem(event._type, event._val);
 }

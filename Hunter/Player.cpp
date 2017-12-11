@@ -5,6 +5,8 @@
 
 #include "DamageBox.h"
 
+#include "Inventory.h"
+
 #define MAX_COMBO_COUNT 3
 
 
@@ -106,7 +108,7 @@ bool Player::CreateFromWorld(World & world, const Vector3 &pos)
    _keyConfig._left = 'A';
    _keyConfig._right = 'D';
 
-   _currentHP = 1000;
+   _currentHP = 500;
    _currentFury = 100;
 
    return true;
@@ -244,14 +246,20 @@ void Player::Update(float deltaTime)
    _prevCommand = _currentCommand;
    _currentCommand.Reset();
 
+   _pTransformComp->UpdateTransform();
+
    TransformComponent &refDamageTrans = _pDamageBox->GetEntity().GetComponent<TransformComponent>();
    //Console::Log("%d\n", (int32)_pDamageBox->GetEntity().GetComponent<CollisionComponent>()._valid);
    _worldSwordPos = refDamageTrans.GetWorldPosition();
+
    Matrix forwardTrans;
-   MatrixTranslation(&forwardTrans, -30.0f, 10.0f, 0.0f);
+   MatrixTranslation(&forwardTrans, 0.0f, 0.0f, -80.0f);
+   Matrix scale;
+   MatrixScaling(&scale, 0.4, 0.4, 0.4);
+   MatrixMultiply(&forwardTrans, &forwardTrans, &scale);
+
    MatrixMultiply(&forwardTrans,  &forwardTrans,  &_pSwordFrame->CombinedTransformationMatrix);
    Vec3TransformCoord(&_worldSwordPos, &_worldSwordPos, &forwardTrans);
-
    refDamageTrans.SetWorldPosition(_worldSwordPos);
 
    _channel.Broadcast<PlayerImformationEvent>(
@@ -269,6 +277,8 @@ void Player::RegisterEvents()
 
 	channel.Add<CollisionSystem::ActorTriggerEvent, Player>(*this);
 	channel.Add<CollisionSystem::ObjectTriggerEvent, Player>(*this);
+
+	channel.Add<Player::PlayerHealEvent, Player>(*this);
 }
 
 void Player::UnRegisterEvents()
@@ -281,6 +291,8 @@ void Player::UnRegisterEvents()
 
 	channel.Remove <CollisionSystem::ActorTriggerEvent, Player>(*this);
 	channel.Remove<CollisionSystem::ObjectTriggerEvent, Player>(*this);
+
+	channel.Remove<Player::PlayerHealEvent, Player>(*this);
 }
 
 void Player::MoveAndRotate(float deltaTime)
@@ -440,11 +452,19 @@ void Player::Handle(const InputManager::KeyDownEvent & event)
       _currentCommand._type = GAMECOMMAND_MOVE;
       _currentCommand._movement._vertical = VERTICAL_MOVEMENT_DOWN;
    }
+
+ 
 }
 
 void Player::Handle(const InputManager::KeyPressedEvent & event)
 {
    uint32 inputCode = event.code;
+
+   if (inputCode == 'E')
+   {
+      _currentCommand._type = GAMECOMMAND_ACTION;
+	  _currentCommand._behavior._type = BEHAVIOR_SKILL;
+   }
 
    if(_keyConfig._left == inputCode)
    {
@@ -1075,10 +1095,38 @@ void Player::Handle(const CollisionSystem::ObjectTriggerEvent & event)
 {
 	if (event._entity2 != _entity) return;
 
+	if (false == _found)
+	{
+		_found = true;
+		SOUNDMANAGER->Play("findSound");
+	}
 
-	//버섯 엔티티 지우기
+	if (_found)
+	{
+		//버섯 엔티티 지우기
+		if (_prevCommand._behavior._type == BEHAVIOR_SKILL)
+		{
+			Entity entityCopy = event._entity1;
 
-	//키누르면 획득
+			EventChannel channel;
+			video::StaticXMeshHandle handle = entityCopy.GetComponent<RenderComponent>()._static;
+			if (handle == VIDEO->GetStaticXMesh("Mushroom01"))
+			{
+				channel.Broadcast<Inventory::ItemCollectEvent>(Inventory::ItemCollectEvent(itemType::mush1, 1));
+			}
+			else if (handle == VIDEO->GetStaticXMesh("Mushroom02"))
+			{
+				channel.Broadcast<Inventory::ItemCollectEvent>(Inventory::ItemCollectEvent(itemType::mush2, 1));
+			}
+			else if (handle == VIDEO->GetStaticXMesh("Mushroom03"))
+			{
+				channel.Broadcast<Inventory::ItemCollectEvent>(Inventory::ItemCollectEvent(itemType::mush3, 1));
+			}
+			entityCopy.Kill();
+			_found = false;
+			//키누르면 획득
+		}
+	}
 }
 
 void Player::QueueAction(Action & action, bool cancle)

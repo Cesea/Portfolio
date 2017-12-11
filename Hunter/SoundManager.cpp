@@ -137,7 +137,6 @@ void SoundManager::Play(const std::string & keyName)
 		if (keyName == iter->first)
 		{
 			//사운드 플레이~~~
-			_channel[count]->set3DAttributes(&_pos, &_vel);
 			_system->playSound(FMOD_CHANNEL_FREE, 
 				*iter->second, false, &_channel[count]);
 		}
@@ -177,9 +176,10 @@ void SoundManager::Play3D(const std::string & keyName, const Vector3 & pos)
 		if (keyName == iter->first)
 		{
 			//사운드 플레이~~~
-			_channel[count]->set3DAttributes(&p, &_vel);
 			_system->playSound(FMOD_CHANNEL_FREE, 
 				*iter->second, false, &_channel[count]);
+
+			_channel[count]->set3DAttributes(&p, &_vel);
 		}
 	}
 }
@@ -199,9 +199,9 @@ void SoundManager::Play3D(const std::string & keyName, const Vector3 & pos, floa
 		if (keyName == iter->first)
 		{
 			//사운드 플레이~~~
-			_channel[count]->set3DAttributes(&p, &_vel);
 			_system->playSound(FMOD_CHANNEL_FREE, 
 				*iter->second, false, &_channel[count]);
+			_channel[count]->set3DAttributes(&p, &_vel);
 			_channel[count]->setVolume(volume);
 		}
 	}

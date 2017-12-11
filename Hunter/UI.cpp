@@ -220,6 +220,15 @@ void UI::Update(float deltaTime, const InputManager & input)
 
 	_inventory->Update(deltaTime, input);
 
+	if (input.keyboard.IsPressed('1'))
+	{
+		EventChannel channel;
+		channel.Broadcast<Player::PlayerHealEvent>(Player::PlayerHealEvent(40));
+		_inventory->DropItem(itemType::potion1, 1);
+		//_inventory->DropItem(itemType::potion2, 1);
+		//_inventory->DropItem(itemType::potion3, 1);
+	}
+
 	//if (input.keyboard.IsReleased('1'))
 	//{
 	//	_inventory->Additem(mush1, 1);

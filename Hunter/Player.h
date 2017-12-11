@@ -147,6 +147,8 @@ private :
 
 	StopWatch _deadTimer;
 
+	bool32 _found{ false };
+
 public :
 
 	struct PlayerImformationEvent
@@ -163,6 +165,20 @@ public :
 		Vector3 _forward;
 		Vector3 _swordPos;
 	};
+
+	struct PlayerHealEvent
+	{
+		PlayerHealEvent(int32 val)
+			:_val(val)
+		{}
+
+		int32 _val;
+	};
+	void Handle(const PlayerHealEvent &event)
+	{
+		_currentHP += event._val;
+		ClampInt(_currentHP, 0, _maxHP);
+	}
 
 };
 
