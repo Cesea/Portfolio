@@ -243,6 +243,9 @@ void MainMenuScene::LoadSoundResources()
 	_loading.LoadSoundResources("findSound",
 		"../resources/sfx/findSound.mp3", false, false);
 
+	_loading.LoadSoundResources("boss_bgm",
+		"../resources/sfx/bgm_ep10_ancient_dragon_2.mp3", false, false);
+
 #pragma region Player 
 	_loading.LoadSoundResources("player_walk_left", 
 		"../resources/sfx/Player/Walk/player_dirt_walk_armorlight_01.wav", false, false, 20.0f, 10000.0f);

@@ -10,6 +10,25 @@
 #define MAX_COMBO_COUNT 3
 
 
+Vector3 rotateVector(const Vector3 &vec, float angle)
+{
+	Matrix matVec;
+	MatrixTranslation(&matVec, vec.x, vec.y, vec.z);
+
+	Matrix matRotate;
+	MatrixRotationY(&matRotate, angle);
+
+	Matrix matFinal =  matVec * matRotate;
+
+	Vector3 finalVec;
+	Vector3 t;
+	Vec3TransformCoord(&finalVec, &t, &matFinal);
+
+	return finalVec;
+}
+
+
+
 Player::Player()
 {
 }
@@ -71,7 +90,6 @@ bool Player::CreateFromWorld(World & world, const Vector3 &pos)
    _channel.Broadcast<GameObjectFactory::ObjectCreatedEvent>(
 	   GameObjectFactory::ObjectCreatedEvent(ARCHE_HERO, _entity, transComp.GetWorldPosition()));
 
-
    _pSwordFrame = (Bone *)D3DXFrameFind(pAnimation->_pSkinnedMesh->_pRootBone, "_1H_sword01");
    if (_pSwordFrame  &&
 	   _pSwordFrame->pMeshContainer)
@@ -83,6 +101,7 @@ bool Player::CreateFromWorld(World & world, const Vector3 &pos)
 	   CollisionComponent &damageCollision = _pDamageBox->GetEntity().GetComponent<CollisionComponent>();
 
 	   transComp.AddChild(&damageTrans);
+	   damageTrans.SetLocalPosition(0, 0, 1.5);
 
 	   damageCollision._triggerType = CollisionComponent::TRIGGER_TYPE::TRIGGER_TYPE_PLAYER_DMGBOX;
 	   damageCollision._duration = 100000.0f;
@@ -249,18 +268,11 @@ void Player::Update(float deltaTime)
    _pTransformComp->UpdateTransform();
 
    TransformComponent &refDamageTrans = _pDamageBox->GetEntity().GetComponent<TransformComponent>();
-   //Console::Log("%d\n", (int32)_pDamageBox->GetEntity().GetComponent<CollisionComponent>()._valid);
-   _worldSwordPos = refDamageTrans.GetWorldPosition();
-
-   Matrix forwardTrans;
-   MatrixTranslation(&forwardTrans, 0.0f, 0.0f, -80.0f);
-   Matrix scale;
-   MatrixScaling(&scale, 0.4, 0.4, 0.4);
-   MatrixMultiply(&forwardTrans, &forwardTrans, &scale);
-
-   MatrixMultiply(&forwardTrans,  &forwardTrans,  &_pSwordFrame->CombinedTransformationMatrix);
-   Vec3TransformCoord(&_worldSwordPos, &_worldSwordPos, &forwardTrans);
-   refDamageTrans.SetWorldPosition(_worldSwordPos);
+   Vector3 forwardRandom = _pTransformComp->GetForward();
+   forwardRandom = rotateVector(forwardRandom, RandFloat(-0.35f, 0.35f));
+   forwardRandom.y += RandFloat(1.0f, 1.4f);
+   Vec3Normalize(&forwardRandom, &forwardRandom);
+   _worldSwordPos = _pTransformComp->GetWorldPosition() + forwardRandom;
 
    _channel.Broadcast<PlayerImformationEvent>(
 	   PlayerImformationEvent(_pTransformComp->GetWorldPosition(), _state, _pTransformComp->GetForward(), _worldSwordPos));
@@ -1072,16 +1084,16 @@ void Player::Handle(const CollisionSystem::ActorTriggerEvent & event)
 			_currentHP -= 100.0f;
 			_inCombat = true;
 			_superArmor = true;
-			if (_currentHP > 0)
+			//if (_currentHP > 0)
 			{
 				this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWarTakingHit), true);
 			}
-			else
-			{
-				_state = PLAYERSTATE_DEAD;
-				this->_pActionComp->_actionQueue.ClearQueue();
-				this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWarDying), true);
-			}
+			//else
+			//{
+			//	_state = PLAYERSTATE_DEAD;
+			//	this->_pActionComp->_actionQueue.ClearQueue();
+			//	this->QueueAction(PLAYER_ANIM(PlayerAnimationEnum::eWarDying), true);
+			//}
 		}
 	} break;
 	//오브젝트와 충돌했다
