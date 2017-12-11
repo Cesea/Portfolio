@@ -268,6 +268,7 @@ void Player::RegisterEvents()
 	channel.Add<InputManager::MousePressedEvent, Player>(*this);
 
 	channel.Add<CollisionSystem::ActorTriggerEvent, Player>(*this);
+	channel.Add<CollisionSystem::ObjectTriggerEvent, Player>(*this);
 }
 
 void Player::UnRegisterEvents()
@@ -279,6 +280,7 @@ void Player::UnRegisterEvents()
 	channel.Remove <InputManager::MousePressedEvent, Player>(*this);
 
 	channel.Remove <CollisionSystem::ActorTriggerEvent, Player>(*this);
+	channel.Remove<CollisionSystem::ObjectTriggerEvent, Player>(*this);
 }
 
 void Player::MoveAndRotate(float deltaTime)
@@ -1067,6 +1069,16 @@ void Player::Handle(const CollisionSystem::ActorTriggerEvent & event)
 	{
 	} break;
 	}
+}
+
+void Player::Handle(const CollisionSystem::ObjectTriggerEvent & event)
+{
+	if (event._entity2 != _entity) return;
+
+
+	//버섯 엔티티 지우기
+
+	//키누르면 획득
 }
 
 void Player::QueueAction(Action & action, bool cancle)
