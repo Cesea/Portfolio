@@ -21,7 +21,7 @@ bool Snake::CreateFromWorld(World & world, const Vector3 &Pos)
 
 	RenderComponent &renderComp = _entity.AddComponent<RenderComponent>();
 	renderComp._type = RenderComponent::Type::eSkinned;
-	int a = RandInt(3);
+	int a = 0;
 	switch (a)
 	{
 	case 0:

@@ -28,6 +28,8 @@ public:
 protected :
 	UI *_pInGameUI;
 
+	bool _colRender{ false };
+
 public:
 };
 

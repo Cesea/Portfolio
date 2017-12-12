@@ -100,14 +100,14 @@ bool Player::CreateFromWorld(World & world, const Vector3 &pos)
 	   TransformComponent &damageTrans = _pDamageBox->GetEntity().GetComponent<TransformComponent>();
 	   CollisionComponent &damageCollision = _pDamageBox->GetEntity().GetComponent<CollisionComponent>();
 
-	   transComp.AddChild(&damageTrans);
-	   damageTrans.SetLocalPosition(0, 0, 1.5);
+	   //transComp.AddChild(&damageTrans);
+	   //damageTrans.SetLocalPosition(0, 0, 0.0);
 
 	   damageCollision._triggerType = CollisionComponent::TRIGGER_TYPE::TRIGGER_TYPE_PLAYER_DMGBOX;
 	   damageCollision._duration = 100000.0f;
 	   damageCollision._valid = false;
 
-	   float range = 0.8f;
+	   float range = 1.2f;
 
 	   damageCollision._boundingBox.Init(Vector3(-range, -range, -range), Vector3(range, range, range));
 	   damageCollision._dmg = PLAYER_ATTACK_ONE_DAMAGE;
@@ -268,6 +268,7 @@ void Player::Update(float deltaTime)
    _pTransformComp->UpdateTransform();
 
    TransformComponent &refDamageTrans = _pDamageBox->GetEntity().GetComponent<TransformComponent>();
+   refDamageTrans.SetWorldPosition(_pTransformComp->GetWorldPosition() + _pTransformComp->GetForward());
    Vector3 forwardRandom = _pTransformComp->GetForward();
    forwardRandom = rotateVector(forwardRandom, RandFloat(-0.35f, 0.35f));
    forwardRandom.y += RandFloat(1.0f, 1.4f);
